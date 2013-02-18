@@ -1,0 +1,17 @@
+.product-price {
+   font-weight: bold;
+   font-size: 14px;
+}
+
+.product-detail {
+   width: 200px;
+   float: right;
+}
+.left {
+   float: left;
+   clear: right;
+}
+.shop-product-attributes input.quantity {
+   width: 30px;
+}
+.right {float: right;}

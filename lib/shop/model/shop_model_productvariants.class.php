@@ -52,20 +52,19 @@ class Shop_Model_ProductVariants extends Model_ORM {
     * @param $variandsId -- pole s id variant
     * @return int
     */
-   public static function getVariantsPrice($variandsId)
+   public static function getVariantsPrice($variantsId)
    {
       $m = new self();
 
       $binds = array();
-      foreach ($variandsId as $id) {
+      foreach ($variantsId as $id) {
          $binds[':bind_'.$id] = (int)$id;
       }
 
       $rec = $m->columns(array('price' => 'SUM('.self::COLUMN_PRICE_ADD.')'))
          ->where(self::COLUMN_ID." IN (".implode(",", array_keys($binds)).")", $binds)
+         ->groupBy(self::COLUMN_ID_PRODUCT)
          ->record();
       return $rec ? $rec->price : 0;
    }
 }
-
-?>

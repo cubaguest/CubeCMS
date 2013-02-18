@@ -239,7 +239,7 @@ abstract class Shop_Product_Controller extends Controller {
       if($urlKey == null){
          $urlKey = $this->getRequest('urlkey');
       }
-      
+
       $model = new Shop_Model_Product();
 
       $combBind = array();
@@ -264,7 +264,7 @@ abstract class Shop_Product_Controller extends Controller {
             . $combWhereString,
             array_merge( array('idc' => $this->category()->getId(), 'ukey' => $urlKey), $combBind )
       );
-      
+
       $product = $model->record();
       // pokud má produkt kombinace, načteme je
       if(isset($product->{Shop_Model_ProductCombinations::COLUMN_ID})
@@ -302,6 +302,9 @@ abstract class Shop_Product_Controller extends Controller {
         $eCat->setOptions(array((string)$c->{Model_Category::COLUMN_NAME} => $c->getPK()), true);
       }
       $eCat->setValues($this->category()->getId());
+      if($this->getRequestParam('idc', false)){
+         $eCat->setValues((int)$this->getRequestParam('idc'));
+      }
       $form->addElement($eCat, $fGrpInfo);
 
       $eWeight = new Form_Element_Text('weight', $this->tr('Hmotnost'));
@@ -456,12 +459,13 @@ abstract class Shop_Product_Controller extends Controller {
    public function editProduct($product = null)
    {
       $model = new Shop_Model_Product();
+      $model->joinFK(Shop_Model_Product::COLUMN_ID_TAX);
       if($product instanceof Model_ORM_Record){
-         $product = $model->newRecord();
+//         $product = $model->newRecord();
+      } else if(is_int($product)){
+         $product = $model->record($product);
       } else if(is_string($product)){
-         $model->joinFK(Shop_Model_Product::COLUMN_ID_TAX)
-            ->where(Shop_Model_Product::COLUMN_URLKEY.' = :ukey ', array('ukey' => $product)
-         );
+         $model->where(Shop_Model_Product::COLUMN_URLKEY.' = :ukey ', array('ukey' => $product));
          $product = $model->record();
       } else {
          $product = $model->newRecord();
@@ -537,13 +541,13 @@ abstract class Shop_Product_Controller extends Controller {
    {
       $model = new Shop_Model_Product();
       $modelProductVariants = new Shop_Model_ProductVariants();
+      $model->joinFK(Shop_Model_Product::COLUMN_ID_TAX);
       if($product instanceof Model_ORM_Record){
 //         $product = $model->newRecord();
+      } else if(is_int($product)){
+         $product = $model->where(Shop_Model_Product::COLUMN_ID.' = :id', array('id' => $product))->record();
       } else if(is_string($product)){
-         $model->joinFK(Shop_Model_Product::COLUMN_ID_TAX)
-            ->where(Shop_Model_Product::COLUMN_URLKEY.' = :ukey ', array('ukey' => $product)
-         );
-         $product = $model->record();
+         $product = $model->where(Shop_Model_Product::COLUMN_URLKEY.' = :ukey ', array('ukey' => $product))->record();
       } else {
          $product = $model->newRecord();
       }
@@ -554,10 +558,10 @@ abstract class Shop_Product_Controller extends Controller {
       }
 
       // delete variant
-      if($this->getRequestParam('dc', false)){
+      if($this->getRequestParam('deleteComb', false)){
          // smazání kombinací a propojneí s atributy
-         $variant = $modelProductVariants->record($this->getRequestParam('dc', 0));
-
+         $variant = $modelProductVariants->record($this->getRequestParam('deleteComb', 0));
+         var_dump($_GET);flush();
          if($variant){
             $modelCombinationHasVariant = new Shop_Model_ProductCombinationHasVariant();
             $modelCombinations = new Shop_Model_ProductCombinations();
@@ -672,7 +676,10 @@ abstract class Shop_Product_Controller extends Controller {
                array(Shop_Model_ProductCombinationHasVariant::COLUMN_ID_COMBINATION))
          ->groupBy(Shop_Model_ProductVariants::COLUMN_ID)
          ->where(Shop_Model_ProductVariants::COLUMN_ID_PRODUCT." = :idp", array('idp' => $product->{Shop_Model_Product::COLUMN_ID}))
-         ->order(array('prattr.'.Shop_Model_Attributes::COLUMN_ID_GROUP => Model_ORM::ORDER_ASC, Shop_Model_Attributes::COLUMN_NAME => Model_ORM::ORDER_ASC))
+         ->order(array(
+            'prattr.'.Shop_Model_Attributes::COLUMN_ID_GROUP => Model_ORM::ORDER_ASC,
+            Shop_Model_Attributes::COLUMN_ORDER => Model_ORM::ORDER_ASC,
+      ))
          ->records();
 
       $this->view()->productVarinats = $productVariants;
@@ -694,7 +701,7 @@ abstract class Shop_Product_Controller extends Controller {
       $modelVariantsGrps = new Shop_Model_AttributesGroups();
       $variants = $modelVariants
          ->joinFK(Shop_Model_Attributes::COLUMN_ID_GROUP)
-         ->order(array( Shop_Model_AttributesGroups::COLUMN_NAME, Shop_Model_Attributes::COLUMN_NAME))
+         ->order(array( Shop_Model_AttributesGroups::COLUMN_ORDER, Shop_Model_Attributes::COLUMN_ORDER))
          ->records();
 
       // form přidání atributů
@@ -888,46 +895,57 @@ abstract class Shop_Product_Controller extends Controller {
       $this->view()->productCombinations = $productCombinations;
    }
 
-   public function processDeleteProduct(Model_ORM_Record $product)
+   protected function formDeleteProduct($product)
    {
       if(!$this->rights()->isWritable()){ return; }
       $formDelete = new Form('product_delete_', true);
-      
+
+
       $eId = new Form_Element_Hidden('id');
       $eId->setValues($product->{Shop_Model_Product::COLUMN_ID});
 
       $formDelete->addElement($eId);
-      
+
       $eDel = new Form_Element_Submit('del', $this->tr('Smazat'));
       $formDelete->addElement($eDel);
-      
+
       if($formDelete->isValid()){
-         $model = new Shop_Model_Product();
-         $product = $model->record($formDelete->id->getValues());
-         
-         // image
-         if($product->{Shop_Model_Product::COLUMN_IMAGE} != null){
-            if(is_file(Shop_Tools::getProductImagesDir().'small'.DIRECTORY_SEPARATOR.$product->{Shop_Model_Product::COLUMN_IMAGE})
-              && is_writable(Shop_Tools::getProductImagesDir().'small'.DIRECTORY_SEPARATOR.$product->{Shop_Model_Product::COLUMN_IMAGE})){
-                  @unlink(Shop_Tools::getProductImagesDir().'small'.DIRECTORY_SEPARATOR.$product->{Shop_Model_Product::COLUMN_IMAGE});
-            }
-            if(is_file(Shop_Tools::getProductImagesDir().DIRECTORY_SEPARATOR.$product->{Shop_Model_Product::COLUMN_IMAGE})
-               && is_writable(Shop_Tools::getProductImagesDir().DIRECTORY_SEPARATOR.$product->{Shop_Model_Product::COLUMN_IMAGE})){
-                  @unlink(Shop_Tools::getProductImagesDir().DIRECTORY_SEPARATOR.$product->{Shop_Model_Product::COLUMN_IMAGE});
-            }
-         }
-         $model->delete($product);
-
-         // @todo smazat kombinace, varinaty a propojení
-
+         $this->processDeleteProduct($formDelete->id->getValues());
          $this->infoMsg()->addMessage(sprintf($this->tr('Produkt %s byl smazán'), $product->{Shop_Model_Product::COLUMN_NAME} ));
          $this->link()->route()->reload();
       }
-      
+
       $this->view()->formDelete = $formDelete;
    }
 
-   public function processDuplicateProduct(Model_ORM_Record $product)
+   public function processDeleteProduct(Model_ORM_Record $product)
+   {
+      $model = new Shop_Model_Product();
+      if($product instanceof Model_ORM_Record){
+      } else if(is_int($product)){
+         $product = $model->record($product);
+      }
+
+      if(!$product){
+         return;
+      }
+
+      // image
+      if($product->{Shop_Model_Product::COLUMN_IMAGE} != null){
+         if(is_file(Shop_Tools::getProductImagesDir().'small'.DIRECTORY_SEPARATOR.$product->{Shop_Model_Product::COLUMN_IMAGE})
+           && is_writable(Shop_Tools::getProductImagesDir().'small'.DIRECTORY_SEPARATOR.$product->{Shop_Model_Product::COLUMN_IMAGE})){
+               @unlink(Shop_Tools::getProductImagesDir().'small'.DIRECTORY_SEPARATOR.$product->{Shop_Model_Product::COLUMN_IMAGE});
+         }
+         if(is_file(Shop_Tools::getProductImagesDir().DIRECTORY_SEPARATOR.$product->{Shop_Model_Product::COLUMN_IMAGE})
+            && is_writable(Shop_Tools::getProductImagesDir().DIRECTORY_SEPARATOR.$product->{Shop_Model_Product::COLUMN_IMAGE})){
+               @unlink(Shop_Tools::getProductImagesDir().DIRECTORY_SEPARATOR.$product->{Shop_Model_Product::COLUMN_IMAGE});
+         }
+      }
+      $model->delete($product);
+      // @todo smazat kombinace, varinaty a propojení
+   }
+
+   protected function formDupliacateProduct(Model_ORM_Record $product)
    {
       if(!$this->rights()->isWritable()){ return; }
       $formDuplicate = new Form('product_duplicate_', true);
@@ -941,68 +959,7 @@ abstract class Shop_Product_Controller extends Controller {
       $formDuplicate->addElement($eDel);
 
       if($formDuplicate->isValid()){
-         $model = new Shop_Model_Product();
-         // duplikace produktu
-//         $product = $model->record($formDuplicate->id->getValues());
-         $origId = $product->getPK();
-         $product->setNew();
-         $product->{Shop_Model_Product::COLUMN_ACTIVE} = false;
-         $product->{Shop_Model_Product::COLUMN_NAME} = $this->tr('Kopie')." ".$product->{Shop_Model_Product::COLUMN_NAME};
-         $product->save();
-
-         // duplikace varinat
-         $modelVariants = new Shop_Model_ProductVariants();
-         $variants = $modelVariants->where(Shop_Model_ProductVariants::COLUMN_ID_PRODUCT." = :idp", array('idp' => $origId))->records();
-
-         $createdCombinations = array(); // pole s ID starých a nových kombinací 'oldid' => 'newid'
-         if($variants){
-            foreach ($variants as $variant){
-               // duplikace varianty
-               $oldVariantId = $variant->getPK();
-               $variant->setNew();
-               $variant->{Shop_Model_ProductVariants::COLUMN_ID_PRODUCT} = $product->getPK();
-               $variant->save();
-
-               // načtou se propojení s kombinacemi
-               $modelCombVariant = new Shop_Model_ProductCombinationHasVariant();
-               $combinationsHasVariants = $modelCombVariant
-                  ->where(Shop_Model_ProductCombinationHasVariant::COLUMN_ID_VARIANT." = :idv", array('idv' => $oldVariantId))
-                  ->records();
-               // projdou se propojení
-               foreach ($combinationsHasVariants as $combinationHasVariant) {
-                  // pokud nová kombinace ještě neexistuje tak se vytvoří
-                  $oldComId = $combinationHasVariant->{Shop_Model_ProductCombinationHasVariant::COLUMN_ID_COMBINATION};
-
-                  if(!isset($createdCombinations[$oldComId])){
-                     $modelCombination = new Shop_Model_ProductCombinations();
-                     $combination = $modelCombination->record($oldComId);
-                     $combination->setNew();
-                     $combination->{Shop_Model_ProductCombinations::COLUMN_ID_PRODUCT} = $product->getPK();
-                     $combination->save();
-                     // uložíme že kombinace je vytvořena
-                     $createdCombinations[$oldComId] = $combination->getPK();
-                  }
-
-                  // uložení propojení s novou kombinací
-                  $combVar = $modelCombVariant->newRecord();
-                  $combVar->{Shop_Model_ProductCombinationHasVariant::COLUMN_ID_COMBINATION} = $createdCombinations[$oldComId];
-                  $combVar->{Shop_Model_ProductCombinationHasVariant::COLUMN_ID_VARIANT} = $variant->getPK();
-                  $combVar->save();
-               }
-            }
-         }
-
-         // duplikace obrázku
-         $img = new File($product->{Shop_Model_Product::COLUMN_IMAGE}, self::getImagesDir());
-         if($img->exist()){
-            $img = $img->copy(self::getImagesDir(), true);
-            // kopie miniatury
-            $thumb = new File($product->{Shop_Model_Product::COLUMN_IMAGE}, self::getImagesDir()."small".DIRECTORY_SEPARATOR);
-            $thumb->copy(self::getImagesDir()."small".DIRECTORY_SEPARATOR, true);
-            // uložení nového názvu obrázku
-            $product->{Shop_Model_Product::COLUMN_IMAGE} = $img->getName();
-            $product->save();
-         }
+         $this->processDuplicateProduct($product);
 
          $this->infoMsg()->addMessage($this->tr('Produkt byl duplikován'));
          $this->link()->route('detail', array('urlkey' => $product->{Shop_Model_Product::COLUMN_URLKEY}))->redirect();
@@ -1011,7 +968,81 @@ abstract class Shop_Product_Controller extends Controller {
       $this->view()->formDuplicate = $formDuplicate;
    }
 
-   public function processChangeProductState(Model_ORM_Record $product)
+   public function processDuplicateProduct($product)
+   {
+      $model = new Shop_Model_Product();
+      if($product instanceof Model_ORM_Record){
+      } else if(is_int($product)){
+         $product = $model->record($product);
+      }
+
+      if(!$product){
+         return;
+      }
+
+      // duplikace produktu
+      $origId = $product->getPK();
+      $product->setNew();
+      $product->{Shop_Model_Product::COLUMN_ACTIVE} = false;
+      $product->{Shop_Model_Product::COLUMN_NAME} = $this->tr('Kopie')." ".$product->{Shop_Model_Product::COLUMN_NAME};
+      $product->save();
+
+      // duplikace varinat
+      $modelVariants = new Shop_Model_ProductVariants();
+      $variants = $modelVariants->where(Shop_Model_ProductVariants::COLUMN_ID_PRODUCT." = :idp", array('idp' => $origId))->records();
+
+      $createdCombinations = array(); // pole s ID starých a nových kombinací 'oldid' => 'newid'
+      if($variants){
+         foreach ($variants as $variant){
+            // duplikace varianty
+            $oldVariantId = $variant->getPK();
+            $variant->setNew();
+            $variant->{Shop_Model_ProductVariants::COLUMN_ID_PRODUCT} = $product->getPK();
+            $variant->save();
+
+            // načtou se propojení s kombinacemi
+            $modelCombVariant = new Shop_Model_ProductCombinationHasVariant();
+            $combinationsHasVariants = $modelCombVariant
+               ->where(Shop_Model_ProductCombinationHasVariant::COLUMN_ID_VARIANT." = :idv", array('idv' => $oldVariantId))
+               ->records();
+            // projdou se propojení
+            foreach ($combinationsHasVariants as $combinationHasVariant) {
+               // pokud nová kombinace ještě neexistuje tak se vytvoří
+               $oldComId = $combinationHasVariant->{Shop_Model_ProductCombinationHasVariant::COLUMN_ID_COMBINATION};
+
+               if(!isset($createdCombinations[$oldComId])){
+                  $modelCombination = new Shop_Model_ProductCombinations();
+                  $combination = $modelCombination->record($oldComId);
+                  $combination->setNew();
+                  $combination->{Shop_Model_ProductCombinations::COLUMN_ID_PRODUCT} = $product->getPK();
+                  $combination->save();
+                  // uložíme že kombinace je vytvořena
+                  $createdCombinations[$oldComId] = $combination->getPK();
+               }
+
+               // uložení propojení s novou kombinací
+               $combVar = $modelCombVariant->newRecord();
+               $combVar->{Shop_Model_ProductCombinationHasVariant::COLUMN_ID_COMBINATION} = $createdCombinations[$oldComId];
+               $combVar->{Shop_Model_ProductCombinationHasVariant::COLUMN_ID_VARIANT} = $variant->getPK();
+               $combVar->save();
+            }
+         }
+      }
+
+      // duplikace obrázku
+      $img = new File($product->{Shop_Model_Product::COLUMN_IMAGE}, self::getImagesDir());
+      if($img->exist()){
+         $img = $img->copy(self::getImagesDir(), true);
+         // kopie miniatury
+         $thumb = new File($product->{Shop_Model_Product::COLUMN_IMAGE}, self::getImagesDir()."small".DIRECTORY_SEPARATOR);
+         $thumb->copy(self::getImagesDir()."small".DIRECTORY_SEPARATOR, true);
+         // uložení nového názvu obrázku
+         $product->{Shop_Model_Product::COLUMN_IMAGE} = $img->getName();
+         $product->save();
+      }
+   }
+
+   protected function formChangeState(Model_ORM_Record $product)
    {
       $form = new Form('product_state_');
 
@@ -1023,24 +1054,37 @@ abstract class Shop_Product_Controller extends Controller {
       $form->addElement($elemChange);
 
       if($form->isValid()){
-         $product->{Shop_Model_Product::COLUMN_ACTIVE} = (bool)$form->state->getValues();
-         $product->save();
-
-         $product->{Shop_Model_Product::COLUMN_ACTIVE}
-            ? $this->infoMsg()->addMessage($this->tr('Produkt by aktivován'))
-            : $this->infoMsg()->addMessage($this->tr('Produkt by deaktivován'));
+         $this->processChangeProductState($product, !$product->{Shop_Model_Product::COLUMN_ACTIVE});
+         $this->infoMsg()->addMessage( $product->{Shop_Model_Product::COLUMN_ACTIVE}
+               ? $this->tr('Produkt by aktivován') : $this->tr('Produkt by deaktivován'));
          $this->link()->redirect();
       }
 
       $this->view()->formState = $form;
    }
 
+   public function processChangeProductState($product, $active = true)
+   {
+      $model = new Shop_Model_Product();
+      if($product instanceof Model_ORM_Record){
+      } else if(is_int($product)){
+         $product = $model->record($product);
+      }
+
+      if(!$product){
+         return;
+      }
+      $product->{Shop_Model_Product::COLUMN_ACTIVE} = $active;
+      $product->save();
+
+   }
+
    protected function editCompleteCallback(Model_ORM_Record $product)
    {
       $this->infoMsg()->addMessage($this->tr('Zboží bylo uloženo'));
 //      if($product->isNew()){
-      $pr = (new Shop_Model_Product())
-         ->joinFK(Shop_Model_Product::COLUMN_ID_CATEGORY, array('curlkey' => Model_Category::COLUMN_URLKEY))
+      $m = new Shop_Model_Product();
+      $pr = $m->joinFK(Shop_Model_Product::COLUMN_ID_CATEGORY, array('curlkey' => Model_Category::COLUMN_URLKEY))
          ->record($product->getPK());
 
       $this->link()

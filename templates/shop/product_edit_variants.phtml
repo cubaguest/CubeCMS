@@ -1,18 +1,16 @@
 <?
+$this->addFile('css://engine:shop/style.less');
+$this->addFile('js://engine:shop.js');
 $jq = new JsPlugin_JQuery();
-$jq->addUIDatepicker();
+$jq->addUIButton();
+$jq->addJQPlugin('cookie');
+$jq->addUITabs();
 $this->addJsPlugin($jq);
 // do titulku
-if($this->edit) {
-   $h = $this->tr('úprava produktu').' '.$this->product->{Shop_Model_Product::COLUMN_NAME};
-} else {
-   $h = $this->tr('přidání produktu');
-}
+$h = $this->tr('úprava variant produktu').' '.$this->product->{Shop_Model_Product::COLUMN_NAME};
+
 $this->addPageTitle($h);
 // donastavení formuláře
-$this->form->name->html()->setAttrib('size', 60)->addClass('form-element-long');
-$this->form->keywords->html()->setAttrib('size', 60)->addClass('form-element-long');
-$this->form->urlkey->html()->setAttrib('size', 60)->addClass('form-element-long');
 //$this->form->metaKeywords->html()->setAttrib('size', 60)->addClass('form-element-long');
 //$this->form->annotation->html()->setAttrib('cols', 58)->setAttrib('rows', 5);
 //$this->form->metaDesc->html()->setAttrib('cols', 58)->setAttrib('rows', 3);
@@ -21,49 +19,454 @@ $this->form->urlkey->html()->setAttrib('size', 60)->addClass('form-element-long'
 //$this->form->created_date->html()->addClass('datepicker');
 ?>
 <h1><?=$h;?></h1>
-<div class="main-content-form-edit" id="article-edit-form">
-   <?echo($this->form);
-   
-   $taxesPrint = array();
-   foreach($this->taxes as $tax){ 
-      $taxesPrint[(int)$tax->{Shop_Model_Tax::COLUMN_ID}] = (int)$tax->{Shop_Model_Tax::COLUMN_VALUE};
+<div class="main-content-form-edit">
+   <?php
+   if($this->moduleActionButtons == null){
+      $this->moduleButtons = array(
+         array(
+            'link' => $this->linkBack == null ? $this->link()->route('detail') : $this->linkBack,
+            'title' => $this->tr('Zavřít úpravu variant a přejít zpět na produkt'),
+            'icon' => 'go-left.png',
+            'name' => $this->tr('Zpět na produkt'),
+         ),
+      );
+   } else {
+      $this->moduleButtons = $this->moduleActionButtons;
    }
+   $this->includeTpl('modules/buttons.phtml', true);
    ?>
+</div>
+<div class="main-content-form-edit" id="products-variants-edit-content">
+   <ul>
+      <li><a href="<?=$this->link()?>#products-variants"><?=$this->tr('Tvorba variant')?></a></li>
+      <li><a href="<?=$this->link()?>#product-combinations"><?=$this->tr('Kombinace')?></a></li>
+      <li><a href="<?=$this->link()?>#product-code-edit"><?=$this->tr('Nastavení kódu produktu')?></a></li>
+   </ul>
+
+   <div id="products-variants" class="ui-table-widget">
+      <div class="">
+         <p>
+            <?printf($this->tr('Základní cena produktu: <strong>%s</strong> bez daně, s daní: <strong>%s</strong>'),
+            Shop_Tools::getPrice($this->product->{Shop_Model_Product::COLUMN_PRICE}), Shop_Tools::getPriceOfProduct($this->product) );
+            ?>
+         </p>
+         <?
+         $this->formEditVariants->html()->setAttrib('id', 'form-create-combinations');
+         echo($this->formEditVariants->renderStart());
+         ?>
+         <table id="products-variants-table" class="full-width variants-table">
+            <thead>
+               <tr class="ui-widget-header">
+                  <th colspan="2"><?=$this->tr('Varianty')?></th>
+                  <th><?=$this->tr('Výchozí')?></th>
+                  <th>
+                     <?=$this->tr('Cena varianty')?><br />
+                     <span class="font-small"><?=$this->tr('bez ceny produktu')?></span>
+                  </th>
+                  <th><?=$this->tr('Kód varianty')?></th>
+                  <th><?=$this->tr('Váha varianty')?></th>
+                  <th></th>
+               </tr>
+            </thead>
+            <tfoot>
+               <tr class="ui-widget-content">
+                  <td colspan="7" class="font-small">
+                     * - <?ps($this->tr('Pro tuto vlastnost nejsou vygenerovány kombinace. Nebude zobrazena ve výběru u produktu.'))?>
+                  </td>
+               </tr>
+               <tr>
+                  <td colspan="7">
+                     <div class="controls">
+                        <?
+                        if(!empty($this->productVarinats)){
+                           echo $this->formEditVariants->generatePrice->control();
+                           echo $this->formEditVariants->generatePrice->label(null, true);
+                           echo $this->formEditVariants->save->control();
+                        }
+                        ?>
+                     </div>
+                  </td>
+               </tr>
+            </tfoot>
+            <tbody>
+            <? if(!empty($this->productVarinats)){
+               $prevGroupId = null;
+               foreach($this->productVarinats as $variant){
+                  // kontrola nové varianty
+                  if($variant->{Shop_Model_Attributes::COLUMN_ID_GROUP} != $prevGroupId){
+                     $prevGroupId = $variant->{Shop_Model_Attributes::COLUMN_ID_GROUP};
+                     ?>
+                  <tr class="group-name ui-state-active">
+                     <td colspan="7">
+                        <?ps($variant->{Shop_Model_AttributesGroups::COLUMN_NAME})?>
+                        ID: <?=$variant->{Shop_Model_Attributes::COLUMN_ID_GROUP}?>
+                     </td>
+                  </tr>
+                     <?
+                  }
+               ?>
+               <tr id="variant-<?=$variant->getPK()?>"
+                   class="variant ui-state-default <?if($variant->{Shop_Model_ProductCombinationHasVariant::COLUMN_ID_COMBINATION} == null) echo "ui-state-active";?>">
+                  <td></td>
+                  <td><?
+                     ps($variant->{Shop_Model_Attributes::COLUMN_NAME});
+                     if($variant->{Shop_Model_ProductCombinationHasVariant::COLUMN_ID_COMBINATION} == null){
+                        echo " *";
+                     }
+                     ?></td>
+                  <td>
+                     <?
+                     $this->formEditVariants->default->setMultiple($variant->{Shop_Model_Attributes::COLUMN_ID_GROUP});
+                     $this->formEditVariants->default->setOptions(array($variant->{Shop_Model_ProductVariants::COLUMN_ID}));
+                     $this->formEditVariants->default->setRenderlabelInControl(false);
+                     echo $this->formEditVariants->default->control();
+                     ?>
+                  </td>
+                  <td>
+                     <table class="price-table">
+                        <tr>
+                           <td><?=$this->tr('Bez daně:')?></td>
+                           <td><?
+                              $this->formEditVariants->price->html()->addClass('price_without_tax');
+                              $this->formEditVariants->price->setMultiple($variant->{Shop_Model_ProductVariants::COLUMN_ID});
+                              $this->formEditVariants->price->setValues($variant->{Shop_Model_ProductVariants::COLUMN_PRICE_ADD});
+                              echo $this->formEditVariants->price->control()." ".VVE_SHOP_CURRENCY_NAME;
+                              ?></td>
+                        </tr>
+                        <tr>
+                           <td><?=$this->tr('S daní:')?></td>
+                           <td>
+                              <input type="text" class="product_variants_price_class price_with_tax"
+                                     value="<? echo Shop_Tools::getPrice(
+                                        $variant->{Shop_Model_ProductVariants::COLUMN_PRICE_ADD},
+                                        $this->product->{Shop_Model_Tax::COLUMN_VALUE}, false);?>"> <?=VVE_SHOP_CURRENCY_NAME?>
+                           </td>
+                        </tr>
+                     </table>
+                  </td>
+                  <td><?
+                     $this->formEditVariants->code->setMultiple($variant->{Shop_Model_ProductVariants::COLUMN_ID});
+                     $this->formEditVariants->code->setValues($variant->{Shop_Model_ProductVariants::COLUMN_CODE_ADD});
+                     echo $this->formEditVariants->code->control();
+                     ?></td>
+                  <td><?
+                     $this->formEditVariants->weight->setMultiple($variant->{Shop_Model_ProductVariants::COLUMN_ID});
+                     $this->formEditVariants->weight->setValues($variant->{Shop_Model_ProductVariants::COLUMN_WEIGHT_ADD});
+                     echo $this->formEditVariants->weight->control();
+                     ?> Kg</td>
+                  <td>
+                     <a href="<?=$this->link()->param('deleteComb', $variant->{Shop_Model_ProductVariants::COLUMN_ID})?>"
+                        class="button-delete-variant" >
+                        <img src="/images/icons/delete.png" alt="del" />
+                     </a>
+
+                  </td>
+               </tr>
+               <?
+               }
+            } else {?>
+               <tr>
+                  <td colspan="6"><?=$this->tr('Není přiřazena žádná varianta')?></td>
+               </tr>
+               <?}?>
+            </tbody>
+         </table>
+         <?echo($this->formEditVariants->renderEnd());?>
+      </div>
+      <div id="products-new-variant" class="">
+         <h2 class=""><?=$this->tr('Přidání varianty')?></h2>
+         <div class="">
+            <?
+            echo $this->formAddVariant->renderStart();
+            echo '<div class="controls">';
+            echo $this->formAddVariant->ids;
+            echo "</div>";
+            echo '<div id="form-selected-variants" class="font-small"></div>';
+            echo '<div class="buttons">';
+            echo '<span class="font-small">'.$this->tr('Více položek označíte podržením klávesy "Ctrl".').'</span>   ';
+            echo $this->formAddVariant->save;
+            echo '<span class="form-return-msg"></span></div>';
+            echo $this->formAddVariant->renderEnd();
+            ?>
+         </div>
+      </div>
+   </div>
+
+   <div id="product-code-edit" class="">
+      <p class="">
+         <?ps($this->tr('Pro dynamické generování kódu stačí doplnit id atributu ve formátu "{id}".
+            Tedy například z kódu PRODUCT-{5}-{3} se generuje PRODUCT-RED-A4.'));?>
+      </p>
+      <div class="">
+         <?
+         $this->formProductCode->html()->setAttrib('id', 'form-save-product-code');
+         echo $this->formProductCode->renderStart();
+         echo '<div class="controls">';
+         echo $this->formProductCode->code;
+         echo $this->formProductCode->save;
+         echo '<span class="form-return-msg"></span></div>';
+         echo $this->formProductCode->renderEnd();
+         ?>
+      </div>
+      <br />
+      <h2><?=$this->tr('Skupiny přiřazené k produktu')?></h2>
+      <div>
+         <table id="products-attributes-groups-table" class="full-width attributes-table ui-table-widget">
+            <thead>
+            <tr class="ui-widget-header">
+               <th><?=$this->tr('Název skupiny')?></th>
+               <th></th>
+            </tr>
+            </thead>
+            <tbody>
+               <?foreach($this->variantsGroups as $group){?>
+               <tr class="ui-state-default">
+                  <td>
+                     <?
+                     ps($group->{Shop_Model_AttributesGroups::COLUMN_NAME}." ");
+                     ps('ID: '.$group->{Shop_Model_AttributesGroups::COLUMN_ID}.'. ');
+                     echo '<span class="font-small">';
+                     ps(sprintf( $this->tr('Do kódu vložte: "%s"'), "{".$group->{Shop_Model_AttributesGroups::COLUMN_ID}."}"  ));
+                     echo '</span>';
+                     ?>
+                  </td>
+                  <td class="variants-groups-buttons">
+                     <a href="<?=$this->link()?>#add-attr-<?=$group->{Shop_Model_Attributes::COLUMN_ID_GROUP}?>"
+                        class="button-add-code" ><img src="/images/icons/add.png" alt="add" />
+                        <?ps($this->tr('přidat do kódu'))?>
+                     </a>
+                  </td>
+               </tr>
+               <?} ?>
+            </tbody>
+         </table>
+
+      </div>
+   </div>
+
+   <div id="product-combinations" class="">
+      <?
+      echo $this->formComb->renderStart();
+      ?>
+      <table id="products-combinations-table" class="full-width combinations-table ui-table-widget">
+         <thead>
+            <tr class="ui-widget-header">
+               <th><?=$this->tr('Kombinace')?></th>
+               <th><?=$this->tr('Kód')?></th>
+               <th><?
+                  echo $this->tr('Váha');
+                  $this->orderParam = 'word';
+                  echo $this->includeFile('tpl://engine:modules/buttons-table-order.phtml');
+                  ?></th>
+               <th><?
+                  echo $this->tr('Množství');
+                  $this->orderParam = 'qord';
+                  echo $this->includeFile('tpl://engine:modules/buttons-table-order.phtml');
+                  ?></th>
+               <th><?
+                  echo $this->tr('Cena bez dph');
+                  $this->orderParam = 'pord';
+                  echo $this->includeFile('tpl://engine:modules/buttons-table-order.phtml');
+                  ?></th>
+<!--               <th></th>-->
+            </tr>
+            <tr class="ui-state-default">
+               <td colspan="5" class="combination-controll">
+                  <?echo $this->formComb->save?>
+               </td>
+            </tr>
+         </thead>
+         <tfoot>
+            <tr class="ui-state-default">
+               <td colspan="5" class="combination-controll">
+                  <?echo $this->formComb->save?>
+               </td>
+            </tr>
+         </tfoot>
+         <tbody>
+            <?
+            if(!empty($this->productCombinations)){
+               $row = 1;
+               foreach($this->productCombinations as $c){?>
+               <tr class="ui-state-default <?
+                  if($c->{Shop_Model_ProductCombinations::COLUMN_IS_DEFAULT}) echo ' ui-state-active';
+                  if($c->{Shop_Model_ProductCombinations::COLUMN_QTY} == 0) echo " ui-state-error";
+                  ?>">
+                  <td class="combination-name"><?
+                     if($c->{Shop_Model_ProductCombinations::COLUMN_IS_DEFAULT}){
+                        ?><img src="/images/icons/asterisk_yellow.png" alt="default" title="<?=$this->tr('Výchozí kombinace')?>" /> <?
+                     }
+                     ps($c->comb_name)?></td>
+                  <td class="combination-code"><?
+                     echo Shop_Tools::getProductCode(
+                        $this->product->{Shop_Model_Product::COLUMN_CODE},
+                        json_decode($c->comb_codes_json)
+                     );
+                     ?></td>
+                  <td class="combination-weight"><?
+                     ps( round($this->product->{Shop_Model_Product::COLUMN_WEIGHT}+$c->weight, 2)." Kg");
+                     ?></td>
+                  <td class="combination-qty"><?
+                     $this->formComb->qty->setMultiple($c->{Shop_Model_ProductCombinations::COLUMN_ID});
+                     $this->formComb->qty->setValues($c->{Shop_Model_ProductCombinations::COLUMN_QTY});
+                     echo $this->formComb->qty->control();
+                     ?></td>
+                  <td class="combination-price"><?
+//                     ps( ($c->price > 0 ? "+".$c->price : $c->price)." Kč");
+//                     echo "<br />";
+                     $this->formComb->price->setMultiple($c->{Shop_Model_ProductCombinations::COLUMN_ID});
+                     $this->formComb->price->setValues($c->{Shop_Model_ProductCombinations::COLUMN_PRICE});
+                     echo $this->formComb->price->control()/*.Shop_Tools::getCurrency()*/;
+//                     echo "<br />";
+                     ps("+".Shop_Tools::getFormatedPrice($this->product->{Shop_Model_Product::COLUMN_PRICE}));
+
+                     // ps(Shop_Tools::getPriceOfProduct($this->product, $c->{Shop_Model_ProductCombinations::COLUMN_PRICE}));
+                     ?></td>
+<!--                  <td class="varinas-groups-buttons">-->
+<!--                     <a href="--><?//=$this->link()->param('cdel', $c->{Shop_Model_ProductCombinations::COLUMN_ID})?><!--"-->
+<!--                     class="button-comb-delete" ><img src="/images/icons/delete.png" alt="delete" /></a>-->
+<!--                  </td>-->
+               </tr>
+               <?
+               if($row % 10 == 0){?>
+               <tr>
+                  <td colspan="5" class="ui-widget-content combination-controll"><?echo $this->formComb->save?></td>
+               </tr>
+               <?}
+                  $row++;
+               }
+            } else {?>
+               <tr class="ui-state-disabled">
+                  <td colspan="5"><?=$this->tr('Žádná kombinace není generována.')?></td>
+               </tr>
+            <?}?>
+         </tbody>
+      </table>
+      <?
+      echo $this->formComb->renderEnd();
+      ?>
+   </div>
+
    <script type="text/javascript">
-      var taxes = <?echo json_encode($taxesPrint)?>;
-   
+      var tax = <?=number_format($this->product->{Shop_Model_Tax::COLUMN_VALUE} == 0 ? 0 : $this->product->{Shop_Model_Tax::COLUMN_VALUE}/100, 2, '.', '' )?>;
       $(document).ready(function(){
-         var $iPrice = $('input[name="product_price"]');
-         var $iPriceWTax = $('input[name="product_pricewtax"]');
-         var $iTax = $('select[name="product_tax"]');
-         
-         $iPrice.change(function(){
-            var tax = parseFloat(taxes[$iTax.val()]);
-            if($iPrice.val() != ""){
-               var price = parseFloat($iPrice.val());
-               if(tax != 0){ price = (1+tax/100)*price; }
-               $iPriceWTax.val(price.toFixed(1));
+
+         function updateContent ()
+         {
+            $.get('<?=$this->link()?>', function(data) {
+               var $data = $(data);
+               $('#products-variants-table').html($('#products-variants-table', $data).html());
+               $('#products-attributes-groups-table').html($('#products-attributes-groups-table', $data).html());
+               $('#products-combinations-table').html($('#products-combinations-table', $data).html());
+            //                     $('#products-combinations-table').html($('products-combinations-table', $data).html());
+            });
+         }
+
+         // base init
+         var cookieExpire = new Date();
+         cookieExpire.setMinutes(cookieExpire.getMinutes()+10);
+         $( "#products-variants-edit-content" ).tabs({
+            cookie: {name: 'productVariantsTabs', expires: cookieExpire }
+         });
+         // events
+         $('#products-new-variant select').change(function(){
+            var outHtml = "";
+            var $opts = $(this).find('option:selected');
+            var curLabel = null;
+            $opts.each(function(){
+               var label = $(this).parent().attr("label");
+               if(label != curLabel){
+                  if(outHtml != ""){ outHtml += "<br/ >"; }
+                  outHtml += "<strong>"+label+":</strong> ";
+                  curLabel = label;
+               }
+               outHtml += $(this).text()+", ";
+            });
+            $('#form-selected-variants').html(/*"<strong><?=$this->tr('Vybráno')?>:</strong><br />"+*/outHtml);
+         });
+
+         $('.price_without_tax, .price_with_tax').live('change', function(){
+            if($(this).hasClass('price_without_tax')){
+               $(this).parents('table.price-table').find('.price_with_tax').val( CubeCMS.Shop.getProductPrice(parseFloat($(this).val()), tax, <?=VVE_SHOP_PRICE_ROUND_DECIMAL?>) );
+            } else {
+               $(this).parents('table.price-table').find('.price_without_tax').val( CubeCMS.Shop.roundPrice(parseFloat($(this).val())/(1+tax), <?=VVE_SHOP_PRICE_ROUND_DECIMAL?>) );
             }
          });
-         $iTax.change(function(){$iPrice.change();});
-         $iPriceWTax.change(function(){
-            var tax = parseFloat(taxes[$iTax.val()]);
-            if($iPriceWTax.val() != ""){
-               var price = parseFloat($iPriceWTax.val());
-               if(tax != 0){ price = price/(1+tax/100);}
-               $iPrice.val(price.toFixed(1) );
+
+         $('.button-delete-variant').live('click', function(){
+            if(!confirm('<?=$this->tr('Smazat tuto varinatu?')?>')){
+               return false;
             }
+            var $this = $(this);
+            var loadbox = CubeCMS.Loader.showLoadBox($this, '<?=$this->tr('Vymazávám')?>');
+
+            $.ajax({
+               type: 'POST',
+               url: '<?=$this->link()->route('editVariantsXHR')?>',
+               data : {deleteComb : (new RegExp('deleteComb=([0-9]+)')).exec($this.attr('href'))[1] },
+               success: function(data){
+                  updateContent();
+                  CubeCMS.Loader.hideLoadBox(loadbox);
+                  CubeCMS.Msg.show(data);
+               }
+            });
+
+            return false;
          });
-         $iPrice.change();
-         
-         // generate url address
-         $('input.product_name_class').change(function(){
-            var lang = $(this).attr('name').match(/\[([a-z]+)\]/)[1];
-            var $url = $('input[name="product_urlkey['+lang+']"]');
-            $url.val(str2url($(this).val()));
+
+         $('.button-add-code').live('click', function(e){
+            e.preventDefault();
+            var re = new RegExp("([0-9]+)$", "g");
+            var id = this.href.match(re);
+
+            var ids = '{'+id[0]+'}';
+//            if($('input[name="product_code_code"]').val().indexOf(ids) == -1){
+               $('input[name="product_code_code"]').val( $('input[name="product_code_code"]').val()+ids );
+//            }
+            return false;
          });
-         
-         $('input[name="product_isNewDate"]').datepicker();
+
+         $('#form-save-product-code').submit(function(){
+            var loadbox = CubeCMS.Loader.showLoadBox(this, '<?=$this->tr('Ukládám')?>');
+            $.ajax({
+               type: 'POST',
+               url: '<?=$this->link()->route('editVariantsXHR')?>',
+               data: $(this).serialize(),
+               success: function(data){
+                  updateContent();
+                  CubeCMS.Loader.hideLoadBox(loadbox);
+                  var $msgBox = $('.form-return-msg').text("").removeClass('ui-state-error');
+                  if(data.infomsg.length > 0){
+                     $msgBox.text(data.infomsg[0]);
+                     setTimeout(function(){
+                        $msgBox.fadeOut(300, function(){
+                           $(this).text("").show()
+                        });
+                     }, 500);
+                  } else if(data.errmsg.length > 0){
+                     $msgBox.text(data.errmsg[0]).addClass('ui-state-error');
+                  }
+               }
+            });
+            return false;
+         });
+         $('#form-create-combinations').submit(function(){
+            var loadbox = CubeCMS.Loader.showLoadBox(this, '<?=$this->tr('Ukládám')?>');
+            $.ajax({
+               type: 'POST',
+               url: '<?=$this->link()->route('editVariantsXHR')?>',
+               data: $(this).serialize(),
+               success: function(data){
+                  updateContent();
+                  CubeCMS.Loader.hideLoadBox(loadbox);
+                  CubeCMS.Msg.show(data);
+               }
+            });
+            return false;
+         });
+
+         $('#products-variants-table>tbody>tr, #products-combinations-table>tbody>tr').live('mouseenter', function(){ $(this).addClass('ui-state-hover'); });
+         $('#products-variants-table>tbody>tr, #products-combinations-table>tbody>tr').live('mouseleave', function(){ $(this).removeClass('ui-state-hover'); });
       });
    
    </script>

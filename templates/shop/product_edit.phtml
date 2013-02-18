@@ -45,6 +45,11 @@ $this->form->urlkey->html()->setAttrib('size', 60)->addClass('form-element-long'
                $iPriceWTax.val(price.toFixed(1));
             }
          });
+         $('input[name="product_stock"]').change(function(){
+            var $row = $('input[name="product_quantity"]').closest('tr');
+            $(this).is(':checked') ? $row.show() : $row.hide();
+         }).change();
+
          $iTax.change(function(){$iPrice.change();});
          $iPriceWTax.change(function(){
             var tax = parseFloat(taxes[$iTax.val()]);
@@ -63,7 +68,11 @@ $this->form->urlkey->html()->setAttrib('size', 60)->addClass('form-element-long'
             $url.val(str2url($(this).val()));
          });
          
-         $('input[name="product_isNewDate"]').datepicker();
+         $('input[name="product_isNewDate"]').datepicker({
+            showOtherMonths: true,
+            selectOtherMonths: true,
+            showButtonPanel: true
+         });
       });
    
    </script>

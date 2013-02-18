@@ -1,0 +1,54 @@
+#products-variants .group-name {
+  font-weight: bold;
+}
+#products-variants .product_variants_price_class {
+  width: 50px;
+}
+#products-variants .product_variants_code_class {
+  width: 100px;
+}
+#products-variants .product_variants_weight_class {
+  width: 50px;
+}
+#products-variants .box-add-attr-code {
+  float: right;
+}
+#products-variants #products-variants-table tfoot .controls {
+  float: right;
+}
+#products-new-variant select {
+  width: 100%;
+  height: 10em;
+}
+#products-new-variant .controls {
+  margin-bottom: 5px;
+}
+#products-new-variant .buttons {
+  text-align: right;
+}
+#products-new-variant #form-selected-variants {
+  font-size: 80%;
+}
+#products-attributes-groups-table .variants-groups-buttons {
+  text-align: right;
+}
+#products-combinations-table .combination-code {
+  white-space: nowrap;
+}
+#products-combinations-table .combination-name {
+  width: 35%;
+  padding-right: 10px;
+}
+#products-combinations-table .combination-qty,
+#products-combinations-table .combination-price {
+  text-align: center;
+}
+#products-combinations-table .combination-qty input,
+#products-combinations-table .combination-price input {
+  width: 40px;
+}
+#products-combinations-table .combination-price,
+#products-combinations-table .combination-weight,
+#products-combinations-table .combination-controll {
+  text-align: right;
+}
