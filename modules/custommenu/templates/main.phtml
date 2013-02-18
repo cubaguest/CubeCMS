@@ -34,7 +34,7 @@ $this->addJsPlugin($jq);
                <?
                if(!empty($box['items'])){
                   foreach ($box['items'] as $item) {?>
-                  <tr id="menu-item-<?=$item->getPK()?>" class="ui-widget-content"
+                  <tr id="menu-item-<?=$item->getPK()?>" class="menu-item ui-widget-content"
                       data-id="<?=$item->getPK()?>"
                       data-name='<?=json_encode($item->{CustomMenu_Model_Items::COLUMN_NAME}->getArray())?>'
                       data-box='<?=$item->{CustomMenu_Model_Items::COLUMN_BOX}?>'
@@ -49,7 +49,7 @@ $this->addJsPlugin($jq);
                         <?
                         $href = $item->{CustomMenu_Model_Items::COLUMN_LINK} != null ? $item->{CustomMenu_Model_Items::COLUMN_LINK} : $item->catLink;
                         ?>
-                        <a href="<?=$href?>"><?ps(vve_tpl_truncate($href, 30))?></a>
+                        <a href="<?=$href?>" title="<?ps($href);?>"><?echo(vve_tpl_xhtml_cut($href, 30))?></a>
                      </td>
                      <td class="actions">
                         <?$src = $item->{CustomMenu_Model_Items::COLUMN_ACTIVE} ? 'enable.png' : "disable.png";?>

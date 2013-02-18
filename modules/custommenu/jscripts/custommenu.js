@@ -30,6 +30,13 @@ CustomMenu = {
       this.$tables.sortable({
          handle: ".move",
          axis: "y",
+         placeholder: "ui-state-highlight",
+         helper: function(e, ui) {
+            ui.children().each(function() {
+               $(this).width($(this).width());
+            });
+            return ui;
+         },
          update: function( event, ui ) {
                   $.ajax({
                      type : 'POST', url : cMenu.editUrl,
@@ -41,10 +48,12 @@ CustomMenu = {
                         }
                      }
                   });
+         },
+         start: function(e, ui ){
+            ui.placeholder.height(ui.helper.outerHeight()).append('<td colspan="4"></td>').addClass('ui-state-highlight');
          }
       });
    },
-
    addCustomMenuItem : function(){
       $('input.edit_menu_item_name_class', this.$formAddDialog).val("");
       $('input[name="edit_menu_item_id"]', this.$formAddDialog).val("");

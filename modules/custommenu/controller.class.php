@@ -11,9 +11,13 @@ class CustomMenu_Controller extends Controller {
    }
 
    public function mainController() {
+      $menus = $this->category()->getParam('positions', null);
+      if(empty($menus)){
+         return;
+      }
+
       $this->view()->form = $this->createFormMenuItem();
 
-      $menus = $this->category()->getParam('positions', null);
       $boxes = array();
       // vytvoření pole pro boxy
       foreach($menus as $key => $name){
