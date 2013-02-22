@@ -136,11 +136,21 @@ class Url_Request {
     */
    private static $isXHRRequest = false;
 
+   private static $instance = false;
+
    /**
     * Konstruktor
     */
-   public function  __construct() {
+   protected function  __construct() {
       $this->checkUrlType();
+   }
+
+   public static function getInstance()
+   {
+      if(!self::$instance){
+         self::$instance = new self();
+      }
+      return self::$instance;
    }
 
    /**
@@ -153,6 +163,7 @@ class Url_Request {
       self::$serverName = $_SERVER["HTTP_HOST"];
       if(isset($_SERVER["HTTPS"])){
          self::$transferProtocol = "https://";
+         Url_Link::setTransferProtocol(self::$transferProtocol);
       }
       
       if(self::$serverName != 'localhost'){
@@ -293,7 +304,7 @@ class Url_Request {
          }
       }
       // kontrola admin kategorie
-      if(Auth::isAdmin()){
+      if(!$return && Auth::isAdmin()){
          $model = new Model_CategoryAdm();
          $cats = $model->getCategoryList();
          unset($model);

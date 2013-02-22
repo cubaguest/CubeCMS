@@ -354,10 +354,11 @@ class AppCore extends TrObject {
    /**
     * Metoda vrací objekt url požadavku
     * @return Url_Request  -- objekt autorizace
+    * @deprecated use Url_Request::getInstance()
     */
    public static function getUrlRequest()
    {
-      return self::$urlRequest;
+      return Url_Request::getInstance();
    }
 
    /**
@@ -696,7 +697,7 @@ class AppCore extends TrObject {
 //            self::getCategory()->getModule()->getName()), 10);
          }
          //					Vytvoření objektu kontroleru
-         $routes = new $routesClassName(self::$urlRequest->getModuleUrlPart(), self::getCategory());
+         $routes = new $routesClassName(Url_Request::getInstance()->getModuleUrlPart(), self::getCategory());
          /**
           * @param Routes
           */
@@ -737,17 +738,17 @@ class AppCore extends TrObject {
    {
       try {
          $cobj = new Object();
-         $cobj->{Model_Category::COLUMN_NAME} = self::$urlRequest->getName();
-         $cobj->{Model_Category::COLUMN_MODULE} = self::$urlRequest->getName();
+         $cobj->{Model_Category::COLUMN_NAME} = Url_Request::getInstance()->getName();
+         $cobj->{Model_Category::COLUMN_MODULE} = Url_Request::getInstance()->getName();
          $cobj->{Model_Category::COLUMN_ALT} = null;
          
          $category = new Category_Core(null, true, $cobj);
          self::$category = $category;
-         $moduleName = self::$urlRequest->getName();
+         $moduleName = Url_Request::getInstance()->getName();
          $controllerClassName = ucfirst($moduleName).'_Controller';
          $viewClassName = ucfirst($moduleName).'_View';
-         $controllerMethod = self::$urlRequest->getAction().'Controller';
-         $viewMethod = self::$urlRequest->getAction().'View';
+         $controllerMethod = Url_Request::getInstance()->getAction().'Controller';
+         $viewMethod = Url_Request::getInstance()->getAction().'View';
          
          if( !class_exists($controllerClassName) 
                || !class_exists($viewClassName) 
@@ -763,7 +764,7 @@ class AppCore extends TrObject {
          
          // přiřazení šablony do výstupu
          $this->getCoreTpl()->module = $tpl;
-         $this->getCoreTpl()->moduleAction = self::$urlRequest->getAction();
+         $this->getCoreTpl()->moduleAction = Url_Request::getInstance()->getAction();
       } catch (Exception $e) {
          CoreErrors::addException($e);
       }
@@ -792,7 +793,7 @@ class AppCore extends TrObject {
          self::getCategory()->getModule()->getName()), 10);
       }
       //	Vytvoření objektu s cestama modulu
-      $routes = new $routesClassName(self::$urlRequest->getModuleUrlPart(),self::getCategory());
+      $routes = new $routesClassName(Url_Request::getInstance()->getModuleUrlPart(),self::getCategory());
 
       $rssClassName = ucfirst(self::getCategory()->getModule()->getName()).'_Rss';
       $rssCore = new $rssClassName(self::getCategory(), $routes);
@@ -807,14 +808,14 @@ class AppCore extends TrObject {
     */
    public function runModuleOnly()
    {
-      if(self::$urlRequest->getUrlType() == Url_Request::URL_TYPE_MODULE_REQUEST) {
+      if(Url_Request::getInstance()->getUrlType() == Url_Request::URL_TYPE_MODULE_REQUEST) {
          $ret = false;
          ob_start();
          // spuštění modulu
          try {
             if(!self::getCategory() instanceof Category_Core OR self::getCategory()->getCatDataObj() == null) {
                throw new CoreException(sprintf($this->tr('Špatně zadaný požadavek "%s" na modul'),
-               self::$urlRequest->getAction().'.'.self::$urlRequest->getOutputType()));
+               Url_Request::getInstance()->getAction().'.'.Url_Request::getInstance()->getOutputType()));
             }
             // načtení a kontrola cest u modulu
             $routesClassName = ucfirst(self::getCategory()->getModule()->getName()).'_Routes';
@@ -824,7 +825,7 @@ class AppCore extends TrObject {
                self::getCategory()->getModule()->getName()), 10);
             }
             //	Vytvoření objektu s cestama modulu
-            $routes = new $routesClassName(self::$urlRequest->getModuleUrlPart());
+            $routes = new $routesClassName(Url_Request::getInstance()->getModuleUrlPart());
 //            $routes = new Routes();
             // kontola cest
             $routes->checkRoutes();
@@ -849,7 +850,7 @@ class AppCore extends TrObject {
          }
          
          if((AppCore::getUrlRequest()->isXHRRequest() AND $routes->getRespondClass() != null)
-            OR (self::$urlRequest->getOutputType() == 'json' AND $routes->getRespondClass() == null AND ob_get_contents() == null )){
+            OR (Url_Request::getInstance()->getOutputType() == 'json' AND $routes->getRespondClass() == null AND ob_get_contents() == null )){
             // render odpovědi pro XHR
             if($routes->getRespondClass() != null){
                $class = $routes->getRespondClass();
@@ -860,7 +861,7 @@ class AppCore extends TrObject {
             // přenos dat z šablony do dat odeslaných v respond
             $respond->setData($controller->_getTemplateObj()->getTemplateVars());
             $respond->renderRespond();
-         } else if(in_array(self::$urlRequest->getOutputType(), Template_Output::getHtmlTypes())){
+         } else if(in_array(Url_Request::getInstance()->getOutputType(), Template_Output::getHtmlTypes())){
             /*
              * TODO -- tohle by se mělo dořešit, protože není jisté jestli tu má být vůbec render
              */
@@ -879,12 +880,12 @@ class AppCore extends TrObject {
          }
          ob_end_flush();
          return $ret;
-      } else if(self::$urlRequest->getUrlType() == Url_Request::URL_TYPE_MODULE_STATIC_REQUEST) {
+      } else if(Url_Request::getInstance()->getUrlType() == Url_Request::URL_TYPE_MODULE_STATIC_REQUEST) {
          // načtení a kontrola cest u modulu
-         $className = ucfirst(self::$urlRequest->getName()).'_Controller';
-         $classNameV = ucfirst(self::$urlRequest->getName()).'_View';
-         $methodName = self::$urlRequest->getAction().'Controller';
-         $methodNameV = self::$urlRequest->getAction().'View';
+         $className = ucfirst(Url_Request::getInstance()->getName()).'_Controller';
+         $classNameV = ucfirst(Url_Request::getInstance()->getName()).'_View';
+         $methodName = Url_Request::getInstance()->getAction().'Controller';
+         $methodNameV = Url_Request::getInstance()->getAction().'View';
          if(method_exists($className,$methodName)) {
             $result = call_user_func($className."::".$methodName);
             if($result !== false AND method_exists($classNameV,$methodNameV)) {
@@ -1006,8 +1007,8 @@ class AppCore extends TrObject {
       }
       $ctrl->runController();
       // view metoda
-      $viewM = 'run'.ucfirst(self::$urlRequest->getOutputType()).'View';
-      if(method_exists($ctrl, $viewM) AND self::$urlRequest->getOutputType() != null AND self::$urlRequest->getOutputType() != 'html'){
+      $viewM = 'run'.ucfirst(Url_Request::getInstance()->getOutputType()).'View';
+      if(method_exists($ctrl, $viewM) AND Url_Request::getInstance()->getOutputType() != null AND Url_Request::getInstance()->getOutputType() != 'html'){
          Template_Output::sendHeaders();
          $ctrl->{$viewM}();
       } else {
@@ -1026,19 +1027,19 @@ class AppCore extends TrObject {
    public function runJsPlugin()
    {
       try {
-         $pluginName = 'JsPlugin_' . ucfirst(self::$urlRequest->getName());
+         $pluginName = 'JsPlugin_' . ucfirst(Url_Request::getInstance()->getName());
          if (class_exists($pluginName)) {
             $jsPlugin = new $pluginName();
-         } else if (class_exists(ucfirst(self::$urlRequest->getName()))) {
-            $pluginName = ucfirst(self::$urlRequest->getName());
+         } else if (class_exists(ucfirst(Url_Request::getInstance()->getName()))) {
+            $pluginName = ucfirst(Url_Request::getInstance()->getName());
             $jsPlugin = new $pluginName();
          } else {
             throw new UnexpectedValueException($this->tr('Neexistující JsPlugin'));
          }
          // vytvoření souboru
          Template_Output::sendHeaders();
-         $jsPlugin->runAction(self::$urlRequest->getAction(), self::$urlRequest->getUrlParams(),
-            self::$urlRequest->getOutputType());
+         $jsPlugin->runAction(Url_Request::getInstance()->getAction(), Url_Request::getInstance()->getUrlParams(),
+            Url_Request::getInstance()->getOutputType());
       } catch (Exception $exc) {
          echo $exc->getMessage();
       }
@@ -1050,11 +1051,11 @@ class AppCore extends TrObject {
     */
    public function runComponent()
    {
-      $componentName = 'Component_'.ucfirst(self::$urlRequest->getName());
+      $componentName = 'Component_'.ucfirst(Url_Request::getInstance()->getName());
          $component = new $componentName();
          // z komponenty patří výstup zde
-         $component->runAction(self::$urlRequest->getAction(), self::$urlRequest->getUrlParams(),
-            self::$urlRequest->getOutputType());
+         $component->runAction(Url_Request::getInstance()->getAction(), Url_Request::getInstance()->getUrlParams(),
+            Url_Request::getInstance()->getOutputType());
       }
 
    /**
@@ -1064,7 +1065,7 @@ class AppCore extends TrObject {
     */
    private function initialWebSettings()
       {
-      $fileName = 'initial'.ucfirst(self::$urlRequest->getOutputType()).'.php';
+      $fileName = 'initial'.ucfirst(Url_Request::getInstance()->getOutputType()).'.php';
       if(file_exists(AppCore::getAppWebDir().self::ENGINE_CONFIG_DIR.DIRECTORY_SEPARATOR.$fileName)) {
          require AppCore::getAppWebDir().self::ENGINE_CONFIG_DIR.DIRECTORY_SEPARATOR.$fileName;
       }
@@ -1099,8 +1100,7 @@ class AppCore extends TrObject {
          // provedení autorizace
          Auth::authenticate();
          // výběr jazyka a locales
-         self::$urlRequest = new Url_Request();
-//         Locales::setLang(self::$urlRequest->getUrlLang());
+//         Locales::setLang(Url_Request::getInstance()->getUrlLang());
          Locales::selectLang();
          // inicializace Šablonovacího systému
          Template::factory();
@@ -1118,40 +1118,40 @@ class AppCore extends TrObject {
       }
 
       // zapnutí buferu podle výstupu
-      Template_Output::factory(self::$urlRequest->getOutputType());
-      if(self::$urlRequest->getUrlLang() != null AND Locales::isLang(self::$urlRequest->getUrlLang())){
-         $reqUrl = str_replace(self::$urlRequest->getUrlLang().URL_SEPARATOR, null, self::$urlRequest->getRequestUrl());
+      Template_Output::factory(Url_Request::getInstance()->getOutputType());
+      if(Url_Request::getInstance()->getUrlLang() != null AND Locales::isLang(Url_Request::getInstance()->getUrlLang())){
+         $reqUrl = str_replace(Url_Request::getInstance()->getUrlLang().URL_SEPARATOR, null, Url_Request::getInstance()->getRequestUrl());
       } else {
-         $reqUrl = self::$urlRequest->getRequestUrl();
+         $reqUrl = Url_Request::getInstance()->getRequestUrl();
       }
-      $catUrl = self::$urlRequest->getCategory();
+      $catUrl = Url_Request::getInstance()->getCategory();
 
-      $className = 'Module_'.ucfirst(self::$urlRequest->getCategory()).'_Category';
+      $className = 'Module_'.ucfirst(Url_Request::getInstance()->getCategory()).'_Category';
       // načtení kategorie
-      if(self::$urlRequest->getUrlType() == Url_Request::URL_TYPE_CORE_MODULE AND class_exists($className)){ // Core Module
-         self::$category = new $className(self::$urlRequest->getCategory(),true);
+      if(Url_Request::getInstance()->getUrlType() == Url_Request::URL_TYPE_CORE_MODULE AND class_exists($className)){ // Core Module
+         self::$category = new $className(Url_Request::getInstance()->getCategory(),true);
       } else if( ( ($reqUrl == '' AND $catUrl == null) OR ($reqUrl != '' AND $catUrl != null)) ) {
-         if(!self::$urlRequest->isAdminCategory()){
-            self::$category = new Category(self::$urlRequest->getCategory(),true);
+         if(!Url_Request::getInstance()->isAdminCategory()){
+            self::$category = new Category(Url_Request::getInstance()->getCategory(),true);
          } else {
-            self::$category = new Category_Admin(self::$urlRequest->getCategory(),true);
+            self::$category = new Category_Admin(Url_Request::getInstance()->getCategory(),true);
          }
          Url_Link::setCategory(self::$category->getUrlKey());
       } 
       if( ((self::$category instanceof Category_Core == false) OR !self::$category->isValid()) 
-            AND self::$urlRequest->getUrlType() != Url_Request::URL_TYPE_MODULE_STATIC_REQUEST
+            AND Url_Request::getInstance()->getUrlType() != Url_Request::URL_TYPE_MODULE_STATIC_REQUEST
          /*OR !self::$category->getRights()->isReadable()*/){ // Chyba stránky
-         self::$category = new Module_ErrPage_Category(self::$urlRequest->getCategory(),true);
+         self::$category = new Module_ErrPage_Category(Url_Request::getInstance()->getCategory(),true);
          Url_Link::setCategory(self::$category->getUrlKey());
          AppCore::setErrorPage(true);
       }
       unset ($className);
-      if(!self::$urlRequest->isFullPage()) {
+      if(!Url_Request::getInstance()->isFullPage()) {
          // vynulování chyby, protože chybová stránka je výchozí stránka
          AppCore::setErrorPage(false);
          // je zpracovává pouze požadavek na část aplikace
          // vybrání části pro zpracování podle požadavku
-         switch (self::$urlRequest->getUrlType()) {
+         switch (Url_Request::getInstance()->getUrlType()) {
             case Url_Request::URL_TYPE_MODULE_REQUEST:
             case Url_Request::URL_TYPE_MODULE_STATIC_REQUEST:
                $ret = $this->runModuleOnly();
@@ -1172,7 +1172,7 @@ class AppCore extends TrObject {
          if($ret === false){
             AppCore::setErrorPage(true);
          }
-         if(self::$urlRequest->getUrlType() != Url_Request::URL_TYPE_MODULE_RSS){
+         if(Url_Request::getInstance()->getUrlType() != Url_Request::URL_TYPE_MODULE_RSS){
             if(AppCore::isErrorPage()) {
                trigger_error($this->tr("Neplatný požadavek na aplikaci"), E_USER_ERROR);
             }
@@ -1182,21 +1182,21 @@ class AppCore extends TrObject {
             }
          }
       }
-      if(self::$urlRequest->isFullPage()
-         OR (AppCore::isErrorPage() AND self::$urlRequest->getUrlType() == Url_Request::URL_TYPE_MODULE_RSS)){
+      if(Url_Request::getInstance()->isFullPage()
+         OR (AppCore::isErrorPage() AND Url_Request::getInstance()->getUrlType() == Url_Request::URL_TYPE_MODULE_RSS)){
          // Globální inicializace proměných do šablony
          $this->initialWebSettings();
          
          try {
-            if(self::$urlRequest->getUrlType() == Url_Request::URL_TYPE_NORMAL AND !AppCore::isErrorPage()) {
+            if(Url_Request::getInstance()->getUrlType() == Url_Request::URL_TYPE_NORMAL AND !AppCore::isErrorPage()) {
                // zpracovávní modulu
                $this->runModule();
-            } else if(self::$urlRequest->getUrlType() == Url_Request::URL_TYPE_MODULE_STATIC_REQUEST AND !AppCore::isErrorPage()) {
+            } else if(Url_Request::getInstance()->getUrlType() == Url_Request::URL_TYPE_MODULE_STATIC_REQUEST AND !AppCore::isErrorPage()) {
                // zpracovávní modulu ve static
                $this->runModuleStatic(true);
             }
             
-            if(self::$urlRequest->getUrlType() == Url_Request::URL_TYPE_CORE_MODULE
+            if(Url_Request::getInstance()->getUrlType() == Url_Request::URL_TYPE_CORE_MODULE
                  OR AppCore::isErrorPage()) {
                // zpracování stránky enginu (sitemap, rss, error, atd.)
                $this->runCoreModule();
