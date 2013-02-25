@@ -11,7 +11,7 @@
 
 class JsPlugin_SuperfishMenu extends JsPlugin {
    protected $isVertical = false;
-   protected $cssFile = null;
+   protected $cssFile = false;
 
 	protected function initJsPlugin() {
 //      $this->setJsPluginName('jquerysmlmenu');
