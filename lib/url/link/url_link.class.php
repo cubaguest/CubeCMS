@@ -375,11 +375,10 @@ class Url_Link extends Url {
       /*
        * jednodušší je udělat sql dotaz na kategorie
        */
-      $cModel = new Model_Category();
-      $cats = $cModel->getCategoryListByModule($module);
+      $cats = Model_Category::getCategoryListByModule($module);
       $linksArr = array();
       foreach($cats as $cat) {
-         $link = new self(true);
+         $link = new Url_Link_Module(true);
          $linksArr[$cat->{Model_Category::COLUMN_ID}] = $link->clear(true)->category((string)$cat->{Model_Category::COLUMN_URLKEY});
       }
       return $linksArr;
