@@ -67,11 +67,17 @@ class Model_CategoryAdm extends Model_File {
       return empty($child) ? false : self::createCatObject($child[0]);
    }
 
-   private static function createCatObject($child){
+   private function createCatObject($child){
       $obj = new Object();
       $urlkey = $child->xpath('urlkey[@lang="'.Locales::getLang().'"]');
+      if(empty($urlkey)){
+         $urlkey = $child->xpath('urlkey[@lang="cs"]');
+      }
       $obj->{Model_Category::COLUMN_URLKEY} = (string)$urlkey[0];
       $name = $child->xpath('name[@lang="'.Locales::getLang().'"]');
+      if(empty($name)){
+         $name = $child->xpath('name[@lang="cs"]');
+      }
       $obj->{Model_Category::COLUMN_NAME} = (string)$name[0];
       $obj->{Model_Category::COLUMN_MODULE} = (string)$child->module;
       $obj->{Model_Category::COLUMN_PARAMS} = (string)$child->params;

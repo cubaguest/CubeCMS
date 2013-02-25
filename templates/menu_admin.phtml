@@ -12,13 +12,21 @@ function vveAdminMenuRenderFunc(SimpleXMLElement $menuArr, $link, $ulParam) {
          echo ("<li>");
       }
       $name = $item->xpath('name[@lang="'.$l.'"]');
+      if(empty($name)){
+         $name = $item->xpath('name[@lang="cs"]');
+      }
       $name = $name[0];
       $urlkey = $item->xpath('urlkey[@lang="'.$l.'"]');
-      if($urlkey != false){
+      if(empty($urlkey)){
+         $urlkey = $item->xpath('urlkey[@lang="cs"]');
+      }
+      if(!empty($urlkey)){
          $urlkey = $urlkey[0];
       }
-
       $t = $item->xpath('title[@lang="'.$l.'"]');
+      if(empty($t)){
+         $t = $item->xpath('title[@lang="cs"]');
+      }
       $title = null;
       if(isset ($t[0])){
          $title = $t[0];
