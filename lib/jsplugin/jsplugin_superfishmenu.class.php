@@ -11,6 +11,7 @@
 
 class JsPlugin_SuperfishMenu extends JsPlugin {
    protected $isVertical = false;
+   protected $cssFile = null;
 
 	protected function initJsPlugin() {
 //      $this->setJsPluginName('jquerysmlmenu');
@@ -21,7 +22,19 @@ class JsPlugin_SuperfishMenu extends JsPlugin {
    {
       $this->isVertical = $v;
    }
-	
+
+   /**
+    * Nasatví externí css soubor
+    * @param null $css
+    */
+   public function setCss($css = false)
+   {
+      if($css != null){
+         $css = tp(Template::STYLESHEETS_DIR."/".$css);
+      }
+      $this->cssFile = $css;
+   }
+
 	protected function setFiles() {
       $jquery = new JsPlugin_JQuery();
       $jquery->addJQPlugin('hoverIntent');
@@ -29,11 +42,15 @@ class JsPlugin_SuperfishMenu extends JsPlugin {
 		//		Přidání js soubrů pluginu
 		$this->addFile(new JsPlugin_JsFile("supersubs.js"));
 		$this->addFile(new JsPlugin_JsFile("superfish.js"));
-		$this->addFile(new JsPlugin_CssFile("superfish.css"));
-      if($this->isVertical){
-         $this->addFile(new JsPlugin_CssFile("superfish-vertical.css"));
+      if($this->cssFile === false){
+         $this->addFile(new JsPlugin_CssFile("superfish.css?nocompress"));
+         if($this->isVertical){
+            $this->addFile(new JsPlugin_CssFile("superfish-vertical.css?nocompress"));
 
+         }
+      } else if($this->cssFile != null){
+         $this->addFile($this->cssFile);
       }
-	}
+   }
 }
 ?>
