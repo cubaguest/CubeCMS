@@ -44,17 +44,26 @@ class Template_Help extends Template {
       
       $file = AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR.$this->module
          .DIRECTORY_SEPARATOR.AppCore::DOCS_DIR.DIRECTORY_SEPARATOR.'help_'.$this->moduleAction.'_'.Locales::getLang().'.phtml';
+      $fileCS = AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR.$this->module
+         .DIRECTORY_SEPARATOR.AppCore::DOCS_DIR.DIRECTORY_SEPARATOR.'help_'.$this->moduleAction.'_cs.phtml';
       if(is_file($file)){ // načtení z aktuálního modulu
          $this->loadHelpFile($file);
+      } else if(is_file($fileCS)){ // načtení z aktuálního modulu
+         $this->loadHelpFile($fileCS);
       } else {
          $pClass = get_parent_class($this->module."_Controller");
          while ($pClass != false && $pClass != 'Controller'){
             $module = strtolower( substr($pClass, 0, -11) ); // remove _Controller word
             $file = AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR.$module
                .DIRECTORY_SEPARATOR.AppCore::DOCS_DIR.DIRECTORY_SEPARATOR.'help_'.$this->moduleAction.'_'.Locales::getLang().'.phtml';
-            
+            $fileCS = AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR.$module
+               .DIRECTORY_SEPARATOR.AppCore::DOCS_DIR.DIRECTORY_SEPARATOR.'help_'.$this->moduleAction.'_cs.phtml';
+
             if(is_file($file)){
                $this->loadHelpFile($file);
+               break;
+            } else if(is_file($fileCS)){
+               $this->loadHelpFile($fileCS);
                break;
             }
             $pClass = get_parent_class($pClass);
