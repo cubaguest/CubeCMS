@@ -134,7 +134,11 @@ class Template_Core extends Template {
       }
       
       // css
-      $css = Template::getStylesheets();
+      if(VVE_DEBUG_LEVEL == 0){
+      } else {
+         $css = Template::getStylesheets();
+      }
+      $css = $this->getCombinedCss();
       array_walk($css, create_function('&$i,$k','$i = "<link rel=\"stylesheet\" type=\"text/css\" href=\"$i\" />\n";'));
       $cssfiles = implode('', $css);
       unset ($css);
@@ -225,6 +229,36 @@ class Template_Core extends Template {
          ), $contents);
       ob_end_clean();
       return ((string)$contents);
+   }
+
+   public function getCombinedCss()
+   {
+      $files = array();
+      $filesForCompress = array();
+      $filesHash = null;
+      $cssFiles = Template::getStylesheets();
+      foreach ($cssFiles as $css) {
+//         pokud je soubor s enginu
+         if(strpos($css, Url_Request::getBaseWebDir(true)) !== false && strpos($css, 'nocompress') === false){
+            // create absolute path
+            $fileAbs = AppCore::getAppWebDir().str_replace(array(Url_Request::getBaseWebDir(), '/'),array('', DIRECTORY_SEPARATOR), $css );
+            $filesForCompress[] = $fileAbs;
+            $filesHash .= $css.filemtime($fileAbs);
+         } else {
+            $files[] = $css;
+         }
+      }
+
+      $fileName = md5($filesHash).".css";
+
+      if(!is_file(AppCore::getAppCacheDir()."stylesheets".DIRECTORY_SEPARATOR. $fileName)){
+         // generate file
+         foreach($filesForCompress as $file){
+            file_put_contents(AppCore::getAppCacheDir(). "stylesheets".DIRECTORY_SEPARATOR. $fileName, file_get_contents($file), FILE_APPEND);
+         }
+      }
+      array_unshift($files, Url_Request::getBaseWebDir().AppCore::ENGINE_CACHE_DIR."/stylesheets/".$fileName);
+      return $files;
    }
 
    /**
