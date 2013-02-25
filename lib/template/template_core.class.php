@@ -135,10 +135,10 @@ class Template_Core extends Template {
       
       // css
       if(VVE_DEBUG_LEVEL == 0){
+         $css = $this->getCombinedCss();
       } else {
          $css = Template::getStylesheets();
       }
-      $css = $this->getCombinedCss();
       array_walk($css, create_function('&$i,$k','$i = "<link rel=\"stylesheet\" type=\"text/css\" href=\"$i\" />\n";'));
       $cssfiles = implode('', $css);
       unset ($css);
@@ -254,7 +254,8 @@ class Template_Core extends Template {
       if(!is_file(AppCore::getAppCacheDir()."stylesheets".DIRECTORY_SEPARATOR. $fileName)){
          // generate file
          foreach($filesForCompress as $file){
-            file_put_contents(AppCore::getAppCacheDir(). "stylesheets".DIRECTORY_SEPARATOR. $fileName, file_get_contents($file), FILE_APPEND);
+            file_put_contents(AppCore::getAppCacheDir(). "stylesheets".DIRECTORY_SEPARATOR. $fileName,
+               ' /* '.$file.' */'."\n".file_get_contents($file), FILE_APPEND);
          }
       }
       array_unshift($files, Url_Request::getBaseWebDir().AppCore::ENGINE_CACHE_DIR."/stylesheets/".$fileName);

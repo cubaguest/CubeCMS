@@ -346,7 +346,7 @@ ul.module-tool-buttons {
 
 /* UI widget pro cube CMS postavný na JQuery UI */
 /* tabulka */
-@padding-widget: 3px;
+@padding-widget: 5px;
 .ui-cube-widget {
    h2, h3, h4 {
       &.ui-widget-header {
@@ -358,6 +358,13 @@ ul.module-tool-buttons {
    .ui-widget-text-content {
       padding: @padding-widget;
    }
+   &.ui-widget-toolbox {
+      select {
+         padding: 0 1px;
+      }
+      padding: @padding-widget;
+   }
+
 }
 .ui-table-widget {
    td, th {

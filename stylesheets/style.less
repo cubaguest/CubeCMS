@@ -1,12 +1,12 @@
 @CHARSET "UTF-8";
-@import "normalize.css";
-@import "style-layout.css";
+@import "@{dirCoreCss}normalize.css";
+@import "@{dirFaceCss}style-layout.css";
 
 /* COLORS */
 @color-text-light: #A0A0A0;
 
 /* PATHS */
-@imgdir: "../../../images";
+@imgdir: @dirCoreImages;
 
 /* Základní nastavení layoutu */
 html,body {
@@ -15,11 +15,10 @@ html,body {
    padding: 0px;
    font-size: 100%;
    text-align: left;
-   background: url('@{imgdir}/backshadow.png') fixed top center white repeat-y;
+   background: url('@{imgdir}backshadow.png') fixed top center white repeat-y;
 }
 
 body {
-   /*background-color: white;  purple tone for outer space */
 }
 
 /* resetovač */
@@ -35,12 +34,15 @@ body {
    font-size: 0px;
 }
 .clearfix:after {
-    clear: both;
-    content: ".";
-    display: block;
-    height: 0;
-    line-height: 0;
-    visibility: hidden;
+   clear: both;
+   content: ".";
+   display: block;
+   height: 0;
+   line-height: 0;
+   visibility: hidden;
+}
+.clear {
+   clear: both;
 }
 
 .hidden {
@@ -115,10 +117,11 @@ td, th {font-size: 100%; text-align: left; }
    p { margin-bottom:3px; border-top: 1px solid gray;}
    p:first-child { border: none;}
 }
-#infoMessages, .message-info { border-color: #b7dcff; background-color: #cce6ff; background-image: url('@{imgdir}/icons/accept.png');}
-#errMessages, .message-err { border-color: #ffc7c0; background-color: #ffe3e0; background-image: url('@{imgdir}/icons/error.png');}
-.message-warning { border-color: #AFAB23; background-color: #f0ea30; background-image: url('@{imgdir}/icons/error.png');}
-#coreErrMessage { border-color: #ffa095; background-color: #ffb2a9; background-image: url('@{imgdir}/icons/error.png');}
+#infoMessages, .message-info { border-color: #b7dcff; background-color: #cce6ff; background-image: url('@{dirCore}images/icons/accept.png');}
+#errMessages, .message-err { border-color: #ffc7c0; background-color: #ffe3e0; background-image: url('@{dirCore}images/icons/error.png');}
+.message-warning { border-color: #AFAB23; background-color: #f0ea30; background-image: url('@{dirCore}images/icons/error.png');}
+#coreErrMessage { border-color: #ffa095; background-color: #ffb2a9; background-image: url('@{dirCore}images/icons/error.png');}
+
 
 
 /* formulařové prvky */
@@ -126,6 +129,14 @@ input, button, textarea, select, a.form-button, .button {
    border: 1px solid #bbbbbb;
    background-color: #ffffff;
    padding: 1px;
+   &.disabled {
+      background-color: silver !important;
+      background-image: none;
+      color: gray;
+      &:hover {
+         background-image: none;
+      }
+   }
 }
 input[type="image"],input[type="checkbox"],input[type="radio"] {
    border: 0;
@@ -137,10 +148,10 @@ input[type="submit"], input[type="reset"], input[type="button"], button, input[t
    color: black;
    cursor: pointer;
 }
-input[type="submit"]:hover, input[type="reset"]:hover, input[type="button"]:hover, 
+input[type="submit"]:hover, input[type="reset"]:hover, input[type="button"]:hover,
 button:hover, a.form-button:hover, .button:hover, input.button-warning:hover,
 input[type="submit"].exclusive:hover, button[type="submit"].exclusive:hover {
-   background: #fff7d4 url('@{imgdir}/forms/buttons_back.gif') 0 0 repeat-x;
+   background: #fff7d4 url('@{imgdir}forms/buttons_back.gif') 0 0 repeat-x;
    text-decoration: none;
 }
 input[type="submit"]:hover, button[type="submit"]:hover {
@@ -149,13 +160,13 @@ input[type="submit"]:hover, button[type="submit"]:hover {
 }
 input.button-cancel:hover, input[type="reset"]:hover, button[type="reset"]:hover, .button-cancel:hover,
 input.cancel:hover, input[type="reset"]:hover, button[type="reset"]:hover
- {
+{
    background-color: #f57676;
    background-position: 0 -40px;
 }
 input.form-required, textarea.form-required {
    background-position: right top;
-   background-image: url('@{imgdir}/form_required.png');
+   background-image: url('@{imgdir}form_required.png');
    background-repeat: no-repeat;
 }
 label.form-error { color:red; }
@@ -172,46 +183,62 @@ input.form-error, textarea.form-error { background-color: #f4d0d0; }
 }
 
 /* tabulka formuláře */
-form fieldset { 
-   width: 100%; 
-   margin: 5px 0; 
-   padding: 0;
-}
-form fieldset legend {
-/*   color: #666666;*/
-   font-size: 14px;
-   font-weight: bold;
-   padding-bottom: 5px;
-   margin-left: 0;
-   padding: 0 10px 5px;
-}
-.form-legend-text {
-   .font-small;
-}
-p.form-legend-text {
-   padding: 0 10px 5px;
-   color: gray;
-}
-form table.form-table {
-   width: 100%;
-   background-color: #e9edf0;
-   border-bottom: 10px solid #e9edf0;
-   border-top: 10px solid #e9edf0;
-}
-form table.form-table td, form table.form-table th {
-   padding: 5px 10px;
-   vertical-align: top;
-   border-bottom: 1px dotted #bbbbbb;
-}
-form table.form-table th.form-labels {
-   width: 90px;
-}
-form table.form-table .mceEditor td, form table.form-table p { /*repair TinyMCE layout */
-   padding: 0;
-}
-form p {margin: 0;}
-.form-required {
-   color:maroon;
+form {
+   fieldset {
+      legend {
+         .form-legend-text {
+            .font-small;
+         }
+         p.form-legend-text {
+            padding: 0 10px 5px;
+            color: gray;
+         }
+
+         font-size: 14px;
+         font-weight: bold;
+         padding-bottom: 5px;
+         margin-left: 0;
+         padding: 0 10px 5px;
+      }
+
+      width: 100%;
+      margin: 5px 0;
+      padding: 0;
+   }
+
+   .form-input-multiple {
+      a {
+         vertical-align: -2px;
+      }
+      margin-bottom: 2px;
+   }
+   .form-required {
+      color:maroon;
+   }
+
+   .form-sub-label { .font-small }
+
+   table.form-table {
+
+      td, th {
+         padding: 5px 10px;
+         vertical-align: top;
+         border-bottom: 1px dotted #bbbbbb;
+      }
+      th.form-labels {
+         width: 90px;
+      }
+      p {margin: 0;}
+
+      .mceEditor td, p { /*repair TinyMCE layout */
+         padding: 0;
+      }
+
+      .full-width;
+      background-color: #e9edf0;
+      border-bottom: 10px solid #e9edf0;
+      border-top: 10px solid #e9edf0;
+   }
 }
 input[type="text"], input[type="password"], form .form-table .form-element-short {
    width: 200px;
@@ -225,26 +252,29 @@ textarea, form .form-table .form-element-long {
 .form-row-action-icon {
    height: 16px;
 }
-.form-sub-label { font-size: 82%; }
+
 .placeholder { color: #aaa; }
-#loadingBox {
+
+#loadingBox, .loadingBox {
 /*   background-color: white;*/
    text-align:center;
    z-index: 10001;
-   padding-top: 30%;
-   background-image: url('@{imgdir}/bg_w_70.png');
+   background-image: url('@{imgdir}bg_w_70.png');
 }
-#loadingBox .loader-w {
+#loadingBox .loader-w, .loadingBox .loader-w {
    text-align: left;
    display: block;
    margin: 0 auto;
    width: 100px;
    border: 1px solid gray;
-   background: white url('@{imgdir}/ajax-loader.gif') 3px 3px no-repeat;
+   background: white url('@{imgdir}ajax-loader.gif') 3px 3px no-repeat;
    padding: 2px 2px 2px 23px;
    -moz-box-shadow:0 0 2px #000000;
    -webkit-box-shadow:0 0 2px #000000;
    box-shadow:0 0 2px #000000;
+   position:absolute;
+   top:30%;
+   left:40%;
 }
 /* odkaz zpět */
 .button_back {
@@ -261,96 +291,65 @@ textarea, form .form-table .form-element-long {
 #breadcrumb .admin {color: red;}
 /* EOF MENU */
 
-
-/* SOF main content  NEW!!! */
-.main-content {} /* Hlavní obsah stránky */
-.main-content-list, .main-content-detail, .main-content-comments {} /* Seznamový obsah stránky */
-.main-content-link-more {
-   text-align: right;
-} /* Odkaz více */
-.main-content-showed {
-   float: left;
-} /* Text s počtem zobrazení */
-.main-content-comments {} /* box s komentáři */
-.main-content-list-record {
-   margin-bottom: 0.5em;
-} /* prvek v seznamu */
-.main-content-no-public, .main-content-concept, .comment-nopublic {
-   background-color: #dddddd;
-} /* nazveřejněný obsah */
-.main-content-list-record-image, .main-content-image {
-   float: left;
-/*   width: 150px;*/
-   text-align: center;
-} /* obrázek v prvku v seznamu */
-.main-content-list-record-image img, .main-content-image img {
-   padding: 0 10px 10px 0;
-}
-.main-content-list-record-images {} /* Obrázky v seznamu */
-.main-content-list-record-date {} /* datum u novinky atd */
-.main-content-list-record-text, .main-content-list-record-annotation {
-   padding: 0 0 0.7em 0;
-} /* text v prvku v seznamu */
-.main-content-annotation {
-   background-color: #fdf5ce;
-   padding: 5px;
-   margin-bottom: 1em;
-} /* Anotace k textu */
-.main-content-tools {
-   text-align: right;
-} /* linky u článku, řazení, archiv*/
-.main-content-note {} /* poznámka */
-.main-content-dates {} /* datumy */
-.main-content-other {} /* ostatní */
-.main-content-image {} /* obrázek v hlavním obsahu */
-.main-content-images {} /* obrázeky (galerie) v hlavním obsahu */
-.main-content-text {} /* text v hlavním obsahu */
-.main-content-text p {}
-.main-content-text ul, .main-content-text ol {
-   margin-left: 30px;
-} /* text v hlavním obsahu */
-
-.main-content-form-edit table.ui-widget td,
-.main-content-form-edit table.ui-widget th {
-   padding: 3px;
-} /* Třída pro editační formulář */
-
-/* JQ ui */
-.main-content-list-record .ui-widget-header,
-.main-content-list-record .ui-widget-content { padding: 5px; }
-.main-content-list-record .ui-widget-header * { padding: 0; }
-
-/* archiv */
-.main-content-archive {}/* Hlavní obsah archivu */
-.main-content-archive-year {}/* rok v archivu */
-.main-content-archive-year-content {}/* obsah roku v archivu */
-.main-content-archive-item {}/* položka v archivu */
-.main-content-archive-dateadd {
-   font-style: italic;
-} /* datum přidání položky */
-
-
-
-/* EOF main content OLD!!! */
-
 /* SOF main content NEW!!! */
-.post {
+.post, .content {
    margin-bottom: 0.5em;
-   
+
    .info {
       font-size: 80%;
       margin-bottom: 0.5em;
       color: @color-text-light;
    }
 }
-.posts-list .post p {
-   margin-bottom: 0;
+.posts-list {
+   .post {
+      p {
+         margin-bottom: 0;
+      }
+   }
+}
+.concept {
+   background-color: #dddddd;
+}
+
+/* SOF ADMIN CONTENT */
+.content-admin {
+
+}
+/* EOF ADMIN CONTENT */
+
+
+/* obsah s editačním formulářem */
+.content-form-edit table.ui-widget td,
+.content-form-edit table.ui-widget th {
+   padding: 3px;
 }
 /* EOF main content NEW!!! */
 
 /* SOF panel content NEW!!! */
 .panel {
    overflow: hidden;
+   padding: 5px;
+   border: 1px solid gray;
+   margin-bottom: 5px;
+
+   input[type="text"], input[type="password"] {
+      max-width: 155px;
+   }
+
+   .name {
+      font-weight: bold;
+   }
+   .content {
+      margin: 5px 0;
+   }
+   .article {
+      border-bottom: 1px dotted silver;
+      .name {
+         font-size: 80%;
+         margin-bottom: 5px;
+      }
+   }
    .note, .place, .time, .date {
       font-size: 82%;
    }
@@ -470,6 +469,29 @@ textarea, form .form-table .form-element-long {
       display: block;
    }
 }
+/* volitelná mennu */
+.custom-menu {
+   &.custom-menu-bottom {
+      ul {
+         li {
+            list-style: none;
+            float: left;
+            margin: 0;
+            padding: 2px 5px;
+         }
+         margin: 0;
+         padding: 0;
+      }
+   }
+   &.custom-menu-left {
+      ul {
+         margin: 0;
+         padding-left: 20px;
+      }
+      border: 1px solid gray;
+   }
+}
+
 
 /* EOF Modules */
 
@@ -478,25 +500,25 @@ textarea, form .form-table .form-element-long {
    padding-left: 18px;
    background-color: transparent;
    background-position: center left;
-   background-image: url('@{imgdir}/files/txt.gif');
+   background-image: url('@{imgdir}files/txt.gif');
    background-repeat: no-repeat;
 }
-.file-pdf {background-image: url('@{imgdir}/files/pdf.gif');}
-.file-doc, .file-docx, .file-dot, .file-odt, .file-ott, .file-rtf {background-image: url('@{imgdir}/files/doc.gif');}
-.file-xls, .file-xlt, .file-ods, .file-ots {background-image: url('@{imgdir}/files/xls.gif');}
-.file-ppt, .file-pps {background-image: url('@{imgdir}/files/ppt.gif');}
-.file-zip {background-image: url('@{imgdir}/files/zip.gif');}
-.file-rar {background-image: url('@{imgdir}/files/rar.gif');}
-.file-avi, .file-wmv, .file-mpg, .file-flv, .file-swf {background-image: url('@{imgdir}/files/avi.gif');}
-.file-jpg, .file-bmp, .file-gif, .file-jpeg, .file-wmf, .file-png, .file-psd, .file-tiff {background-image: url('@{imgdir}/files/jpg.gif');}
-.dir-icon {background-image: url('@{imgdir}/icons/folder.png');}
+.file-pdf {background-image: url('@{imgdir}files/pdf.gif');}
+.file-doc, .file-docx, .file-dot, .file-odt, .file-ott, .file-rtf {background-image: url('@{imgdir}files/doc.gif');}
+.file-xls, .file-xlt, .file-ods, .file-ots {background-image: url('@{imgdir}files/xls.gif');}
+.file-ppt, .file-pps {background-image: url('@{imgdir}files/ppt.gif');}
+.file-zip {background-image: url('@{imgdir}files/zip.gif');}
+.file-rar {background-image: url('@{imgdir}files/rar.gif');}
+.file-avi, .file-wmv, .file-mpg, .file-flv, .file-swf {background-image: url('@{imgdir}files/avi.gif');}
+.file-jpg, .file-bmp, .file-gif, .file-jpeg, .file-wmf, .file-png, .file-psd, .file-tiff {background-image: url('@{imgdir}files/jpg.gif');}
+.dir-icon {background-image: url('@{imgdir}icons/folder.png');}
 /* EOF file extension */
 
 /* PRINT */
 @media print {
    body { font-size: 80%; }
    * { background: none!important;  background-color: white!important; }
-   #page { width: auto; } 
+   #page { width: auto; }
    .image-box {
       float: left;
       margin-right: 10px;
