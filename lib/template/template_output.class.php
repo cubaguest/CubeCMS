@@ -146,6 +146,7 @@ class Template_Output {
          }
          header('Cache-Control: public, no-cache' );
          header('Cache-Control: max-age=60', false );
+         header('X-Powered-By: Cube CMS '.AppCore::ENGINE_VERSION.".".AppCore::ENGINE_RELEASE);
          if(Auth::isLogin()) {
             header('Cache-Control: store, no-cache, must-revalidate' ); //private,
             header('Cache-Control: post-check=0, pre-check=0', false );
