@@ -195,30 +195,9 @@ class Login_Controller extends Controller {
       }
 
       if($form->isValid()){
-         $user = $modelUsr->where(Model_Users::COLUMN_USERNAME.' = :uname', array('uname' => $form->username->getValues()))->record();
-
-         $mail = explode(';', $user->{Model_Users::COLUMN_MAIL});
-
-         $email = new Email(false);
-         $email->addAddress($mail[0], $user->{Model_Users::COLUMN_NAME}.' '.$user->{Model_Users::COLUMN_SURNAME});
-         $email->setSubject($this->tr('Obnova zapomenutého hesla'));
-
-         $cnt = $this->tr("Vazeny uzivateli,\nzasilame Vam vyzadanou zmenu hesla.\nPokud jste tento email nevygeneroval Vy, jedna se nejspise\no omyl jineho uzivatele a muzete tento email ignorovat.\n");
-         $newPass = self::generatePassword();
-         $cnt .= "\n".  $this->tr('Heslo').': '.$newPass."\n\n";
-         $cnt .= $this->tr("S pozdravem\nTým").' '.VVE_WEB_NAME;
-         $email->setContent($cnt);
-         $email->send();
-
-         if(defined('Model_Users::COLUMN_PASSWORD_RESTORE')){// need release 6.4 r4 or higer
-            $user->{Model_Users::COLUMN_PASSWORD_RESTORE} = Auth::cryptPassword($newPass);
-         } else {
-            $user->{Model_Users::COLUMN_PASSWORD} = Auth::cryptPassword($newPass);
-         }
-         $modelUsr->save($user);
-
+         Auth::sendRestorePassword($form->username->getValues());
          $this->log(sprintf('Změna hesla uživatele %s', $form->username->getValues()));
-         $this->infoMsg()->addMessage($this->tr('Nově vygenerované heslo bylo zasláno na Váš e-mail'));
+         $this->infoMsg()->addMessage($this->tr('Nové heslo Vám bylo zasláno na Váš e-mail'));
          $this->link()->route()->reload();
       }
       

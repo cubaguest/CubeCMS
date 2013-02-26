@@ -449,4 +449,44 @@ class Auth extends TrObject {
       $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
       return substr( str_shuffle( $chars ), 0, $len );
    }
+
+   /**
+    * Metoda pro generování nového hesla
+    * @param $userName
+    */
+   public static function sendRestorePassword($userName)
+   {
+      $tr = new Translator();
+      $modelUsr = new Model_Users();
+      $user = $modelUsr->where(Model_Users::COLUMN_USERNAME.' = :uname OR '.Model_Users::COLUMN_MAIL." = :mail",
+         array('uname' => $userName, 'mail' => $userName))->record();
+
+      $mail = explode(';', $user->{Model_Users::COLUMN_MAIL});
+
+      $email = new Email(true);
+      $email->addAddress($mail[0], $user->{Model_Users::COLUMN_NAME}.' '.$user->{Model_Users::COLUMN_SURNAME});
+
+      $email->setSubject(VVE_WEB_NAME.': '.$tr->tr('obnova hesla'));
+
+      $cnt = $tr->tr("<p>Vážený uživateli,</p>
+         <p>zasíláme Vám vyžádanou změnu hesla.</p>
+         <p>Pokud jste tento email nevygeneroval Vy, jedná se nejspíše o omyl jiného uživatele a můžete tento e-mail ignorovat.
+         Vašeho aktuálního hesla se změna samozřejmně nedotkne.</p>");
+
+      $newPass = self::generatePassword();
+
+      $cnt .= '<table><tr>';
+      $cnt .= "<th>".  $tr->tr('Heslo').':</th><td>'.$newPass."</td>";
+      $cnt .= '</tr></table>';
+
+      $email->setContent(Email::getBaseHtmlMail($cnt));
+      $email->send();
+
+      if(defined('Model_Users::COLUMN_PASSWORD_RESTORE')){// need release 6.4 r4 or higer
+         $user->{Model_Users::COLUMN_PASSWORD_RESTORE} = Auth::cryptPassword($newPass);
+      } else {
+         $user->{Model_Users::COLUMN_PASSWORD} = Auth::cryptPassword($newPass);
+      }
+      $modelUsr->save($user);
+   }
 }
