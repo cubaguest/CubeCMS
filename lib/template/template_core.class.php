@@ -26,7 +26,7 @@ class Template_Core extends Template {
     * Šablona pro ajax requesty v iframe
     */
    const INDEX_AJAXIFRAME_TEMPLATE = 'index_ajax_iframe.phtml';
-   
+
    /**
     * Šablona pro mobilní zařízení
     */
@@ -49,13 +49,13 @@ class Template_Core extends Template {
     * @var array
     */
    private static $metaTags = array();
-   
+
    /**
     * Cesta ke Cover obrázku
     * @var string
     */
    private static $coverImagePath = null;
-   
+
    /**
     * Konstruktor
     */
@@ -79,14 +79,14 @@ class Template_Core extends Template {
             self::$pageTitle = array_merge(array(VVE_WEB_NAME), self::$pageTitle);
          }
       }
-      
+
       // prepare base Tags
       self::setMetaTag('generator', 'Cube-CMS '.AppCore::ENGINE_VERSION);
       self::setMetaTag('canonical', $this->link()->rmParam()); // drop every page params
       // base image
       if(Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_ICON} != null){
          self::setCoverImage(Category::getImageDir(Category::DIR_IMAGE)
-               .Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_ICON} );
+            .Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_ICON} );
       }
    }
 
@@ -98,7 +98,7 @@ class Template_Core extends Template {
    public function style($name) {
       $path = null;
       try {
-          $path = $this->getLinkPathFromEngine($name);
+         $path = $this->getLinkPathFromEngine($name);
       } catch(Template_Exception $e) {
       }
       return $path;
@@ -125,14 +125,14 @@ class Template_Core extends Template {
       }
       echo parent::__toString();
       $contents = ob_get_clean();
-      
+
       if($contents == null){
          $errorTpl = new Template(new Url_Link(true));
          $errorTpl->addFile('tpl://error/coreerrorbody.phtml');
          $errorTpl->renderTemplate();
          $contents = ob_get_clean();
       }
-      
+
       // css
       if(VVE_DEBUG_LEVEL == 0){
          $css = $this->getCombinedCss();
@@ -170,16 +170,16 @@ class Template_Core extends Template {
       if(self::getMetaTag('keywords') == null AND Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_KEYWORDS} != null){
          self::setMetaTag('keywords',Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_KEYWORDS});
       }
-      
+
       $metaTags = null;
-      
+
       if(self::$coverImagePath != null ){
          $metaTags .= '<link rel="image_src" href="'.self::$coverImagePath.'"/>'."\n";
          self::setMetaTag('og:image', self::$coverImagePath);
       } else if(isset(self::$metaTags['og:image']) && self::$coverImagePath == null){
          $metaTags .= '<link rel="image_src" href="'.self::$metaTags['og:image'].'"/>'."\n";
       }
-      
+
       if(!empty (self::$metaTags)){
          foreach (self::$metaTags as $key => $value) {
             if((string)$value == null){
@@ -212,7 +212,7 @@ class Template_Core extends Template {
          '/(<!-- *)?\{\*\-[A-Z0-9_-]+\-\*\}( *-->)?/',
          // remove empty meta tags
          '/[ ]*<meta name="[a-z]+" content="" ?\/>\n/i'
-         ), array(
+      ), array(
          // basic
          $cssfiles,
          $jscripts,
@@ -226,7 +226,7 @@ class Template_Core extends Template {
          '',
          // remove empty meta tags
          ''
-         ), $contents);
+      ), $contents);
       ob_end_clean();
       return ((string)$contents);
    }
@@ -249,13 +249,21 @@ class Template_Core extends Template {
          }
       }
 
-      $fileName = md5($filesHash).".css";
+      $fileName = md5($filesHash)."s.css";
 
-      if(!is_file(AppCore::getAppCacheDir()."stylesheets".DIRECTORY_SEPARATOR. $fileName)){
+      if(!is_file(AppCore::getAppCacheDir()."stylesheets".DIRECTORY_SEPARATOR. $fileName) || true == true){
+         file_put_contents(AppCore::getAppCacheDir(). "stylesheets".DIRECTORY_SEPARATOR. $fileName, "");
          // generate file
          foreach($filesForCompress as $file){
+            $cssCnt = file_get_contents($file);
+            // replace relative paths
+            $dir = dirname($file);
+            $url = str_replace(array(AppCore::getAppWebDir(), DIRECTORY_SEPARATOR), array(Url_Request::getBaseWebDir(), '/'), $dir)."/";
+            $cssCnt = preg_replace('#url\((?!\s*[\'"]?(?:https?:)?//)\s*([\'"])?#', "url($1{$url}", $cssCnt);
+//            var_dump($file, $dir, $url);flush();
+
             file_put_contents(AppCore::getAppCacheDir(). "stylesheets".DIRECTORY_SEPARATOR. $fileName,
-               ' /* '.$file.' */'."\n".file_get_contents($file), FILE_APPEND);
+               ' /* file: '.$file." mtime: ".filemtime($file).' */'."\n".$cssCnt, FILE_APPEND);
          }
       }
       array_unshift($files, Url_Request::getBaseWebDir().AppCore::ENGINE_CACHE_DIR."/stylesheets/".$fileName);
@@ -308,7 +316,7 @@ class Template_Core extends Template {
       return self::$pageTitle;
    }
 
-     /**
+   /**
     * Metoda nastavuje klíčová slova stránky
     * @param string $title -- klíčová slova stránky
     */
@@ -339,13 +347,13 @@ class Template_Core extends Template {
    public static function getPageDescription() {
       return self::getMetaTag('description');
    }
-   
+
    /**
     * Metoda nastavuje meta tag stránky
     * @param string $name -- název tagu
     * @param string $value -- hodnota tagu
-    * 
-    * @example 
+    *
+    * @example
     * <b>Facebook</b><br/>
     * <meta property="og:title" content="Article title" /><br/>
     * <meta property="og:type" content="movie"/><br/>
@@ -382,22 +390,22 @@ class Template_Core extends Template {
 
    /**
     * Metoda nastaví titulní obrázek stránky
-    * @param string $path - URL obrázku 
+    * @param string $path - URL obrázku
     */
-   public static function setCoverImage($path) 
+   public static function setCoverImage($path)
    {
       self::$coverImagePath = $path;
    }
-   
+
    /**
     * Metoda vrací adresu titulního obrázku
-    * @return string $path 
+    * @return string $path
     */
-   public static function getCoverImage() 
+   public static function getCoverImage()
    {
       return self::$coverImagePath;
    }
-   
+
    /**
     * Metoda vrací objekt detekce prohlížeče
     * @return Browser
@@ -406,6 +414,6 @@ class Template_Core extends Template {
    {
       return self::$browser;
    }
-   
+
 }
 ?>
