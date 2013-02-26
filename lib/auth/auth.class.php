@@ -53,7 +53,7 @@ class Auth extends TrObject {
     * Id uživatele
     * @var integer
     */
-   private static $userId = null;
+   private static $userId = -1;
 
    /**
     * Uživatelské jméno uživatele
@@ -72,7 +72,7 @@ class Auth extends TrObject {
     * @var string
     */
    private static $userIsAdmin = false;
-   
+
    /**
     * Uživatel je Admin pro aktuální web
     * @var string
@@ -134,11 +134,11 @@ class Auth extends TrObject {
       self::$userSites = $_SESSION[self::USER_SITES];
       self::$userIsAdmin = $_SESSION[self::USER_ADMIN];
       self::$userIsSiteAdmin = false;
-      
+
       if(self::$userIsAdmin AND (
-         empty(self::$userSites) 
-         OR (VVE_SUB_SITE_DOMAIN != null AND isset(self::$userSites[VVE_SUB_SITE_DOMAIN]))
-         OR (VVE_SUB_SITE_DOMAIN == null AND isset(self::$userSites['www']) ) )){
+         empty(self::$userSites)
+            OR (VVE_SUB_SITE_DOMAIN != null AND isset(self::$userSites[VVE_SUB_SITE_DOMAIN]))
+            OR (VVE_SUB_SITE_DOMAIN == null AND isset(self::$userSites['www']) ) )){
          self::$userIsSiteAdmin = true;
       }
 
@@ -151,7 +151,8 @@ class Auth extends TrObject {
     * metoda nastvuje výchozí prametry pro nepřihlášeného uživatele
     */
    private static function setDefaultUserParams() {
-      self::$userGroupId = self::$userId = (int)VVE_DEFAULT_ID_GROUP;
+      self::$userGroupId = (int)VVE_DEFAULT_ID_GROUP;
+      self::$userId = -1;
       self::$userGroupName = VVE_DEFAULT_GROUP_NAME;
       self::$userName = VVE_DEFAULT_USER_NAME;
       self::$userIsAdmin = false;
@@ -191,8 +192,8 @@ class Auth extends TrObject {
                AppCore::getUserErrors()->addMessage($tr->tr("Nepodařilo se přihlásit. Zřejmě váš účet neexistuje."));
             } else {
                if (Auth::cryptPassword(htmlentities($_POST["login_passwd"],ENT_QUOTES)) == $user->{Model_Users::COLUMN_PASSWORD}
-               OR ($user->{Model_Users::COLUMN_PASSWORD_RESTORE} != null
-                  AND Auth::cryptPassword(htmlentities($_POST["login_passwd"],ENT_QUOTES)) == $user->{Model_Users::COLUMN_PASSWORD_RESTORE})){
+                  OR ($user->{Model_Users::COLUMN_PASSWORD_RESTORE} != null
+                     AND Auth::cryptPassword(htmlentities($_POST["login_passwd"],ENT_QUOTES)) == $user->{Model_Users::COLUMN_PASSWORD_RESTORE})){
                   // Uspesne prihlaseni do systemu
                   self::$login = true;
                   self::$userName = $user->{Model_Users::COLUMN_USERNAME};
@@ -232,15 +233,14 @@ class Auth extends TrObject {
                      Log::msg($tr->tr('Uživateli bylo obnoveno nové heslo'), null, self::$userName);
                   }
                   // uložení přihlášení
-                  
+
                   $modelUserLogins = new Model_UsersLogins();
                   $newLogin = $modelUserLogins->newRecord();
                   $newLogin->{Model_UsersLogins::COLUMN_ID_USER} = self::$userId;
                   $newLogin->{Model_UsersLogins::COLUMN_IP_ADDRESS} = $_SERVER['REMOTE_ADDR'];
                   $newLogin->{Model_UsersLogins::COLUMN_BROWSER} = $_SERVER['HTTP_USER_AGENT'];
                   $modelUserLogins->save($newLogin);
-                  
-                  
+
                   Log::msg($tr->tr('Uživatel byl přihlášen'), null, self::$userName);
                   // permanent login
                   if(isset ($_POST['login_permanent']) AND $_POST['login_permanent'] == 'on'){
@@ -314,10 +314,10 @@ class Auth extends TrObject {
             unset($modelSites);
 
             if(self::$userIsAdmin AND (
-               empty(self::$userSites) 
-               OR (VVE_SUB_SITE_DOMAIN != null AND isset(self::$userSites[VVE_SUB_SITE_DOMAIN]))
-               OR (VVE_SUB_SITE_DOMAIN == null AND isset(self::$userSites['www']) ) )){
-                  self::$userIsSiteAdmin = true;
+               empty(self::$userSites)
+                  OR (VVE_SUB_SITE_DOMAIN != null AND isset(self::$userSites[VVE_SUB_SITE_DOMAIN]))
+                  OR (VVE_SUB_SITE_DOMAIN == null AND isset(self::$userSites['www']) ) )){
+               self::$userIsSiteAdmin = true;
             }
 
             self::saveUserDetailToSession();
@@ -341,10 +341,10 @@ class Auth extends TrObject {
 
    private static function getUser($username) {
       $model = new Model_Users();
-      $rec = $model->joinFK(Model_Users::COLUMN_GROUP_ID, 
-            array('gname' => Model_Groups::COLUMN_NAME, Model_Groups::COLUMN_IS_ADMIN))
+      $rec = $model->joinFK(Model_Users::COLUMN_GROUP_ID,
+         array('gname' => Model_Groups::COLUMN_NAME, Model_Groups::COLUMN_IS_ADMIN))
          ->where(Model_Users::COLUMN_USERNAME.' = :username OR '.Model_Users::COLUMN_MAIL.' = :mail',
-                array('username' => $username, 'mail' => $username))->record();
+         array('username' => $username, 'mail' => $username))->record();
       return $rec;
    }
 
@@ -413,7 +413,7 @@ class Auth extends TrObject {
    public static function isAdmin() {
       return self::$userIsSiteAdmin;
    }
-   
+
    /**
     * Metoda vrací jestli je uživatele administrátor pro některé stránky z domény
     * @return bool -- true pokud je administrator
@@ -450,4 +450,3 @@ class Auth extends TrObject {
       return substr( str_shuffle( $chars ), 0, $len );
    }
 }
-?>
