@@ -204,7 +204,7 @@ class Email {
       if($file instanceof Filesystem_File){
          $file = $file->getName(true);
       }
-      $this->files[] = $file;
+      $this->files[] = (string)$file;
       return $this;
    }
 
