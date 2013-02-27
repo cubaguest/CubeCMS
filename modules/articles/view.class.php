@@ -143,7 +143,7 @@ class Articles_View extends View {
          $this->toolbox->addTool($toolAdd);
          if($this->category()->getRights()->isControll()){
             $this->toolbox->setIcon(Template_Toolbox2::ICON_WRENCH);
-            $toolETView = new Template_Toolbox2_Tool_PostRedirect('edit_text', $this->tr("Upravit text"),
+            $toolETView = new Template_Toolbox2_Tool_PostRedirect('edit_text', $this->tr("Upravit úvodní text"),
             $this->link()->route('edittext'));
             $toolETView->setIcon('page_edit.png')->setTitle($this->tr('Upravit úvodní text'));
             $this->toolbox->addTool($toolETView);
@@ -189,7 +189,7 @@ class Articles_View extends View {
 
    public function editTextView() {
       Template_Module::setEdit(true);
-      $this->addTinyMCE('simple');
+      $this->setTinyMCE($this->form->text, 'simple');
       $this->template()->addFile('tpl://articles:edittext.phtml');
       Template_Navigation::addItem($this->tr('Úprava úvodního textu'), $this->link());
    }
