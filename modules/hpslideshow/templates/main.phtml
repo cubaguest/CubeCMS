@@ -1,0 +1,157 @@
+<?
+$this->addFile("css://style.less");
+
+$jq = new JsPlugin_JQuery();
+$jq->addUITabs();
+$jq->addUISortable();
+$this->addJsPlugin($jq);
+$this->addJsPlugin(new JsPlugin_JQueryCSS());
+
+?>
+<h1><?echo $this->category()->getName();?></h1>
+<div class="content-admin">
+   <div id="form-upload">
+      <?
+      echo $this->formUpload;
+      ?>
+   </div>
+   <h2><?ps($this->tr('Nahrané obrázky'))?></h2>
+   <?if(!empty($this->images)){?>
+      <ul id="images-list" class="ui-widget ui-cube-widget">
+         <?foreach ($this->images as $img) {?>
+         <li class="ui-widget-content ui-state-default slide-image-row" id="image-<?=$img->getPK()?>" data-id="<?=$img->getPK()?>">
+            <ul class="tabs-links clearfix">
+               <li><a class="tab-link" href="<?=$this->link()?>#preview-<?=$img->getPK()?>"><?ps($this->tr('Náhled'))?></a></li>
+               <li><a class="tab-link" href="<?=$this->link()?>#edit-<?=$img->getPK()?>"><?ps($this->tr('Úprava'))?></a></li>
+            </ul>
+            <div class="tab tab-preview" id="preview-<?=$img->getPK()?>">
+               <img class="image-slide" src="<?=$this->imagesUrl.$img->getPK().'.jpg'?>" />
+               <?if((string)$img->{HPSlideShow_Model::COLUMN_LABEL} != null){?>
+                  <div class="image-label"><?ps(vve_get_lang_string($img->{HPSlideShow_Model::COLUMN_LABEL}))?></div>
+               <?}?>
+               <div class="link-info">
+               <?if((string)$img->{HPSlideShow_Model::COLUMN_LINK} != null){?>
+                  <?ps($this->tr('Odkaz na'))?>:
+                   <a href="<?=$img->{HPSlideShow_Model::COLUMN_LINK}?>" class="link-external"><?ps($img->{HPSlideShow_Model::COLUMN_LINK})?></a>
+               <?} else if($img->{HPSlideShow_Model::COLUMN_ID_CAT} != 0){?>
+                   <?ps($this->tr('Odkaz na kategorie'))?>:
+                  <a href="<?=$this->link()->clear()->category($img->{Model_Category::COLUMN_URLKEY})?>" class="link-external">
+                     <?ps($img->{Model_Category::COLUMN_NAME});?>
+                  </a>
+               <?} else {?>
+                  <?ps($this->tr('Nemá proklik'))?>.
+               <?}?>
+               </div>
+            </div>
+            <div class="tab" id="edit-<?=$img->getPK()?>">
+               <?
+               $this->formEdit->html()->addClass('form-edit-image');
+               $this->formEdit->id->setValues($img->{HPSlideShow_Model::COLUMN_ID});
+               $this->formEdit->catId->setValues($img->{HPSlideShow_Model::COLUMN_ID_CAT});
+               $this->formEdit->link->setValues($img->{HPSlideShow_Model::COLUMN_LINK});
+               $this->formEdit->label->setValues($img->{HPSlideShow_Model::COLUMN_LABEL});
+               echo $this->formEdit;
+               ?>
+            </div>
+            <div class="slide-buttons">
+               <span class="button-move"><img src="images/icons/arrow_up_down.png" /></span>
+               <a class="button-changestate" data-id="<?=$img->getPK()?>" href="<?=$this->link()?>#changestate-<?=$img->getPK()?>"><img
+                       src="images/icons/<?echo $img->{HPSlideShow_Model::COLUMN_ACTIVE} ? 'enable.png' : 'disable.png'?>" /></a>
+               <a class="button-delete" data-id="<?=$img->getPK()?>" href="<?=$this->link()?>#delete-<?=$img->getPK()?>"><img src="images/icons/cancel.png" /></a>
+            </div>
+         </li>
+         <?}?>
+      </ul>
+      <script type="text/javascript">
+         $(document).ready(function(){
+            $( "#images-list>li" ).tabs();
+            $( "#images-list" ).sortable({
+               placeholder: "ui-state-highlight",
+               axis: "y",
+               forceHelperSize: true,
+               forcePlaceholderSize: true,
+               handle : ".button-move",
+               update : function( event, ui ){
+                  $.ajax({
+                     type : 'POST', url : "<?=$this->link()->route('editImage')?>",
+                     data : {action : 'changepos', id : ui.item.data('id'), pos : ui.item.index()+1},
+                     success : function(data){
+                        if(data.errmsg.length != 0){
+                           alert('Chyba při přesunu: '+data.errmsg.join(";"));
+                        }
+                     }
+                  });
+               }
+            });
+
+            $('.button-delete').click( function (){
+               if(!confirm('<?ps($this->tr('Opravdu smazat obrázek?'))?>')){
+                   return false;
+               }
+               var $li = $(this).closest('li.slide-image-row');
+               var id = $(this).data("id");
+               $.ajax({
+                  type: "POST",
+                  url: "<?=$this->link()->route('editImage')?>",
+                  data: {action : "delete", id : id},
+                  success : function(data){
+                     $li.fadeOut(300, function(){
+                        $(this).remove();
+                     });
+                  }
+               });
+               return false;
+            });
+
+            $('.button-changestate').click( function (){
+               var id = $(this).data("id");
+               var $this = $(this);
+               $.ajax({
+                  type: "POST",
+                  url: "<?=$this->link()->route('editImage')?>",
+                  data: {action : "changestate", id : id},
+                  success : function(data){
+                     var $img = $('img', $this);
+                     if($img.attr('src').indexOf('enable') === -1){
+                        $img.attr('src', $img.attr('src').replace('disable', 'enable'))
+                     } else {
+                        $img.attr('src', $img.attr('src').replace('enable', 'disable'))
+                     }
+
+                  }
+               });
+               return false;
+            });
+
+            $('input[name="img_edit_save"]').after($('<img src="images/progress_small.gif" />').addClass('loader').hide());
+
+            $('form.form-edit-image').submit(function(){
+               var $form = $(this);
+               $('.loader', $form).show();
+               $('input[name="img_edit_save"]', $form).attr('disabled', 'disabled');
+               $.ajax({
+                  type: "POST",
+                  url: "<?=$this->link()?>",
+                  data: $form.serialize(),
+                  success : function(html){
+
+                     $('.tab-preview', html).each(function(){
+                        $('#'+$(this).attr('id')).html($(this).html());
+                     });
+
+                     $('.loader', $form).hide();
+                     $('input[name="img_edit_save"]', $form).removeAttr('disabled');
+                  }
+               });
+
+               return false;
+            });
+
+         });
+      </script>
+   <?} else { ?>
+      <div class="admin-info-text">
+         <?ps($this->tr('Naní nahrán žádný obrázek'))?>
+      </div>
+   <?}?>
+</div>

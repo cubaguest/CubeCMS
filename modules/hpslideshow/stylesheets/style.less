@@ -1,0 +1,65 @@
+#hp-slideshow {
+   .slide {
+      .label {
+         position: absolute;
+         bottom: 0;
+         background-color: white;
+         margin: 5px;
+         padding: 5px;
+      }
+      >a, img {
+         display: block;
+      }
+      position: absolute;
+      top: 0;
+      left: 0;
+   }
+   margin: 10px 0;
+   position: relative;
+   height: 150px;
+}
+
+#images-list {
+   >li {
+      .slide-buttons {
+         .button-move {
+            cursor: ns-resize;
+         }
+         position: absolute;
+         top: 8px;
+         right: 10px;
+      }
+      list-style: none;
+      margin: 0 0 5px 0;
+      position: relative;
+   }
+
+   .tab-link {
+      padding: 3px;
+      font-size: 80%;
+   }
+   .ui-tabs-panel {
+      img.image-slide {
+         width: 100%;
+      }
+      .image-label {
+         position: absolute;
+         bottom: 2em;
+         background: transparent url('@{dirCoreImages}bg_w_70.png') top left repeat;
+         padding: 5px;
+         margin: 0 5px;
+         left: 0px;
+      }
+      img.loader {
+         display: inline-block;
+         margin-left: 0.5em;
+      }
+      .tab-preview {
+         position: relative;
+      }
+      padding: 3px;
+   }
+
+   margin: 0;
+   padding: 0;
+}

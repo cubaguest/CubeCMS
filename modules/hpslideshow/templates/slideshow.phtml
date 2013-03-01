@@ -1,0 +1,28 @@
+<div id="hp-slideshow">
+   <?
+   $link = new Url_Link(true);
+   foreach ($this->images as $img) {
+   // prepare link
+   $href = (string)vve_get_lang_string($img->{HPSlideShow_Model::COLUMN_LINK});
+   if($img->{HPSlideShow_Model::COLUMN_ID_CAT} != 0){
+      $href = $link->category($img->{Model_Category::COLUMN_URLKEY});
+   }
+   $label = (string)vve_get_lang_string($img->{HPSlideShow_Model::COLUMN_LABEL});
+   ?>
+   <div class="slide">
+      <? if($href != null){?>
+      <a href="<?=$href?>">
+      <?}?>
+      <img src="<?echo $this->imagesUrl.$img->getPK().".jpg";?>" />
+      <? if($href != null){?>
+      </a>
+      <?}?>
+      <?if($label != null){?>
+      <div class="label"><?ps($label)?></div>
+      <?}?>
+   </div>
+   <?}?>
+</div>
+<script type="text/javascript">
+   $(document).ready(function(){ $('#hp-slideshow').cubeHPSlider(); });
+</script>
