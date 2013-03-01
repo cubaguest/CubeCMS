@@ -121,6 +121,7 @@ class Form extends TrObject implements ArrayAccess, Iterator {
       if($this->protectForm && $this->elementToken instanceof Form_Element_Token){
          $pHtml->addContent((string)$this->elementToken->controll());
       }
+      $pHtml->addClass('inline');
       $html->addContent($pHtml);
 
       $prevGrp = null;

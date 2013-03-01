@@ -67,7 +67,7 @@ class Model_CategoryAdm extends Model_File {
       return empty($child) ? false : self::createCatObject($child[0]);
    }
 
-   private function createCatObject($child){
+   private static function createCatObject($child){
       $obj = new Object();
       $urlkey = $child->xpath('urlkey[@lang="'.Locales::getLang().'"]');
       if(empty($urlkey)){

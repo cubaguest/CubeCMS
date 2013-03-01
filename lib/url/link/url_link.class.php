@@ -94,6 +94,14 @@ class Url_Link extends Url {
       return Url_Request::getBaseWebDir();
    }
 
+   /**
+    * Metoda vrací adresu k web aplikaci
+    * @return string -- adresa ke kořenu aplikace
+    */
+   public static function getWebURL() {
+      return Url_Request::getBaseWebDir();
+   }
+
    /*
     * VEŘEJNÉ METODY
     */

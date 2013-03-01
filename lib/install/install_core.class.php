@@ -193,12 +193,12 @@ class Install_Core {
                         $update = 'all';
                      } else if($buffer != null) {
                         if($update == 'all' ||
-                        (defined('VVE_SUB_SITE_DIR') && ((!defined('VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND') && VVE_SUB_SITE_DIR == null && $update == 'main' )
-                                                     || (!defined('VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND') && VVE_SUB_SITE_DIR != null && $update == 'sub' ) ) )
-                        // for old subdomain htaccess
-                        || (defined('VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND') && ((VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND == null && $update == 'main' )
-                                                                          || (VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND != null && $update == 'sub' )) )
-                                                                          ){
+                           (defined('VVE_SUB_SITE_DIR') && ((!defined('VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND') && VVE_SUB_SITE_DIR == null && $update == 'main' )
+                              || (!defined('VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND') && VVE_SUB_SITE_DIR != null && $update == 'sub' ) ) )
+                           // for old subdomain htaccess
+                           || (defined('VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND') && ((VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND == null && $update == 'main' )
+                              || (VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND != null && $update == 'sub' )) )
+                        ){
                            $sql .= $buffer;
                         } else if($update == 'shop' && defined('VVE_SHOP') && VVE_SHOP == true){
                            $sql .= $buffer;
@@ -206,7 +206,7 @@ class Install_Core {
                            $sql .= $m.' SKIPING '. $update  ."\n";
 //                            $sql .= '-- '.$buffer;
                         }
-                        
+
                      }
                   }
 //                   echo nl2br("-- SQL Update :\n ".$sql);die();
@@ -242,33 +242,40 @@ class Install_Core {
       }
 //       die();
       Install_Module::updateAllModules();
-      $this->installComplete(sprintf('Jádro a moduly bylo aktualizováno na verzi %s release %s', AppCore::ENGINE_VERSION, AppCore::ENGINE_RELEASE));
-      
       // update subdomains
       $this->updateSubdomains();
+
+      $this->installComplete(sprintf('Jádro a moduly bylo aktualizováno na verzi %s release %s', AppCore::ENGINE_VERSION, AppCore::ENGINE_RELEASE));
    }
 
    private function updateSubdomains()
    {
-      $modelDomains = new Model_Sites();
-      $subDomains = $modelDomains->where(Model_Sites::COLUMN_IS_MAIN." = 0", array())->records();
-      if(!empty($subDomains)){
-         foreach($subDomains as $domain){
-            // build link
-            $site = str_replace('www', $domain->{Model_Sites::COLUMN_DOMAIN}, Url_Request::getBaseWebDir(true))."sitemap.html?sessionid=".session_id();
-            $ch = curl_init($site);
-            curl_setopt($ch, CURLOPT_AUTOREFERER, true);
-            curl_setopt($ch, CURLOPT_HEADER, true);
-            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type: text/xml; charset=UTF-8"));
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT']);
-            if(curl_exec($ch) === false)
-            {
-               Log::msg('Nelze updatovat subdoménu: '.$domain->{Model_Sites::COLUMN_DOMAIN}." CURL_ERRNO: ".curl_errno($ch)." CURL_ERROR: ".curl_error($ch));
+      // do not update main site
+      if(strpos($_SERVER['SERVER_NAME'], 'www') !== false){
+         $modelDomains = new Model_Sites();
+         $subDomains = $modelDomains->where(Model_Sites::COLUMN_IS_MAIN." = 0", array())->records();
+         if(!empty($subDomains)){
+            foreach($subDomains as $domain){
+               // build link
+//               $site = str_replace('www', $domain->{Model_Sites::COLUMN_DOMAIN}, 'http://'.$_SERVER['SERVER_NAME'])."/sitemap.html?sessionid=".session_id();
+               $site = str_replace('www', $domain->{Model_Sites::COLUMN_DOMAIN}, 'http://'.$_SERVER['SERVER_NAME']);
+//               var_dump($site);
+               $ch = curl_init($site);
+               curl_setopt($ch, CURLOPT_AUTOREFERER, true);
+               curl_setopt($ch, CURLOPT_HEADER, true);
+               curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+               curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+               curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type: text/xml; charset=UTF-8"));
+               curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+               curl_setopt($ch, CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT']);
+               $res = curl_exec($ch);
+//               var_dump($res);
+               if($res === false)
+               {
+                  Log::msg('Nelze updatovat subdoménu: '.$domain->{Model_Sites::COLUMN_DOMAIN}." CURL_ERRNO: ".curl_errno($ch)." CURL_ERROR: ".curl_error($ch));
+               }
+               curl_close($ch);
             }
-            curl_close($ch);
          }
       }
    }
@@ -312,8 +319,8 @@ class Install_Core {
       $model = new Model_DbSupport();
       $stmt = $model->runSQL($SQL);
       if(!$stmt){
-         var_dump($stmt->errorInfo());
-         throw new PDOException('Undefined SQL error.');
+//         var_dump($stmt->errorInfo());
+         throw new PDOException('Undefined SQL error: '.$stmt->errorInfo());
       }
    }
 
@@ -341,7 +348,7 @@ class Install_Core {
    public function getInstallDir()
    {
       return AppCore::getAppLibDir() . AppCore::ENGINE_LIB_DIR . DIRECTORY_SEPARATOR
-      . self::CORE_INSTALL_DIR . DIRECTORY_SEPARATOR;
+         . self::CORE_INSTALL_DIR . DIRECTORY_SEPARATOR;
    }
 
    protected function replaceDBPrefix($cnt)
@@ -358,4 +365,3 @@ class Install_Core {
    }
 
 }
-?>

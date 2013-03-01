@@ -2,15 +2,21 @@
 // repair order in shop attributes
 if(defined('VVE_SHOP') && VVE_SHOP == true){
    // aktualizace pořadí atributů a jejich skupin
-   $groups = (new Shop_Model_AttributesGroups())->records();
+   $mgrp = new Shop_Model_AttributesGroups();
+   $groups = $mgrp
+      ->columns(array(Shop_Model_AttributesGroups::COLUMN_ID, Shop_Model_AttributesGroups::COLUMN_ORDER))
+      ->records();
    $grpOrder = 1;
    if(!empty($groups)){
       foreach($groups as $grp){
          $grp->{Shop_Model_AttributesGroups::COLUMN_ORDER} = $grpOrder;
          $grp->save();
          $grpOrder++;
-
-         $attributes = (new Shop_Model_Attributes())->where(Shop_Model_Attributes::COLUMN_ID_GROUP." = :id", array('id' => $grp->getPK()))->records();
+         $mAttr = new Shop_Model_Attributes();
+         $attributes = $mAttr
+            ->where(Shop_Model_Attributes::COLUMN_ID_GROUP." = :id", array('id' => $grp->getPK()))
+            ->columns(array(Shop_Model_Attributes::COLUMN_ID, Shop_Model_Attributes::COLUMN_ID_GROUP, Shop_Model_Attributes::COLUMN_ORDER))
+            ->records();
          $atrOrder = 1;
          if(!empty($attributes)){
             foreach($attributes as $atr){
@@ -24,9 +30,11 @@ if(defined('VVE_SHOP') && VVE_SHOP == true){
    }
 
    // Aktualizace pořadí produktů
-   $products = (new Shop_Model_Product())
-      ->order(array(Shop_Model_Product::COLUMN_ID_CATEGORY => Model_ORM::ORDER_ASC, Shop_Model_Product::COLUMN_NAME => Model_ORM::ORDER_ASC) )
-      ->records();
+   $m = new Shop_Model_Product();
+   $m->columns(array(Shop_Model_Product::COLUMN_ID_CATEGORY, Shop_Model_Product::COLUMN_ORDER))
+      ->order(array(Shop_Model_Product::COLUMN_ID_CATEGORY => Model_ORM::ORDER_ASC, Shop_Model_Product::COLUMN_ID => Model_ORM::ORDER_ASC) );
+
+   $products = $m->records();
    $order = 1;
    $idc = null;
    foreach ($products as $product) {
@@ -38,6 +46,4 @@ if(defined('VVE_SHOP') && VVE_SHOP == true){
       $product->save();
       $order++;
    }
-
-
 }

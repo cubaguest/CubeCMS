@@ -74,7 +74,7 @@ class Form_Element_Select extends Form_Element {
     * @param string/int $value -- hodnota volby
     */
    public function addOption($name, $value){
-      $this->options[$name] = $value;
+      $this->options[(string)$name] = $value;
    }
 
       /**

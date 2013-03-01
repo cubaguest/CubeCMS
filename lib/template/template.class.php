@@ -857,15 +857,6 @@ class Template extends TrObject {
          @mkdir($targetPath);
          @mkdir($targetPath.DIRECTORY_SEPARATOR.'shop'); // for shop styles
       }
-//      var_dump($targetPath . $rpFile . ".css", !is_file($targetPath . $rpFile . ".css"), !is_writable($targetPath . $rpFile . ".css"));
-//      if(!is_file($targetPath . $rpFile . ".css") || !is_writable($targetPath . $rpFile . ".css")){
-//         $targetPath = $cachePath;
-//         if(!is_dir($targetPath)){
-//            @mkdir($targetPath);
-//         }
-//         $url = Url_Request::getBaseWebDir()."cache/".self::STYLESHEETS_DIR."/";
-//         $createNewFile = true;
-//      }
       $hash = md5($path.$file);
       $compiledFileUrl = $url.$file.".".$hash.".css";
 

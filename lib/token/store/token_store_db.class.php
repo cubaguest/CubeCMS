@@ -15,7 +15,8 @@ class Token_Store_Db implements Token_Store {
 
    public function check($token)
    {
-      return (bool)(new Model_Tokens())->where(
+      $model = new Model_Tokens();
+      return (bool)$model->where(
          Model_Tokens::COLUMN_TOKEN." = :token "
             ." AND ".Model_Tokens::COLUMN_ID_USER." = :idu"
             ." AND ".Model_Tokens::COLUMN_TIME_ADD." > DATE_ADD(NOW(), INTERVAL :secs SECOND )",
@@ -25,7 +26,8 @@ class Token_Store_Db implements Token_Store {
 
    public function save($token)
    {
-      $tokenRec = (new Model_Tokens())->newRecord();
+      $m = new Model_Tokens();
+      $tokenRec = $m->newRecord();
       $tokenRec->{Model_Tokens::COLUMN_ID_USER} = Auth::getUserId();
       $tokenRec->{Model_Tokens::COLUMN_TOKEN} = $token;
       $tokenRec->save();
@@ -33,16 +35,16 @@ class Token_Store_Db implements Token_Store {
 
    public function delete($token)
    {
-      (new Model_Tokens())
-         ->where(Model_Tokens::COLUMN_TOKEN." = :token AND ".Model_Tokens::COLUMN_ID_USER." = :idu",
+      $m = new Model_Tokens();
+      $m->where(Model_Tokens::COLUMN_TOKEN." = :token AND ".Model_Tokens::COLUMN_ID_USER." = :idu",
             array('token' => $token, 'idu' => Auth::getUserId()))
          ->delete();
    }
 
    public function gc()
    {
-      (new Model_Tokens())
-         ->where(Model_Tokens::COLUMN_TIME_ADD." < DATE_ADD(NOW(), INTERVAL :secs SECOND )",
+      $m = new Model_Tokens();
+      $m->where(Model_Tokens::COLUMN_TIME_ADD." < DATE_ADD(NOW(), INTERVAL :secs SECOND )",
          array('secs' => -(self::TOKEN_EXPIRE)))
          ->delete();
    }

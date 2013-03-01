@@ -77,6 +77,15 @@ class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_I
                }
             }
          }
+      } else if($elemObj instanceof Form_Element_Multi_Checkbox){
+         $isSomeOk = false;
+         foreach ($elemObj->getUnfilteredValues() as $v) {
+            $v == true ? $isSomeOk = true : null;
+         }
+         if(!$isSomeOk) {
+            $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
+            $this->isValid = false;
+         }
       } else if($elemObj instanceof Form_Element_Checkbox || $elemObj instanceof Form_Element_File){
          if($elemObj->getUnfilteredValues() == false) {
             $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
@@ -155,4 +164,3 @@ class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_I
       return false;
    }
 }
-?>

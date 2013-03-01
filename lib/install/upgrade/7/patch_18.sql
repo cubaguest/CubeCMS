@@ -1,5 +1,9 @@
 -- Update na verzi 7.18
 
+-- update module length
+ALTER TABLE `{PREFIX}categories` CHANGE COLUMN `module` `module` VARCHAR(30) NULL DEFAULT NULL  ;
+
+
 /* UPDATE_MAIN_SITE */
 -- tabluka s tokeny pouze u hlavní stránky
 CREATE TABLE IF NOT EXISTS `{PREFIX}secure_tokens` (
@@ -68,7 +72,4 @@ CHANGE COLUMN `personal_pickup_only` `product_personal_pickup_only` TINYINT(1) N
 CHANGE COLUMN `required_pickup_date` `product_required_pickup_date` TINYINT(1) NULL DEFAULT '0'  ,
 CHANGE COLUMN `is_new_to_date` `product_is_new_to_date` DATE NULL DEFAULT NULL  ,
 ADD COLUMN `product_order` INT(11) NULL DEFAULT 0 ;
-
-
-
 /* END_UPDATE */

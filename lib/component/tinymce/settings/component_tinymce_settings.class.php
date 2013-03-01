@@ -266,12 +266,27 @@ abstract class Component_TinyMCE_Settings extends TrObject implements ArrayAcces
    protected function getContentCssFile()
    {
       $contentCss = null;
-      if(is_file(Template::faceDir().Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.'style.less.css' ) ){
+      $file = 'style.less';
+      $faceRealPath = Face::getCurrent()->getDir().Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR;
+      $parentFaceRealPath = AppCore::getAppLibDir()."faces".DIRECTORY_SEPARATOR.Face::getCurrent()->getName().DIRECTORY_SEPARATOR.Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR;
+      $faceFile = 'style.less.'.md5($faceRealPath.$file).'.css';
+      $parentFaceFile = 'style.less.'.md5($parentFaceRealPath.$file).'.css';
+
+      $libRealPath = AppCore::getAppLibDir().Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR;
+      $libFile = 'style.less.'.md5($libRealPath.$file).'.css';
+
+      if(is_file(AppCore::getAppCacheDir().Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.$faceFile) ){
          // check less css file form face
-         $contentCss = Template::faceUrl().Template::STYLESHEETS_DIR."/style.less.css";
-      } else if(is_file(Template::faceDir(true).Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.'style.less.css' ) ){
+         $contentCss = Url_Request::getBaseWebDir(false).AppCore::ENGINE_CACHE_DIR."/".Template::STYLESHEETS_DIR."/"
+            .$faceFile;
+      } else if(is_file(AppCore::getAppLibDir().AppCore::ENGINE_CACHE_DIR.DIRECTORY_SEPARATOR.Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.$parentFaceFile) ){
+         // check less css file form face
+         $contentCss = Url_Request::getBaseWebDir(true).AppCore::ENGINE_CACHE_DIR."/".Template::STYLESHEETS_DIR."/"
+            .$parentFaceFile;
+      } else if(is_file(AppCore::getAppCacheDir().Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.$libFile ) ){
          // check less css file form parent face
-         $contentCss = Template::faceUrl().Template::STYLESHEETS_DIR."/style.less.css";
+         $contentCss = Url_Request::getBaseWebDir(true).AppCore::ENGINE_CACHE_DIR."/".Template::STYLESHEETS_DIR."/"
+            .$libFile;
       }
       // old for normal content css file
       else if(is_file(Template::faceDir().Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.'style-content.css')) {

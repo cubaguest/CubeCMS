@@ -644,23 +644,21 @@ class Form_Element extends TrObject implements Form_Element_Interface {
       $link = new Url_Link();
 
       // button remove row
-//      $a = new Html_Element('a', $this->tr('odebrat'));
       $a = new Html_Element('a', '<img src="/images/icons/delete.png" alt="'.$this->tr('odebrat').'" />');
       $a->setAttrib('href', $link."#add".$this->getName());
       $a->setAttrib('onclick', "return CubeCMS.Form.removeRow(this)");
       $a->addClass('button-remove-multiple-line');
       if($first){
-         $a->addClass('hidden');
+         $a->setAttrib('style', 'display:none;');
       }
       $cnt .= $a;
       // button add new row
-//      $a = new Html_Element('a', $this->tr('přidat'));
       $a = new Html_Element('a', '<img src="/images/icons/add.png" alt="'.$this->tr('přidat').'" />');
       $a->setAttrib('href', $link."#add".$this->getName());
       $a->setAttrib('onclick', "return CubeCMS.Form.addRow(this)");
       $a->addClass('button-add-multiple-line');
       if(!$last){
-         $a->addClass('hidden');
+         $a->setAttrib('style', 'display:none;');
       }
       $cnt .= $a;
 
@@ -710,6 +708,12 @@ class Form_Element extends TrObject implements Form_Element_Interface {
             if(is_array($values) && $this->dimensional === true){
                $container = new Html_Element('p');
                $container->addClass('form-input-multiple');
+               /**
+                * @todo - tohle vyřešit nějak jinak, protože se vkládá index 0 do pole s hodnotami
+                */
+               if(empty($values)){
+                  $values[] = null;
+               }
                $cnt = null;
                end($values);
                $lastKey = key($values);

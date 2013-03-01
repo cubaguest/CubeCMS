@@ -11,7 +11,7 @@
 class Form_Validator_Url extends Form_Validator implements Form_Validator_Interface {
    public function  __construct($errMsg = null) {
       if($errMsg == null) {
-         parent::__construct($this->tr('Položka "%s" není korektní adresa'));
+         parent::__construct($this->tr('Položka "%s" není korektní URL adresa'));
       } else {
          parent::__construct($errMsg);
       }
@@ -32,10 +32,19 @@ class Form_Validator_Url extends Form_Validator implements Form_Validator_Interf
          // input text
          case 'Form_Element_Text':
          case 'Form_Element_Password':
-            if($elemObj->isDimensional() OR $elemObj->isMultiLang()) {
+            if($elemObj->isMultiple() OR $elemObj->isMultiLang()) {
+               foreach($elemObj->getUnfilteredValues() as $value){
+                  if($value != null && !filter_var($value, FILTER_VALIDATE_URL)){
+                     $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
+                     return false;
+                  }
+               }
 
             } else {
-               if($elemObj->getUnfilteredValues() != null AND !preg_match('/^(?#Protocol)(?:(?:ht|f)tp(?:s?)\:\/\/|~\/|\/)?(?#Username:Password)(?:\w+:\w+@)?(?#Subdomains)(?:(?:[-\w]+\.)+(?#TopLevel Domains)(?:com|org|net|gov|mil|biz|info|mobi|name|aero|jobs|museum|travel|[a-z]{2}))(?#Port)(?::[\d]{1,5})?(?#Directories)(?:(?:(?:\/(?:[-\w~!$+|.,=]|%[a-f\d]{2})+)+|\/)+|\?|#)?(?#Query)(?:(?:\?(?:[-\w~!$+|.,*:]|%[a-f\d{2}])+=?(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)(?:&(?:[-\w~!$+|.,*:]|%[a-f\d{2}])+=?(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)*)*(?#Anchor)(?:#(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)?$/i', $elemObj->getUnfilteredValues())){
+               if($elemObj->getUnfilteredValues() != null
+//                  AND !preg_match('/^(?#Protocol)(?:(?:ht|f)tp(?:s?)\:\/\/|~\/|\/)?(?#Username:Password)(?:\w+:\w+@)?(?#Subdomains)(?:(?:[-\w]+\.)+(?#TopLevel Domains)(?:com|org|net|gov|mil|biz|info|mobi|name|aero|jobs|museum|travel|[a-z]{2}))(?#Port)(?::[\d]{1,5})?(?#Directories)(?:(?:(?:\/(?:[-\w~!$+|.,=]|%[a-f\d]{2})+)+|\/)+|\?|#)?(?#Query)(?:(?:\?(?:[-\w~!$+|.,*:]|%[a-f\d{2}])+=?(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)(?:&(?:[-\w~!$+|.,*:]|%[a-f\d{2}])+=?(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)*)*(?#Anchor)(?:#(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)?$/i', $elemObj->getUnfilteredValues())
+                  AND !filter_var($elemObj->getUnfilteredValues(), FILTER_VALIDATE_URL)
+               ){
                   $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
                   return false;
                }
@@ -48,4 +57,3 @@ class Form_Validator_Url extends Form_Validator implements Form_Validator_Interf
 
    }
 }
-?>

@@ -239,9 +239,14 @@ class Template_Core extends Template {
       $cssFiles = Template::getStylesheets();
       foreach ($cssFiles as $css) {
 //         pokud je soubor s enginu
-         if(strpos($css, Url_Request::getBaseWebDir(true)) !== false && strpos($css, 'nocompress') === false){
+         if(strpos($css, Url_Request::getBaseWebDir(false)) !== false && strpos($css, 'nocompress') === false){
             // create absolute path
-            $fileAbs = AppCore::getAppWebDir().str_replace(array(Url_Request::getBaseWebDir(), '/'),array('', DIRECTORY_SEPARATOR), $css );
+            $fileAbs = AppCore::getAppWebDir().str_replace(array(Url_Request::getBaseWebDir(false), '/'),array('', DIRECTORY_SEPARATOR), $css );
+            $filesForCompress[] = $fileAbs;
+            $filesHash .= $css.filemtime($fileAbs);
+         } else if(strpos($css, Url_Request::getBaseWebDir(true)) !== false && strpos($css, 'nocompress') === false){
+            // create absolute path
+            $fileAbs = AppCore::getAppLibDir().str_replace(array(Url_Request::getBaseWebDir(true), '/'),array('', DIRECTORY_SEPARATOR), $css );
             $filesForCompress[] = $fileAbs;
             $filesHash .= $css.filemtime($fileAbs);
          } else {
@@ -258,7 +263,9 @@ class Template_Core extends Template {
             $cssCnt = file_get_contents($file);
             // replace relative paths
             $dir = dirname($file);
-            $url = str_replace(array(AppCore::getAppWebDir(), DIRECTORY_SEPARATOR), array(Url_Request::getBaseWebDir(), '/'), $dir)."/";
+            $url = str_replace(
+               array(AppCore::getAppLibDir(),AppCore::getAppWebDir(), DIRECTORY_SEPARATOR),
+               array(Url_Request::getBaseWebDir(), Url_Request::getBaseWebDir(), '/'), $dir)."/";
             $cssCnt = preg_replace('#url\((?!\s*[\'"]?(?:https?:)?//)\s*([\'"])?#', "url($1{$url}", $cssCnt);
 //            var_dump($file, $dir, $url);flush();
 
@@ -416,4 +423,3 @@ class Template_Core extends Template {
    }
 
 }
-?>
