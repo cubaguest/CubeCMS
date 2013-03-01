@@ -99,10 +99,14 @@ if(VVE_DEBUG_LEVEL > 1){ $this->addFile('js://enginehelpers.js');
             <div id="col1wrap" class="column">
                <div id="col1pad" class="<?if(!empty($this->panels['left'])) echo "col1pad_plusleft";?><?if(!Template_Module::isEdit()) echo " col1pad_plusright";?>">
                   <?
-                  
                   $this->includeTpl("messages.phtml", true);
                   $navTpl = new Template_Navigation();
                   echo $navTpl;
+
+                  if(Template::isTitlePage()){
+                     echo HPSlideShow_View::getSlideshow();
+                  }
+
                   if(VVE_DEBUG_LEVEL > 0){ echo "<pre>";Debug::printDebug(); echo "</pre>";Debug_Timer::printTimers(); }
                   ?>
                   <div class="main-content module-<?=  Category::getSelectedCategory()->getModule()->getName()?>">
@@ -181,9 +185,6 @@ if(VVE_DEBUG_LEVEL > 1){ $this->addFile('js://enginehelpers.js');
       <div id="debug">
          <?
          if(VVE_DEBUG_LEVEL > 1) {
-            echo "<pre>";
-            $this->getCombineCssFile();
-            echo "</pre>";
             if(function_exists('xdebug_get_function_count')){
                print ("Run functions: ".xdebug_get_function_count()."<br />");
                print ("Memory: ".xdebug_memory_usage()."<br />");
