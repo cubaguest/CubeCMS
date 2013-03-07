@@ -15,6 +15,6 @@ ADD COLUMN `id_parent_message` INT NULL DEFAULT 0  AFTER `id_topic` ,
 ADD COLUMN `message_order` INT NULL DEFAULT 0 , 
 ADD COLUMN `message_depth` INT NULL DEFAULT 0 ,
 ADD COLUMN `message_reaction_send_notify` TINYINT(1) NULL DEFAULT 0 , 
-RENAME TO  `cube_cms`.`cube_cms_forum_messages` ;
+RENAME TO  `{PREFIX}forum_messages` ;
 
 

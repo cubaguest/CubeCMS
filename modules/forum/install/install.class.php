@@ -20,18 +20,20 @@ class Forum_Install extends Install_Module {
       
          $curTopic = null;
          $curPos = 1;
-         foreach ($messages as $msg){
-            if($msg->{Forum_Model_Messages::COLUMN_ID_TOPIC} != $curTopic){
-               // reset counter if diferent topic
-               $curTopic = $msg->{Forum_Model_Messages::COLUMN_ID_TOPIC};
-               $curPos = 1;
+         if($messages){
+            foreach ($messages as $msg){
+               if($msg->{Forum_Model_Messages::COLUMN_ID_TOPIC} != $curTopic){
+                  // reset counter if diferent topic
+                  $curTopic = $msg->{Forum_Model_Messages::COLUMN_ID_TOPIC};
+                  $curPos = 1;
+               }
+               // update db
+               $msg->{Forum_Model_Messages::COLUMN_ORDER} = $curPos;
+               $model->save($msg);
+               $curPos++;
             }
-            // update db
-            $msg->{Forum_Model_Messages::COLUMN_ORDER} = $curPos;
-            $model->save($msg);
-            $curPos++;
          }
-         
+
       }
       
    }

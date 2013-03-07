@@ -65,7 +65,7 @@ class Forum_Model_Messages extends Model_ORM {
        * @copyright Jakub Vrána
        * @see http://php.vrana.cz/diskuse-s-reakcemi.php
        */
-      $this->lock();
+      $this->lock(self::LOCK_WRITE);
       // posun pouze pokud je přidán nový
       if($record->isNew() && $record->{self::COLUMN_ORDER} == 0 && $record->{self::COLUMN_DEPTH} == 0 ){
          // není rodič
