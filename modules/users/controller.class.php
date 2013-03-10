@@ -330,7 +330,7 @@ GROUP BY `t_grp`.`id_group`*/
       $form->addElement($eName, $fGrp);
       
       $eSurName = new Form_Element_Text('surname', $this->tr('Přijmení'));
-      $eSurName->addValidation(new Form_Validator_NotEmpty());
+      //$eSurName->addValidation(new Form_Validator_NotEmpty());
       $form->addElement($eSurName, $fGrp);
       
       $eMail = new Form_Element_Text('mail', $this->tr('E-mail'));
@@ -511,5 +511,3 @@ GROUP BY `t_grp`.`id_group`*/
    }
 
 }
-
-?>
