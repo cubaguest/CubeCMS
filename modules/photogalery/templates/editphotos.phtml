@@ -26,7 +26,7 @@ $this->addFile("css://photogalery:style.less");
                    title="<?=$this->tr('upravit řazení obrázků')?>" onclick="window.location.href = '<?=$this->link()->route('sortphotos')->param('b','e')?>'" />
             <input id="button-check-all-images" type="button" value="<?=$this->tr('Změnit označení')?>" title="<?=$this->tr('Změnit označení pro smazání')?>" />
             <?
-            echo $this->editForm->save->controll();
+            echo $this->editForm->save->control();
             ?>
          </div>
          <div id="edit-photos-list" class="ui-widget-content edit-photos-list-short">
@@ -43,7 +43,7 @@ $this->addFile("css://photogalery:style.less");
                   $this->editForm->delete->setDimensional($image->{PhotoGalery_Model_Images::COLUMN_ID});
                   $this->editForm->delete->setValues(false);
                   //echo ($this->editForm->delete->label());
-                  echo ($this->editForm->delete->controll()->addClass('button-check-delete-image'));//->setAttrib('onclick', "if(this.checked == true)return confirm('Smazat?')"));
+                  echo ($this->editForm->delete->control()->addClass('button-check-delete-image'));//->setAttrib('onclick', "if(this.checked == true)return confirm('Smazat?')"));
                   echo ($this->editForm->delete->scripts());
                   ?>
                </td>
@@ -64,12 +64,11 @@ $this->addFile("css://photogalery:style.less");
                <td valign="top" style="padding-right:10px;">
                   <div class="photo-name-controll">
                      <?
-                     $this->editForm->name->setDimensional($image->{PhotoGalery_Model_Images::COLUMN_ID});
-                     $this->editForm->name->setValues(array($image->{PhotoGalery_Model_Images::COLUMN_ID} =>
-                        $image->{PhotoGalery_Model_Images::COLUMN_NAME}));
+                     $this->editForm->name->setMultiple($image->{PhotoGalery_Model_Images::COLUMN_ID});
+                     $this->editForm->name->setValues($image->{PhotoGalery_Model_Images::COLUMN_NAME});
                      echo ($this->editForm->name->label()."<br />");
                      echo ($this->editForm->name->labelLangs());
-                     echo ($this->editForm->name->controll());
+                     echo ($this->editForm->name->control());
                      echo ($this->editForm->name->scripts());
                      ?>
                   </div>
@@ -79,7 +78,7 @@ $this->addFile("css://photogalery:style.less");
                      $this->editForm->ord->setValues($image->{PhotoGalery_Model_Images::COLUMN_ORDER});
                      echo ($this->editForm->ord->label());
                      $this->editForm->ord->html()->setAttrib('size', 5);
-                     echo ($this->editForm->ord->controll());
+                     echo ($this->editForm->ord->control());
                      echo ($this->editForm->ord->scripts());
                      ?>
                      <?
@@ -87,7 +86,7 @@ $this->addFile("css://photogalery:style.less");
                      $this->editForm->rotate->setDimensional($image->{PhotoGalery_Model_Images::COLUMN_ID});
                      $this->editForm->rotate->html()->addClass('image-rotate-controll');
                      echo ($this->editForm->rotate->label());
-                     echo ($this->editForm->rotate->controll());?>   
+                     echo ($this->editForm->rotate->control());?>   
                   </div>
                </td>
                <td valign="top">
@@ -97,13 +96,13 @@ $this->addFile("css://photogalery:style.less");
                              $image->{PhotoGalery_Model_Images::COLUMN_DESC}));
                      echo ($this->editForm->desc->label()."<br />");
                      echo ($this->editForm->desc->labelLangs());
-                     echo ($this->editForm->desc->controll());
+                     echo ($this->editForm->desc->control());
                      echo ($this->editForm->desc->scripts());
                      ?>
                      <?
                      $this->editForm->id->setDimensional($image->{PhotoGalery_Model_Images::COLUMN_ID});
                      $this->editForm->id->setValues($image->{PhotoGalery_Model_Images::COLUMN_ID});
-                     echo ($this->editForm->id->controll());?>
+                     echo ($this->editForm->id->control());?>
                   <a href="<?=$this->link()?>#delete-image" title="<?=$this->tr('Smazat obrázek')?>"
                      class="button-delete-image" data-id="<?=$image->{PhotoGalery_Model_Images::COLUMN_ID}?>"
                           ><span class="ui-icon ui-icon-closethick"> </span></a>
@@ -116,8 +115,8 @@ $this->addFile("css://photogalery:style.less");
             <button class="button-toggle-all"><?=$this->tr('Rozbalit')?></button>
             <?
             echo ($this->editForm->goBack->label());
-            echo ($this->editForm->goBack->controll());
-            echo $this->editForm->save->controll();
+            echo ($this->editForm->goBack->control());
+            echo $this->editForm->save->control();
             ?>
          </div>
          <?=$this->editForm->scripts()?>

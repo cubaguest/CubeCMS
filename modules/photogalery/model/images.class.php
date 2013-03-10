@@ -44,22 +44,18 @@ class PhotoGalery_Model_Images extends Model_ORM {
     * @param <type> $num
     * @return PDOStatement
     */
-   public function getImages($idCat, $idArt, $num = 0) {
-      $dbc = Db_PDO::getInstance();
-      $limit = null;
-      if($num != 0) {
-         $limit = " LIMIT 0,".(int)$num;
-      }
-      $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
-              ." WHERE (".self::COLUMN_ID_CAT." = :idcat) AND (".self::COLUMN_ID_ART." = :idart)"
-              ." ORDER BY ".self::COLUMN_ORDER." ASC"
-              .$limit);
-      $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
-      $dbst->bindParam(':idcat', $idCat, PDO::PARAM_INT);
-      $dbst->bindParam(':idart', $idArt, PDO::PARAM_INT);
-      $dbst->execute();
+   public static function getImages($idCat, $idArt = 0, $num = 0) {
+      $model = new self();
 
-      return $dbst;
+      $model->where(self::COLUMN_ID_CAT." = :idc AND ".self::COLUMN_ID_ART." = :ida",
+         array('idc' => $idCat, 'ida' => $idArt))
+         ->order(self::COLUMN_ORDER);
+
+      if($num != 0){
+         $model->limit(0, $num);
+      }
+
+      return $model->records();
    }
 
    public function getImage($id) {
