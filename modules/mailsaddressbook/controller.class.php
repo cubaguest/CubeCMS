@@ -345,7 +345,8 @@ class MailsAddressBook_Controller extends Controller {
 
       if($formImportUsers->isValid()){
          // načtení všech uživatelů
-         $users = (new Model_Users())
+         $mu = new Model_Users();
+         $users = $mu
             ->where(Model_Users::COLUMN_ID_GROUP." = :idg", array('idg' => $formImportUsers->usrGroup->getValues()))
             ->records();
 
