@@ -229,11 +229,24 @@ class Model_Category extends Model_ORM {
    {
       $model = new self();
 
+      $whereStr = null;
+      $whereBind = array();
+      if(is_array($module)){
+         $modBinds = array();
+         foreach($module as $key => $mod){
+            $modBinds[':mod_'.$key] = $mod;
+         }
+         $whereStr = self::COLUMN_MODULE." IN (".implode(',', array_keys($modBinds)).")";
+         $whereBind = $modBinds;
+      } else {
+         $whereStr = self::COLUMN_MODULE." = :module";
+         $whereBind['module'] = $module;
+      }
       if($onlyWithRights){
          $model->onlyWithAccess();
-         $model->where(" AND ".self::COLUMN_MODULE." = :module", array('module' => $module), true);
+         $model->where(" AND ".$whereStr, $whereBind, true);
       } else {
-         $model->where(self::COLUMN_MODULE." = :module", array('module' => $module));
+         $model->where($whereStr, $whereBind);
       }
       return $model->records();
    }
