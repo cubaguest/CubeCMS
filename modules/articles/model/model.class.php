@@ -70,6 +70,43 @@ class Articles_Model extends Model_ORM {
       $this->addRelatioOneToMany(self::COLUMN_ID, 'Articles_Model_TagsConnection', Articles_Model_TagsConnection::COLUMN_ID_ARTICLE);
    }
 
+   protected function beforeSave(Model_ORM_Record $record, $type = 'U')
+   {
+//      if($record->{self::COLUMN_QUANTITY} < 0){
+//         $record->{self::COLUMN_QUANTITY} = -1;
+//      }
+      // generování unkátního url klíče
+      $urlkeys = $record->{self::COLUMN_URLKEY};
+      foreach (Locales::getAppLangs() as $lang) {
+         // pokud není url klíč
+         if($urlkeys[$lang] == null){
+            $urlkeys[$lang] = vve_cr_url_key($record[self::COLUMN_NAME][$lang]);
+         }
+
+         $counter = 1;
+         $baseKey = $urlkeys[$lang];
+         $urlKeyParts = array();
+         if(preg_match('/(.*)-([0-9]+)$/', $baseKey, $urlKeyParts)){
+            $baseKey = $urlKeyParts[1];
+            $counter = (int)$urlKeyParts[2];
+         }
+         if($record->isNew()){
+            while($this->where(self::COLUMN_URLKEY." = :ukey", array('ukey' => $urlkeys[$lang]))->count() != 0 ){
+               $urlkeys[$lang] = $baseKey."-".$counter;
+               $counter++;
+            };
+         } else {
+            // exist record ignore yourself
+            while($this->where(self::COLUMN_URLKEY." = :ukey AND ".self::COLUMN_ID ." != :id",
+               array('ukey' => $urlkeys[$lang], 'id' => $record->getPK() ))->count() != 0 ){
+               $urlkeys[$lang] = $baseKey."-".$counter;
+               $counter++;
+            };
+         }
+      }
+      $record->{self::COLUMN_URLKEY} = $urlkeys;
+   }
+
    /**
     * Metoda uloží novinku do db
     *
@@ -281,4 +318,3 @@ class Articles_Model extends Model_ORM {
    }
 }
 
-?>

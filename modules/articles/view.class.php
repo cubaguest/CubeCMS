@@ -1,7 +1,8 @@
 <?php
 class Articles_View extends View {
    public function mainView() {
-      $this->template()->addFile('tpl://'.$this->category()->getParam(Articles_Controller::PARAM_TPL_LIST, 'articles:list.phtml'));
+//      $this->template()->addFile('tpl://'.$this->category()->getParam(Articles_Controller::PARAM_TPL_LIST, 'articles:list.phtml'));
+      $this->template()->addFile('tpl://'.$this->category()->getParam(Articles_Controller::PARAM_TPL_LIST, 'list.phtml')); // Proč z articles??
       $this->createListToolbox();
       
       if($this->selectedTag != null){

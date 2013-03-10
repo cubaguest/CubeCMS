@@ -15,6 +15,11 @@ class Articles_Controller extends Controller {
    const PARAM_TPL_ARCHIVE = 'tplarchive';
    const PARAM_MOUNTED_CATS = 'moc';
 
+   const PARAM_MAIL_NAME = 'mname';
+   const PARAM_MAIL_PASSWORD = 'mpass';
+   const PARAM_MAIL_SERVER = 'mserver';
+   const PARAM_MAIL_SECURE_KEY = 'mseckey';
+
    const DEFAULT_SORT = 'date';
 
    const SORT_TOP = 'top';
@@ -36,7 +41,7 @@ class Articles_Controller extends Controller {
    public function mainController() {
       //        Kontrola práv
       $this->checkReadableRights();
-
+//      self::AutoRunHourly();
       // načtení článků
       $artModel = new Articles_Model();
       
@@ -358,7 +363,7 @@ class Articles_Controller extends Controller {
       }
 
       // odkaz zpět
-      $this->view()->linkBack = $this->link()->back($this->link()->route(), 1);
+      $this->view()->linkBack = $this->link()->route();
 
       // diskuse
       if($this->category()->getParam('discussion_allow', false) == true){
@@ -1495,7 +1500,31 @@ class Articles_Controller extends Controller {
       }
 
       $form->addElement($elemNotify, $fGrpAdv);
-      
+
+      $fGrpEMail = $form->addGroup('emailLoad', $this->tr('Načítání z e-mailu'),
+         $this->tr("Pokud je nastaven přístup k e-malové schránce, stránka automaticky načítá z tét schránky nové
+         e-maily a vytváří z nich položky. Název e-mailové schránky nastavte tak, aby nebyla odhadnutelná
+         (např. blog5685stranky@domena.cz) a držte ji v tajnosti. V opačném případě se Vám mohou zobrazovat nechtěné příspěvky."));
+
+      $elemMailName = new Form_Element_Text('mailName', $this->tr('E-mail'));
+      $elemMailName->addValidation(new Form_Validator_Email());
+      $elemMailName->setValues(isset($settings[self::PARAM_MAIL_NAME]) ? $settings[self::PARAM_MAIL_NAME] : null);
+      $form->addElement($elemMailName, $fGrpEMail);
+
+      $elemMailPass = new Form_Element_Text('mailPass', $this->tr('Heslo schránky'));
+      $elemMailPass->setSubLabel($this->tr('Heslo je při úpravě zkryto'));
+      $form->addElement($elemMailPass, $fGrpEMail);
+
+      $elemMailServer = new Form_Element_Text('mailServer', $this->tr('Server schránky'));
+      $elemMailServer->setSubLabel($this->tr('Např.: imap.serve.cz (pro jiný port: imap.server.cz:995). Pokud není zadán, apliakce se pokusí server detekovat z e-mailu s předponou imap.'));
+      $elemMailServer->setValues( isset($settings[self::PARAM_MAIL_SERVER]) ? $settings[self::PARAM_MAIL_SERVER] : null);
+      $form->addElement($elemMailServer, $fGrpEMail);
+
+      $elemMailSecKey = new Form_Element_Text('mailSecKey', $this->tr('Bezpečnostní řetězec'));
+      $elemMailSecKey->setSubLabel($this->tr('Nasatvte na náhodný řetězec. E-maily, které se mají načíst potom musí tento řetězec obsahovat, jinak budou odmítnuty.'));
+      $elemMailSecKey->setValues( isset($settings[self::PARAM_MAIL_SECURE_KEY]) ? $settings[self::PARAM_MAIL_SECURE_KEY] : null);
+      $form->addElement($elemMailSecKey, $fGrpEMail);
+
       
       $fGrpPrivate = $form->addGroup('privateZone', $this->tr('Privátní zóna'), $this->tr("Privátní zóna povoluje
          vložení textů, které jsou viditelné pouze vybraným uživatelům. U každé položky tak
@@ -1522,10 +1551,18 @@ class Articles_Controller extends Controller {
          $settings[self::PARAM_TPL_LIST] = $form->tplList->getValues();
          $settings[self::PARAM_TPL_DETAIL] = $form->tplDetail->getValues();
          $settings[self::PARAM_TPL_ARCHIVE] = $form->tplArchive->getValues();
-         
+
          $mCats = $form->mountedCats->getValues() == null ? array() : $form->mountedCats->getValues();
-         $settings[self::PARAM_MOUNTED_CATS] = implode(';', $mCats);
-         $settings[self::PARAM_NOTIFY_RECIPIENTS] = implode(';', $form->sendNotify->getValues());
+
+         $settings[self::PARAM_MOUNTED_CATS] = is_array($mCats) ? implode(';', $mCats) : null;
+         $settings[self::PARAM_NOTIFY_RECIPIENTS] = is_array($form->sendNotify->getValues()) ? implode(';', $form->sendNotify->getValues()) : null;
+
+         $settings[self::PARAM_MAIL_NAME] = $form->mailName->getValues();
+         if($form->mailPass->getValues() != null){
+            $settings[self::PARAM_MAIL_PASSWORD] = $form->mailPass->getValues();
+         }
+         $settings[self::PARAM_MAIL_SERVER] = $form->mailServer->getValues();
+         $settings[self::PARAM_MAIL_SECURE_KEY] = $form->mailSecKey->getValues();
       }
    }
    
@@ -1546,5 +1583,205 @@ class Articles_Controller extends Controller {
                Articles_Model::COLUMN_PRIORITY_END_DATE => NULL,
                ));
    }
+
+   public static function AutoRunHourly()
+   {
+      // načtou se kategorie s modulem articles
+      $cats = self::_AutorunGetCategories();
+
+      // procházení kategorií
+
+      foreach($cats as $c){
+         $category = new Category(null, false, $c);
+
+         if($category->getParam(self::PARAM_MAIL_NAME) == null){
+            continue;
+         }
+
+         $server = $category->getParam(self::PARAM_MAIL_SERVER);
+         $email = $category->getParam(self::PARAM_MAIL_NAME);
+
+         // odvození z e-mailu
+         if($server == null){
+            $server = 'imap.'.substr(strrchr($email, "@"), 1).":993";
+         }
+         // nemá předán port, použije se výchozí
+         else if(!preg_match('/:[0-9]+/', $server)){
+            $server .= ':993';
+         }
+
+         // připojení k mailu
+         $imap = imap_open('{'.$server.'/imap/ssl/novalidate-cert}INBOX',
+            $email, $category->getParam(self::PARAM_MAIL_PASSWORD));
+         if (!$imap) {
+            Log::msg(imap_last_error());
+         }
+
+         $info = imap_mailboxmsginfo($imap);
+
+         $emails = imap_search($imap, 'UNSEEN');
+         if(!$emails || empty($email)){
+            continue;
+         }
+         foreach ($emails as $email_id) {
+            try {
+               if($category->getParam(self::PARAM_MAIL_SECURE_KEY) != null){
+                  $cnt = imap_fetchbody($imap, $email_id, '1', FT_PEEK);
+                  if(strpos($cnt, $category->getParam(self::PARAM_MAIL_SECURE_KEY)) === false){
+                     continue;
+                  }
+               }
+               $msg = self::_AutorunParseMessage($email_id, $imap);
+               if($category->getParam(self::PARAM_MAIL_SECURE_KEY) != null){
+                  $msg['plain'] = str_replace($category->getParam(self::PARAM_MAIL_SECURE_KEY), '', $msg['plain']);
+                  $msg['html'] = str_replace($category->getParam(self::PARAM_MAIL_SECURE_KEY), '', $msg['html']);
+               }
+               self::_AutorunProcessMessage($category, $msg);
+
+//               imap_delete($imap, $email_id, FT_UID);
+
+            } catch (Exception $e) {
+               Log::msg($e->getTraceAsString(), 'article-loadmail');
+            }
+         }
+         // čištění
+         imap_expunge($imap);
+
+      }
+   }
+
+   protected static function _AutorunGetCategories()
+   {
+      return Model_Category::getCategoryListByModule(array('articles', 'news'));
+   }
+
+   protected static function _AutorunProcessMessage(Category $category, $msg)
+   {
+      // uložení článku
+      $model = new Articles_Model();
+      $article = $model->newRecord();
+
+      $article->{Articles_Model::COLUMN_NAME} = $msg['subject'];
+      $article->{Articles_Model::COLUMN_TEXT} = $msg['plain'];
+      if($msg['html'] != null){
+         Loader::loadLib('htmlpurifier');
+
+         $purifierConfig = HTMLPurifier_Config::createDefault();
+         $purifierConfig->set('HTML.TidyLevel', 'heavy' );
+         $purifierConfig->set('HTML.Allowed', 'p,b,strong,a[href|title],i,em,span,img[src|alt],div,address,h1,h2,h3,h4,h5,table,tr,td,th,hr,tbody,thead,tfoot');
+         $purifierConfig->set('Cache.SerializerPath', AppCore::getAppCacheDir() );
+         $purifier = new HTMLPurifier($purifierConfig);
+         $article->{Articles_Model::COLUMN_TEXT} = $purifier->purify($msg['html']);
+      }
+
+      $article->{Articles_Model::COLUMN_ID_CATEGORY} = $category->getId();
+
+      // zpracování titulního obrázku
+      if(!empty($msg['attachments'])){
+         $img = reset($msg['attachments']);
+
+         $image = new File(AppCore::getAppCacheDir().$img);
+
+         $image->move(AppCore::getAppDataDir().VVE_ARTICLE_TITLE_IMG_DIR);
+//         $image->saveAs(AppCore::getAppDataDir().VVE_ARTICLE_TITLE_IMG_DIR,
+//            $category->getParam('TITLE_IMAGE_WIDTH', VVE_ARTICLE_TITLE_IMG_W),
+//            $category->getParam('TITLE_IMAGE_HWIGHT', VVE_ARTICLE_TITLE_IMG_H),
+//            $category->getParam('TITLE_IMAGE_CROP', VVE_ARTICLE_TITLE_IMG_C));
+         $article->{Articles_Model::COLUMN_TITLE_IMAGE} = $image->getName();
+      }
+
+      $article->save();
+
+      return $article->getPK();
+   }
+
+   protected static function _AutorunParseMessage($msgUID, $connection)
+   {
+      $structure = imap_fetchstructure($connection, $msgUID);
+      $msgInfo = imap_headerinfo($connection, $msgUID);
+      $subjects = imap_mime_header_decode($msgInfo->subject);
+      $subject = null;
+      foreach($subjects as $subjectPart) {
+         $subject .= $subjectPart->charset == 'default' ? $subjectPart->text : iconv($subjectPart->charset, 'utf-8', $subjectPart->text);
+      }
+
+      $retStruct = array(
+         'subject' => $subject,
+         'plain' => null,
+         'html' => null,
+         'attachments' => array(),
+      );
+
+      // Zajimaji nas pouze zpravy, ktere maji 2 a vice casti.
+      // Tyto zpravy mohou obsahovat prilohy.
+      if (isset($structure->parts))
+      {
+         // Vyhledani priloh v kazde casti zpravy.
+         foreach ($structure->parts as $partNo => $part)
+         {
+            // je pole alternativní obsah?
+            if ($part->subtype == 'ALTERNATIVE' && is_array($part->parts)) {
+               foreach ($part->parts as $subPartNo => $subPart){
+                  if($subPart->subtype == 'PLAIN'){
+                     // Nacteni obsahu casti mailu.
+                     $retStruct['plain'] = $part_content = self::_AutorunEncodeContent(
+                        imap_fetchbody($connection, $msgUID, ($partNo+1).'.'.($subPartNo+1)), $subPart->encoding, $subPart->parameters);
+                  } else if($subPart->subtype == 'HTML'){
+                     $retStruct['html'] = $part_content = self::_AutorunEncodeContent(
+                        imap_fetchbody($connection, $msgUID, ($partNo+1).'.'.($subPartNo+1)), $subPart->encoding, $subPart->parameters);
+                  }
+               }
+            } else if ($part->subtype == 'PLAIN') {
+               $retStruct['plain'] = $part_content = self::_AutorunEncodeContent(
+                  imap_fetchbody($connection, $msgUID, ($partNo+1)), $part->encoding, $part->parameters);
+            } else if ($part->subtype == 'HTML') {
+               $retStruct['html'] = $part_content = self::_AutorunEncodeContent(
+                  imap_fetchbody($connection, $msgUID, ($partNo+1)), $part->encoding, $part->parameters);
+            } else if (isset($part->disposition) && $part->disposition == 'attachment' && $part->ifdparameters) {
+               // Prohledani parametru. Zajima nas atribut s nazvem 'filename'.
+               foreach ($part->dparameters as $part_param) {
+                  // Tato cast obsahuje informaci o jmenu souboru v priloze.
+                  $partName = mb_strtolower($part_param->attribute, 'utf-8');
+                  if ($partName == 'filename') {
+                     // Kontrola, jestli ma soubor pozadovanou priponu.
+                     if (pathinfo(strtolower($part_param->value), PATHINFO_EXTENSION) == 'jpg')
+                     {
+                        // Nacteni obsahu casti mailu.
+                        $part_content = self::_AutorunEncodeContent(
+                           imap_fetchbody($connection, $msgUID, $partNo + 1), $part->encoding);
+                        file_put_contents(AppCore::getAppCacheDir().$part_param->value, $part_content);
+                        $retStruct['attachments'][] = $part_param->value;
+                     }
+                  }
+               }
+            }
+         }
+      }
+
+
+      return $retStruct;
+   }
+
+   protected static function _AutorunEncodeContent($cnt, $encoding, $params = array())
+   {
+      switch ($encoding)
+      {
+         case 3:
+            $cnt = base64_decode($cnt);
+            break;
+         case 4:
+            $cnt = quoted_printable_decode($cnt);
+            break;
+      }
+      // charset
+      if(!empty($params)){
+         foreach($params as $param) {
+            if($param->attribute == 'charset'){
+               $cnt = iconv($param->value, 'utf-8', $cnt);
+            }
+         }
+      }
+
+      return $cnt;
+   }
 }
-?>
