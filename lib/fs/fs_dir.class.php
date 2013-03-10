@@ -2,12 +2,12 @@
 /**
  * Třída directory
  *
- * @copyright  	Copyright (c) 2008-2011 Jakub Matas
- * @version    	$Id:  $ VVE 7.3 $Revision: $
+ * @copyright     Copyright (c) 2008-2011 Jakub Matas
+ * @version       $Id:  $ VVE 7.3 $Revision: $
  * @author        $Author: $ $Date: $
  * @author        cuba
  *                $LastChangedBy: $ $LastChangedDate: $
- * @abstract 		Třída 
+ * @abstract      Třída 
  */
 class FS_Dir extends TrObject {
    /**
@@ -42,96 +42,90 @@ class FS_Dir extends TrObject {
       if($this->path == null){
          $this->path = AppCore::getAppCacheDir();
       }
+      // add las slash
+      if(substr($this->path, -1) != DIRECTORY_SEPARATOR){
+         $this->path .= DIRECTORY_SEPARATOR;
+      }
    }
 
     /**
-	  * Metoda otestuje existenci adresáře, a pokud neexistuje pokusí se jej vytvořit
-	  * @param string -- název adresáře
+     * Metoda otestuje existenci adresáře, a pokud neexistuje pokusí se jej vytvořit
+     * @param string -- název adresáře
      * 
      * @todo dodělat přidávání lomítek před adresář
-	 */
-	public function check() 
+    */
+   public function check() 
    {
-		//doplnění posledního lomítka za dest adresář
-      $directory = (string)$this;
-      
-      if($directory[strlen($directory)-1] != "/"){
-			$directory .= "/";
-		}
+      //doplnění posledního lomítka za dest adresář
+      if(substr($this->path, -1) != DIRECTORY_SEPARATOR){
+         $this->path .= DIRECTORY_SEPARATOR;
+      }
       if(!$this->exist() OR !is_dir((string)$this)){
          return $this->create();
-		}
-      return true;
-	}
-
-   /**
-	 * Funkce vytvoři zadaný adresář i podadresáře, pokud neexistují
-	 * @param string -- adresář
-	 */
-   public function create()
-   {
-      if(!@mkdir((string)$this, 0777, true)){
-         throw new CoreException(sprintf($this->tr('Adresáři "%s" se nepodařilo vytvořit, zkontrolujte oprávnění'),$path), 2);
-      }
-      if(!chmod((string)$this, 0777)){
-         throw new CoreException(sprintf($this->tr('Adresáři "%s" se nepodařilo přidělit potřebná oprávnění'),$path), 3);
       }
       return true;
    }
 
    /**
-	 * Metoda maže rekjurzivně zadaný adresář
-	 * @param string -- INTERNAL !!! not use !!!
-	 * @return FS_Dir
-    * @todo -- přepsat !!!!
-	 */
-	public function delete($path = null){
-      if($path === null) $path = (string)$this;
-      
-		if (is_dir($path) && !is_link($path)){
-         $dir = opendir($path);
-			if ($dir){
-				while (($sf = readdir($dir)) !== false){
-					if ($sf == '.' || $sf == '..'){
-						continue;
-					}
-					try {
-                  $this->delete($path.'/'.$sf);
-               } catch (UnexpectedValueException $exc) {
-                  throw new UnexpectedValueException(sprintf($this->tr('Soubor "%s" z adresáře "%s" nemohl být smazán.'),$sf,$path),4);
-                  
-                  break;
-               }
-				}
-				closedir($dir);
-			}
-			if (!@rmdir($path)){
-            throw new UnexpectedValueException(sprintf($this->tr('Adresář "%s" se nepodařilo smazat.'),$path),5);
-			}
-         return true;
-		} else if(file_exists($path)){
-			if (!@unlink($path)){
-            throw new UnexpectedValueException(sprintf($this->tr('Soubor "%s" se nepodařilo smazat.'),$path),6);
-			}
-		}
-      return $this;
-	}
+    * Funkce vytvoři zadaný adresář i podadresáře, pokud neexistují
+    * @param string -- adresář
+    */
+   public function create()
+   {
+      if(!@mkdir((string)$this, 0777, true)){
+         throw new CoreException(sprintf($this->tr('Adresáři "%s" se nepodařilo vytvořit, zkontrolujte oprávnění'),(string)$this), 2);
+      }
+      if(!chmod((string)$this, 0777)){
+         throw new CoreException(sprintf($this->tr('Adresáři "%s" se nepodařilo přidělit potřebná oprávnění'),(string)$this), 3);
+      }
+      return true;
+   }
 
    /**
-	 * Metoda kontroluje jestli je cesta zadána správně,
-	 * jinak vrací opravenou cestu
-	 *
-	 * @param string -- cesta
-	 * @return string -- opravená cesta
-	 */
-   private function checkDirPath($path = null) {
-      if($path == null){
-         $path = $this->getDir();
+    * Metoda maže rekurzivně zadaný adresář
+    * @param string -- INTERNAL !!! not use !!!
+    * @return FS_Dir
+    * @todo -- přepsat !!!!
+    */
+   public function delete($path = null){
+      if($path === null) $path = (string)$this;
+      self::deleteStatic($path);
+      return $this;
+   }
+
+   public static function deleteStatic($dir)
+   {
+      if (is_dir($dir) && !is_link($dir)){
+         foreach(glob($dir . '/*') as $file) {
+            if(is_dir($file))
+               self::deleteContentStatic($file);
+            else
+               unlink($file);
+         }
+         @rmdir($dir);
       }
-      if(($path[strlen($path)-1] != '/') AND ($path[strlen($path)-1] != '\\')){
-         $path.=DIRECTORY_SEPARATOR;
+
+      self::deleteContentStatic($dir);
+   }
+
+   /**
+    * Metoda maže rekjurzivně obsah zadaného adresáře
+    * @return FS_Dir
+    */
+   public static function deleteContentStatic($path){
+      if (is_dir($path) && !is_link($path)){
+         foreach(glob($path . '/*') as $file) {
+            if(is_dir($file))
+               self::deleteContentStatic($file);
+            else
+               unlink($file);
+         }
       }
-      return $path;
+   }
+
+   public function deleteContent(){
+      self::deleteContentStatic((string)$this);
+      return $this;
    }
 
    /**
@@ -175,7 +169,7 @@ class FS_Dir extends TrObject {
     * @return string -- adresář
     */
    public function  __toString() {
-      return $this->getPath().DIRECTORY_SEPARATOR.$this->getName().DIRECTORY_SEPARATOR;
+      return $this->getPath().$this->getName().DIRECTORY_SEPARATOR;
    }
 
    /**
@@ -186,10 +180,10 @@ class FS_Dir extends TrObject {
    public function rename($newName){
       // tady patří detekce jestli byla předána cesta nebo jenom název
       
-      if(@rename((string)$this, $this->path.$newName)){
-         $this->dir = $newDir;
+      if(@rename((string)$this, $this->getPath().$newName)){
+         $this->dir = $newName;
       } else {
-         throw new UnexpectedValueException($this->tr('Adresář se nepodařilo přejmenovat'));
+         throw new UnexpectedValueException(sprintf($this->tr('Adresář "%s" se nepodařilo přejmenovat'), (string)$this));
       }
       return $this;
    }
