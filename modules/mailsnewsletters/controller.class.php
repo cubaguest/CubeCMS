@@ -35,7 +35,8 @@ class MailsNewsletters_Controller extends Controller {
       $eCnt = new Form_Element_TextArea('content', $this->tr('Obsah'));
       $eCnt->addValidation(new Form_Validator_NotEmpty());
       $form->addElement($eCnt, $grpCnt);
-      
+
+
       $grpSend = $form->addGroup('sendgrp', $this->tr('Parametry odeslání'));
       
       $eActive = new Form_Element_Checkbox('active', $this->tr('Aktivní'));
@@ -56,8 +57,12 @@ class MailsNewsletters_Controller extends Controller {
       foreach ($grps as $g) {
          $eGroups->setOptions(array($g->{MailsAddressBook_Model_Groups::COLUMN_NAME} => $g->{MailsAddressBook_Model_Groups::COLUMN_ID}), true);
       }
+      $eGroups->setSubLabel($this->tr('Jiné resp. další e-mailové adresy než z adresáře můžete přidat níže'));
       $form->addElement($eGroups, $grpSend);
 
+      $eOtherEmails = new Form_Element_TextArea('otherEmails', $this->tr('Další emaily'));
+      $eOtherEmails->setSubLabel($this->tr('Emailové adresy oddělené středníkem nebo čárkou'));
+      $form->addElement($eOtherEmails, $grpSend);
 
       $eTestMail = new Form_Element_Text('sendtestmail', $this->tr('Testovací e-mail'));
       $eTestMail->setValues(Auth::getUserMail());
@@ -93,6 +98,11 @@ class MailsNewsletters_Controller extends Controller {
          if( $button == 'sendtest' ){
             $form->sendtestmail->addValidation(new Form_Validator_NotEmpty());
             $form->sendtestmail->addValidation(new Form_Validator_Email());
+         }
+
+         $numMails = preg_match_all("/[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})/i", $form->otherEmails->getValues());
+         if($button != 'sendtest' && $form->groups->getValues() == null && $numMails == 0){
+            $form->otherEmails->setError($this->tr('Musíte zadat skupinu nebo nějaké e-mailové adresy'));
          }
       }
 
@@ -143,24 +153,42 @@ class MailsNewsletters_Controller extends Controller {
             if($record->{MailsNewsletters_Model_Newsletter::COLUMN_ACTIVE} == true){
                // uložení mailů do fronty
                $idgrps = $form->groups->getValues();
-               // načtení emailů ze skupiny
-               $grpIDSPL = array();
-               foreach ($idgrps as $id) {
-                  $grpIDSPL[':pl_'.$id] = $id;
-               }
-               $mWhereString = MailsAddressBook_Model_Addressbook::COLUMN_ID_GRP.' IN ('.implode(',',array_keys($grpIDSPL)).')';
-               $mWhereBinds = $grpIDSPL;
-               $mails = $modelAB->where($mWhereString, $mWhereBinds)->records();
 
-               foreach ($mails as $mail){
-                  $qRec = $modelQueue->newRecord();
-                  $qRec->{MailsNewsletters_Model_Queue::COLUMN_ID_NEWSLETTER} = $idn;
-                  $qRec->{MailsNewsletters_Model_Queue::COLUMN_MAIL} = $mail->{MailsAddressBook_Model_Addressbook::COLUMN_MAIL};
-                  $qRec->{MailsNewsletters_Model_Queue::COLUMN_NAME} = $mail->{MailsAddressBook_Model_Addressbook::COLUMN_NAME};
-                  $qRec->{MailsNewsletters_Model_Queue::COLUMN_SURNAME} = $mail->{MailsAddressBook_Model_Addressbook::COLUMN_SURNAME};
-                  $qRec->{MailsNewsletters_Model_Queue::COLUMN_DATE_SEND} = $form->senddate->getValues();
-                  $qRec->save();
+               if($idgrps != null){
+                  // načtení emailů ze skupiny
+                  $grpIDSPL = array();
+                  foreach ($idgrps as $id) {
+                     $grpIDSPL[':pl_'.$id] = $id;
+                  }
+                  $mWhereString = MailsAddressBook_Model_Addressbook::COLUMN_ID_GRP.' IN ('.implode(',',array_keys($grpIDSPL)).')';
+                  $mWhereBinds = $grpIDSPL;
+                  $mails = $modelAB->where($mWhereString, $mWhereBinds)->records();
+
+                  foreach ($mails as $mail){
+                     $qRec = $modelQueue->newRecord();
+                     $qRec->{MailsNewsletters_Model_Queue::COLUMN_ID_NEWSLETTER} = $idn;
+                     $qRec->{MailsNewsletters_Model_Queue::COLUMN_MAIL} = $mail->{MailsAddressBook_Model_Addressbook::COLUMN_MAIL};
+                     $qRec->{MailsNewsletters_Model_Queue::COLUMN_NAME} = $mail->{MailsAddressBook_Model_Addressbook::COLUMN_NAME};
+                     $qRec->{MailsNewsletters_Model_Queue::COLUMN_SURNAME} = $mail->{MailsAddressBook_Model_Addressbook::COLUMN_SURNAME};
+                     $qRec->{MailsNewsletters_Model_Queue::COLUMN_DATE_SEND} = $form->senddate->getValues();
+                     $qRec->save();
+                  }
                }
+
+               if($form->otherEmails->getValues() != null){
+                  $matches = array();
+                  preg_match_all("/[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})/i", $form->otherEmails->getValues(), $matches);
+                  if(!empty($matches[0])){
+                     foreach($matches[0] as $email) {
+                        $qRec = $modelQueue->newRecord();
+                        $qRec->{MailsNewsletters_Model_Queue::COLUMN_ID_NEWSLETTER} = $idn;
+                        $qRec->{MailsNewsletters_Model_Queue::COLUMN_MAIL} = $email;
+                        $qRec->{MailsNewsletters_Model_Queue::COLUMN_DATE_SEND} = $form->senddate->getValues();
+                        $qRec->save();
+                     }
+                  }
+               }
+
                $this->infoMsg()->addMessage($this->tr('Newsletter byl uložen, aktivován a e-maily byly zařazeny do fronty odesílání. K odeslání dojde během zadaného dne.'));
             } else {
                $this->infoMsg()->addMessage($this->tr('Newsletter byl uložen a vyřazen z fronty pokud v ní byl.'));
