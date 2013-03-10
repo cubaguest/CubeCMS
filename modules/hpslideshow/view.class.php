@@ -9,7 +9,7 @@ class HPSlideShow_View extends View {
     * Metoda vrátí šablonu pro slideshow
     * return Template_Module
     */
-   public static function getSlideshow()
+   public static function getSlideshow($assignCss = true)
    {
       $tpl = new Template_Module(new Url_Link_Module(), new Category());
 
@@ -25,8 +25,9 @@ class HPSlideShow_View extends View {
          $tpl->imagesUrl = Url_Link::getWebURL().VVE_DATA_DIR."/hpslideshow/";
          $tpl->addFile('tpl://hpslideshow:slideshow.phtml');
          $tpl->addFile('js://hpslideshow:slider.js');
-         $tpl->addFile('css://hpslideshow:style.less');
-
+         if($assignCss){
+            $tpl->addFile('css://hpslideshow:style.less');
+         }
       }
       return $tpl;
    }
