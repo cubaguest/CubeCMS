@@ -2,7 +2,6 @@
 $this->addCssFile("style.css");
 $this->includeFile('tpl://articles:sortLabel.phtml');
 $h1 = $this->category()->getName().$this->sortText;
-$imagesM = new PhotoGalery_Model_Images();
 echo $this->toolbox;
 ?>
 <h1><?=$h1;?></h1>
@@ -23,7 +22,7 @@ echo $this->toolbox;
             $mainImage = vve_tpl_image_tag(
                vve_tpl_art_title_image($article->{Articles_Model::COLUMN_TITLE_IMAGE}),$article->{Articles_Model::COLUMN_NAME}, 100, 100);
          } else {
-            $img = $imagesM->getImages($this->category()->getId(), $article->{Articles_Model_Detail::COLUMN_ID},1)->fetch();
+            $img = PhotoGalery_Model_Images::getImages($this->category()->getId(), $article->{Articles_Model_Detail::COLUMN_ID},1);
             if($img != false){
                $mainImage = vve_tpl_image_tag($this->category()->getModule()->getDataDir(true)
                   .$article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]
