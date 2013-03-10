@@ -389,11 +389,14 @@ function tp($path = null)
 
 /**
  * Funkce vrátí adresu titulního obrázku např. článku 
- * @param string $img -- obrázek
+ * @param string/Model_ORM_Record $img -- obrázek
  * @return string -- adresa obrázku 
  */
 function vve_tpl_art_title_image($img)
 {
+   if($img instanceof Model_ORM_Record){
+      $img = $img->{Articles_Model::COLUMN_TITLE_IMAGE};
+   }
    return Url_Request::getBaseWebDir().VVE_DATA_DIR.'/'.VVE_ARTICLE_TITLE_IMG_DIR.'/'.$img;
 }
 
