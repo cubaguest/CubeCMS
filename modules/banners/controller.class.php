@@ -126,7 +126,7 @@ class Banners_Controller extends Controller {
       $form->addElement($name);
       
       $url = new Form_Element_Text('url', $this->tr('URL'));
-      $url->addValidation(new Form_Validator_NotEmpty());
+//      $url->addValidation(new Form_Validator_NotEmpty());
       $url->addValidation(new Form_Validator_Url());
       $form->addElement($url);
       
@@ -278,7 +278,7 @@ class Banners_Controller extends Controller {
       $this->view()->newpos = $newPos;
       
       $model = new Banners_Model();
-      $model->lock();
+      $model->lock(Model_ORM::LOCK_WRITE);
       $banner = $model->record($idb);
       if(!$banner){
          $this->errMsg()->addMessage($this->tr('Banner se nepodařilo přesunout, protože neexistuje'));
@@ -326,7 +326,7 @@ class Banners_Controller extends Controller {
                   ->update(array(Banners_Model::COLUMN_ORDER => array( 'stmt' => Banners_Model::COLUMN_ORDER.'-1') ));
          }
       } catch (Exception $e) {
-         
+         $this->view()->excp = $e->getTraceAsString();
       }
       $model->unLock();
    }

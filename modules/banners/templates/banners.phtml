@@ -9,12 +9,14 @@ foreach ($this->banners as $banner) {
               .http_build_query( array( 'clickthru' => $linkClick, 'clickTAG' => $linkClick ));
       echo vve_tpl_flash($flashUrl, 200, 100);
    } else {
-      ?>
-   <a href="<?=$linkClick;?>" 
-      title="<?ps($banner->{Banners_Model::COLUMN_NAME})?>"
-      rel="nofollow" class="<?if($banner->{Banners_Model::COLUMN_NEW_WINDOW}){echo "link-external";}?>"
-      ><img src="<?=$this->dir.$banner->{Banners_Model::COLUMN_FILE}?>" height="100"
-           alt="<?ps($banner->{Banners_Model::COLUMN_NAME})?>" /></a>
+      if($banner->{Banners_Model::COLUMN_URL} != null){?>
+         <a href="<?=$linkClick;?>"
+            title="<?ps($banner->{Banners_Model::COLUMN_NAME})?>"
+            rel="nofollow" class="<?if($banner->{Banners_Model::COLUMN_NEW_WINDOW}){echo "link-external";}?>"><?
+      }
+      ?><img src="<?=$this->dir.$banner->{Banners_Model::COLUMN_FILE}?>" height="100"
+           alt="<?ps($banner->{Banners_Model::COLUMN_NAME})?>" /><?
+      if($banner->{Banners_Model::COLUMN_URL} != null){?></a><?}?>
    <?
    }
 }
