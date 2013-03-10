@@ -1,10 +1,23 @@
--- Verze 7.7
+-- phpMyAdmin SQL Dump
+-- version 3.4.11.1deb1
+-- http://www.phpmyadmin.net
+--
+-- Počítač: localhost
+-- Vygenerováno: Stř 06. bře 2013, 09:07
+-- Verze MySQL: 5.5.29
+-- Verze PHP: 5.4.6-1ubuntu1.1
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+
 --
--- Databáze: `levyna`
+-- Databáze: `moravaokno`
 --
 
 -- --------------------------------------------------------
@@ -23,113 +36,126 @@ CREATE TABLE IF NOT EXISTS `cubecms_global_config` (
   `type` enum('string','number','bool','list','listmulti','ser_object') NOT NULL DEFAULT 'string',
   `id_group` smallint(6) NOT NULL DEFAULT '0',
   `callback_func` varchar(100) DEFAULT NULL,
+  `hidden_value` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id_config`),
   UNIQUE KEY `key` (`key`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=118 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=131 ;
 
 --
 -- Vypisuji data pro tabulku `cubecms_global_config`
 --
 
-INSERT INTO `cubecms_global_config` (`id_config`, `key`, `label`, `value`, `values`, `protected`, `type`, `id_group`, `callback_func`) VALUES
-(1, 'DEFAULT_ID_GROUP', NULL, '2', NULL, 0, 'number', 3, NULL),
-(2, 'DEFAULT_GROUP_NAME', NULL, 'guest', NULL, 0, 'string', 3, NULL),
-(3, 'DEFAULT_USER_NAME', NULL, 'anonym', NULL, 0, 'string', 3, NULL),
-(4, 'APP_LANGS', 'Všechny vybrané jazyky aplikace', 'cs', 'cs;en;de;ru;sk', 0, 'listmulti', 8, NULL),
-(5, 'DEFAULT_APP_LANG', 'Výchozí jazyk aplikace. Tento jazyk je potom u většiny položek povinný.', 'cs', 'cs;en;de;ru;sk', 0, 'list', 8, NULL),
-(6, 'IMAGES_DIR', NULL, 'images', NULL, 0, 'string', 3, NULL),
-(7, 'IMAGES_LANGS_DIR', NULL, 'langs', NULL, 0, 'string', 3, NULL),
-(8, 'DEBUG_LEVEL', 'Režim ladění stránek (0 pro vypnutí)', '2', NULL, 0, 'number', 3, NULL),
-(9, 'TEMPLATE_FACE', 'Název vzhledu stránek', 'default', NULL, 0, 'string', 4, NULL),
-(10, 'SITEMAP_PERIODE', 'Výchozí položka pro změnu mapy stránek pro vyhledávače', 'weekly', NULL, 0, 'string', 5, NULL),
-(11, 'SEARCH_RESULT_LENGHT', 'Délka řetězce s výsledkem hledání', '300', NULL, 0, 'number', 9, NULL),
-(12, 'SEARCH_HIGHLIGHT_TAG', 'Název tagu, který se užívá pro zvýraznění slova ve výsledcích hledání', 'strong', NULL, 0, 'string', 9, NULL),
-(13, 'SESSION_NAME', 'Název cookies s id session, která se ukládá u klienta', '{PREFIX}cookie', NULL, 0, 'string', 3, NULL),
-(14, 'WEB_NAME', 'Název stránek', 'VVE Engine', NULL, 0, 'string', 2, NULL),
-(61, 'CATEGORIES_STRUCTURE', NULL, 'O:18:"Category_Structure":7:{s:25:"\0Category_Structure\0level";i:0;s:22:"\0Category_Structure\0id";i:0;s:28:"\0Category_Structure\0idParent";N;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:1:{i:0;O:18:"Category_Structure":7:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";i:1;s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}s:30:"\0Category_Structure\0withHidden";b:0;s:4:"type";s:4:"main";}}s:30:"\0Category_Structure\0withHidden";b:0;s:4:"type";s:4:"main";}', NULL, 1, 'ser_object', 1, NULL),
-(58, 'USE_GLOBAL_ACCOUNTS_TB_PREFIXES', 'Prefixy tabulek pro které se má použít globální systém přihlašování', '{PREFIX}', '', 0, 'string', 3, NULL),
-(59, 'NAVIGATION_MENU_TABLE', 'Název tabulky s navigačním menu', '{PREFIX}navigation_panel', NULL, 0, 'string', 3, NULL),
-(60, 'SHARES_TABLE', 'Název tabulky s odkazy na sdílení (při global)', '{PREFIX}shares', NULL, 0, 'string', 3, NULL),
-(21, 'PAGE_TITLE_SEPARATOR', 'Oddělovač položek v nadpisu stránky', '|', NULL, 0, 'string', 4, NULL),
-(16, 'NAVIGATION_SEPARATOR', 'Oddělovač položek v navigaci mezi kategoriemi', '::', NULL, 0, 'string', 4, NULL),
-(17, 'HEADLINE_SEPARATOR', 'Oddělovač slov v nadpisu H1', ' - ', NULL, 0, 'string', 4, NULL),
-(19, 'PANEL_TYPES', 'Jaké druhy panelů jsou zapnuty a povoleny (musí je implementovat šablona)', 'left;right;bottom', 'left;right;bottom;top', 0, 'listmulti', 4, NULL),
-(97, 'FTP_HOST', 'Adresa ftp serveru, kde jsou stránky nahrány', 'localhost', NULL, 0, 'string', 3, NULL),
-(98, 'FTP_PORT', 'Port ftp serveru, kde jsou stránky nahrány', '22', NULL, 0, 'number', 3, NULL),
-(20, 'DATA_DIR', NULL, 'data', NULL, 0, 'string', 3, NULL),
-(22, 'USE_GLOBAL_ACCOUNTS', 'Globální systém přihlašování', 'false', NULL, 0, 'bool', 3, NULL),
-(23, 'GLOBAL_TABLES_PREFIX', 'Prefix globálních tabulek', '{PREFIX}', NULL, 0, 'string', 3, NULL),
-(27, 'PDF_PAGE_FORMAT', 'Formát stránky pro pdf výstup', 'A4', NULL, 0, 'string', 5, NULL),
-(28, 'PDF_PAGE_ORIENTATION', 'Natočení stránky pro pdf výstup (P=portrait, L=landscape)', 'P', 'P;L', 0, 'list', 5, NULL),
-(29, 'PDF_CREATOR', 'Název pdf kreatoru', 'TCPDF', NULL, 0, 'string', 5, NULL),
-(30, 'PDF_AUTHOR', 'Autor pdf', 'TCPDF', NULL, 0, 'string', 5, NULL),
-(31, 'PDF_HEADER_LOGO', 'Název loga v hlavičce pdf', NULL, NULL, 0, 'string', 5, NULL),
-(32, 'PDF_HEADER_LOGO_WIDTH', 'Šířka loga v hlavičce', NULL, NULL, 0, 'string', 5, NULL),
-(33, 'PDF_UNIT', 'Jednotky použité u pdf (pt=point, mm=millimeter, cm=centimeter, in=inch)', 'mm', 'mm;pt;cm;in', 0, 'list', 5, NULL),
-(34, 'PDF_MARGIN_HEADER', 'Odsazení hlavičky', '5', NULL, 0, 'string', 5, NULL),
-(35, 'PDF_MARGIN_FOOTER', 'Odsazení zápatí', '10', NULL, 0, 'string', 5, NULL),
-(36, 'PDF_MARGIN_TOP', 'Odsazení stránky z vrchu', '20', NULL, 0, 'string', 5, NULL),
-(37, 'PDF_MARGIN_BOTTOM', 'Odsazení stránky od spodu', '25', NULL, 0, 'string', 5, NULL),
-(38, 'PDF_MARGIN_LEFT', 'Odsazení z leva', '15', NULL, 0, 'string', 5, NULL),
-(39, 'PDF_MARGIN_RIGHT', 'Odsazení z prava', '15', NULL, 0, 'string', 5, NULL),
-(40, 'PDF_FONT_NAME_MAIN', 'Název hlavního fontu', 'arial', NULL, 0, 'string', 5, NULL),
-(41, 'PDF_FONT_SIZE_MAIN', 'Velikost hlavního fontu', '10', NULL, 0, 'string', 5, NULL),
-(42, 'PDF_FONT_NAME_DATA', 'Font pro data', 'arial', NULL, 0, 'string', 5, NULL),
-(43, 'PDF_FONT_SIZE_DATA', 'Velikost fontu pro data', '6', NULL, 0, 'string', 5, NULL),
-(44, 'PDF_FONT_MONOSPACED', 'Název pevného fontu', 'courier', NULL, 0, 'string', 5, NULL),
-(45, 'PDF_IMAGE_SCALE_RATIO', 'Zvětšení obrázků ve výstupním pdf', '1', NULL, 0, 'string', 5, NULL),
-(46, 'HEAD_MAGNIFICATION', 'zvětšovací poměr nadpisů', '1.1', NULL, 0, 'string', 5, NULL),
-(51, 'WEB_DESCRIPTION', 'Popis stránek', 'Web Pages', NULL, 0, 'string', 2, NULL),
-(50, 'FEED_NUM', 'Poček generovaných rss/atom kanálů', '10', NULL, 0, 'number', 5, NULL),
-(52, 'WEB_MASTER_NAME', 'Jméno webmastera', 'Webmaster Name', NULL, 0, 'string', 2, NULL),
-(53, 'WEB_MASTER_EMAIL', 'E-mail webmastera', 'webmaster@web.com', NULL, 0, 'string', 6, NULL),
-(54, 'FEED_TTL', 'Počet minut kešování kanálu', '30', NULL, 0, 'number', 5, NULL),
-(55, 'WEB_COPYRIGHT', 'Copyright poznámka k webu ({Y} - nahrazeno rokem)', 'Obsah toho webu je licencován podle ... Žádná s jeho částí nesmí být použita bez vědomí webmastera. Copyrigth {Y}', NULL, 0, 'string', 2, NULL),
-(56, 'SEARCH_ARTICLE_REL_MULTIPLIER', 'Násobič pro relevanci nadpisu článku (1 - nekonečno)', '5', NULL, 0, 'number', 9, NULL),
-(57, 'ADMIN_MENU_STRUCTURE', 'Administrační menu', 'O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:0;s:22:"\0Category_Structure\0id";i:0;s:28:"\0Category_Structure\0idParent";N;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:6:{i:1;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:1:"3";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:2:{i:0;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";i:1;s:28:"\0Category_Structure\0idParent";s:1:"3";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}i:1;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:1:"4";s:28:"\0Category_Structure\0idParent";s:1:"3";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}}}i:2;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:1:"5";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:1:{i:0;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:1:"6";s:28:"\0Category_Structure\0idParent";s:1:"5";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}}}i:4;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:1:"9";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:2:{i:1;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:3:"103";s:28:"\0Category_Structure\0idParent";s:1:"9";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}i:2;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:3:"105";s:28:"\0Category_Structure\0idParent";s:1:"9";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}}}i:5;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:3:"166";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:3:{i:0;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:3:"125";s:28:"\0Category_Structure\0idParent";s:3:"166";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}i:1;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:2:"10";s:28:"\0Category_Structure\0idParent";s:3:"166";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}i:2;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:1:"8";s:28:"\0Category_Structure\0idParent";s:3:"166";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}}}i:6;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:2:"11";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:2:{i:0;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:2:"12";s:28:"\0Category_Structure\0idParent";s:2:"11";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}i:1;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:2:"13";s:28:"\0Category_Structure\0idParent";s:2:"11";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}}}i:7;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:1:"2";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}}}', NULL, 1, 'ser_object', 1, NULL),
-(62, 'MAIN_PAGE_TITLE', 'Nadpis hlavní stránky', 'Main Title Page', NULL, 0, 'string', 2, NULL),
-(63, 'ALLOW_EXTERNAL_JS', 'Povolení externích JavaScript souborů', 'true', NULL, 0, 'bool', 3, NULL),
-(74, 'CM_SITEMAP_MAX_ITEMS', 'Maximální počet položek v mapě stránek (pro vyhledávače)', '50', NULL, 0, 'number', 5, NULL),
-(73, 'CM_SITEMAP_MAX_ITEMS_PAGE', 'Maximální počet položek v mapě stránek', '20', NULL, 0, 'number', 4, NULL),
-(75, 'CM_SITEMAP_CAT_ICON', 'Název ikony pro sitemap', 'sitemap.png', NULL, 0, 'string', 4, NULL),
-(76, 'CM_ERR_CAT_ICON', 'Název ikony pro chybovou stránku', 'error.png', NULL, 0, 'string', 4, NULL),
-(77, 'CM_RSS_CAT_ICON', 'Název ikony pro stránku s rss kanály', 'rsslist.png', NULL, 0, 'string', 4, NULL),
-(78, 'LOGIN_TIME', 'Doba po které je uživatel automaticky odhlášen (s)', '3600', NULL, 0, 'number', 3, NULL),
-(79, 'IMAGE_THUMB_W', 'Výchozí šířka miniatury', '150', NULL, 0, 'number', 7, NULL),
-(80, 'IMAGE_THUMB_H', 'Výchozí výška miniatury', '150', NULL, 0, 'number', 7, NULL),
-(81, 'SMTP_SERVER', 'Adresa smtp serveru pro odesílání pošty', 'localhost', NULL, 0, 'string', 6, NULL),
-(82, 'SMTP_SERVER_PORT', 'Port smtp serveru pro odesílání pošty', NULL, NULL, 0, 'number', 6, NULL),
-(83, 'SMTP_SERVER_USERNAME', 'Uživatelské jméno smtp serveru pro odesílání pošty', NULL, NULL, 0, 'string', 6, NULL),
-(84, 'SMTP_SERVER_PASSWORD', 'Uživatelské heslo smtp serveru pro odesílání pošty', NULL, NULL, 0, 'string', 6, NULL),
-(85, 'SHORT_TEXT_TAGS', 'tagy, které jsou povoleny ve zkrácených výpisech', '<strong><a><em><span>', NULL, 0, 'string', 3, NULL),
-(86, 'NOREPLAY_MAIL', 'Název schránky odesílané pošty', 'noreplay@web.com', NULL, 0, 'string', 6, NULL),
-(94, 'TOKENS_STORE', 'Kde se mají ukládat bezpečnostní tokeny', 'session', 'session;db;file', 0, 'list', 3, NULL),
-(88, 'DEFAULT_PHOTO_W', 'Výchozí šířka fotky', '800', NULL, 0, 'number', 7, NULL),
-(89, 'DEFAULT_PHOTO_H', 'Výchozí výška fotky', '600', NULL, 0, 'number', 7, NULL),
-(90, 'STORE_ORIGINAl_FILES', 'Ukládání originálních souborů', '1', NULL, 0, 'bool', 7, NULL),
-(91, 'JQUERY_THEME', 'Téma JQuery UI', 'base', NULL, 0, 'string', 4, NULL),
-(93, 'IMAGE_THUMB_CROP', 'Ořezávat miniatury', '1', NULL, 0, 'bool', 7, NULL),
-(95, 'MAIN_TPL_VIEWS', 'Vzhledy hlavní šablony', NULL, NULL, 0, 'string', 4, NULL),
-(96, 'PIROBOX_THEME', 'Téma JsPluginu Pirobox', 'white', 'black;blackwhite;shadow;white;whiteblack', 0, 'list', 4, NULL),
-(99, 'FTP_USER', 'Uživatel ftp serveru, kde jsou stránky nahrány', 'user', NULL, 0, 'string', 3, NULL),
-(100, 'FTP_PASSOWRD', 'Heslo uživatele ftp serveru, kde jsou stránky nahrány', NULL, NULL, 0, 'string', 3, NULL),
-(101, 'USE_IMAGEMAGICK', 'Jeslti se má používat knihovna Imagick pro práci s obrázky', '0', NULL, 0, 'bool', 3, NULL),
-(102, 'SUB_SITE_DOMAIN', 'Doména podstránek', NULL, NULL, 0, 'string', 1, NULL),
-(103, 'SUB_SITE_DIR', 'Adresár s podstránkami', NULL, NULL, 0, 'string', 1, NULL),
-(104, 'SUB_SITE_USE_HTACCESS', 'Jestli je pro subdomény použit htaccess', '0', NULL, 0, 'bool', 1, NULL),
-(105, 'MAIN_SITE_TABLE_PREFIX', 'Prefix tabulek hlavních stránek (některé moduly využívají globální tabulky)', NULL, NULL, 0, 'string', 1, NULL),
-(106, 'SMTP_SERVER_ENCRYPT', 'Šifrování spojení k SMTP serveru (tls, ssl)', NULL, NULL, 0, 'string', 6, NULL),
-(107, 'ARTICLES_IN_LIST', 'Výchozí počet článků na jednu stránku', '5', NULL, 0, 'number', 4, NULL),
-(108, 'ARTICLE_TITLE_IMG_W', 'Titulní obrázek článku - šířka', '100', NULL, 0, 'number', 7, NULL),
-(109, 'ARTICLE_TITLE_IMG_H', 'Titulní obrázek článku - výška', '100', NULL, 0, 'number', 7, NULL),
-(110, 'ARTICLE_TITLE_IMG_DIR', 'Titulní obrázek článku - adresář', 'title-images', NULL, 0, '', 7, NULL),
-(111, 'FCB_APP_ID', 'Facebook App ID (pokud nějáká existuje)', NULL, NULL, 0, 'string', 11, NULL),
-(112, 'FCB_PAGE_URL', 'Adresa stránky/skupiny na Facebooku', NULL, NULL, 0, 'string', 11, NULL),
-(113, 'FCB_ADMINS', 'Facebook administrátoři komentářů (ID uživatelů oddělené čárkou)', NULL, NULL, 0, 'string', 11, NULL),
-(114, 'FCB_SHOW_LIKE_THIS_BUTTON', 'Zobrazit tlačítko "Like this" Facebooku', '1', NULL, 0, 'bool', 11, NULL),
-(115, 'GOOGLE_ANALYTICS_CODE', 'Kód pro Google Analytics', NULL, NULL, 0, 'string', 11, NULL),
-(116, 'GOOGLE_SHOW_PLUS_BUTTON', 'Zobrazit tlačítko Google +1', '1', NULL, 0, 'bool', 11, NULL),
-(117, 'SHARE_TOOLS_BUTTON_SHOW', 'Zobrazit tlačítko sdílení pomocí ostatních služeb', '1', NULL, 0, 'bool', 11, NULL);
+INSERT INTO `cubecms_global_config` (`id_config`, `key`, `label`, `value`, `values`, `protected`, `type`, `id_group`, `callback_func`, `hidden_value`) VALUES
+(1, 'DEFAULT_ID_GROUP', NULL, '2', NULL, 0, 'number', 3, NULL, 0),
+(2, 'DEFAULT_GROUP_NAME', NULL, 'guest', NULL, 0, 'string', 3, NULL, 0),
+(3, 'DEFAULT_USER_NAME', NULL, 'anonym', NULL, 0, 'string', 3, NULL, 0),
+(4, 'APP_LANGS', 'Všechny vybrané jazyky aplikace', 'cs', 'cs;en;de;ru;sk', 0, 'listmulti', 8, NULL, 0),
+(5, 'DEFAULT_APP_LANG', 'Výchozí jazyk aplikace. Tento jazyk je potom u většiny položek povinný.', 'cs', 'cs;en;de;ru;sk', 0, 'list', 8, NULL, 0),
+(6, 'IMAGES_DIR', NULL, 'images', NULL, 0, 'string', 3, NULL, 0),
+(7, 'IMAGES_LANGS_DIR', NULL, 'langs', NULL, 0, 'string', 3, NULL, 0),
+(8, 'DEBUG_LEVEL', 'Režim ladění stránek (0 pro vypnutí)', '2', NULL, 0, 'number', 3, NULL, 0),
+(9, 'TEMPLATE_FACE', 'Název vzhledu stránek', 'default', NULL, 0, 'string', 4, NULL, 0),
+(10, 'SITEMAP_PERIODE', 'Výchozí položka pro změnu mapy stránek pro vyhledávače', 'weekly', NULL, 0, 'string', 5, NULL, 0),
+(11, 'SEARCH_RESULT_LENGHT', 'Délka řetězce s výsledkem hledání', '300', NULL, 0, 'number', 9, NULL, 0),
+(12, 'SEARCH_HIGHLIGHT_TAG', 'Název tagu, který se užívá pro zvýraznění slova ve výsledcích hledání', 'strong', NULL, 0, 'string', 9, NULL, 0),
+(13, 'SESSION_NAME', 'Název cookies s id session, která se ukládá u klienta', '{PREFIX}cookie', NULL, 0, 'string', 3, NULL, 0),
+(14, 'WEB_NAME', 'Název stránek', 'VVE Engine', NULL, 0, 'string', 2, NULL, 0),
+(61, 'CATEGORIES_STRUCTURE', NULL, 'O:18:"Category_Structure":7:{s:25:"\0Category_Structure\0level";i:0;s:22:"\0Category_Structure\0id";i:0;s:28:"\0Category_Structure\0idParent";N;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:1:{i:0;O:18:"Category_Structure":7:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";i:1;s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}s:30:"\0Category_Structure\0withHidden";b:0;s:4:"type";s:4:"main";}}s:30:"\0Category_Structure\0withHidden";b:0;s:4:"type";s:4:"main";}', NULL, 1, 'ser_object', 1, NULL, 0),
+(58, 'USE_GLOBAL_ACCOUNTS_TB_PREFIXES', 'Prefixy tabulek pro které se má použít globální systém přihlašování', '{PREFIX}', '', 0, 'string', 3, NULL, 0),
+(59, 'NAVIGATION_MENU_TABLE', 'Název tabulky s navigačním menu', '{PREFIX}navigation_panel', NULL, 0, 'string', 3, NULL, 0),
+(60, 'SHARES_TABLE', 'Název tabulky s odkazy na sdílení (při global)', '{PREFIX}shares', NULL, 0, 'string', 3, NULL, 0),
+(21, 'PAGE_TITLE_SEPARATOR', 'Oddělovač položek v nadpisu stránky', '|', NULL, 0, 'string', 4, NULL, 0),
+(16, 'NAVIGATION_SEPARATOR', 'Oddělovač položek v navigaci mezi kategoriemi', '::', NULL, 0, 'string', 4, NULL, 0),
+(119, 'USE_CATEGORY_ALT_IN_TITLE', 'Použít alternativní název kategorie v titulku stránky', 'false', NULL, 0, 'bool', 3, NULL, 0),
+(19, 'PANEL_TYPES', 'Jaké druhy panelů jsou zapnuty a povoleny (musí je implementovat šablona)', 'left;right;bottom', 'left;right;bottom;top;center', 0, 'listmulti', 4, NULL, 0),
+(97, 'FTP_HOST', 'Adresa ftp serveru, kde jsou stránky nahrány', 'localhost', NULL, 0, 'string', 3, NULL, 0),
+(98, 'FTP_PORT', 'Port ftp serveru, kde jsou stránky nahrány', '22', NULL, 0, 'number', 3, NULL, 0),
+(20, 'DATA_DIR', NULL, 'data', NULL, 0, 'string', 3, NULL, 0),
+(22, 'USE_GLOBAL_ACCOUNTS', 'Globální systém přihlašování', 'false', NULL, 0, 'bool', 3, NULL, 0),
+(23, 'GLOBAL_TABLES_PREFIX', 'Prefix globálních tabulek', '{PREFIX}', NULL, 0, 'string', 3, NULL, 0),
+(27, 'PDF_PAGE_FORMAT', 'Formát stránky pro pdf výstup', 'A4', NULL, 0, 'string', 5, NULL, 0),
+(28, 'PDF_PAGE_ORIENTATION', 'Natočení stránky pro pdf výstup (P=portrait, L=landscape)', 'P', 'P;L', 0, 'list', 5, NULL, 0),
+(29, 'PDF_CREATOR', 'Název pdf kreatoru', 'TCPDF', NULL, 0, 'string', 5, NULL, 0),
+(30, 'PDF_AUTHOR', 'Autor pdf', 'TCPDF', NULL, 0, 'string', 5, NULL, 0),
+(31, 'PDF_HEADER_LOGO', 'Název loga v hlavičce pdf', NULL, NULL, 0, 'string', 5, NULL, 0),
+(32, 'PDF_HEADER_LOGO_WIDTH', 'Šířka loga v hlavičce', NULL, NULL, 0, 'string', 5, NULL, 0),
+(33, 'PDF_UNIT', 'Jednotky použité u pdf (pt=point, mm=millimeter, cm=centimeter, in=inch)', 'mm', 'mm;pt;cm;in', 0, 'list', 5, NULL, 0),
+(34, 'PDF_MARGIN_HEADER', 'Odsazení hlavičky', '5', NULL, 0, 'string', 5, NULL, 0),
+(35, 'PDF_MARGIN_FOOTER', 'Odsazení zápatí', '10', NULL, 0, 'string', 5, NULL, 0),
+(36, 'PDF_MARGIN_TOP', 'Odsazení stránky z vrchu', '20', NULL, 0, 'string', 5, NULL, 0),
+(37, 'PDF_MARGIN_BOTTOM', 'Odsazení stránky od spodu', '25', NULL, 0, 'string', 5, NULL, 0),
+(38, 'PDF_MARGIN_LEFT', 'Odsazení z leva', '15', NULL, 0, 'string', 5, NULL, 0),
+(39, 'PDF_MARGIN_RIGHT', 'Odsazení z prava', '15', NULL, 0, 'string', 5, NULL, 0),
+(40, 'PDF_FONT_NAME_MAIN', 'Název hlavního fontu', 'arial', NULL, 0, 'string', 5, NULL, 0),
+(41, 'PDF_FONT_SIZE_MAIN', 'Velikost hlavního fontu', '10', NULL, 0, 'string', 5, NULL, 0),
+(42, 'PDF_FONT_NAME_DATA', 'Font pro data', 'arial', NULL, 0, 'string', 5, NULL, 0),
+(43, 'PDF_FONT_SIZE_DATA', 'Velikost fontu pro data', '6', NULL, 0, 'string', 5, NULL, 0),
+(44, 'PDF_FONT_MONOSPACED', 'Název pevného fontu', 'courier', NULL, 0, 'string', 5, NULL, 0),
+(45, 'PDF_IMAGE_SCALE_RATIO', 'Zvětšení obrázků ve výstupním pdf', '1', NULL, 0, 'string', 5, NULL, 0),
+(46, 'HEAD_MAGNIFICATION', 'zvětšovací poměr nadpisů', '1.1', NULL, 0, 'string', 5, NULL, 0),
+(51, 'WEB_DESCRIPTION', 'Popis stránek', 'Web Pages', NULL, 0, 'string', 2, NULL, 0),
+(50, 'FEED_NUM', 'Poček generovaných rss/atom kanálů', '10', NULL, 0, 'number', 5, NULL, 0),
+(52, 'WEB_MASTER_NAME', 'Jméno webmastera', 'Webmaster Name', NULL, 0, 'string', 2, NULL, 0),
+(53, 'WEB_MASTER_EMAIL', 'E-mail webmastera', 'webmaster@web.com', NULL, 0, 'string', 6, NULL, 0),
+(54, 'FEED_TTL', 'Počet minut kešování kanálu', '30', NULL, 0, 'number', 5, NULL, 0),
+(55, 'WEB_COPYRIGHT', 'Copyright poznámka k webu ({Y} - nahrazeno rokem)', 'Obsah toho webu je licencován podle ... Žádná s jeho částí nesmí být použita bez vědomí webmastera. Copyrigth {Y}', NULL, 0, 'string', 2, NULL, 0),
+(56, 'SEARCH_ARTICLE_REL_MULTIPLIER', 'Násobič pro relevanci nadpisu článku (1 - nekonečno)', '5', NULL, 0, 'number', 9, NULL, 0),
+(57, 'ADMIN_MENU_STRUCTURE', 'Administrační menu', '', NULL, 1, 'ser_object', 1, NULL, 0),
+(62, 'MAIN_PAGE_TITLE', 'Nadpis hlavní stránky', 'Main Title Page', NULL, 0, 'string', 2, NULL, 0),
+(63, 'ALLOW_EXTERNAL_JS', 'Povolení externích JavaScript souborů', 'true', NULL, 0, 'bool', 3, NULL, 0),
+(74, 'CM_SITEMAP_MAX_ITEMS', 'Maximální počet položek v mapě stránek (pro vyhledávače)', '50', NULL, 0, 'number', 5, NULL, 0),
+(73, 'CM_SITEMAP_MAX_ITEMS_PAGE', 'Maximální počet položek v mapě stránek', '20', NULL, 0, 'number', 4, NULL, 0),
+(75, 'CM_SITEMAP_CAT_ICON', 'Název ikony pro sitemap', 'sitemap.png', NULL, 0, 'string', 4, NULL, 0),
+(76, 'CM_ERR_CAT_ICON', 'Název ikony pro chybovou stránku', 'error.png', NULL, 0, 'string', 4, NULL, 0),
+(77, 'CM_RSS_CAT_ICON', 'Název ikony pro stránku s rss kanály', 'rsslist.png', NULL, 0, 'string', 4, NULL, 0),
+(78, 'LOGIN_TIME', 'Doba po které je uživatel automaticky odhlášen (s)', '3600', NULL, 0, 'number', 3, NULL, 0),
+(79, 'IMAGE_THUMB_W', 'Výchozí šířka miniatury', '150', NULL, 0, 'number', 7, NULL, 0),
+(80, 'IMAGE_THUMB_H', 'Výchozí výška miniatury', '150', NULL, 0, 'number', 7, NULL, 0),
+(81, 'SMTP_SERVER', 'Adresa smtp serveru pro odesílání pošty', 'localhost', NULL, 0, 'string', 6, NULL, 0),
+(82, 'SMTP_SERVER_PORT', 'Port smtp serveru pro odesílání pošty', NULL, NULL, 0, 'number', 6, NULL, 0),
+(83, 'SMTP_SERVER_USERNAME', 'Uživatelské jméno smtp serveru pro odesílání pošty', NULL, NULL, 0, 'string', 6, NULL, 0),
+(84, 'SMTP_SERVER_PASSWORD', 'Uživatelské heslo smtp serveru pro odesílání pošty', NULL, NULL, 0, 'string', 6, NULL, 1),
+(85, 'SHORT_TEXT_TAGS', 'tagy, které jsou povoleny ve zkrácených výpisech', '<strong><a><em><span>', NULL, 0, 'string', 3, NULL, 0),
+(86, 'NOREPLAY_MAIL', 'Název schránky odesílané pošty', 'noreplay@web.com', NULL, 0, 'string', 6, NULL, 0),
+(94, 'TOKENS_STORE', 'Kde se mají ukládat bezpečnostní tokeny', 'db', 'session;db;file', 0, 'list', 3, NULL, 0),
+(88, 'DEFAULT_PHOTO_W', 'Výchozí šířka fotky', '800', NULL, 0, 'number', 7, NULL, 0),
+(89, 'DEFAULT_PHOTO_H', 'Výchozí výška fotky', '600', NULL, 0, 'number', 7, NULL, 0),
+(90, 'STORE_ORIGINAl_FILES', 'Ukládání originálních souborů', '1', NULL, 0, 'bool', 7, NULL, 0),
+(91, 'JQUERY_THEME', 'Téma JQuery UI', 'base', NULL, 0, 'string', 4, NULL, 0),
+(93, 'IMAGE_THUMB_CROP', 'Ořezávat miniatury', '1', NULL, 0, 'bool', 7, NULL, 0),
+(95, 'MAIN_TPL_VIEWS', 'Vzhledy hlavní šablony', NULL, NULL, 0, 'string', 4, NULL, 0),
+(96, 'PIROBOX_THEME', 'Téma JsPluginu Pirobox', 'white', 'black;blackwhite;shadow;white;whiteblack', 0, 'list', 4, NULL, 0),
+(99, 'FTP_USER', 'Uživatel ftp serveru, kde jsou stránky nahrány', 'user', NULL, 0, 'string', 3, NULL, 0),
+(100, 'FTP_PASSOWRD', 'Heslo uživatele ftp serveru, kde jsou stránky nahrány', NULL, NULL, 0, 'string', 3, NULL, 1),
+(101, 'USE_IMAGEMAGICK', 'Jeslti se má používat knihovna Imagick pro práci s obrázky', '0', NULL, 0, 'bool', 3, NULL, 0),
+(102, 'SUB_SITE_DOMAIN', 'Doména podstránek', NULL, NULL, 0, 'string', 1, NULL, 0),
+(103, 'SUB_SITE_DIR', 'Adresár s podstránkami', NULL, NULL, 0, 'string', 1, NULL, 0),
+(104, 'SUB_SITE_USE_HTACCESS', 'Jestli je pro subdomény použit htaccess', '0', NULL, 0, 'bool', 1, NULL, 0),
+(105, 'MAIN_SITE_TABLE_PREFIX', 'Prefix tabulek hlavních stránek (některé moduly využívají globální tabulky)', NULL, NULL, 0, 'string', 1, NULL, 0),
+(106, 'SMTP_SERVER_ENCRYPT', 'Šifrování spojení k SMTP serveru (tls, ssl)', NULL, NULL, 0, 'string', 6, NULL, 0),
+(107, 'ARTICLES_IN_LIST', 'Výchozí počet článků na jednu stránku', '5', NULL, 0, 'number', 4, NULL, 0),
+(108, 'ARTICLE_TITLE_IMG_W', 'Titulní obrázek článku - šířka', '100', NULL, 0, 'number', 7, NULL, 0),
+(109, 'ARTICLE_TITLE_IMG_H', 'Titulní obrázek článku - výška', '100', NULL, 0, 'number', 7, NULL, 0),
+(110, 'ARTICLE_TITLE_IMG_DIR', 'Titulní obrázek článku - adresář', 'title-images', NULL, 0, '', 7, NULL, 0),
+(111, 'FCB_APP_ID', 'Facebook App ID (pokud nějáká existuje)', NULL, NULL, 0, 'string', 11, NULL, 0),
+(112, 'FCB_PAGE_URL', 'Adresa stránky/skupiny na Facebooku', NULL, NULL, 0, 'string', 11, NULL, 0),
+(113, 'FCB_ADMINS', 'Facebook administrátoři komentářů (ID uživatelů oddělené čárkou)', NULL, NULL, 0, 'string', 11, NULL, 0),
+(114, 'FCB_SHOW_LIKE_THIS_BUTTON', 'Zobrazit tlačítko "Like this" Facebooku', '1', NULL, 0, 'bool', 11, NULL, 0),
+(115, 'GOOGLE_ANALYTICS_CODE', 'Kód pro Google Analytics', NULL, NULL, 0, 'string', 11, NULL, 0),
+(116, 'GOOGLE_SHOW_PLUS_BUTTON', 'Zobrazit tlačítko Google +1', '1', NULL, 0, 'bool', 11, NULL, 0),
+(117, 'SHARE_TOOLS_BUTTON_SHOW', 'Zobrazit tlačítko sdílení pomocí ostatních služeb', '1', NULL, 0, 'bool', 11, NULL, 0),
+(118, 'IMAGE_COMPRESS_QUALITY', 'kvalita komprese obrázků', '90', NULL, 0, 'number', 7, NULL, 0),
+(120, 'FCB_APP_SECRET_KEY', 'Facebook App Secret Key', NULL, NULL, 0, 'string', 11, NULL, 1),
+(121, 'FCB_PAGE_ID', 'ID stránky/skupiny na Facebooku', NULL, NULL, 0, 'string', 11, NULL, 0),
+(122, 'FCB_ACCESS_TOKEN', 'Access token pro přístup k Facebooku', NULL, NULL, 0, 'string', 11, NULL, 1),
+(123, 'ARTICLE_TITLE_IMG_C', 'Ořezávat titulní obrázky', 'true', NULL, 0, 'bool', 7, NULL, 0),
+(124, 'CACHE_TEXT_IMAGES', 'Zapnutí kešování obrázků v textu', 'true', NULL, 0, 'bool', 7, NULL, 0),
+(125, 'CACHE_TEXT_IMAGES_CROP', 'Ořezání kešovaného obrázku při zadání obou rozměrů', 'false', NULL, 0, 'bool', 7, NULL, 0),
+(126, 'MEMCACHE_SERVER', 'MemCache server - adresa', NULL, NULL, 0, 'string', 3, NULL, 0),
+(127, 'MEMCACHE_PORT', 'MemCache server - port', NULL, NULL, 0, 'number', 3, NULL, 0),
+(128, 'ANALYTICS_DISABLED_HOSTS', 'IP adresy pro které je analýza stránek vypnuta (odělené čárkou)', '127.0.0.1', NULL, 0, 'string', 11, NULL, 0),
+(129, 'ENABLE_LANG_AUTODETECTION', 'Zapnutí autodetekce jazyka', 'false', NULL, 0, 'bool', 8, NULL, 0),
+(130, 'DEFAULT_LANG_SUBSTITUTION', 'Nahrazovat jazyk výchozím jazykem', 'false', NULL, 0, 'bool', 8, NULL, 0);
 
 -- --------------------------------------------------------
 
@@ -148,7 +174,7 @@ CREATE TABLE IF NOT EXISTS `cubecms_global_config_groups` (
   `desc_en` varchar(200) DEFAULT NULL,
   `desc_de` varchar(200) DEFAULT NULL,
   PRIMARY KEY (`id_group`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=12 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=21 ;
 
 --
 -- Vypisuji data pro tabulku `cubecms_global_config_groups`
@@ -165,7 +191,68 @@ INSERT INTO `cubecms_global_config_groups` (`id_group`, `name_cs`, `name_sk`, `n
 (9, 'Hledání', 'Hľadanie', 'Search', 'Suche', 'Nastavení výsledků hledání', 'Nastavenie výsledkov hľadania', 'Search Settings', NULL),
 (5, 'Exporty', 'Exporty', 'Exports', 'Exporte', 'Nastavení exportů (rss, pdf, ...)', 'Nastavenie exportov (rss, pdf, ...)', 'Export Settings (RSS, PDF, ...)', NULL),
 (10, 'E-Shop nastavení', NULL, NULL, NULL, 'Nastavení elektronického obchodu. Toto nastavení je lépe upravovat přímo v nastavení obchodu.', NULL, NULL, NULL),
-(11, 'Soc. sítě/analýza', 'Soc. sítě/analýza', 'Soc. Networks/Analysis', NULL, 'Nastavení sociálních sítí a analytických nástrojů. (např. Facebook, Google Analytics,...)', NULL, NULL, NULL);
+(11, 'Soc. sítě/analýza', 'Soc. sítě/analýza', 'Soc. Networks/Analysis', NULL, 'Nastavení sociálních sítí a analytických nástrojů. (např. Facebook, Google Analytics,...)', NULL, NULL, NULL),
+(20, 'Moduly', 'Moduly', 'Modules', 'Module', 'Nastavení modulů', 'Nastavenie modulov', 'Modules Settings', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabulky `{PREFIX}autorun`
+--
+
+CREATE TABLE IF NOT EXISTS `{PREFIX}autorun` (
+  `id_autorun` int(11) NOT NULL AUTO_INCREMENT,
+  `autorun_module_name` varchar(20) NOT NULL,
+  `autorun_period` varchar(10) NOT NULL DEFAULT 'daily',
+  `autorun_url` varchar(200) DEFAULT NULL,
+  PRIMARY KEY (`id_autorun`),
+  KEY `period` (`autorun_period`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
+
+--
+-- Vypisuji data pro tabulku `{PREFIX}autorun`
+--
+
+INSERT INTO `{PREFIX}autorun` (`id_autorun`, `autorun_module_name`, `autorun_period`, `autorun_url`) VALUES
+(1, 'services', 'weekly', NULL),
+(2, 'mailsnewsletters', 'hourly', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabulky `{PREFIX}banners`
+--
+
+CREATE TABLE IF NOT EXISTS `{PREFIX}banners` (
+  `id_banner` int(11) NOT NULL AUTO_INCREMENT,
+  `banner_name` varchar(50) CHARACTER SET utf8 COLLATE utf8_czech_ci NOT NULL,
+  `banner_file` varchar(50) NOT NULL,
+  `banner_active` tinyint(1) NOT NULL DEFAULT '1',
+  `banner_box` varchar(20) DEFAULT NULL,
+  `banner_order` smallint(6) NOT NULL DEFAULT '0',
+  `banner_url` varchar(200) DEFAULT NULL,
+  `banner_text` varchar(300) CHARACTER SET utf8 COLLATE utf8_czech_ci DEFAULT NULL,
+  `banner_time_add` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `banner_new_window` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id_banner`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabulky `{PREFIX}banners_clicks`
+--
+
+CREATE TABLE IF NOT EXISTS `{PREFIX}banners_clicks` (
+  `id_banner_click` int(11) NOT NULL AUTO_INCREMENT,
+  `id_banner` varchar(45) CHARACTER SET latin1 DEFAULT NULL,
+  `banner_click_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `banner_click_ip` int(11) DEFAULT '0',
+  `banner_click_browser` varchar(200) CHARACTER SET latin1 DEFAULT NULL,
+  PRIMARY KEY (`id_banner_click`),
+  KEY `banner` (`id_banner`),
+  KEY `timebanner` (`id_banner`,`banner_click_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -175,18 +262,22 @@ INSERT INTO `cubecms_global_config_groups` (`id_group`, `name_cs`, `name_sk`, `n
 
 CREATE TABLE IF NOT EXISTS `{PREFIX}categories` (
   `id_category` smallint(3) NOT NULL AUTO_INCREMENT,
-  `module` varchar(20) DEFAULT NULL,
+  `module` varchar(30) DEFAULT NULL,
   `data_dir` varchar(100) DEFAULT NULL,
   `urlkey_cs` varchar(100) CHARACTER SET utf8 COLLATE utf8_czech_ci DEFAULT NULL,
+  `disable_cs` tinyint(1) NOT NULL DEFAULT '0',
   `label_cs` varchar(200) CHARACTER SET utf8 COLLATE utf8_czech_ci DEFAULT NULL,
   `alt_cs` varchar(200) CHARACTER SET utf8 COLLATE utf8_czech_ci DEFAULT NULL,
   `urlkey_en` varchar(100) DEFAULT NULL,
+  `disable_en` tinyint(1) NOT NULL DEFAULT '0',
   `label_en` varchar(200) DEFAULT NULL,
   `alt_en` varchar(200) DEFAULT NULL,
   `urlkey_de` varchar(100) DEFAULT NULL,
+  `disable_de` tinyint(1) NOT NULL DEFAULT '0',
   `label_de` varchar(200) DEFAULT NULL,
   `alt_de` varchar(200) DEFAULT NULL,
   `urlkey_sk` varchar(100) CHARACTER SET utf8 COLLATE utf8_slovak_ci DEFAULT NULL,
+  `disable_sk` tinyint(1) NOT NULL DEFAULT '0',
   `label_sk` varchar(200) CHARACTER SET utf8 COLLATE utf8_slovak_ci DEFAULT NULL,
   `alt_sk` varchar(200) CHARACTER SET utf8 COLLATE utf8_slovak_ci DEFAULT NULL,
   `keywords_cs` varchar(200) CHARACTER SET utf8 COLLATE utf8_czech_ci DEFAULT NULL,
@@ -212,11 +303,17 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}categories` (
   `icon` varchar(100) DEFAULT NULL,
   `background` varchar(100) DEFAULT NULL,
   `id_owner_user` smallint(6) DEFAULT '0',
+  `allow_handle_access` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id_category`),
   KEY `urlkey_cs` (`urlkey_cs`),
   KEY `urlkey_sk` (`urlkey_sk`),
   KEY `urlkey_en` (`urlkey_en`),
   KEY `urlkey_de` (`urlkey_de`),
+  KEY `urlkey_disable_cs` (`disable_cs`),
+  KEY `urlkey_disable_en` (`disable_en`),
+  KEY `urlkey_disable_de` (`disable_de`),
+  KEY `urlkey_disable_sk` (`disable_sk`),
+  KEY `individual_panel` (`individual_panels`),
   FULLTEXT KEY `label_cs` (`label_cs`),
   FULLTEXT KEY `label_en` (`label_en`),
   FULLTEXT KEY `label_de` (`label_de`),
@@ -231,8 +328,8 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}categories` (
 -- Vypisuji data pro tabulku `{PREFIX}categories`
 --
 
-INSERT INTO `{PREFIX}categories` (`id_category`, `module`, `data_dir`, `urlkey_cs`, `label_cs`, `alt_cs`, `urlkey_en`, `label_en`, `alt_en`, `urlkey_de`, `label_de`, `alt_de`, `urlkey_sk`, `label_sk`, `alt_sk`, `keywords_cs`, `description_cs`, `keywords_en`, `description_en`, `keywords_de`, `description_de`, `keywords_sk`, `description_sk`, `ser_params`, `params`, `protected`, `priority`, `active`, `individual_panels`, `sitemap_changefreq`, `sitemap_priority`, `visibility`, `changed`, `default_right`, `feeds`, `icon`, `background`, `id_owner_user`) VALUES
-(1, 'login', 'ucet', 'ucet', 'účet', NULL, 'account', 'account', NULL, NULL, NULL, NULL, 'ucet', 'účet', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 1, 0, 'never', 0, 1, '2011-06-21 07:18:45', 'r--', 0, NULL, NULL, 0);
+INSERT INTO `{PREFIX}categories` (`id_category`, `module`, `data_dir`, `urlkey_cs`, `disable_cs`, `label_cs`, `alt_cs`, `urlkey_en`, `disable_en`, `label_en`, `alt_en`, `urlkey_de`, `disable_de`, `label_de`, `alt_de`, `urlkey_sk`, `disable_sk`, `label_sk`, `alt_sk`, `keywords_cs`, `description_cs`, `keywords_en`, `description_en`, `keywords_de`, `description_de`, `keywords_sk`, `description_sk`, `ser_params`, `params`, `protected`, `priority`, `active`, `individual_panels`, `sitemap_changefreq`, `sitemap_priority`, `visibility`, `changed`, `default_right`, `feeds`, `icon`, `background`, `id_owner_user`, `allow_handle_access`) VALUES
+(1, 'login', 'ucet', 'ucet', 0, 'účet', NULL, 'account', 0, 'account', NULL, NULL, 0, NULL, NULL, 'ucet', 0, 'účet', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 1, 0, 'never', 0, 1, '2011-06-21 07:18:45', 'r--', 0, NULL, NULL, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -273,19 +370,21 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}config` (
   `type` enum('string','number','bool','list','listmulti','ser_object') NOT NULL DEFAULT 'string',
   `id_group` smallint(6) NOT NULL DEFAULT '0',
   `callback_func` varchar(100) DEFAULT NULL,
+  `hidden_value` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id_config`),
   UNIQUE KEY `key` (`key`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=6 ;
 
 --
 -- Vypisuji data pro tabulku `{PREFIX}config`
 --
 
-INSERT INTO `{PREFIX}config` (`id_config`, `key`, `label`, `value`, `values`, `protected`, `type`, `id_group`, `callback_func`) VALUES
-(1, 'CATEGORIES_STRUCTURE', NULL, 'O:18:"Category_Structure":7:{s:25:"\0Category_Structure\0level";i:0;s:22:"\0Category_Structure\0id";i:0;s:28:"\0Category_Structure\0idParent";N;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:1:{i:0;O:18:"Category_Structure":7:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:1:"1";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}s:30:"\0Category_Structure\0withHidden";b:0;s:4:"type";s:4:"main";}}s:30:"\0Category_Structure\0withHidden";b:0;s:4:"type";s:4:"main";}', NULL, 1, 'ser_object', 1, NULL),
-(2, 'ADMIN_MENU_STRUCTURE', 'Administrační menu', 'O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:0;s:22:"\0Category_Structure\0id";i:0;s:28:"\0Category_Structure\0idParent";N;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:6:{i:1;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:1:"3";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:2:{i:0;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";i:1;s:28:"\0Category_Structure\0idParent";s:1:"3";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}i:1;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:1:"4";s:28:"\0Category_Structure\0idParent";s:1:"3";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}}}i:2;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:1:"5";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:1:{i:0;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:1:"6";s:28:"\0Category_Structure\0idParent";s:1:"5";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}}}i:4;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:1:"9";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:2:{i:1;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:3:"103";s:28:"\0Category_Structure\0idParent";s:1:"9";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}i:2;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:3:"105";s:28:"\0Category_Structure\0idParent";s:1:"9";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}}}i:5;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:3:"166";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:3:{i:0;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:3:"125";s:28:"\0Category_Structure\0idParent";s:3:"166";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}i:1;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:2:"10";s:28:"\0Category_Structure\0idParent";s:3:"166";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}i:2;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:1:"8";s:28:"\0Category_Structure\0idParent";s:3:"166";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}}}i:6;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:2:"11";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:2:{i:0;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:2:"12";s:28:"\0Category_Structure\0idParent";s:2:"11";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}i:1;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:2;s:22:"\0Category_Structure\0id";s:2:"13";s:28:"\0Category_Structure\0idParent";s:2:"11";s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}}}i:7;O:18:"Category_Structure":5:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:1:"2";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}}}}', NULL, 1, 'ser_object', 1, NULL),
-(3, 'VERSION', 'Verze jádra', '7', NULL, 1, 'string', 1, NULL),
-(4, 'RELEASE', 'verze release', '7', NULL, 1, 'number', 1, NULL);
+INSERT INTO `{PREFIX}config` (`id_config`, `key`, `label`, `value`, `values`, `protected`, `type`, `id_group`, `callback_func`, `hidden_value`) VALUES
+(1, 'CATEGORIES_STRUCTURE', NULL, 'O:18:"Category_Structure":7:{s:25:"\0Category_Structure\0level";i:0;s:22:"\0Category_Structure\0id";i:0;s:28:"\0Category_Structure\0idParent";N;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:1:{i:0;O:18:"Category_Structure":7:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:1:"1";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}s:30:"\0Category_Structure\0withHidden";b:0;s:4:"type";s:4:"main";}}s:30:"\0Category_Structure\0withHidden";b:0;s:4:"type";s:4:"main";}', NULL, 1, 'ser_object', 1, NULL, 0),
+(2, 'ADMIN_MENU_STRUCTURE', 'Administrační menu', '', NULL, 1, 'ser_object', 1, NULL, 0),
+(3, 'VERSION', 'Verze jádra', '7', NULL, 1, 'string', 1, NULL, 0),
+(4, 'RELEASE', 'verze release', '18', NULL, 1, 'number', 1, NULL, 0),
+(5, 'FCB_ACCESS_TOKEN', 'Access token pro přístup k Facebooku', NULL, NULL, 0, 'string', 11, NULL, 1);
 
 -- --------------------------------------------------------
 
@@ -324,6 +423,70 @@ INSERT INTO `{PREFIX}config_groups` (`id_group`, `name_cs`, `name_sk`, `name_en`
 -- --------------------------------------------------------
 
 --
+-- Struktura tabulky `{PREFIX}custom_menu_items`
+--
+
+CREATE TABLE IF NOT EXISTS `{PREFIX}custom_menu_items` (
+  `id_custom_menu_item` int(11) NOT NULL AUTO_INCREMENT,
+  `id_category` int(11) NOT NULL DEFAULT '0',
+  `menu_item_box` varchar(45) NOT NULL,
+  `menu_item_name_cs` varchar(50) CHARACTER SET utf8 COLLATE utf8_czech_ci DEFAULT NULL,
+  `menu_item_name_en` varchar(50) DEFAULT NULL,
+  `menu_item_name_de` varchar(50) DEFAULT NULL,
+  `menu_item_name_sk` varchar(50) CHARACTER SET utf8 COLLATE utf8_slovak_ci DEFAULT NULL,
+  `menu_item_link` varchar(200) CHARACTER SET latin1 DEFAULT NULL,
+  `menu_item_new_window` tinyint(1) DEFAULT '0',
+  `menu_item_order` int(11) NOT NULL DEFAULT '0',
+  `menu_item_active` tinyint(1) DEFAULT '1',
+  PRIMARY KEY (`id_custom_menu_item`),
+  KEY `fk_category` (`id_category`),
+  KEY `box` (`menu_item_box`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabulky `{PREFIX}forms`
+--
+
+CREATE TABLE IF NOT EXISTS `{PREFIX}forms` (
+  `id_form` int(11) NOT NULL AUTO_INCREMENT,
+  `form_name` varchar(200) DEFAULT NULL,
+  `form_message` varchar(1000) DEFAULT NULL,
+  `form_send_to_mails` varchar(500) DEFAULT NULL,
+  `form_send_to_users` varchar(100) DEFAULT NULL,
+  `form_sended` int(11) DEFAULT '0',
+  `form_time_add` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `form_active` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id_form`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabulky `{PREFIX}forms_elements`
+--
+
+CREATE TABLE IF NOT EXISTS `{PREFIX}forms_elements` (
+  `id_form_element` int(11) NOT NULL AUTO_INCREMENT,
+  `id_form` int(11) NOT NULL,
+  `form_element_name` varchar(50) NOT NULL,
+  `form_element_label` varchar(50) NOT NULL,
+  `form_element_type` varchar(20) NOT NULL DEFAULT 'text',
+  `form_element_value` varchar(200) DEFAULT NULL,
+  `form_element_required` tinyint(1) DEFAULT '0',
+  `form_element_options` varchar(1000) DEFAULT NULL,
+  `form_element_order` smallint(6) DEFAULT '1',
+  `form_element_validator` varchar(50) DEFAULT NULL,
+  `form_element_ismultiple` tinyint(1) DEFAULT '0',
+  PRIMARY KEY (`id_form_element`),
+  KEY `order` (`id_form`,`form_element_order`),
+  KEY `id_form` (`id_form`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
 -- Struktura tabulky `{PREFIX}groups`
 --
 
@@ -348,39 +511,114 @@ INSERT INTO `{PREFIX}groups` (`id_group`, `name`, `label`, `used`, `default_righ
 -- --------------------------------------------------------
 
 --
--- Struktura tabulky `{PREFIX}mails_addressbook`
+-- Struktura tabulky `{PREFIX}hpslideshow_images`
 --
 
-CREATE TABLE IF NOT EXISTS `{PREFIX}mails_addressbook` (
-  `id_mail` smallint(6) NOT NULL AUTO_INCREMENT,
-  `id_group` smallint(6) NOT NULL DEFAULT '1',
-  `name` varchar(30) CHARACTER SET utf8 COLLATE utf8_czech_ci DEFAULT NULL,
-  `surname` varchar(30) CHARACTER SET utf8 COLLATE utf8_czech_ci DEFAULT NULL,
-  `mail` varchar(100) CHARACTER SET utf8 COLLATE utf8_czech_ci NOT NULL,
-  `note` varchar(400) DEFAULT NULL,
-  PRIMARY KEY (`id_mail`),
-  KEY `GROUP` (`id_group`)
+CREATE TABLE IF NOT EXISTS `{PREFIX}hpslideshow_images` (
+  `id_image` int(11) NOT NULL AUTO_INCREMENT,
+  `id_category` smallint(6) DEFAULT '0',
+  `image_label_cs` varchar(400) CHARACTER SET utf8 COLLATE utf8_czech_ci DEFAULT NULL,
+  `image_label_en` varchar(400) DEFAULT NULL,
+  `image_label_de` varchar(400) DEFAULT NULL,
+  `image_label_sk` varchar(400) CHARACTER SET utf8 COLLATE utf8_slovak_ci DEFAULT NULL,
+  `image_link_cs` varchar(100) DEFAULT NULL,
+  `image_link_en` varchar(100) DEFAULT NULL,
+  `image_link_de` varchar(100) DEFAULT NULL,
+  `image_link_sk` varchar(100) DEFAULT NULL,
+  `image_order` smallint(6) NOT NULL DEFAULT '0',
+  `image_active` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id_image`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
 --
--- Struktura tabulky `{PREFIX}mails_groups`
+-- Struktura tabulky `{PREFIX}mails_addressbook`
 --
 
-CREATE TABLE IF NOT EXISTS `{PREFIX}mails_groups` (
-  `id_group` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(45) CHARACTER SET utf8 COLLATE utf8_czech_ci NOT NULL,
-  `note` varchar(400) CHARACTER SET utf8 COLLATE utf8_czech_ci DEFAULT NULL,
-  PRIMARY KEY (`id_group`)
+CREATE TABLE IF NOT EXISTS `{PREFIX}mails_addressbook` (
+  `id_addressbook_mail` smallint(6) NOT NULL AUTO_INCREMENT,
+  `id_addressbook_group` smallint(6) NOT NULL DEFAULT '1',
+  `addressbook_name` varchar(30) CHARACTER SET utf8 COLLATE utf8_czech_ci DEFAULT NULL,
+  `addressbook_surname` varchar(30) CHARACTER SET utf8 COLLATE utf8_czech_ci DEFAULT NULL,
+  `addressbook_mail` varchar(100) CHARACTER SET utf8 COLLATE utf8_czech_ci NOT NULL,
+  `addressbook_note` varchar(400) DEFAULT NULL,
+  `addressbook_valid` smallint(6) DEFAULT '0',
+  PRIMARY KEY (`id_addressbook_mail`),
+  KEY `GROUP` (`id_addressbook_group`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabulky `{PREFIX}mails_addressbook_groups`
+--
+
+CREATE TABLE IF NOT EXISTS `{PREFIX}mails_addressbook_groups` (
+  `id_addressbook_group` int(11) NOT NULL AUTO_INCREMENT,
+  `addressbook_group_name` varchar(45) CHARACTER SET utf8 COLLATE utf8_czech_ci NOT NULL,
+  `addressbook_group_note` varchar(400) CHARACTER SET utf8 COLLATE utf8_czech_ci DEFAULT NULL,
+  PRIMARY KEY (`id_addressbook_group`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
 
 --
--- Vypisuji data pro tabulku `{PREFIX}mails_groups`
+-- Vypisuji data pro tabulku `{PREFIX}mails_addressbook_groups`
 --
 
-INSERT INTO `{PREFIX}mails_groups` (`id_group`, `name`, `note`) VALUES
+INSERT INTO `{PREFIX}mails_addressbook_groups` (`id_addressbook_group`, `addressbook_group_name`, `addressbook_group_note`) VALUES
 (1, 'Základní', 'Základní skupina');
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabulky `{PREFIX}mails_newsletters`
+--
+
+CREATE TABLE IF NOT EXISTS `{PREFIX}mails_newsletters` (
+  `id_newsletter` int(11) NOT NULL AUTO_INCREMENT,
+  `id_newsletter_template` int(11) NOT NULL,
+  `id_user` int(11) NOT NULL,
+  `newsletter_subject` varchar(100) DEFAULT NULL,
+  `newsletter_date_send` date DEFAULT NULL,
+  `newsletter_deleted` tinyint(4) DEFAULT '0',
+  `newsletter_active` tinyint(4) DEFAULT '0',
+  `newsletter_content` text,
+  `newsletter_groups_ids` varchar(200) DEFAULT NULL,
+  `newsletter_viewed` int(11) DEFAULT '0',
+  PRIMARY KEY (`id_newsletter`),
+  KEY `fk_users` (`id_user`),
+  KEY `fk_newsletters_templates` (`id_newsletter_template`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabulky `{PREFIX}mails_newsletters_queue`
+--
+
+CREATE TABLE IF NOT EXISTS `{PREFIX}mails_newsletters_queue` (
+  `id_newsletter_queue` int(11) NOT NULL AUTO_INCREMENT,
+  `id_newsletter` int(11) NOT NULL,
+  `newsletter_queue_mail` varchar(100) NOT NULL,
+  `newsletter_queue_name` varchar(100) DEFAULT NULL,
+  `newsletter_queue_surname` varchar(100) DEFAULT NULL,
+  `newsletter_queue_date_send` date NOT NULL,
+  PRIMARY KEY (`id_newsletter_queue`,`id_newsletter`),
+  KEY `fk_newsletter` (`id_newsletter`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabulky `{PREFIX}mails_newsletters_templates`
+--
+
+CREATE TABLE IF NOT EXISTS `{PREFIX}mails_newsletters_templates` (
+  `id_newsletter_template` int(11) NOT NULL AUTO_INCREMENT,
+  `newsletter_template_name` varchar(100) NOT NULL,
+  `newsletter_template_deleted` tinyint(4) DEFAULT '0',
+  PRIMARY KEY (`id_newsletter_template`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -392,7 +630,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}mails_sends` (
   `id_mail` smallint(6) NOT NULL AUTO_INCREMENT,
   `id_user` smallint(6) NOT NULL,
   `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `recipients` varchar(2000) DEFAULT NULL,
+  `recipients` text,
   `subject` varchar(500) DEFAULT NULL,
   `content` text,
   `attachments` varchar(500) DEFAULT NULL,
@@ -408,11 +646,14 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}mails_sends` (
 
 CREATE TABLE IF NOT EXISTS `{PREFIX}mails_send_queue` (
   `id_mail` int(11) NOT NULL AUTO_INCREMENT,
+  `id_user` smallint(6) NOT NULL,
   `mail` varchar(100) NOT NULL,
   `name` varchar(100) DEFAULT NULL,
   `undeliverable` tinyint(1) DEFAULT '0',
+  `mail_data` blob,
   PRIMARY KEY (`id_mail`),
-  UNIQUE KEY `id_mail_UNIQUE` (`id_mail`)
+  UNIQUE KEY `id_mail_UNIQUE` (`id_mail`),
+  KEY `id_user` (`id_user`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
@@ -427,27 +668,37 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}modules_instaled` (
   `version_major` tinyint(3) unsigned NOT NULL DEFAULT '1',
   `version_minor` tinyint(3) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id_module`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=15 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=25 ;
 
 --
 -- Vypisuji data pro tabulku `{PREFIX}modules_instaled`
 --
 
 INSERT INTO `{PREFIX}modules_instaled` (`id_module`, `name`, `version_major`, `version_minor`) VALUES
-(1, 'text', 1, 1),
+(1, 'text', 1, 4),
 (2, 'upgrade', 1, 1),
-(3, 'mails', 3, 0),
+(3, 'mails', 4, 0),
 (4, 'search', 1, 0),
 (5, 'users', 2, 0),
-(6, 'panels', 1, 0),
+(6, 'panels', 1, 1),
 (7, 'empty', 1, 0),
-(8, 'services', 1, 0),
+(8, 'services', 2, 0),
 (9, 'configuration', 3, 0),
 (10, 'templates', 1, 1),
 (11, 'phpinfo', 1, 0),
 (12, 'categories', 2, 0),
 (13, 'login', 1, 0),
-(14, 'quicktools', 1, 0);
+(14, 'quicktools', 1, 0),
+(15, 'forms', 1, 0),
+(16, 'banners', 1, 0),
+(17, 'custommenu', 1, 0),
+(18, 'mailsaddressbook', 1, 0),
+(19, 'mailsnewsletters', 1, 1),
+(20, 'hpslideshow', 1, 0),
+(21, 'catsbulkedit', 1, 0),
+(22, 'crontab', 1, 0),
+(23, 'trstaticstexts', 1, 0),
+(24, 'redirect', 1, 0);
 
 -- --------------------------------------------------------
 
@@ -487,6 +738,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}panels` (
   `pname_en` varchar(100) DEFAULT NULL,
   `pname_de` varchar(100) DEFAULT NULL,
   `pname_sk` varchar(100) CHARACTER SET utf8 COLLATE utf8_slovak_ci DEFAULT NULL,
+  `panel_force_global` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id_panel`),
   KEY `id_cat` (`id_cat`),
   KEY `id_show_cat` (`id_show_cat`)
@@ -520,8 +772,9 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}rights` (
   `id_group` smallint(6) NOT NULL,
   `right` enum('---','r--','-w-','--c','rw-','-wc','r-c','rwc') NOT NULL DEFAULT 'r--',
   PRIMARY KEY (`id_right`),
-  KEY `id_category` (`id_category`,`id_group`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=37 ;
+  KEY `id_cat_grp` (`id_category`,`id_group`),
+  KEY `id_cat` (`id_category`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
 
 --
 -- Vypisuji data pro tabulku `{PREFIX}rights`
@@ -549,6 +802,22 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}search_apis` (
 -- --------------------------------------------------------
 
 --
+-- Struktura tabulky `{PREFIX}secure_tokens`
+--
+
+CREATE TABLE IF NOT EXISTS `{PREFIX}secure_tokens` (
+  `id_secure_token` int(11) NOT NULL AUTO_INCREMENT,
+  `id_user` int(11) NOT NULL,
+  `secure_token` varchar(40) NOT NULL,
+  `secure_token_created` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id_secure_token`),
+  KEY `token_user_time` (`secure_token`,`id_user`,`secure_token_created`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+
+-- --------------------------------------------------------
+
+--
 -- Struktura tabulky `{PREFIX}sessions`
 --
 
@@ -562,45 +831,6 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}sessions` (
   PRIMARY KEY (`session_key`),
   UNIQUE KEY `ssession_key_UNIQUE` (`session_key`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
---
--- Vypisuji data pro tabulku `{PREFIX}sessions`
---
-
-INSERT INTO `{PREFIX}sessions` (`session_key`, `value`, `created`, `updated`, `ip`, `id_user`) VALUES
-('vhbje94c9r2dbgfpf7g85nqgn1', 0x6c616e677c733a323a226373223b757365726e616d657c733a353a2261646d696e223b6d61696c7c733a303a22223b69645f757365727c693a313b69645f67726f75707c693a313b67726f75705f6e616d657c733a353a2261646d696e223b69705f616464726573737c733a393a223132372e302e302e31223b6c6f67696e74696d657c693a313330383633383030353b6c6f67696e7c623a313b61646d696e7c623a303b61646d696e5f6772707c623a313b73697465737c613a303a7b7d, '2011-06-21 08:32:26', '2011-06-21 08:33:25', '127.0.0.1', 0),
-('75deun62a2psmgdr7bcj2c4br0', 0x6c616e677c733a323a226373223b, '2011-10-07 07:33:36', '2011-10-07 07:33:36', '127.0.0.1', 0),
-('9nu9tplrdf3fd5u0kbrnpoj874', 0x473377485339366d654e7269305141304a6a77764b39455a707437736d5479726a5f34524443454a7857707456313871614954306a6a764770346e6b6839763459726e70766b516b796e6436485167742d444f79454f39563476676e336967726971784c36657753745057454f7458556e707745784231787277794d6e4e70444f704f6e4d36394a4530656b4d524e637052596f57765f6b5156777a7971556b7a686d4a6f7632484d7a4f676d6a43656b7176576569356973596b6a74655f46386a6f457778754b6c4252306438414d6c525a652d7242537054324942646a75533943456b79674f4b4a47324344343766662d733459734f755665797a67514458725052515558446b53374979346450687645475f412e2e, '2012-02-01 10:24:00', '2012-02-01 10:25:05', '127.0.0.1', 0);
-
--- --------------------------------------------------------
-
---
--- Struktura tabulky `{PREFIX}shares`
---
-
-CREATE TABLE IF NOT EXISTS `{PREFIX}shares` (
-  `id_share` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
-  `link` varchar(300) NOT NULL,
-  `icon` varchar(100) NOT NULL,
-  `name` varchar(100) NOT NULL,
-  PRIMARY KEY (`id_share`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=11 ;
-
---
--- Vypisuji data pro tabulku `{PREFIX}shares`
---
-
-INSERT INTO `{PREFIX}shares` (`id_share`, `link`, `icon`, `name`) VALUES
-(1, 'http://www.linkuj.cz/?id=linkuj&amp;url={URL}&amp;title={TITLE}', 'http://linkuj.cz/img/linkuj_icon.gif', 'linkuj.cz'),
-(2, 'http://www.jagg.cz/bookmarks.php?action=add&amp;address={URL}&amp;title={TITLE}', 'http://www.jagg.cz/icon.png', 'jagg.cz'),
-(3, 'http://vybrali.sme.sk/submit.php?url={URL}', 'http://zena.sme.sk/storm/imgs/toolbar/doasdf_c.gif', 'vybrali.sme.sk'),
-(4, 'http://www.google.com/bookmarks/mark?op=edit&amp;bkmk={URL}&amp;title={TITLE}', 'icons_logos/google.gif', 'Google'),
-(5, 'http://www.facebook.com/share.php?u={URL}&amp;title={TITLE}', 'icons_logos/facebook.gif', 'Facebook'),
-(6, 'http://delicious.com/save?v=5&amp;noui&amp;jump=close&amp;url={URL}&amp;title={TITLE}', 'http://static.delicious.com/img/delicious.gif', 'delicious.com'),
-(7, 'http://digg.com/submit?url={URL}&amp;title={TITLE}&amp;topic={TITLE}', 'http://digg.com/img/badges/16x16-digg-guy.gif', 'digg.com'),
-(8, 'http://www.diigo.com/post?url={URL}&amp;title={TITLE}', 'http://www.diigo.com/images/ii_blue.gif', 'diigo.com'),
-(9, 'http://pridat.eu/zalozku/?url={URL}&amp;title={TITLE}', 'http://i.pridat.eu/wwwpridateu.gif', 'pridat.eu'),
-(10, 'http://www.bookmarky.cz/a.php?cmd=add&amp;url={URL}&amp;title={TITLE}', 'http://www.bookmarky.cz/bookmarky16x16.gif', 'bookmarky.cz');
 
 -- --------------------------------------------------------
 
@@ -661,6 +891,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}templates` (
 CREATE TABLE IF NOT EXISTS `{PREFIX}texts` (
   `id_text` smallint(4) unsigned NOT NULL AUTO_INCREMENT,
   `id_item` smallint(5) unsigned NOT NULL,
+  `id_user` int(11) DEFAULT '0',
   `subkey` varchar(30) NOT NULL DEFAULT 'nokey',
   `changed` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `label_cs` varchar(200) CHARACTER SET utf8 COLLATE utf8_czech_ci DEFAULT NULL,
@@ -675,8 +906,10 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}texts` (
   `label_sk` varchar(1000) CHARACTER SET utf8 COLLATE utf8_slovak_ci DEFAULT NULL,
   `text_sk` mediumtext CHARACTER SET utf8 COLLATE utf8_slovak_ci,
   `text_clear_sk` mediumtext CHARACTER SET utf8 COLLATE utf8_slovak_ci,
+  `data` text,
   PRIMARY KEY (`id_text`),
   KEY `id_item` (`id_item`),
+  KEY `subkey` (`id_item`,`subkey`),
   FULLTEXT KEY `label_cs` (`label_cs`),
   FULLTEXT KEY `label_en` (`label_en`),
   FULLTEXT KEY `label_de` (`label_de`),
@@ -747,3 +980,24 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}users` (
 INSERT INTO `{PREFIX}users` (`id_user`, `username`, `password`, `password_restore`, `id_group`, `name`, `surname`, `mail`, `note`, `blocked`, `foto_file`, `deleted`, `created`, `last_login`) VALUES
 (2, 'guest', NULL, NULL, 2, 'test', 'tetasdhf', '', NULL, 0, NULL, 0, NULL, NULL),
 (1, 'admin', 'd033e22ae348aeb5660fc2140aec35850c4da997', NULL, 1, 'admin', 'admin', '', NULL, 0, NULL, 0, NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabulky `{PREFIX}users_logins`
+--
+
+CREATE TABLE IF NOT EXISTS `{PREFIX}users_logins` (
+  `id_user_login` int(11) NOT NULL AUTO_INCREMENT,
+  `id_user` int(11) NOT NULL DEFAULT '0',
+  `user_login_ip` varchar(15) DEFAULT NULL,
+  `user_login_browser` varchar(200) DEFAULT NULL,
+  `user_login_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id_user_login`),
+  KEY `idu_by_time` (`id_user`,`user_login_time`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

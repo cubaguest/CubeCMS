@@ -1,30 +1,18 @@
--- VERZE 7.7
--- Nahradit za prefix tabulek
+-- phpMyAdmin SQL Dump
+-- version 3.4.11.1deb1
+-- http://www.phpmyadmin.net
+--
+-- Počítač: localhost
+-- Vygenerováno: Stř 06. bře 2013, 09:17
+-- Verze MySQL: 5.5.29
+-- Verze PHP: 5.4.6-1ubuntu1.1
 
--- nová skupina v konfigu
-INSERT INTO `{PREFIX}config_groups` ( `id_group` , `name_cs` , `name_sk` , `name_en` , `name_de` , `desc_cs` , `desc_sk` , `desc_en` , `desc_de` )
-VALUES (NULL , 'E-Shop nastavení', NULL , NULL , NULL , 'Nastavení elektronického obchodu. Toto nastavení je lépe upravovat přímo v nastavení obchodu.', NULL , NULL , NULL);
+SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
+SET time_zone = "+00:00";
 
-INSERT INTO `{PREFIX}config` (`key` , `label` , `value` , `values` , `protected` , `type` , `id_group` , `callback_func` )
-VALUES 
-('SHOP', 'Zapnutí podpory pro e-shop', 'true', NULL , 0, 'bool', 10, NULL),
-('SHOP_CURRENCY_NAME', 'Náze měny (Kč, $, ...)', 'Kč', NULL , 0, 'string', 10, NULL),
-('SHOP_CURRENCY_CODE', 'Kód měny (USD, CZK, ...)', 'CZK', NULL , 0, 'string', 10, NULL), 
-('SHOP_FREE_SHIPPING', 'Doprava zdarma od (-1 pro vypnutí)', 2000, NULL , 0, 'number', 10, NULL),
-('SHOP_NEWSLETTER_GROUP_ID', 'Id skupiny, kam se mají řadit maily pro newsletter', 17, NULL, 0, 'number', 10, NULL),
-('SHOP_ORDER_STATUS', 'Stavy objednávek', 'přijato;odesláno;zrušeno;zaplaceno;vráceno;zabaleno', NULL , '0', 'string', '10', NULL),
-('SHOP_ORDER_DEFAULT_STATUS', 'Výchozí status objednávky', 'přijato', NULL , 0, 'string', 10, NULL),
-('SHOP_STORE_ADDRESS', 'Adresa obchodu', NULL , NULL , '0', 'string', '10', NULL),
-('SHOP_ORDER_MAIL', 'E-Mailová adresa, do které budou přeposílány e-maily o nových objednávkách.', 'jakubmatas@gmail.com', NULL , '0', 'string', '10', NULL),
-
-('SHOP_CUSTOMERS_GROUP_ID', 'ID systémové skupiny se zákazníky.', '0', NULL , '0', 'number', '10', NULL),
-('SHOP_CUSTOMERS_DEFAULT_GROUP_ID', 'ID výchozí zákaznická skupina.', '1', NULL , '0', 'number', '10', NULL),
-
-('SHOP_ALLOW_BUY_NOT_IN_STOCK', 'Povolení prodeje pokud zboží není skladem.', 'false', NULL , '0', 'bool', '10', NULL),
-('SHOP_PRICE_ROUND_DECIMAL', 'Počet míst zaokrouhlení ceny.', 1, NULL , '0', 'number', '10', NULL),
-('SHOP_PRICE_DECIMALS', 'Počet desetiných míst ceny.', 1, NULL , '0', 'number', '10', NULL)
-;
-
+--
+-- Databáze: `cube_cms`
+--
 
 -- --------------------------------------------------------
 
@@ -39,10 +27,10 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}shop_attributes` (
   `attribute_name_en` varchar(100) DEFAULT NULL,
   `attribute_name_sk` varchar(100) CHARACTER SET utf8 COLLATE utf8_slovak_ci DEFAULT NULL,
   `attribute_name_de` varchar(100) DEFAULT NULL,
+  `attribute_order` int(11) DEFAULT '0',
   PRIMARY KEY (`id_attribute`),
   KEY `group` (`id_attribute_group`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
 
 -- --------------------------------------------------------
 
@@ -56,6 +44,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}shop_attributes_groups` (
   `atgroup_name_en` varchar(100) DEFAULT NULL,
   `atgroup_name_sk` varchar(100) CHARACTER SET utf8 COLLATE utf8_slovak_ci DEFAULT NULL,
   `atgroup_name_de` varchar(100) DEFAULT NULL,
+  `atgroup_order` int(11) DEFAULT '0',
   PRIMARY KEY (`id_attribute_group`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
@@ -81,6 +70,56 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}shop_cart_items` (
   KEY `fk_comb` (`id_product_combination`),
   KEY `index_search` (`id_session`,`id_user`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabulky `{PREFIX}shop_customers`
+--
+
+CREATE TABLE IF NOT EXISTS `{PREFIX}shop_customers` (
+  `id_customer` int(11) NOT NULL AUTO_INCREMENT,
+  `id_user` int(11) NOT NULL,
+  `id_customer_group` int(11) NOT NULL,
+  `customer_phone` varchar(15) DEFAULT NULL,
+  `customer_company` varchar(70) DEFAULT NULL,
+  `customer_street` varchar(70) DEFAULT NULL,
+  `customer_city` varchar(50) DEFAULT NULL,
+  `customer_psc` varchar(6) DEFAULT NULL,
+  `id_country` int(11) DEFAULT '0',
+  `customer_ic` varchar(20) DEFAULT NULL,
+  `customer_dic` varchar(20) DEFAULT NULL,
+  `customer_delivery_name` varchar(70) DEFAULT NULL,
+  `customer_delivery_street` varchar(70) DEFAULT NULL,
+  `customer_delivery_city` varchar(50) DEFAULT NULL,
+  `customer_delivery_psc` varchar(6) DEFAULT NULL,
+  `id_delivery_country` int(11) DEFAULT '0',
+  PRIMARY KEY (`id_customer`),
+  KEY `fk_user` (`id_user`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabulky `{PREFIX}shop_customers_groups`
+--
+
+CREATE TABLE IF NOT EXISTS `{PREFIX}shop_customers_groups` (
+  `id_customer_group` int(11) NOT NULL AUTO_INCREMENT,
+  `customer_group_name` varchar(50) NOT NULL,
+  `customer_group_reduction` smallint(6) DEFAULT '0',
+  `customer_group_deleted` tinyint(1) DEFAULT '0',
+  PRIMARY KEY (`id_customer_group`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
+
+--
+-- Vypisuji data pro tabulku `{PREFIX}shop_customers_groups`
+--
+
+INSERT INTO `{PREFIX}shop_customers_groups` (`id_customer_group`, `customer_group_name`, `customer_group_reduction`, `customer_group_deleted`) VALUES
+(1, 'Základní', 0, 0),
+(2, 'Stálý', 5, 0);
 
 -- --------------------------------------------------------
 
@@ -124,7 +163,6 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}shop_orders` (
   KEY `fk_shop_orders_shop_users1` (`id_customer`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
-
 -- --------------------------------------------------------
 
 --
@@ -148,6 +186,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}shop_order_items` (
   KEY `fk_products` (`id_product`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
+-- --------------------------------------------------------
 
 --
 -- Struktura tabulky `{PREFIX}shop_order_status`
@@ -183,9 +222,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}shop_payments` (
   `payment_settings` blob,
   `price_add` varchar(1000) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id_payment`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;
-
--- --------------------------------------------------------
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
 
 --
 -- Vypisuji data pro tabulku `{PREFIX}shop_payments`
@@ -194,7 +231,8 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}shop_payments` (
 INSERT INTO `{PREFIX}shop_payments` (`id_payment`, `payment_class`, `payment_name_cs`, `payment_text_cs`, `payment_name_sk`, `payment_text_sk`, `payment_name_en`, `payment_text_en`, `payment_name_de`, `payment_text_de`, `payment_settings`, `price_add`) VALUES
 (1, NULL, 'Hotově', 'Platba při převzení', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0'),
 (2, NULL, 'Dobírka', 'Platba za zboží bude provedena při převzení zboží od doručovací firmy', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '30'),
-(3, NULL, 'Platba na účet předem', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0');
+(3, NULL, 'Platba na účet předem', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0'),
+(4, NULL, 'Platba kartou', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '3%');
 
 -- --------------------------------------------------------
 
@@ -206,8 +244,8 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}shop_products_combinations` (
   `id_product_combination` int(11) NOT NULL AUTO_INCREMENT,
   `id_product` int(11) NOT NULL,
   `product_combination_quantity` int(11) DEFAULT '0',
-  `product_combination_price_add` FLOAT NULL DEFAULT 0,
   `product_combination_is_default` tinyint(1) DEFAULT '0',
+  `product_combination_price_add` float DEFAULT '0',
   PRIMARY KEY (`id_product_combination`),
   KEY `fk_product` (`id_product`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
@@ -226,7 +264,6 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}shop_products_combinations_variants` (
   KEY `fk_combvariant` (`id_product_combination`,`id_variant`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
 -- --------------------------------------------------------
 
 --
@@ -237,62 +274,63 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}shop_products_general` (
   `id_product` int(11) NOT NULL AUTO_INCREMENT,
   `id_category` smallint(6) NOT NULL,
   `id_tax` int(11) NOT NULL,
-  `code` varchar(100) DEFAULT NULL,
-  `name_cs` varchar(200) CHARACTER SET utf8 COLLATE utf8_czech_ci DEFAULT NULL,
-  `urlkey_cs` varchar(200) DEFAULT NULL,
-  `text_short_cs` text,
-  `text_cs` text CHARACTER SET utf8 COLLATE utf8_czech_ci,
-  `text_clear_cs` text,
-  `keywords_cs` varchar(300) DEFAULT NULL,
-  `name_en` varchar(200) DEFAULT NULL,
-  `urlkey_en` varchar(200) DEFAULT NULL,
-  `text_short_en` text,
-  `text_en` text,
-  `text_clear_en` text,
-  `keywords_en` varchar(300) DEFAULT NULL,
-  `name_de` varchar(200) DEFAULT NULL,
-  `urlkey_de` varchar(200) DEFAULT NULL,
-  `text_short_de` text,
-  `text_de` text,
-  `text_clear_de` text,
-  `keywords_de` varchar(300) DEFAULT NULL,
-  `name_sk` varchar(200) CHARACTER SET utf8 COLLATE utf8_slovak_ci DEFAULT NULL,
-  `urlkey_sk` varchar(200) DEFAULT NULL,
-  `text_short_sk` text,
-  `text_sk` text CHARACTER SET utf8 COLLATE utf8_slovak_ci,
-  `text_clear_sk` text,
-  `keywords_sk` varchar(300) DEFAULT NULL,
-  `price` float DEFAULT NULL,
-  `unit` varchar(20) DEFAULT NULL,
-  `unit_size` int(11) DEFAULT NULL,
-  `quantity` int(11) DEFAULT '-1',
+  `product_code` varchar(100) DEFAULT NULL,
+  `product_name_cs` varchar(200) CHARACTER SET utf8 COLLATE utf8_czech_ci DEFAULT NULL,
+  `product_urlkey_cs` varchar(200) DEFAULT NULL,
+  `product_text_short_cs` text,
+  `product_text_cs` text CHARACTER SET utf8 COLLATE utf8_czech_ci,
+  `product_text_clear_cs` text,
+  `product_keywords_cs` varchar(300) DEFAULT NULL,
+  `product_name_en` varchar(200) DEFAULT NULL,
+  `product_urlkey_en` varchar(200) DEFAULT NULL,
+  `product_text_short_en` text,
+  `product_text_en` text,
+  `product_text_clear_en` text,
+  `product_keywords_en` varchar(300) DEFAULT NULL,
+  `product_name_de` varchar(200) DEFAULT NULL,
+  `product_urlkey_de` varchar(200) DEFAULT NULL,
+  `product_text_short_de` text,
+  `product_text_de` text,
+  `product_text_clear_de` text,
+  `product_keywords_de` varchar(300) DEFAULT NULL,
+  `product_name_sk` varchar(200) CHARACTER SET utf8 COLLATE utf8_slovak_ci DEFAULT NULL,
+  `product_urlkey_sk` varchar(200) DEFAULT NULL,
+  `product_text_short_sk` text,
+  `product_text_sk` text CHARACTER SET utf8 COLLATE utf8_slovak_ci,
+  `product_text_clear_sk` text,
+  `product_keywords_sk` varchar(300) DEFAULT NULL,
+  `product_price` float DEFAULT NULL,
+  `product_unit` varchar(20) DEFAULT NULL,
+  `product_unit_size` int(11) DEFAULT NULL,
+  `product_quantity` int(11) DEFAULT '-1',
   `product_stock` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Povolení skladu',
-  `weight` float DEFAULT NULL,
-  `discount` tinyint(4) DEFAULT '0',
-  `deleted` tinyint(4) DEFAULT '0',
-  `showed` int(11) NOT NULL DEFAULT '0',
-  `active` tinyint(4) DEFAULT '1',
-  `image` varchar(100) DEFAULT NULL,
-  `date_add` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `personal_pickup_only` tinyint(1) DEFAULT '0',
-  `required_pickup_date` tinyint(1) DEFAULT '0',
-  `is_new_to_date` date DEFAULT NULL,
+  `product_weight` float DEFAULT NULL,
+  `product_discount` tinyint(4) DEFAULT '0',
+  `product_deleted` tinyint(4) DEFAULT '0',
+  `product_showed` int(11) NOT NULL DEFAULT '0',
+  `product_active` tinyint(4) DEFAULT '1',
+  `product_image` varchar(100) DEFAULT NULL,
+  `product_date_add` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `product_personal_pickup_only` tinyint(1) DEFAULT '0',
+  `product_required_pickup_date` tinyint(1) DEFAULT '0',
+  `product_is_new_to_date` date DEFAULT NULL,
+  `product_order` int(11) DEFAULT '0',
   PRIMARY KEY (`id_product`),
   KEY `fk_id_category` (`id_category`),
   KEY `fk_id_tax` (`id_tax`),
-  KEY `urlkey_cs` (`urlkey_cs`),
-  KEY `urlkey_en` (`urlkey_en`),
-  KEY `urlkey_de` (`urlkey_de`),
-  KEY `urlkey_sk` (`urlkey_sk`),
-  FULLTEXT KEY `text_cs_fulltext` (`text_clear_cs`),
-  FULLTEXT KEY `text_en_fulltext` (`text_clear_en`),
-  FULLTEXT KEY `text_sk_fulltext` (`text_clear_sk`),
-  FULLTEXT KEY `text_de_fulltext` (`text_clear_de`),
-  FULLTEXT KEY `name_cs_fulltext` (`name_cs`),
-  FULLTEXT KEY `name_en_fulltext` (`name_en`),
-  FULLTEXT KEY `name_sk_fulltext` (`name_sk`),
-  FULLTEXT KEY `name_de_fulltext` (`name_de`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+  KEY `urlkey_cs` (`product_urlkey_cs`),
+  KEY `urlkey_en` (`product_urlkey_en`),
+  KEY `urlkey_de` (`product_urlkey_de`),
+  KEY `urlkey_sk` (`product_urlkey_sk`),
+  FULLTEXT KEY `text_cs_fulltext` (`product_text_clear_cs`),
+  FULLTEXT KEY `text_en_fulltext` (`product_text_clear_en`),
+  FULLTEXT KEY `text_sk_fulltext` (`product_text_clear_sk`),
+  FULLTEXT KEY `text_de_fulltext` (`product_text_clear_de`),
+  FULLTEXT KEY `name_cs_fulltext` (`product_name_cs`),
+  FULLTEXT KEY `name_en_fulltext` (`product_name_en`),
+  FULLTEXT KEY `name_sk_fulltext` (`product_name_sk`),
+  FULLTEXT KEY `name_de_fulltext` (`product_name_de`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
 
 -- --------------------------------------------------------
 
@@ -311,6 +349,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}shop_products_variants` (
   PRIMARY KEY (`id_variant`),
   KEY `fkeys` (`id_product`,`id_attribute`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
 
 -- --------------------------------------------------------
 
@@ -334,16 +373,17 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}shop_shippings` (
   `shipping_is_personal_pickup` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id_shipping`),
   KEY `id_zone` (`id_zone`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
 
 --
 -- Vypisuji data pro tabulku `{PREFIX}shop_shippings`
 --
 
 INSERT INTO `{PREFIX}shop_shippings` (`id_shipping`, `id_zone`, `shipping_name_cs`, `shipping_name_en`, `shipping_name_de`, `shipping_name_sk`, `shipping_price`, `payments_disallowed`, `shipping_text_cs`, `shipping_text_en`, `shipping_text_sk`, `shipping_text_de`, `shipping_is_personal_pickup`) VALUES
-(1, 0, 'Osobní odběr', 'Osobní odběr', NULL, NULL, '0', '2;3', NULL, NULL, NULL, NULL, 1),
-(2, 0, 'Česká pošta', 'Česká pošta', NULL, NULL, '100', '1', NULL, NULL, NULL, NULL, 0),
-(3, 0, 'PPL obchodní balík', 'PPL obchodní balík', NULL, NULL, '120', '1', NULL, NULL, NULL, NULL, 0);
+(1, 0, 'Osobní odběr', 'Osobní odběr', NULL, NULL, '0', '2;3;5', NULL, NULL, NULL, NULL, 1),
+(2, 0, 'Česká pošta', 'Česká pošta', NULL, NULL, '80', '1', NULL, NULL, NULL, NULL, 0),
+(3, 0, 'PPL obchodní balík', 'PPL obchodní balík', NULL, NULL, '60', '1', NULL, NULL, NULL, NULL, 0),
+(4, 0, 'Vlastní doprava', NULL, NULL, NULL, '5%', '1', NULL, NULL, NULL, NULL, 0);
 
 -- --------------------------------------------------------
 
@@ -356,7 +396,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}shop_tax` (
   `tax_name` varchar(50) NOT NULL,
   `tax_value` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`id_tax`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
 
 --
 -- Vypisuji data pro tabulku `{PREFIX}shop_tax`
@@ -364,8 +404,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}shop_tax` (
 
 INSERT INTO `{PREFIX}shop_tax` (`id_tax`, `tax_name`, `tax_value`) VALUES
 (1, 'Bez daně', 0),
-(2, 'DPH 20%', 20),
-(3, 'DPH 14%', 14);
+(2, 'DPH 20%', 20);
 
 -- --------------------------------------------------------
 
@@ -385,38 +424,3 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}shop_zones` (
 
 INSERT INTO `{PREFIX}shop_zones` (`id_zone`, `zone_name`) VALUES
 (1, 'Česká Republika');
-
-
-CREATE TABLE IF NOT EXISTS `{PREFIX}shop_customers` (
-  `id_customer` INT NOT NULL AUTO_INCREMENT ,
-  `id_user` INT NOT NULL ,
-  `id_customer_group` INT NOT NULL ,
-  `customer_phone` VARCHAR(15) NULL DEFAULT NULL ,
-  `customer_company` varchar(70) DEFAULT NULL,
-  `customer_street` varchar(70) DEFAULT NULL,
-  `customer_city` varchar(50) DEFAULT NULL,
-  `customer_psc` varchar(6) DEFAULT NULL,
-  `customer_ic` varchar(20) DEFAULT NULL,
-  `customer_dic` varchar(20) DEFAULT NULL,
-  `customer_delivery_name` varchar(70) DEFAULT NULL,
-  `customer_delivery_street` varchar(70) DEFAULT NULL,
-  `customer_delivery_city` varchar(50) DEFAULT NULL,
-  `customer_delivery_psc` varchar(6) DEFAULT NULL,
-  PRIMARY KEY (`id_customer`) ,
-  INDEX `fk_user` (`id_user` ASC)
-) ENGINE = MyISAM DEFAULT CHARSET=utf8 COLLATE = utf8_general_ci;
-
-CREATE TABLE IF NOT EXISTS `{PREFIX}shop_customers_groups` (
-  `id_customer_group` INT NOT NULL AUTO_INCREMENT ,
-  `customer_group_name` VARCHAR(50) NOT NULL ,
-  `customer_group_reduction` SMALLINT NULL DEFAULT 0 ,
-  `customer_group_deleted` TINYINT(1) NULL DEFAULT 0 ,
-  PRIMARY KEY (`id_customer_group`)
-)ENGINE = MyISAM DEFAULT CHARSET = utf8 COLLATE = utf8_general_ci;
-
-INSERT INTO `{PREFIX}shop_customers_groups` (`customer_group_name`, `customer_group_reduction`) VALUES ('Základní', '0');
-
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
