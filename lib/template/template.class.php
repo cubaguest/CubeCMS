@@ -121,6 +121,8 @@ class Template extends TrObject {
 
    protected static $currentFace;
 
+   protected static $isFullPageWidth = false;
+
    /*
     * ============= MAGICKÉ METODY
    */
@@ -1069,5 +1071,21 @@ class Template extends TrObject {
       }
 
       return $text;
+   }
+
+   /**
+    * Metoda vrací jestli je daná stránka na celou šířku
+    * @return bool
+    */
+   public static function isFullWidth() {
+      return self::$isFullPageWidth;
+   }
+
+   /**
+    * Metoda nastavuje jestli má byt zobrazena stránka na celou šířku
+    * @param bool $edit -- true pro zapnutí
+    */
+   public static function setFullWidth($full = false) {
+      self::$isFullPageWidth = $full;
    }
 }
