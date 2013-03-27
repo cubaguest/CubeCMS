@@ -273,9 +273,9 @@ class Component_TinyMCE_Uploader extends Component_TinyMCE {
          }
          $ite = new RecursiveDirectoryIterator($dirPublic );
          foreach (new RecursiveIteratorIterator($ite, RecursiveIteratorIterator::SELF_FIRST) 
-            as $name => $item) {
+            as $item) {
             // @todo vymyslet jak filtrovat small a medium, protože to jsou adresáře galerií
-            if($item->isDir() && $item->isWritable()
+            if($item->isDir() && $item->isWritable() && $item->getFilename() != "." && $item->getFilename() != ".."
                && ( strpos($item->getPathname(), "small") === false
                && strpos($item->getPathname(), "medium") === false ) ){
                array_push($publicDirs, $this->encodeDir($item->getPathname()));
@@ -292,9 +292,9 @@ class Component_TinyMCE_Uploader extends Component_TinyMCE {
       }
       $ite = new RecursiveDirectoryIterator($dirHome );
       foreach (new RecursiveIteratorIterator($ite, RecursiveIteratorIterator::SELF_FIRST) 
-         as $name => $item) {
+         as $item) {
          // @todo vymyslet jak filtrovat small a medium, protože to jsou adresáře galerií
-         if($item->isDir()
+         if($item->isDir() && $item->isWritable() && $item->getFilename() != "." && $item->getFilename() != ".."
               && ( strpos($item->getPathname(), "small") === false
             && strpos($item->getPathname(), "medium") === false ) ){
             array_push($homeDirs, $this->encodeDir($item->getPathname()));
