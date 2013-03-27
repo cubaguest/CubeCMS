@@ -376,13 +376,15 @@ class File extends TrObject implements File_Interface {
    /**
     * Metoda odešle zadaný soubor ke klientu
     */
-   public function send($forceDownload = false)
+   public function send($forceDownload = false, $alternateName = null)
    {
+      $fileName = ($alternateName == null ? $this->getName() : $alternateName);
       if ($this->exist()) {
+         ob_end_clean();
          header('Content-Description: File Transfer');
          header('Content-Type: application/octet-stream');
          if($forceDownload){
-            header('Content-Disposition: attachment; filename='.$this->getName());
+            header('Content-Disposition: attachment; filename='.$fileName);
          }
 
          header('Content-Transfer-Encoding: binary');
@@ -390,23 +392,23 @@ class File extends TrObject implements File_Interface {
          header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
          header('Pragma: public');
          header('Content-Length: ' . $this->getSize());
-         ob_clean();
          flush();
          readfile((string)$this);
       } else {
+         ob_end_clean();
          header('Content-Description: File Transfer');
          header('Content-Type: application/octet-stream');
          if($forceDownload){
-            header('Content-Disposition: attachment; filename='.$this->getName());
+            header('Content-Disposition: attachment; filename='.$fileName);
          }
          header('Content-Transfer-Encoding: binary');
          header('Expires: 0');
          header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
          header('Pragma: public');
-         header('Content-Length: ' . strlen($this->getContent()) );
-         ob_clean();
+//         header('Content-Length: ' . strlen($this->getContent()) );
          flush();
-         echo $this->getContent();
+//         echo file_get_contents((string)$this);
+         echo $this->getData();
       }
       exit;
    }

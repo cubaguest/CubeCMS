@@ -116,7 +116,7 @@ abstract class File_Image_Base extends TrObject {
     * @param type $option -- Konstanta třídy RESIZE_XXX
     * @return File_Image_Base 
     */
-   public function resize($w, $h, $option = self::RESIZE_AUTO)
+   public function resize($w, $h, $option = self::RESIZE_AUTO, $resizeUp = false)
    {
       return $this;
    }
@@ -218,13 +218,13 @@ abstract class File_Image_Base extends TrObject {
       if($this->file->exist()) {
          $imageProperty = getimagesize((string)$this->file);
          if($imageProperty == false){
-            throw new File_Image_Exception($this->tr('Zadaný soubor není platný obrázek'));
+            throw new File_Image_Exception(sprintf($this->tr('Zadaný soubor %s není platný obrázek'), $this->file->getPath().$this->file->getName()));
          }
          $this->imageType = $imageProperty[2];
       } else if( ($type = array_search($this->file->getExtension(), $this->imgTypesExtensions)) !== false) {
          $this->imageType = $type;
       } else {
-         throw new File_Image_Exception($this->tr('Zadaný soubor není platný obrázek'));
+         throw new File_Image_Exception(sprintf($this->tr('Zadaný soubor %s není platný obrázek'), $this->file->getPath().$this->file->getName()));
       }
    }
    
