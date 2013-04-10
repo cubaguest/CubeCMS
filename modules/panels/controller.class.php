@@ -7,6 +7,21 @@
 class Panels_Controller extends Controller {
    private $editForm = null;
 
+   private $panels = null;
+
+   protected function init()
+   {
+      $panels = Face::getParamStatic('panels');
+      if(empty($panels)){
+         $panels = array();
+         $panelPositions = vve_parse_cfg_value(VVE_PANEL_TYPES);
+         foreach($panelPositions as $pos){
+            $panels[$pos] = $pos;
+         }
+      }
+      $this->view()->facePanels = $this->panels = $panels;
+   }
+
    public function mainController() 
    {
       $this->checkWritebleRights();
@@ -142,11 +157,11 @@ class Panels_Controller extends Controller {
 
       $elemUpdateAll = new Form_Element_Checkbox('updateAll', $this->tr('Aktualizovat vše'));
       $elemUpdateAll->setSubLabel($this->tr('Aktualizovat všechny panely vybrané kategorie podle této úpravy.'));
-      $this->editForm->addElement($elemUpdateAll, 'settings',1);
+      $this->editForm->addElement($elemUpdateAll, 'settings',5);
       
       $elemUpdateAllInBox = new Form_Element_Checkbox('updateAllInBox', $this->tr('Pouze ve vybraném boxu'));
       $elemUpdateAllInBox->setSubLabel($this->tr('Provede aktualizaci všech panelů pouze pro vybraný pox.'));
-      $this->editForm->addElement($elemUpdateAllInBox, 'settings',2);
+      $this->editForm->addElement($elemUpdateAllInBox, 'settings',6);
       
       $this->editForm->panel_cat->setValues($panel->{Model_Panel::COLUMN_ID_CAT});
       $this->editForm->panel_box->setValues($panel->{Model_Panel::COLUMN_POSITION});
@@ -238,7 +253,6 @@ class Panels_Controller extends Controller {
    private function createEditForm($multipleCatSelect = false) 
    {
       // kategorie a šablony
-      $panelPositions = vve_parse_cfg_value(VVE_PANEL_TYPES);
       $struct = Category_Structure::getStructure(Category_Structure::ALL);
       $panelCats = $this->createArray($struct);
 
@@ -279,7 +293,7 @@ class Panels_Controller extends Controller {
       $form->addElement($elemForceGlobal, 'settings');
       
       $panelType = new Form_Element_Select('panel_box', $this->tr('Box panelu'));
-      $panelType->setOptions($panelPositions);
+      $panelType->setOptions(array_flip($this->panels));
       $form->addElement($panelType,'settings');
 
       $panelOrder = new Form_Element_Text('panel_order', $this->tr('Řazení panelu'));
@@ -417,7 +431,6 @@ class Panels_Controller extends Controller {
          ->where(Model_Panel::COLUMN_ID_SHOW_CAT." = :idc OR ".Model_Panel::COLUMN_FORCE_GLOBAL." = 1", array('idc' => $idc))
          ->order(array(Model_Panel::COLUMN_POSITION => Model_ORM::ORDER_ASC, Model_Panel::COLUMN_ORDER => Model_ORM::ORDER_DESC))
          ->records();
-      echo($model->getSQLQuery());
    }
 
    public function panelSettingsController()

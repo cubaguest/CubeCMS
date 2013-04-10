@@ -20,7 +20,13 @@ foreach ($this->panels as $key => $panel) {
          }
          ?>
    </td>
-   <td><?=$panel->{Model_Panel::COLUMN_POSITION}?></td>
+   <td><?
+      if(!empty($this->facePanels)){
+         ps($this->facePanels[$panel->{Model_Panel::COLUMN_POSITION}]);
+      } else {
+         ps($panel->{Model_Panel::COLUMN_POSITION});
+      }
+      ?></td>
    <td>
       <form method="post" action="<?=$this->link()->clear()?>" style="display:inline;">
          <input type="text" name="panel_position" value="<?=$panel->{Model_Panel::COLUMN_ORDER}?>" style="width: 30px" size="4" />
@@ -52,7 +58,4 @@ foreach ($this->panels as $key => $panel) {
 <tr class="ui-widget-content ui-state-disabled">
    <td colspan="4"><?=$this->tr('Není uložen žádný panel');?></td>
 </tr>
-
-
 <?}
-?>
