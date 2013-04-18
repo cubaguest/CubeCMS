@@ -1,20 +1,29 @@
 <?
 $h1 = $this->category()->getName();
 $dwLink = new Url_DownloadLink($this->category()->getModule()->getDataDir());
+$this->addFile('css://style.less');
 echo $this->toolbox;
 ?>
 <h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $h1;?></h1>
 <div class="posts-list files-list">
    <?if($this->files != false && !empty ($this->files)){?>
       <?foreach ($this->files as $file) {?>
-         <div class="text dwfile file">
+         <div class="text dwfile file clearfix">
             <h2 id="dwfile-<?=$file->{DownloadFiles_Model::COLUMN_FILE}?>"><?=$file->{DownloadFiles_Model::COLUMN_NAME}?></h2>
+            <?if(!$file->{DownloadFiles_Model::COLUMN_ACTIVE}){?>
+               <div class="message message-warning">
+                  <?ps($this->tr('Naktivní'))?>
+                  - <a href="<?=$this->link()->param('activate', $file->getPK())?>"><strong><?ps($this->tr('aktivovat'))?></strong></a><br />
+               </div>
+            <?}?>
             <?if($file->{DownloadFiles_Model::COLUMN_TEXT} != null){?><p><?=$file->{DownloadFiles_Model::COLUMN_TEXT}?></p><?}?>
-            <p>
-               <?=$this->tr('Nahráno')?>: <?=vve_date("%x", new DateTime($file->{DownloadFiles_Model::COLUMN_TIME_ADD}))?>
+            <div class="date">
+               <?=$this->tr('Přidáno')?>: <strong><?=vve_date("%x", new DateTime($file->{DownloadFiles_Model::COLUMN_TIME_ADD}))?></strong>
+            </div>
+            <div class="links">
                <a href="<?=$this->dataDir.$file->{DownloadFiles_Model::COLUMN_FILE}?>" title="<?=$this->tr('Zobrazit')?>"><?=$this->tr('Zobrazit')?></a>
                <a href="<?=$dwLink->file($file->{DownloadFiles_Model::COLUMN_FILE})?>" title="<?=$this->tr('Stáhnout')?>"><?=$this->tr('Stáhnout')?></a>
-            </p>
+            </div>
             <?echo $file->toolbox;?>
          </div>
       <?}?>

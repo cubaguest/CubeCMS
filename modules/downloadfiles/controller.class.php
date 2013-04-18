@@ -23,9 +23,20 @@ class DownloadFiles_Controller extends Controller {
       
       // load items
       $model = new DownloadFiles_Model();
-      
+
+      if($this->rights()->isWritable()){
+         if($this->getRequestParam('activate', false)){
+            $model
+               ->where(DownloadFiles_Model::COLUMN_ID." = :id", array('id' => $this->getRequestParam('activate')))
+               ->update(array(DownloadFiles_Model::COLUMN_ACTIVE => true));
+            $this->link()->rmParam('activate')->reload();
+         }
+      }
+
       $files = $model
-            ->where(DownloadFiles_Model::COLUMN_ID_CATEGORY.' = :idc', array('idc' => $this->category()->getId()))
+            ->where(DownloadFiles_Model::COLUMN_ID_CATEGORY.' = :idc '
+               . ($this->rights()->isWritable() == false ? ' AND '.DownloadFiles_Model::COLUMN_ACTIVE." = 1" : null),
+                  array('idc' => $this->category()->getId()))
             ->order(array(
                DownloadFiles_Model::COLUMN_COLUMN => Model_ORM::ORDER_ASC, 
                DownloadFiles_Model::COLUMN_TIME_ADD => Model_ORM::ORDER_DESC,
@@ -53,6 +64,7 @@ class DownloadFiles_Controller extends Controller {
          $fileRec->{DownloadFiles_Model::COLUMN_FILE} = $file['name'];
          $fileRec->{DownloadFiles_Model::COLUMN_NAME} = $form->name->getValues();
          $fileRec->{DownloadFiles_Model::COLUMN_TEXT} = $form->text->getValues();
+         $fileRec->{DownloadFiles_Model::COLUMN_ACTIVE} = $form->active->getValues();
          if(isset ($form->column)){
             $fileRec->{DownloadFiles_Model::COLUMN_COLUMN} = $form->column->getValues();
          }
@@ -94,6 +106,7 @@ class DownloadFiles_Controller extends Controller {
          
          $fileRec->{DownloadFiles_Model::COLUMN_NAME} = $form->name->getValues();
          $fileRec->{DownloadFiles_Model::COLUMN_TEXT} = $form->text->getValues();
+         $fileRec->{DownloadFiles_Model::COLUMN_ACTIVE} = $form->active->getValues();
          if(isset ($form->column)){
             $fileRec->{DownloadFiles_Model::COLUMN_COLUMN} = $form->column->getValues();
          }
@@ -128,7 +141,7 @@ class DownloadFiles_Controller extends Controller {
       $elemFile->addValidation(new Form_Validator_FileExtension(
          $this->category()->getParam(self::PARAM_ALLOWED_TYPES, Form_Validator_FileExtension::ALL)));
       $form->addElement($elemFile);
-      
+
       if($this->category()->getParam(self::PARAM_COLS, 1) > 1){
          $elemCol = new Form_Element_Select('column', $this->tr('Sloupec'));
          for ($col = 1; $col <= $this->category()->getParam(self::PARAM_COLS, 1); $col++) {
@@ -136,6 +149,10 @@ class DownloadFiles_Controller extends Controller {
          }
          $form->addElement($elemCol);
       }
+
+      $elemActive = new Form_Element_Checkbox('active', $this->tr('Aktivní'));
+      $elemActive->setValues(true);
+      $form->addElement($elemActive);
       
       $elemSave = new Form_Element_SaveCancel('save');
       $form->addElement($elemSave);
@@ -143,6 +160,7 @@ class DownloadFiles_Controller extends Controller {
       if($fileObj != null){
          $form->name->setValues($fileObj->{DownloadFiles_Model::COLUMN_NAME});
          $form->text->setValues($fileObj->{DownloadFiles_Model::COLUMN_TEXT});
+         $form->active->setValues($fileObj->{DownloadFiles_Model::COLUMN_ACTIVE});
          $form->file->setSubLabel(sprintf($this->tr('Nahraný soubor: <strong>%s</strong>. Pokud nahrajete nový, dojde k přepsání.'), $fileObj->{DownloadFiles_Model::COLUMN_FILE}));
          $form->file->removeValidation('Form_Validator_NotEmpty');
          if(isset ($form->column)){
@@ -175,7 +193,7 @@ class DownloadFiles_Controller extends Controller {
       if($form->isValid()){
          $model = new DownloadFiles_Model();
          $fileRec = $model->record($form->id->getValues());
-         
+         // PROČ ????
          if(!$this->checkValidEditFileRecord($fileRec)){
             $this->log(sprintf('pokus o smazání souboru "%s" z cizí kategorie', $fileRec->{DownloadFiles_Model::COLUMN_FILE}));
             throw new InvalidArgumentException($this->tr('Tento soubor nelze smazat. nepatří do dané kategorie'));

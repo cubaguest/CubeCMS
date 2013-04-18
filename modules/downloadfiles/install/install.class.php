@@ -4,5 +4,3 @@ class DownloadFiles_Install extends Install_Module {
        $this->runSQLCommand($this->replaceDBPrefix($this->getSQLFileContent('install.sql')));
    }
 }
-
-?>

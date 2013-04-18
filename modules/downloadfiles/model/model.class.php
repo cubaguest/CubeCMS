@@ -21,6 +21,7 @@ class DownloadFiles_Model extends Model_ORM {
    const COLUMN_FILE = 'dwfile';
    const COLUMN_TIME_ADD = 'time_add';
    const COLUMN_COLUMN = 'dwfile_column';
+   const COLUMN_ACTIVE = 'dwfile_active';
 
    protected function _initTable()
    {
@@ -36,13 +37,11 @@ class DownloadFiles_Model extends Model_ORM {
       
       $this->addColumn(self::COLUMN_COLUMN, array('datatype' => 'smallint', 'pdoparam' => PDO::PARAM_INT, 'default' => 1));
       $this->addColumn(self::COLUMN_TIME_ADD, array('datatype' => 'timestamp', 'pdoparam' => PDO::PARAM_STR, 'default' => 'CURRENT_TIMESTAMP'));
+      $this->addColumn(self::COLUMN_ACTIVE, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => true));
 
       $this->setPk(self::COLUMN_ID);
       
       $this->addForeignKey(self::COLUMN_ID_CATEGORY, 'Model_Categories', Model_Category::COLUMN_CAT_ID);
       $this->addForeignKey(self::COLUMN_ID_USER, 'Model_Users');
    }
-   
 }
-
-?>
