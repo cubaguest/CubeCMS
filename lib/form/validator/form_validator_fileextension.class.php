@@ -35,12 +35,17 @@ class Form_Validator_FileExtension extends Form_Validator implements Form_Valida
     */
    private $extensions = array();
 
+   private $currentExtType = 0;
+
+   protected $notAllowedExtensions = array('php', 'php3', 'php4', 'php5', 'cgi', 'asp');
+
    public function  __construct($extensions, $errMsg = null) {
       if(!is_array($extensions)){
          if(is_int($extensions)){ // konstanty třídy
+            $this->currentExtType = $extensions;
             $cur = $extensions;
             $extensions = array();
-            
+
             if(($cur-self::WEB) >= 0){
                $extensions = array_merge($extensions, array("htm","html","xhtml","xml","css","php","js"));
                $cur -= self::WEB;
@@ -95,12 +100,15 @@ class Form_Validator_FileExtension extends Form_Validator implements Form_Valida
     * @param Form_Element $element -- samotný element
     */
    public function addHtmlElementParams(Form_Element $element) {
-      if(count($this->extensions) > 5){
-         $mimes = implode(', ', array_slice($this->extensions, 0, 5) ).',<span title="'.implode(', ', $this->extensions).'"> ...</span>';
+      if($this->currentExtType == self::ALL){
+
+      } else if(count($this->extensions) > 5){
+         $element->addValidationConditionLabel(sprintf($this->tr("soubor s příponou %s"),
+            implode(', ', array_slice($this->extensions, 0, 5) ).',<span title="'.implode(', ', $this->extensions).'"> ...</span>'));
       } else {
-         $mimes = implode(', ', $this->extensions);
+         $element->addValidationConditionLabel(sprintf($this->tr("soubor s příponou %s"),
+            implode(', ', $this->extensions)));
       }
-      $element->addValidationConditionLabel(sprintf($this->tr("soubor s příponou %s"),$mimes));
    }
 
    public function validate(Form_Element $elemObj) {
@@ -111,16 +119,16 @@ class Form_Validator_FileExtension extends Form_Validator implements Form_Valida
       switch (get_class($elemObj)) {
          // input text
          case 'Form_Element_File':
-            if($elemObj->isDimensional() OR $elemObj->isMultiLang()) {
+            if($elemObj->isMultiple() OR $elemObj->isMultiLang()) {
                foreach ($values as $file){
-                  if(!in_array(strtolower($file['extension']), $this->extensions)) {
-                  $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
-                  $this->isValid = false;
-                  return false;
-               }
+                  if(!$this->checkExtension($file['extension'])) {
+                     $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
+                     $this->isValid = false;
+                     return false;
+                  }
                }
             } else {
-               if(!in_array(strtolower($values['extension']), $this->extensions)) {
+               if(!$this->checkExtension($values['extension'])){
                   $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
                   $this->isValid = false;
                   return false;
@@ -132,5 +140,18 @@ class Form_Validator_FileExtension extends Form_Validator implements Form_Valida
       }
       return true;
    }
+
+   protected function checkExtension($ext)
+   {
+      // disallow all non secure extension
+      if($this->currentExtType != self::ALL_NO_SAFE && in_array($ext, $this->notAllowedExtensions)){
+         return false;
+      }
+      if($this->currentExtType != self::ALL && $this->currentExtType != self::ALL_NO_SAFE
+         && !in_array(strtolower($ext), $this->extensions)) {
+         return false;
+      }
+      return true;
+   }
+
 }
-?>
