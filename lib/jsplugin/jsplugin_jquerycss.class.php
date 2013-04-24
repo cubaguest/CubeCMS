@@ -32,4 +32,3 @@ class JsPlugin_JQueryCSS extends JsPlugin_JQuery {
    protected function addJs($name) {
    }
 }
-?>

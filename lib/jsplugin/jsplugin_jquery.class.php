@@ -40,7 +40,10 @@ class JsPlugin_JQuery extends JsPlugin {
    protected $plugins = array('ui.timepicker');
 
    protected function initJsPlugin() {
-      if(defined('VVE_JQUERY_THEME')){
+      if(Face::getParamStatic('jquery_theme') != null){
+         self::$globalTheme = Face::getParamStatic('jquery_theme');
+         $this->setCfgParam('theme', Face::getParamStatic('jquery_theme'));
+      } else if(defined('VVE_JQUERY_THEME')){
          self::$globalTheme = VVE_JQUERY_THEME;
          $this->setCfgParam('theme', VVE_JQUERY_THEME);
       }
