@@ -15,8 +15,8 @@ class Contact_Controller extends Controller {
    const TEXT_KEY_PANEL = 'panel';
 
    /**
-   * Kontroler pro zobrazení novinek
-   */
+    * Kontroler pro zobrazení novinek
+    */
    public function mainController() {
       //		Kontrola práv
       $this->checkReadableRights();
@@ -73,23 +73,27 @@ class Contact_Controller extends Controller {
          $formQuestion->name->setValues($user->{Model_Users::COLUMN_NAME}.' '.$user->{Model_Users::COLUMN_SURNAME});
          $formQuestion->mail->setValues($user->{Model_Users::COLUMN_MAIL});
       }
-      
+
       if($formQuestion->haveElement('subjectDef') AND $formQuestion->isSend()
          AND $formQuestion->subjectDef->getValues() == 0 AND $formQuestion->subject->getValues() == null){
-          $formQuestion->subject->setError($this->tr('Musí být zadán předmět zprávy.'));
+         $formQuestion->subject->setError($this->tr('Musí být zadán předmět zprávy.'));
       }
 
       if($formQuestion->isValid()){
          $model = new Contact_Model_Questions();
          $model->saveQuestion($formQuestion->name->getValues(), $formQuestion->mail->getValues(),
-             $formQuestion->subject->getValues(), $formQuestion->text->getValues());
+            $formQuestion->subject->getValues(), $formQuestion->text->getValues());
 
          $adminMails = array();
 
          $subject = $formQuestion->subject->getValues();
 
-         if($formQuestion->haveElement('subjectDef') AND (int)$formQuestion->subjectDef->getValues() > 0){
+         if($formQuestion->haveElement('subjectDef') AND (int)$formQuestion->subjectDef->getValues() > 0){
             $subject = preg_replace('/<.*>/', '', $subs[(int)$formQuestion->subjectDef->getValues()-1]);
+            if($formQuestion->subject->getValues() != null){
+               $subject .= ': '.$formQuestion->subject->getValues();
+            }
+
             //vytažení emailu, pokud je
             $matches = array();
             if(preg_match('/<(.*)>/', $subs[(int)$formQuestion->subjectDef->getValues()-1], $matches) !== 0){
@@ -97,16 +101,34 @@ class Contact_Controller extends Controller {
             }
          }
 
-         // odeslání emailu
-         $mail = new Email();
-         $mail->setSubject($subject);
-         // odesílatele mailu nastavit na adresu zadanou ve formu
-         //$mail->setFrom($formQuestion->mail->getValues());
-         $mail->message()->setSender(array($formQuestion->mail->getValues() => $mail->sanitize($formQuestion->name->getValues())));
-         $mail->message()->setFrom(array($formQuestion->mail->getValues() => $mail->sanitize($formQuestion->name->getValues())));
-         $mail->message()->setReplyTo($formQuestion->mail->getValues());
-         $mail->message()->setBody($mail->sanitize($formQuestion->text->getValues()));
-         //$mail->addAddress($formQuestion->mail->getValues()); // odesílat?
+         $html = '<p>Byl odeslán kontaktní formulář ze stránek '.VVE_WEB_NAME.'.</p>';
+         $html .= '<table class="styled">';
+         $html .= '<tr>';
+         $html .= '<th>Jméno a přijmení</th>';
+         $html .= '<td>'.$formQuestion->name->getValues().'</td>';
+         $html .= '</tr>';
+         $html .= '<tr>';
+         $html .= '<th>E-mail</th>';
+         $html .= '<td>'.$formQuestion->mail->getValues().'</td>';
+         $html .= '</tr>';
+         $html .= '<tr>';
+         $html .= '<th>Předmět</th>';
+         $html .= '<td>'.$subject.'</td>';
+         $html .= '</tr>';
+         $html .= '</table>';
+         $html .= '<br />';
+         $html .= '<h2>Text</h2>';
+         $html .= '<p>'.$formQuestion->text->getValues().'</p>';
+
+
+
+         // create email
+         $email = new Email(true);
+         $email->setSubject($subject);
+         $email->setContent(Email::getBaseHtmlMail($html));
+
+         $email->setFrom(array($formQuestion->mail->getValues() => $formQuestion->name->getValues()));
+         //$mail->addAddress($formQuestion->mail->getValues()); // odesílat na odesílatele?
 
          if(empty($adminMails)){ // pokud je prázdný výtahneme nasatvené maily
             // maily adminů - předané
@@ -120,11 +142,12 @@ class Contact_Controller extends Controller {
                $adminMails = array_merge($adminMails, explode(';', $user->{Model_Users::COLUMN_MAIL}));
             }
          }
-         $mail->addAddress($adminMails);
+         $email->addAddress($adminMails);
          try {
-            $mail->sendMail();
+            $email->send();
+            // $mail->sendMail();
             $this->infoMsg()->addMessage($this->tr('Váš dotaz byl úspěšně odeslán. Co nejdříve Vám odpovíme.'));
-            $this->link()->reload();
+//            $this->link()->reload();
          } catch (Exception $e){
             new CoreErrors($e);
          }
@@ -132,9 +155,9 @@ class Contact_Controller extends Controller {
       $this->view()->formQuestion = $formQuestion;
    }
 
-  /**
-   * controller pro úpravu kontaktu
-   */
+   /**
+    * controller pro úpravu kontaktu
+    */
    public function editController() {
       $this->checkWritebleRights();
       $modelText = new Text_Model();
@@ -178,16 +201,16 @@ class Contact_Controller extends Controller {
          $matches = array();
          $texts = $formEdit->text->getValues();
          $textsPanels = $formEdit->textPanel->getValues();
-         
+
          if($textRecord == false){
             $textRecord = $modelText->newRecord();
-            $textRecord->{Text_Model::COLUMN_ID_CATEGORY} = $this->category()->getId(); 
-            $textRecord->{Text_Model::COLUMN_SUBKEY} = self::TEXT_KEY_MAIN; 
+            $textRecord->{Text_Model::COLUMN_ID_CATEGORY} = $this->category()->getId();
+            $textRecord->{Text_Model::COLUMN_SUBKEY} = self::TEXT_KEY_MAIN;
          }
-         $textRecord->{Text_Model::COLUMN_TEXT} = $texts; 
-         $textRecord->{Text_Model::COLUMN_TEXT_CLEAR} = vve_strip_tags($texts); 
+         $textRecord->{Text_Model::COLUMN_TEXT} = $texts;
+         $textRecord->{Text_Model::COLUMN_TEXT_CLEAR} = vve_strip_tags($texts);
          $modelText->save($textRecord);
-         
+
          $textsPSave = array();
          foreach ($texts as $lang => $text) {
             $matches = array();
@@ -200,11 +223,11 @@ class Contact_Controller extends Controller {
          if(!empty ($textsPSave)){
             if($textRecordPanel == false){
                $textRecordPanel = $modelText->newRecord();
-               $textRecordPanel->{Text_Model::COLUMN_ID_CATEGORY} = $this->category()->getId(); 
-               $textRecordPanel->{Text_Model::COLUMN_SUBKEY} = self::TEXT_KEY_PANEL; 
+               $textRecordPanel->{Text_Model::COLUMN_ID_CATEGORY} = $this->category()->getId();
+               $textRecordPanel->{Text_Model::COLUMN_SUBKEY} = self::TEXT_KEY_PANEL;
             }
-            $textRecordPanel->{Text_Model::COLUMN_TEXT} = $textsPSave; 
-            $textRecordPanel->{Text_Model::COLUMN_TEXT_CLEAR} = vve_strip_tags($textsPSave); 
+            $textRecordPanel->{Text_Model::COLUMN_TEXT} = $textsPSave;
+            $textRecordPanel->{Text_Model::COLUMN_TEXT_CLEAR} = vve_strip_tags($textsPSave);
             $modelText->save($textRecordPanel);
          }
          $this->infoMsg()->addMessage($this->tr('Text kontaktu byl uložen'));
@@ -232,7 +255,7 @@ class Contact_Controller extends Controller {
 
       $elemGGMapUrlPar = new Form_Element_Text('ggMapUrlParams', 'Parametry url');
       $elemGGMapUrlPar->setSubLabel('Obrázek: Parametry v url pro danou mapu (zvětšení, střed mapy, ...). např: center=Valašské+Meziříčí&zoom=15<br />
-         Vložený rám: URL adresa vnitřku rámu, tedy vše za "http://maps.google.com/maps?q=" (vytažená z Google Maps). ');
+         Vložený rám: URL adresa mapy pro sdílení pomocí odkazu (z Google Maps). ');
       $form->addElement($elemGGMapUrlPar,$grpMap);
       if(isset($settings[self::PARAM_MAP_URL_PARAMS])) {
          $form->ggMapUrlParams->setValues($settings[self::PARAM_MAP_URL_PARAMS]);
@@ -273,7 +296,7 @@ class Contact_Controller extends Controller {
 
 
       $grpAdmin = $form->addGroup('admins', 'Nastavení příjemců',
-              'Nastavení příjemců odeslaných dotazů z kontaktního formuláře');
+         'Nastavení příjemců odeslaných dotazů z kontaktního formuláře');
 
       // maily správců
       $elemEamilRec = new Form_Element_TextArea('otherRec', 'Adresy správců');
@@ -294,8 +317,8 @@ lze využít následující výběr již existujících uživatelů.');
       foreach ($users as $user) {
          if($user->{Model_Users::COLUMN_MAIL} != null){
             $usersIds[$user->{Model_Users::COLUMN_NAME} ." ".$user->{Model_Users::COLUMN_SURNAME}
-              .' ('.$user->{Model_Users::COLUMN_USERNAME}.') - '.$user->{Model_Users::COLUMN_GROUP_LABEL}
-              .' ('.$user->{Model_Users::COLUMN_GROUP_NAME}.')'] = $user->{Model_Users::COLUMN_ID};
+               .' ('.$user->{Model_Users::COLUMN_USERNAME}.':'.$user->{Model_Users::COLUMN_GROUP_NAME}
+               .') - '.$user->{Model_Users::COLUMN_MAIL}] = $user->{Model_Users::COLUMN_ID};
          }
       }
       $elemAdmins->setOptions($usersIds);
@@ -323,4 +346,3 @@ lze využít následující výběr již existujících uživatelů.');
       }
    }
 }
-?>

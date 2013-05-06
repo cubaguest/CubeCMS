@@ -1,10 +1,18 @@
-<?if($this->urlParams != null){?>
+<?
+if($this->urlParams == null){
+   return;
+}
+$url = $this->urlParams;
+if(strpos($url, 'http') === false){
+   $url = 'https://maps.google.com/maps?q='.$url;
+}
+$url = new Url($url);
+$url->param('output', 'embed');
+$url->param('ie', 'UTF8');
+?>
 <h2 id="contact-map-headline"><?=$this->tr('Mapa jak se k nám dostanete')?></h2>
 <div class="contact-map">
 <iframe width="500" height="400" frameborder="0" scrolling="no"
-        marginheight="0" marginwidth="0"
-        src="http://maps.google.com/maps?q=<?echo $this->urlParams?>"></iframe><br />
-<small><a href="http://maps.google.com/maps?q=<?echo $this->urlParams?>"
-          style="color:#0000FF;text-align:left">Zvětšit mapu</a></small>
+        marginheight="0" marginwidth="0" src="<?echo $url?>"></iframe><br />
+      <small><a href="<?echo $url?>"><?ps($this->tr('Zvětšit mapu'))?></a></small>
 </div>
-<?}?>
