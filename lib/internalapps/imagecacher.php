@@ -6,13 +6,21 @@
  *
  * Example cached path: http://www.cube-cms.com/cache/imgc/default/200x150/data/title-images/Mister-Monster.jpg
  */
-
+/* Potřebují se předdefinovat základní třídy aplikace */
 class File_Image_Exception extends Exception {}
+class CoreException extends Exception {}
 class Translator {
    public function tr($str){ return $str; }
    public function translator(){}
    public function setTranslator(){}
 }
+
+function sendError($msg = null){
+   header("HTTP/1.0 404 Not Found");
+   echo "<h1>".$msg."</h1>";
+   die;
+}
+
 
 if(!isset($_GET['s']) || !isset($_GET['tf']) || !isset($_GET['is'])){
    sendError('Nejsou předány všechny parametry');
@@ -69,31 +77,32 @@ include_once $libDir.'lib'.DIRECTORY_SEPARATOR.'file'.DIRECTORY_SEPARATOR.'image
 include_once $libDir.'lib'.DIRECTORY_SEPARATOR.'file'.DIRECTORY_SEPARATOR.'image'.DIRECTORY_SEPARATOR.'file_image_gd.class.php';
 include_once $libDir.'lib'.DIRECTORY_SEPARATOR.'fs'.DIRECTORY_SEPARATOR.'fs_dir.class.php';
 define('VVE_USE_IMAGEMAGICK', false);
-$image = new File_Image($webDir.$SOURCE);
+try {
+   $image = new File_Image($webDir.$SOURCE);
 
-$resizeType = File_Image_Base::RESIZE_AUTO;
-if($SIZES['c'] == true){
-   $resizeType = File_Image_Base::RESIZE_CROP;
-} else if ($SIZES['h'] == null) {
-   $resizeType = File_Image_Base::RESIZE_LANDSCAPE;
-} else if ($SIZES['w'] == null) {
-   $resizeType = File_Image_Base::RESIZE_PORTRAIT;
-}
+   $resizeType = File_Image_Base::RESIZE_AUTO;
+   if($SIZES['c'] == true){
+      $resizeType = File_Image_Base::RESIZE_CROP;
+   } else if ($SIZES['h'] == null) {
+      $resizeType = File_Image_Base::RESIZE_LANDSCAPE;
+   } else if ($SIZES['w'] == null) {
+      $resizeType = File_Image_Base::RESIZE_PORTRAIT;
+   }
 
-$dir = new FS_Dir(dirname($CACHED_FILE));
-$dir->check();
+   // create thum in cache
+   $image->getData()->resize($SIZES['w'], $SIZES['h'], $resizeType );
 
-// create thum in cache
-$image->getData()->resize($SIZES['w'], $SIZES['h'], $resizeType )
-   ->write($CACHED_FILE);
-$image->send();
+   $dir = new FS_Dir(dirname($CACHED_FILE));
+   $dir->check();
+
+   $image->getData()->write($CACHED_FILE);
+   $image->send();
 
 // redirect to new image
 //header('Content-Type: text/html; charset=utf-8');
-header('Location: '.$cache_file_url.'?new');
-
-function sendError($msg = null){
-   header("HTTP/1.0 404 Not Found");
-   echo "<h1>".$msg."</h1>";
-   die;
+   header('Location: '.$cache_file_url.'?new');
+} catch (Exception $e) {
+   // send original image? or resize in memory and send
+   $image->send();
 }
+
