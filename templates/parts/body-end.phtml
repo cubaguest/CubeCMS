@@ -13,7 +13,7 @@ if(VVE_DEBUG_LEVEL > 1) {
                <th><?ps('Úroveň DEBUG režimu:')?></th>
                <td><?ps(VVE_DEBUG_LEVEL)?></td>
                <th><?ps('IP:')?></th>
-               <td><?ps($_SERVER['REMOTE_ADDR']." (".$_SERVER['REMOTE_HOST'].")")?></td>
+               <td><?ps($_SERVER['REMOTE_ADDR']. (isset($_SERVER['REMOTE_HOST']) ? " (".$_SERVER['REMOTE_HOST'].")" : null) )?></td>
             </tr>
             <tr>
                <th><?ps('Exec time jádra:')?></th>
