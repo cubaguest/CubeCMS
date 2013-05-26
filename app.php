@@ -907,9 +907,16 @@ class AppCore extends TrObject {
    {
       $this->coreTpl->panels = array();
       // vygenerování pole pro šablony panelů
-      $panelPositions = vve_parse_cfg_value(VVE_PANEL_TYPES);
-      foreach ($panelPositions as $panel) {
-         $this->coreTpl->panels[$panel] = array();
+      $panelPositions = Face::getParamStatic('panels');
+      if(!empty($panelPositions)){
+         foreach($panelPositions as $key => $pos){
+            $this->coreTpl->panels[$key] = array();
+         }
+      } else {
+         $panelPositions = vve_parse_cfg_value(VVE_PANEL_TYPES);
+         foreach($panelPositions as $pos){
+            $this->coreTpl->panels[$pos] = array();
+         }
       }
       /**
        *  @todo optimalizovat dotaz!! zabere 0.005 sekundy
@@ -1092,13 +1099,15 @@ class AppCore extends TrObject {
          $this->_initMessagesAndErrors();
 
          /*
-          * TODO: Tohle se musí doladit, protože to je začarovaný kruch.
+          * TODO: Tohle se musí doladit, protože to je začarovaný kruch. špatný návrh inicializace
           * Locales závisí na URL_Requestu a URL_Request zívisí na Auth a Auth na Locales
           */
          //inicializace lokalizace
          Locales::factory();
          // provedení autorizace
          Auth::authenticate();
+         // parsování requestu
+         Url_Request::getInstance();
          // výběr jazyka a locales
 //         Locales::setLang(Url_Request::getInstance()->getUrlLang());
          Locales::selectLang();
