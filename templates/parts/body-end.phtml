@@ -1,0 +1,79 @@
+<?
+if(VVE_DEBUG_LEVEL > 1) {
+   $this->addFile('css://debug.less');
+   ?>
+   <div id="debug">
+      <div>
+         <table>
+            <caption><?ps($this->tr('DEBUG'))?></caption>
+            <tr class="row">
+               <td colspan="4">CORE</td>
+            </tr>
+            <tr>
+               <th><?ps('Exec time:')?></th>
+               <td><?ps($this->execTime)?></td>
+               <th><?ps('SQL Queries:')?></th>
+               <td><?ps(Db_PDO::getCountQueries())?></td>
+            </tr>
+            <tr>
+               <th><?ps('Current user:')?></th>
+               <td><?ps(Auth::getUserName()." - ID:".Auth::getUserId())?></td>
+               <th><?ps('Engine version:')?></th>
+               <td><?ps(AppCore::ENGINE_VERSION.'.'.AppCore::ENGINE_RELEASE)?></td>
+            </tr>
+            <tr>
+               <th><?ps('WEB name:')?></th>
+               <td><?ps(VVE_WEB_NAME)?></td>
+               <th><?ps('FACE:')?></th>
+               <td><?ps(Face::getCurrent()->getName())?></td>
+            </tr>
+            <tr>
+               <th><?ps('Module:')?></th>
+               <td><?ps(Category::getSelectedCategory()->getModule()->getName())?></td>
+               <th><?ps('Action:')?></th>
+               <td><?ps($this->moduleAction)?></td>
+            </tr>
+            <?if(function_exists('xdebug_get_function_count')){?>
+            <tr class="row">
+               <td colspan="4">XDEBUG</td>
+            </tr>
+            <tr>
+               <th><?ps('Memory:')?></th>
+               <td><?ps(xdebug_memory_usage())?></td>
+
+               <th><?ps('Run functions:')?></th>
+               <td><?ps(xdebug_get_function_count())?></td>
+            </tr>
+            <tr>
+               <th><?ps('Memory PEAK:')?></th>
+               <td><?ps(xdebug_peak_memory_usage())?></td>
+
+               <th><?ps('Index time (with compile css/js):')?></th>
+               <td><?ps(xdebug_time_index())?></td>
+            </tr>
+            <?}?>
+         </table>
+      </div>
+   </div>
+<?}
+if(Category::getSelectedCategory()->getRights()->isWritable() || Template::pVar('showHelp') === true){
+   $help = new Template_Help($this->moduleAction, Category::getSelectedCategory()->getModule());
+   echo $help;
+}
+?>
+<?if(defined('VVE_GOOGLE_ANALYTICS_CODE') && VVE_GOOGLE_ANALYTICS_CODE != null
+   && !in_array($_SERVER['REMOTE_ADDR'], explode(',', VVE_ANALYTICS_DISABLED_HOSTS))){?>
+<script type="text/javascript">
+   /* <![CDATA[ */
+   var _gaq = _gaq || [];
+   _gaq.push(['_setAccount', '<?=VVE_GOOGLE_ANALYTICS_CODE?>']);
+   _gaq.push(['_trackPageview']);
+
+   (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+   })();
+   /* ]]> */
+</script>
+<?}?>
