@@ -5,32 +5,38 @@ if(VVE_DEBUG_LEVEL > 1) {
    <div id="debug">
       <div>
          <table>
-            <caption><?ps($this->tr('DEBUG'))?></caption>
+            <caption><?ps($this->tr('Infomrace o jádře'))?></caption>
             <tr class="row">
                <td colspan="4">CORE</td>
             </tr>
             <tr>
-               <th><?ps('Exec time:')?></th>
+               <th><?ps('Úroveň DEBUG režimu:')?></th>
+               <td><?ps(VVE_DEBUG_LEVEL)?></td>
+               <th><?ps('IP:')?></th>
+               <td><?ps($_SERVER['REMOTE_ADDR']." (".$_SERVER['REMOTE_HOST'].")")?></td>
+            </tr>
+            <tr>
+               <th><?ps('Exec time jádra:')?></th>
                <td><?ps($this->execTime)?></td>
-               <th><?ps('SQL Queries:')?></th>
+               <th><?ps('SQL dotazů:')?></th>
                <td><?ps(Db_PDO::getCountQueries())?></td>
             </tr>
             <tr>
-               <th><?ps('Current user:')?></th>
+               <th><?ps('Aktuální uživatel:')?></th>
                <td><?ps(Auth::getUserName()." - ID:".Auth::getUserId())?></td>
-               <th><?ps('Engine version:')?></th>
+               <th><?ps('Verze jádra:')?></th>
                <td><?ps(AppCore::ENGINE_VERSION.'.'.AppCore::ENGINE_RELEASE)?></td>
             </tr>
             <tr>
-               <th><?ps('WEB name:')?></th>
-               <td><?ps(VVE_WEB_NAME)?></td>
-               <th><?ps('FACE:')?></th>
+               <th><?ps('Název webu (VVE_WEB_NAME):')?></th>
+               <td><span title="<?ps(VVE_WEB_NAME)?>"><?ps(vve_tpl_truncate(VVE_WEB_NAME, 30))?></span></td>
+               <th><?ps('Název vzhledu (face):')?></th>
                <td><?ps(Face::getCurrent()->getName())?></td>
             </tr>
             <tr>
-               <th><?ps('Module:')?></th>
+               <th><?ps('Modul:')?></th>
                <td><?ps(Category::getSelectedCategory()->getModule()->getName())?></td>
-               <th><?ps('Action:')?></th>
+               <th><?ps('Akce:')?></th>
                <td><?ps($this->moduleAction)?></td>
             </tr>
             <?if(function_exists('xdebug_get_function_count')){?>
@@ -38,17 +44,17 @@ if(VVE_DEBUG_LEVEL > 1) {
                <td colspan="4">XDEBUG</td>
             </tr>
             <tr>
-               <th><?ps('Memory:')?></th>
-               <td><?ps(xdebug_memory_usage())?></td>
+               <th><?ps('Paměť:')?></th>
+               <td><?ps(number_format(xdebug_memory_usage(), 0, '.', ' ').' B')?></td>
 
-               <th><?ps('Run functions:')?></th>
-               <td><?ps(xdebug_get_function_count())?></td>
+               <th><?ps('Spuštěno funkcí:')?></th>
+               <td><?ps(number_format(xdebug_get_function_count(), 0, '.', ' '))?></td>
             </tr>
             <tr>
-               <th><?ps('Memory PEAK:')?></th>
-               <td><?ps(xdebug_peak_memory_usage())?></td>
+               <th><?ps('Paměť (špička):')?></th>
+               <td><?ps(number_format(xdebug_peak_memory_usage(), 0, '.', ' ').' B')?></td>
 
-               <th><?ps('Index time (with compile css/js):')?></th>
+               <th><?ps('Index time (s kompilací css/js):')?></th>
                <td><?ps(xdebug_time_index())?></td>
             </tr>
             <?}?>
