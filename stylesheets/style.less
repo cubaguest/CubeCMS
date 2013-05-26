@@ -2,7 +2,18 @@
 @import "@{dirCoreCss}normalize.css";
 @import "@{dirFaceCss}style-layout.css";
 
+/**
+ * Základní cesty - NEPOUŽÍVAT RELATIVNÍ CESTY!!! PO KOMPRESI NEBUDOU RELATIVNÍ!!!
+ * dirFace - cesta k vzhledu
+ * dirFaceParent - cesta k rodičovskému vzhledu
+ * dirCoreImages - cestak ke core obrázkům
+ * dirCore - cesta k apliakci (base url)
+ * dirFaceCss - cesta k css vzhledu
+ * dirCoreCss - cestak core css
+ */
+
 /* COLORS */
+@color-text: #A0A0A0;
 @color-text-light: #A0A0A0;
 
 /* PATHS */
@@ -44,41 +55,38 @@ body {
 .clear {
    clear: both;
 }
-
 .hidden {
    display:none;
 }
-
 .font-small { font-size: 82%; }
-
 .full-width { width: 100%;}
-
 .left-box { float: left; }
-
 .right-box { float: right; }
 
 /* uprava prvku globalne */
-h1 { font-size: 122%; }
-h2 { font-size: 112%; }
-h3 { font-size: 107%;}
-
-a, a:visited,a:active {
-   text-decoration: none;
-   border-width: 0;
-}
-
-a:hover {
-   text-decoration: underline;
-}
-
-span[title] {
-   border-bottom: 1px dashed gray;
-}
-
 p,h1,h2,h3,h4 {
    margin: 0;
    padding: 0;
    margin-bottom: 0.5em;
+}
+h1 { font-size: 122%; }
+h2 { font-size: 112%; }
+h3 { font-size: 107%;}
+h4, h5, h6 { font-size: 100%;}
+a {
+   &:visited, &:active {
+      text-decoration: none;
+      border-width: 0;
+   }
+   &:visited {
+
+   }
+   &:hover {
+      text-decoration: underline;
+   }
+}
+span[title] {
+   border-bottom: 1px dashed gray;
 }
 td, th {font-size: 100%; text-align: left; }
 
@@ -89,21 +97,46 @@ td, th {font-size: 100%; text-align: left; }
 .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button {
    font-size: 0.8em !important;
 }
-
 .note {
    .font-small;
    border-top: 1px solid silver;
 }
-
 .rounded-corners(@radius: 5px) {
    border-radius: @radius;
    -webkit-border-radius: @radius;
    -moz-border-radius: @radius;
 }
-
 .even { background-color: #d4e3ff; }
 .odd {}
+.image-left {
+   .left-box;
+   padding: 0 10px 10px 0;
+}
+.image-right {
+   .right-box;
+   padding: 0 0 10px 10px;
+}
+a.image {
+   img {
+      display: block;
+   }
+   &:hover {
+      text-decoration: none;
+   }
+   span {
+      padding: 2px;
+      display: block;
+   }
+   border: 1px solid #B0A1A1;
+   display: inline-block;
+   margin-bottom: 10px;
+   margin-right: 10px;
+   line-height: 0;
+}
 
+.photogalery + p, .photogalery + div, .photogalery + hr,
+a.image + p, a.image + h3, a.image + h2, a.image + h3, a.image + h4, a.image + div
+{clear: both;}
 
 /* Hlášky */
 .message {
@@ -186,19 +219,18 @@ input.form-error, textarea.form-error { background-color: #f4d0d0; }
 form {
    fieldset {
       legend {
-         .form-legend-text {
-            .font-small;
-         }
-         p.form-legend-text {
-            padding: 0 10px 5px;
-            color: gray;
-         }
-
          font-size: 14px;
          font-weight: bold;
          padding-bottom: 5px;
          margin-left: 0;
          padding: 0 10px 5px;
+      }
+      .form-legend-text {
+         .font-small;
+      }
+      p.form-legend-text {
+         padding: 0 10px 5px;
+         color: gray;
       }
 
       width: 100%;
@@ -292,6 +324,14 @@ textarea, form .form-table .form-element-long {
 /* EOF MENU */
 
 /* SOF main content NEW!!! */
+.text {
+   p {
+      margin-bottom: 1em;
+   }
+   ul > li { list-style: disc; }
+   ol > li { list-style: decimal; }
+}
+
 .post, .content {
    margin-bottom: 0.5em;
 
@@ -532,5 +572,4 @@ textarea, form .form-table .form-element-long {
 }
 
 // import content css
-@import "style-content.less";
 @import "style-tinymce.less";
