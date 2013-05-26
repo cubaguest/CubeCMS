@@ -859,7 +859,7 @@ class Template extends TrObject {
          @mkdir($targetPath);
          @mkdir($targetPath.DIRECTORY_SEPARATOR.'shop'); // for shop styles
       }
-      $hash = md5($path.$file);
+      $hash = md5(Url_Request::getDomain().$path.$file);
       $compiledFileUrl = $url.$file.".".$hash.".css";
 
       try {
@@ -919,7 +919,7 @@ class Template extends TrObject {
          @mkdir($cachePath.DIRECTORY_SEPARATOR.'shop'); // for shop styles
       }
 
-      $hash = md5($path.$file);
+      $hash = md5(Url_Request::getDomain().$path.$file);
       $url = Url_Request::getBaseWebDir(false).AppCore::ENGINE_CACHE_DIR."/".self::STYLESHEETS_DIR."/";
       $compiledFileUrl = $url.$file.'-'.$module."-".$hash.".css";
 
