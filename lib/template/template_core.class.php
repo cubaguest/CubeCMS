@@ -463,6 +463,13 @@ class Template_Core extends Template {
    {
       echo "<!-- {*-STYLESHEETS-*} -->\n"
           ."<!-- {*-JAVASCRIPTS-*} -->";
+
+      if(Category::getSelectedCategory()->getRights()->isWritable()){
+         $this->addFile('css://style-admin.less');
+         if(Auth::isAdmin()){
+            $this->addFile('js://admin/menu.js');
+         }
+      }
    }
 
    /**

@@ -37,12 +37,6 @@ if(VVE_DEBUG_LEVEL > 1){ $this->addFile('js://enginehelpers.js');
       <script type="text/javascript" src="./jscripts/fix_eolas.js" defer="defer"></script>
       <![endif]-->
       <?$this->renderHeaderCSSJS()?>
-      <? // admin nessesary files
-      if(Category::getSelectedCategory()->getRights()->isWritable()){
-         $this->addFile('css://style-admin.less');
-         if(Auth::isAdmin()){ $this->addFile('js://admin/menu.js'); }
-      }
-      ?>
       <script type="text/javascript">/* <![CDATA[ */<?$this->renderHeaderScripts()?>/* ]]> */</script>
    </head>
    <body id="pageTop" class="<? echo $this->getBodyClasses(true);?>" >
