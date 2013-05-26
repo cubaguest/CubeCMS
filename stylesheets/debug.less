@@ -1,0 +1,53 @@
+@color-debug: #ff7f50;
+#debug {
+   div {
+      table {
+         caption {
+            font-size: 12px;
+            color: @color-debug;
+            text-align: left;
+            font-weight: bold;
+            margin-bottom: 5px;
+         }
+         th, td {
+            font-size: 12px;
+            padding: 0 3px 3px 0;
+         }
+         th {
+            width: 250px;
+         }
+         .row {
+            td {
+               color: @color-debug;
+               font-weight: bold;
+               font-size: 10px;
+            }
+         }
+         width: 100%;
+      }
+      border: 1px solid @color-debug;
+      background-color: lighten(@color-debug, 30);
+      padding: 5px;
+   }
+   width: 1000px;
+   margin: 1em auto;
+}
+
+.debug-log {
+   pre {
+      font-size: 10px;
+      white-space: pre-wrap; /* css-3 */
+      white-space: -moz-pre-wrap !important; /* Mozilla, since 1999 */
+      white-space: -pre-wrap; /* Opera 4-6 */
+      white-space: -o-pre-wrap; /* Opera 7 */
+      word-wrap: break-word; /* Internet Explorer 5.5+ */
+   }
+   table td {
+      padding: 5px;
+   }
+   border: 1px solid @color-debug;
+   background-color: lighten(@color-debug, 30);
+   padding: 5px;
+   margin: 10px 0;
+   overflow: auto;
+}

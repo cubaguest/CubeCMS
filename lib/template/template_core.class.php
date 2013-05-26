@@ -174,10 +174,11 @@ class Template_Core extends Template {
       $metaTags = null;
 
       if(self::$coverImagePath != null ){
-         $metaTags .= '<link rel="image_src" href="'.self::$coverImagePath.'"/>'."\n";
-         self::setMetaTag('og:image', self::$coverImagePath);
+         // title image must be about 300x300
+         $metaTags .= '<link rel="image_src" href="'.vve_image_cacher(self::$coverImagePath, 300, 300).'"/>'."\n";
+         self::setMetaTag('og:image', self::$coverImagePath);// facebook chce co největší
       } else if(isset(self::$metaTags['og:image']) && self::$coverImagePath == null){
-         $metaTags .= '<link rel="image_src" href="'.self::$metaTags['og:image'].'"/>'."\n";
+         $metaTags .= '<link rel="image_src" href="'.vve_image_cacher(self::$metaTags['og:image'], 300, 300).'"/>'."\n";
       }
 
       if(!empty (self::$metaTags)){
@@ -422,4 +423,98 @@ class Template_Core extends Template {
       return self::$browser;
    }
 
+   /* části pro render do indexu */
+   /**
+    * Render základních hlaviček
+    */
+   public function renderHeaderBase()
+   {
+      echo '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />'."\n"
+          .'<!-- {*-PAGE_META_TAGS-*}-->'."\n"
+          .'<title><!-- {*-PAGE_TITLE-*}--></title>'."\n"
+          .'<base href="'.Url_Link::getMainWebDir().'" />'."\n"
+          .'<link rel="canonical" href="'.$this->link()->rmParam().'" />'."\n";
+   }
+
+   /**
+    * Render pro rss kanály
+    */
+   public function renderHeaderRSS()
+   {
+      $model = new Model_Category();
+      $model->setSelectAllLangs(false);
+      $cats = $model
+         ->onlyWithAccess()
+         ->columns(array(Model_Category::COLUMN_NAME, Model_Category::COLUMN_URLKEY))
+         ->where(Model_Category::COLUMN_FEEDS.' = 1', array())->records();
+      $link = new Url_Link(true);
+      foreach ($cats as $cat){
+         $link->category($cat->{Model_Category::COLUMN_URLKEY})->file('rss.xml');
+         echo '<link rel="alternate" type="application/rss+xml" title="'.htmlspecialchars(VVE_WEB_NAME.' - '.$cat->{Model_Category::COLUMN_CAT_LABEL})
+            .'" href="'.$link.'" />'."\n";
+      }
+
+   }
+
+   /**
+    * Render CSS a JS souborů
+    */
+   public function renderHeaderCSSJS()
+   {
+      echo "<!-- {*-STYLESHEETS-*} -->\n"
+          ."<!-- {*-JAVASCRIPTS-*} -->";
+   }
+
+   /**
+    * Render javascriptu ve hlavičce (nejčastěji nastavení systému)
+    */
+   public function renderHeaderScripts()
+   {
+      $params = array(
+         'domain' => Url_Request::getDomain(),
+         'lang' => Locales::getLang(),
+         'primaryLang' => Locales::getDefaultLang()
+      );
+      echo 'CubeCMS.init('.json_encode($params).');'."\n";
+   }
+
+   /**
+    * Render začátku obsahu (za body)
+    */
+   public function renderBodyBegin()
+   {
+      if(Auth::isAdmin() AND $this->menuAdminObj != null AND !empty($this->menuAdminObj->menu)) {
+         $this->includeTplObj($this->menuAdminObj);
+      }
+   }
+
+   /**
+    * Render konce obsahu (před ukončovacím body)
+    */
+   public function renderBodyEnd()
+   {
+      $tpl = new Template($this->link);
+      $tpl->addFile('tpl://parts/body-end.phtml'); // cca 5kb
+//      $tpl->setVars($this->getTemplateVars());
+      $tpl->privateVars = &$this->privateVars; // tohle nevím jestli je správně kvůli přístupu (protected)???
+      echo $tpl;
+   }
+
+   /**
+    * Vrací seznam tříd pro element body
+    * @param bool $returnString
+    * @return array|string
+    */
+   public function getBodyClasses($returnString = true)
+   {
+      $classes = array(
+         "module-".Category::getSelectedCategory()->getModule()->getName(),
+         "module-".Category::getSelectedCategory()->getModule()->getName().'-'.$this->moduleAction,
+         "module-action-".$this->moduleAction
+      );
+      if(Auth::isAdmin()) {
+         $classes[] = 'with-admin-menu';
+      }
+      return $returnString ? implode(' ', $classes) : $classes;
+   }
 }

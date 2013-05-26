@@ -3,7 +3,6 @@ if(Template::browser()->isMobile() && ( !isset($_COOKIE['mobile'] ) || $_COOKIE[
    $this->includeFile("tpl://index_handle.phtml");
    return;
 }
-
 // base metatags
 Template_Core::setMetaTag('Robots', 'index,follow');
 Template_Core::setMetaTag('generator', AppCore::ENGINE_NAME.' '.AppCore::ENGINE_VERSION.'.'.  AppCore::ENGINE_RELEASE);
@@ -23,7 +22,6 @@ if(preg_match('/(?i)msie ([1-9])/i',$_SERVER['HTTP_USER_AGENT'], $matches)) {
 // base styles
 $this->addFile('css://style.less');
 // DEBUG
-if(VVE_DEBUG_LEVEL > 0){ $this->addFile('css://style-debug.css');}
 Template::addJsPlugin(new JsPlugin_JQuery());
 if(VVE_DEBUG_LEVEL > 1){ $this->addFile('js://enginehelpers.js');
 } else { $this->addFile('js://enginehelpers.min.js');}
@@ -32,52 +30,23 @@ if(VVE_DEBUG_LEVEL > 1){ $this->addFile('js://enginehelpers.js');
 ?><!DOCTYPE html>
 <html>
    <head>
-      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-      <!-- {*-PAGE_META_TAGS-*}-->
-      <title><!-- {*-PAGE_TITLE-*}--></title>
-      <base href="<?=Url_Link::getMainWebDir()?>" />
-      <link rel="canonical" href="<?=$this->link()->rmParam()?>" />
-      <?//feedy RSS
-      $model = new Model_Category();
-      $model->setSelectAllLangs(false);
-      $cats = $model->columns(array(Model_Category::COLUMN_NAME, Model_Category::COLUMN_URLKEY))
-         ->where(Model_Category::COLUMN_FEEDS.' = 1', array())->records();
-      $link = new Url_Link(true);
-      foreach ($cats as $cat){
-         $link->category($cat->{Model_Category::COLUMN_URLKEY})->file('rss.xml');
-         ?><link rel="alternate" type="application/rss+xml" title="<?=VVE_WEB_NAME." - ".$cat->{Model_Category::COLUMN_CAT_LABEL}?>" href="<?=$link?>" />
-      <?
-      }?>
+      <?$this->renderHeaderBase();?>
+      <?$this->renderHeaderRSS();?>
       <!--[if lte IE 6]>
       <link rel="stylesheet" type="text/css" href="<?=$this->style('style_ie6.css')?>" />
       <script type="text/javascript" src="./jscripts/fix_eolas.js" defer="defer"></script>
       <![endif]-->
-      <!-- {*-STYLESHEETS-*} -->
-      <!-- {*-JAVASCRIPTS-*} -->
+      <?$this->renderHeaderCSSJS()?>
       <? // admin nessesary files
       if(Category::getSelectedCategory()->getRights()->isWritable()){
          $this->addFile('css://style-admin.less');
          if(Auth::isAdmin()){ $this->addFile('js://admin/menu.js'); }
       }
       ?>
-      <script type="text/javascript">
-         /* <![CDATA[ */
-         CubeCMS.init({
-            domain : '<?=Url_Request::getDomain();?>',
-            lang : '<?=Locales::getDefaultLang()?>',
-            primaryLang : '<?=Locales::getDefaultLang()?>'
-         });
-         /* ]]> */
-      </script>
+      <script type="text/javascript">/* <![CDATA[ */<?$this->renderHeaderScripts()?>/* ]]> */</script>
    </head>
-   <body id="pageTop" class="<?
-         echo " module-".Category::getSelectedCategory()->getModule()->getName();
-         echo " module-action-".$this->moduleAction;
-         if(Auth::isAdmin()) echo ' with-admin-menu';
-         ?>" >
-      <? // admin menu
-      if(Auth::isAdmin() AND $this->menuAdminObj != null AND !empty($this->menuAdminObj->menu)) $this->includeTplObj($this->menuAdminObj);
-      ?>
+   <body id="pageTop" class="<? echo $this->getBodyClasses(true);?>" >
+      <? $this->renderBodyBegin();?>
       <? //NavigationMenu_View::listView(); ?>
       <div id="bodywrap" style="<?
                     $back = Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_BACKGROUND};
@@ -106,8 +75,7 @@ if(VVE_DEBUG_LEVEL > 1){ $this->addFile('js://enginehelpers.js');
                   if(Template::isTitlePage()){
                      echo HPSlideShow_View::getSlideshow();
                   }
-
-                  if(VVE_DEBUG_LEVEL > 0){ echo "<pre>";Debug::printDebug(); echo "</pre>";Debug_Timer::printTimers(); }
+                  if(VVE_DEBUG_LEVEL > 0){ echo Debug::printDebug(); echo Debug_Timer::printTimers(); }
                   ?>
                   <div class="main-content module-<?=  Category::getSelectedCategory()->getModule()->getName()?>">
                   <? $this->includeTpl("modules.phtml", true); ?>
@@ -182,40 +150,8 @@ if(VVE_DEBUG_LEVEL > 1){ $this->addFile('js://enginehelpers.js');
          </div><!-- footwrap -->
       </div><!-- bodywrap /-->
       <hr class="reseter" />
-      <div id="debug">
-         <?
-         if(VVE_DEBUG_LEVEL > 1) {
-            if(function_exists('xdebug_get_function_count')){
-               print ("Run functions: ".xdebug_get_function_count()."<br />");
-               print ("Memory: ".xdebug_memory_usage()."<br />");
-               print ("Memory PEAK: ".xdebug_peak_memory_usage()."<br />");
-               print ("Index time: ".xdebug_time_index()."<br />");
-            }
-            print ("Exec time: ".$this->execTime."s<br />");
-            print ("SQL Queries: ".Db_PDO::getCountQueries()."<br />");
-            print ("Current user: ".Auth::getUserName()." - ".Auth::getUserId()."<br />");
-         }
-         ?>
-      </div>
-      <?if(defined('VVE_GOOGLE_ANALYTICS_CODE') && VVE_GOOGLE_ANALYTICS_CODE != null 
-            && !in_array($_SERVER['REMOTE_ADDR'], explode(',', VVE_ANALYTICS_DISABLED_HOSTS))){?>
-          <script type="text/javascript">
-             /* <![CDATA[ */
-             var _gaq = _gaq || [];
-             _gaq.push(['_setAccount', '<?=VVE_GOOGLE_ANALYTICS_CODE?>']);
-             _gaq.push(['_trackPageview']);
-
-           (function() {
-               var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-               ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-               var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-            })();
-            /* ]]> */
-         </script>
-      <?}?>
-      <?if(Category::getSelectedCategory()->getRights()->isWritable() || Template::pVar('showHelp') === true){
-         $help = new Template_Help($this->moduleAction, Category::getSelectedCategory()->getModule());
-         echo $help;      
-      }?>
+      <?
+      $this->renderBodyEnd();
+      ?>
    </body>
 </html>
