@@ -3,12 +3,21 @@ if( !empty($this->moduleButtons) ){
    $jq = new JsPlugin_JQuery();
    $jq->addUIButton();
    $this->addJsPlugin($jq);
+   $this->addFile('css://engine:style-admin.less');// need for buttons style
    ?>
-   <ul class="module-tool-buttons">
-   <?foreach ($this->moduleButtons as $button) {?>
-      <li><a class="ui-button" href="<?=$button['link']?>" title="<?ps($button['title'])?>" <?if(isset($button['confirm'])){ echo 'onclick="return confirm(\''.htmlspecialchars($button['confirm']).'\')"';}?>
-         <?if(isset($button['id'])) echo "id=\"".$button['id']."\"";?>
-         ><img src="<?echo strpos($button['icon'], 'http') !== false ? $button['icon'] : '/images/icons/'.$button['icon']?>" alt="back" /><?ps($button['name'])?></a></li>
+   <ul class="module-tool-buttons clearfix">
+   <?foreach ($this->moduleButtons as $button) {
+      $attrStr = null;
+      $button['attributes']['href'] = $button['link'];
+      $button['attributes']['title'] = $button['title'];
+      if(isset($button['confirm'])){ $button['attributes']['onclick'] = 'return confirm(\''.htmlspecialchars($button['confirm']).'\')'; }
+      if(isset($button['id'])){ $button['attributes']['id'] = $button['id']; }
+      foreach($button['attributes'] as $name => $value){
+         $attrStr .= $name.'="'.$value.'" ';
+      }
+      ?>
+      <li><a class="ui-button" <?=$attrStr?> ><img src="<?echo strpos($button['icon'], 'http') !== false
+         ? $button['icon'] : '/images/icons/'.$button['icon']?>" alt="back" /><?ps($button['name'])?></a></li>
    <?}?>
    </ul>
    <hr class="reseter" />
