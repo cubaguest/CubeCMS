@@ -16,8 +16,8 @@ var CubePhotogaleryDialog = {
 	preInit : function() {
 		var url;
 //      tinyMCEPopup.requireLangPack('cubephotogalery');
-		tinyMCEPopup.requireLangPack();
-      
+      tinyMCEPopup.requireLangPack();
+
 //		if (url = tinyMCEPopup.getParam("external_image_list_url"))
 //			document.write('<script language="javascript" type="text/javascript" src="' + tinyMCEPopup.editor.documentBaseURI.toAbsolute(url) + '"></script>');
 	},
@@ -222,7 +222,7 @@ var CubePhotogaleryDialog = {
       if(formObj.wrapperList.value != ""){
          cnt = tinymce.DOM.create(formObj.wrapperList.value, {'class' : 'photogalery'});
       } else {
-         cnt = tinymce.DOM.create("p", {'class' : 'photogalery'});
+         cnt = tinymce.DOM.create("div", {'class' : 'photogalery'});
       }
       cnt.appendChild(document.createTextNode('\u00a0'));
 

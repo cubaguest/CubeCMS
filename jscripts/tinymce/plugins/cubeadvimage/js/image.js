@@ -199,7 +199,11 @@ var ImageDialog = {
          // if preview create A and append IMG
          if(f.srcFull.value != null && f.cai_createThumbnail.checked == true){
             var img = tinyMCEPopup.editor.dom.createHTML('img', args);
-            cnt = tinyMCEPopup.dom.createHTML('a', {'href' : f.srcFull.value, "class" : "pirobox preview", 'title' : 'show lightbox'}, img);
+            cnt = tinyMCEPopup.dom.createHTML('a', {
+               'href' : f.srcFull.value,
+               'class' : "pirobox preview",
+               'rel' : "lightbox",
+               'title' : (args.title ? args.title : (args.alt ? args.alt : ""))}, img);
             
             ed.execCommand('mceInsertContent', true, cnt, {skip_undo : 1});
          } else {
@@ -376,19 +380,19 @@ var ImageDialog = {
 		}
 	},
 
-	changeHeight : function() {
-		var f = document.forms[0], tp, t = this;
+   changeHeight : function() {
+      var f = document.forms[0], tp, t = this;
 
-		if (!f.constrain.checked || !t.preloadImg) {
-			return;
-		}
+      if (!f.constrain.checked || !t.preloadImg) {
+         return;
+      }
 
-		if (f.width.value == "" || f.height.value == "")
-			return;
+      if (f.width.value == "" || f.height.value == "")
+         return;
 
-		tp = (parseInt(f.width.value) / parseInt(t.preloadImg.width)) * t.preloadImg.height;
-		f.height.value = tp.toFixed(0);
-	},
+      tp = (parseInt(f.width.value) / parseInt(t.preloadImg.width)) * t.preloadImg.height;
+      f.height.value = tp.toFixed(0);
+   },
 
 	changeWidth : function() {
 		var f = document.forms[0], tp, t = this;

@@ -2,6 +2,7 @@
  * editor_plugin_src.js
  *
  * Copyright 2009, Moxiecode Systems AB
+ * Copyright 2012, Cube studio
  * Released under LGPL License.
  *
  * License: http://tinymce.moxiecode.com/license
@@ -9,6 +10,7 @@
  */
 
 (function() {
+   tinymce.PluginManager.requireLangPack('cubeadvlink');
 	tinymce.create('tinymce.plugins.CubeAdvancedLinkPlugin', {
 		init : function(ed, url) {
 			this.editor = ed;
@@ -33,11 +35,11 @@
 
 			// Register buttons
 			ed.addButton('link', {
-				title : 'cubeadvlink.link_desc',
+				title : 'cubeadvlink.title',
 				cmd : 'mceCubeAdvLink'
 			});
 
-			ed.addShortcut('ctrl+k', 'cubeadvlink.advlink_desc', 'mceCubeAdvLink');
+			ed.addShortcut('ctrl+k', 'cubeadvlink.title', 'mceCubeAdvLink');
 
 			ed.onNodeChange.add(function(ed, cm, n, co) {
 				cm.setDisabled('link', co && n.nodeName != 'A');

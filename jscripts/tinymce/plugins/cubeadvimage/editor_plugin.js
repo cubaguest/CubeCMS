@@ -10,6 +10,7 @@
  */
 
 (function() {
+   tinymce.PluginManager.requireLangPack('cubeadvimage');
 	tinymce.create('tinymce.plugins.CubeAdvancedImagePlugin', {
 		init : function(ed, url) {
 			// Register commands
@@ -30,7 +31,7 @@
 
 			// Register buttons
 			ed.addButton('image', {
-				title : 'cubeadvimage.image_desc',
+				title : 'cubeadvimage.title',
 				cmd : 'mceCubeAdvImage'
 			});
 		},

@@ -1,1 +1,66 @@
-tinyMCE.addI18n('sk.advlink_dlg',{"target_name":"N\u00e1zov cie\u013ea",classes:"Triedy",style:"\u0160t\u00fdl",id:"ID","popup_position":"Umiestnenie (X/Y)",langdir:"Smer textu","popup_size":"Ve\u013ekos\u0165","popup_dependent":"Z\u00e1vislos\u0165 (iba Mozilla Firefox)","popup_resizable":"Umo\u017eni\u0165 zmenu ve\u013ekosti","popup_location":"Zobrazi\u0165 li\u0161tu umiestnen\u00ed","popup_menubar":"Zobrazi\u0165 ponuku","popup_toolbar":"Zobrazi\u0165 panel n\u00e1strojov","popup_statusbar":"Zobrazi\u0165 stavov\u00fd riadok","popup_scrollbars":"Zobrazi\u0165 posuvn\u00edky","popup_return":"Vlo\u017ei\u0165 \'return false\'","popup_name":"N\u00e1zov okna","popup_url":"URL vyskakovacieho okna",popup:"JavaScriptov\u00e9 okno","target_blank":"Otvori\u0165 v novom okne","target_top":"Otvori\u0165 v hlavnom okne/r\u00e1me (nahradi\u0165 v\u0161etky r\u00e1my)","target_parent":"Otvori\u0165 v nadradenom okne/r\u00e1me","target_same":"Otvori\u0165 v rovnakom okne/r\u00e1me","anchor_names":"Z\u00e1lo\u017eka","popup_opts":"Mo\u017enosti","advanced_props":"Roz\u0161\u00edren\u00e9 parametre","event_props":"Udalosti","popup_props":"Vlastnosti vyskakovacieho okna","general_props":"Obecn\u00e9 parametre","advanced_tab":"Roz\u0161\u00edren\u00e9","events_tab":"Udalosti","popup_tab":"Vyskakovacie okno","general_tab":"Obecn\u00e9",list:"Zoznam odkazov","is_external":"Zadan\u00e1 URL vyzer\u00e1 ako extern\u00fd odkaz, chcete doplni\u0165 povinn\u00fd prefix http://?","is_email":"Zadan\u00e1 URL vyzer\u00e1 ako e-mailov\u00e1 adresa, chcete doplni\u0165 povinn\u00fd prefix mailto:?",titlefield:"Titulok",target:"Cie\u013e",url:"URL odkazu",title:"Vlo\u017ei\u0165/upravi\u0165 odkaz","link_list":"Zoznam odkazov",rtl:"Sprava do\u013eava",ltr:"Z\u013eava doprava",accesskey:"Kl\u00e1vesov\u00e1 skratka",tabindex:"Poradie pre tabul\u00e1tor",rev:"Vz\u0165ah cie\u013ea k str\u00e1nke",rel:"Vz\u0165ah str\u00e1nky k cie\u013eu",mime:"MIME typ",encoding:"K\u00f3dovanie",langcode:"K\u00f3d jazyka","target_langcode":"Jazyk cie\u013ea",width:"\u0160\u00edrka",height:"V\u00fd\u0161ka"});
+tinyMCE.addI18n('sk.cubeadvlink_dlg',{
+   "target_name":"N\u00e1zev c\u00edle",
+   classes:"T\u0159\u00eddy",
+   style:"Styl",
+   id:"ID",
+   "popup_position":"Um\u00edst\u011bn\u00ed (X/Y)",
+   langdir:"Sm\u011br textu",
+   "popup_size":"Velikost",
+   "popup_dependent":"Z\u00e1vislost (pouze Mozilla/Firefox)",
+   "popup_resizable":"Umo\u017enit zm\u011bnu velikosti",
+   "popup_location":"Zobrazit pole s adresou",
+   "popup_menubar":"Zobrazit nab\u00eddku",
+   "popup_toolbar":"Zobrazit panel n\u00e1stroj\u016f",
+   "popup_statusbar":"Zobrazit stavov\u00fd \u0159\u00e1dek",
+   "popup_scrollbars":"Zobrazit posuvn\u00edky",
+   "popup_return":"Vlo\u017eit \'return false\'",
+   "popup_name":"N\u00e1zev okna",
+   "popup_url":"URL vyskakovac\u00edho okna",
+   popup:"Javascriptov\u00e9 okno",
+   "target_blank":"Otev\u0159\u00edt v nov\u00e9m okn\u011b/r\u00e1mu",
+   "target_top":"Otev\u0159\u00edt v hlavn\u00edm okn\u011b/r\u00e1mu (nahradit v\u0161echny r\u00e1my)",
+   "target_parent":"Otev\u0159\u00edt v nad\u0159azen\u00e9m okn\u011b/r\u00e1mu",
+   "target_same":"Otev\u0159\u00edt v tomto okn\u011b/r\u00e1mu",
+   "anchor_names":"Z\u00e1lo\u017eka",
+   "popup_opts":"Mo\u017enosti",
+   "advanced_props":"Roz\u0161\u00ed\u0159en\u00e9 parametry",
+   "event_props":"Ud\u00e1losti",
+   "popup_props":"Vlastnosti vyskakovac\u00edho okna",
+   "general_props":"Obecn\u00e9 parametry",
+   "advanced_tab":"Roz\u0161\u00ed\u0159en\u00e9",
+   "events_tab":"Ud\u00e1losti",
+   "popup_tab":"Vyskakovac\u00ed okno",
+   "general_tab":"Obecn\u00e9",
+   list:"Seznam odkaz\u016f",
+   "is_external":"Zadan\u00e9 URL vypad\u00e1 jako extern\u00ed odkaz, chcete doplnit povinn\u00fd prefix http://?",
+   "is_email":"Zadan\u00e9 URL vypad\u00e1 jako e-mailov\u00e1 adresa, chcete doplnit povinn\u00fd prefix mailto:?",
+   titlefield:"Titulek",
+   target:"C\u00edl",
+   url:"URL odkazu",
+   title:"Vlo\u017eit/upravit odkaz",
+   "link_list":"Seznam odkaz\u016f",
+   rtl:"Zprava doleva",
+   ltr:"Zleva doprava",
+   accesskey:"Kl\u00e1vesov\u00e1 zkratka",
+   tabindex:"Po\u0159ad\u00ed pro tabul\u00e1tor",
+   rev:"Vztah c\u00edle ke str\u00e1nce",
+   rel:"Vztah str\u00e1nky k c\u00edli",
+   mime:"MIME typ",
+   encoding:"K\u00f3dov\u00e1n\u00ed",
+   langcode:"K\u00f3d jazyka",
+   "target_langcode":"Jazyk c\u00edle",
+   width:"\u0160\u00ed\u0159ka",
+   height:"V\u00fd\u0161ka",
+   /* Cube */
+   "tab_upload":"Nahranie z počítača",
+   file:"Súbor",
+   "file_select" : "Výber súboru"
+   ,"dir_name" : "Zlo\u017eka pro ulo\u017eenie"
+   ,"dir_new_name" : "Nov\u00e1 zlo\u017eka"
+
+   ,"upload" : "Nahrať"
+   ,"file_uplaod" : "Nahranie súboru"
+   ,"file_uplaod_warning" : "Předvložením súboru musíte súbor nahrať!"
+   ,"file_is_not_uploaded" : "Soubor nebyl nahr\u00e1n. Pokra\u010dovat bez nahr\u00e1n\u00ed?"
+   ,"target_dir" : "C\u00edlov\u00fd adres\u00e1\u0159"
+});
