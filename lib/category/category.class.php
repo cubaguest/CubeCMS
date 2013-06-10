@@ -171,7 +171,7 @@ class Category extends Category_Core {
     * @return bool
     */
    public function haveFeed() {
-      return $this->getCatDataObj()->{Model_Category::COLUMN_FEEDS};
+      return $this->getDataObj()->{Model_Category::COLUMN_FEEDS};
    }
 }
 ?>

@@ -8,7 +8,7 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
    const ALL = 1;
    const VISIBLE_ONLY = 2;
    const CACHE_KEY_NAME = 'struct';
-   
+
    private $level = 0;
    private $id = null;
    private $idParent = null;
@@ -17,12 +17,12 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
 
    private $withHidden = false; // odstranit
    public $type = 'main';
-   
+
    /**
     * Viditelná struktura
     * @var unknown_type
     */
-   protected static $structureVisible = false; 
+   protected static $structureVisible = false;
    /**
     * Kompletní struktura
     * @var unknown_type
@@ -31,8 +31,11 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
    /**
     * Cesta k aktuální kategorii
     * @var array
-    */ 
-   protected static $path; 
+    */
+   protected static $path;
+
+   protected static $defaultCategory = null;
+   protected static $defaultCategoryPriority = -1;
 
    /**
     * Konstruktor pro vytvoření objektu se sekcemi
@@ -105,6 +108,15 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
    }
 
    /**
+    * Metoda vrací nadřazený element
+    * @return Category_Structure nebo false pokud je root
+    */
+   public function getParent()
+   {
+      return $this->idParent != 0 ? self::getStructure(self::ALL)->getCategory($this->idParent) : false;
+   }
+
+   /**
     * Metoda vrátí cestu k zadané kategorii. POkud kaegorie není zadána, použije se aktuální
     * @param int $idCat
     * @param array $retArray -- internal
@@ -139,7 +151,7 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
       }
       return false;
    }
-   
+
    /**
     * metoda vrací pozici potomka
     * @param int $idc -- id kategorie
@@ -173,7 +185,7 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
    public function getMaxDepth()
    {
       $d = 0;
-   
+
       if(!$this->isEmpty()){
          $d = 1;
          $childd = 0;
@@ -185,7 +197,7 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
       }
       return $d;
    }
-   
+
    /**
     * Metoda nastaví kategorie a odstraní nepoužité kategorie a sekce
     * @param array $catArray -- pole s kategoriemi
@@ -200,10 +212,10 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
          $child->withHidden($this->withHidden);
          if(isset ($catArray[$child->getId()])) {
             // načtení práva
-            $right = $catArray[$child->getId()][Model_Rights::COLUMN_RIGHT] != null 
+            $right = $catArray[$child->getId()][Model_Rights::COLUMN_RIGHT] != null
                ? $catArray[$child->getId()][Model_Rights::COLUMN_RIGHT] : $catArray[$child->getId()][Model_Category::COLUMN_DEF_RIGHT];
 
-            if( (Auth::isAdmin() OR $right[0] == 'r' OR Auth::getUserId() == $catArray[$child->getId()][Model_Category::COLUMN_ID_USER_OWNER]) 
+            if( (Auth::isAdmin() OR $right[0] == 'r' OR Auth::getUserId() == $catArray[$child->getId()][Model_Category::COLUMN_ID_USER_OWNER])
                AND ($this->withHidden // všechny zkryté bez rozdílu
                   OR ($catArray[$child->getId()][Model_Category::COLUMN_VISIBILITY] == Model_Category::VISIBILITY_ALL) // viditelné všem
                   OR (!Auth::isLogin() AND $catArray[$child->getId()][Model_Category::COLUMN_VISIBILITY] == Model_Category::VISIBILITY_WHEN_NOT_LOGIN) // viditelné nepřihlášeným
@@ -211,7 +223,7 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
                   OR (Auth::isAdmin() AND $catArray[$child->getId()][Model_Category::COLUMN_VISIBILITY] == Model_Category::VISIBILITY_WHEN_ADMIN) // viditelné adminům
                   OR (Auth::isAdminGroup() AND $catArray[$child->getId()][Model_Category::COLUMN_VISIBILITY] == Model_Category::VISIBILITY_WHEN_ADMIN_ALL) // viditelné adminům ze všech domén
                )) {
-                  $child->setCategories($catArray);
+               $child->setCategories($catArray);
             } else {
                unset ($this->childrens[$key]);
             }
@@ -276,7 +288,7 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
    }
 
    private function recalculateLevels($obj, $newLevel)
-      {
+   {
       foreach ($obj->getChildrens() as $child) {
          $child->setLevel($newLevel+1);
          if(!$child->isEmpty()){
@@ -320,7 +332,7 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
       }
       return false;
    }
-   
+
    /**
     * Metoda odstraní zadaného potomka ze struktury
     * @param int $id -- id potomka
@@ -366,36 +378,86 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
       return false;
    }
 
-   public function prevChild(Category_Structure $schild)
+   /**
+    * Vrací předchozí položku
+    * @param Category_Structure $schild
+    * @return Category_Structure|bool
+    * @todo Odstranit parametr!!!
+    * @note parametr se bude odstraňovat
+    */
+   public function prevChild(Category_Structure $schild = null)
    {
-      reset($this->childrens);
-      while ($child = current($this->childrens)) {
-         if ($child->getId() == $schild->getId()) {
-            if(@prev($this->childrens)){
-               return current($this->childrens);
-            } else {
-               return null;
+      if(!$schild){
+         $parent = $this->getParent();
+         if($parent){
+            $childs = $parent->getChildrens();
+            reset($childs);
+            while ($child = current($childs)) {
+               if ($child->getId() == $this->getId()) {
+                  if(@prev($childs)){
+                     return current($childs);
+                  } else {
+                     return false;
+                  }
+               }
+               @next($childs);
             }
          }
-         @next($this->childrens);
+      } else {
+         reset($this->childrens);
+         while ($child = current($this->childrens)) {
+            if ($child->getId() == $schild->getId()) {
+               if(@prev($this->childrens)){
+                  return current($this->childrens);
+               } else {
+                  return false;
+               }
+            }
+            @next($this->childrens);
+         }
       }
-      return null;
+      return false;
    }
 
-   public function nextChild(Category_Structure $schild)
+   /**
+    * Vrací následující položku
+    * @param Category_Structure $schild
+    * @return Category_Structure|null
+    * @todo Odstranit parametr!!!
+    * @note parametr se bude odstraňovat
+    */
+   public function nextChild(Category_Structure $schild = null)
    {
-      reset($this->childrens);
-      while ($child = current($this->childrens)) {
-         if ($child->getId() == $schild->getId()) {
-            if(@next($this->childrens)){
-               return current($this->childrens);
-            } else {
-               return null;
+      if(!$schild){
+         $parent = $this->getParent();
+         if($parent){
+            $childs = $parent->getChildrens();
+            reset($childs);
+            while ($child = current($childs)) {
+               if ($child->getId() == $this->getId()) {
+                  if(@next($childs)){
+                     return current($childs);
+                  } else {
+                     return false;
+                  }
+               }
+               @next($childs);
             }
          }
-         @next($this->childrens);
+      } else {
+         reset($this->childrens);
+         while ($child = current($this->childrens)) {
+            if ($child->getId() == $schild->getId()) {
+               if(@next($this->childrens)){
+                  return current($this->childrens);
+               } else {
+                  return false;
+               }
+            }
+            @next($this->childrens);
+         }
       }
-      return null;
+      return false;
    }
 
    public function getChild($id)
@@ -451,16 +513,15 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
 
    public function saveStructure()
    {
-      $model = new Model_Config();
-      $record = $model->where(Model_Config::COLUMN_KEY, 'CATEGORIES_STRUCTURE')->record();
-      file_put_contents(AppCore::getAppCacheDir()."struct_before".date("Y-m-d_G:i").".tmp", $record->{Model_Config::COLUMN_VALUE});
-      // tady cleanup protože v db není třeba objektů kategorií
-      $data = serialize(self::$structure);
-      $record->{Model_Config::COLUMN_VALUE} = $data;
-      $model->save($record);
-      $cache = new Cache();
-      $cache->delete(self::getCacheKey());
-      self::loadStruct();
+      $struct = clone self::$structure;
+      $struct->cleanUpCategory();
+      file_put_contents(AppCore::getAppCacheDir()."struct_before".date("Y-m-d_G:i").".tmp", $struct);
+
+      $data = serialize($struct);
+      Model_Config::setValue('CATEGORIES_STRUCTURE', $data);
+
+      self::clearCache();
+      //self::loadStruct(); // vytváři nekonzistenci cache
    }
 
    /**
@@ -470,58 +531,73 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
     */
    public static function getStructure($type = self::VISIBLE_ONLY)
    {
-      if(self::$structure == false){
+      if(!self::$structure){
          self::loadStruct();
       }
       switch ($type) {
          case self::ALL:
-            $rStruct = self::$structure;
+            return self::$structure;
             break;
          case self::VISIBLE_ONLY:
          default:
-            $rStruct = self::$structureVisible;
+            return self::$structureVisible;
             break;
       }
-      return $rStruct;
    }
-   
+
+   /**
+    * Vrací výchozí kategorii stránek
+    * @return Category/null
+    */
+   public static function getDefaultCategory()
+   {
+      return self::$defaultCategory;
+   }
+
    /**
     * Metoda načte strukturu a doplní objekty kategorií
     */
    protected static function loadStruct()
    {
-      $cache = new Cache();
-      if( $st = $cache->get(self::getCacheKey()) ){
-         self::$structure = $st['base'];
-         self::$structureVisible = $st['vis'];
-      } else {
+      // kešování na stejném serveru stojí za hovno
+      if( (self::$structure = Cache::get(self::getCacheKey().'_base')) == false
+         || (self::$structureVisible = Cache::get(self::getCacheKey().'_visible')) == false ){
          self::$structure = unserialize(VVE_CATEGORIES_STRUCTURE);
-         // tohle by se mělo řešit přes __wakeUp
          $modelCats = new Model_Category();
          $cats = $modelCats->getCategoryList(true);
-         
+
          self::$structure->setCategoriesObjects($cats);
-         
+
          self::$structureVisible = clone self::$structure;
          self::$structureVisible->clearNonVisible();
-         
-         $cache->set(self::getCacheKey(), array( 'base' => self::$structure, 'vis' => self::$structureVisible ));
+         Cache::set(self::getCacheKey().'_base', clone self::$structure);
+         Cache::set(self::getCacheKey().'_visible', clone self::$structureVisible);
       }
    }
-   
+
+   public static function clearCache()
+   {
+      Cache::delete(self::getCacheKey().'_base');
+      Cache::delete(self::getCacheKey().'_visible');
+   }
+
    protected function setCategoriesObjects($catArray, $level = 0)
    {
       $childs = $this->getChildrens();
       foreach ($childs as $key => $child) {
          if(isset ($catArray[$child->getId()])) {
             $child->catObj = new Category(null, false, $catArray[$child->getId()]);
+            if($child->catObj->getDataObj()->{Model_Category::COLUMN_PRIORITY} > self::$defaultCategoryPriority){
+               self::$defaultCategory = $child->catObj;
+               self::$defaultCategoryPriority = $child->catObj->getDataObj()->{Model_Category::COLUMN_PRIORITY};
+            }
             $child->setCategoriesObjects($catArray, $level+1);
          } else {
             unset ($this[$key]);
          }
       }
    }
-   
+
    protected function clearNonVisible(){
       $childs = $this->getChildrens(); // kvůli referencím tohle musí být přenesené
       foreach ($childs as $key => $child) {
@@ -529,13 +605,13 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
          $rightDefault = (string)$child->getCatObj()->getDataObj()->{Model_Category::COLUMN_DEF_RIGHT};
          $visibility = (string)$child->getCatObj()->getDataObj()->{Model_Category::COLUMN_VISIBILITY};
          $ownerId = (string)$child->getCatObj()->getDataObj()->{Model_Category::COLUMN_ID_USER_OWNER};
-          
+
          $right = $right != null ? $right : $rightDefault;
-          
+
          if( ( (string)$child->getCatObj()->getDataObj()->{Model_Category::COLUMN_URLKEY} != null) // musí být URL klíč, jinak je neplatná
-               AND (Auth::isAdmin() OR $right[0] == 'r' OR Auth::getUserId() == $ownerId)
+            AND (Auth::isAdmin() OR $right[0] == 'r' OR Auth::getUserId() == $ownerId)
                AND (
-                     ($visibility == Model_Category::VISIBILITY_ALL) // viditelné všem
+                  ($visibility == Model_Category::VISIBILITY_ALL) // viditelné všem
                      OR (!Auth::isLogin() AND $visibility == Model_Category::VISIBILITY_WHEN_NOT_LOGIN) // viditelné nepřihlášeným
                      OR (Auth::isLogin() AND $visibility == Model_Category::VISIBILITY_WHEN_LOGIN) // viditelné přihlášeným
                      OR (Auth::isAdmin() AND $visibility == Model_Category::VISIBILITY_WHEN_ADMIN) // viditelné adminům
@@ -549,7 +625,7 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
             unset($this[$key]);
          }
       }
-   }  
+   }
 
    /**
     * Magická metoda pro výpis
@@ -563,28 +639,28 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
       $string = null;
       return (string)$string;
    }
-   
-   public function __sleep() 
+
+   public function __sleep()
    {
-      $this->cleanUpCategory();
+//      $this->cleanUpCategory();
       return array('level', 'id', 'idParent', 'catObj', 'childrens');
    }
 
-   protected function cleanUpCategory() 
+   public function cleanUpCategory()
    {
       $this->catObj = null;
       foreach ($this->getChildrens() as $child) {
          $child->cleanUpCategory();
       }
    }
-   
+
    private static function getCacheKey()
    {
       return '_struct_user_'.Auth::getUserId()."_".Locales::getLang();
-   } 
-   
+   }
+
    /* ARRAY ACCESS */
-   public function offsetSet($offset, $value) 
+   public function offsetSet($offset, $value)
    {
       if (is_null($offset)) {
          $this->childrens[] = $value;
@@ -592,7 +668,7 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
          $this->childrens[$offset] = $value;
       }
    }
-   public function offsetExists($offset) 
+   public function offsetExists($offset)
    {
       return isset($this->childrens[$offset]);
    }
@@ -600,9 +676,8 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
    {
       unset($this->childrens[$offset]);
    }
-   public function offsetGet($offset) 
+   public function offsetGet($offset)
    {
       return isset($this->childrens[$offset]) ? $this->childrens[$offset] : null;
    }
 }
-?>
