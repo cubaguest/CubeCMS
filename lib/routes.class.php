@@ -45,14 +45,14 @@ class Routes {
    /**
     * Konstruktor třídy
     */
-   function __construct($urlRequest, Category_Core $category = null, $routeVars = array()) {
-      $this->urlRequest = $urlRequest;
+   function __construct(Category_Core $category = null, $routeVars = array()) {
+      $this->urlRequest = Url_Request::getInstance()->getModuleUrlPart();
       if(!empty ($routeVars)){
          foreach ($routeVars as $key => $value) {
             $this->{$key} = $value;
          }
       }
-      
+
       $this->addRoute(self::MODULE_SETTINGS, 'settings', 'viewSettings', 'settings/'); // nastavení vzhledu modulu
       $this->addRoute(self::MODULE_METADATA, 'metadata', 'viewMetadata', 'metadata/'); // nastavení metadat modulu
       $this->initRoutes();
@@ -80,12 +80,12 @@ class Routes {
       foreach ($this->routes as $routeName => $route) {
          $matches = array();
          $rege = preg_replace(array(
-            "/::([a-z0-9_-]+)::/",
-            "/:\?:([a-z0-9_-]+):\?:/",
+            "/::([a-zA-Z0-9_-]+)::/",
+            "/:\?:([a-zA-Z0-9_-]+):\?:/",
             "/\//",
          ), array(
-            "(?P<$1>[a-z0-9_-]+)",
-            "(?:(?P<$1>[a-z0-9_-]+)\/?)?",
+            "(?P<$1>[a-zA-Z0-9_-]+)",
+            "(?:(?P<$1>[a-zA-Z0-9_-]+)\/?)?",
             "/+",
          ), (string)$route['regexp']);
 
@@ -121,11 +121,11 @@ class Routes {
           'respondClass' =>  $respondClass
          );
    }
-   
+
    /**
     * Metoda odepere zadanou cestu
     * @param string $name -- název cesty
-    * @return Routes 
+    * @return Routes
     */
    final public function removeRoute($name)
    {
@@ -141,21 +141,21 @@ class Routes {
    {
       $className = ucfirst($module).'_Routes';
       if(class_exists($className)){
-         $mr = new $className($this->urlRequest, null, $routeVars);
+         $mr = new $className(null, $routeVars);
          $this->routes = array_merge($this->routes, $mr->getRoutes());
       }
    }
 
    /**
     * metoda vrátí všechny cesty modulu
-    * @return array 
+    * @return array
     */
    final public function getRoutes()
    {
       return $this->routes;
    }
 
-      /**
+   /**
     * Metoda vrací typ odpovědi nastavené pro danou cestu (konstanty RESPOND_)
     * @return const RESPOND_
     */
@@ -170,7 +170,7 @@ class Routes {
    final public function getRouteName() {
       return $this->selectedRoute;
    }
-   
+
    /**
     * Metoda nastaví parametr pro cestu (POZOR! Url_Link jej přepíše)
     * @param string $param -- název parametr
@@ -178,7 +178,7 @@ class Routes {
     * @return Routes -- sám sebe
     */
    final public function setRouteParam($param, $value){
-      $this->routeParams[$name] = $value;
+      $this->routeParams[$param] = $value;
       return $this;
    }
 
@@ -248,5 +248,14 @@ class Routes {
          return null;
       }
    }
+
+   /**
+    * Interní funkce pro vrácení části odkazu na položku podle id (bez kategorie)
+    * @param $id int -- id položky
+    * @return string
+    */
+   public static function itemLink($id)
+   {
+      return null;
+   }
 }
-?>
