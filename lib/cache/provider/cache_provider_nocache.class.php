@@ -19,4 +19,9 @@ Class Cache_Provider_NoCache implements Cache_Provider_Interface {
    public function flush() {
       return true;
    }
+
+   public static function isEnabled()
+   {
+      return false;
+   }
 }

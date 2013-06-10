@@ -4,32 +4,51 @@ class Cache {
     * Objekt pro kešování
     * @var Cache_Provider_Interface
     */
-   private $cacher = false;
+   private static $provider = null;
    
-   function __construct() {
-      if(defined('VVE_MEMCACHE_SERVER') && VVE_MEMCACHE_SERVER != null){
-         $this->cacher = new Cache_Provider_MemCache();
-      } else {
-         $this->cacher = new Cache_Provider_NoCache();
+   protected static function checkProvider() {
+      if(self::$provider === null){
+         if(defined('VVE_MEMCACHE_SERVER') && VVE_MEMCACHE_SERVER != null){
+            self::$provider = new Cache_Provider_MemCache();
+         }
+
+         if(!self::$provider || !self::$provider->isEnabled()){
+            self::$provider = new Cache_Provider_NoCache();
+         }
       }
    }
    
-   public function get($key) 
+   public static function get($key)
    {
-      return $this->cacher->get($key);
+      self::checkProvider();
+      return self::getProvider()->get($_SERVER['SERVER_NAME'].'_'.$key);
    }
    
-   public function set($key, $value, $expire = 3600, $compress = true) 
+   public static function set($key, $value, $expire = 3600, $compress = true)
    {
-      $this->cacher->set($_SERVER['SERVER_NAME'].'_'.$key, $value, $expire, $compress);
+      self::checkProvider();
+      self::getProvider()->set($_SERVER['SERVER_NAME'].'_'.$key, $value, $expire, $compress);
    }
    
-   public function delete($key) 
+   public static function delete($key)
    {
-      $this->cacher->delete($key);
+      self::checkProvider();
+      return self::getProvider()->delete($_SERVER['SERVER_NAME'].'_'.$key);
    }
-   
+
+   public static function isEnabled()
+   {
+      self::checkProvider();
+      return self::getProvider()->isEnabled();
+   }
+
+   /**
+    * Vrací provider pro kešování
+    * @return bool|Cache_Provider_Interface
+    */
+   public static function getProvider()
+   {
+      self::checkProvider();
+      return self::$provider;
+   }
 }
-
-
-?>

@@ -7,7 +7,10 @@ Class Cache_Provider_MemCache implements Cache_Provider_Interface {
    {
       if(!self::$disable && !self::$memcache){
          self::$memcache = new Memcache();
-         if(!self::$memcache->connect(VVE_MEMCACHE_SERVER, VVE_MEMCACHE_PORT) ) {
+         $server = VVE_MEMCACHE_SERVER == 'localhost' ? '127.0.0.1' : VVE_MEMCACHE_SERVER;
+         self::$memcache->addServer($server, VVE_MEMCACHE_PORT);
+         $stats = @self::$memcache->getExtendedStats();
+         if (!(bool)$stats[$server.":".VVE_MEMCACHE_PORT] || !@self::$memcache->connect($server, VVE_MEMCACHE_PORT)){
             self::$disable = true;
          }
       }
@@ -28,10 +31,15 @@ Class Cache_Provider_MemCache implements Cache_Provider_Interface {
    }
    
    public function set($key, $value, $expire = 36000, $compress = true) {
+      $ret = true;
       if(!self::$disable){
-         return self::$memcache->set($key, $value, $compress == true ? MEMCACHE_COMPRESSED : 0 ,$expire);
+         $ret = self::$memcache->replace($key, $value, 0, $expire);
+         if(!$ret){
+            $ret = self::$memcache->set($key, $value, 0, $expire);
+         }
+
       }
-      return true;
+      return $ret;
    }
    
    public function replace($key, $value, $expire = 36000, $compress = true) {
@@ -46,5 +54,10 @@ Class Cache_Provider_MemCache implements Cache_Provider_Interface {
          return self::$memcache->flush();
       }
       return true;
+   }
+
+   public static function isEnabled()
+   {
+      return !self::$disable;
    }
 }
