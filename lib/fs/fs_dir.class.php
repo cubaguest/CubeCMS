@@ -73,7 +73,7 @@ class FS_Dir extends TrObject {
    public function create()
    {
       if(!@mkdir((string)$this, 0777, true)){
-         throw new CoreException(sprintf($this->tr('Adresáři "%s" se nepodařilo vytvořit, zkontrolujte oprávnění'),(string)$this), 2);
+         throw new CoreException(sprintf($this->tr('Adresář "%s" se nepodařilo vytvořit, zkontrolujte oprávnění'),(string)$this), 2);
       }
       if(!chmod((string)$this, 0777)){
          throw new CoreException(sprintf($this->tr('Adresáři "%s" se nepodařilo přidělit potřebná oprávnění'),(string)$this), 3);
