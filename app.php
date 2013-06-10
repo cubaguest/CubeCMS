@@ -29,7 +29,7 @@ class AppCore extends TrObject {
     * Revize Enginu
     * @internal before change release move new config values from _initConfig method
     */
-   const ENGINE_RELEASE = 18;
+   const ENGINE_RELEASE = 19;
 
    /**
     * Obsahuje hlavní soubor aplikace
@@ -497,18 +497,29 @@ class AppCore extends TrObject {
       $pathFull = implode('/', $pathDirs);
       array_pop($pathDirs); // remove last path item
       $pathShort = implode('/', $pathDirs);
+
+//      Debug::log(array(
+//         'loader' => 'LIB',
+//         '$classOrigName' => $classOrigName,
+//         '$file' => $file,
+//         '$pathDirs' => $pathDirs,
+//         '$pathFull' => $pathFull,
+//         '$pathShort' => $pathShort,
+//      ));
       // short path
       if (is_file(AppCore::getAppLibDir() . AppCore::ENGINE_LIB_DIR
             . DIRECTORY_SEPARATOR . $pathShort . DIRECTORY_SEPARATOR . $file)) {
-         require_once AppCore::getAppLibDir() . AppCore::ENGINE_LIB_DIR
+         require AppCore::getAppLibDir() . AppCore::ENGINE_LIB_DIR
             . DIRECTORY_SEPARATOR . $pathShort . DIRECTORY_SEPARATOR . $file;
+//         Debug::log('used short');
          return true;
       }
       // full path
       if (is_file(AppCore::getAppLibDir() . AppCore::ENGINE_LIB_DIR
-            . DIRECTORY_SEPARATOR . $pathFull . DIRECTORY_SEPARATOR . $file)) {
-         require_once AppCore::getAppLibDir() . AppCore::ENGINE_LIB_DIR
+      . DIRECTORY_SEPARATOR . $pathFull . DIRECTORY_SEPARATOR . $file)) {
+         require AppCore::getAppLibDir() . AppCore::ENGINE_LIB_DIR
             . DIRECTORY_SEPARATOR . $pathFull . DIRECTORY_SEPARATOR . $file;
+//         Debug::log('used long');
          return true;
       }
       return false;
@@ -527,21 +538,30 @@ class AppCore extends TrObject {
       $pathFull = implode('/', $pathDirs);
       array_pop($pathDirs);
       $pathShort = implode('/', $pathDirs);
-      
+//      Debug::log(array(
+//         'loader' => 'MODULE',
+//         '$classOrigName' => $classOrigName,
+//         '$file' => $file,
+//         '$pathDirs' => $pathDirs,
+//         '$pathFull' => $pathFull,
+//         '$pathShort' => $pathShort,
+//      ));
       // short path
-      if (file_exists(AppCore::getAppLibDir() . AppCore::MODULES_DIR
+      if (is_file(AppCore::getAppLibDir() . AppCore::MODULES_DIR
             . DIRECTORY_SEPARATOR . $pathShort . DIRECTORY_SEPARATOR . $moduleFile)) {
-         require_once AppCore::getAppLibDir() . AppCore::MODULES_DIR
+         require AppCore::getAppLibDir() . AppCore::MODULES_DIR
             . DIRECTORY_SEPARATOR . $pathShort . DIRECTORY_SEPARATOR . $moduleFile;
+//         Debug::log('used module short');
          return true;
-      } 
+      }
       // full path
-      if (file_exists(AppCore::getAppLibDir() . AppCore::MODULES_DIR
-            . DIRECTORY_SEPARATOR . $pathFull . DIRECTORY_SEPARATOR . $moduleFile)) {
-         require_once AppCore::getAppLibDir() . AppCore::MODULES_DIR
+      if (is_file(AppCore::getAppLibDir() . AppCore::MODULES_DIR
+      . DIRECTORY_SEPARATOR . $pathFull . DIRECTORY_SEPARATOR . $moduleFile)) {
+         require AppCore::getAppLibDir() . AppCore::MODULES_DIR
             . DIRECTORY_SEPARATOR . $pathFull . DIRECTORY_SEPARATOR . $moduleFile;
+//         Debug::log('used module long');
          return true;
-      } 
+      }
       return false;
    }
 

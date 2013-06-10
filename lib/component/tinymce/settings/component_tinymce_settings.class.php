@@ -36,7 +36,7 @@ abstract class Component_TinyMCE_Settings extends TrObject implements ArrayAcces
       $this->setDefaultValues();
       $this->settings['language'] = Locales::getLang();
    }
-   
+
    protected function setDefaultValues()
    {
       $this->settings = $this->defaultSettings;
@@ -44,7 +44,7 @@ abstract class Component_TinyMCE_Settings extends TrObject implements ArrayAcces
       $this->plugins = $this->defaultPlugins;
    }
 
-   final public function getSetting($name) 
+   final public function getSetting($name)
    {
       return $this->settings[$name];
    }
@@ -53,24 +53,24 @@ abstract class Component_TinyMCE_Settings extends TrObject implements ArrayAcces
     * Metoda vrací název theme
     * @return string
     */
-   final public function getThemeName() 
+   final public function getThemeName()
    {
       return $this->settingName;
    }
-   
+
    /**
     * Metoda nasatvuje parametr editoru
     * @param string $name -- název parametru
     * @param mixed $value -- hodnota parametru
     * @return Component_TinyMCE_Settings
     */
-   final public function setSetting($name, $value) 
+   final public function setSetting($name, $value)
    {
       $this->settings[$name] = $value;
       return $this;
    }
 
-   final public function getParamsForUrl() 
+   final public function getParamsForUrl()
    {
       $urlParams = array();
       $urlParams['set'] = $this->settingName;
@@ -89,7 +89,7 @@ abstract class Component_TinyMCE_Settings extends TrObject implements ArrayAcces
             }
          }
       }
-      
+
       // create diferents
       $tmp = array();
       foreach ($this->defaultSettings as $key => $value) {
@@ -104,7 +104,7 @@ abstract class Component_TinyMCE_Settings extends TrObject implements ArrayAcces
     * metoda vrací vybrané pluginy
     * @return array -- pol epluginů
     */
-   public function getPlugins() 
+   public function getPlugins()
    {
       return $this->plugins;
    }
@@ -113,7 +113,7 @@ abstract class Component_TinyMCE_Settings extends TrObject implements ArrayAcces
     * Metoda nastavuje pluginy
     * @param array $pluginsarr -- pole pluginů
     */
-   public function setPlugins($pluginsarr) 
+   public function setPlugins($pluginsarr)
    {
       $this->plugins = $pluginsarr;
    }
@@ -122,7 +122,7 @@ abstract class Component_TinyMCE_Settings extends TrObject implements ArrayAcces
     * Metoda vrací tlačítka v zadanám řádku
     * @param int $row -- číslo řádku
     */
-   public function getButtons($row = 1) 
+   public function getButtons($row = 1)
    {
       return $this->buttons['theme_advanced_buttons'.$row];
    }
@@ -132,7 +132,7 @@ abstract class Component_TinyMCE_Settings extends TrObject implements ArrayAcces
     * @param int $row -- číslo řádku
     * @param array $buttons -- tlačítka
     */
-   public function setButtons($buttons, $row = 1) 
+   public function setButtons($buttons, $row = 1)
    {
       $this->buttons['theme_advanced_buttons'.$row] = $buttons;
    }
@@ -153,11 +153,11 @@ abstract class Component_TinyMCE_Settings extends TrObject implements ArrayAcces
       foreach ($settings as $key => $value) {
          if($value == '0' OR $value == '1'){
             $settings[$key] = (bool)$value;
-         } 
+         }
       }
-      
+
       $this->settings = array_merge($this->settings, $settings);
-      
+
       // remove empty and null values
       foreach ($this->settings as $key => $value) {
          if($value === null) unset ($this->settings[$key]);
@@ -173,13 +173,13 @@ abstract class Component_TinyMCE_Settings extends TrObject implements ArrayAcces
          }
       }
    }
-   
-   public function  settingsAsString() 
+
+   public function  settingsAsString()
    {
       if($this->settings['document_base_url'] == null){
          $this->settings['document_base_url'] = Url_Request::getBaseWebDir();
       }
-      
+
       if(!empty ($this->plugins)){
          $this->settings['plugins'] = implode(',', $this->plugins);
       }
@@ -197,10 +197,10 @@ abstract class Component_TinyMCE_Settings extends TrObject implements ArrayAcces
             unset($this->settings['content_css']);
          }
       }
-      
+
       $cnt = "tinyMCE.init({\n";
       // uživ změny
-      
+
       $cnt .= $this->generateJsSettings($this->settings);
       $cnt .= "});\n";
       return $cnt;
@@ -213,7 +213,7 @@ abstract class Component_TinyMCE_Settings extends TrObject implements ArrayAcces
     * @return string -- řetězec s generovaným souborem
     * @todo Kompletně přepsat systém generace konfigu, tohle stojí za hovno
     */
-   private function generateJsSettings($params) 
+   private function generateJsSettings($params)
    {
       $content = null;
       foreach ($params as $paramName => $paramValue) {
@@ -228,10 +228,10 @@ abstract class Component_TinyMCE_Settings extends TrObject implements ArrayAcces
             $v = str_replace('\/', '/', json_encode($paramValue));
          }
          $content .= $paramName." : ".$v.",\n";
-                  
+
          continue;
          /* ================== END ======================= */
-         
+
          /*if(is_array($paramValue)) {
             $content .= $paramName." = ".json_encode($paramValue).",\n";
          } else {
@@ -262,18 +262,18 @@ abstract class Component_TinyMCE_Settings extends TrObject implements ArrayAcces
       $content .= "\n";
       return $content;
    }
-   
+
    protected function getContentCssFile()
    {
       $contentCss = null;
       $file = 'style.less';
       $faceRealPath = Face::getCurrent()->getDir().Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR;
       $parentFaceRealPath = AppCore::getAppLibDir()."faces".DIRECTORY_SEPARATOR.Face::getCurrent()->getName().DIRECTORY_SEPARATOR.Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR;
-      $faceFile = 'style.less.'.md5($faceRealPath.$file).'.css';
-      $parentFaceFile = 'style.less.'.md5($parentFaceRealPath.$file).'.css';
+      $faceFile = 'style.less.'.md5(Url_Request::getDomain().$faceRealPath.$file).'.css';
+      $parentFaceFile = 'style.less.'.md5(Url_Request::getDomain().$parentFaceRealPath.$file).'.css';
 
       $libRealPath = AppCore::getAppLibDir().Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR;
-      $libFile = 'style.less.'.md5($libRealPath.$file).'.css';
+      $libFile = 'style.less.'.md5(Url_Request::getDomain().$libRealPath.$file).'.css';
 
       if(is_file(AppCore::getAppCacheDir().Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.$faceFile) ){
          // check less css file form face
@@ -304,7 +304,7 @@ abstract class Component_TinyMCE_Settings extends TrObject implements ArrayAcces
    }
 
    /* ArrayAccess */
-   public function offsetSet($offset, $value) 
+   public function offsetSet($offset, $value)
    {
       if (is_null($offset)) {
          $this->settings[] = $value;
@@ -312,25 +312,25 @@ abstract class Component_TinyMCE_Settings extends TrObject implements ArrayAcces
          $this->settings[$offset] = $value;
       }
    }
-   public function offsetExists($offset) 
+   public function offsetExists($offset)
    {
       return isset($this->settings[$offset]);
    }
-   public function offsetUnset($offset) 
+   public function offsetUnset($offset)
    {
       unset($this->settings[$offset]);
    }
-   public function offsetGet($offset) 
+   public function offsetGet($offset)
    {
       return isset($this->settings[$offset]) ? $this->settings[$offset] : null;
    }
-   
+
    /* MAGIC */
    public function __set($name, $value)
    {
       $this->settings[$name] = $value;
    }
-   
+
    public function __get($name)
    {
       return isset($this->settings[$name]) ? $this->settings[$name] : null;

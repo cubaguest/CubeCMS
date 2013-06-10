@@ -70,8 +70,6 @@ class Install_Module {
 
    /**
     * Metoda pro update modulu
-    * @param int $fromVersion -- původní verze
-    * @param int $toVersion -- nová verze
     */
    public function update() {
       $model = new Model_Module();

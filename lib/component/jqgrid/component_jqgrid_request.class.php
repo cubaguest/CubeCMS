@@ -37,7 +37,7 @@ class Component_JqGrid_Request {
    public function __construct() {
       if (isset($_POST[self::REQUEST_SEARCH]) AND $_POST[self::REQUEST_SEARCH] == 'true') {
          $this->isSearch = true;
-         if(isset($_POST[self::REQUEST_FILTERS])){
+         if(isset($_POST[self::REQUEST_FILTERS]) && $_POST[self::REQUEST_FILTERS] != null){
             // hledání podle filtrů
             $this->searchOper = self::SEARCH_BY_FILTERS;
             
