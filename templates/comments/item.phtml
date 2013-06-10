@@ -24,7 +24,8 @@ if(!$comment->viewed){
          $this->toolboxComment->comment_public_->getForm()->id->setValues($comment->{Component_Comments_Model::COL_ID});
          echo $this->toolboxComment;
       }?>
-   <span><strong><?=$comment->{Component_Comments_Model::COL_NICK}?></strong>&nbsp;<?=vve_date('%X %G:%i', new DateTime($comment->{Component_Comments_Model::COL_TIME_ADD}))?></span>
+   <span><strong><?=$comment->{Component_Comments_Model::COL_NICK}?></strong>
+      &nbsp;<?=vve_date('%X %G:%i', new DateTime($comment->{Component_Comments_Model::COL_TIME_ADD}))?></span>
    <?if($comment->{Component_Comments_Model::COL_CENSORED} != true) {?>
       <p><?=nl2br($this->filter($comment->{Component_Comments_Model::COL_COMMENT},array('emoticons')),true)?></p>
    <?} else {
