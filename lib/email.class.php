@@ -356,8 +356,8 @@ class Email {
     */
    public static function getBaseHtmlMail($content) 
    {
-      $fileLang = Face::getCurrent()->getDir()."mail".DIRECTORY_SEPARATOR."mail_base_".Locales::getLang().".html";
-      $file = Face::getCurrent()->getDir()."mail".DIRECTORY_SEPARATOR."mail_base.html";
+      $fileLang = Face::getCurrent()->getDir().Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR."mail".DIRECTORY_SEPARATOR."mail_base_".Locales::getLang().".html";
+      $file = Face::getCurrent()->getDir().Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR."mail".DIRECTORY_SEPARATOR."mail_base.html";
       $fileCore = AppCore::getAppLibDir().AppCore::ENGINE_TEMPLATE_DIR.DIRECTORY_SEPARATOR."mail".DIRECTORY_SEPARATOR."mail_base.html";
       
       if(is_file($fileLang)){
