@@ -23,14 +23,14 @@ class Component_Comments_Model extends Model_ORM {
    const COL_ID_ART		= 'id_article';
    const COL_ID_CAT		= 'id_category';
    const COL_ID_PARENT	= 'id_parent';
-   const COL_NICK       = 'nick';
-   const COL_COMMENT		= 'comment';
-   const COL_PUBLIC		= 'public';
-   const COL_CENSORED	= 'censored';
-   const COL_ORDER		= 'corder';
-   const COL_LEVEL		= 'level';
-   const COL_TIME_ADD	= 'time_add';
-   const COL_IP_ADDRESS	= 'ip_address';
+   const COL_NICK       = 'comment_nick';
+   const COL_COMMENT		= 'comment_comment';
+   const COL_PUBLIC		= 'comment_public';
+   const COL_CENSORED	= 'comment_censored';
+   const COL_ORDER		= 'comment_corder';
+   const COL_LEVEL		= 'comment_level';
+   const COL_TIME_ADD	= 'comment_time_add';
+   const COL_IP_ADDRESS	= 'comment_ip_address';
 
    protected function  _initTable() {
       $this->setTableName(self::DB_TABLE, 't_comments');
@@ -55,7 +55,7 @@ class Component_Comments_Model extends Model_ORM {
    public function  save(Model_ORM_Record $record) {
 //      $dbc->query("LOCK TABLES {$this->getTableName()} WRITE");
 //      $dbc->beginTransaction();
-      $this->lock();
+      $this->lock(self::LOCK_WRITE);
       // posun pouze pokud je přidán nový
       if($record->isNew()){
          // není rodič
@@ -96,6 +96,7 @@ class Component_Comments_Model extends Model_ORM {
            }
            $record->{self::COL_LEVEL} =  $parent->{self::COL_LEVEL}+1;
          }
+         $record->{self::COL_TIME_ADD} =  new DateTime();
       }
       // uložíme komentář
       $ret = parent::save($record);

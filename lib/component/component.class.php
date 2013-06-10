@@ -103,6 +103,7 @@ class Component extends TrObject {
    /**
     * Metoda nastaví id článku
     * @param integer $id
+    * @deprecated používat konfiguraci komponenty!
     */
    public function setIdArticle($id) {
       $this->idArticle = $id;
@@ -111,6 +112,7 @@ class Component extends TrObject {
    /**
     * Metoda vrací nastavené Id článku
     * @return integer -- id článku
+    * @deprecated používat konfiguraci komponenty!
     */
    public function getIdArticle() {
       return $this->idArticle;

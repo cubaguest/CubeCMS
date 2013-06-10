@@ -240,4 +240,3 @@ class Component_Comments extends Component {
 
    }
 }
-?>
