@@ -35,7 +35,7 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
          if($params['lang']){
             $this->columns[$name]['value'] = new Model_ORM_LangCell();
          }
-         if(!$fromDb && isset($this->columns[$name]['default'])){
+         if((string)$this->columns[$name]['default'] == "CURRENT_TIMESTAMP"){
             if($this->columns[$name]['default'] === "CURRENT_TIMESTAMP"){
                $this->columns[$name]['value'] = date(DATE_ISO8601);
             } else {
@@ -228,6 +228,20 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
       }
    }
 
+   /**
+    * Metoda vrací obsah záznamu jako asociativní pole
+    * @return array
+    */
+   public function toArray()
+   {
+      $array = array();
+
+      foreach($this as $column => $properties){
+         $array[$column] = $properties['value'];
+      }
+      return $array;
+   }
+   
    /* implementace rozhraní */
 
    /**
@@ -325,17 +339,16 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
       // remove DateTime obj
       foreach ($this->columns as &$col) {
          if($col['value'] instanceof DateTime){
-            $col['value'] = $col['value']->format(DATE_ISO8601); 
+            $col['value'] = $col['value']->format(DATE_ISO8601);
          }
       }
       // remove DateTime obj
       foreach ($this->externColumns as &$col) {
          if($col['value'] instanceof DateTime){
-            $col['value'] = $col['value']->format(DATE_ISO8601); 
+            $col['value'] = $col['value']->format(DATE_ISO8601);
          }
       }
-      
-      return array('columns', 'externColumns', 'pKeyValue', 'fromDb');
+
+      return array('columns', 'externColumns', 'pKeyValue', 'fromDb', 'model');
    }
 }
-?>
