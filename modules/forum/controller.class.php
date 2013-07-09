@@ -11,6 +11,8 @@ class Forum_Controller extends Controller {
    const DEFAULT_NUM_ON_PAGE = 20;
    const MIN_SEC_FOR_HUMAN = 15;
 
+   const COOKIE_NAME = 'cube_cf';
+
    protected function init()
    {
       parent::init();
@@ -88,9 +90,9 @@ class Forum_Controller extends Controller {
       $modelTopic = new Forum_Model_Topics();
 
 
-      $parentMsg = $model->record($this->getRequestParam('msg', null));
       $pid = null;
-      if($parentMsg != false){
+      if($this->getRequestParam('msg', false)){
+         $parentMsg = $model->record($this->getRequestParam('msg', null));
          $this->view()->parentMessage = $parentMsg;
          $pid = $parentMsg->{Forum_Model_Messages::COLUMN_ID};
       }
@@ -362,7 +364,6 @@ class Forum_Controller extends Controller {
       if($message == null){
          $message = $model->newRecord();
       }
-
       $elemName = new Form_Element_Text('name', $this->tr('Předmět'));
       $elemName->addValidation(new Form_Validator_MaxLength(200));
       $form->addElement($elemName);
@@ -473,10 +474,9 @@ class Forum_Controller extends Controller {
             }
             $message->{Forum_Model_Messages::COLUMN_IP} = $_SERVER['REMOTE_ADDR'];
          }
-
          if(isset($form->parentMsgId)){
             $parentMsg = $model->record($form->parentMsgId->getValues());
-            $message->{Forum_Model_Messages::COLUMN_ID_PARENT_MESSAGE} = $parentMsg->{Forum_Model_Messages::COLUMN_ID};
+            $message->{Forum_Model_Messages::COLUMN_ID_PARENT_MESSAGE} = $parentMsg->getPK();
             if($parentMsg->{Forum_Model_Messages::COLUMN_SEND_NOTIFY}){
                $this->sendMessageNotification($idTopic, $parentMsg, $message);
             }
@@ -563,7 +563,6 @@ class Forum_Controller extends Controller {
          $formDel->addElement($eDel);
          if($formDel->isValid()){
             $modelP->delete($formDel->id->getValues());
-            $msg = $modelP->record($formDel->id->getValues());
 
             // check user rights ?
 
@@ -644,16 +643,18 @@ class Forum_Controller extends Controller {
 //      }
       $modelP->order(array(Forum_Model_Messages::COLUMN_ORDER => Model_ORM::ORDER_ASC));
 
-//      $scrollComponent = new Component_Scroll();
-//      $scrollComponent->setConfig('page_param', 'p_p');
-//      $scrollComponent->setConfig(Component_Scroll::CONFIG_CNT_ALL_RECORDS, $modelP->count());
-//      $scrollComponent->setConfig(Component_Scroll::CONFIG_RECORDS_ON_PAGE,
-//              $this->category()->getParam('scroll', self::DEFAULT_NUM_ON_PAGE));
+      $messages = $modelP->records();
+
+      $ids = isset($_COOKIE[self::COOKIE_NAME]) ? explode('|', $_COOKIE[self::COOKIE_NAME]) : array();
+      foreach($messages as &$msg){
+         $msg->voteEnabled = (!$this->rights()->isControll() && in_array($msg->getPK(), $ids)) ? false : true;
+      }
+
 
       $this->view()->topic = $topic;
       $this->view()->linkBack = $this->link()->route()->rmParam('p_p');
 //      $this->view()->messages = $modelP->limit($scrollComponent->getStartRecord(), $scrollComponent->getRecordsOnPage())->records();
-      $this->view()->messages = $modelP->records();
+      $this->view()->messages = $messages;
 //      $this->view()->scrollComp = $scrollComponent;
 
       /* attachments */
@@ -1040,7 +1041,46 @@ class Forum_Controller extends Controller {
    }
 
    private function getTopicDataDir( $tid, $webPath = false){
-      return $this->getModule()->getDataDir($webPath)."topic-".$tid.( $webPath ? "/" : DIRECTORY_SEPARATOR );
+      return $this->module()->getDataDir($webPath)."topic-".$tid.( $webPath ? "/" : DIRECTORY_SEPARATOR );
+   }
+
+   /**
+    * Kontroler pro volbu u zpráv
+    */
+   public function voteMessageController()
+   {
+      if(!isset($_GET['id']) || !isset($_GET['action'])){
+         $this->errMsg()->addMessage($this->tr('Chyba parametrů'));
+         return;
+      }
+
+      $action = $_GET['action'];
+      $model = new Forum_Model_Messages();
+      $message = $model->record((int)$_GET['id']);
+
+      if(!$message){
+         throw new UnexpectedValueException($this->tr('Zpráva neexistuje'));
+      }
+
+      switch($action){
+         case 'voteUp':
+            $message->{Forum_Model_Messages::COLUMN_VOTE} = $message->{Forum_Model_Messages::COLUMN_VOTE} + 1;
+            $message->save();
+            break;
+         case 'voteDown':
+            $message->{Forum_Model_Messages::COLUMN_VOTE} = $message->{Forum_Model_Messages::COLUMN_VOTE}-1;
+            $message->save();
+            break;
+         case 'voteSpam':
+            $message->{Forum_Model_Messages::COLUMN_VOTE_SPAM} = $message->{Forum_Model_Messages::COLUMN_VOTE_SPAM}+1;
+            $message->save();
+            break;
+      }
+
+      $this->view()->votes = $message->{Forum_Model_Messages::COLUMN_VOTE};
+      $this->view()->votesSpam = $message->{Forum_Model_Messages::COLUMN_VOTE_SPAM};
+      $this->view()->idMessage = $message->getPK();
+
    }
 
    /**

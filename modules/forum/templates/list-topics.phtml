@@ -1,6 +1,6 @@
 <?
 $this->addJsPlugin(new JsPlugin_JQuery());
-$this->addFile('css://style.css');
+$this->addFile('css://style.less');
 $jq = new JsPlugin_JQuery();
 $jqcss = new JsPlugin_JQueryCSS();
 $this->addJsPlugin($jq);
@@ -15,7 +15,6 @@ echo $this->toolbox;
             <th class="name"><?=$this->tr('Téma');?></th>
             <th class="author"><?=$this->tr('Autor');?></th>
             <th class="count-messages"><?=$this->tr('Příspěvků');?></th>
-            <th class="views"><?=$this->tr('Shlédnuto');?></th>
             <th class="last-message"><?=$this->tr('Poslední reakce');?></th>
          </tr>
       </thead>
@@ -28,17 +27,23 @@ echo $this->toolbox;
             <td class="name">
                <a href="<?=$this->link()->route('showTopic', array('id' => $topic->{Forum_Model_Topics::COLUMN_ID}))?>"
                   title="<?=ps($topic->{Forum_Model_Topics::COLUMN_NAME})?>"><?=ps($topic->{Forum_Model_Topics::COLUMN_NAME})?></a>
-                  <?if($topic->{Forum_Model_Topics::COLUMN_SOLVED}){echo '<span class="font-small"> - vyřešeno</span>';}?>
+                  <?if($topic->{Forum_Model_Topics::COLUMN_SOLVED}){echo '<span class="font-small"> - vyřešeno</span>';}?><br />
             </td>
             <td class="author"><?=ps($topic->{Forum_Model_Topics::COLUMN_CREATED_BY})?></td>
             <td class="count-messages"><?=ps((int)$topic->messages_count)?></td>
-            <td class="views"><?=ps((int)$topic->{Forum_Model_Topics::COLUMN_VIEWS})?></td>
             <td class="last-message"><?=vve_date('%d.%m.%Y %G:%i', $lastDate)?></td>
+         </tr>
+         <tr class="ui-widget-content">
+            <td colspan="5">
+               <p class="text">
+                  <?echo vve_tpl_truncate(strip_tags($topic->{Forum_Model_Topics::COLUMN_TEXT}), 50)?>
+               </p>
+            </td>
          </tr>
       <?}
       } else {?>
          <tr class="item row">
-            <td colspan="6"><?=$this->tr('Žádné téma není vytvořeno')?></td>
+            <td colspan="5"><?=$this->tr('Žádné téma není vytvořeno')?></td>
          </tr>
       <?}?>
       </tbody>

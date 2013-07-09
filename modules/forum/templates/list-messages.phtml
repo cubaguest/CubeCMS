@@ -1,12 +1,14 @@
 <?
 $this->addJsPlugin(new JsPlugin_JQuery());
-$this->addFile('css://style.css');
+$this->addFile('css://style.less');
 $h = $this->topic->{Forum_Model_Topics::COLUMN_NAME};
 if($this->topic->{Forum_Model_Topics::COLUMN_SOLVED}){
    $h .= ' - '.$this->tr('vyřešeno');
 }
 $jqcss = new JsPlugin_JQueryCSS();
 $this->addJsPlugin($jqcss);
+$expire = new DateTime();
+$expire->modify('+1 year');
 ?>
 <h1><?=$h?></h1>
 <div class="forum-items main-content-list">
@@ -52,7 +54,8 @@ $this->addJsPlugin($jqcss);
                </td>
             </tr>
             <tr>
-               <td></td>
+               <td>
+               </td>
                <td class="message-tools">
                   <?
                   $linkToAdd = $this->link()
@@ -89,7 +92,7 @@ $this->addJsPlugin($jqcss);
                      ?>
                      </div>
                   </td>
-                  <td class="message-text">
+                  <td class="message-text" rowspan="2">
                      <?
                      if($this->toolboxMessage instanceof Template_Toolbox2 && ($this->category()->getRights()->isControll()
                         || $message->{Forum_Model_Messages::COLUMN_ID_USER} == Auth::getUserId() )){
@@ -131,8 +134,40 @@ $this->addJsPlugin($jqcss);
                </td>
             </tr>
             <tr>
-               <td></td>
+               <td class="message-vote">
+<!--                  <strong>--><?//ps($this->tr('Hodnocení'))?><!--</strong><br />-->
+               </td>
+            </tr>
+            <?if($this->category()->getRights()->isControll() && $message->{Forum_Model_Messages::COLUMN_VOTE_SPAM} > 10){?>
+            <tr>
+               <td colspan="2">
+                  <div class="message message-warning">
+                     <strong><?ps(sprintf($this->tr('%s krát označen jako "nevhodné/SPAM"'), $message->{Forum_Model_Messages::COLUMN_VOTE_SPAM}))?></strong>
+                  </div>
+               </td>
+            </tr>
+            <?}?>
+            <tr>
+               <td>
+                  <div class="message-vote clearfix">
+                     <?if($message->voteEnabled){?>
+                     <a class="vote-button vote-button-up" href="<?=$this->link()->route('voteMessage')->param('id', $message->getPK())->param('action', 'voteUp')?>"
+                        title="<?ps($this->tr('Hotnotit: výborně'))?>" ><img src="images/icons/go-up.png"/></a>
+                     <?}?>
+                     <span class="vote-counter">
+                        <?if(!$message->voteEnabled){ ps($this->tr('Hlasů').": ");}?>
+                        <?ps($message->{Forum_Model_Messages::COLUMN_VOTE})?>
+                     </span>
+                     <?if($message->voteEnabled){?>
+                     <a class="vote-button vote-button-down" href="<?=$this->link()->route('voteMessage')->param('id', $message->getPK())->param('action', 'voteDown')?>"
+                        title="<?ps($this->tr('Hotnotit: zbytečný'))?>" ><img src="images/icons/go-down.png"/></a>
+                     <a class="vote-button vote-button-spam" href="<?=$this->link()->route('voteMessage')->param('id', $message->getPK())->param('action', 'voteSpam')?>"
+                        title="<?ps($this->tr('Nahlásit nevhodné / SPAM'))?>" ><img src="images/icons/decline.png"/></a><br />
+                     <?}?>
+                  </div>
+               </td>
                <td class="message-tools">
+                  <div class="message-vote-label clearfix"></div>
                   <?
                   $linkToAdd = $this->link()
                      ->route('addMessage', array('id' => $this->topic->{Forum_Model_Topics::COLUMN_ID}))
@@ -166,7 +201,47 @@ $this->addJsPlugin($jqcss);
 $this->addJsPlugin(new JsPlugin_PrettyPhoto());
 ?>
 <script type="text/javascript">
+   function getCookie(name) {
+      var regexp = new RegExp("(?:^" + name + "|;\\s*"+ name + ")=(.*?)(?:;|$)", "g");
+      var result = regexp.exec(document.cookie);
+      return (result === null) ? null : result[1];
+   }
    $(document).ready(function(){
 	   $("a[rel^='prettyPhoto']").prettyPhoto({social_tools: ''});
+
+      $('.vote-button').hover(function(){
+         $(this).closest('table').find('.message-vote-label').text($(this).prop('title'));
+         $(this).data('title', $(this).prop('title'));
+         $(this).prop('title', "");
+      }, function(){
+         $(this).prop('title', $(this).data('title'));
+         $(this).closest('table').find('.message-vote-label').text("");
+      });
+      $('.vote-button').click(function(){
+         var $link = $(this);
+         $.ajax({
+            url : $link.prop('href'),
+            cache : false,
+            success : function(respond){
+               if(respond.infomsg && respond.errmsg.length == 0){
+                  var $msg = $('#message-'+respond.idMessage);
+                  var idsStrored = getCookie('<?=Forum_Controller::COOKIE_NAME?>');
+                  var ids = idsStrored == null ? new Array() : idsStrored.split('|');
+                  if($.inArray(respond.idMessage, ids) == -1){
+                     ids.push(respond.idMessage);
+                  }
+                  document.cookie ='<?=Forum_Controller::COOKIE_NAME?>='+ids.join('|')+'; expires=<?=$expire->format(DATE_COOKIE)?>; path=/'
+                  $('.vote-counter', $msg).text('<?ps($this->tr('Hlasů'))?>: '+respond.votes);
+                  <?if(!$this->category()->getRights()->isControll()){?>
+                  // disable buttons
+                  $('.vote-button,.message-vote-label', $msg).remove();
+                  <?}?>
+               }
+            }
+         });
+         return false;
+      });
+
+
 	});
 </script>

@@ -5,11 +5,12 @@ if($this->message instanceof Model_ORM_Record){
    $h = sprintf($this->tr('Přidání příspěvku'));
 }
 $this->addPageTitle($h);
-$this->addFile('css://style.css');
+$this->addFile('css://style.less');
 ?>
 <h1><?=$h?></h1>
 <div class="main-content-detail forum-message-edit">
-   <?if($this->parentMessage){?>
+   <?
+   if($this->parentMessage){?>
    <?if($this->parentMessage->{Forum_Model_Messages::COLUMN_NAME} != null){?>
    <h2><?=$this->tr('Reakce na')?>: <?ps($this->parentMessage->{Forum_Model_Messages::COLUMN_NAME})?></h2>
    <?}?>

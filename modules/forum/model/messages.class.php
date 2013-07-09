@@ -18,7 +18,7 @@ class Forum_Model_Messages extends Model_ORM {
    const COLUMN_ID_USER = 'message_id_user';
    const COLUMN_ID_PARENT_MESSAGE = 'id_parent_message';
    const COLUMN_EMAIL = 'message_email';
-   const COLUMN_CREATED_BY = 'message_created_by';
+   const COLUMN_CREATED_BY = 'message_author';
    const COLUMN_CREATED_BY_MODERATOR = 'message_created_by_moderator';
    const COLUMN_WWW = 'message_www';
    const COLUMN_NAME = 'message_name';
@@ -30,6 +30,8 @@ class Forum_Model_Messages extends Model_ORM {
    const COLUMN_ORDER = 'message_order';
    const COLUMN_DEPTH = 'message_depth';
    const COLUMN_SEND_NOTIFY = 'message_reaction_send_notify';
+   const COLUMN_VOTE = 'message_vote';
+   const COLUMN_VOTE_SPAM = 'message_spam_vote';
 
    protected function  _initTable() {
       $this->setTableName(self::DB_TABLE, 't_f_messages');
@@ -52,6 +54,8 @@ class Forum_Model_Messages extends Model_ORM {
       $this->addColumn(self::COLUMN_ORDER, array('datatype' => 'int', 'default' => 0, 'pdoparam' => PDO::PARAM_INT));
       $this->addColumn(self::COLUMN_DEPTH, array('datatype' => 'int', 'default' => 0, 'pdoparam' => PDO::PARAM_INT));
       $this->addColumn(self::COLUMN_SEND_NOTIFY, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => 0));
+      $this->addColumn(self::COLUMN_VOTE, array('datatype' => 'int', 'default' => 0, 'pdoparam' => PDO::PARAM_INT));
+      $this->addColumn(self::COLUMN_VOTE_SPAM, array('datatype' => 'int', 'default' => 0, 'pdoparam' => PDO::PARAM_INT));
 
       $this->setPk(self::COLUMN_ID);
 
@@ -60,7 +64,7 @@ class Forum_Model_Messages extends Model_ORM {
       $this->addRelatioOneToMany(self::COLUMN_ID, 'Forum_Model_Attachments', Forum_Model_Attachments::COLUMN_ID_MESSAGE);
    }
 
-   public function  save(Model_ORM_Record $record) {
+   public function save(Model_ORM_Record $record) {
       /**
        * @copyright Jakub Vrána
        * @see http://php.vrana.cz/diskuse-s-reakcemi.php
@@ -70,6 +74,7 @@ class Forum_Model_Messages extends Model_ORM {
       if($record->isNew() && $record->{self::COLUMN_ORDER} == 0 && $record->{self::COLUMN_DEPTH} == 0 ){
          // není rodič
          if((int)$record->{self::COLUMN_ID_PARENT_MESSAGE} == 0){
+            /* //verze pro řazení posledních na konec
             $order = $this->columns(array('max' => 'MAX('.self::COLUMN_ORDER.')'))
                ->where(self::COLUMN_ID_TOPIC.' = :idt', array('idt' => $record->{self::COLUMN_ID_TOPIC}))
                ->record();
@@ -77,12 +82,22 @@ class Forum_Model_Messages extends Model_ORM {
             if($order->max != null){
                $record->{self::COLUMN_ORDER} = $order->max+1;
             }
+            */
+            //verze pro řazení posledních na začátek
+            $record->{self::COLUMN_ORDER} = 1;
+            // posunutí všech ostatních o jedno dolů
+            $model = new self();
+            $model->where(self::COLUMN_ID_TOPIC." = :idt",
+               array('idt' => $record->{self::COLUMN_ID_TOPIC}))
+               ->update(array(
+                  self::COLUMN_ORDER => array('stmt' => self::COLUMN_ORDER." + 1" )
+               ));
+
          }
          // je rodič
          else {
             // zjištění pořadí a hloubky příspěvku, na který se reaguje
             $parent = $this->where(self::COLUMN_ID.' = :id', array('id' => $record->{self::COLUMN_ID_PARENT_MESSAGE}))->record();
-            
             // zjištění pořadí příspěvku, na jehož místo se bude vkládat - první následující s menší nebo stejnou hloubkou jako rodič
             $replacedComment = $this->columns(array('min' => 'MIN('.self::COLUMN_ORDER.')-1', self::COLUMN_ID, self::COLUMN_DEPTH, self::COLUMN_ORDER))
                ->where(self::COLUMN_ID_TOPIC.' = :idt AND '.self::COLUMN_ORDER.' > :rorder AND '.self::COLUMN_DEPTH.' <= :rdepth',
@@ -120,55 +135,47 @@ class Forum_Model_Messages extends Model_ORM {
       $ret = true;
       if($pk != null){
          $rec = $pk;
+         $model = new self();
          if(($pk instanceof Model_ORM_Record) == false){
-            $rec = $this->where()->record($pk);
+            $rec = $model->where()->record($pk);
          }
          if($rec){
-            //$do = mysql_result(mysql_query("SELECT MIN(poradi) FROM diskuse WHERE poradi > $row[poradi] AND hloubka <= $row[hloubka]"), 0);
-            $recsForDelete = $this
-               ->columns(array('minord' => 'MIN('.self::COLUMN_ORDER.')'))
-               ->where(self::COLUMN_ORDER." > :rorder AND ".self::COLUMN_DEPTH." <= :rdepth", 
-               array('rorder' => $rec->{self::COLUMN_ORDER}, 'rdepth' => $rec->{self::COLUMN_DEPTH}))
+            $recsForDelete = $model
+               ->columns(array('maxord' => 'MIN('.self::COLUMN_ORDER.')'))
+               ->where(self::COLUMN_ORDER." > :rorder AND ".self::COLUMN_DEPTH." <= :rdepth AND ".self::COLUMN_ID_TOPIC." = :idt",
+               array('rorder' => $rec->{self::COLUMN_ORDER}, 'rdepth' => $rec->{self::COLUMN_DEPTH}, 'idt' => $rec->{self::COLUMN_ID_TOPIC}))
                ->record();
-            
-            // mysql_query("DELETE FROM diskuse WHERE poradi >= $row[poradi]" . ($do ? " AND poradi < $do" : ""));
-               
-               
-            if($recsForDelete){ // má potomky
-               $this->where(self::COLUMN_ORDER." >= :rord  AND ".self::COLUMN_ORDER." < :toord", 
-                  array('rord' => $rec->{self::COLUMN_ORDER}, 'toord' => $recsForDelete->minord ) )
+            if($recsForDelete->maxord != null){ // je následující zpráva
+               // smazání pouze omezeného počtu
+               $model->where(self::COLUMN_ORDER." > :rord  AND ".self::COLUMN_ORDER." < :toord AND ".self::COLUMN_ID_TOPIC." = :idt",
+                  array('rord' => $rec->{self::COLUMN_ORDER}, 'toord' => $recsForDelete->maxord, 'idt' => $rec->{self::COLUMN_ID_TOPIC} ) )
                   ->delete();
-                  
-               $this->where(self::COLUMN_ORDER." >= :minord", array('minord' => $recsForDelete->minord))
+
+               $model->where(self::COLUMN_ORDER." >= :maxord AND ".self::COLUMN_ID_TOPIC." = :idt",
+                  array('maxord' => $recsForDelete->maxord, 'idt' => $rec->{self::COLUMN_ID_TOPIC}))
                   ->update(array(
-                     self::COLUMN_ORDER => array('stmt' => self::COLUMN_ORDER." - ".($recsForDelete->minord - $rec->{self::COLUMN_ORDER}) )
+                     self::COLUMN_ORDER => array('stmt' => self::COLUMN_ORDER." - ".($recsForDelete->maxord - $rec->{self::COLUMN_ORDER}) )
                   ));
                   
-            } else {
-               $this->where(self::COLUMN_ORDER." >= :rord", array('rord' => $rec->{self::COLUMN_ORDER}))->delete();
+            } else { // není žádná další zpráva na stejné nebo vyšší úrovni
+               // smazání následujících
+               $model->where(self::COLUMN_ORDER." > :rord AND ".self::COLUMN_ID_TOPIC." = :idt",
+                  array('rord' => $rec->{self::COLUMN_ORDER}, 'idt' => $rec->{self::COLUMN_ID_TOPIC}))
+                  ->delete();
             }   
          }
-         
-         // Řešení Jakub Vrány 
-         // zjištění pořadí a hloubky příspěvku, který se maže
-//         $row = mysql_fetch_assoc(mysql_query("SELECT poradi, hloubka FROM diskuse WHERE id = '$_POST[del]'"));
-//         if ($row) {
-//            // zjištění pořadí příspěvku, do kterého se bude mazat - první následující s menší nebo stejnou hloubkou jako rodič
-//            $do = mysql_result(mysql_query("SELECT MIN(poradi) FROM diskuse WHERE poradi > $row[poradi] AND hloubka <= $row[hloubka]"), 0);
-//            mysql_query("DELETE FROM diskuse WHERE poradi >= $row[poradi]" . ($do ? " AND poradi < $do" : ""));
-//            if ($do) { // maže se zprostředku tabulky, posunout následující záznamy
-//               mysql_query("UPDATE diskuse SET poradi = poradi - " . ($do - $row["poradi"]) . " WHERE poradi >= $do");
-//            }
-//         }
-      
-      } else {
-         $ret = parent::delete($pk);
       }
-      
+      // smazání vybraného
+      $ret = parent::delete($pk);
+
 //      $this->unLock();
       return $ret;
    }
-   
-}
 
-?>
+   public static function getMessage($id)
+   {
+      $m = new self();
+      return $m->record((int)$id);
+   }
+
+}
