@@ -35,8 +35,8 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
          if($params['lang']){
             $this->columns[$name]['value'] = new Model_ORM_LangCell();
          }
-         if((string)$this->columns[$name]['default'] == "CURRENT_TIMESTAMP"){
-            if($this->columns[$name]['default'] === "CURRENT_TIMESTAMP"){
+         if(!$fromDb && isset($this->columns[$name]['default'])){
+            if((string)$this->columns[$name]['default'] == "CURRENT_TIMESTAMP"){
                $this->columns[$name]['value'] = date(DATE_ISO8601);
             } else {
                $this->columns[$name]['value'] = $this->columns[$name]['default'];
