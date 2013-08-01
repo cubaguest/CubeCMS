@@ -4,11 +4,11 @@
  * Třida obsahuje vrstvu mezi šablonovacím systémem a samotným pohledem (viewrem).
  * Umožňuje všechny základní operace při volbě a plnění šablony a jejímu zobrazení.
  *
- * @copyright  	Copyright (c) 2008-2009 Jakub Matas
- * @version    	$Id$ Cube CMS 7.7 $Revision$
+ * @copyright     Copyright (c) 2008-2009 Jakub Matas
+ * @version       $Id$ Cube CMS 7.7 $Revision$
  * @author        $Author$ $Date$
  *                $LastChangedBy$ $LastChangedDate$
- * @abstract 		Třída pro obsluhu šablony
+ * @abstract      Třída pro obsluhu šablony
  */
 
 class Template_Core extends Template {
@@ -56,6 +56,10 @@ class Template_Core extends Template {
     */
    private static $coverImagePath = null;
 
+   private static $instance = null;
+
+   private static $canonical = null;
+
    /**
     * Konstruktor
     */
@@ -82,12 +86,25 @@ class Template_Core extends Template {
 
       // prepare base Tags
       self::setMetaTag('generator', 'Cube-CMS '.AppCore::ENGINE_VERSION);
-      self::setMetaTag('canonical', $this->link()->rmParam()); // drop every page params
+      self::$canonical = $this->link()->rmParam();
+//      self::setMetaTag('canonical', $this->link()->rmParam()); // drop every page params
       // base image
-      if(Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_ICON} != null){
+      if(Category::getSelectedCategory()->getDataObj()->{Model_Category::COLUMN_ICON} != null){
          self::setCoverImage(Category::getImageDir(Category::DIR_IMAGE)
-            .Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_ICON} );
+            .Category::getSelectedCategory()->getDataObj()->{Model_Category::COLUMN_ICON} );
       }
+   }
+
+   /**
+    * Vrací instanci hlavní šablony
+    * @return Template_Core
+    */
+   public static function getInstance()
+   {
+      if(self::$instance == null){
+         self::$instance = new self();
+      }
+      return self::$instance;
    }
 
    /**
@@ -196,43 +213,146 @@ class Template_Core extends Template {
             }
          }
       }
-
       // replacements vars
-      $contents = preg_replace(array(
-         // basic
-         '/(<!-- *)?\{\*-STYLESHEETS-\*\}( *-->)?/',
-         '/(<!-- *)?\{\*-JAVASCRIPTS-\*\}( *-->)?/',
-         // basic meta
-         '/(<!-- *)?\{\*-PAGE_TITLE-\*\}( *-->)?/',
-         '/(<!-- *)?\{\*-PAGE_HEADLINE-\*\}( *-->)?/',
-         // user meta tags
-         '/(<!-- *)?\{\*-PAGE_META_TAGS-\*\}( *-->)?/',
-         // CORE ERRORS
-         '/(<!-- *)?\{\*-CORE_ERRORS-\*\}( *-->)?/',
-         //  remove not used vars
-         '/(<!-- *)?\{\*\-[A-Z0-9_-]+\-\*\}( *-->)?/',
-         // remove empty meta tags
-         '/[ ]*<meta name="[a-z]+" content="" ?\/>\n/i'
+      $contents = str_replace(array(
+         '<!--{*-PAGE_TITLE-*}-->',
+         '<!--{*-PAGE_META_TAGS-*}-->',
+         '<!--{*-STYLESHEETS-*}-->',
+         '<!--{*-JAVASCRIPTS-*}-->',
+         '<!--{*-CORE_ERRORS-*}-->',
       ), array(
-         // basic
+         $title,
+         $metaTags,
          $cssfiles,
          $jscripts,
-         // basic meta
-         $title,
-         htmlspecialchars(strip_tags(self::$pageHeadline)),
-         $metaTags,
-         // CORE ERRORS
          $errCnt,
-         //  remove not used vars
-         '',
-         // remove empty meta tags
-         ''
       ), $contents);
+
+//      $contents = preg_replace(array(
+         // basic
+//         '/(<!-- *)?\{\*-STYLESHEETS-\*\}( *-->)?/',
+//         '/(<!-- *)?\{\*-JAVASCRIPTS-\*\}( *-->)?/',
+         // basic meta
+//         '/(<!-- *)?\{\*-PAGE_TITLE-\*\}( *-->)?/',
+//         '/(<!-- *)?\{\*-PAGE_HEADLINE-\*\}( *-->)?/',
+//         '/(<!-- *)?\{\*-PAGE_META_TAGS-\*\}( *-->)?/',
+         // CORE ERRORS
+//         '/(<!-- *)?\{\*-CORE_ERRORS-\*\}( *-->)?/',
+         //  remove not used vars
+//         '/(<!-- *)?\{\*\-[A-Z0-9_-]+\-\*\}( *-->)?/',
+         // remove empty meta tags
+//         '/[ ]*<meta name="[a-z]+" content="" ?\/>\n/i'
+//      ), array(
+         // basic
+//         $cssfiles,
+//         $jscripts,
+         // basic meta
+//         $title,
+//         htmlspecialchars(strip_tags(self::$pageHeadline)),
+//         $metaTags,
+         // CORE ERRORS
+//         $errCnt,
+         //  remove not used vars
+//         '',
+         // remove empty meta tags
+//         ''
+//      ), $contents);
       ob_end_clean();
       return ((string)$contents);
    }
 
    public function getCombinedCss()
+   {
+      $files = array();
+      $filesForCompress = array();
+      $filesHash = null;
+      $cssFiles = Template::getStylesheets();
+      foreach ($cssFiles as $css) {
+//         pokud je soubor s enginu
+         if(strpos($css, Url_Request::getBaseWebDir(false)) !== false && strpos($css, 'nocompress') === false){
+            // create absolute path
+            $fileAbs = AppCore::getAppWebDir().str_replace(array(Url_Request::getBaseWebDir(false), '/'),array('', DIRECTORY_SEPARATOR), $css );
+            $filesForCompress[] = $fileAbs;
+            $filesHash .= $css.filemtime($fileAbs);
+         } else if(strpos($css, Url_Request::getBaseWebDir(true)) !== false && strpos($css, 'nocompress') === false){
+            // create absolute path
+            $fileAbs = AppCore::getAppLibDir().str_replace(array(Url_Request::getBaseWebDir(true), '/'),array('', DIRECTORY_SEPARATOR), $css );
+            $filesForCompress[] = $fileAbs;
+            $filesHash .= $css.filemtime($fileAbs);
+         } else {
+            $files[] = $css;
+         }
+      }
+
+      $fileName = md5($filesHash)."s.css";
+
+      if(!is_file(AppCore::getAppCacheDir()."stylesheets".DIRECTORY_SEPARATOR. $fileName)){
+         // generate file
+         $cnt = null;
+         $imports = array();
+         foreach($filesForCompress as $file){
+            $cssCnt = file_get_contents($file);
+            // replace relative paths
+            $dir = dirname($file);
+            $url = str_replace(
+               array(AppCore::getAppLibDir(),AppCore::getAppWebDir(), DIRECTORY_SEPARATOR),
+               array(Url_Request::getBaseWebDir(), Url_Request::getBaseWebDir(), '/'), $dir)."/";
+
+            // get imports
+            $matches = array();
+            if(preg_match_all('/(@import (url)\(([^>]*?)\))/',$cssCnt, $matches)){
+               foreach($matches[1] as $importUrl){
+                  $imports[] = preg_replace('#url\((?!\s*[\'"]?(?:https?:)?//)\s*([\'"])?#', "url($1{$url}", $importUrl).';';
+               }
+            }
+
+            // replace contents
+            $cssCnt = preg_replace(
+               array(
+                  /* important word - charset, import */
+                  '/@charset "?utf-8"?;/i',
+                  '/@import (url)\(([^>]*?)\);?/',
+                  /* repair relative urls */
+                  '#url\((?!\s*[\'"]?(?:https?:)?//)\s*([\'"])?#',
+                  /* comments */
+                  "`^([\t\s]+)`ism",
+                  "`^\/\*(.+?)\*\/`ism",
+                  "`([\n\A;]+)\/\*(.+?)\*\/`ism",
+                  "`([\n\A;\s]+)//(.+?)[\n\r]`ism",
+                  "`(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+`ism",
+               ),
+               array(
+                  /* important word - charset, import */
+                  "",
+                  "",
+                  /* repair relative urls */
+                  "url($1{$url}",
+                  /* comments */
+                  '',
+                  "",
+                  "$1",
+                  "$1\n",
+                  "\n"
+               ),
+               $cssCnt);
+            // remove comments
+//            $cssCnt = preg_replace(array_keys($regex),$regex,$cssCnt);
+
+
+            $cnt .= "\n".'/* file: '.$file." mtime: ".filemtime($file).' */'."\n"
+               .$cssCnt;
+         }
+         file_put_contents(AppCore::getAppCacheDir(). "stylesheets".DIRECTORY_SEPARATOR. $fileName,
+            "@CHARSET \"UTF-8\"; \n"
+            ."/* GENERATED: ".vve_date("%x, %X")." */\n"
+            .implode("\n", $imports)
+            .$cnt);
+      }
+      array_unshift($files, Url_Request::getBaseWebDir().AppCore::ENGINE_CACHE_DIR."/stylesheets/".$fileName);
+      return $files;
+   }
+
+   public function getCombinedJs()
    {
       $files = array();
       $filesForCompress = array();
@@ -268,10 +388,20 @@ class Template_Core extends Template {
                array(AppCore::getAppLibDir(),AppCore::getAppWebDir(), DIRECTORY_SEPARATOR),
                array(Url_Request::getBaseWebDir(), Url_Request::getBaseWebDir(), '/'), $dir)."/";
             $cssCnt = preg_replace('#url\((?!\s*[\'"]?(?:https?:)?//)\s*([\'"])?#', "url($1{$url}", $cssCnt);
+            // remove comments
+            $regex = array(
+               "`^([\t\s]+)`ism"=>'',
+               "`^\/\*(.+?)\*\/`ism"=>"",
+               "`([\n\A;]+)\/\*(.+?)\*\/`ism"=>"$1",
+               "`([\n\A;\s]+)//(.+?)[\n\r]`ism"=>"$1\n",
+               "`(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+`ism"=>"\n"
+            );
+            $cssCnt = preg_replace(array_keys($regex),$regex,$cssCnt);
+
 //            var_dump($file, $dir, $url);flush();
 
             file_put_contents(AppCore::getAppCacheDir(). "stylesheets".DIRECTORY_SEPARATOR. $fileName,
-               ' /* file: '.$file." mtime: ".filemtime($file).' */'."\n".$cssCnt, FILE_APPEND);
+               "\n".' /* file: '.$file." mtime: ".filemtime($file).' */'."\n".$cssCnt, FILE_APPEND);
          }
       }
       array_unshift($files, Url_Request::getBaseWebDir().AppCore::ENGINE_CACHE_DIR."/stylesheets/".$fileName);
@@ -415,6 +545,24 @@ class Template_Core extends Template {
    }
 
    /**
+    * Metoda nastaví canonical adresu stránky
+    * @param string $path - URL obrázku
+    */
+   public static function setCanonical($path)
+   {
+      self::$canonical = $path;
+   }
+
+   /**
+    * Metoda vrací canonical adresu stránky
+    * @return string $path
+    */
+   public static function getCanonical()
+   {
+      return self::$canonical;
+   }
+
+   /**
     * Metoda vrací objekt detekce prohlížeče
     * @return Browser
     */
@@ -430,10 +578,10 @@ class Template_Core extends Template {
    public function renderHeaderBase()
    {
       echo '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />'."\n"
-          .'<!-- {*-PAGE_META_TAGS-*}-->'."\n"
-          .'<title><!-- {*-PAGE_TITLE-*}--></title>'."\n"
+          .'<!--{*-PAGE_META_TAGS-*}-->'."\n"
+          .'<title><!--{*-PAGE_TITLE-*}--></title>'."\n"
           .'<base href="'.Url_Link::getMainWebDir().'" />'."\n"
-          .'<link rel="canonical" href="'.$this->link()->rmParam().'" />'."\n";
+          .'<link rel="canonical" href="'.self::getCanonical().'" />'."\n";
    }
 
    /**
@@ -461,8 +609,8 @@ class Template_Core extends Template {
     */
    public function renderHeaderCSSJS()
    {
-      echo "<!-- {*-STYLESHEETS-*} -->\n"
-          ."<!-- {*-JAVASCRIPTS-*} -->";
+      echo "<!--{*-STYLESHEETS-*}-->\n"
+          ."<!--{*-JAVASCRIPTS-*}-->";
 
       if(Category::getSelectedCategory()->getRights()->isWritable()){
          $this->addFile('css://style-admin.less');
