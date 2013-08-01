@@ -18,9 +18,8 @@ class JsPlugin_JQueryDropDown extends JsPlugin {
 	protected function setFiles() {
       $this->addDependJsPlugin(new JsPlugin_JQuery());
 //		Přidání css stylu
-		$this->addFile(new JsPlugin_CssFile('jquery.dd.css'));
-		//		Přidání js soubrů pluginu
-		$this->addFile(new JsPlugin_JsFile("jquery.dd.js"));
+		$this->addFile(new JsPlugin_CssFile('jquery.dd.css?nocompress'));
+      //    Přidání js soubrů pluginu
+      $this->addFile(new JsPlugin_JsFile("jquery.dd.min.js"));
 	}
 }
-?>
