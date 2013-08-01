@@ -356,8 +356,8 @@ class Email {
     */
    public static function getBaseHtmlMail($content) 
    {
-      $fileLang = Face::getCurrent()->getDir().Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR."mail".DIRECTORY_SEPARATOR."mail_base_".Locales::getLang().".html";
-      $file = Face::getCurrent()->getDir().Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR."mail".DIRECTORY_SEPARATOR."mail_base.html";
+      $fileLang = Face::getCurrent()->getDir()."mail".DIRECTORY_SEPARATOR."mail_base_".Locales::getLang().".html";
+      $file = Face::getCurrent()->getDir()."mail".DIRECTORY_SEPARATOR."mail_base.html";
       $fileCore = AppCore::getAppLibDir().AppCore::ENGINE_TEMPLATE_DIR.DIRECTORY_SEPARATOR."mail".DIRECTORY_SEPARATOR."mail_base.html";
       
       if(is_file($fileLang)){
@@ -372,12 +372,16 @@ class Email {
          . ' <head>'
          .'<style>
          body { font-family: Verdana, sans-serif; font-size: 0.8em; color:#484848; }
-         h1, h2, h3 { font-family: "Trebuchet MS", Verdana, sans-serif; margin: 0px; }
-         h1 { font-size: 1.2em; }
-         h2, h3 { font-size: 1.1em; }
+         h1, h2, h3 { font-family: "Trebuchet MS", Verdana, sans-serif; margin: 10px 0; }
+         h1 { font-size: 2em; }
+         h2 { font-size: 1.5em; }
+         h3 { font-size: 1.3em; }
          a, a:link, a:visited { color: #2A5685;}
          a:hover, a:active { color: #c61a1a; }
          hr { width: 100%; height: 1px; background: #ccc; border: 0; }
+         table.border { border: 1px solid #2A5685;}
+         table th {text-align: left;}
+         table th, table td {padding: 2px 3px; }
          .footer { font-size: 0.8em; font-style: italic; }
          </style>'
          . '</head>'
