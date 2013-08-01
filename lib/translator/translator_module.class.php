@@ -12,8 +12,14 @@
 
 class Translator_Module extends Translator {
    public function  __construct($domain = self::PRIMARY_DOMAIN) {
-      $this->domain = strtolower($domain);
-      parent::__construct();
+      parent::__construct($domain);
+
+      $this->translationsS = array_merge(
+         isset(self::$translators[self::PRIMARY_DOMAIN]) ? self::$translators[self::PRIMARY_DOMAIN]->getSingulars() : array(),
+         self::$translators[$this->domain]->getSingulars());
+      $this->translationsP = array_merge(
+         isset(self::$translators[self::PRIMARY_DOMAIN]) ? self::$translators[self::PRIMARY_DOMAIN]->getPlurals() : array(),
+         self::$translators[$this->domain]->getPlurals());
    }
       /**
     *  Metoda načte překlady

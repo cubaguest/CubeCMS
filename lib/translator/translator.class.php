@@ -43,19 +43,20 @@ class Translator {
 
    protected $locale = null;
 
-   private static $translators = array();
+   protected static $translators = array();
 
    /**
     * Kontruktor pro vytvoření objektu překladatele
     * @param string $domain -- název modulu. pokud je null je použit překlad jádra
     */
-   public function  __construct()
+   public function  __construct($domain = self::PRIMARY_DOMAIN)
    {
+      $this->domain = strtolower($domain);
       if(!isset (self::$translators[$this->domain])){
          $this->loadTranslations();
-         self::$translators[$this->domain] = &$this;
+         self::$translators[$this->domain] = $this;
       } else {
-         $this->translationsS = self::$translators[$this->domain]->getSigulars();
+         $this->translationsS = self::$translators[$this->domain]->getSingulars();
          $this->translationsP = self::$translators[$this->domain]->getPlurals();
       }
    }
@@ -164,7 +165,7 @@ class Translator {
    }
 
 
-   public function getSigulars() {
+   public function getSingulars() {
       return $this->translationsS;
    }
    public function getPlurals() {
