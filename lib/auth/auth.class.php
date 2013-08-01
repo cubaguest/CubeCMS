@@ -248,7 +248,11 @@ class Auth extends TrObject {
                   }
                   self::saveUserDetailToSession();
                   $link = new Url_Link();
-                  $link->reload($link->getTransferProtocol().'://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']);
+                  if(isset($_GET['redirect'])){
+                     $link->reload($_GET['redirect']);
+                  } else {
+                     $link->reload($link->getTransferProtocol().'://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']);
+                  }
                   return true;
                } else {
                   AppCore::getUserErrors()->addMessage($tr->tr("Bylo zadáno špatné heslo."));
