@@ -258,8 +258,8 @@ class Template extends TrObject {
     * @return string -- hodnota ošetřená o specielní znaky nebo výchozí hodnota
     */
    public function post($name, $defaultValue = null) {
-      if(isset ($_POST{$name})) {
-         return htmlspecialchars($_POST{$name});
+      if(isset ($_POST[$name])) {
+         return htmlspecialchars($_POST[$name]);
       } else {
          return $defaultValue;
       }
@@ -271,9 +271,9 @@ class Template extends TrObject {
     * @param string $defaultValue -- výchozí hodnota pokud prvek nebyl odeslán
     * @return string -- hodnota ošetřená o specielní znaky nebo výchozí hodnota
     */
-   public function get($name, $defaultValue = null) {
-      if(isset ($_GET{$name})) {
-         return urldecode($_GET{$name});
+    public function get($name, $defaultValue = null) {
+      if(isset ($_GET[$name])) {
+         return urldecode($_GET[$name]);
       } else {
          return $defaultValue;
       }
