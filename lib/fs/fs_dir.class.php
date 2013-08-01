@@ -27,7 +27,7 @@ class FS_Dir extends TrObject {
     * @param string $name -- (option) název adresáře
     * @param string $path -- (option) cesta k adresáři (pokud není zadána pokusí se rozparsovat mízev adresáře)
     */
-   public function __construct($name = null, $path = null) 
+   public function __construct($name = null, $path = null)
    {
       // kontrola správnosti adresáře
       $this->name = $name;
@@ -62,6 +62,25 @@ class FS_Dir extends TrObject {
       }
       if(!$this->exist() OR !is_dir((string)$this)){
          return $this->create();
+      }
+      return true;
+   }
+
+   /**
+    * Metoda provede kontrolu existence adresáře a pokud neexistuje tak jej vytvoří
+    * @param $dir
+    * @return bool
+    */
+   public static function checkStatic($dir)
+   {
+      //doplnění posledního lomítka za dest adresář
+      if(substr($dir, -1) != DIRECTORY_SEPARATOR){
+         $dir .= DIRECTORY_SEPARATOR;
+      }
+      if(!file_exists($dir) || !is_dir($dir)){
+         if(!@mkdir($dir, 0777, true)){
+            return false;
+         }
       }
       return true;
    }
