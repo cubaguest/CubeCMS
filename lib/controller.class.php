@@ -424,37 +424,40 @@ abstract class Controller extends TrObject {
    /**
     * Metoda kontroluje práva pro čtení modulu. v opačném případě vyvolá přesměrování
     */
-   final public function checkReadableRights() 
+   final public function checkReadableRights()
    {
       if(!$this->rights()->isReadable()) {
-         $this->errMsg()->addMessage(sprintf(
-            $this->tr("Nemáte dostatčná práva pro přístup ke kategorii \"%s\" nebo jste byl(a) odhlášen(a)"), 
-            $this->category()->getName()), true);
-         $this->link(true)->clear(true)->reload(null, 401);
+//         $this->errMsg()->addMessage(sprintf(
+//            $this->tr("Nemáte dostatčná práva pro přístup ke kategorii \"%s\" nebo jste byl(a) odhlášen(a)"),
+//            $this->category()->getName()), true);
+         throw new UnauthorizedAccessException();
+//         $this->link(true)->clear(true)->reload(null, 401);
       }
    }
    /**
     * Metoda kontroluje práva pro zápis do modulu. v opačném případě vyvolá přesměrování
     */
-   final public function checkWritebleRights() 
+   final public function checkWritebleRights()
    {
       if(!$this->rights()->isWritable()) {
-         $this->errMsg()->addMessage(sprintf(
-            $this->tr("Nemáte dostatčná práva pro přístup ke kategorii \"%s\" nebo jste byl(a) odhlášen(a)"), 
-            $this->category()->getName()), true);
-         $this->link(true)->clear(true)->reload();
+//         $this->errMsg()->addMessage(sprintf(
+//            $this->tr("Nemáte dostatčná práva pro přístup ke kategorii \"%s\" nebo jste byl(a) odhlášen(a)"),
+//            $this->category()->getName()), true);
+//         $this->link(true)->clear(true)->reload();
+         throw new UnauthorizedAccessException();
       }
    }
    /**
     * Metoda kontroluje práva pro plný přístup k modulu. v opačném případě vyvolá přesměrování
     */
-   final public function checkControllRights() 
+   final public function checkControllRights()
    {
       if(!$this->rights()->isControll()) {
-         $this->errMsg()->addMessage(sprintf(
-            $this->tr("Nemáte dostatčná práva pro přístup ke kategorii \"%s\" nebo jste byl(a) odhlášen(a)"), 
-            $this->category()->getName()), true);
-         $this->link(true)->clear(true)->reload();
+//         $this->errMsg()->addMessage(sprintf(
+//            $this->tr("Nemáte dostatčná práva pro přístup ke kategorii \"%s\" nebo jste byl(a) odhlášen(a)"),
+//            $this->category()->getName()), true);
+//         $this->link(true)->clear(true)->reload();
+         throw new UnauthorizedAccessException();
       }
    }
 

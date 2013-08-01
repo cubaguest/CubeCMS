@@ -9,25 +9,17 @@
  * @abstract 		Třída pro vytvoření kategorie chybové stránky
  */
 
-class Module_ErrPage_Category extends Category_Core {
-   /**
-    * Konstruktor načte informace o kategorii
-    * @string $catKey --  klíč kategorie
-    * @bool $isMainCategory --  (option) jest-li se jedná o hlavní kategorii
-    */
-   public function  __construct($catKey = null, $isSelectedCategory = false, $categoryDataObj = null) {
-      parent::__construct($catKey, $isSelectedCategory, $this->createCatObj());
-   }
+class Module_ForbiddenAccess_Category extends Module_ErrPage_Category {
 
    protected function createCatObj() {
       $category = new Object();
       // Je třeba více?
       $category->{Model_Category::COLUMN_CAT_ID} = 0;
       $category->{Model_Rights::COLUMN_RIGHT} = 'r--';
-      $category->{Model_Category::COLUMN_MODULE} = 'errpage';
-      $category->{Model_Category::COLUMN_CAT_LABEL} = $this->tr('Chyba');
+      $category->{Model_Category::COLUMN_MODULE} = 'forbiddenaccess';
+      $category->{Model_Category::COLUMN_CAT_LABEL} = $this->tr('Přístup odepřen');
       $category->{Model_Category::COLUMN_INDIVIDUAL_PANELS} = false;
-      $category->{Model_Category::COLUMN_DESCRIPTION} = $this->tr('Chybová stránka');
+      $category->{Model_Category::COLUMN_DESCRIPTION} = $this->tr('Chybová stránka - přístup odepřen');
       $category->{Model_Category::COLUMN_KEYWORDS} = null;
       if(defined('VVE_CM_ERR_CAT_ICON')){
          $category->{Model_Category::COLUMN_ICON} = VVE_CM_ERR_CAT_ICON;

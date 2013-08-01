@@ -8,7 +8,7 @@
  * @version    $Id$ VVE 5.0.0 $Revision$
  * @author     $Author$ $Date$
  *             $LastChangedBy$ $LastChangedDate$
- * @abstract 	Hlavní třída aplikace(Singleton)
+ * @abstract   Hlavní třída aplikace(Singleton)
  * @license    GNU General Public License v. 2 viz. Docs/license.txt
  * @internal   Last ErrorCode 22
  */
@@ -140,12 +140,6 @@ class AppCore extends TrObject {
    private static $_appLibDir = null;
 
    /**
-    * Objekt pro přístup k šabloně v jádře
-    * @var Template
-    */
-   private $coreTpl = null;
-
-   /**
     * Objekt s hláškami modulů
     * @var Messages
     */
@@ -197,10 +191,10 @@ class AppCore extends TrObject {
     */
    private function __construct()
    {
-      //		inicializace stratovacího času
+      //    inicializace stratovacího času
       List ($usec, $sec) = Explode (' ', microtime());
       $this->_startTime=((float)$sec + (float)$usec);
-      //		Definice globálních konstant
+      //    Definice globálních konstant
       define('URL_SEPARATOR', '/');
       // verze PHP
       if(!defined('PHP_VERSION_ID')){
@@ -228,7 +222,7 @@ class AppCore extends TrObject {
       // inicializace parametrů jádra a php
       $this->_initCore();
 
-      //	přidání adresáře pro načítání knihoven
+      // přidání adresáře pro načítání knihoven
       set_include_path(AppCore::getAppLibDir().self::ENGINE_LIB_DIR.DIRECTORY_SEPARATOR . PATH_SEPARATOR . get_include_path());
 
       // Autoloaders
@@ -403,7 +397,8 @@ class AppCore extends TrObject {
    {
       // exceptions
       $exFiles = array('coreException','dbException','badClassException','badFileException',
-         'imageException','badRequestException', 'controllerException', 'UnexpectedPageException', 'ModuleException');
+         'imageException','badRequestException', 'controllerException', 'UnexpectedPageException', 'ModuleException',
+         'UnauthorizedAccessException', 'ForbiddenAccessException');
       foreach ($exFiles as $exFile) {
          require_once (AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR . DIRECTORY_SEPARATOR
             . AppCore::ENGINE_EXCEPTIONS_DIR . DIRECTORY_SEPARATOR . $exFile.'.class.php');
@@ -584,7 +579,7 @@ class AppCore extends TrObject {
       set_error_handler(array('CoreErrors', 'errorHandler') );
       set_exception_handler( array( 'CoreErrors', 'exceptionHandler' ) );
       register_shutdown_function( array( 'AppCore', 'shutDownHandler' ) );
-      //		Vytvoření objektu pro práci se zprávami
+      //    Vytvoření objektu pro práci se zprávami
       self::$messages = new Messages('session', 'messages', true);
       self::$userErrors = new Messages('session', 'errors');
 
@@ -646,10 +641,7 @@ class AppCore extends TrObject {
     */
    public function getCoreTpl()
    {
-      if(!($this->coreTpl instanceof Template_Core)){
-         $this->coreTpl = new Template_Core();
-      }
-      return $this->coreTpl;
+      return Template_Core::getInstance();
    }
 
    /**
@@ -657,7 +649,7 @@ class AppCore extends TrObject {
     */
    public function assignMainVarsToTemplate()
    {
-      //	Hlavni promene strany
+      // Hlavni promene strany
       $this->getCoreTpl()->debug = VVE_DEBUG_LEVEL;
       $this->getCoreTpl()->mainLangImagesPath = VVE_IMAGES_LANGS_DIR.URL_SEPARATOR;
       $this->getCoreTpl()->categoryId = Category::getSelectedCategory()->getId();
@@ -693,7 +685,7 @@ class AppCore extends TrObject {
     */
    public function renderTemplate()
    {
-      //		načtení doby zpracovávání aplikace
+      //    načtení doby zpracovávání aplikace
       List ($usec, $sec) = Explode(' ', microtime());
       $endTime = ((float) $sec + (float) $usec);
       $this->getCoreTpl()->execTime = round($endTime - $this->_startTime, 4);
@@ -716,8 +708,8 @@ class AppCore extends TrObject {
 //            throw new BadClassException(sprintf($this->tr('Nepodařilo se načíst třídu "%s" cest (routes) modulu.'),
 //            self::getCategory()->getModule()->getName()), 10);
          }
-         //					Vytvoření objektu kontroleru
-         $routes = new $routesClassName(Url_Request::getInstance()->getModuleUrlPart(), self::getCategory());
+         //             Vytvoření objektu kontroleru
+         $routes = new $routesClassName(self::getCategory());
          /**
           * @param Routes
           */
@@ -739,7 +731,7 @@ class AppCore extends TrObject {
             throw new BadClassException(sprintf($this->tr('Nepodařilo se načíst třídu "%s" controlleru modulu.'),
             self::getCategory()->getModule()->getName()), 10);
          }
-         //					Vytvoření objektu kontroleru
+         //             Vytvoření objektu kontroleru
          $controller = new $controllerClassName(self::getCategory(), $routes);
          unset ($routes);
          $controller->runCtrl();
@@ -778,7 +770,7 @@ class AppCore extends TrObject {
             return false;
          }
          
-         //	spuštění statické metody kontroleru a viewru
+         // spuštění statické metody kontroleru a viewru
          $data = call_user_func(array($controllerClassName, $controllerMethod));
          $tpl = call_user_func(array($viewClassName, $viewMethod), $data);
          
@@ -812,8 +804,8 @@ class AppCore extends TrObject {
          throw new BadClassException(sprintf($this->tr('Nepodařilo se načíst třídu cest (routes) modulu "%s".'),
          self::getCategory()->getModule()->getName()), 10);
       }
-      //	Vytvoření objektu s cestama modulu
-      $routes = new $routesClassName(Url_Request::getInstance()->getModuleUrlPart(),self::getCategory());
+      // Vytvoření objektu s cestama modulu
+      $routes = new $routesClassName(self::getCategory());
 
       $rssClassName = ucfirst(self::getCategory()->getModule()->getName()).'_Rss';
       $rssCore = new $rssClassName(self::getCategory(), $routes);
@@ -844,8 +836,8 @@ class AppCore extends TrObject {
                throw new BadClassException(sprintf($this->tr('Nepodařilo se načíst třídu cest (routes) modulu "%s".'),
                self::getCategory()->getModule()->getName()), 10);
             }
-            //	Vytvoření objektu s cestama modulu
-            $routes = new $routesClassName(Url_Request::getInstance()->getModuleUrlPart());
+            // Vytvoření objektu s cestama modulu
+            $routes = new $routesClassName();
 //            $routes = new Routes();
             // kontola cest
             $routes->checkRoutes();
@@ -861,7 +853,7 @@ class AppCore extends TrObject {
                        self::getCategory()->getModule()->getName()), 10);
 //               throw new BadClassException(sprintf($this->tr('Nepodařilo se načíst třídu "%s" controleru modulu.'), $controllerClassName));
             }
-            //					Vytvoření objektu kontroleru
+            //             Vytvoření objektu kontroleru
             $controller = new $controllerClassName(self::getCategory(), $routes);
             $ret =  $controller->runCtrl();
          } catch (Exception $e ) {
@@ -869,7 +861,7 @@ class AppCore extends TrObject {
 //            return false;
          }
          
-         if((AppCore::getUrlRequest()->isXHRRequest() AND $routes->getRespondClass() != null)
+         if((Url_Request::getInstance()->isXHRRequest() AND $routes->getRespondClass() != null)
             OR (Url_Request::getInstance()->getOutputType() == 'json' AND $routes->getRespondClass() == null AND ob_get_contents() == null )){
             // render odpovědi pro XHR
             if($routes->getRespondClass() != null){
@@ -925,19 +917,20 @@ class AppCore extends TrObject {
     */
    public function runPanels()
    {
-      $this->coreTpl->panels = array();
+      $panels = array();
       // vygenerování pole pro šablony panelů
       $panelPositions = Face::getParamStatic('panels');
       if(!empty($panelPositions)){
          foreach($panelPositions as $key => $pos){
-            $this->coreTpl->panels[$key] = array();
+            $panels[$key] = array();
          }
       } else {
          $panelPositions = vve_parse_cfg_value(VVE_PANEL_TYPES);
          foreach($panelPositions as $pos){
-            $this->coreTpl->panels[$pos] = array();
+            $panels[$pos] = array();
          }
       }
+      Template_Core::getInstance()->panels = $panels;
       /**
        *  @todo optimalizovat dotaz!! zabere 0.005 sekundy
        */
@@ -960,7 +953,7 @@ class AppCore extends TrObject {
 
       foreach ($panels as $panel) {
          // pokud je panel vypnut přeskočíme zracování
-         if(!isset ($this->coreTpl->panels[(string) $panel->{Model_Panel::COLUMN_POSITION}])){
+         if(!isset (Template_Core::getInstance()->panels[(string) $panel->{Model_Panel::COLUMN_POSITION}])){
             continue;
          }
          try {
@@ -977,7 +970,7 @@ class AppCore extends TrObject {
                throw new BadClassException(sprintf($this->tr('Nepodařilo se načíst třídu "%s" cest (routes) modulu.'),
                      $panelCat->getModule()->getName()), 10);
             }
-            //					Vytvoření objektu kontroleru
+            //             Vytvoření objektu kontroleru
             $routes = new $routesClassName(null, $panelCat);
             $controllerClassName = ucfirst($panelCat->getModule()->getName()) . '_Panel';
             if (!class_exists($controllerClassName)) {
@@ -985,10 +978,10 @@ class AppCore extends TrObject {
                      self::getCategory()->getModule()->getName()), 10);
             }
 
-            //	Vytvoření objektu kontroleru
+            // Vytvoření objektu kontroleru
             $panelController = new $controllerClassName($panelCat, $routes);
             $panelController->run();
-            array_push($this->coreTpl->panels[(string) $panel->{Model_Panel::COLUMN_POSITION}], $panelController->_getTemplateObj());
+            array_push(Template_Core::getInstance()->panels[(string) $panel->{Model_Panel::COLUMN_POSITION}], $panelController->_getTemplateObj());
          } catch (Exception $exc) {
             CoreErrors::addException($exc);
          }
@@ -1000,8 +993,8 @@ class AppCore extends TrObject {
     */
    public function assignCoreErrorsToTpl()
    {
-      $this->coreTpl->coreErrors = CoreErrors::getErrors();
-      $this->coreTpl->coreErrorsEmpty = CoreErrors::isEmpty();
+      Template_Core::getInstance()->coreErrors = CoreErrors::getErrors();
+      Template_Core::getInstance()->coreErrorsEmpty = CoreErrors::isEmpty();
    }
 
    /**
@@ -1021,10 +1014,10 @@ class AppCore extends TrObject {
     */
    public function runCoreModule()
    {
-      $module = 'Module_'.ucfirst(self::$category->getModule()->getName());
+      $module = 'Module_'.ucfirst(self::$category->getDataObj()->{Model_Category::COLUMN_MODULE});
       // forbiden access ?
       if( !self::$category->getRights()->isReadable() && !self::$category->getRights()->isWritable() && !self::$category->getRights()->isControll() ){
-         $module = 'Module_DenyPage';
+         $module = 'Module_ForbiddenAccess';
       }
       $className = $module;
       if(class_exists($className)){
@@ -1040,7 +1033,7 @@ class AppCore extends TrObject {
          $ctrl->{$viewM}();
       } else {
           $ctrl->runView();
-          if(!AppCore::getUrlRequest()->isXHRRequest()){
+          if(!Url_Request::getInstance()->isXHRRequest()){
             $this->getCoreTpl()->module = $ctrl->template();
           } else {
             $ctrl->template()->renderTemplate();
@@ -1113,9 +1106,9 @@ class AppCore extends TrObject {
          $this->checkCoreVersion();
          // inicializace URL
          Url_Request::factory();
-         //		inicializace sessions
+         //    inicializace sessions
          Session::factory();
-         //		Inicializace chybových hlášek
+         //    Inicializace chybových hlášek
          $this->_initMessagesAndErrors();
 
          /*
@@ -1232,6 +1225,24 @@ class AppCore extends TrObject {
             }
          } catch (UnexpectedPageException $e) {
             AppCore::setErrorPage(true);
+            /* @TODO tohle asij do háje zeleného */
+            if($e->getMessage() != null){
+               AppCore::getUserErrors()->addMessage($e->getMessage());
+            }
+            $this->runCoreModule();
+         } catch (UnauthorizedAccessException $e) {
+            self::$category = new Module_UnauthorizedAccess_Category();
+            /* @TODO tohle asij do háje zeleného */
+            if($e->getMessage() != null){
+               AppCore::getUserErrors()->addMessage($e->getMessage());
+            }
+            $this->runCoreModule();
+         } catch (ForbiddenAccessException $e) {
+            self::$category = new Module_ForbiddenAccess_Category();
+            /* @TODO tohle asij do háje zeleného */
+            if($e->getMessage() != null){
+               AppCore::getUserErrors()->addMessage($e->getMessage());
+            }
             $this->runCoreModule();
          } catch (Exception $e) {
             CoreErrors::addException($e);
@@ -1240,19 +1251,19 @@ class AppCore extends TrObject {
          //vytvoření hlavního menu
          $this->createMenus();
          try {
-            // =========	spuštění panelů
+            // =========   spuštění panelů
             $this->runPanels();
          } catch (Exception $exc) {
             CoreErrors::addException($exc);
          }
 
-         //	Přiřazení hlášek do šablony
+         // Přiřazení hlášek do šablony
          $this->assignMessagesToTpl();
          // vložení proměných šablony z jadra
          $this->assignMainVarsToTemplate();
          // přiřazení chybových hlášek jádra do šablony
          $this->assignCoreErrorsToTpl();
-         //	render šablony
+         // render šablony
          $this->renderTemplate();
       }
       if(VVE_DEBUG_LEVEL >= 3 AND function_exists('xdebug_stop_trace')){
