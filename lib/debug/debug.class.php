@@ -82,7 +82,7 @@ class Debug {
    } 
    
    public static function printImmediately() {
-      echo '<div class="debug-log" style="margin-top: 30px;">';// admin menu
+      echo '<div class="debug-log">';// admin menu
       $args = func_get_args();
       foreach ($args as $arg) {
          var_dump($arg);
