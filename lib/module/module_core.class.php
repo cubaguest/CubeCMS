@@ -63,5 +63,3 @@ class Module_Core extends TrObject {
       return $this->template;
    }
 }
-
-?>
