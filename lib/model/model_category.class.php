@@ -120,6 +120,8 @@ class Model_Category extends Model_ORM {
 
    protected function beforeSave(Model_ORM_Record $record, $type = 'I')
    {
+      Cache::delete('cats_list_'.Auth::getUserId().'_1'); // allLangs true
+      Cache::delete('cats_list_'.Auth::getUserId().'_'); // allLangs false
       foreach ($record->{self::COLUMN_URLKEY} as $url) {
          $record->{self::COLUMN_DISABLE} = $record->{self::COLUMN_URLKEY} == null ? true : false;
       }
@@ -144,23 +146,26 @@ class Model_Category extends Model_ORM {
    public function getCategoryList($allLangs = false)
    {
       if(self::$allCatsRecords == null){
-         $this->columns(array(
-            Model_Category::COLUMN_NAME, Model_Category::COLUMN_ALT, 
-            Model_Category::COLUMN_DESCRIPTION, Model_Category::COLUMN_KEYWORDS,
-            Model_Category::COLUMN_DEF_RIGHT, Model_Category::COLUMN_ID_USER_OWNER, Model_Category::COLUMN_FEEDS,
-            Model_Category::COLUMN_INDIVIDUAL_PANELS, Model_Category::COLUMN_MODULE, Model_Category::COLUMN_URLKEY,
-            Model_Category::COLUMN_VISIBILITY, Model_Category::COLUMN_ICON,  Model_Category::COLUMN_BACKGROUND,  
-            Model_Category::COLUMN_PRIORITY
-//            , 'uk_l' => 'LENGTH( '.self::COLUMN_URLKEY.'_'.Locales::getLang().' )'
+         $key = 'cats_list_'.Auth::getUserId().'_'.(string)$allLangs;
+         if( ($cats = Cache::get($key)) == false ){
+            $this->columns(array(
+               Model_Category::COLUMN_NAME, Model_Category::COLUMN_ALT,
+               Model_Category::COLUMN_DESCRIPTION, Model_Category::COLUMN_KEYWORDS,
+               Model_Category::COLUMN_DEF_RIGHT, Model_Category::COLUMN_ID_USER_OWNER, Model_Category::COLUMN_FEEDS,
+               Model_Category::COLUMN_INDIVIDUAL_PANELS, Model_Category::COLUMN_MODULE, Model_Category::COLUMN_URLKEY,
+               Model_Category::COLUMN_VISIBILITY, Model_Category::COLUMN_ICON,  Model_Category::COLUMN_BACKGROUND,
+               Model_Category::COLUMN_PRIORITY
+   //            , 'uk_l' => 'LENGTH( '.self::COLUMN_URLKEY.'_'.Locales::getLang().' )'
             ));
-         $this->setSelectAllLangs($allLangs)
-            ->withRights()
-            ->where(Model_Category::COLUMN_DISABLE.' = 0', array());
+            $this->setSelectAllLangs($allLangs)
+               ->withRights()
+               ->where(Model_Category::COLUMN_DISABLE.' = 0', array());
 //             ->order(array('LENGTH('.Model_Category::COLUMN_URLKEY.')' => 'DESC')); // filesort
-            // new length optimization - make filesort         
-//            ->order(array('urlkey_len_cs' => 'DESC'));
-         //; // end of query 
-         self::$allCatsRecords = $this->records(Model_ORM::FETCH_PKEY_AS_ARR_KEY);
+            $cats = $this->records(Model_ORM::FETCH_PKEY_AS_ARR_KEY);
+            Cache::set($key, $cats);
+         }
+         // new length optimization - make filesort    ->order(array('urlkey_len_cs' => 'DESC'));
+         self::$allCatsRecords = $cats;
       }
       return self::$allCatsRecords;
    }
@@ -215,8 +220,9 @@ class Model_Category extends Model_ORM {
    public function saveCatParams($catId, $params)
    {
       // pokud je pole serializujeme
-      if (is_array($params))
+      if (is_array($params)) {
          $params = serialize($params);
+      }
       $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("UPDATE " . Db_PDO::table(self::DB_TABLE)
             . " SET " . self::COLUMN_PARAMS . " = :params WHERE " . self::COLUMN_CAT_ID . " = :idcat");

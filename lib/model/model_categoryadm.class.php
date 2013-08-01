@@ -54,16 +54,28 @@ class Model_CategoryAdm extends Model_File {
 
    public function getCategory($urlkey){
       $child = self::$structure->xpath("//item[child::urlkey=\"".$urlkey."\" and child::urlkey[@lang=\"".Locales::getLang()."\"]]");
+      // try cs
+      if(empty($child)){
+         $child = self::$structure->xpath("//item[child::urlkey=\"".$urlkey."\" and child::urlkey[@lang=\"cs\"]]");
+      }
       return empty($child) ? false : self::createCatObject($child[0]);
    }
 
    public static function getCategoryByID($id){
       $child = self::$structure->xpath("//item[@id=\"".$id."\" and child::urlkey[@lang=\"".Locales::getLang()."\"]]");
+      // try cs
+      if(empty($child)){
+         $child = self::$structure->xpath("//item[@id=\"".$id."\" and child::urlkey[@lang=\"cs\"]]");
+      }
       return empty($child) ? false : self::createCatObject($child[0]);
    }
 
    public static function getCategoryByModule($module){
       $child = self::$structure->xpath("//item[child::module=\"".$module."\" and child::urlkey[@lang=\"".Locales::getLang()."\"]]");
+      // try cs
+      if(empty($child)){
+         $child = self::$structure->xpath("//item[child::module=\"".$module."\" and child::urlkey[@lang=\"cs\"]]");
+      }
       return empty($child) ? false : self::createCatObject($child[0]);
    }
 

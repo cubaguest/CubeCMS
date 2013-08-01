@@ -53,5 +53,18 @@ class Model_Config extends Model_ORM {
 
       $this->addForeignKey(self::COLUMN_ID_GROUP, 'Model_ConfigGroups', Model_ConfigGroups::COLUMN_ID);
    }
+
+   /**
+    * Metoda nastaví proměnnou konfigurace
+    * @param $name
+    * @param $value
+    * @return bool
+    */
+   public static function setValue($name, $value)
+   {
+      $model = new self();
+      return $model
+         ->where(self::COLUMN_KEY." = :name", array('name' => $name))
+         ->update(array(self::COLUMN_VALUE => $value));
+   }
 }
-?>
