@@ -12,6 +12,13 @@ class Cache {
             self::$provider = new Cache_Provider_MemCache();
          }
 
+         if(defined('VVE_CACHE_PROVIDER') && VVE_CACHE_PROVIDER != null){
+            $class = 'Cache_Provider_'.VVE_CACHE_PROVIDER;
+            if(class_exists($class)){
+               self::$provider = new $class();
+            }
+         }
+
          if(!self::$provider || !self::$provider->isEnabled()){
             self::$provider = new Cache_Provider_NoCache();
          }
