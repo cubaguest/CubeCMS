@@ -126,6 +126,7 @@ function vve_strip_tags($value)
  * <p>%M - Numeric representation of a month, with leading zeros - 01 through 12</p>
  * <p>%f(%b) - Abbreviated month name, based on the locale - Jan through Dec</p>
  * <p>%F(%B) - Full month name, based on the locale - January through December</p>
+ * <p>%J - Celý název měsíce za řadovou číslovkou - ledna až prosince</p>
  * <p>%Y - A full numeric representation of a year, 4 digits - Examples: 1999 or 2003</p>
  * <p>%y - A two digit representation of a year - Examples: 99 or 03</p>
  * <p>%G - 24-hour format of an hour without leading zeros - 0 through 23</p>
@@ -168,13 +169,40 @@ function vve_date($format, $timestamp = null)
       '%g' => array('func' => 'date', 'param' => 'g'),
       '%h' => array('func' => 'date', 'param' => 'h'),
       '%i' => array('func' => 'date', 'param' => 'i'),
-      '%s' => array('func' => 'date', 'param' => 's')
+      '%s' => array('func' => 'date', 'param' => 's'),
+      '%J' => array('func' => '_vve_date_mtr', 'param' => '')
    );
 
    foreach ($replacementArray as $str => $func) {
       $format = str_replace($str, call_user_func_array($func['func'], array($func['param'], (int) $timestamp)), $format);
    }
    return $format;
+}
+
+/**              
+ * Interní funkce pro překlad názvu měsíce po řadové čísloce
+ * @param $param
+ * @param $timestam
+ * @return string
+ */
+function _vve_date_mtr($param, $timestam){
+   $monthTR = array(
+      'cs' => array(
+         1 => 'ledna',
+         'února',
+         'března',
+         'dubna',
+         'května',
+         'června',
+         'července',
+         'srpna',
+         'září',
+         'října',
+         'listopadu',
+         'prosince',
+      )
+   );
+   return isset($monthTR[Locales::getLang()]) ? $monthTR[Locales::getLang()][date('n', $timestam)] : strftime('%B', $timestam);
 }
 
 /**
