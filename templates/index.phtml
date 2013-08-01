@@ -14,7 +14,7 @@ Template::setPVar('IE',false);
 $matches = array();
 if(preg_match('/(?i)msie ([1-9])/i',$_SERVER['HTTP_USER_AGENT'], $matches)) {
    Template::setPVar('IE_WARN',false);
-   if((int)$matches[1] < 7 AND !isset ($_COOKIE['show_ie_warning'])){
+   if((strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE 6.') !==  FALSE) AND !isset ($_COOKIE['show_ie_warning'])){
       Template::setPVar('IE_WARN',true);
    }
    Template::setPVar('IE',true);
