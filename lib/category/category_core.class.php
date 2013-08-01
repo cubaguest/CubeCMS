@@ -69,9 +69,14 @@ class Category_Core extends TrObject {
       if ($isSelectedCategory) {
          self::$selectedCategory = $this;
       }
-      $this->module = new Module($catKey, null);
+      $this->prepareModule($categoryDataObj->{Model_Category::COLUMN_MODULE});
       $this->categoryRights = new Rights();
       $this->loadRights();
+   }
+
+   protected function prepareModule($module)
+   {
+      $this->module = new Module($module, null);
    }
 
    /**
