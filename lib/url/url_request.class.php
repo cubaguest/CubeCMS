@@ -252,22 +252,21 @@ class Url_Request {
       if(strpos($urlPart, 'admin') !== 0){ // pokud je obsaženo jako první slovo admin > jedná se o admin kategorii a není nutné procházen normální
          // načtení kategorií
          $cache = new Cache();
-         $cacheKey = md5('_cats_'.Auth::getGroupId().Locales::getLang()."_".$urlPart);
+         $cacheKey = md5(self::$serverName.'_cats_'.Auth::getGroupId().Locales::getLang()."_".$urlPart);
          
          if( ($cat = $cache->get($cacheKey)) == false){
             $modelCat = new Model_Category();
             $cat = $modelCat
                ->columns(
-                     array(Model_Category::COLUMN_URLKEY,
-                        'urlpart' => 'REPLACE(:urlpartfull, '.Model_Category::COLUMN_URLKEY.'_'.Locales::getLang().', \'\')'), 
-                     array('urlpartfull' => $urlPart))
-               ->where('INSTR(:url, '.Model_Category::COLUMN_URLKEY.'_'.Locales::getLang().') = 1', 
-                     array( 'url' => $urlPart ))
+               array(Model_Category::COLUMN_URLKEY,
+                  'urlpart' => 'TRIM(LEADING '.Model_ORM::getLangColumn(Model_Category::COLUMN_URLKEY).' FROM :urlpartfull)'),
+               array('urlpartfull' => $urlPart))
+               ->where('INSTR(:url, '.Model_ORM::getLangColumn(Model_Category::COLUMN_URLKEY).') = 1',
+               array( 'url' => $urlPart ))
                ->order(array('LENGTH('.Model_Category::COLUMN_URLKEY.')' => Model_ORM::ORDER_DESC))
                ->record();
             $cache->set($cacheKey, $cat);
          } 
-         
          if($cat != false && !$cat->isNew()){
             $matches = array();
             $regexp = "/\/([^?]*)\/?\??(.*)/i";
