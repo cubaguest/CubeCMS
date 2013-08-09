@@ -23,13 +23,7 @@ class AppCore extends TrObject {
    /**
     * Verze enginu
     */
-   const ENGINE_VERSION = 7;
-
-   /**
-    * Revize Enginu
-    * @internal before change release move new config values from _initConfig method
-    */
-   const ENGINE_RELEASE = 19;
+   const ENGINE_VERSION = '8.0.0';
 
    /**
     * Obsahuje hlavní soubor aplikace
@@ -446,13 +440,6 @@ class AppCore extends TrObject {
             }
          }
       }
-      
-      // THIS IS FOR UPDATE - move this configs after release is ready to update sql script
-      if(self::ENGINE_VERSION <= 7 && self::ENGINE_RELEASE < 19 ){
-         // remove in 7.19 version
-
-         // shop
-      }
    }
 
    /**
@@ -468,15 +455,6 @@ class AppCore extends TrObject {
       } else if(!defined('VVE_VERSION')) {
          $core = new Install_Core();
          $core->upgradeToMain();
-      } else {
-      }
-      // update
-      if(!defined('VVE_RELEASE')){
-         define('VVE_RELEASE', 0);
-      }
-      if(VVE_RELEASE != self::ENGINE_RELEASE){ // kvůli neexistenci předchozí detekce
-         $core = new Install_Core();
-         $core->update();
       }
    }
 

@@ -31,17 +31,14 @@ class Category_Admin extends Category {
 
       }
       $this->category = $categoryDataObj;
-//       Debug::log($this->category);
 
-      $this->module = new Module($this->category->{Model_Category::COLUMN_MODULE}, null);
-      $this->module->setDataDir($this->category->{Model_Category::COLUMN_DATADIR});
       $this->categoryRights = new Rights();
       $this->loadRights();
 
-      if($this->category->{Model_Category::COLUMN_PARAMS} != null){
-         $this->catParams = array_merge($this->catParams, unserialize($this->category->{Model_Category::COLUMN_PARAMS}));
+      if($this->getDataObj()->{Model_Category::COLUMN_PARAMS} != null){
+         $this->catParams = array_merge($this->catParams, unserialize($this->getDataObj()->{Model_Category::COLUMN_PARAMS}));
       }
-
+      $this->createModuleObject();
    }
 
    private function loadCat($catKey = null, $catDataObj = null){

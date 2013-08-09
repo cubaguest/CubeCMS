@@ -156,19 +156,19 @@ abstract class Controller extends TrObject {
    {
       if($this->category() instanceof Category_Admin){
          // zatím pouze administrační moduly
-         $m = new Model_Module();
-         $module = $m->where(Model_Module::COLUMN_NAME." = :module", array('module' => $this->module()->getName()))->record();
-         if(!$module){
-            $cls = $this->moduleName."_Install";
-            $installer = new $cls();
-            try {
-               $installer->installModule();
-               $this->infoMsg()->addMessage($this->tr('Modul byl instalován'));
-               $this->link()->reload();
-            } catch (Exception $e) {
-               new CoreErrors($e);
-            }
-         }
+//         $m = new Model_Module();
+//         $module = $m->where(Model_Module::COLUMN_NAME." = :module", array('module' => $this->module()->getName()))->record();
+//         if(!$module){
+//            $cls = $this->moduleName."_Install";
+//            $installer = new $cls();
+//            try {
+//               $installer->installModule();
+//               $this->infoMsg()->addMessage($this->tr('Modul byl instalován'));
+//               $this->link()->reload();
+//            } catch (Exception $e) {
+//               new CoreErrors($e);
+//            }
+//         }
       }
    }
    

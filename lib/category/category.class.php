@@ -18,7 +18,6 @@ class Category extends Category_Core {
     * @bool $isMainCategory --  (option) jest-li se jedná o hlavní kategorii
     */
    public function  __construct($catKey = null, $isSelectedCategory = false, $categoryDataObj = null) {
-//      parent::__construct($catKey = null, $isSelectedCategory = false, $categoryDataObj = null);
       //		vbrání kategorie
       if($catKey != null) {
          $this->loadCat($catKey, $categoryDataObj);
@@ -34,30 +33,7 @@ class Category extends Category_Core {
       if($isSelectedCategory) {
          self::$selectedCategory = $this;
       }
-      $this->prepareModule($this->getDataObj()->{Model_Category::COLUMN_MODULE});
-   }
-
-   protected function prepareModule($module)
-   {
-      // vytvoření objektu Modulu
-      if($this->category->{Model_Category::COLUMN_PARAMS} != null){
-         $this->catParams = array_merge($this->catParams, unserialize($this->category->{Model_Category::COLUMN_PARAMS}));
-      }
-      if($this->category->{Model_Category::COLUMN_PARAMS_OLD} != null){
-         $this->catParams = array_merge($this->catParams, $this->parseParams($this->category->{Model_Category::COLUMN_PARAMS_OLD}));
-      }
-      $this->module = new Module((string)$this->category->{Model_Category::COLUMN_MODULE},$this->catParams);
-      // pokud je zadána vlastní složka pro data
-      if($this->category->{Model_Category::COLUMN_DATADIR} != null){
-         $this->module->setDataDir($this->category->{Model_Category::COLUMN_DATADIR});
-      } else {
-         $datadir = $this->category[Model_Category::COLUMN_URLKEY][Locales::getDefaultLang()];
-         $last = strrpos($datadir,URL_SEPARATOR);
-         if($last !== false){
-            $datadir = substr($datadir,$last+1);
-         }
-         $this->module->setDataDir($datadir);
-      }
+      $this->createModuleObject();
    }
 
    /**
@@ -69,11 +45,19 @@ class Category extends Category_Core {
       if($catDataObj === null) {
          $catModel = new Model_Category();
          if(intval($catKey)){
-            $catModel->withRights()->where(Model_Category::COLUMN_ID .' = :id', array('id' => (int)$catKey));
+            $catModel
+               ->withRights()
+               ->withModule()
+               ->where(Model_Category::COLUMN_ID .' = :id', array('id' => (int)$catKey));
          } else if($catKey != null) {
-            $catModel->withRights()->where(Model_Category::COLUMN_URLKEY.' = :urlkey', array('urlkey' => $catKey));
+            $catModel
+               ->withRights()
+               ->withModule()
+               ->where(Model_Category::COLUMN_URLKEY.' = :urlkey', array('urlkey' => $catKey));
          } else {
-            $catModel->withRights()
+            $catModel
+               ->withRights()
+               ->withModule()
                ->where(Model_Category::COLUMN_URLKEY.' IS NOT NULL', array())
                ->order(array(Model_Category::COLUMN_PRIORITY => Model_ORM::ORDER_DESC));
          }

@@ -2,33 +2,23 @@
 $this->addJsPlugin(new JsPlugin_JQueryCSS());
 $this->addCssFile('style.css');
 ?>
-<h2><?=$this->_('Seznam instalovaných modulů')?></h2>
+<h2><?=$this->tr('Seznam instalovaných modulů')?></h2>
 <table class="modules-list">
    <thead>
       <tr class="ui-widget-header">
-         <th scope="col" class="modules-tb-name"><?=$this->_('Název modulu')?></th>
-         <th scope="col" class="modules-tb-version"><?=$this->_('instalovaná verze')?></th>
-         <th scope="col" class="modules-tb-version"><?=$this->_('aktuální verze')?></th>
+         <th scope="col" class="modules-tb-name"><?=$this->tr('Název modulu')?></th>
+         <th scope="col" class="modules-tb-version"><?=$this->tr('instalovaná verze')?></th>
       </tr>
    </thead>
    <tbody>
       <?foreach ($this->modules as $module) {?>
-      <tr class="ui-widget-content ui-state-default<?if($module['upgrade'] == true) echo " ui-state-error" ?>">
+      <tr class="ui-widget-content ui-state-default">
          <td><?=$module['name']?></td>
-         <td><?=$module['inst_ver']?></td>
-         <td><?=$module['avail_ver']?></td>
+         <td><?=$module['version']?></td>
       </tr>
       <?}?>
    </tbody>
 </table>
 <br />
 <div>
-   <?
-   if($this->allowUpgrade === true){
-      echo $this->formUpgrade->renderStart();
-      echo $this->formUpgrade->save->Controll();
-      echo $this->formUpgrade->renderEnd();
-   }
-   ?>
-
 </div>

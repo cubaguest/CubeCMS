@@ -29,6 +29,7 @@ class Module_Sitemap_Category extends Category_Core {
       $category->{Model_Category::COLUMN_INDIVIDUAL_PANELS} = false;
       $category->{Model_Category::COLUMN_DESCRIPTION} = $this->tr('Kompletní mapa stránek');
       $category->{Model_Category::COLUMN_KEYWORDS} = null;
+      $category->{Model_Module::COLUMN_VERSION} = '1.0.0';
       if(defined('VVE_CM_SITEMAP_CAT_ICON')){
          $category->{Model_Category::COLUMN_ICON} = VVE_CM_SITEMAP_CAT_ICON;
       } else {

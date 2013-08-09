@@ -1,3 +1,0 @@
-ALTER TABLE `{PREFIX}titlepage_items` CHANGE COLUMN `id_item` `id-item` SMALLINT(6) NOT NULL AUTO_INCREMENT  , CHANGE COLUMN `id_category` `id-category` SMALLINT(5) UNSIGNED NOT NULL  , CHANGE COLUMN `id_external` `id-external` SMALLINT(5) UNSIGNED NULL DEFAULT '0'
-, DROP PRIMARY KEY
-, ADD PRIMARY KEY (`id-item`) ;

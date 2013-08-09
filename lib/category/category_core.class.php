@@ -69,14 +69,35 @@ class Category_Core extends TrObject {
       if ($isSelectedCategory) {
          self::$selectedCategory = $this;
       }
-      $this->prepareModule($categoryDataObj->{Model_Category::COLUMN_MODULE});
+      $this->createModuleObject();
       $this->categoryRights = new Rights();
       $this->loadRights();
    }
 
-   protected function prepareModule($module)
+   protected function createModuleObject()
    {
-      $this->module = new Module($module, null);
+      $mClass = ucfirst((string)$this->getDataObj()->{Model_Category::COLUMN_MODULE}).'_Module';
+      if(!class_exists($mClass)){
+         $mClass = 'Module';
+      }
+
+      if($this->getDataObj()->{Model_Category::COLUMN_PARAMS} != null){
+         $this->catParams = array_merge($this->catParams, unserialize($this->getDataObj()->{Model_Category::COLUMN_PARAMS}));
+      }
+      if($this->getDataObj()->{Model_Category::COLUMN_PARAMS_OLD} != null){
+         $this->catParams = array_merge($this->catParams, $this->parseParams($this->getDataObj()->{Model_Category::COLUMN_PARAMS_OLD}));
+      }
+
+      $this->module = new $mClass(
+         (string)$this->getDataObj()->{Model_Category::COLUMN_MODULE},
+         $this->catParams,
+         $this->getDataObj()->{Model_Module::COLUMN_VERSION}
+      );
+
+      // pokud je zadána vlastní složka pro data
+      if($this->getDataObj()->{Model_Category::COLUMN_DATADIR} != null){
+         $this->module->setDataDir($this->getDataObj()->{Model_Category::COLUMN_DATADIR});
+      }
    }
 
    /**

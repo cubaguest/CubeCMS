@@ -15,6 +15,7 @@ class Model_Module extends Model_ORM {
 
    const COLUMN_ID = 'id_module';
    const COLUMN_NAME = 'name';
+   const COLUMN_VERSION = 'version';
    const COLUMN_VERSION_MAJOR = 'version_major';
    const COLUMN_VERSION_MINOR = 'version_minor';
 
@@ -23,9 +24,10 @@ class Model_Module extends Model_ORM {
    
       $this->addColumn(self::COLUMN_ID, array('datatype' => 'smallint', 'ai' => true, 'nn' => true, 'pk' => true));
       $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(30)', 'nn' => true, 'index' => true, 'pdoparam' => PDO::PARAM_STR));
-      $this->addColumn(self::COLUMN_VERSION_MAJOR, array('datatype' => 'tinyint(3)', 'nn' => true, 
+      $this->addColumn(self::COLUMN_VERSION, array('datatype' => 'varchar(5)', 'nn' => true, 'pdoparam' => PDO::PARAM_STR, 'default' => '1.0.0'));
+      $this->addColumn(self::COLUMN_VERSION_MAJOR, array('datatype' => 'tinyint(3)', 'nn' => true,
             'pdoparam' => PDO::PARAM_INT,'default' => 1));
-      $this->addColumn(self::COLUMN_VERSION_MINOR, array('datatype' => 'tinyint(3)', 'nn' => true, 
+      $this->addColumn(self::COLUMN_VERSION_MINOR, array('datatype' => 'tinyint(3)', 'nn' => true,
             'pdoparam' => PDO::PARAM_INT,'default' => 0));
    
       $this->setPk(self::COLUMN_ID);
@@ -61,22 +63,6 @@ class Model_Module extends Model_ORM {
    }
 
    /**
-    * Metoda pro provedení sql příkazu (externího)
-    * @param string $sql
-    */
-   public function installModuleTable($module){
-      if(file_exists(AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR.$module
-              .DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'install.sql')){
-         $sqlQuery = file_get_contents(AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR.$module
-              .DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'install.sql');
-         // přepsání prefixu
-         $sqlQuery = str_replace('{PREFIX}', VVE_DB_PREFIX, $sqlQuery);
-         $dbc = Db_PDO::getInstance();
-         return $dbc->exec($sqlQuery);
-      }
-   }
-
-   /**
     * MEtoda zjišťuje jestli je daný modul instalován
     * @param string $name -- název modulu
     * @return bool -- true pokud je již modul instalován
@@ -96,22 +82,14 @@ class Model_Module extends Model_ORM {
    }
 
 
-   public function registerInstaledModule($name, $vMajor = 1, $vMinor = 0) {
+   public function registerInstaledModule($name, $version) {
       $dbc = Db_PDO::getInstance();
 
       $dbst = $dbc->prepare('INSERT INTO '.Db_PDO::table(self::DB_TABLE)." "
-                 ."(".self::COLUMN_NAME.", ".self::COLUMN_VERSION_MAJOR.", ".self::COLUMN_VERSION_MINOR.")"
-                 ." VALUES (:name, :vmajor, :vminor)");
+                 ."(".self::COLUMN_NAME.", ".self::COLUMN_VERSION.")"
+                 ." VALUES (:name, :version)");
 
-      return $dbst->execute(array(':name' => $name, ':vmajor' => $vMajor, ':vminor' => $vMinor));
-   }
-
-   public function registerUpdatedModule($name, $vMajor = 1, $vMinor = 0) {
-      $dbc = Db_PDO::getInstance();
-      $dbst = $dbc->prepare('UPDATE '.Db_PDO::table(self::DB_TABLE)." "
-                 ." SET ".self::COLUMN_VERSION_MAJOR." = :vmajor, ".self::COLUMN_VERSION_MINOR." = :vminor"
-                 ." WHERE ".self::COLUMN_NAME." = :name");
-      return $dbst->execute(array(':name' => $name, ':vmajor' => (int)$vMajor, ':vminor' => (int)$vMinor));
+      return $dbst->execute(array(':name' => $name, ':version' => $version));
    }
 
    public function getInstalledModules() {
@@ -123,5 +101,15 @@ class Model_Module extends Model_ORM {
 
       return $dbst;
    }
+
+   /**
+    * Metoda detekuje jestli je modul nainstalován
+    * @param $module
+    * @return bool
+    */
+   public static function isInstalled($module)
+   {
+      $m = new self();
+      return (bool)$m->where(self::COLUMN_NAME." = :name", array('name' => $module))->count();
+   }
 }
-?>

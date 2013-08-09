@@ -140,6 +140,17 @@ class Model_Category extends Model_ORM {
    }
 
    /**
+    * Metoda přidá informace o modulu kategorie
+    * @return Model_Category
+    */
+   public function withModule()
+   {
+      $this->join(Model_Category::COLUMN_MODULE, array('t_mod' => 'Model_Module'), Model_Module::COLUMN_NAME,
+                  array(Model_Module::COLUMN_VERSION), self::JOIN_LEFT);
+      return $this;
+   }
+
+   /**
     * Metoda načte všechny kategorie
     * @return array of Model_ORM_Records -- pole s objekty
     */

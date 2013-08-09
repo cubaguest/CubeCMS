@@ -31,6 +31,7 @@ class Module_AutoRun_Category extends Category_Core {
       $category->{Model_Category::COLUMN_DESCRIPTION} = $this->tr('Spouštěč plánovaných úloh');
       $category->{Model_Category::COLUMN_KEYWORDS} = null;
       $category->{Model_Category::COLUMN_ICON} = null;
+      $category->{Model_Module::COLUMN_VERSION} = '1.0.0';
       return $category;
    }
 }
