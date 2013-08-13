@@ -482,6 +482,7 @@ class Forum_Controller extends Controller {
             }
          }
          $newMsg = $message->isNew();
+
          $model->save($message);
 
          if($form->haveElement('delete_attachment') ){
@@ -1049,14 +1050,14 @@ class Forum_Controller extends Controller {
     */
    public function voteMessageController()
    {
-      if(!isset($_GET['id']) || !isset($_GET['action'])){
+      if(!isset($_POST['id']) || !isset($_POST['action'])){
          $this->errMsg()->addMessage($this->tr('Chyba parametrů'));
          return;
       }
 
-      $action = $_GET['action'];
+      $action = $_POST['action'];
       $model = new Forum_Model_Messages();
-      $message = $model->record((int)$_GET['id']);
+      $message = $model->record((int)$_POST['id']);
 
       if(!$message){
          throw new UnexpectedValueException($this->tr('Zpráva neexistuje'));

@@ -151,18 +151,27 @@ $expire->modify('+1 year');
                <td>
                   <div class="message-vote clearfix">
                      <?if($message->voteEnabled){?>
-                     <a class="vote-button vote-button-up" href="<?=$this->link()->route('voteMessage')->param('id', $message->getPK())->param('action', 'voteUp')?>"
-                        title="<?ps($this->tr('Hotnotit: výborně'))?>" ><img src="images/icons/go-up.png"/></a>
+                     <form class="form-vote form-vote-up" method="post" action="<?=$this->link()->route('voteMessage')?>">
+                        <input type="hidden" name="action" value="voteUp" />
+                        <input type="hidden" name="id" value="<?=$message->getPK()?>" />
+                        <input type="image" name="imgsubmit" class="vote-button vote-button-up" src="images/icons/go-up.png" title="<?ps($this->tr('Hotnotit: výborně'))?>" />
+                     </form>
                      <?}?>
                      <span class="vote-counter">
                         <?if(!$message->voteEnabled){ ps($this->tr('Hlasů').": ");}?>
                         <?ps($message->{Forum_Model_Messages::COLUMN_VOTE})?>
                      </span>
                      <?if($message->voteEnabled){?>
-                     <a class="vote-button vote-button-down" href="<?=$this->link()->route('voteMessage')->param('id', $message->getPK())->param('action', 'voteDown')?>"
-                        title="<?ps($this->tr('Hotnotit: zbytečný'))?>" ><img src="images/icons/go-down.png"/></a>
-                     <a class="vote-button vote-button-spam" href="<?=$this->link()->route('voteMessage')->param('id', $message->getPK())->param('action', 'voteSpam')?>"
-                        title="<?ps($this->tr('Nahlásit nevhodné / SPAM'))?>" ><img src="images/icons/decline.png"/></a><br />
+                     <form class="form-vote form-vote-down" method="post" action="<?=$this->link()->route('voteMessage')?>">
+                        <input type="hidden" name="action" value="voteDown" />
+                        <input type="hidden" name="id" value="<?=$message->getPK()?>" />
+                        <input class="vote-button vote-button-down" type="image" src="images/icons/go-down.png" title="<?ps($this->tr('Hotnotit: zbytečný'))?>" />
+                     </form>
+                     <form class="form-vote form-vote-spam" method="post" action="<?=$this->link()->route('voteMessage')?>">
+                        <input type="hidden" name="action" value="voteSpam" />
+                        <input type="hidden" name="id" value="<?=$message->getPK()?>" />
+                        <input class="vote-button vote-button-spam" type="image" src="images/icons/decline.png" title="<?ps($this->tr('Nahlásit nevhodné / SPAM'))?>" />
+                     </form>
                      <?}?>
                   </div>
                </td>
@@ -217,11 +226,13 @@ $this->addJsPlugin(new JsPlugin_PrettyPhoto());
          $(this).prop('title', $(this).data('title'));
          $(this).closest('table').find('.message-vote-label').text("");
       });
-      $('.vote-button').click(function(){
-         var $link = $(this);
+
+      $('form.form-vote').submit(function(){
+         var $form = $(this);
          $.ajax({
-            url : $link.prop('href'),
-            cache : false,
+            url : $form.attr('action'),
+            data : $form.serialize(),
+            cache : false, type : 'post',
             success : function(respond){
                if(respond.infomsg && respond.errmsg.length == 0){
                   var $msg = $('#message-'+respond.idMessage);
@@ -234,7 +245,7 @@ $this->addJsPlugin(new JsPlugin_PrettyPhoto());
                   $('.vote-counter', $msg).text('<?ps($this->tr('Hlasů'))?>: '+respond.votes);
                   <?if(!$this->category()->getRights()->isControll()){?>
                   // disable buttons
-                  $('.vote-button,.message-vote-label', $msg).remove();
+                  $('.form-vote,.message-vote-label', $msg).remove();
                   <?}?>
                }
             }
