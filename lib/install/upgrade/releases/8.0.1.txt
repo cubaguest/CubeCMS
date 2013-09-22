@@ -1,0 +1,9 @@
+NEW:
+- Nový model Model_Users_Settings pro ukládání dat k nastavení jednotlivých uživatelů
+
+EDIT:
+
+
+
+FIXED:
+
