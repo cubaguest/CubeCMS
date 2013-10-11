@@ -1,20 +1,20 @@
-<div class="message <?if(empty ($this->messages)){ echo "hidden";}?>" id="infoMessages">
+<div class="message message-info <?if(empty ($this->messages)){ echo "hidden";}?>" id="infoMessages">
      <?// Vypis hlasek
      if(!empty ($this->messages)) {
         foreach ($this->messages as $message) {
-           print ("<p>".$message . "</p>");
+           echo '<p>'.$message . '</p>';
         }
      }?>
 </div>
-{*-CORE_ERRORS-*}
+<!--{*-CORE_ERRORS-*}-->
 <? // chyby modulu?>
-<div class="message <?if(empty ($this->moduleErrors) AND Template::pVar('IE_WARN') == false) { echo "hidden";}?>" id="errMessages">
+<div class="message message-err <?if(empty ($this->moduleErrors) AND Template::pVar('IE_WARN') == false) { echo "hidden";}?>" id="errMessages">
    <?
    if(Template::pVar('IE_WARN') == true){ $this->includeTpl('ie6browser.phtml',true); }
    if(!empty ($this->moduleErrors)) {
       echo("<strong>".$this->tr("Chyba:")."</strong>");
       foreach ($this->moduleErrors as $error) {
-         print ("<p>".$error ."</p>");
+         echo '<p>'.$error . '</p>';
       }
    }?>
 </div>
