@@ -190,6 +190,8 @@ class Form_Decorator implements Form_Decorator_Interface {
       else if(
           $element instanceof Form_Element_Text 
           || $element instanceof Form_Element_Password 
+          || $element instanceof Form_Element_File 
+          || $element instanceof Form_Element_TextArea 
           || ($element instanceof Form_Element_Select && !$element instanceof Form_Element_Radio) ){
          $element->html()->addClass('form-control');
       } 
