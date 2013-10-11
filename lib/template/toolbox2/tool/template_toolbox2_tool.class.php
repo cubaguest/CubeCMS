@@ -144,7 +144,8 @@ class Template_Toolbox2_Tool implements Template_Toolbox2_Tool_Interface {
     * @return string
     */
    public function getIcon() {
-      return $this->icon;
+      // remove translate icon in 8.2
+      return Template_Toolbox2::translateIcon($this->icon);
    }
 
    /**
@@ -207,4 +208,3 @@ class Template_Toolbox2_Tool implements Template_Toolbox2_Tool_Interface {
       return $null;
    }
 }
-?>

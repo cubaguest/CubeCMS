@@ -1,12 +1,46 @@
 /* jen pro pořádek */
 body.with-admin-menu {padding: 0; margin: 0; margin-top: 25px}
 /* fonty */
-.admin-font, .toolbox input, .toolbox .toolbox-tool-button, #adminMenuWrapper ul.dropdown li a {
+.admin-font, .toolbox, #adminMenuWrapper ul.dropdown li a {
    font-family: "Tahoma", "Arial", sans-serif !important;
    font-size: 12px;
 }
 /* BASIC ADMIN MENU wrapper */
 #adminMenuWrapper {
+   /* ADMIN MENU LEVEL ONE */
+   ul.dropdown, ul.dropdown ul {
+      position: relative;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      z-index: 1000;
+   }
+   
+   ul.dropdown {
+      li {
+         &.hover, &:hover { 
+            a { color: white; }
+         }
+         a {
+            &:hover {background: #333333 !important;}
+            &:active { color: #ffa500; }
+            img { vertical-align: text-bottom; margin-right: 2px;}
+            display: block; padding: 0 8px; color: white; line-height: 24px;
+            -moz-border-radius: 10px 10px 0 0;
+            border-radius: 10px 10px 0 0;
+            overflow: hidden;
+         }
+         font-weight: bold; float: left; zoom: 1; background-color: #666666;
+         padding: 0;
+         margin: 0;
+         font-size: small;
+         text-decoration: none;
+         list-style: none;
+         position: relative;
+      }
+      li.adminmenu-user-item, li.adminmenu-user-item ul li {background-color: #006666;}
+      li.adminmenu-shop-item, li.adminmenu-shop-item ul li {background-color: #660000;}
+   }
    background-color: #666666;
    position: fixed;
    top: 0;
@@ -19,38 +53,6 @@ body.with-admin-menu {padding: 0; margin: 0; margin-top: 25px}
    -webkit-box-shadow:0px 0px 3px #000;
    -moz-box-shadow: 0px 0px 3px #000;
 }
-/* ADMIN MENU LEVEL ONE */
-#adminMenuWrapper ul.dropdown, #adminMenuWrapper ul.dropdown ul {
-   position: relative;
-   list-style: none;
-   padding: 0;
-   margin: 0;
-   z-index: 1000;
-}
-#adminMenuWrapper ul.dropdown li {
-   font-weight: bold; float: left; zoom: 1; background-color: #666666;
-   padding: 0;
-   margin: 0;
-   font-size: small;
-   text-decoration: none;
-   list-style: none;
-   position: relative;
-}
-#adminMenuWrapper ul.dropdown li a {
-   display: block; padding: 0 8px; color: white; line-height: 24px;
-   -moz-border-radius: 10px 10px 0 0;
-   border-radius: 10px 10px 0 0;
-   overflow: hidden;
-}
-#adminMenuWrapper ul.dropdown li a:hover {background: #333333 !important;}
-#adminMenuWrapper ul.dropdown li a:active { color: #ffa500; }
-#adminMenuWrapper ul.dropdown li a img { vertical-align: text-bottom; margin-right: 2px;}
-#adminMenuWrapper ul.dropdown li.adminmenu-user-item,
-#adminMenuWrapper ul.dropdown li.adminmenu-user-item ul li {background-color: #006666;}
-#adminMenuWrapper ul.dropdown li.adminmenu-shop-item,
-#adminMenuWrapper ul.dropdown li.adminmenu-shop-item ul li {background-color: #660000;}
-#adminMenuWrapper ul.dropdown li.hover, #adminMenuWrapper ul.dropdown li:hover {  }
-#adminMenuWrapper ul.dropdown li.hover a { color: white; }
 
 /* ADMIN MENU LEVEL TWO */
 #adminMenuWrapper ul.dropdown ul {
@@ -86,6 +88,39 @@ body.with-admin-menu {padding: 0; margin: 0; margin-top: 25px}
 
 /* SOF ToolBox Panel s editací */
 .toolbox {
+   form {
+      input[type="hidden"] { display:none; }
+      input[type="image"] { vertical-align:bottom; }
+      input[type="submit"]:hover, a:hover { color: black; }
+   }
+   .toolbox-tool {
+      > div {
+         padding-left: 5px;
+      }
+      button, input[type="submit"], a {
+         span.icon {
+            display: inline-block;
+            margin-right: 7px;
+            width: 15px;
+            text-align: center;
+         }
+         background:none;
+         border:none !important;
+         cursor: pointer;
+         text-align:left;
+         background-repeat: no-repeat;
+         display: inline-block;
+         width: 100%;
+         margin: 0;
+         padding: 3px 5px;
+         text-decoration: none;
+      }
+      .toolbox-changelang-button {
+         width: auto;
+      }
+      font-size: 16px;
+   }
+   
    background: orange;
    border: olive 1px solid;
    position: absolute;
@@ -99,65 +134,58 @@ body.with-admin-menu {padding: 0; margin: 0; margin-top: 25px}
    -webkit-border-radius: 4px;
    border-radius: 4px;
    text-align: left;
-
-   form p {
-      padding: 0 !important;
-      margin: 0 !important
-   }
-
-   form {
-      input[type="hidden"] { display:none; }
-      input[type="image"] { vertical-align:bottom; }
-      input[type="submit"]:hover { color: black; }
-   }
-}
-.toolbox-tool input[type="submit"] {
-   background:none;
-   border:none !important;
-   cursor: pointer;
-   text-align:left;
-   background-repeat: no-repeat;
 }
 a.toolbox-button {
+   span {
+      display: inline-block;
+      margin: 3px;
+   }
    display: block;
    position: absolute;
    top: 1px;
    right: 1px;
-   width: 20px;
+   width: 24px;
    border-width: 1px;
    overflow: hidden;
    line-height: 5px;
    padding: 0;
    z-index: 8000;
+   text-decoration: none;
+   text-align: center;
+}
 
-   img {
-      padding: 2px;
-      margin: 0;
-   }
-}
-.toolbox-tool {
-   line-height: 16px;
-   padding: 2px 2px 0 2px;
-   img {
-      vertical-align:-2px;
-   }
-}
 .toolbox-active-content {
    background-color: #e3e3e3;
 }
 /* Toolbox pro editaci poloĹľek */
 .toolbox-inline {
    float: right;
-   padding: 3px;
-   * {
-      display: inline;
-      padding: 0;
+   a, a:visited, button {
+      &:hover {
+         background-image: none;
+         background-color: transparent;
+         color: #333 !important;
+      }
+      background: none transparent;
+      color: #777 !important;
+      display: inline-block;
+      line-height: 1;
+/*      float: left;
+      width: 16px;
+      height: 16px;*/
       margin: 0;
-      line-height: 0;
+      padding: 0;
+      border: 0px none;
    }
-   form div, a.toolbox-tool-inline-button {
+   .toolbox-tool-inline {
+      span.icon {
+         /*width: 18px;*/
+         text-align: center;
+         display: inline-block;
+      }
+      margin-left: 5px;
+      /*display: inline-block;*/
       float: left;
-      margin-left: 3px;
    }
    a, a:hover {
       text-decoration: none;
@@ -167,37 +195,51 @@ a.toolbox-button {
 /* EOF ToolBox Panel s editací */
 
 /* Jazykové taby */
-form table.form-table p.form-link-lang-container {
-   margin: 0;
-   padding: 2px 3px;
-   padding-right: 0;
-   border: 1px solid #bbbbbb;
-   border-bottom: 0px solid transparent;
-   float: left;
-   background-color: #eeeeee;
-}
-.form-elem-container { /*form-link-lang-container need clearfix */
-   clear: left;
-}
-a.form-link-lang {
-   color: black;
-   font-size: 12px;
-   border: 1px solid #bbbbbb;
-   padding: 3px;
-   margin-right: 3px;
-   display: block;
-   float: left;
-   background: transparent url('@{dirCoreImages}forms/langs_back.gif') 0 0 repeat-x;
-   -moz-border-radius: 2px;
-   border-radius: 2px;
-}
-a.form-link-lang:hover, a.form-link-lang-sel:hover, a.form-link-lang:focus, a.form-link-lang-sel:focus {
-   background-position: 0 -20px;
-   text-decoration: none;
-}
+form {
+   .lang-container {
+      a.link-lang {
+         color: black;
+         font-size: 12px;
+         border: 1px solid #aaa;
+         padding: 3px 6px;
+         display: inline-block;
+         /*float: left;*/
+         /*background: transparent url('@{dirCoreImages}forms/langs_back.gif') 0 0 repeat-x;*/
+         @radius: 4px;
+         -moz-border-top-left-radius: @radius;
+         -moz-border-top-right-radius: @radius;
+         border-top-left-radius: @radius;
+         border-top-right-radius: @radius;
+         text-decoration: none;
+         border-bottom: 0px none;
+         color: #aaa;
+      }
+      a.link-lang:hover, a.link-lang-sel:hover, a.link-lang:focus, a.link-lang-sel:focus {
+         /*background-position: 0 -20px;*/
+         text-decoration: none;
+         color: #000;
+         border-color: #000;
+      }
 
-a.form-link-lang-sel {
-   background-position: 0 -40px;
+      a.link-lang-sel {
+         /*background-position: 0 -40px;*/
+         background-color: #ddd;
+         color: #000;
+         border-color: #000;
+      }
+      
+      margin: 0;
+      /*padding: 3px 5px 0;*/
+      padding-right: 0;
+      /*border: 1px solid #bbbbbb;*/
+      border-bottom: 0px solid transparent;
+      /*float: left;*/
+      display: inline-block;
+      /*background-color: #eeeeee;*/
+   }
+   .form-elem-container { /*form-link-lang-container need clearfix */
+      clear: left;
+   }
 }
 
 /* SOF QuickTool Toolbox */
@@ -205,17 +247,17 @@ a.form-link-lang-sel {
    float: right;
    height: 20px;
    line-height: 20px;
-}
-#quicktool-toolbox a {
-   display: block;
-   float: left;
-   height: 20px;
-}
-#quicktool-toolbox a img {
-   padding: 2px;
-}
-#quicktool-toolbox a:hover {
-   background-color: #bbbbbb;
+   a {
+      img {
+         padding: 2px;
+      }
+      &:hover {
+         background-color: #bbbbbb;
+      }
+      display: block;
+      float: left;
+      height: 20px;
+   }
 }
 /* EOF QuickTool Toolbox */
 
@@ -228,11 +270,19 @@ a.form-link-lang-sel {
 }
 .module-navigation {
    margin-bottom: 5px;
-}
-li.module-navigation-tab a img {
-   top: 5px;
-   vertical-align: -2px;
-   padding-right: 4px;
+   li.module-navigation-tab {
+      a {
+         img {
+            top: 5px;
+            vertical-align: -2px;
+            padding-right: 4px;
+         }
+         span.icon {
+            display: inline-block;
+            margin-right: 5px;
+         }
+      }
+   }
 }
 .lang-image {padding-right: 2px; width: 18px; height: 12px;}
 
@@ -252,21 +302,39 @@ li.module-navigation-tab a img {
 }
 
 /* titulní obrázky u článků */
-a.button-select-title-image {
-   width: 100px;
-   height: 100px;
-   margin: 2px;
-   padding: 1px;
-   border: 1px solid gray;
-   float: left;
-}
-#dialog-title-image { display: none; }
-a.button-open-title-image-galery { margin-left: 10px; }
-#dialog-title-image a.selected {
-   border-color: #83AD4F;
-   box-shadow: 0px 0px 5px 3px green;
-   -moz-box-shadow: 0px 0px 5px 1px green;
-   -webkit-box-shadow: 0px 0px 5px 1px green;
+
+#dialog-title-image { 
+   a.button-select-title-image {
+      img {
+         display: inline-block;
+         max-width: 96px;
+         max-height: 96px;
+      }
+      &:before {
+         content: '';
+         display: inline-block;
+         height: 100%;
+         vertical-align: middle;
+         margin-right: -0.25em; /* Adjusts for spacing */
+      }
+      width: 100px;
+      height: 100px;
+      margin: 2px;
+      padding: 1px;
+      border: 1px solid #ccc;
+      /*float: left;*/
+      display: inline-block;
+      vertical-align: middle;
+      text-align: center;
+   }
+   a.selected {
+      border-color: #000;
+      box-shadow: 0px 0px 5px 3px #A61700;
+      -moz-box-shadow: 0px 0px 5px 1px #A61700;
+      -webkit-box-shadow: 0px 0px 5px 1px #A61700;
+   }
+   display: table;
+   width: 100%;
 }
 /* Box nápovědy u kategorie */
 #module-help-box {
@@ -317,9 +385,9 @@ a.button-open-title-image-galery { margin-left: 10px; }
 
 ul.module-tool-buttons {
    margin: 0; padding: 0 0 10px 0;
-   li a { float: left; margin-right: 5px; margin-bottom: 5px; }
+   li a, div { float: left; margin-right: 5px; margin-bottom: 5px; }
    li a img { vertical-align: -2px; margin-right: 5px; }
-   li a .ui-button-text { padding: 5px; }
+   li .ui-button-text { padding: 3px 5px; }
 }
 .module-row-tool-buttons { float: right; }
 .module-row-tool-buttons *, .module-tool-buttons * { display: inline; }
