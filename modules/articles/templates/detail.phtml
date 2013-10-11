@@ -52,6 +52,18 @@ $editTime = new DateTime($this->article->{Articles_Model::COLUMN_EDIT_TIME});
       ?>
    </div>
    <?}?>
+
+   <?if(!empty($this->similar)){?>
+   <h3><?ps('Podobné články')?></h3>
+   <ul class="related-posts">
+      <?foreach($this->similar as $item){?>
+      <li>
+         <a href="<?=$this->link()->route('detail', array('urlkey' => $item->{Articles_Model::COLUMN_URLKEY}))?>"
+            title="<?ps($item->{Articles_Model::COLUMN_NAME})?>"><?ps(vve_tpl_truncate($item->{Articles_Model::COLUMN_NAME}, 50));?></a>
+      </li>
+      <?}?>
+   </ul>
+   <?}?>
    
    <script type="text/javascript">
       /* <![CDATA[ */
@@ -76,6 +88,10 @@ $editTime = new DateTime($this->article->{Articles_Model::COLUMN_EDIT_TIME});
    <?} else {
       $this->includeTpl("buttonback.phtml", true);
    }
+   
+   
+   $this->includeFile('tpl://engine:parts/gastats.phtml');
+   
    if($this->category()->getParam('shareTools', true) == true){
    $this->includeTpl('articletools.phtml', true, array(
       'lastEditTime' => $this->article->{Articles_Model::COLUMN_EDIT_TIME},

@@ -312,8 +312,8 @@ class Articles_Controller extends Controller {
             }
             
          }
-         
-         return false;
+
+         throw new UnexpectedPageException();
       }
 
       if((string)$article->{Model_Users::COLUMN_USERNAME} == null){ // username po vytvoření
@@ -321,6 +321,7 @@ class Articles_Controller extends Controller {
       }
 
       $this->view()->article = $article;
+
       // přičtení zobrazení pokud není admin
       if($this->rights()->isControll() == false AND $article->{Articles_Model::COLUMN_ID_USER} != Auth::getUserId()){
          $article->{Articles_Model::COLUMN_SHOWED} = $article->{Articles_Model::COLUMN_SHOWED}+1;
@@ -416,12 +417,37 @@ class Articles_Controller extends Controller {
          ->where(Articles_Model_TagsConnection::COLUMN_ID_ARTICLE." = :ida", array('ida' => $article->getPK() ) )
          ->order(array(Articles_Model_Tags::COLUMN_NAME => Model_ORM::ORDER_ASC ))
          ->records();
-      
+
       $tags = array();
+      $tagsIds = array();
       foreach ($tagsRecs as $tag) {
+         $tagsIds[':id_'.$tag->{Articles_Model_TagsConnection::COLUMN_ID_TAG}] = $tag->{Articles_Model_TagsConnection::COLUMN_ID_TAG};
          $tags[] = $tag->{Articles_Model_Tags::COLUMN_NAME};
       }
       $this->view()->tags = $tags;
+
+      // pokud jsou tagy načteme relevantní články
+      if(!empty($tagsIds)){
+         $modelTags = new Articles_Model_TagsConnection();
+         $similar = $modelTags
+            ->joinFK(Articles_Model_TagsConnection::COLUMN_ID_ARTICLE,
+            array(Articles_Model::COLUMN_URLKEY, Articles_Model::COLUMN_NAME, Articles_Model::COLUMN_ADD_TIME))
+            ->where(Articles_Model_TagsConnection::COLUMN_ID_TAG." IN (".implode(',', array_keys($tagsIds)).")"
+               ." AND ".Articles_Model::COLUMN_ID_CATEGORY." = :idc"
+               ." AND ".Articles_Model::COLUMN_CONCEPT." = 0"
+               ." AND ".Articles_Model::COLUMN_ADD_TIME." <= NOW()"
+               ." AND ".Articles_Model::COLUMN_ID." != :artId"
+            , array_merge(array(
+               'idc' => $this->category()->getId(),
+               'artId' => $article->getPK()
+            ), $tagsIds)
+         )
+            ->limit(0,5)
+            ->order(array(Articles_Model_TagsConnection::COLUMN_ID_ARTICLE => Model_ORM::ORDER_DESC))
+            ->groupBy(array(Articles_Model_TagsConnection::COLUMN_ID_ARTICLE))
+            ->records();
+         $this->view()->similar = $similar;
+      }
       
       $modelUsers = new Model_Users();
       $this->view()->creator = $modelUsers->record($article->{Articles_Model::COLUMN_ID_USER});
@@ -504,8 +530,13 @@ class Articles_Controller extends Controller {
             array('urlkey' => $this->getRequest('urlkey'), 'idc' => $this->category()->getId()))->record();
       
       if($article == false){
-         return false;
+         throw new UnexpectedPageException();
       }
+
+      if(!$this->rights()->isControll() && $article->{Articles_Model::COLUMN_ID_USER} != Auth::getUserId()){
+         throw new ForbiddenAccessException();
+      }
+
       $this->view()->article = $article;
       
       $editForm = $this->createForm($article);
@@ -996,7 +1027,7 @@ class Articles_Controller extends Controller {
       
       if($form->isSend() ){
          if($form->save->getValues() == false) {
-            $this->link()->route('detail')->reload();
+            $this->link()->route( $article instanceof Model_ORM ? 'detail' : null)->reload();
          }
          if(isset($form->priorit) && $form->priority->getValues() != 0){
             $form->priorityEndDate->addValidation(new Form_Validator_NotEmpty(

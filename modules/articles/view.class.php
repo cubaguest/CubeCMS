@@ -70,7 +70,7 @@ class Articles_View extends View {
          }
       }*/
       // define canonical url
-      Template_Core::setMetaTag('canonical', $this->link()->rmParam());
+      Template_Core::setCanonical($this->link()->rmParam());
       if($this->article->{Articles_Model::COLUMN_TITLE_IMAGE} != null){
          Template_Core::setCoverImage(vve_tpl_art_title_image($this->article->{Articles_Model::COLUMN_TITLE_IMAGE}));
       }
@@ -190,7 +190,7 @@ class Articles_View extends View {
 
    public function editTextView() {
       Template_Module::setEdit(true);
-      $this->setTinyMCE($this->form->text, 'simple');
+      $this->setTinyMCE($this->form->text, 'advanced');
       $this->template()->addFile('tpl://articles:edittext.phtml');
       Template_Navigation::addItem($this->tr('Úprava úvodního textu'), $this->link());
    }
