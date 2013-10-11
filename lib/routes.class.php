@@ -258,4 +258,15 @@ class Routes {
    {
       return null;
    }
+   
+   /**
+    * Metoda vytvoří objekt cest pro danou kategorii
+    * @param Category_Core $category
+    * @return Routes
+    */
+   public static function createModuleRoutes(Category_Core $category)
+   {
+      $class = $category->getModule()->getName().'_Routes';
+      return new $class($category);
+   }
 }
