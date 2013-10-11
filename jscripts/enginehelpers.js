@@ -263,14 +263,16 @@ CubeCMS.Loader = {
 
 CubeCMS.Form = {
    addRow : function(button){
-      var $original = $(button).parent();
+      var $original = $(button).closest('.form-input-multiple');
       var $new = $original.clone(true);
       var $input = $new.find('input');
       $input.attr('id', $input.attr('id')+Math.floor((Math.random()*10)+1))
          .attr('name', $input.attr('name').replace(/\[.*\]/, '[]'))
          .val("");
       $original.removeClass('form-input-multiple-last').find('a.button-add-multiple-line').hide();
-      $original.after($new);
+      
+      $original.after($new.hide());
+      $new.slideDown(200);
 
       if($original.parent().find('.form-input-multiple').length > 1){
          $original.parent().find('a.button-remove-multiple-line').show();
@@ -278,7 +280,7 @@ CubeCMS.Form = {
       return false;
    },
    removeRow : function(button){
-      var $row = $(button).parent();
+      var $row = $(button).closest('.form-input-multiple');
       var $container = $row.parent();
       if($row.hasClass('form-input-multiple-last')){
          // add prev class
@@ -286,14 +288,44 @@ CubeCMS.Form = {
          // show prev add button
          $row.prev().addClass('form-input-multiple-last');
       }
-      $row.remove();
+      $row.slideUp(200, function(){
+         $(this).remove();
+      });
 
       if($container.find('.form-input-multiple').length == 1){
          $container.find('a.button-remove-multiple-line').hide();
       }
       return false;
+   },
+   addButton : function($element, options){
+      options = $.extend({
+         icon : 'refresh',
+         href : window.location+'#',
+         text : null,
+         class : null,
+         id : null
+      }, options);
+      
+      if(!$element.parent().hasClass('input-group')){
+         $element.wrap($('<div></div>').addClass('input-group'));
+      }
+      
+      var $button = $('<a></a>')
+         .addClass('input-group-btn')
+         .addClass(options.class)
+         .prop({
+            href : options.href,
+            id : options.id
+         });
+      if(options.icon !== null){
+         $button.append($('<span></span>').addClass('icon').addClass('icon-'+options.icon));
+      }
+      if(options.text !== null){
+         $button.html(options.text);
+      }
+      $element.parent().append($button);
    }
-}
+};
 
 //base vars
 if(typeof(contentSelector) === "undefined"){
@@ -359,7 +391,7 @@ function initToolboxEvents(){
          opacity     : 1,
          top         : $button.offset().top-2,
          left        : $button.offset().left-$toolbox.width()+22,
-         width       : $toolbox.width(),
+         width       : $toolbox.width()+5,
          'z-index'   : 10000
       }).show();
    });
@@ -430,15 +462,15 @@ $(document).ready(function(){
    CubeCMS.setup(); // init base class when document ready
 
    // when language is changed
-   $('.form-link-lang-container a.form-link-lang').live('click',function(event, focus){
+   $('form .lang-container').on('click', 'a.link-lang',function(event, focus){
       if(typeof focus == 'undefined') focus = true;
       var lang = this.lang;
-      $(this).parent('p').find('a').removeClass('form-link-lang-sel');
-      $(this).addClass('form-link-lang-sel');
+      $(this).parent().find('a').removeClass('link-lang-sel');
+      $(this).addClass('link-lang-sel');
       // vybereme prvek, který obsahuje inputy
-      var $container = $(this).closest('*:has(p[lang])');
-      $('p[lang]', $container).hide();
-      var p = $('p[lang="'+lang+'"]', $container).show();
+      var $container = $(this).closest('*:has(div[lang])');
+      $('div[lang]', $container).hide();
+      var p = $('div[lang="'+lang+'"]', $container).show();
       if(focus) {
          p.find('input,textarea,select').focus();
       }
@@ -450,9 +482,9 @@ $(document).ready(function(){
    });
    // select default language
    if(typeof document.primaryLang !== "undefined"){
-      $('.form-link-lang-container a[lang="'+document.primaryLang+'"]').trigger('click', [false]);
+      $('.lang-container a[lang="'+document.primaryLang+'"]').trigger('click', [false]);
    } else {
-      $('.form-link-lang-container a[lang="'+document.lang+'"]').trigger('click', [false]);
+      $('.lang-container a[lang="'+document.lang+'"]').trigger('click', [false]);
    }
    // toolbox events
    initToolboxEvents();
