@@ -66,7 +66,7 @@ class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_I
             }
          } else {
             if($elemObj->isMultiple()) {
-               if(!$this->checkIsOneValue($elemObj->getUnfilteredValues())) {
+               if($elemObj->getUnfilteredValues() != null && !$this->checkIsOneValue($elemObj->getUnfilteredValues())) {
                   $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
                   $this->isValid = false;
                }
