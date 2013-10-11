@@ -31,12 +31,11 @@ $this->addJsPlugin(New JsPlugin_JQuery());
    
    $(document).ready(function(){
 	   var $usernameStatus = $('<span></span>').attr('id', 'usernameStatus') ;
+      
 	   // create buttons
-	   $('input[name="create_user_password"]').after(
-			   $(' <a></a>').attr({ href : '<?=$this->link()?>#', id : 'buttonGeneratePasswd'})
-			   .append(' ').append($('<img />').attr('src', 'images/icons/arrow_refresh.png') ) 
-		);
-		
+      CubeCMS.Form.addButton($('input[name="create_user_password"]'), 
+      { id : 'buttonGeneratePasswd' });
+      
 	   $('input[name="create_user_username"]').after($usernameStatus);
 
 	   // create password

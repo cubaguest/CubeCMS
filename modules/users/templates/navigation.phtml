@@ -1,7 +1,7 @@
 <?
 $this->items = array(
-   'Nový uživatel' => array('link' => (string)$this->link()->route(''), 'icon' => 'user_add.png'),
-   'Uživatelé' => array('link' => (string)$this->link()->route('users'), 'icon' => 'user.png'),
-   'Skupiny' => array('link' => (string)$this->link()->route('groups'), 'icon' => 'group.png'),
+   'Nový uživatel' => array('link' => (string)$this->link()->route(''), 'icon' => Template_Toolbox2::ICON_ADD),
+   'Uživatelé' => array('link' => (string)$this->link()->route('users'), 'icon' => Template_Toolbox2::ICON_USER),
+   'Skupiny' => array('link' => (string)$this->link()->route('groups'), 'icon' => Template_Toolbox2::ICON_GROUP),
    );
 $this->includeTpl('module_navigation.phtml', true);?>
