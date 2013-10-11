@@ -25,7 +25,7 @@ class Form_Element_TextArea extends Form_Element_Text {
    public function control($renderKey = null) {
       $rKey = $renderKey != null ? $renderKey : $this->renderedId;
       if(!$this->isValid AND $this->isPopulated) {
-         $this->html()->addClass(Form_Element::$cssClasses['error']);
+         $this->html()->addClass($this->cssClasses['error']);
          if(!self::$elementFocused){ $this->html()->setAttrib('autofocus','autofocus'); self::$elementFocused = true;}
       }
 
@@ -34,14 +34,14 @@ class Form_Element_TextArea extends Form_Element_Text {
       $cnt = null;
       if($this->isMultiLang()) {
          foreach ($this->getLangs() as $langKey => $langLabel) {
-            $container = new Html_Element('p', $this->html());
+            $container = clone $this->containerElement;
+            $container->addContent($this->html());
             $this->html()->clearContent();
             $this->html()->setAttrib('lang', $langKey);
             if($this->isDimensional()){
                $this->html()->setAttrib('name', $this->getName().'['.$this->dimensional.']['.$langKey.']');
                $this->html()->setAttrib('id', $this->getName().'_'.$rKey."_".$this->dimensional.'_'.$langKey);
                $container->setAttrib('id', $this->getName().'_'.$rKey."_".$this->dimensional.'_container_'.$langKey);
-//               $container->addClass($this->getName()."_".$this->dimensional."_container_class");
                $this->html()->addContent(htmlspecialchars($values[$this->dimensional][$langKey]));
             } else {
                $this->html()->setAttrib('name', $this->getName().'['.$langKey.']');
@@ -49,9 +49,8 @@ class Form_Element_TextArea extends Form_Element_Text {
                $container->setAttrib('id', $this->getName().'_'.$rKey.'_container_'.$langKey);
                $this->html()->addContent(htmlspecialchars($values[$langKey]));
             }
-            $container->addClass(Form_Element::$cssClasses['elemContainer']);
+            $container->addClass($this->cssClasses['elemContainer']);
             $container->setAttrib('lang', $langKey);
-
             $cnt .= $container;
          }
       } else {
@@ -77,4 +76,3 @@ class Form_Element_TextArea extends Form_Element_Text {
       return $cnt;
    }
 }
-?>

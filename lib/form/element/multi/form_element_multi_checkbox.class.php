@@ -7,8 +7,8 @@
  * chyby.
  *
  *
- * @copyright     Copyright (c) 2008 Jakub Matas
- * @version       $Id: $ VVE 6.0 $Revision: $
+ * @copyright     Copyright (c) 2013 Jakub Matas
+ * @version       $Id: $ VVE 7.10 $Revision: $
  * @author        $Author: $ $Date: $
  *                $LastChangedBy: $ $LastChangedDate: $
  * @abstract      Třída pro obsluhu formulářového prvku typu Input-Text
@@ -16,14 +16,33 @@
 class Form_Element_Multi_Checkbox extends Form_Element_Checkbox {
    protected $options = array();
 
+   public $renderCols = 2;
+
    protected function init() {
       parent::init();
       $this->setMultiple(true);
+      $this->cssClasses['wrapperClass'] = 'checkbox-group';
    }
 
+   /**
+    * Metoda nastaví všechny hodnoty
+    * @param $options
+    * @param bool $merge
+    */
    public function setOptions($options, $merge = false)
    {
       $this->options = $merge ? array_merge($this->options, $options) : $options;
+   }
+
+   /**
+    * Metoda nastaví počet sloupců do kterých se budou elementy vykreslovat
+    * @param int $cols -- počet sloupců
+    * @return Form_Element_Multi_Checkbox
+    */
+   public function setRenderedCols($cols = 2)
+   {
+      $this->renderCols = $cols;
+      return $this;
    }
 
    /**
@@ -41,6 +60,7 @@ class Form_Element_Multi_Checkbox extends Form_Element_Checkbox {
 
    /**
     * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
+    * @param int $renderKey
     * @return string
     */
    public function control($renderKey = null) {
@@ -50,8 +70,9 @@ class Form_Element_Multi_Checkbox extends Form_Element_Checkbox {
 
       // rozdělení na dva sloupce
       $opts = count($this->options);
-      $rows = ceil($opts/2);
-
+      
+      $rows = ceil($opts/$this->renderCols);
+      
       $elements = array();
       foreach($this->options as $optKey => $optName){
          $this->html()->setAttrib('name', $this->getName()."[".$optKey."]");
@@ -64,9 +85,6 @@ class Form_Element_Multi_Checkbox extends Form_Element_Checkbox {
          }
 
          $this->html()->setAttrib('type', 'checkbox');
-//         if(!is_array($values) AND !empty ($values)) {
-//            $this->html()->setAttrib('value', $values);
-//         }
 
          $l = new Html_Element('label', $optName);
          $l->setAttrib('for', $this->getName().'_'.$rKey."_".$optKey);
@@ -74,13 +92,20 @@ class Form_Element_Multi_Checkbox extends Form_Element_Checkbox {
          if($renderKey == null){
             $this->renderedId++;
          }
-         $elements[] = $this->html().$l;
+         $wrapper = clone $this->containerElement;
+         $wrapper->addClass('checkbox');
+         $wrapper->addContent($this->html().$l);
+         $elements[] = $wrapper;
       }
       $parts = array_chunk($elements, $rows, true);
-      return '<table><tr>
-         <td>'.implode('<br />', $parts[0]).'</td>
-         <td>'.implode('<br />', $parts[1]).'</td>
-         </tr></table>';
+
+      $ret = '<table class="'.$this->cssClasses['wrapperClass'].'"><tr>';
+
+      foreach($parts as $part) {
+         $ret .= '<td>'.implode('', $part).'</td>';
+      }
+
+      $ret .= '</tr></table>';
+      return $ret;
    }
 }
-?>

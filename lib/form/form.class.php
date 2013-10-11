@@ -27,13 +27,13 @@ class Form extends TrObject implements ArrayAccess, Iterator {
     * Pole z prvky formuláře
     * @var array
     */
-   private $elements = array();
+   public $elements = array();
 
    /**
     * Pole se skupinami elementů
     * @var array
     */
-   private $elementsGroups = array();
+   public $elementsGroups = array();
 
    /**
     * Proměná obsahuje jestli byl formulář odeslán
@@ -69,21 +69,23 @@ class Form extends TrObject implements ArrayAccess, Iterator {
     * Element pro zjištění odeslání formuláře
     * @var Form_Element_Hidden
     */
-   private $elementCheckForm = null;
-
-   private $protectForm = false;
-   private $elementToken = null;
+   public $elementCheckForm = null;
+   public $protectForm = false;
+   public $elementToken = null;
+   
    private $tokenIsOk = false;
-
    private $submitElement = null;
+   private $decorator = null;
 
 
    /**
     * Konstruktor vytváří objekt formuláře
     * @param string $prefix -- (option) prefix pro formulářové prvky
     */
-   function __construct($prefix = null, $protectForm = false) {
+   function __construct($prefix = null, $protectForm = false, Form_Decorator_Interface $decorator = null) {
       $this->formPrefix = $prefix;
+      $this->decorator = $decorator == null ? new Form_Decorator() : $decorator;
+      
       $this->htmlElement = new Html_Element('form');
       $this->setAction(new Url_Link_Module());
       $this->setSendMethod();
@@ -93,8 +95,13 @@ class Form extends TrObject implements ArrayAccess, Iterator {
       $this->setProtected($protectForm);
    }
 
+   public function setDecorator(Form_Decorator_Interface $decorator)
+   {
+      $this->decorator = $decorator;
+   }
+
    public function  __toString() {
-      return $this->creatString();
+      return $this->decorator->render($this);
    }
 
    /**
@@ -102,9 +109,7 @@ class Form extends TrObject implements ArrayAccess, Iterator {
     */
    private function createToken()
    {
-//      if($this->elementToken == null){
-         $this->elementToken = new Form_Element_Token('_'.$this->formPrefix.'_token');
-//      }
+      $this->elementToken = new Form_Element_Token('_'.$this->formPrefix.'_token');
    }
 
    /**
@@ -113,53 +118,7 @@ class Form extends TrObject implements ArrayAccess, Iterator {
     * @return string -- formulář jako řetězec
     */
    private function creatString(Form_Decorator_Interface $decorator = null) {
-      if($decorator == null) {
-         $decorator = new Form_Decorator();
-      }
-      $html = clone $this->html();
-      $pHtml = new Html_Element('div', $this->elementCheckForm->control());
-      if($this->protectForm && $this->elementToken instanceof Form_Element_Token){
-         $pHtml->addContent((string)$this->elementToken->controll());
-      }
-      $pHtml->addClass('inline');
-      $html->addContent($pHtml);
-
-      $prevGrp = null;
-      $d = clone $decorator;
-      $grps = $this->elementsGroups;
-      reset($grps);
-      while (list($key, $grp) = each($grps)) {
-         // pokud element není ve skupině
-         if(!is_array($grp)) {
-            $next = true;
-            // zařazení elementu do skupiny
-            $d->addElement($this->elements[$key]);
-            // aktuální prvek z pole - curent dává následující, ne na který se ukazuje
-            $next = current($grps);
-            // pokud je další pole nabo není element, ukončíme skupinu
-            if($next === false OR is_array($next)){ // konec nebo další je skupina
-               $html->addContent((string)$d);
-               $d = clone $decorator;
-            }
-         }
-         // pokud patří do skupiny
-         else {
-            // pokud je skupina prázdná
-            if(!empty ($grp['elements'])) {
-            // render elementů do skupiny
-               foreach ($grp['elements'] as $key2 => $elemName) {
-                  $d->addElement($this->elements[$key2]);
-               }
-               $d->setGroupName($grp['label']);
-               $d->setGroupText($grp['text']);
-
-               $html->addContent((string)$d);
-               $d = clone $decorator;
-            };
-         }
-      }
-      $html->addContent($this->scripts());
-      return (string)$html;
+      
    }
 
    /**
@@ -176,7 +135,6 @@ class Form extends TrObject implements ArrayAccess, Iterator {
     * @param mixed $value -- hodnota proměnné
     */
    public function  __set($name, $value) {
-//      $this->elements[$name] = $value;
       $this->addElement($value);
    }
 
@@ -213,7 +171,9 @@ class Form extends TrObject implements ArrayAccess, Iterator {
          unset ($this->elementsGroups[$name]);
       }
       foreach ($this->elementsGroups as $key => $group) {
-         if(!is_array($group)) continue;
+         if(!is_array($group)) {
+            continue;
+         }
          unset ($this->elementsGroups[$key]['elements'][$name]);
       }
    }
@@ -224,8 +184,7 @@ class Form extends TrObject implements ArrayAccess, Iterator {
     */
    public function renderStart() {
       $cnt = $this->html()->__toStringBegin();
-//      $this->createToken();
-      $p = new Html_Element('p', (string)$this->elementCheckForm->controll());
+      $p = new Html_Element('div', (string)$this->elementCheckForm->controll());
       if($this->elementToken !== null){
          $p->addContent((string)$this->elementToken->controll());
       }
@@ -545,7 +504,6 @@ class Form extends TrObject implements ArrayAccess, Iterator {
             $secondPart = array_slice($this->elementsGroups[$group]['elements'], $position);
             $insertPart = array($name => $this->elements[$name]->getName());
             $this->elementsGroups[$group]['elements'] = array_merge($firstPart, $insertPart, $secondPart);
-//            $this->elementsGroups[$group]['elements'][$name] = $this->elements[$name]->getName();
          }
 
       }
@@ -620,7 +578,11 @@ class Form extends TrObject implements ArrayAccess, Iterator {
     * @param Form_Decorator $decorator -- objekt Form dekorátoru
     */
    public function render(Form_Decorator_Interface $decorator = null) {
-      echo ($this->creatString($decorator));
+      if($decorator == null){
+         echo $this->decorator->render($this);
+      } else {
+         echo $decorator->render($this);
+      }
    }
 
    /**

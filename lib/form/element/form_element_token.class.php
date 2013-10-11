@@ -39,4 +39,3 @@ class Form_Element_Token extends Form_Element_Hidden {
    }
    
 }
-?>

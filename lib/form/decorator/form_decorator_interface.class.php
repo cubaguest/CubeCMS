@@ -27,33 +27,40 @@ interface Form_Decorator_Interface {
     */
    public function __construct($decoration = null);
 
-   public function addElement(Form_Element $element);
-
    /**
     * Metoda vygeneruje řádek pro formulář
-    * @return Html_Element -- objekt Html_elementu
+    * @return string
     */
-   public function render($createGroupClass = false);
-
+   public function render(Form $form);
+   
    /**
-    * Metoda nastaví název skupiny
-    * @param string $name -- tag legend
-    * @return Form_Decorator 
+    * Renderuje celou skupinu elementů
+    * @param type $param
     */
-   public function setGroupName($name);
-
+   public function createGroup($name, $params, $formElements);
+   
    /**
-    * Metoda nastaví popisek skupiny
-    * @param string $text -- popisek uvnitře fieldsetu
-    * @return Form_Decorator
+    * Renderuje řádek elementu
+    * @param type $param
     */
-   public function setGroupText($text);
-
+   public function createRow($name, $formElements);
+   
    /**
-    * Magická metoda vrátí obsah dekorátoru jako řetězec
-    * @return string (nejčastěji fieldset)
+    * Renderuje popisek k prvku
+    * @param type $param
     */
-   public function __toString();
-
+   public function createLabel($element);
+   
+   /**
+    * Renderuje ovládací prvek
+    * @param type $param
+    */
+   public function createControl($element);
+   
+   /**
+    * Renderuje ovládací prvek
+    * @param Html_Element $param
+    */
+   public function createForm(Form $form);
+   
 }
-?>

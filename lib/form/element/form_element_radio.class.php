@@ -62,13 +62,16 @@ class Form_Element_Radio extends Form_Element_Select {
     */
    public function control($renderKey = null) {
       $rKey = $renderKey != null ? $renderKey : $this->renderedId;
-      $group = null;
+      $group = clone $this->containerElement;
+      $group->addClass('inline-elements');
       $this->html()->setAttrib('type', 'radio');
 
       $first = true;
       $i = 1;
       $numOpts = count($this->options);
       foreach ($this->options as $optLabel => $optVal) {
+         $wrap = clone $this->containerElement;
+         $wrap->addClass('radio');
          $opt = clone $this->html();
          if($this->isMultiple()) {
             $opt->setAttrib('name', $this->getName()."[".$this->dimensional."]");
@@ -77,7 +80,9 @@ class Form_Element_Radio extends Form_Element_Select {
             $opt->setAttrib('name', $this->getName());
             $opt->setAttrib('id', $this->getName().'_'.$i.'_'.$rKey);
          }
-         if($optVal == false) $optVal = 0;
+         if($optVal == false) {
+            $optVal = 0;
+         }
          $opt->setAttrib('value', (string)$optVal);
          if(($this->unfilteredValues !== false AND $this->unfilteredValues !== null AND $this->unfilteredValues == $optVal)
             OR ($this->unfilteredValues === null AND $first == true) ) {
@@ -86,7 +91,8 @@ class Form_Element_Radio extends Form_Element_Select {
             $opt->setAttrib('checked', 'checked');
          }
          $first = false;
-         $group .= (string)$opt;
+//         $group .= (string)$opt;
+         $wrap->addContent($opt);
          if($this->renderLabel){
             $l = new Html_Element('label', $optLabel);
             if($this->isMultiple()) {
@@ -94,9 +100,11 @@ class Form_Element_Radio extends Form_Element_Select {
             } else {
                $l->setAttrib('for', $this->getName().'_'.$i.'_'.$rKey);
             }
-            $group .= $l.($numOpts > 2 ? '<br />' : null);
+//            $group .= $l.($numOpts > 2 ? '<br />' : null);
+            $wrap->addContent($l.($numOpts > 2 ? '<br />' : null));
          }
          $i++;
+         $group->addContent($wrap);
       }
       if($renderKey == null){
          $this->renderedId++;

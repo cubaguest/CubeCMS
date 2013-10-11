@@ -43,7 +43,7 @@ class Form_Element_UrlKey extends Form_Element_Text {
       $this->createValidationLabels();
       $this->html()->clearContent();
       if(!$this->isValid AND $this->isPopulated) {
-         $this->html()->addClass(self::$cssClasses['error']);
+         $this->html()->addClass($this->cssClasses['error']);
          if(!self::$elementFocused){ $this->html()->setAttrib('autofocus','autofocus'); self::$elementFocused = true;}
       }
       $values = $this->getUnfilteredValues();
@@ -59,13 +59,13 @@ class Form_Element_UrlKey extends Form_Element_Text {
          $cnt = null;
          $first = true;
          foreach ($this->getLangs() as $langKey => $langLabel) {
-            $container = new Html_Element('p');
+            $container = clone $this->containerElement;
             $this->html()->setAttrib('name', $this->getName().'['.$langKey.']');
             $this->html()->setAttrib('id', $this->getName().'_'.$rKey.'_'.$langKey);
             $this->html()->setAttrib('value', htmlspecialchars($values[$langKey]));
             $container->setAttrib('id', $this->getName().'_container_'.$langKey);
             $this->html()->setAttrib('lang', $langKey);
-            $container->addClass(self::$cssClasses['elemContainer']);
+            $container->addClass($this->cssClasses['elemContainer']);
             $container->setAttrib('lang', $langKey);
             $cnt .= $container->setContent($this->html().$updateButton);
          }

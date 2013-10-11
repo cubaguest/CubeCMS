@@ -146,16 +146,22 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     */
    protected $renderedId = 1;
 
+   protected $containerElement = null;
+
+
    /**
     * Název css tříd, která se přidávají k elementům
     * @var array
     */
-   public static $cssClasses = array('error' => 'form-error',
-      'validations' => 'form-box-validations',
-      'langLinkContainer' => 'form-link-lang-container',
-      'langLink' => 'form-link-lang',
-      'langLinkSel' => 'form-link-lang-sel',
-      'elemContainer' => 'form-elem-container');
+   public $cssClasses = array('error' => 'form-error',
+      'validations' => 'validations',
+      'langLinkContainer' => 'lang-container',
+      'langLink' => 'link-lang',
+      'langLinkSel' => 'link-lang-sel',
+      'elemContainer' => 'elem-container',
+      'multipleClass' => 'form-input-multiple',
+      'multipleClassLast' => 'form-input-multiple-last',
+       );
 
    /**
     * Konstruktor elemntu
@@ -163,6 +169,7 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * @param string $label -- popis elemntu
     */
    public function  __construct($name, $label = null, $prefix = null) {
+      $this->containerElement = new Html_Element('div');
       if($name instanceof Form_Element){
          $this->formElementName = str_replace($name->formElementPrefix, '', $name->getName());
          $this->formElementLabel = $name->getLabel();
@@ -188,8 +195,8 @@ class Form_Element extends TrObject implements Form_Element_Interface {
    protected function initHtmlElements() {
       $this->htmlElement = new Html_Element('input');
       $this->htmlElementLabel = new Html_Element('label');
-      $this->htmlElementValidaionLabel = new Html_Element('p');
-      $this->htmlElementSubLabel = new Html_Element('p');
+      $this->htmlElementValidaionLabel = clone $this->containerElement;
+      $this->htmlElementSubLabel = clone $this->containerElement;
    }
 
    /*
@@ -590,7 +597,7 @@ class Form_Element extends TrObject implements Form_Element_Interface {
       $elem = clone $this->htmlLabel();
       $elem->clearContent();
       if(!$this->isValid AND $this->isPopulated) {
-         $elem->addClass(self::$cssClasses['error']);
+         $elem->addClass($this->cssClasses['error']);
       }
       if($this->formElementLabel !== null) {
          $elem->addContent(!$after ? $this->formElementLabel.":" : $this->formElementLabel);
@@ -640,7 +647,8 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     */
    protected function getMultipleButtons($first = false, $last = false)
    {
-      $cnt = null;
+      $cnt = clone $this->containerElement;
+      $cnt->addClass('buttons');
       $link = new Url_Link();
 
       // button remove row
@@ -651,7 +659,7 @@ class Form_Element extends TrObject implements Form_Element_Interface {
       if($first){
          $a->setAttrib('style', 'display:none;');
       }
-      $cnt .= $a;
+      $cnt->addContent($a);
       // button add new row
       $a = new Html_Element('a', '<img src="/images/icons/add.png" alt="'.$this->tr('přidat').'" />');
       $a->setAttrib('href', $link."#add".$this->getName());
@@ -660,8 +668,7 @@ class Form_Element extends TrObject implements Form_Element_Interface {
       if(!$last){
          $a->setAttrib('style', 'display:none;');
       }
-      $cnt .= $a;
-
+      $cnt->addContent($a);
       return $cnt;
    }
 
@@ -670,7 +677,7 @@ class Form_Element extends TrObject implements Form_Element_Interface {
       $this->createValidationLabels();
       $this->html()->clearContent();
       if(!$this->isValid AND $this->isPopulated) {
-         $this->html()->addClass(self::$cssClasses['error']);
+         $this->html()->addClass($this->cssClasses['error']);
          if(!self::$elementFocused){ $this->html()->setAttrib('autofocus','autofocus'); self::$elementFocused = true;}
       }
       $values = $this->getUnfilteredValues();
@@ -680,7 +687,7 @@ class Form_Element extends TrObject implements Form_Element_Interface {
       if($this->isMultiLang()) {
          $cnt = null;
          foreach ($this->getLangs() as $langKey => $langLabel) {
-            $container = new Html_Element('p');
+            $container = clone $this->containerElement;
             if($this->isMultiple()) {
                $this->html()->setAttrib('name', $this->getName().'['.$this->dimensional.']['.$langKey.']');
                $this->html()->setAttrib('id', $this->getName().'_'.$rKey."_".$this->dimensional.'_'.$langKey);
@@ -698,7 +705,7 @@ class Form_Element extends TrObject implements Form_Element_Interface {
                $container->setAttrib('id', $this->getName().'_container_'.$langKey);
             }
             $this->html()->setAttrib('lang', $langKey);
-            $container->addClass(self::$cssClasses['elemContainer'])->addClass('form-input-lang-'.$langKey);
+            $container->addClass($this->cssClasses['elemContainer'])->addClass('form-input-lang-'.$langKey);
             $container->setAttrib('lang', $langKey);
             $container->setContent((string)$this->html());
             $cnt .= $container;
@@ -706,8 +713,8 @@ class Form_Element extends TrObject implements Form_Element_Interface {
       } else {
          if($this->isMultiple()) {
             if(is_array($values) && $this->dimensional === true){
-               $container = new Html_Element('p');
-               $container->addClass('form-input-multiple');
+               $container = clone $this->containerElement;
+               $container->addClass($this->cssClasses['multipleClass']);
                /**
                 * @todo - tohle vyřešit nějak jinak, protože se vkládá index 0 do pole s hodnotami
                 */
@@ -727,14 +734,13 @@ class Form_Element extends TrObject implements Form_Element_Interface {
                   if($lastKey != $key){
                      $container->addContent($this->getMultipleButtons(false, false), true);
                   } else {
-                     $container->addClass('form-input-multiple-last');
+                     $container->addClass($this->cssClasses['multipleClassLast']);
                      $container->addContent($this->getMultipleButtons($numVals == 1, true), true);
-
                   }
                   $cnt .= $container;
                }
             } else if($values == null && $this->dimensional === true){
-               $container = new Html_Element('p');
+               $container = clone $this->containerElement;
                $container->addClass('form-input-multiple');
                $this->html()->setAttrib('name', $this->getName()."[]");
                $this->html()->setAttrib('id', $this->getName().'_'.$rKey);
@@ -803,7 +809,7 @@ class Form_Element extends TrObject implements Form_Element_Interface {
          }
          $labels = substr($labels, 0, strlen($labels)-2).")";
          $this->htmlValidLabel()->setContent($labels);
-         $this->htmlValidLabel()->addClass(self::$cssClasses['validations']);
+         $this->htmlValidLabel()->addClass($this->cssClasses['validations']);
          return $this->htmlValidLabel();
       }
       return null;
@@ -817,23 +823,22 @@ class Form_Element extends TrObject implements Form_Element_Interface {
       if($this->isMultilang() AND count($this->langs) > 1) {
          $langButtons = null;
          foreach ($this->getLangs() as $langKey => $langLabel) {
-//            $a = new Html_Element('a', new Html_Element('span', $langLabel));
             $a = new Html_Element('a', $langLabel);
             $a->setAttrib('href', "#");
-            $a->addClass(self::$cssClasses['langLink']);
+            $a->addClass($this->cssClasses['langLink']);
             if($this->isDimensional()) {
                $a->setAttrib('id', $this->getName()."_".$this->dimensional."_lang_link_".$langKey);
             } else {
                $a->setAttrib('id', $this->getName()."_lang_link_".$langKey);
             }
             $a->setAttrib('lang', $langKey);
-//            $a->setAttrib('onclick', "return formElemSwitchLang(this,'".$langKey."');");
             $a->setAttrib('title', $langLabel);
             $a->setAttrib('lang', $langKey);
             $langButtons .= $a;
          }
-         $container = new Html_Element('p', $langButtons);
-         return $container->addClass(self::$cssClasses['langLinkContainer']);
+         $container = clone $this->containerElement;
+         $container->addContent($langButtons);
+         return $container->addClass($this->cssClasses['langLinkContainer']);
       }
       return null;
    }
@@ -885,4 +890,3 @@ class Form_Element extends TrObject implements Form_Element_Interface {
       return $this->htmlElementSubLabel;
    }
 }
-?>

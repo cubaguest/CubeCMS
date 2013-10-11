@@ -29,50 +29,106 @@ class Form_Decorator_Clear implements Form_Decorator_Interface {
     */
    public function __construct($decoration = null)
    {
-   }
-
-   public function addElement(Form_Element $element)
-   {
-       $this->content .= $element->controll().$element->scripts();
+      
    }
 
    /**
     * Metoda vygeneruje řádek pro formulář
-    * @return Html_Element -- objekt Html_elementu
+    * @return string
     */
-   public function render($createGroupClass = false)
+   public function render(Form $form)
    {
-      return $this->content;
+      $html = $this->createForm($form);
+      foreach ($form->elementsGroups as $name => $group) {
+         if(is_array($group)){
+            $html->addContent($this->createGroup($name, $group, $form->elements));
+         } else {
+            $html->addContent($this->createRow($name, $form->elements));
+         }
+      }
+      return (string)$html;
    }
-
+   
    /**
-    * Metoda nastaví název skupiny
-    * @param string $name -- tag legend
-    * @return Form_Decorator 
+    * Renderuje celou skupinu elementů
+    * @param type $param
     */
-   public function setGroupName($name)
+   public function createGroup($name, $params, $formElements)
    {
-      return $this;
+      if(empty($params['elements'])){
+         return null;
+      }
+      
+      $grp = new Html_Element('fieldset');
+      $name = new Html_Element('span', $params['label']);
+      if(mb_strlen($params['text']) <= 80){
+         $text = new Html_Element('span', new Html_Element('small', $params['text']));
+         $grp->addContent(new Html_Element('legend', $name->addClass('legend-name') . $text->addClass('legend-text')));
+      } else {
+         $grp->addContent(new Html_Element('legend', $name->addClass('legend-name')));
+         $text = new Html_Element('div', $params['text']);
+         $grp->addContent($text->addClass('form-legend-text'));
+      }
+      // lementy
+      foreach ($params['elements'] as $name => $realname) {
+         $grp->addContent($this->createRow($name, $formElements));
+      }
+      
+      return $grp;
    }
-
+   
    /**
-    * Metoda nastaví popisek skupiny
-    * @param string $text -- popisek uvnitře fieldsetu
-    * @return Form_Decorator
+    * Renderuje řádek elementu
+    * @param type $param
     */
-   public function setGroupText($text)
+   public function createRow($name, $formElements)
    {
-      return $this;
+      return $this->createLabel($formElements[$name]) . $this->createControl($formElements[$name]);
    }
-
+   
    /**
-    * Magická metoda vrátí obsah dekorátoru jako řetězec
-    * @return string (nejčastěji fieldset)
+    * Renderuje popisek k prvku
+    * @param type $param
     */
-   public function __toString()
+   public function createLabel($element)
    {
-      return $this->render();
+      $string = null;
+      if(
+          !$element instanceof Form_Element_Button 
+          && !$element instanceof Form_Element_Submit 
+          && !$element instanceof Form_Element_SaveCancel 
+          ){
+         $string .= $element->label();
+      }
+      return $string;
    }
-
+   
+   /**
+    * Renderuje ovládací prvek
+    * @param type $param
+    */
+   public function createControl($element)
+   {
+      $string = null;
+      $string .= $element->control();
+      return $string;
+   }
+   
+   /**
+    * Renderuje ovládací prvek
+    * @param Html_Element $param
+    */
+   public function createForm(Form $form)
+   {
+      $html = $form->html();
+      $html->clearContent();
+      $html->setAttrib('role', 'form');
+      $html->addClass('form-inline');
+      // kontrolní prvky
+      $html->addContent($form->elementCheckForm->control());
+      if($form->protectForm && $form->elementToken instanceof Form_Element_Token){
+         $html->addContent($form->elementToken->controll());
+      }
+      return $html;
+   }
 }
-?>

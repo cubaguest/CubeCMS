@@ -13,7 +13,6 @@ class Form_Element_SaveCancel extends Form_Element {
 
    private $cancelConfirmMsg = true;
 
-
    protected function init() {
       $this->htmlElement = new Html_Element('input');
       $this->html()->setAttrib('type', 'submit');
@@ -25,6 +24,10 @@ class Form_Element_SaveCancel extends Form_Element {
          }
          $this->formElementLabel = $this->getLabel();
       }
+      $this->cssClasses += array(
+          'confirmClass' => array('button-save'),
+          'cancelClass' => array('button-cancel'),
+          );
    }
 
    public function setCancelConfirm($param = true) {
@@ -61,7 +64,10 @@ class Form_Element_SaveCancel extends Form_Element {
       $this->setValues($this->formElementLabel[0]);
       $this->html()->clearClasses();
       $this->html()->removeAttrib('onclick');
-      $this->html()->addClass('button-save');
+      foreach ($this->cssClasses['confirmClass'] as $class) {
+         $this->html()->addClass($class);
+      }
+      
       $ctrlSave = clone parent::control();
       $this->renderedId--;
       $ctrlSave->setAttrib('name', $this->getName().'_ok');
@@ -69,10 +75,13 @@ class Form_Element_SaveCancel extends Form_Element {
 
       $this->setValues($this->formElementLabel[1]);
       $this->html()->clearClasses();
+      
       if($this->cancelConfirmMsg == true){
          $this->html()->setAttrib('onclick', 'return confirm(\''.$this->tr('Opravdu zrušit změny?').'\')');
       }
-      $this->html()->addClass('button-cancel');
+      foreach ($this->cssClasses['cancelClass'] as $class) {
+         $this->html()->addClass($class);
+      }
       $ctrlCancel = clone parent::control();
       $this->renderedId--;
       $ctrlCancel->setAttrib('name', $this->getName().'_cancel');

@@ -83,4 +83,3 @@ class Form_Element_SubmitImage extends Form_Element_Submit implements Form_Eleme
       return $this->html();
    }
 }
-?>

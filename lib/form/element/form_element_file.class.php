@@ -38,6 +38,7 @@ class Form_Element_File extends Form_Element {
       parent::__construct($name, $label,$prefix);
       $this->setUploadDir(AppCore::getAppCacheDir());
       $this->addValidation(new Form_Validator_FileSize(VVE_MAX_UPLOAD_SIZE));
+      $this->cssClasses['containerClass'] = 'input-file-multiple';
    }
 
    /**
@@ -215,8 +216,11 @@ class Form_Element_File extends Form_Element {
       if($this->isMultiple()){
          $this->html()->setAttrib('multiple', 'multiple');
          if($this->dimensional === true){
-            $container = new Html_Element('p');
-            $container->addClass('form-input-multiple')->addClass('form-input-multiple-last');
+            $container = clone $this->containerElement;
+            $container
+                ->addClass($this->cssClasses['containerClass'])
+                ->addClass($this->cssClasses['multipleClass'])
+                ->addClass($this->cssClasses['multipleClassLast']);
 
             $this->html()->setAttrib('name', $this->getName()."[]");
             $this->html()->setAttrib('id', $this->getName().'_'.$rKey);
@@ -305,4 +309,3 @@ class Form_Element_File extends Form_Element {
       return $fileObj;
    }
 }
-?>

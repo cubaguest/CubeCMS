@@ -50,4 +50,3 @@ class Form_Element_Multi_Submit extends Form_Element_Multi {
       return null;
    }
 }
-?>
