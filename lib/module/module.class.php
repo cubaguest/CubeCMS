@@ -312,7 +312,7 @@ class Module
          // načti rodiče
          $class = get_parent_class($class);
       }
-      Debug::log($someLoaded);
+     
       if($someLoaded){
          // přeřazení proměnných pro kompatibilitu
          if(isset($this->main) && $this->main != null){
