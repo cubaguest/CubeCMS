@@ -20,10 +20,19 @@ class Text_Controller extends Controller {
     */
    protected $textModel = null;
 
+   protected $customFields = array();
+
    protected function init()
    {
       parent::init();
       $this->textModel = new Text_Model();
+
+      $fields = $this->module()->getTemplateParam($this->category()->getParam(self::PARAM_TPL_MAIN), 'customFields', false);
+      if($fields){
+         foreach($fields as $tpl => $labels){
+            $this->customFields[$tpl] = $labels[Locales::getLang()];
+         }
+      }
    }
 
    /**
@@ -41,11 +50,18 @@ class Text_Controller extends Controller {
       //		Kontrola práv
       $this->checkWritebleRights();
       
-      $rec = $this->loadTempRecord();
+      $rec = $this->loadTempRecord(Text_Model::TEXT_MAIN_KEY);
       if(!$rec){
          $this->link()->route()->reload();
       }
-      $this->exportTextController($rec);
+      // store custom fields
+      $customFields = array();
+      if(!empty($this->customFields)){
+         foreach($this->customFields as $key => $label){
+            $customFields[$key] = $this->loadTempRecord($key);
+         }
+      }
+      $this->exportTextController($rec, $customFields);
       
       $formPreview = new Form('text_preview_');
       $grp = $formPreview->addGroup('preview', $this->tr('Co s textem?'));
@@ -60,6 +76,15 @@ class Text_Controller extends Controller {
          } else {
             // store and show new text
             $this->processTempData($rec);
+
+            // store custom fields
+            if(!empty($this->customFields)){
+               foreach($this->customFields as $key => $label){
+                  $rec = $this->loadTempRecord($key);
+                  $this->processTempData($rec);
+               }
+            }
+
             $this->infoMsg()->addMessage($this->tr('Text byl uložen'));
             $this->link()->route()->param('tmp')->reload();
          }
@@ -68,12 +93,12 @@ class Text_Controller extends Controller {
       $this->view()->formPreview = $formPreview;
    }
 
-   public function exportTextController(Model_ORM_Record $text = null) 
+   public function exportTextController(Model_ORM_Record $text = null, $fields = array())
    {
       $this->checkReadableRights();
 
       $modelPrivate = new Text_Model_Private();
-      
+
       if($text == null){
          // text
          $text = $this->loadData(self::TEXT_MAIN_KEY);
@@ -86,6 +111,19 @@ class Text_Controller extends Controller {
          if($this->category()->getRights()->isControll() OR $modelPrivate->haveGroup($textPrivate->{Text_Model::COLUMN_ID}, Auth::getGroupId())
             OR $modelPrivate->haveUser($textPrivate->{Text_Model::COLUMN_ID}, Auth::getUserId())){
                $this->view()->textPrivate = $textPrivate;
+         }
+      }
+
+      if(!empty($this->customFields)){
+         if(empty($fields)){
+            $fields = $this->loadDataByKeys(array_keys($this->customFields));
+         }
+         // load custom fileds
+         if(!empty($fields)){
+            foreach($fields as $fName => $field){
+               $propName = 'customField'.$fName;
+               $this->view()->{$propName} = $field->{Text_Model::COLUMN_TEXT};
+            }
          }
       }
    }
@@ -106,17 +144,24 @@ class Text_Controller extends Controller {
          $this->infoMsg()->addMessage($this->tr('Náhled byl zrušen'));
          $this->link()->param('tmpclear')->reload();
       }
-      
+
+      $customFields = array();
       if(!$this->getRequestParam('tmp', false)){
          $textRec = $this->loadData(self::TEXT_MAIN_KEY);
+         if(!empty($this->customFields)){
+            $customFields = $this->loadDataByKeys(array_keys($this->customFields));
+         }
          if($this->isTempRecord()){
             $this->view()->previewLink = $this->link()->param('tmp', true);
             $this->view()->previewLinkCancel = $this->link()->param('tmpclear', true);
          }
       } else {
-         $textRec = $this->loadTempRecord();
+         $textRec = $this->loadTempRecord(Text_Model::TEXT_MAIN_KEY);
+         foreach($this->customFields as $key => $label){
+            $customFields[$key] = $this->loadTempRecord($key);
+         }
       }
-      $form = $this->createEditForm($textRec);
+      $form = $this->createEditForm($textRec, $customFields);
 
       if($form->isSend() AND $form->send->getValues() == 'cancel'){
          $this->infoMsg()->addMessage($this->tr('Změny byly zrušeny'));
@@ -126,12 +171,18 @@ class Text_Controller extends Controller {
 
       if($form->isValid()){
          if($form->send->getValues() == 'preview'){
-            $this->processFormData($form, $textRec, self::TEXT_MAIN_KEY, $elementName = 'text', true);
+            $this->processFormData($form, $textRec, self::TEXT_MAIN_KEY, 'text', true);
+            foreach($this->customFields as $key => $label){
+               $this->processFormData($form, $customFields[$key], $key, 'filed_'.$key, true);
+            }
             $this->link()->route('preview')->reload();
          } else {
             try {
                // odtranění script, nebezpečných tagů a komentřů
                $this->processFormData($form, $textRec, self::TEXT_MAIN_KEY);
+               foreach($this->customFields as $key => $label){
+                  $this->processFormData($form, $customFields[$key], $key, 'filed_'.$key);
+               }
                $this->clearTempRecord();
                $this->log('úprava textu');
                $this->infoMsg()->addMessage($this->tr('Text byl uložen'));
@@ -160,12 +211,33 @@ class Text_Controller extends Controller {
       return $textRecord;
    }
 
+   protected function loadDataByKeys($keys, $loadAllLangs = true)
+   {
+      $forWhere = array();
+      foreach($keys as $id => $key){
+         $forWhere[':key_'.$id] = $key;
+      }
+
+      $tmp = $this->textModel->where(Text_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Text_Model::COLUMN_SUBKEY.' IN ('.implode(', ',array_keys($forWhere)).')',
+         array_merge(array('idc' => $this->category()->getId()), $forWhere))
+         ->joinFK(Text_Model::COLUMN_ID_USER_EDIT)
+         ->setSelectAllLangs($loadAllLangs)
+         ->records();
+
+      $records = array();
+      foreach($tmp as $rec){
+         $records[$rec->{Text_Model::COLUMN_SUBKEY}] = $rec;
+      }
+
+      return $records;
+   }
+
    /**
     *
     * @param Model_ORM_Record $rec
     * @return Form 
     */
-   protected function createEditForm($rec)
+   protected function createEditForm($rec, $customFields = array())
    {
       $form = new Form("text_");
       
@@ -187,9 +259,19 @@ class Text_Controller extends Controller {
          $form->label->setValues($rec->{Text_Model::COLUMN_LABEL});
       }
 
-//       $submit = new Form_Element_SaveCancel('send');
-//       $form->addElement($submit);
-      
+      // custom fileds
+      if($fields = $this->customFields){
+         foreach($fields as $field => $label){
+            $elem = new Form_Element_TextArea('filed_'.$field, $label);
+            $elem->setLangs();
+            if(isset($customFields[$field])){
+               $elem->setValues($customFields[$field]->{Text_Model::COLUMN_TEXT});
+            }
+            $form->addElement($elem, $grpText);
+         }
+         $this->view()->fields = array_keys($this->customFields);
+      }
+
       $submits = new Form_Element_Multi_Submit('send');
       $submits->addElement(new Form_Element_Submit('cancel', $this->tr('Zrušit')));
       $submits->addElement(new Form_Element_Submit('save', $this->tr('Uložit')));
@@ -211,7 +293,6 @@ class Text_Controller extends Controller {
       if(!isset ($form->{$elementName})){
          throw new InvalidArgumentException($this->tr('Nebyl předán správný název formulářového prvku s daty'));
       }
-      
       $text = vve_strip_html_comment($form->{$elementName}->getValues());
       if ($this->category()->getParam(self::PARAM_ALLOW_SCRIPT_IN_TEXT, false) == false) {
          foreach ($text as $lang => $t) {
@@ -230,21 +311,22 @@ class Text_Controller extends Controller {
          $textRec->{Text_Model::COLUMN_LABEL} = $form->label->getValues();
       }
       $textRec->{Text_Model::COLUMN_ID_USER_EDIT} = Auth::getUserId();
+
       if($toTemp){
-         $this->seveTempRecord($textRec);
+         $this->seveTempRecord($textRec, $subkey);
       } else {
          $this->textModel->save($textRec);
       }
       return $textRec;
    }
 
-   protected function processTempData($record) 
+   protected function processTempData($record)
    {
       $this->textModel->save($record);
-      $this->clearTempRecord();
+      $this->clearTempRecord($record->{Text_Model::COLUMN_SUBKEY});
    }
    
-   protected function loadTempRecord($key = 'text') 
+   protected function loadTempRecord($key = Text_Model::TEXT_MAIN_KEY)
    {
       $f = AppCore::getAppCacheDir().$key."_prew_c".$this->category()->getId()."_u".Auth::getUserId().".tmp";
       if(is_file($f) && filesize($f) > 0){
@@ -252,14 +334,14 @@ class Text_Controller extends Controller {
       }
       return false;
    }
-   
-   protected function seveTempRecord($record, $key = 'text') 
+
+   protected function seveTempRecord($record, $key = Text_Model::TEXT_MAIN_KEY)
    {
       $f = AppCore::getAppCacheDir().$key."_prew_c".$this->category()->getId()."_u".Auth::getUserId().".tmp";
       file_put_contents($f, serialize($record));
    }
    
-   protected function clearTempRecord($key = 'text') 
+   protected function clearTempRecord($key = Text_Model::TEXT_MAIN_KEY)
    {
       $f = AppCore::getAppCacheDir().$key."_prew_c".$this->category()->getId()."_u".Auth::getUserId().".tmp";
       if(is_file($f)){
@@ -267,7 +349,7 @@ class Text_Controller extends Controller {
       }
    }
    
-   protected function isTempRecord($key = 'text') 
+   protected function isTempRecord($key = Text_Model::TEXT_MAIN_KEY)
    {
       $f = AppCore::getAppCacheDir().$key."_prew_c".$this->category()->getId()."_u".Auth::getUserId().".tmp";
       return ( is_file($f) && filesize($f) > 0 );
@@ -372,7 +454,7 @@ class Text_Controller extends Controller {
             $this->infoMsg()->addMessage($this->tr('Privátní text byl uložen'));
             $this->link()->route()->reload();
          } catch (PDOException $exc) {
-            new CoreErrors($e);
+            new CoreErrors($exc);
          }
       }
       // view
@@ -383,16 +465,12 @@ class Text_Controller extends Controller {
    {
       $fGrpViewSet = $form->addGroup('view', $this->tr('Nastavení vzhledu'));
 
-      $componentTpls = new Component_ViewTpl();
-      $componentTpls->setConfig(Component_ViewTpl::PARAM_MODULE, $this->module()->getName());
-
       $elemTplMain = new Form_Element_Select('tplMain', $this->tr('Hlavní šablona'));
-      $elemTplMain->setOptions(array_flip($componentTpls->getTpls()));
+      $elemTplMain->setOptions(array_flip($this->module()->getTemplates()));
       if(isset($settings[self::PARAM_TPL_MAIN])) {
          $elemTplMain->setValues($settings[self::PARAM_TPL_MAIN]);
       }
       $form->addElement($elemTplMain, $fGrpViewSet);
-      unset ($componentTpls);
 
       $fGrpEditSet = $form->addGroup('editSettings', $this->tr('Nastavení úprav'));
 
@@ -469,4 +547,3 @@ class Text_Controller extends Controller {
    }
 }
 
-?>
