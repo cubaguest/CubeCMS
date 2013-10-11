@@ -44,7 +44,7 @@ class Photogalery_View extends View {
          
          $toolSortImages = new Template_Toolbox2_Tool_PostRedirect('sort_images', $this->tr("Řadit obrázky"),
          $this->link()->route('sortphotos'));
-         $toolSortImages->setIcon('images.png')->setTitle($this->tr('Řadit obrázky'));
+         $toolSortImages->setIcon(Template_Toolbox2::ICON_MOVE)->setTitle($this->tr('Řadit obrázky'));
          $toolbox->addTool($toolSortImages);
          $this->template()->toolboxImages = $toolbox;
       }
