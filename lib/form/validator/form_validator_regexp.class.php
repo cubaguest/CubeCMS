@@ -15,10 +15,10 @@ class Form_Validator_Regexp extends Form_Validator implements Form_Validator_Int
    private $regexp = null;
 
    public function  __construct($regexp='//', $errMsg = null) {
-      if($errMsg == null) {
-         parent::__construct($this->tr('Položka "%s" nevyhovuje zadanému regulárnímu výrazu'));
-      } else if($regexp == self::REGEXP_PHONE_CZSK AND $errMsg == null) {
+      if($regexp == self::REGEXP_PHONE_CZSK AND $errMsg == null) {
          parent::__construct($this->tr('Položka "%s" neobsahuje platné telefonní číslo'));
+      } else if($errMsg == null) {
+         parent::__construct($this->tr('Položka "%s" nevyhovuje zadanému regulárnímu výrazu'));
       } else {
          parent::__construct($errMsg);
       }
