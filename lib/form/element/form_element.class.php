@@ -647,9 +647,34 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     */
    protected function getMultipleButtons($first = false, $last = false)
    {
+      $link = new Url_Link();
+      $cnt = null;
+      
+      // button add new row
+      $a = new Html_Element('a', '<span class="icon icon-plus"></span>');
+      $a->setAttrib('href', $link."#add".$this->getName());
+      $a->setAttrib('onclick', "return CubeCMS.Form.addRow(this)");
+      $a->addClass('button-add-multiple-line')->addClass('input-group-btn');
+      if(!$last){
+         $a->setAttrib('style', 'display:none;');
+      }
+      $cnt .= $a;
+      
+      $a = new Html_Element('a', '<span class="icon icon-minus"></span>');
+      $a->setAttrib('href', $link."#add".$this->getName());
+      $a->setAttrib('onclick', "return CubeCMS.Form.removeRow(this)");
+      $a->addClass('button-remove-multiple-line')->addClass('input-group-btn');
+      if($first){
+         $a->setAttrib('style', 'display:none;');
+      }
+      $cnt .= $a;
+      
+      return $cnt;
+      
+      
       $cnt = clone $this->containerElement;
       $cnt->addClass('buttons');
-      $link = new Url_Link();
+      
 
       // button remove row
       $a = new Html_Element('a', '<img src="/images/icons/delete.png" alt="'.$this->tr('odebrat').'" />');
@@ -714,7 +739,10 @@ class Form_Element extends TrObject implements Form_Element_Interface {
          if($this->isMultiple()) {
             if(is_array($values) && $this->dimensional === true){
                $container = clone $this->containerElement;
-               $container->addClass($this->cssClasses['multipleClass']);
+               $container
+                   ->addClass($this->cssClasses['multipleClass'])
+                   ->addClass('input-group')
+                   ;
                /**
                 * @todo - tohle vyřešit nějak jinak, protože se vkládá index 0 do pole s hodnotami
                 */

@@ -220,7 +220,8 @@ class Form_Element_File extends Form_Element {
             $container
                 ->addClass($this->cssClasses['containerClass'])
                 ->addClass($this->cssClasses['multipleClass'])
-                ->addClass($this->cssClasses['multipleClassLast']);
+                ->addClass($this->cssClasses['multipleClassLast'])
+                ->addClass('input-group');
 
             $this->html()->setAttrib('name', $this->getName()."[]");
             $this->html()->setAttrib('id', $this->getName().'_'.$rKey);

@@ -272,29 +272,29 @@ CubeCMS.Form = {
       $original.removeClass('form-input-multiple-last').find('a.button-add-multiple-line').hide();
       
       $original.after($new.hide());
-      $new.slideDown(200);
+      $new.fadeIn(200, function(){
+      });
 
-      if($original.parent().find('.form-input-multiple').length > 1){
-         $original.parent().find('a.button-remove-multiple-line').show();
+      if($original.closest('.form-controls').find('.form-input-multiple').length > 1){
+         $original.closest('.form-controls').find('a.button-remove-multiple-line').show();
       }
       return false;
    },
    removeRow : function(button){
       var $row = $(button).closest('.form-input-multiple');
-      var $container = $row.parent();
-      if($row.hasClass('form-input-multiple-last')){
-         // add prev class
-         $row.prev().addClass('form-input-multiple-last').find('a.button-add-multiple-line').show();
-         // show prev add button
-         $row.prev().addClass('form-input-multiple-last');
-      }
-      $row.slideUp(200, function(){
+      var $container = $row.closest('.form-controls');
+      $row.fadeOut(100, function(){
+         if($row.hasClass('form-input-multiple-last')){
+            // add prev class
+            $row.prev().addClass('form-input-multiple-last').find('a.button-add-multiple-line').show();
+            // show prev add button
+            $row.prev().addClass('form-input-multiple-last');
+         }
          $(this).remove();
+         if($container.find('.form-input-multiple').length == 1){
+            $container.find('a.button-remove-multiple-line').hide();
+         }
       });
-
-      if($container.find('.form-input-multiple').length == 1){
-         $container.find('a.button-remove-multiple-line').hide();
-      }
       return false;
    },
    addButton : function($element, options){
