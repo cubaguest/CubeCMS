@@ -18,9 +18,11 @@
             case 'Template_Toolbox2_Tool_PostRedirect':
                ?>
          <form action="<?=$tool->getAction() ?>" method="post" onsubmit="<?=$formOnSubmit?>" name="<?=$name?>">
-            <div><input class="toolbox-tool-inline-button" type="image" src="<?=$image?>" name="<?=$tool->getName() ?>_button"
-                     value="<?=$tool->getLabel() ?>" title="<?=$tool->getTitle() ?>" />
-                  <?
+            <div>
+               <button class="toolbox-tool-inline-button" type="submit" 
+                       title="<?=$tool->getTitle() ?>" name="<?=$tool->getName() ?>_button" value="<?=$tool->getLabel() ?>"
+                       ><span class="icon icon-<?=$tool->getIcon()?>"></span></button>
+                  <?php
                   $addVal = $tool->getSubmitValues();
                   foreach ($addVal as $key => $value) {
                      echo "<input type=\"hidden\" name=\"$key\" value=\"" . (string) $value . "\" />";
@@ -36,9 +38,10 @@
                foreach ($addVal as $key => $value) {
                   $link->param($key, $value);
                }
-               ?><a href="<?=$link ?>" title="<?=$tool->getTitle() ?>" 
-                  id="toolbox-button-<?=substr(md5($link), 0,8)?>" onclick="<?=$formOnSubmit?>" class="toolbox-tool-inline-button toolbox-button-<?=$name?>"
-                  ><img alt="<?=$tool->getLabel()?>" src="<?=$image?>"/></a>
+               ?><a href="<?=$link ?>" title="<?ps($tool->getTitle())?>"
+                  id="toolbox-button-<?=substr(md5($link), 0,8)?>" onclick="<?=$formOnSubmit?>" 
+                  class="toolbox-tool-inline-button toolbox-button-<?=$name?>"
+                  ><span class="icon icon-<?=$tool->getIcon()?>"></span></a>
                <?
                break;
             case 'Template_Toolbox2_Tool_Form':
@@ -46,8 +49,11 @@
                <form action="<?=$tool->getForm()->getAction();?>" method="<?=$tool->getForm()->getSendMethod();?>" onsubmit="<?=$formOnSubmit?>" name="<?=$name?>">
                   <div><?foreach ($tool->getForm() as $element) {
                   if($element instanceof Form_Element_Submit OR $element instanceof Form_Element_SubmitImage){
-                     ?><input class="toolbox-tool-inline-button" type="image" name="<?=$element->getName()?>"
-                         src="<?=$image?>" value="<?=$element->getLabel()?>" title="<?=$element->getLabel() ?>" /><?
+                     ?>
+                     <button class="toolbox-tool-inline-button" type="submit" 
+                       title="<?=$element->getLabel() ?>" name="<?=$element->getName() ?>_button" value="<?=$element->getLabel() ?>"
+                       ><span class="icon icon-<?=$tool->getIcon()?>"></span></button>
+                     <?
                   } else if($element instanceof Form_Element_Hidden) {
                      ?><input type="hidden" name="<?=$element->getName();?>" value="<?=$element->getValues() ?>" /><?
                   }
@@ -66,6 +72,12 @@
                         title="<?=$lang?>"><img src="images/langs/small/<?=$key?>.png" /></a>
                   <?}?>
                </div>
+               <?
+               break;
+            case 'Template_Toolbox2_Tool_Button':
+               ?>
+               <button class="toolbox-button toolbox-button-<?ps($name)?>" title="<?ps($tool->getTitle())?>"
+                       onclick="<?=$formOnSubmit?>"><span class="icon icon-<?=$tool->getIcon()?>"></span></button>
                <?
                break;
             default:

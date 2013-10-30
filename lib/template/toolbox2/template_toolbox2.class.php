@@ -21,20 +21,21 @@ class Template_Toolbox2 extends Template {
    const ICON_PAGE_EDIT = 'edit';
    const ICON_WRENCH = 'wrench';
    const ICON_COG = 'cog';
-   const ICON_IMAGE = 'picture';
-   const ICON_IMAGE_WRENCH = 'picture';
-   const ICON_ADD = 'plus-sign';
-   const ICON_DELETE = 'remove-sign';
+   const ICON_IMAGE = 'picture-o';
+   const ICON_IMAGE_WRENCH = 'picture-o';
+   const ICON_ADD = 'plus-circle';
+   const ICON_DELETE = 'times-circle';
    const ICON_MOVE = 'move';
    const ICON_MOVE_UP_DOWN = 'resize-vertical';
    const ICON_USER = 'user';
    const ICON_GROUP = 'group';
-   const ICON_DISABLE = 'eye-close';
-   const ICON_ENABLE = 'eye-open';
+   const ICON_DISABLE = 'eye-slash';
+   const ICON_ENABLE = 'eye';
    const ICON_COPY = 'copy';
-   const ICON_STATS = 'bar-chart';
+   const ICON_STATS = 'bar-chart-o';
    const ICON_HOME = 'home';
-   const ICON_EXPORT = 'share';
+   const ICON_EXPORT = 'share-square-o';
+   const ICON_SHARE = 'share';
    
    const TEMPLATE_NORMAL = "toolbox.phtml";
    const TEMPLATE_INLINE = "toolbox_inline.phtml";
@@ -198,8 +199,8 @@ class Template_Toolbox2 extends Template {
    public static function translateIcon($icon){
       $iconName = str_replace('.png', null, $icon);
       $translate = array(
-         'add' => 'plus-sign',
-         'page_add' => 'plus-sign',
+         'add' => self::ICON_ADD,
+         'page_add' => self::ICON_ADD,
          'page_delete' => self::ICON_DELETE,
          'page_edit' => self::ICON_PAGE_EDIT /*"file-text"*/,
          'page_copy' => self::ICON_COPY,

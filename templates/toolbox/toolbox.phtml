@@ -4,7 +4,9 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
 $rTime = rand(1, time());
 ?>
 <a class="toolbox-button ui-state-default ui-corner-all" id="toolbox-<?=$rTime?>-button"
-   href="" title="<?$this->tr('Otevřít nástroje')?>"><img src="<?=$this->iconsDir.$this->toolboxIcon?>" alt="icon <?=$this->toolboxIcon?>" height="16" /></a>
+   href="#" title="<?$this->tr('Otevřít nástroje')?>">
+   <span class="icon icon-<?=$this->toolboxIcon?>"></span>
+</a>
 <div class="toolbox" id="toolbox-<?=$rTime?>-box">
    <? foreach ($this->getTools() as $name => $tool) {
       $class = get_class($tool);
@@ -24,9 +26,11 @@ $rTime = rand(1, time());
          switch ($class) {
             case 'Template_Toolbox2_Tool_PostRedirect':
                ?>
-         <form action="<?=$tool->getAction() ?>" method="post" onsubmit="<?=$formOnSubmit?>" name="<?=$name?>">
-            <div><?=$image;?><input class="toolbox-tool-button ui-state-default" type="submit" name="<?=$tool->getName() ?>_button"
-                     value="<?=$tool->getLabel() ?>" title="<?=$tool->getTitle() ?>" />
+               <form action="<?=$tool->getAction() ?>" method="post" onsubmit="<?=$formOnSubmit?>" name="<?=$name?>">
+                  <div>
+                     <button type="submit" name="<?=$tool->getName() ?>_button"
+                             class="toolbox-tool-button ui-state-default" title="<?=$tool->getTitle() ?>"
+                             ><span class="icon icon-<?=$tool->getIcon()?>"></span><?=$tool->getLabel() ?></button>
                   <?
                   $addVal = $tool->getSubmitValues();
                   foreach ($addVal as $key => $value) {
@@ -46,7 +50,7 @@ $rTime = rand(1, time());
                ?><a href="<?=$link ?>" title="<?=$tool->getTitle() ?>"
                     id="toolbox-button-<?=substr(md5($link), 0,8)?>" onclick="<?=$formOnSubmit?>" 
                     class="toolbox-tool-button toolbox-button-<?=$name?>"
-                    ><?=$image." ".htmlspecialchars($tool->getLabel())?></a>
+                    ><span class="icon icon-<?=$tool->getIcon()?>"></span><?=htmlspecialchars($tool->getLabel())?></a>
                 <?
                /*?>
          <form action="<?=$tool->getAction()?>" method="get" onsubmit="<?=$formOnSubmit?>" name="<?=$name?>">
@@ -63,31 +67,41 @@ $rTime = rand(1, time());
                break;
             case 'Template_Toolbox2_Tool_Form':
                ?>
-               <form action="<?=$tool->getForm()->getAction();?>" method="<?=$tool->getForm()->getSendMethod();?>" name="<?=$name?>" onsubmit="<?=$formOnSubmit?>">
-                  <div><?=$image;?><?
-
-               foreach ($tool->getForm() as $element) {
-                  if($element instanceof Form_Element_Submit OR $element instanceof Form_Element_SubmitImage){
-                     ?><input class="toolbox-tool-button ui-state-default" type="submit" name="<?=$element->getName()?>"
-                         value="<?=$element->getLabel()?>" title="<?=$element->getLabel() ?>" /><?
-                  } else if($element instanceof Form_Element_Hidden) {
-                     ?><input type="hidden" name="<?=$element->getName();?>" value="<?=$element->getValues() ?>" /><?
+               <form action="<?=$tool->getForm()->getAction();?>" 
+                     method="<?=$tool->getForm()->getSendMethod();?>" name="<?=$name?>" onsubmit="<?=$formOnSubmit?>">
+                  <div><?
+                  foreach ($tool->getForm() as $element) {
+                     if($element instanceof Form_Element_Submit OR $element instanceof Form_Element_SubmitImage){
+                        ?><button class="toolbox-tool-button ui-state-default" type="submit" name="<?=$element->getName()?>"
+                             title="<?=$element->getLabel() ?>"
+                        ><span class="icon icon-<?=$tool->getIcon()?>"></span><?=$element->getLabel()?></button>
+                        <?
+                     } else if($element instanceof Form_Element_Hidden) {
+                        ?><input type="hidden" name="<?=$element->getName();?>" value="<?=$element->getValues() ?>" /><?
+                     }
                   }
-               }
                   ?><input type="hidden" name="<?=$tool->getForm()->getFormChecker()->getName();?>" value="<?=$tool->getForm()->getFormChecker()->getValues() ?>" /><?
                ?></div></form><?
                break;
             case 'Template_Toolbox2_Tool_LangLoader':
                ?>
-               <div style="font-size: small;"><?=$image?>
+               <div><span class="icon icon-<?=$tool->getIcon()?>"></span>
                <?
                echo $this->tr('Ukaž');
                $link = new Url_Link();
                   foreach($tool->getLangs() as $key => $lang){?>
                      <a class="toolbox-changelang-button" href="<?if(Locales::getLang() != $key){ echo $link->param('l', $key); } else {echo $link->param('l');}?>" 
-                        title="<?=$lang?>"><img src="images/langs/small/<?=$key?>.png" /></a>
+                        title="<?=$lang?>"
+                        ><img src="images/langs/small/<?=$key?>.png" /></a>
                   <?}?>
                </div>
+               <?
+               break;
+            case 'Template_Toolbox2_Tool_Button':
+               ?>
+               <button class="toolbox-button toolbox-button-<?ps($name)?>" title="<?ps($tool->getTitle())?>"
+                       style="background-image: url('<?=$image?>')"
+                       onclick="<?=$formOnSubmit?>"></button>
                <?
                break;
             default:
