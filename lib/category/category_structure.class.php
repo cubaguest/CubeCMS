@@ -234,6 +234,30 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
    }
 
    /**
+    * Odebere neviditelné potomky
+    */
+   public function removeNonVisibleChildrens()
+   {
+      foreach ($this->childrens as $key => $child) {
+         $dataObj = $child->getCatObj()->getCatDataObj();
+         if($child->getCatObj() != false
+//            AND (Auth::isAdmin() OR $dataObj[$child->getId()][Model_Rights::COLUMN_RIGHT][0] == 'r' OR Auth::getUserId() == $catArray[$child->getId()][Model_Category::COLUMN_ID_USER_OWNER]) // práva ke kategorii
+            AND (
+//               $this->withHidden // všechny zkryté bez rozdílu OR
+               ($dataObj[Model_Category::COLUMN_VISIBILITY] == Model_Category::VISIBILITY_ALL) // viditelné všem
+               OR (!Auth::isLogin() AND $dataObj[Model_Category::COLUMN_VISIBILITY] == Model_Category::VISIBILITY_WHEN_NOT_LOGIN) // viditelné nepřihlášeným
+               OR (Auth::isLogin() AND $dataObj[Model_Category::COLUMN_VISIBILITY] == Model_Category::VISIBILITY_WHEN_LOGIN) // viditelné přihlášeným
+               OR (Auth::isAdmin() AND $dataObj[Model_Category::COLUMN_VISIBILITY] == Model_Category::VISIBILITY_WHEN_ADMIN) // viditelné adminům
+               OR (Auth::isAdminGroup() AND $dataObj[Model_Category::COLUMN_VISIBILITY] == Model_Category::VISIBILITY_WHEN_ADMIN_ALL) // viditelné adminům ze všech domén
+            )) {
+            $child->removeNonVisibleChildrens();
+         } else {
+            unset ($this->childrens[$key]);
+         }
+      }
+   }
+
+   /**
     * Metoda nastaví jestli se mají i zkryté kategorie
     * @param bool $hidden
     */
@@ -644,6 +668,19 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
    {
 //      $this->cleanUpCategory();
       return array('level', 'id', 'idParent', 'catObj', 'childrens');
+   }
+   
+   /**
+    * Klonování kvůli referencím
+    */
+   public function __clone()
+   {
+      foreach ($this as $key => $value) {
+         $this->childrens[$key] = clone $this->childrens[$key];
+      }
+      if(is_object($this->catObj)){
+         $this->catObj = clone $this->catObj;
+      }
    }
 
    public function cleanUpCategory()

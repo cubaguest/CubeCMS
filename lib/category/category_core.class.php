@@ -88,10 +88,15 @@ class Category_Core extends TrObject {
          $this->catParams = array_merge($this->catParams, $this->parseParams($this->getDataObj()->{Model_Category::COLUMN_PARAMS_OLD}));
       }
 
+      $installedVersion = $this->getDataObj()->{Model_Module::COLUMN_VERSION};
+      $moduleName = (string)$this->getDataObj()->{Model_Category::COLUMN_MODULE};
+      if(!isset($this->getDataObj()->{Model_Module::COLUMN_VERSION})){
+         $installedVersion = Model_Module::getVersion($moduleName);
+      }
       $this->module = new $mClass(
-         (string)$this->getDataObj()->{Model_Category::COLUMN_MODULE},
+         $moduleName,
          $this->catParams,
-         $this->getDataObj()->{Model_Module::COLUMN_VERSION}
+         $installedVersion
       );
 
       // pokud je zadána vlastní složka pro data
@@ -258,6 +263,15 @@ class Category_Core extends TrObject {
    public function getModule()
    {
       return $this->module;
+   }
+   
+   /**
+    * Alias for getModule
+    * @return Module
+    */
+   public function module()
+   {
+      return $this->getModule();
    }
 
    /**
