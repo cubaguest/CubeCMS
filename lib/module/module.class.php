@@ -25,23 +25,19 @@ class Module
 
    protected $coreModule = false;  // vypíná aktualizace, protože ty jsou obsaženy v aktualizaci jádra
 
+   private $currentModule = null;
 
-   protected $customTemplates = false;
+
    /**
-    * Pole s šablonama
+    * Šablony modulu
     * @var array
     */
-   protected $templatesMain = array();
+   protected static $templates = array();
    /**
-    * Pole s šablonama
+    * Šablony panelu modulu
     * @var array
     */
-   protected $templatesPanel = array();
-   /**
-    * Pole s parametry šablon
-    * @var array
-    */
-   protected $templatesParams = array();
+   protected static $panelTemplates = array();
 
    /**
     * @param $name
@@ -54,9 +50,6 @@ class Module
       $this->params = $params;
       $this->dataDir = $name;
       $this->checkVersion($version);
-      if($this->customTemplates){
-         $this->loadTemplates();
-      }
    }
 
    public function __toString()
@@ -186,7 +179,7 @@ class Module
    protected function installDependentModules()
    {
       foreach ($this->depModules as $module) {
-         Debug::log($module, Model_Module::isInstalled($module));
+//         Debug::log($module, Model_Module::isInstalled($module));
          if(!Model_Module::isInstalled($module)){
             $mClass = ucfirst($module) . '_Module';
             if(!class_exists($mClass)){
@@ -274,77 +267,156 @@ class Module
 
    /**
     * Metoda provede načtení šablon a jejich parametrů
+    * @todo tady by šlo nádherně kešovat přes soubor
     */
-   protected function loadTemplates()
+   public function loadTemplates()
    {
+      if(isset(self::$templates[$this->getName()])){
+         return;
+      } else {
+         self::$templates[$this->getName()] = array();
+         self::$panelTemplates[$this->getName()] = array();
+      }
+      
       $someLoaded = false;
       $class = get_class($this);
+      $modules = array();
+      // @todo dořešit načítání z modulů od kterých se dědí
       while ($class != 'Module') {
          $module = strtolower( substr($class, 0, -7));
-         // zkus existenci souborů
-         // soubor z face
-         if(is_file(Template::faceDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
-            .$module.DIRECTORY_SEPARATOR.Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.self::TPLS_LIST_FILE)){
-
-            include Template::faceDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
-               .$module.DIRECTORY_SEPARATOR.Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.self::TPLS_LIST_FILE;
-            $someLoaded = true;
-            break;
-         }
-         // soubor z hlavního vzhledu
-         else if(is_file(Template::faceDir(true).AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
-            .$module.DIRECTORY_SEPARATOR.Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.self::TPLS_LIST_FILE)){
-
-            include Template::faceDir(true).AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
-               .$module.DIRECTORY_SEPARATOR.Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.self::TPLS_LIST_FILE;
-            $someLoaded = true;
-            break;
-         }
-            // soubor z modulu
-         else if(is_file(AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR.$module
-            .DIRECTORY_SEPARATOR.Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.self::TPLS_LIST_FILE)){
-
-            include AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR.$module
-                  .DIRECTORY_SEPARATOR.Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.self::TPLS_LIST_FILE;
-            $someLoaded = true;
-            break;
-         }
+         $modules[] = $module;
          // načti rodiče
          $class = get_parent_class($class);
       }
-     
-      if($someLoaded){
-         // přeřazení proměnných pro kompatibilitu
-         if(isset($this->main) && $this->main != null){
-             $this->templatesMain = $this->main;
+//      $modules = array_reverse($modules);
+      
+      foreach ($modules as $name) {
+         $this->currentModule = $name;
+         if(is_file(Template::faceDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
+            .$name.DIRECTORY_SEPARATOR.Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.self::TPLS_LIST_FILE)){
+            include Template::faceDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
+               .$name.DIRECTORY_SEPARATOR.Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.self::TPLS_LIST_FILE;
+            $someLoaded = true;
          }
-         if(isset($this->panel) && $this->panel != null){
-             $this->templatesPanel = $this->panel;
+         // soubor z hlavního vzhledu
+         else if(is_file(Template::faceDir(true).AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
+            .$name.DIRECTORY_SEPARATOR.Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.self::TPLS_LIST_FILE)){
+            include Template::faceDir(true).AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
+               .$name.DIRECTORY_SEPARATOR.Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.self::TPLS_LIST_FILE;
+            $someLoaded = true;
          }
-         $tpls = $this->templatesMain;
-         $this->templatesMain = array();
-         foreach($tpls as $tpl => $labels){
-            $this->templatesMain[$tpl] = $labels[Locales::getLang()];
-         }
-         $tpls = $this->templatesPanel;
-         $this->templatesPanel = array();
-         foreach($tpls as $tpl => $labels){
-            $this->templatesPanel[$tpl] = $labels[Locales::getLang()];
+            // soubor z modulu
+         else if(is_file(AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR.$name
+            .DIRECTORY_SEPARATOR.Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.self::TPLS_LIST_FILE)){
+            include AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR.$name
+                  .DIRECTORY_SEPARATOR.Template::TEMPLATES_DIR.DIRECTORY_SEPARATOR.self::TPLS_LIST_FILE;
+            $someLoaded = true;
          }
       }
-
+      $this->currentModule = null;
+      
+      /**
+       * Backward compatibility
+       */
+      if($someLoaded){
+         // přeřazení proměnných pro kompatibilitu
+         if(isset($this->main) && is_array($this->main)){
+            foreach($this->main as $tpl => $labels){
+               $this->addTemplate('main', $tpl, $labels);
+            }
+         }
+         if(isset($this->panel) && is_array($this->panel)){
+            foreach($this->panel as $tpl => $labels){
+               $this->addPanelTemplate($tpl, $labels);
+            }
+         }
+      }
    }
+   
+   /**
+    * 
+    * @param type $action
+    * @param type $file
+    * @param type $labels
+    * @param type $params
+    * @todo dořešit načítání z modulů od kterých se dědí
+    */
+   protected function addTemplate($action, $file, $labels, $params = array())
+   {
+      // kvůli pozdější implementaci překladače, tady nechme převod na řetězec
+      $l = null;
+      if(is_array($labels)){
+         $l = isset($labels[Locales::getLang()]) ? $labels[Locales::getLang()] : $labels[Locales::getDefaultLang()];
+      } else {
+         $l = (string)$labels;
+      }
+      if($this->currentModule != null && $this->currentModule != $this->getName()){
+         if(strpos($file, ':') === false){ // neobsahuje děděný modul
+            $file = $this->currentModule.':'.$file;
+         }
+      }
+      
+      if( ($pos = strpos($file, ':')) !== false){
+         $tr = new Translator();
+         $l .= $tr->tr(' - děděno z modulu ').  substr($file, 0, $pos);
+      }
+      
+      if(!isset(self::$templates[$this->getName()][$action])){
+         self::$templates[$this->getName()][$action][$file] = array();
+      }
+      
+      self::$templates[$this->getName()][$action][$file] = array(
+         'name' => $l, // možná bude lepší detekovat jinak
+         'params' => $params
+      );
+   }
+   
+   protected function addPanelTemplate($file, $labels, $params = array())
+   {
+      // kvůli pozdější implementaci překladače, tady nechme převod na řetězec
+      $l = null;
+      if(is_array($labels)){
+         $l = isset($labels[Locales::getLang()]) ? $labels[Locales::getLang()] : $labels[Locales::getDefaultLang()];
+      } else {
+         $l = (string)$labels;
+      }
+      if($this->currentModule != null && $this->currentModule != $this->getName()){
+         if(strpos($file, ':') === false){ // neobsahuje děděný modul
+            $file = $this->currentModule.':'.$file;
+         }
+      }
+      
+      if( ($pos = strpos($file, ':')) !== false){
+         $tr = new Translator();
+         $l .= $tr->tr(' - děděno z modulu ').  substr($file, 0, $pos);
+      }
+      
+      if(!isset(self::$panelTemplates[$this->getName()][$file])){
+         self::$panelTemplates[$this->getName()][$file] = array();
+      }
+      
+      self::$panelTemplates[$this->getName()][$file] = array(
+            'name' => $l, // možná bude lepší detekovat jinak
+            'params' => $params
+         );   
+   }
+   
 
    /**
     * Metoda vrací šablony modulu
     * @return array
     */
-   public function getTemplates()
+   public function getTemplates($action = 'main')
    {
-      if($this->templatesMain == false) {
-         $this->loadTemplates();
-      }
-      return $this->templatesMain;
+       if(isset(self::$templates[$this->getName()][$action])){
+          return self::$templates[$this->getName()][$action];
+       }
+       return false;
+   }
+   
+   public function getAllTemplates()
+   {
+      return self::$templates[$this->getName()];
    }
 
    /**
@@ -353,10 +425,10 @@ class Module
     */
    public function getPanelTemplates()
    {
-      if($this->templatesPanel == false) {
-         $this->loadTemplates();
+      if(isset(self::$panelTemplates[$this->getName()])){
+         return self::$panelTemplates[$this->getName()];
       }
-      return $this->templatesPanel;
+      return false;
    }
 
    /**
@@ -365,22 +437,15 @@ class Module
     * @param $param
     * @return mixed
     */
-   public function getTemplateParam($tpl, $param, $default = null)
+   public function getTemplateParam($action, $tpl, $param, $default = null)
    {
-      if(isset($this->templatesParams[$tpl]) && isset($this->templatesParams[$tpl][$param])){
-         return $this->templatesParams[$tpl][$param];
+      if(isset(self::$templates[$this->getName()][$action]) 
+          && isset(self::$templates[$this->getName()][$action][$tpl])
+          && isset(self::$templates[$this->getName()][$action][$tpl][$param])
+          
+          ){
+         return self::$templates[$this->getName()][$action][$tpl][$param];
       }
       return $default;
    }
-
-   /**
-    * Metoda pro implementaci updatu v modulu (např. přesun souborů)
-    * @param int $major -- major verzen na kterou se updatuje
-    * @param int $minor -- minor verzen na kterou se updatuje
-    */
-//   protected function modulePreUpdate($version) {}
-//
-//   protected function modulePostUpdate($version) {}
-
-
 }

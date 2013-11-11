@@ -35,6 +35,21 @@ class Articles_Controller extends Controller {
    protected $allowEmptyText = false;
 
 
+   protected function init()
+   {
+      $this->actionsLabels = array(
+          'main' => $this->tr('Přehled položek'),
+          'show' => $this->tr('Detail'),
+          'archive' => $this->tr('Archiv'),
+          'edit' => $this->tr('Úprava položky'),
+          'add' => $this->tr('Přidání položky'),
+          'editprivate' => $this->tr('Úprava privátního textu položky'),
+          'edittext' => $this->tr('Úprava úvodního textu položky'),
+          'move' => $this->tr('Přesun položky'),
+      );
+   }
+
+
    /**
     * Kontroler pro zobrazení novinek
     */
@@ -1410,35 +1425,6 @@ class Articles_Controller extends Controller {
          $elemSort->setValues($settings[self::PARAM_SORT]);
       }
       $form->addElement($elemSort, $fGrpView);
-
-
-      // šablony
-      $componentTpls = new Component_ViewTpl();
-
-      $componentTpls->setConfig(Component_ViewTpl::PARAM_MODULE, $settings['_module']);
-
-      $elemTplList = new Form_Element_Select('tplList', $this->tr('Šablona seznamu'));
-      $elemTplList->setOptions(array_flip($componentTpls->getTpls('list')));
-      if(isset($settings[self::PARAM_TPL_LIST])) {
-         $elemTplList->setValues($settings[self::PARAM_TPL_LIST]);
-      }
-      $form->addElement($elemTplList, $fGrpView);
-
-      $elemTplDetail = new Form_Element_Select('tplDetail', $this->tr('Šablona detailu'));
-      $elemTplDetail->setOptions(array_flip($componentTpls->getTpls('detail')));
-      if(isset($settings[self::PARAM_TPL_DETAIL])) {
-         $elemTplDetail->setValues($settings[self::PARAM_TPL_DETAIL]);
-      }
-      $form->addElement($elemTplDetail, $fGrpView);
-
-      $elemTplArchive = new Form_Element_Select('tplArchive', $this->tr('Šablona archivu'));
-      $elemTplArchive->setOptions(array_flip($componentTpls->getTpls('archive')));
-      if(isset($settings[self::PARAM_TPL_ARCHIVE])) {
-         $elemTplArchive->setValues($settings[self::PARAM_TPL_ARCHIVE]);
-      }
-      $form->addElement($elemTplArchive, $fGrpView);
-
-      unset ($componentTpls);
 
       $elemDisableList = new Form_Element_Checkbox('disableList', $this->tr('Vypnout úvodní seznam'));
       $elemDisableList->setSubLabel($this->tr('Pokud je list vypnut, stránka je automaticky přesměrována na první položku. V detailu je pak načten seznam položek.'));

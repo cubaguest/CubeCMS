@@ -5,27 +5,35 @@
  */
 class Navigation_Controller extends Controller {
    const TEXT_MAIN_KEY = 'main';
-   const DEFAUL_NESTED_LEVEL = 2;
+   const DEFAUL_NESTED_LEVEL = 1;
 
    const PARAM_NESTED_LEVEL = 'allow_private';
+   const PARAM_IGNORE_IDS = 'igids';
    const PARAM_EDITOR_TYPE = 'editor';
    const PARAM_ALLOW_SCRIPT_IN_TEXT = 'allow_script';
    const PARAM_TPL_MAIN = 'tplmain';
    const PARAM_TPL_PANEL = 'tplpanel';
 
+   private $ignoreCats = false;
+
+   public function init()
+   {
+      parent::init();
+      $this->actionsLabels = array(
+          'main' => $this->tr('Rozcestník')
+      );
+   }
+   
    /**
     * Kontroler pro zobrazení textu
     */
    public function mainController()
    {
-      //		Kontrola práv
+      //    Kontrola práv
       $this->checkReadableRights();
       $menu = Category_Structure::getStructure();
       if ($menu != false) {
-         $catModel = new Model_Category();
-         
-         $menu->setCategories($catModel->getCategoryList());
-         $childs = $menu->getCategory($this->category()->getId())->getChildrens();
+         $this->ignoreCats = explode(';', $this->category()->getParam(self::PARAM_IGNORE_IDS, null));
          $newMenu = $this->recursive($menu->getCategory($this->category()->getId()));
          $this->view()->structure = $newMenu;
       }
@@ -43,14 +51,25 @@ class Navigation_Controller extends Controller {
    {
       $retArr = array();
       foreach ($obj->getChildrens() as $child) {
-//         $child = new Category_Structure(0);
+         if($this->ignoreCats && in_array($child->getId(), $this->ignoreCats)){
+            continue;
+         }
          $ar = array(
             'name' => $child->getCatObj()->getName(),
             'label' => $child->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_DESCRIPTION},
             'obj' => $child->getCatObj()->getCatDataObj(),
+            'category' => $child->getCatObj(),
             'link' => $this->link(true)->category($child->getCatObj()->getUrlKey()),
             'childs' => array(),
+            'text' => null,
          );
+         if($level == 1){
+            $text = Text_Model::getText($child->getCatObj()->getId(), self::TEXT_MAIN_KEY);
+            if($text){
+               $ar['text'] = $text->{Text_Model::COLUMN_TEXT};
+            }
+         }   
+            
          if (!$child->isEmpty() AND ($level + 1 <= $this->category()->getParam(self::PARAM_NESTED_LEVEL, self::DEFAUL_NESTED_LEVEL))) {
             $ar['childs'] = $this->recursive($child, $level + 1);
          }
@@ -112,15 +131,40 @@ class Navigation_Controller extends Controller {
       $eLevel->addValidation(new Form_Validator_IsNumber());
 
       $form->addElement($eLevel, $fGrpViewSet);
-
       if (isset($settings[self::PARAM_NESTED_LEVEL])) {
          $form->level->setValues($settings[self::PARAM_NESTED_LEVEL]);
       }
+
+      $eIgnore = new Form_Element_Select('ignore', $this->tr('Nezobrazovat'));
+      $cat = Category_Structure::getStructure()->getCategory($this->category()->getId());
+      $arr = $this->catStructToArray($cat);
+      $eIgnore->setOptions($arr);
+      $eIgnore->setMultiple(true);
+
+      $form->addElement($eIgnore, $fGrpViewSet);
+      if (isset($settings[self::PARAM_IGNORE_IDS])) {
+         $form->ignore->setValues( is_array($settings[self::PARAM_IGNORE_IDS]) ? $settings[self::PARAM_IGNORE_IDS] 
+             : explode(';', $settings[self::PARAM_IGNORE_IDS]));
+      }
+
       // znovu protože mohl být už jednou validován bez těchto hodnot
       if ($form->isValid()) {
+         Debug::log($form->ignore->getValues());
          $settings[self::PARAM_NESTED_LEVEL] = $form->level->getValues();
+         $settings[self::PARAM_IGNORE_IDS] = ($form->ignore->getValues() != null && !empty($form->ignore->getValues())) 
+             ? implode(';', $form->ignore->getValues()) : null;
       }
    }
 
+   protected function catStructToArray(Category_Structure $cat, $returnArray = array(), $level = 1)
+   {
+      foreach($cat as $child){
+         $returnArray[$child->getId()] = str_repeat('.', 3*($level-1)).$child->getCatObj()->getName(true);
+         if(!$child->isEmpty()){
+            $this->catStructToArray($child, $returnArray, $level+1);
+         }
+      }
+      return $returnArray;
+   }
+
 }
-?>

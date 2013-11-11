@@ -26,7 +26,7 @@ class BulletinBoard_Panel extends Panel {
    }
 
    public function panelView() {
-      $this->template()->addFile('tpl://'.$this->category()->getParam(self::PARAM_TPL_PANEL, 'panel.phtml'));
+      $this->template()->addFile($this->getTemplate());
       $this->template()->rssLink = $this->link()->clear()->route().Url_Request::URL_FILE_RSS;
    }
 
@@ -39,17 +39,6 @@ class BulletinBoard_Panel extends Panel {
       if(isset($settings['num'])) {
          $form->num->setValues($settings['num']);
       }
-
-      // šablony
-      $componentTpls = new Component_ViewTpl();
-      $componentTpls->setConfig(Component_ViewTpl::PARAM_MODULE, $settings['_module']);
-
-      $elemTplPanel = new Form_Element_Select('tplPanel', 'Šablona panelu');
-      $elemTplPanel->setOptions(array_flip($componentTpls->getTpls('panel')));
-      if(isset($settings[self::PARAM_TPL_PANEL])) {
-         $elemTplPanel->setValues($settings[self::PARAM_TPL_PANEL]);
-      }
-      $form->addElement($elemTplPanel, 'basic');
 
       $elemType = new Form_Element_Select('type', 'Řazení');
       $types = array('Podle data' => 'list', 'Podle počtu přečtění' => 'top', 'Náhodně' => 'rand');

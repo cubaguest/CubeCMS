@@ -1,7 +1,7 @@
 <?php
 class Photogalery_View extends View {
    public function mainView() {
-      $this->template()->addFile('tpl://'.$this->category()->getParam(Photogalery_Controller::PARAM_TPL_MAIN, 'list.phtml'));
+      $this->template()->addFile($this->getTemplate());
       if($this->category()->getRights()->isWritable()) {
          $this->toolboxText = new Template_Toolbox2();
          $this->toolboxText->setIcon(Template_Toolbox2::ICON_PEN);

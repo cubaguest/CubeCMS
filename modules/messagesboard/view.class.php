@@ -1,7 +1,7 @@
 <?php
 class MessagesBoard_View extends View {
    public function mainView() {
-      $this->template()->addFile('tpl://list.phtml');
+      $this->template()->addFile($this->getTemplate());
       $this->createListToolbox();
       $this->createMsgToolbox();
       if($this->form instanceof Form){

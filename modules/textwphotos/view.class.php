@@ -11,5 +11,3 @@ class TextWPhotos_View extends Text_View {
       $pView->addImagesToolbox();
    }
 }
-
-?>

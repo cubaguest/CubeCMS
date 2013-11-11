@@ -1,7 +1,7 @@
 <?php
 class News_View extends Articles_View {
    public function mainView() {
-      $this->template()->addFile('tpl://'.$this->category()->getParam(Articles_Controller::PARAM_TPL_LIST, 'news:list.phtml'));
+      $this->template()->addFile($this->getTemplate());
       $this->createListToolbox();
       if($this->toolbox != null){
          $this->toolbox->add_article->setLabel($this->_('Přidat novinku'))->setTitle($this->_('Přidat novou novinku'));
@@ -16,4 +16,3 @@ class News_View extends Articles_View {
       }
    }
 }
-?>

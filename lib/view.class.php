@@ -333,5 +333,19 @@ abstract class View extends TrObject {
       }
    }
    
+   public function getTemplate($action = null)
+   {
+      $action = $action !== null ? $action : $this->actionName;
+      $param = 'tpl_action_'.$action;
+      if( ($tpl = $this->category()->getParam($param, false)) !== false ){
+         return 'tpl://'.$tpl;
+      } else {
+         // kontrola jestli existuje výběr z šablon. Pokud ne, vracej null
+         $tpls = $this->category()->getModule()->getTemplates($action);
+         if(is_array($tpls) && !empty($tpls)){
+            return 'tpl://'.key($tpls); // return first template
+         }
+      }
+      return 'tpl://'.$action.'.phtml';
+   }
 }
-?>

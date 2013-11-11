@@ -7,7 +7,7 @@
 class Navigation_View extends View {
    public function mainView()
    {
-      $this->template()->addFile('tpl://main.phtml');
+      $this->template()->addFile($this->getTemplate());
       if($this->text != null){
          $this->text = $this->template()->filter((string)$this->text, array('anchors','filesicons'));
       }

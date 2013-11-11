@@ -10,6 +10,7 @@ class TextWPhotos_Controller extends Text_Controller {
       parent::init();
       // registrace modulu fotogalerie pro obsluhu galerie
       $this->registerModule('photogalery');
+      $this->actionsLabels['main'] = $this->tr('Hlavní stránka');
    }
 
       /**
@@ -30,5 +31,3 @@ class TextWPhotos_Controller extends Text_Controller {
       parent::settings($settings, $form);
    }
 }
-
-?>

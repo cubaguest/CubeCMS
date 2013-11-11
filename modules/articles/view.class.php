@@ -1,8 +1,7 @@
 <?php
 class Articles_View extends View {
    public function mainView() {
-//      $this->template()->addFile('tpl://'.$this->category()->getParam(Articles_Controller::PARAM_TPL_LIST, 'articles:list.phtml'));
-      $this->template()->addFile('tpl://'.$this->category()->getParam(Articles_Controller::PARAM_TPL_LIST, 'list.phtml')); // Proč z articles??
+      $this->template()->addFile($this->getTemplate()); // Proč z articles??
       $this->createListToolbox();
       
       if($this->selectedTag != null){
@@ -31,7 +30,7 @@ class Articles_View extends View {
    }
 
    public function showView() {
-      $this->template()->addFile('tpl://'.$this->category()->getParam(Articles_Controller::PARAM_TPL_DETAIL, 'articles:detail.phtml'));
+      $this->template()->addFile($this->getTemplate());
       $this->addMetaTags($this->article);
       if($this->category()->getParam(Articles_Controller::PARAM_DISABLE_LIST, false)){ // pokud není list přidáme tlačítko pro přidání položky
          $this->createListToolbox();
@@ -163,7 +162,7 @@ class Articles_View extends View {
    }
 
    public function archiveView() {
-      $this->template()->addFile('tpl://'.$this->category()->getParam(Articles_Controller::PARAM_TPL_ARCHIVE, 'articles:archive.phtml'));
+      $this->template()->addFile($this->getTemplate());
       Template_Navigation::addItem($this->tr('Archiv'), $this->link());
    }
 
@@ -404,5 +403,3 @@ class Articles_View extends View {
       $api->flush();
    }
 }
-
-?>

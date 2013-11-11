@@ -26,13 +26,14 @@ class Articles_Panel extends Panel {
    }
 
    public function panelView() {
-      $tplFile = $this->panel()->getParam(self::PARAM_TPL_PANEL, 'panel.phtml');
-      $tplFilePanel = str_replace('.phtml', '_'.$this->panel()->getPosition().'.phtml', $tplFile);
-      if($this->template()->existTpl($tplFilePanel, $this->category()->getModule()->getName())){
-         $this->template()->addFile('tpl://'.$tplFilePanel);
-      } else {
-         $this->template()->addFile('tpl://'.$tplFile);
-      }
+//      $tplFile = $this->panel()->getParam(self::PARAM_TPL_PANEL, 'panel.phtml');
+//      $tplFilePanel = str_replace('.phtml', '_'.$this->panel()->getPosition().'.phtml', $tplFile);
+//      if($this->template()->existTpl($tplFilePanel, $this->category()->getModule()->getName())){
+//         $this->template()->addFile('tpl://'.$tplFilePanel);
+//      } else {
+//         $this->template()->addFile('tpl://'.$tplFile);
+//      }
+      $this->template()->addFile($this->getTemplate());
       
       $this->template()->rssLink = $this->link()->clear()->route().Url_Request::URL_FILE_RSS;
    }
@@ -47,17 +48,6 @@ class Articles_Panel extends Panel {
          $form->num->setValues($settings['num']);
       }
 
-      // šablony
-      $componentTpls = new Component_ViewTpl();
-      $componentTpls->setConfig(Component_ViewTpl::PARAM_MODULE, $settings['_module']);
-
-      $elemTplPanel = new Form_Element_Select('tplPanel', $this->tr('Šablona panelu'));
-      $elemTplPanel->setOptions(array_flip($componentTpls->getTpls('panel')));
-      if(isset($settings[self::PARAM_TPL_PANEL])) {
-         $elemTplPanel->setValues($settings[self::PARAM_TPL_PANEL]);
-      }
-      $form->addElement($elemTplPanel, 'basic');
-
       $elemType = new Form_Element_Select('type', $this->tr('Řazení'));
       $types = array($this->tr('Podle data') => 'list', $this->tr('Podle počtu přečtění') => 'top', $this->tr('Náhodně') => 'rand');
       $elemType->setOptions($types);
@@ -70,7 +60,6 @@ class Articles_Panel extends Panel {
 
       if($form->isValid()) {
          $settings['num'] = $form->num->getValues();
-         $settings[self::PARAM_TPL_PANEL] = $form->tplPanel->getValues();
          // protože je vždy hodnota
          if($form->type->getValues() != self::DEFAULT_TYPE){
             $settings['type'] = $form->type->getValues();

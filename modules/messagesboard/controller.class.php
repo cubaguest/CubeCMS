@@ -6,6 +6,13 @@ class MessagesBoard_Controller extends Controller {
    const PARAM_ALLOW_COLORS = 'a_c';
    const PARAM_COLORS = 'c';
 
+   public function init()
+   {
+      parent::init();
+      $this->actionsLabels = array(
+          'main' => $this->tr('Seznam příspěvků')
+      );
+   }
 
    /**
     * Kontroler pro zobrazení novinek

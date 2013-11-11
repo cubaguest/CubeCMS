@@ -58,6 +58,9 @@ class Photogalery_Controller extends Controller {
    public function init()
    {
       $this->idItem = $this->category()->getId();
+      $this->actionsLabels = array(
+          'main' => $this->tr('Hlavní stránka')
+      );
    }
 
    /**
@@ -606,18 +609,6 @@ class Photogalery_Controller extends Controller {
    public function settings(&$settings,Form &$form)
    {
       $fGrpViewSet = $form->addGroup('view', $this->tr('Nastavení vzhledu'));
-
-      $componentTpls = new Component_ViewTpl();
-      $componentTpls->setConfig(Component_ViewTpl::PARAM_MODULE, $this->module()->getName());
-
-      $elemTplMain = new Form_Element_Select('tplMain', $this->tr('Hlavní šablona'));
-
-      $elemTplMain->setOptions(array_flip($componentTpls->getTpls()));
-      if(isset($settings[self::PARAM_TPL_MAIN])) {
-         $elemTplMain->setValues($settings[self::PARAM_TPL_MAIN]);
-      }
-      $form->addElement($elemTplMain, $fGrpViewSet);
-      unset ($componentTpls);
 
       $fGrpEditSet = $form->addGroup('editSettings', $this->tr('Nastavení úprav'));
 

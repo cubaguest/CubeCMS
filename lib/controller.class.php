@@ -13,6 +13,11 @@
  */
 
 abstract class Controller extends TrObject {
+   const SETTINGS_GROUP_BASE = 'basic';
+   const SETTINGS_GROUP_VIEW = 'view';
+   const SETTINGS_GROUP_TEMPLATES = 'tpls';
+   const SETTINGS_GROUP_SOCIAL = 'social';
+   
    /**
     * Název nového actionViewru
     * @var string
@@ -78,7 +83,13 @@ abstract class Controller extends TrObject {
     * @var array 
     */
    protected $registeredModules = array();
-   
+
+   /**
+    * Pole s popisem akcí - pro překlady
+    * @var array
+    */
+   protected $actionsLabels = array();
+
    /**
     * Konstruktor třídy vytvoří a naplní základní vlastnosti pro modul
     *
@@ -86,7 +97,7 @@ abstract class Controller extends TrObject {
     * @param Routes $routes -- objekt cest pro daný modul
     */
    public final function __construct($base, Routes $routes = null, View $view = null, Url_Link_Module $link = null) 
-      {
+   {
       //TODO odstranit nepotřebné věci v paramtrech konstruktoru
       if($base instanceof Controller) {
          $link = $link == null ? $base->link() : $link;
@@ -115,9 +126,6 @@ abstract class Controller extends TrObject {
       // kontrola oprávnění
       $this->checkReadableRights();
       
-      // kontrola instalace a verze modulu
-      $this->checkModule();
-      
       // pokud se jedná o zděděný kontroler tak načíst všechny překlady děděných modulů
       $class = get_class($this);
       $modulesTrs = array();
@@ -145,33 +153,13 @@ abstract class Controller extends TrObject {
          $this->initView();
       }
 
+      // donačtení šablon modulu
+      $this->module()->loadTemplates();
+      
       // Inicializace kontroleru modulu
       $this->init();
    }
 
-   /**
-    * Metoda kontrolu modul a jeho aktuální verzi
-    */
-   private function checkModule() 
-   {
-      if($this->category() instanceof Category_Admin){
-         // zatím pouze administrační moduly
-//         $m = new Model_Module();
-//         $module = $m->where(Model_Module::COLUMN_NAME." = :module", array('module' => $this->module()->getName()))->record();
-//         if(!$module){
-//            $cls = $this->moduleName."_Install";
-//            $installer = new $cls();
-//            try {
-//               $installer->installModule();
-//               $this->infoMsg()->addMessage($this->tr('Modul byl instalován'));
-//               $this->link()->reload();
-//            } catch (Exception $e) {
-//               new CoreErrors($e);
-//            }
-//         }
-      }
-   }
-   
    private function initView() 
    {
       //	Načtení třídy View
@@ -195,7 +183,7 @@ abstract class Controller extends TrObject {
       $this->registeredModules[$module] = $testMetod;
    }
 
-/**
+   /**
     * Metoda vrací objekt viewru modulu
     * @return View
     */
@@ -211,7 +199,7 @@ abstract class Controller extends TrObject {
     * @return mixed -- obsah volby
     */
    final public function getOption($name, $defaultValue = null) 
-      {
+   {
       if(isset ($this->options[$name])) {
          return $this->options[$name];
       }
@@ -234,7 +222,7 @@ abstract class Controller extends TrObject {
     * @return mixed -- obsah volby
     */
    final public function setOption($name, $value = null) 
-      {
+   {
       $this->options[$name] = $value;
    }
    
@@ -395,7 +383,7 @@ abstract class Controller extends TrObject {
       Log_Module::msg($msg, $this->module()->getName(), $this->category()->getLabel());
    }
 
-      /**
+   /**
     * Metoda volaná při destrukci objektu
     */
    function __destruct() 
@@ -584,8 +572,10 @@ abstract class Controller extends TrObject {
       $this->checkControllRights();
 
       $form = new Form('settings_', true);
-      $grpBasic = $form->addGroup('basic', $this->tr('Základní nastavení'));
-      $grpView = $form->addGroup('view', $this->tr('Nastavení vzhledu'));
+      $grpBasic = $form->addGroup(self::SETTINGS_GROUP_BASE, $this->tr('Základní nastavení'));
+      $grpView = $form->addGroup(self::SETTINGS_GROUP_VIEW, $this->tr('Nastavení vzhledu'));
+      $grpTemplates = $form->addGroup(self::SETTINGS_GROUP_TEMPLATES, $this->tr('Nastavení šablon stránek'));
+      $grpSocial = $form->addGroup(self::SETTINGS_GROUP_SOCIAL, $this->tr('Sociální obsah'));
 
 
       if($this->category()->getCatDataObj()->{Model_Category::COLUMN_PARAMS}!= null){
@@ -605,6 +595,25 @@ abstract class Controller extends TrObject {
 
       unset($settings['_module']);
 
+      // nastavení šablon
+      $tplElements = array();
+      $templates = $this->module()->getAllTemplates();
+      foreach ($templates as $action => $tpls) {
+         if($tpls /*&& sizeof($tpls) > 1*/){ // má smysl zobrazovat výběr z jedné šablony?
+            $label = isset($this->actionsLabels[$action]) ? $this->actionsLabels[$action] : $action;
+            $name = 'tpl_action_'.$action;
+            $tplSelect = new Form_Element_Select($name, $this->tr('Šablona pro stránku ').'"'.$label.'"');
+            foreach ($tpls as $file => $arr) {
+               $tplSelect->addOption($arr['name'], $file);
+            }
+            if(isset($settings[$name])){
+               $tplSelect->setValues($settings[$name]);
+            }
+            $tplElements[] = $name;
+            $form->addElement($tplSelect, $grpTemplates);
+         }
+      }
+      
       // ostatní nastavení
       /* IKONA */
       $elemIcon = new  Form_Element_File('icon', $this->tr('Titulní obrázek/ Ikona'));
@@ -696,6 +705,13 @@ abstract class Controller extends TrObject {
             $catRec->{Model_Category::COLUMN_BACKGROUND} = $form->backgroundUploaded->getValues();
          }
 
+         // uložení šablon
+         foreach ($tplElements as $eName) {
+            if(isset($form->$eName)){
+               $settings[$eName] = $form->$eName->getValues();
+            }
+         }
+         
          /* serializace volitelných parametrů */
          $catRec->{Model_Category::COLUMN_PARAMS} = serialize($settings);
 
@@ -806,4 +822,3 @@ abstract class Controller extends TrObject {
 
    public static function categoryDuplicate(Category_Core $oldCat, Category_Core $newCat) {}
 }
-?>

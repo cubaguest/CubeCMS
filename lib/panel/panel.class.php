@@ -70,6 +70,10 @@ abstract class Panel extends TrObject {
       $this->link = $link;
       // locales
       $this->locale = new Locales($category->getModule()->getName());
+      
+      // donačtení šablon modulu
+      $this->category()->module()->loadTemplates();
+      
       if($template instanceof Template_Panel) {
          $this->template = $template;
       } else {
@@ -99,8 +103,17 @@ abstract class Panel extends TrObject {
    /**
     * Metoda vrací objekt panelu
     * @return Panel_Obj
+    * @deprecated - use panel()
     */
    final public function panelObj() {
+      return $this->panelObj;
+   }
+
+   /**
+    * Metoda vrací objekt panelu
+    * @return Panel_Obj
+    */
+   final public function panel() {
       return $this->panelObj;
    }
 
@@ -146,6 +159,14 @@ abstract class Panel extends TrObject {
     */
    final public function template(){
       return $this->template;
+   }
+
+   final public function getTemplate()
+   {
+      if( ($tpl = $this->panel()->getParam('tpl_panel')) != null) {
+         return 'tpl://'.$tpl;
+      }
+      return 'tpl://panel.phtml';
    }
 
    /**
@@ -199,8 +220,21 @@ abstract class Panel extends TrObject {
 
       $settings = $this->panelObj()->getParams();
 
+      // nastavení šablon
+      $templates = $this->category()->module()->getPanelTemplates();
+      $tplElementName = 'tpl_panel';
+      if($templates /*&& sizeof($tpls) > 1*/){ // má smysl zobrazovat výběr z jedné šablony?
+         $tplSelect = new Form_Element_Select($tplElementName, $this->tr('Šablona panelu'));
+         foreach ($templates as $file => $arr) {
+            $tplSelect->addOption($arr['name'], $file);
+         }
+         if(isset($settings[$tplElementName])){
+            $tplSelect->setValues($settings[$tplElementName]);
+         }
+         $form->addElement($tplSelect, $grpView);
+      }
+      
       $settings['_module'] = $this->category()->getModule()->getName();
-
       if(method_exists($this, 'settings')){
          $this->settings($settings, $form);
       } else if(method_exists(ucfirst($this->category()->getModule()->getName()).'_Panel','settingsController')) {
@@ -210,7 +244,6 @@ abstract class Panel extends TrObject {
 
       unset($settings['_module']);
 
-      
       /* BUTTONS SAVE AND CANCEL */
       $submitButton = new Form_Element_SaveCancel('send');
       $form->addElement($submitButton);
@@ -221,6 +254,10 @@ abstract class Panel extends TrObject {
       }
       
       if($form->isValid()){
+         if(isset($form->{$tplElementName})){
+            $settings[$tplElementName] = $form->{$tplElementName}->getValues();
+         }
+         
          $this->panelObj()->setParams($settings);
          $this->infoMsg()->addMessage($this->tr('Nastavení bylo uloženo'));
          $this->link()->route()->reload();

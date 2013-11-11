@@ -12,6 +12,13 @@
 
 class PhotogaleryMed_Controller extends ArticlesWGal_Controller {
    const DEFAULT_IMAGES_IN_LIST = 4;
+   
+   public function init()
+   {
+      parent::init();
+      $this->actionsLabels['main'] = $this->tr('Seznam galerií');
+   }
+   
    /**
     * Kontroler pro zobrazení fotogalerii
     */

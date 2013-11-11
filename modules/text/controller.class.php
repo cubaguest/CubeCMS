@@ -33,6 +33,10 @@ class Text_Controller extends Controller {
             $this->customFields[$tpl] = $labels[Locales::getLang()];
          }
       }
+      
+      $this->actionsLabels = array(
+          'main' => $this->tr('Textová strana')
+      );
    }
 
    /**
@@ -463,15 +467,6 @@ class Text_Controller extends Controller {
 
    public function settings(&$settings, Form &$form) 
    {
-      $fGrpViewSet = $form->addGroup('view', $this->tr('Nastavení vzhledu'));
-
-      $elemTplMain = new Form_Element_Select('tplMain', $this->tr('Hlavní šablona'));
-      $elemTplMain->setOptions(array_flip($this->module()->getTemplates()));
-      if(isset($settings[self::PARAM_TPL_MAIN])) {
-         $elemTplMain->setValues($settings[self::PARAM_TPL_MAIN]);
-      }
-      $form->addElement($elemTplMain, $fGrpViewSet);
-
       $fGrpEditSet = $form->addGroup('editSettings', $this->tr('Nastavení úprav'));
 
       $elemEditorType = new Form_Element_Select('editor_type', $this->tr('Typ editoru'));
@@ -511,7 +506,6 @@ class Text_Controller extends Controller {
          $settings[self::PARAM_ALLOW_PRIVATE] = $form->allow_private_zone->getValues();
          $settings[self::PARAM_EDITOR_TYPE] = $form->editor_type->getValues();
          $settings[self::PARAM_ALLOW_SCRIPT_IN_TEXT] = $form->allow_script->getValues();
-         $settings[self::PARAM_TPL_MAIN] = $form->tplMain->getValues();
       }
    }
 

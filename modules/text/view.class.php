@@ -6,7 +6,8 @@
 
 class Text_View extends View {
    public function mainView() {
-      $this->template()->addFile('tpl://'.$this->category()->getParam(Text_Controller::PARAM_TPL_MAIN, 'text.phtml'));
+//      $this->template()->addFile('tpl://'.$this->category()->getParam(Text_Controller::PARAM_TPL_MAIN, 'text.phtml'));
+      $this->template()->addFile($this->getTemplate());
 
       if($this->category()->getRights()->isWritable()) {
          $toolbox = new Template_Toolbox2();
@@ -105,12 +106,19 @@ class Text_View extends View {
    }
 
    public function editView() {
-      Template_Module::setEdit(true);
+      Template_Module::setFullWidth(true);
       $this->h1 = sprintf($this->tr('úprava textu kategorie "%s"'), $this->category()->getName());
       Template_Core::setPageTitle($this->h1);
       $this->setTinyMCE($this->form->text, $this->category()->getParam(Text_Controller::PARAM_EDITOR_TYPE));
       $this->template()->addFile("tpl://text:textedit.phtml");
       Template_Navigation::addItem($this->tr('Úprava obsahu'), $this->link());
+
+      if($this->fields){
+         foreach($this->fields as $field){
+            $element = 'filed_'.$field;
+            $this->setTinyMCE($this->form->$element, 'simple');
+         }
+      }
    }
 
    public function editPrivateView() {
@@ -121,7 +129,7 @@ class Text_View extends View {
    }
 
    public function editPanelView() {
-      Template_Module::setEdit(true);
+      Template_Module::setFullWidth(true);
       $this->h1 = sprintf($this->tr('úprava textu panelu kategorie "%s"'), $this->category()->getName());
       Template_Core::setPageTitle($this->h1);
       $this->setTinyMCE($this->form->text, $this->category()->getParam(Text_Controller::PARAM_EDITOR_TYPE, 'advanced'));
