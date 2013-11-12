@@ -33,6 +33,8 @@ class Component_TinyMCE_Settings_Advanced extends Component_TinyMCE_Settings {
       'valid_styles' => "{
          '*' : 'color,font-size,font-weight,font-style,text-decoration,background-color,text-align, margin-left,margin-right,margin-top,margin-bottom,float,border-left,border-right,border-top,border-bottom', 
          'table' : 'margin-left,margin-right',
+         'td' : 'width,height',
+         'th' : 'width,height',
          'ol' : 'list-style-type', 'ul' : 'list-style-type'}",
       'tab_focus' => ':prev,:next',
       'width' => "100%",
