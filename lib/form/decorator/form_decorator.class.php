@@ -210,7 +210,7 @@ class Form_Decorator implements Form_Decorator_Interface {
     */
    public function createForm(Form $form)
    {
-      $html = $form->html();
+      $html = clone $form->html();
       $html
           ->addClass('form-horizontal')
           ->setAttrib('role', 'form');
