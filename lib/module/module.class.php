@@ -196,16 +196,22 @@ class Module
 
       $versions = array();
       if(is_dir($updateDir)){
-         foreach (glob($updateDir."*.php") as $filename) {
-            $version = str_replace(".php", "", basename($filename));
-            if(version_compare($version, $currentVersion) == 1){
-               $versions[$version] = null;
+         $phpFiles = glob($updateDir."*.php");
+         if(sizeof($phpFiles) > 0){
+            foreach ($phpFiles as $filename) {
+               $version = str_replace(".php", "", basename($filename));
+               if(version_compare($version, $currentVersion) == 1){
+                  $versions[$version] = null;
+               }
             }
          }
-         foreach (glob($updateDir."*.sql") as $filename) {
-            $version = str_replace(".sql", "", basename($filename));
-            if(version_compare($version, $currentVersion) == 1){
-               $versions[$version] = null;
+         $sqlFiles = glob($updateDir."*.sql");
+         if(sizeof($sqlFiles) > 0){
+            foreach ($sqlFiles as $filename) {
+               $version = str_replace(".sql", "", basename($filename));
+               if(version_compare($version, $currentVersion) == 1){
+                  $versions[$version] = null;
+               }
             }
          }
       }
