@@ -30,6 +30,23 @@ class Module_AutoRun extends Module_Core {
       $dayInWeek = $time->format("N");
       $month = $time->format("n");
       
+      if(isset($_GET['debug']) && isset($_GET['daily'])){
+         $hour = '01';
+      }
+      if(isset($_GET['debug']) && isset($_GET['weekly'])){
+         $dayInWeek = '7';
+         $hour = '02';
+      }
+      if(isset($_GET['debug']) && isset($_GET['monthly'])){
+         $day = '2';
+         $hour = '03';
+      }
+      if(isset($_GET['debug']) && isset($_GET['yearly'])){
+         $day = '1';
+         $month = '1';
+         $hour = '03';
+      }
+      
       // for testing
 //       $minute = '00';
 //       $hour = '01';
@@ -146,7 +163,10 @@ class Module_AutoRun extends Module_Core {
             // close cURL resource, and free up system resources
             curl_close($ch);
          }
+      } else {
+         $this->printMsg($this->tr('Není definována žádná subdoména'), 'gray' );
       }
+      $this->printMsg($this->tr('Spouštění subdomén kompletní'), 'green', true );
    } 
    
    private function printMsg($msg = null, $color = null, $strong = false){
@@ -171,4 +191,3 @@ class Module_AutoRun extends Module_Core {
       echo $msg ."<br />";
    }
 }
-?>
