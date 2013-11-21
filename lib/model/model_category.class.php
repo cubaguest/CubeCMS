@@ -4,11 +4,11 @@
  * Třída Modelu pro práci s kategoriemi.
  * Třída, která umožňuje pracovet s modelem kategorií
  *
- * @copyright  	Copyright (c) 2008-2009 Jakub Matas
- * @version    	$Id$ VVE3.9.2 $Revision$
- * @author			$Author$ $Date$
- * 						$LastChangedBy$ $LastChangedDate$
- * @abstract 		Třída pro vytvoření modelu pro práci s kategoriemi
+ * @copyright     Copyright (c) 2008-2009 Jakub Matas
+ * @version       $Id$ VVE3.9.2 $Revision$
+ * @author        $Author$ $Date$
+ *                   $LastChangedBy$ $LastChangedDate$
+ * @abstract      Třída pro vytvoření modelu pro práci s kategoriemi
  * @todo          nutný refaktoring
  */
 class Model_Category extends Model_ORM {
@@ -24,7 +24,7 @@ class Model_Category extends Model_ORM {
     */
    const COLUMN_ID = 'id_category';
    const COLUMN_ID_USER_OWNER = 'id_owner_user';
-//   const COLUMN_ID_GROUP	= 'id_group';
+//   const COLUMN_ID_GROUP = 'id_group';
    const COLUMN_NAME = 'label';
    const COLUMN_ALT = 'alt';
    const COLUMN_URLKEY = 'urlkey';
@@ -43,7 +43,8 @@ class Model_Category extends Model_ORM {
    const COLUMN_DESCRIPTION = 'description';
    const COLUMN_CHANGED = 'changed';
    const COLUMN_FEEDS = 'feeds';
-   const COLUMN_ICON = 'icon';
+   const COLUMN_IMAGE = 'icon';
+   const COLUMN_ICON = self::COLUMN_IMAGE;
    const COLUMN_BACKGROUND = 'background';
    const COLUMN_ALLOW_HANDLE_ACC = 'allow_handle_access';
 
@@ -165,11 +166,13 @@ class Model_Category extends Model_ORM {
                Model_Category::COLUMN_DEF_RIGHT, Model_Category::COLUMN_ID_USER_OWNER, Model_Category::COLUMN_FEEDS,
                Model_Category::COLUMN_INDIVIDUAL_PANELS, Model_Category::COLUMN_MODULE, Model_Category::COLUMN_URLKEY,
                Model_Category::COLUMN_VISIBILITY, Model_Category::COLUMN_ICON,  Model_Category::COLUMN_BACKGROUND,
-               Model_Category::COLUMN_PRIORITY
+               Model_Category::COLUMN_PRIORITY,
+               Model_Category::COLUMN_PARAMS
    //            , 'uk_l' => 'LENGTH( '.self::COLUMN_URLKEY.'_'.Locales::getLang().' )'
             ));
             $this->setSelectAllLangs($allLangs)
                ->withRights()
+               ->withModule()
                ->where(Model_Category::COLUMN_DISABLE.' = 0', array());
 //             ->order(array('LENGTH('.Model_Category::COLUMN_URLKEY.')' => 'DESC')); // filesort
             $cats = $this->records(Model_ORM::FETCH_PKEY_AS_ARR_KEY);
@@ -221,6 +224,19 @@ class Model_Category extends Model_ORM {
             . " WHERE (" . self::COLUMN_CAT_ID . " = :idcat)");
       $dbst->bindParam(':idcat', $idCategory, PDO::PARAM_INT);
       return $dbst->execute();
+   }
+
+   /**
+    * Metoda nastaví změnu kategorie
+    * @param int $id -- id kategorie
+    */
+   public static function setImage($idc, $image, $col = self::COLUMN_IMAGE)
+   {
+      $m = new self();
+
+      return $m
+         ->where(self::COLUMN_ID." = :id", array('id' => $idc))
+         ->update(array($col => $image));
    }
 
    /**
