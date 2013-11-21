@@ -315,6 +315,22 @@ class Category_Core extends TrObject {
          return Url_Request::getBaseWebDir() . VVE_DATA_DIR . URL_SEPARATOR . self::DIR_IMAGES . URL_SEPARATOR . $type . URL_SEPARATOR;
       }
    }
-
+   
+   /**
+    * Metoda vrac� obr�zek kategorie
+    * @param string $type - typ obr�zku
+    * @param bool $returnUrl -- vracet URL nebo absolutn� cestu
+    * @return string
+    */
+   public function getImage($type = 'title', $returnUrl = true)
+   {
+      if($type == 'title' || $type == 'icon'){
+         return self::getImageDir(self::DIR_IMAGE, !$returnUrl).$this->getDataObj()->{Model_Category::COLUMN_IMAGE};
+      } else if($type == 'bg' || $type == 'background'){
+         return self::getImageDir(self::DIR_BACKGROUND, !$returnUrl).$this->getDataObj()->{Model_Category::COLUMN_BACKGROUND};
+      } else if($this->getParam($type) != null) {
+         return self::getImageDir($type).$this->getParam($type);
+      }
+      return null;
+   }
 }
-?>
