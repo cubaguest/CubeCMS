@@ -2056,6 +2056,36 @@ class Model_ORM extends Model implements ArrayAccess {
       return $lang == null ? $column.'_'.Locales::getLang() : $column.'_'.$lang;
    }
 
-
+   /**
+    * metoda vrací daný objekt
+    * @param int/string $id -- klíč položky
+    * @return Model_ORM_Record/false
+    * @since 8.0.1
+    * @depends PHP 5.3
+    */
+   public static function getRecord($id) {
+      $m = new static();
+      return $m->record($id);
+   }
+   
+   /*
+    * Metoda vytvoří placeholdery pro klauzuli WHERE IN 
+    */
+   public static function getWhereINPlaceholders($array)
+   {
+      array_walk($array, create_function('&$val,$key', '$val = ":key_".$key;'));
+      return implode(',', $array); 
+   }
+   
+   /*
+    * Metoda vytvoří pole s hodnotami pro klauzuli WHERE IN 
+    */
+   public static function getWhereINValues($array)
+   {
+      $retArray = array();
+      foreach ($array as $key => $value){
+         $retArray[':key_'.$key] = $value;
+      }
+      return $retArray; 
+   }
 }
-?>
