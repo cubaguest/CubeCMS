@@ -336,5 +336,22 @@ class Model_Users extends Model_ORM {
       $dbst->execute(array(':iduser' => $iduser, ':password' => Auth::cryptPassword($newPass)));
       return $dbst;
    }
+   
+   /**
+    * Metoda vrací pole s uživatelskými emaily
+    * @return array
+    */
+   public static function getUsersMails($usersIds = array())
+   {
+      if(empty($usersIds)){
+         return array();
+      }
+      $returnArray = array();
+      $model = new Model_Users();
+      $users = $model->where(Model_Users::COLUMN_ID.' IN ('.Model_ORM::getWhereINPlaceholders($usersIds).')', Model_ORM::getWhereINValues($usersIds))->records();
+      foreach ($users as $user) {
+         $returnArray[$user->{Model_Users::COLUMN_NAME}.' '.$user->{Model_Users::COLUMN_SURNAME}] = $user->{Model_Users::COLUMN_MAIL};
+      }
+      return $returnArray;
+   }
 }
-?>
