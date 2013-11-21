@@ -302,7 +302,7 @@ CubeCMS.Form = {
          icon : 'refresh',
          href : window.location+'#',
          text : null,
-         class : null,
+         elementClass : null,
          id : null
       }, options);
       
@@ -312,7 +312,7 @@ CubeCMS.Form = {
       
       var $button = $('<a></a>')
          .addClass('input-group-btn')
-         .addClass(options.class)
+         .addClass(options.elementClass)
          .prop({
             href : options.href,
             id : options.id
