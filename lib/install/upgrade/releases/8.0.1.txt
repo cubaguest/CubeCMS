@@ -2,8 +2,10 @@ NEW:
 - Nový model Model_Users_Settings pro ukládání dat k nastavení jednotlivých uživatelů
 
 EDIT:
-
+- přepsání FORM decoratoru
+- nový Form Element UserSelect
 
 
 FIXED:
+- téma pro TinyMCE komponentu
 
