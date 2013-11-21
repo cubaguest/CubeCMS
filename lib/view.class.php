@@ -270,7 +270,7 @@ abstract class View extends TrObject {
          $theme->setSetting('editor_selector', 'mceEditor_'.$theme->getThemeName().'_'.$formElement->getName());
          $this->tinyMCE->setEditorSettings($theme);
       } else {
-         $formElement->html()->addClass("mceEditor_".$theme);
+         $formElement->html()->addClass("mceEditor_".$theme.'_'.$formElement->getName());
          switch ($theme) {
             case 'simple':
                $settings = new Component_TinyMCE_Settings_AdvSimple();
@@ -289,7 +289,7 @@ abstract class View extends TrObject {
                $settings->setSetting('height', '600');
                break;
          }
-         $settings->setSetting('editor_selector', 'mceEditor_'.$theme);
+         $settings->setSetting('editor_selector', 'mceEditor_'.$theme.'_'.$formElement->getName());
          if(!empty ($editorSettings)){
             foreach ($editorSettings as $name => $value) {
                $settings->setSetting($name, $value);
