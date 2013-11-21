@@ -25,7 +25,7 @@
 }
 
 * html div.mail-recipients, * html div.mail-content {
-   height: expression( this.scrollHeight > 250 ? "250px" : "auto" ); /* sets max-height for IE */
+   //height: expression( this.scrollHeight > 250 ? "250px" : "auto" ); /* sets max-height for IE */
 }
 div.mail-recipients, div.mail-content {
    max-height: 250px; /* sets max-height value for all standards-compliant browsers */
@@ -45,9 +45,9 @@ div.mail-recipients, div.mail-content {
    width: 98%;
 }
 
-#mails-queue-buttons form,
-#mails-queue-buttons p {
-   display: inline;
+.mails-queue-buttons form,
+.mails-queue-buttons div {
+   display: inline-block;
 }
 
 .mail-send-result {

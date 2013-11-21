@@ -3,7 +3,7 @@ $this->addPageTitle($this->tr('seznam odeslaných emailů'));
 $jQuery = new JsPlugin_JQuery();
 $jQuery->addUIAccordion();
 $this->addJsPlugin($jQuery);
-$this->addCssFile('style.css');
+$this->addCssFile('style.less');
 ?>
 <h1><?=$this->category()->getName().' - '.$this->tr('odeslané e-maily')?></h1>
 <?=$this->includeTpl('navigation.phtml');?>

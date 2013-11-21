@@ -1,12 +1,12 @@
 <?
 $this->addPageTitle($this->tr('Fronta odesílání e-mailů'));
-$this->addCssFile('style.css');
+$this->addCssFile('style.less');
 ?>
 <h1><?=$this->tr('Fronta odesílání e-mailů')?></h1>
 <?=$this->includeTpl('navigation.phtml');?>
-<div>
+<div class="form-edit admin-content">
 <br />
-<div id="mails-queue-buttons">
+<div class="mails-queue-buttons">
 <?
 if($this->formSend != null){
    $this->formSend->html()->setAttrib('name', 'form-send-queue');
@@ -56,7 +56,7 @@ if($this->formSend != null){
    <?}?>
 </table>
 <br />
-<div id="mails-queue-buttons">
+<div class="mails-queue-buttons">
 <?
 if($this->formSend != null){
    $this->formSend->html()->setAttrib('name', 'form-send-queue');
