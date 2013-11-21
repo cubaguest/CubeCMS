@@ -81,6 +81,21 @@ class Model_Module extends Model_ORM {
       return true;
    }
 
+   /**
+    * Metoda vrací verzi modulu
+    * @param string $name -- název modulu
+    * @return string -- verze
+    */
+   public static function getVersion($name) {
+      $m = new self();
+      $module = $m->where(self::COLUMN_NAME." = :name", array('name' => $name))->record();
+
+      if($module){
+         return $module->{self::COLUMN_VERSION};
+      }
+      return null;
+   }
+
 
    public function registerInstaledModule($name, $version) {
       $dbc = Db_PDO::getInstance();
