@@ -462,7 +462,7 @@ $(document).ready(function(){
    CubeCMS.setup(); // init base class when document ready
 
    // when language is changed
-   $('form .lang-container').on('click', 'a.link-lang',function(event, focus){
+   $('body').on('click', 'form .lang-container a.link-lang',function(event, focus){
       if(typeof focus == 'undefined') focus = true;
       var lang = this.lang;
       $(this).parent().find('a').removeClass('link-lang-sel');
