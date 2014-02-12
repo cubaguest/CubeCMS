@@ -272,10 +272,17 @@ class Shop_Model_ProductCombinations extends Model_ORM {
       $forDelete = $modelComb
          ->columns(array(
             Shop_Model_ProductCombinations::COLUMN_ID,
-            'num_variants' => 'COUNT('.Shop_Model_ProductCombinationHasVariant::COLUMN_ID_VARIANT.')'
+            'num_variants' => 'COUNT(vari.'.Shop_Model_ProductCombinationHasVariant::COLUMN_ID_VARIANT.')'
          ))
-         ->join(Shop_Model_ProductCombinations::COLUMN_ID, "Shop_Model_ProductCombinationHasVariant",
+         ->join(Shop_Model_ProductCombinations::COLUMN_ID, array('comb_var' => "Shop_Model_ProductCombinationHasVariant"),
             Shop_Model_ProductCombinationHasVariant::COLUMN_ID_COMBINATION)
+         ->join(
+            array('comb_var' => Shop_Model_ProductCombinationHasVariant::COLUMN_ID_VARIANT),
+            array('vari' => "Shop_Model_ProductVariants"),
+            Shop_Model_ProductVariants::COLUMN_ID,
+            array('*'), Model_ORM::JOIN_LEFT, ' AND vari.'.Shop_Model_ProductVariants::COLUMN_ID_PRODUCT." = :idvp",
+            array('idvp' => $idProduct)
+         )
          ->where(Shop_Model_ProductCombinations::COLUMN_ID_PRODUCT.' = :idp', array('idp' => $idProduct) )
          ->groupBy(Shop_Model_ProductCombinations::COLUMN_ID)
          ->having('num_variants != :countGrps', array('countGrps' => count($groupsVariants)))

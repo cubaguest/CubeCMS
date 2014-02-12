@@ -40,8 +40,10 @@ class Shop_Cart implements Iterator, ArrayAccess {
             GROUP_CONCAT(t_attr_g.atgroup_name_cs, ': ', t_attr.attribute_name_cs SEPARATOR ', ') AS combination_label,
             COALESCE(product_combination_quantity, quantity) AS product_quantity
           * */
-         Shop_Model_Product::COLUMN_WEIGHT => 'COALESCE(SUM(t_var.'.Shop_Model_ProductVariants::COLUMN_WEIGHT_ADD.'), 0) + t_pr.'.Shop_Model_Product::COLUMN_WEIGHT,
-         Shop_Model_Product::COLUMN_PRICE => 'COALESCE(SUM(t_comb.'.Shop_Model_ProductCombinations::COLUMN_PRICE.'), 0) + t_pr.'.Shop_Model_Product::COLUMN_PRICE,
+//         Shop_Model_Product::COLUMN_WEIGHT => 'COALESCE(SUM(t_var.'.Shop_Model_ProductVariants::COLUMN_WEIGHT_ADD.'), 0) + t_pr.'.Shop_Model_Product::COLUMN_WEIGHT,
+//         Shop_Model_Product::COLUMN_PRICE => 'COALESCE(SUM(t_comb.'.Shop_Model_ProductCombinations::COLUMN_PRICE.'), 0) + t_pr.'.Shop_Model_Product::COLUMN_PRICE,
+         Shop_Model_Product::COLUMN_WEIGHT => 'COALESCE(t_var.'.Shop_Model_ProductVariants::COLUMN_WEIGHT_ADD.', 0) + t_pr.'.Shop_Model_Product::COLUMN_WEIGHT,
+         Shop_Model_Product::COLUMN_PRICE => 'COALESCE(t_comb.'.Shop_Model_ProductCombinations::COLUMN_PRICE.', 0) + t_pr.'.Shop_Model_Product::COLUMN_PRICE,
          Shop_Model_Product::COLUMN_QUANTITY => 'COALESCE(t_comb.'.Shop_Model_ProductCombinations::COLUMN_QTY.', t_pr.'.Shop_Model_Product::COLUMN_QUANTITY.')',
          'combination_label' => 'GROUP_CONCAT(t_attr_g.'.Model_ORM::getLangColumn(Shop_Model_AttributesGroups::COLUMN_NAME)
             .', \': \', t_attr.'.Model_ORM::getLangColumn(Shop_Model_Attributes::COLUMN_NAME).' SEPARATOR \', \')',
