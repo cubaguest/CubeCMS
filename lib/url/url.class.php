@@ -325,6 +325,7 @@ class Url
          } else {
             Template_Output::addHeader("Location: " . (string)$link, true, $code);
          }
+         Template_Output::addHeader('X-XSS-Protection: 0');
          Template_Output::sendHeaders();
          session_commit(); // při více přesměrování se ztrácí info a err messages
          die;
