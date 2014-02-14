@@ -28,28 +28,8 @@ class Contact_View extends View {
     */
    public function editView() {
       $this->template()->addTplFile('edit.phtml');
-      $this->formEdit->text->html()->addClass("mceEditor");
-      $this->addTinyMCE('mceEditor');
-      $this->formEdit->textPanel->html()->addClass("mceEditorSimple");
-      $this->addTinyMCE('mceEditorSimple');
+      $this->setTinyMCE($this->formEdit->text, 'advanced');
+      $this->setTinyMCE($this->formEdit->textPanel, 'advanced', array('height' => 300));
       Template_Module::setEdit(true);
    }
-
-   private function addTinyMCE($selector) {
-      $this->tinyMCE = new Component_TinyMCE();
-      switch ($selector) {
-         case 'mceEditorSimple':
-            $settings = new Component_TinyMCE_Settings_AdvSimple();
-            $settings->setSetting('editor_selector', $selector);
-            break;
-         case 'mceEditor':
-         default:
-            $settings = new Component_TinyMCE_Settings_Advanced();
-            $settings->setSetting('height', '600');
-            break;
-      }
-      $this->tinyMCE->setEditorSettings($settings);
-      $this->tinyMCE->mainView();
-   }
 }
-?>

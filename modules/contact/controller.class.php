@@ -63,6 +63,11 @@ class Contact_Controller extends Controller {
       $elemText = new Form_Element_TextArea('text', $this->tr('Text'));
       $elemText->addValidation(new Form_Validator_NotEmpty());
       $formQuestion->addElement($elemText);
+      
+      if(!Auth::isLogin()){
+         $elemCaptcha = new Form_Element_Captcha('captcha', $this->tr('OvYen�'));
+         $formQuestion->addElement($elemCaptcha);
+      }
 
       $elemSubmit = new Form_Element_Submit('send', $this->tr('Odeslat'));
       $formQuestion->addElement($elemSubmit);
