@@ -7,6 +7,7 @@ class Forum_Controller extends Controller {
    const PARAM_CAPCHA_SEC = 'c_s';
    const PARAM_NOTIFY_EMAILS = 'n_e';
    const PARAM_NOTIFY_USERS = 'n_u';
+   const PARAM_ORDER_BY_DATE = 'obd';
 
    const DEFAULT_NUM_ON_PAGE = 20;
    const MIN_SEC_FOR_HUMAN = 15;
@@ -646,6 +647,12 @@ class Forum_Controller extends Controller {
 
       $messages = $modelP->records();
 
+      $sorted = $this->messagesToArray($messages);
+      if($this->category()->getParam(self::PARAM_ORDER_BY_DATE,'desc') == 'asc'){
+         $sorted = array_reverse($sorted);
+      }
+      $this->view()->messagesSort = $sorted;
+      
       $ids = isset($_COOKIE[self::COOKIE_NAME]) ? explode('|', $_COOKIE[self::COOKIE_NAME]) : array();
       foreach($messages as &$msg){
          $msg->voteEnabled = (!$this->rights()->isControll() && in_array($msg->getPK(), $ids)) ? false : true;
@@ -672,6 +679,18 @@ class Forum_Controller extends Controller {
       }
       $this->view()->attachments = $attachments;
       $this->view()->attachmentsPath = $this->getTopicDataDir($topic->getPK(), true);
+   }
+   
+   protected function messagesToArray($messages, $idParent = 0) {
+      $result = array();
+      foreach ($messages as $msg) {
+         if($msg->{Forum_Model_Messages::COLUMN_ID_PARENT_MESSAGE} == $idParent ){
+            $item = $msg;
+            $item->childs = $this->messagesToArray($messages, $msg->getPK());
+            $result[] = $item;
+         } 
+      }
+      return count($result) > 0 ? $result : null;
    }
 
    public function rssTopicController()
@@ -1098,6 +1117,16 @@ class Forum_Controller extends Controller {
       if(isset($settings['scrollT'])) {
          $form->scrollT->setValues($settings['scrollT']);
       }
+      
+      $elemOrder = new Form_Element_Select('order', $this->tr('PoYad� koYenov�ch pY�spvko'));
+      $elemOrder->setOptions(array(
+          $this->tr('Od nejstara�ho pY�spvku') => 'asc',
+          $this->tr('Od nejnovja�ho pY�spvku') => 'desc'
+      ), false, false);
+      $form->addElement($elemOrder, 'basic');
+      if(isset($settings[self::PARAM_ORDER_BY_DATE])) {
+         $form->order->setValues($settings[self::PARAM_ORDER_BY_DATE]);
+      }
 
 //      $elemScroll = new Form_Element_Text('scroll', $this->tr('Počet příspěvků na stránku'));
 //      $elemScroll->setSubLabel($this->tr(sprintf('Výchozí: %s příspěvků', self::DEFAULT_NUM_ON_PAGE)));
@@ -1156,6 +1185,7 @@ class Forum_Controller extends Controller {
       if($form->isValid()) {
          $settings['scrollT'] = $form->scrollT->getValues();
 //         $settings['scroll'] = $form->scroll->getValues();
+         $settings[self::PARAM_ORDER_BY_DATE]= $form->order->getValues();
          $settings[self::PARAM_CAPCHA_SEC] = (int)$form->capchatime->getValues();
          // oznámení
          $settings[self::PARAM_NOTIFY_EMAILS] = $form->notifyEMails->getValues();

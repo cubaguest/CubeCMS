@@ -70,129 +70,138 @@ $expire->modify('+1 year');
             </tr>
          </table>
       </li>
-      <?if(!empty ($this->messages)){ ?>
-      <?foreach ($this->messages as $message) {?>
-      <li id="message-<?=$message->{Forum_Model_Messages::COLUMN_ID}?>"
-          style="margin-left: <?=(int)($message->{Forum_Model_Messages::COLUMN_DEPTH}*20+10)?>px"
-          class="item ui-widget-content <?if($message->{Forum_Model_Messages::COLUMN_CENSORED})echo "ui-state-disabled";?>">
-            <table class="full-width">
-               <tr>
-                  <td class="message-author">
-                     <?echo ps($message->{Forum_Model_Messages::COLUMN_CREATED_BY}).'<br/>';?>
-                     <div class="message-params">
-                     <?if($message->{Forum_Model_Messages::COLUMN_CREATED_BY_MODERATOR} == true){
-                        echo $this->tr('Moderátor').'<br/>';
-                     } else if($message->{Forum_Model_Messages::COLUMN_ID_USER} == 0){
-                        echo $this->tr('Anonymní').'<br/>';
-                     }
-                     printf($this->tr('Přidáno: %s'), vve_date('%d.%m.%Y %G:%i', new DateTime($message->{Forum_Model_Messages::COLUMN_DATE_ADD})));
-                     if($message->{Forum_Model_Messages::COLUMN_CENSORED}){
-                        echo '<p class="font-small">'.$this->tr('Příspěvek byl cenzurován').'</p>';
-                     }
-                     ?>
-                     </div>
-                  </td>
-                  <td class="message-text" rowspan="2">
-                     <?
-                     if($this->toolboxMessage instanceof Template_Toolbox2 && ($this->category()->getRights()->isControll()
-                        || $message->{Forum_Model_Messages::COLUMN_ID_USER} == Auth::getUserId() )){
-                        $this->toolboxMessage->edit_message->setAction($this->link()->route('editMessage', array('idm' => $message->{Forum_Model_Messages::COLUMN_ID})));
-                        if(isset($this->toolboxMessage->message_delete)){
-                           $this->toolboxMessage->message_censore->getForm()->id->setValues($message->{Forum_Model_Messages::COLUMN_ID});
-                           $this->toolboxMessage->message_delete->getForm()->id->setValues($message->{Forum_Model_Messages::COLUMN_ID});
-                        }
-                        echo $this->toolboxMessage;
-                     }
-                     ?>
-                     <div class="text">
-                     <?
-                     if($this->category()->getRights()->isControll() || $message->{Forum_Model_Messages::COLUMN_CENSORED} == false){
-                        if($message->{Forum_Model_Messages::COLUMN_NAME} != null){
-                           echo '<h2>'.$message->{Forum_Model_Messages::COLUMN_NAME}.'</h2>';
-                        }
-                        echo $message->{Forum_Model_Messages::COLUMN_TEXT};
-                     } else {
-                        echo '<p>'.$this->tr('Příspěvek byl cenzurován.').'<p>';
-                     }?>
-                     </div>
-                     <?if(isset($this->attachments[$message->{Forum_Model_Messages::COLUMN_ID}]) && !empty($this->attachments[$message->{Forum_Model_Messages::COLUMN_ID}])){ 
-                        $str = null;
-                        foreach ($this->attachments[$message->{Forum_Model_Messages::COLUMN_ID}] as $file) {
-                           $imgTag = new Html_Element('a', htmlspecialchars($file->{Forum_Model_Attachments::COLUMN_FILENAME}));
-                           $imgTag->setAttrib('href', $this->attachmentsPath.$file->{Forum_Model_Attachments::COLUMN_FILENAME});
-                           $imgTag->setAttrib('title', $file->{Forum_Model_Attachments::COLUMN_FILENAME});
-                           if(in_array( strtolower( pathinfo($file->{Forum_Model_Attachments::COLUMN_FILENAME}, PATHINFO_EXTENSION) ), array('jpg', 'jpeg', 'png', 'gif'))){
-                              $imgTag->setAttrib('rel', 'prettyPhoto');
+      <?php
+      if(!empty ($this->messages)){ 
+         function renderMessages($messages, $_this, $tr){
+            foreach ($messages as $message) {?>
+            <li id="message-<?=$message->{Forum_Model_Messages::COLUMN_ID}?>"
+                style="margin-left: <?=(int)($message->{Forum_Model_Messages::COLUMN_DEPTH}*20+10)?>px"
+                class="item ui-widget-content <?if($message->{Forum_Model_Messages::COLUMN_CENSORED})echo "ui-state-disabled";?>">
+                  <table class="full-width">
+                     <tr>
+                        <td class="message-author">
+                           <?echo ps($message->{Forum_Model_Messages::COLUMN_CREATED_BY}).'<br/>';?>
+                           <div class="message-params">
+                           <?if($message->{Forum_Model_Messages::COLUMN_CREATED_BY_MODERATOR} == true){
+                              echo $tr->tr('Moderátor').'<br/>';
+                           } else if($message->{Forum_Model_Messages::COLUMN_ID_USER} == 0){
+                              echo $tr->tr('Anonymní').'<br/>';
                            }
-                           $str .= '<li>'.$imgTag.'</li>';
-                        }?>
-                     <div class="attachments">
-                        <strong><?=$this->tr('Přílohy')?></strong>
-                        <ul><?=$this->filter($str, 'filesicons');?></ul>
-                     </div>
-                     <?} ?>
-               </td>
-            </tr>
-            <tr>
-               <td class="message-vote">
-<!--                  <strong>--><?//ps($this->tr('Hodnocení'))?><!--</strong><br />-->
-               </td>
-            </tr>
-            <?if($this->category()->getRights()->isControll() && $message->{Forum_Model_Messages::COLUMN_VOTE_SPAM} > 10){?>
-            <tr>
-               <td colspan="2">
-                  <div class="message message-warning">
-                     <strong><?ps(sprintf($this->tr('%s krát označen jako "nevhodné/SPAM"'), $message->{Forum_Model_Messages::COLUMN_VOTE_SPAM}))?></strong>
-                  </div>
-               </td>
-            </tr>
-            <?}?>
-            <tr>
-               <td>
-                  <div class="message-vote clearfix">
-                     <?if($message->voteEnabled){?>
-                     <form class="form-vote form-vote-up" method="post" action="<?=$this->link()->route('voteMessage')?>">
-                        <input type="hidden" name="action" value="voteUp" />
-                        <input type="hidden" name="id" value="<?=$message->getPK()?>" />
-                        <input type="image" name="imgsubmit" class="vote-button vote-button-up" src="images/icons/go-up.png" title="<?ps($this->tr('Hotnotit: výborně'))?>" />
-                     </form>
-                     <?}?>
-                     <span class="vote-counter">
-                        <?if(!$message->voteEnabled){ ps($this->tr('Hlasů').": ");}?>
-                        <?ps($message->{Forum_Model_Messages::COLUMN_VOTE})?>
-                     </span>
-                     <?if($message->voteEnabled){?>
-                     <form class="form-vote form-vote-down" method="post" action="<?=$this->link()->route('voteMessage')?>">
-                        <input type="hidden" name="action" value="voteDown" />
-                        <input type="hidden" name="id" value="<?=$message->getPK()?>" />
-                        <input class="vote-button vote-button-down" type="image" src="images/icons/go-down.png" title="<?ps($this->tr('Hotnotit: zbytečný'))?>" />
-                     </form>
-                     <form class="form-vote form-vote-spam" method="post" action="<?=$this->link()->route('voteMessage')?>">
-                        <input type="hidden" name="action" value="voteSpam" />
-                        <input type="hidden" name="id" value="<?=$message->getPK()?>" />
-                        <input class="vote-button vote-button-spam" type="image" src="images/icons/decline.png" title="<?ps($this->tr('Nahlásit nevhodné / SPAM'))?>" />
-                     </form>
-                     <?}?>
-                  </div>
-               </td>
-               <td class="message-tools">
-                  <div class="message-vote-label clearfix"></div>
-                  <?
-                  $linkToAdd = $this->link()
-                     ->route('addMessage', array('id' => $this->topic->{Forum_Model_Topics::COLUMN_ID}))
-                     ->param('msg', $message->{Forum_Model_Messages::COLUMN_ID}); 
-                  ?>
-                  <?if($this->category()->getRights()->isWritable() && $this->topic->{Forum_Model_Topics::COLUMN_CLOSED} == false){?>
-                  <a href="<?=$linkToAdd ?>" 
-                     title="<?=$this->tr('Reagovat na tento příspěvek')?>" 
-                     ><img src="/images/icons/comment_add.png" alt="add" /> <?=$this->tr('Reagovat')?></a>
+                           printf($tr->tr('Přidáno: %s'), vve_date('%d.%m.%Y %G:%i', new DateTime($message->{Forum_Model_Messages::COLUMN_DATE_ADD})));
+                           if($message->{Forum_Model_Messages::COLUMN_CENSORED}){
+                              echo '<p class="font-small">'.$_this->tr('PY�spvek byl cenzurován').'</p>';
+                           }
+                           ?>
+                           </div>
+                        </td>
+                        <td class="message-text" rowspan="2">
+                           <?
+                           if($_this->toolboxMessage instanceof Template_Toolbox2 && ($_this->category()->getRights()->isControll()
+                              || $message->{Forum_Model_Messages::COLUMN_ID_USER} == Auth::getUserId() )){
+                              $_this->toolboxMessage->edit_message->setAction($_this->link()->route('editMessage', array('idm' => $message->{Forum_Model_Messages::COLUMN_ID})));
+                              if(isset($_this->toolboxMessage->message_delete)){
+                                 $_this->toolboxMessage->message_censore->getForm()->id->setValues($message->{Forum_Model_Messages::COLUMN_ID});
+                                 $_this->toolboxMessage->message_delete->getForm()->id->setValues($message->{Forum_Model_Messages::COLUMN_ID});
+                              }
+                              echo $_this->toolboxMessage;
+                           }
+                           ?>
+                           <div class="text">
+                           <?
+                           if($_this->category()->getRights()->isControll() || $message->{Forum_Model_Messages::COLUMN_CENSORED} == false){
+                              if($message->{Forum_Model_Messages::COLUMN_NAME} != null){
+                                 echo '<h2>'.$message->{Forum_Model_Messages::COLUMN_NAME}.'</h2>';
+                              }
+                              echo $message->{Forum_Model_Messages::COLUMN_TEXT};
+                           } else {
+                        echo '<p>'.$tr->tr('Příspěvek byl cenzurován.').'<p>';
+                           }?>
+                           </div>
+                           <?if(isset($_this->attachments[$message->{Forum_Model_Messages::COLUMN_ID}]) && !empty($_this->attachments[$message->{Forum_Model_Messages::COLUMN_ID}])){ 
+                              $str = null;
+                              foreach ($_this->attachments[$message->{Forum_Model_Messages::COLUMN_ID}] as $file) {
+                                 $imgTag = new Html_Element('a', htmlspecialchars($file->{Forum_Model_Attachments::COLUMN_FILENAME}));
+                                 $imgTag->setAttrib('href', $_this->attachmentsPath.$file->{Forum_Model_Attachments::COLUMN_FILENAME});
+                                 $imgTag->setAttrib('title', $file->{Forum_Model_Attachments::COLUMN_FILENAME});
+                                 if(in_array( strtolower( pathinfo($file->{Forum_Model_Attachments::COLUMN_FILENAME}, PATHINFO_EXTENSION) ), array('jpg', 'jpeg', 'png', 'gif'))){
+                                    $imgTag->setAttrib('rel', 'prettyPhoto');
+                                 }
+                                 $str .= '<li>'.$imgTag.'</li>';
+                              }?>
+                           <div class="attachments">
+                        <strong><?=$tr->tr('Přílohy')?></strong>
+                        <ul><?=$_this->filter($str, 'filesicons');?></ul>
+                           </div>
+                           <?} ?>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td class="message-vote">
+      <!--                  <strong>--><?//ps($this->tr('Hodnocen�'))?><!--</strong><br />-->
+                     </td>
+                  </tr>
+                  <?if($_this->category()->getRights()->isControll() && $message->{Forum_Model_Messages::COLUMN_VOTE_SPAM} > 10){?>
+                  <tr>
+                     <td colspan="2">
+                        <div class="message message-warning">
+                     <strong><?ps(sprintf($tr->tr('%s krát označen jako "nevhodné/SPAM"'), $message->{Forum_Model_Messages::COLUMN_VOTE_SPAM}))?></strong>
+                        </div>
+                     </td>
+                  </tr>
                   <?}?>
-               </td>
-            </tr>
-         </table>
-      </li>
-      <?}
-   }?>
+                  <tr>
+                     <td>
+                        <div class="message-vote clearfix">
+                           <?if($message->voteEnabled){?>
+                           <form class="form-vote form-vote-up" method="post" action="<?=$_this->link()->route('voteMessage')?>">
+                              <input type="hidden" name="action" value="voteUp" />
+                              <input type="hidden" name="id" value="<?=$message->getPK()?>" />
+                              <input type="image" name="imgsubmit" class="vote-button vote-button-up" src="images/icons/go-up.png" title="<?ps($tr->tr('Hotnotit: výborně'))?>" />
+                           </form>
+                           <?}?>
+                           <span class="vote-counter">
+                        <?if(!$message->voteEnabled){ ps($this->tr('Hlasů').": ");}?>
+                              <?ps($message->{Forum_Model_Messages::COLUMN_VOTE})?>
+                           </span>
+                           <?if($message->voteEnabled){?>
+                           <form class="form-vote form-vote-down" method="post" action="<?=$_this->link()->route('voteMessage')?>">
+                              <input type="hidden" name="action" value="voteDown" />
+                              <input type="hidden" name="id" value="<?=$message->getPK()?>" />
+                        <input class="vote-button vote-button-down" type="image" src="images/icons/go-down.png" title="<?ps($tr->tr('Hotnotit: zbytečný'))?>" />
+                           </form>
+                           <form class="form-vote form-vote-spam" method="post" action="<?=$_this->link()->route('voteMessage')?>">
+                              <input type="hidden" name="action" value="voteSpam" />
+                              <input type="hidden" name="id" value="<?=$message->getPK()?>" />
+                              <input class="vote-button vote-button-spam" type="image" src="images/icons/decline.png" title="<?ps($tr->tr('Nahlásit nevhodné / SPAM'))?>" />
+                           </form>
+                           <?}?>
+                        </div>
+                     </td>
+                     <td class="message-tools">
+                        <div class="message-vote-label clearfix"></div>
+                        <?
+                        $linkToAdd = $_this->link()
+                           ->route('addMessage', array('id' => $_this->topic->{Forum_Model_Topics::COLUMN_ID}))
+                           ->param('msg', $message->{Forum_Model_Messages::COLUMN_ID}); 
+                        ?>
+                        <?if($_this->category()->getRights()->isWritable() && $_this->topic->{Forum_Model_Topics::COLUMN_CLOSED} == false){?>
+                        <a href="<?=$linkToAdd ?>" 
+                           title="<?=$tr->tr('Reagovat na tento příspěvek')?>" 
+                           ><img src="/images/icons/comment_add.png" alt="add" /> <?=$tr->tr('Reagovat')?></a>
+                        <?}?>
+                     </td>
+                  </tr>
+               </table>
+            </li>
+            <?php
+                  if($message->childs != null){
+                     renderMessages($message->childs, $_this, $tr);
+                  }
+               }
+            }
+            renderMessages($this->messagesSort, $this, $this->translator());
+      }
+      ?>
       <li class="topic-footer ui-widget-content item message-tools">
          <a href="<?=$this->link()->route('rssTopic', array('id' => $this->topic->{Forum_Model_Topics::COLUMN_ID}))?>" 
             title="<?=$this->tr('Sledovat diskusi pomocí rss')?>" 
@@ -252,7 +261,5 @@ $this->addJsPlugin(new JsPlugin_PrettyPhoto());
          });
          return false;
       });
-
-
 	});
 </script>
