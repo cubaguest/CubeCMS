@@ -19,6 +19,7 @@ class Model_CategoryAdm extends Model_File {
     * @var SimpleXMLElement
     */
    private static $structure = null;
+   protected static $lang = null;
 
    public function __construct()
    {
@@ -37,6 +38,7 @@ class Model_CategoryAdm extends Model_File {
             $this->appendSimplexml(self::$structure, $userStructure);
          }
       }
+      self::$lang = Locales::getUserLang();
    }
 
    private function appendSimplexml(&$simplexml_to, &$simplexml_from)
@@ -53,7 +55,7 @@ class Model_CategoryAdm extends Model_File {
    }
 
    public function getCategory($urlkey){
-      $child = self::$structure->xpath("//item[child::urlkey=\"".$urlkey."\" and child::urlkey[@lang=\"".Locales::getLang()."\"]]");
+      $child = self::$structure->xpath("//item[child::urlkey=\"".$urlkey."\" and child::urlkey[@lang=\"".self::$lang."\"]]");
       // try cs
       if(empty($child)){
          $child = self::$structure->xpath("//item[child::urlkey=\"".$urlkey."\" and child::urlkey[@lang=\"cs\"]]");
@@ -62,7 +64,7 @@ class Model_CategoryAdm extends Model_File {
    }
 
    public static function getCategoryByID($id){
-      $child = self::$structure->xpath("//item[@id=\"".$id."\" and child::urlkey[@lang=\"".Locales::getLang()."\"]]");
+      $child = self::$structure->xpath("//item[@id=\"".$id."\" and child::urlkey[@lang=\"".self::$lang."\"]]");
       // try cs
       if(empty($child)){
          $child = self::$structure->xpath("//item[@id=\"".$id."\" and child::urlkey[@lang=\"cs\"]]");
@@ -71,7 +73,7 @@ class Model_CategoryAdm extends Model_File {
    }
 
    public static function getCategoryByModule($module){
-      $child = self::$structure->xpath("//item[child::module=\"".$module."\" and child::urlkey[@lang=\"".Locales::getLang()."\"]]");
+      $child = self::$structure->xpath("//item[child::module=\"".$module."\" and child::urlkey[@lang=\"".self::$lang."\"]]");
       // try cs
       if(empty($child)){
          $child = self::$structure->xpath("//item[child::module=\"".$module."\" and child::urlkey[@lang=\"cs\"]]");
@@ -81,12 +83,12 @@ class Model_CategoryAdm extends Model_File {
 
    private static function createCatObject($child){
       $obj = new Object();
-      $urlkey = $child->xpath('urlkey[@lang="'.Locales::getLang().'"]');
+      $urlkey = $child->xpath('urlkey[@lang="'.self::$lang.'"]');
       if(empty($urlkey)){
          $urlkey = $child->xpath('urlkey[@lang="cs"]');
       }
       $obj->{Model_Category::COLUMN_URLKEY} = (string)$urlkey[0];
-      $name = $child->xpath('name[@lang="'.Locales::getLang().'"]');
+      $name = $child->xpath('name[@lang="'.self::$lang.'"]');
       if(empty($name)){
          $name = $child->xpath('name[@lang="cs"]');
       }

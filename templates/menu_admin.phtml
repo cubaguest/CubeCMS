@@ -1,7 +1,7 @@
 <?
 // funkce pro render menu
 function vveAdminMenuRenderFunc(SimpleXMLElement $menuArr, $link, $ulParam) {
-   $l = Locales::getLang();
+   $l = Locales::getUserLang();
    echo ("<ul ".$ulParam.">\n");
    foreach ($menuArr as $key => $item) {
       if(isset($item['type']) && $item['type'] == 'user'){

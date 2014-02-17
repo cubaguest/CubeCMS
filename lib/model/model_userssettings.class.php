@@ -9,7 +9,7 @@
  * @abstract      Třída s modelem pro práci s uživateli
  */
 
-class Model_Users_Settings extends Model_ORM {
+class Model_UsersSettings extends Model_ORM {
 /**
  * Název tabulky s uživateli
  */
@@ -47,7 +47,7 @@ class Model_Users_Settings extends Model_ORM {
       $idUser = $idUser == null ? Auth::getUserId() : $idUser;
       $set = $m
          ->where(self::COLUMN_ID_USER.' = :idu AND '.self::COLUMN_NAME.' = :name', array('idu' => $idUser, 'name' => $name))
-         ->record(PDO::FETCH_OBJ);
+         ->record(null, null, PDO::FETCH_OBJ);
 
       return $set != false ? $set->{self::COLUMN_VALUE} : $defaultValue ;
    }
@@ -61,9 +61,20 @@ class Model_Users_Settings extends Model_ORM {
             ->where(self::COLUMN_ID_USER.' = :idu AND '.self::COLUMN_NAME.' = :name', array('idu' => $idUser, 'name' => $name))
             ->delete();
       } else {
-         $m
+         $setting = $m
             ->where(self::COLUMN_ID_USER.' = :idu AND '.self::COLUMN_NAME.' = :name', array('idu' => $idUser, 'name' => $name))
-            ->update(array(self::COLUMN_VALUE => $value));
+            ->record();
+         if(!$setting){
+            $setting = $m->newRecord();
+            $setting->{self::COLUMN_ID_USER} = $idUser;
+            $setting->{self::COLUMN_NAME} = $name;
+         }
+         $setting->{self::COLUMN_VALUE} = $value;
+         $setting->save();
+         
+//         $m
+//            ->where(self::COLUMN_ID_USER.' = :idu AND '.self::COLUMN_NAME.' = :name', array('idu' => $idUser, 'name' => $name))
+//            ->update(array(self::COLUMN_VALUE => $value));
       }
    }
 }

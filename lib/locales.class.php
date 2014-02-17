@@ -376,6 +376,15 @@ class Locales extends TrObject {
    }
 
    /**
+    * Metoda vrací jazyk uživatele
+    * @return string (cs, en, de, ...)
+    */
+   public static function getUserLang()
+   {
+      return Model_UsersSettings::getSettings('userlang', Locales::getLang());
+   }
+   
+   /**
     * Konstruktor vytvoří objekt pro přístup k locales
     * @param string $moduleDomain
     */
