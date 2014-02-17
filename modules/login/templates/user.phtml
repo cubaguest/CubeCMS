@@ -37,6 +37,10 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
          <th class="ui-widget-header"><?=$this->tr('Poznámka / popis')?></th>
          <td class="ui-widget-content"><?=$this->user->{Model_Users::COLUMN_NOTE}?></td>
       </tr>
+      <tr>
+         <th class="ui-widget-header"><?=$this->tr('Preferovaný jazyk')?></th>
+         <td class="ui-widget-content"><?=Locales::getUserLang()?></td>
+      </tr>
    </table>
    <br />
    <?=$this->includeTpl('buttons.phtml')?>

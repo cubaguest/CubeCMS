@@ -145,6 +145,13 @@ class Login_Controller extends Controller {
       $elemNote = new Form_Element_TextArea('note', $this->tr('Poznámky'));
       $form->addElement($elemNote, $fGrpOther);
 
+      if(count(Locales::getAppLangs()) > 1 && Auth::isAdmin()){
+         $fGrpSettings = $form->addGroup('settings', $this->tr('Nastavení'));
+         $elemLang = new Form_Element_Select('lang', $this->tr('Výchozí jazyk'));
+         $elemLang->setOptions(array_flip(Locales::getAppLangsNames()));
+         $form->addElement($elemLang, $fGrpSettings);
+      }
+      
       $elemSubmit = new Form_Element_SaveCancel('save');
       $form->addElement($elemSubmit);
 
@@ -152,6 +159,9 @@ class Login_Controller extends Controller {
       $form->surname->setValues($user->{Model_Users::COLUMN_SURNAME});
       $form->email->setValues($user->{Model_Users::COLUMN_MAIL});
       $form->note->setValues($user->{Model_Users::COLUMN_NOTE});
+      if(isset($form->lang)){
+         $form->lang->setValues(Model_UsersSettings::getSettings('userlang', Locales::getDefaultLang()));
+      }
 
       return $form;
    }
@@ -164,6 +174,9 @@ class Login_Controller extends Controller {
       $user->{Model_Users::COLUMN_SURNAME} = $form->surname->getValues();
       $user->{Model_Users::COLUMN_MAIL} = $form->email->getValues();
       $user->{Model_Users::COLUMN_NOTE} = $form->note->getValues();
+      if(isset($form->lang)){
+         Model_UsersSettings::setSettings('userlang', $form->lang->getValues());
+      }
       $modelUser->save($user);
    }
 
@@ -189,7 +202,8 @@ class Login_Controller extends Controller {
             $this->link()->route()->reload();
          }
          if($form->username->getValues() != null AND
-            $modelUsr->where(Model_Users::COLUMN_USERNAME, $form->username->getValues())->record() == false){
+            $modelUsr->where(Model_Users::COLUMN_USERNAME." = :username ||  ".Model_Users::COLUMN_MAIL." = :mail",
+            array('username' => $form->username->getValues(), 'mail' => $form->username->getValues()))->record() == false){
             $eUsername->setError($this->tr('Zadané uživatelské jméno neexistuje'));
          }
       }
@@ -214,5 +228,3 @@ class Login_Controller extends Controller {
       return $string; 
    }
 }
-
-?>
