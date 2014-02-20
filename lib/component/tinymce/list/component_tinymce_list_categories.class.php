@@ -19,11 +19,12 @@ class Component_TinyMCE_List_Categories extends Component_TinyMCE_List {
             }
             
             $label = Locales::isMultilang() 
-               ? sprintf($this->tr('Kategorie[%s]: %s'), strtoupper($lang), $cat[Model_Category::COLUMN_NAME][$lang] ) 
-               : sprintf($this->tr('Kategorie: %s'), $cat[Model_Category::COLUMN_NAME][$lang] );
+               ? sprintf($this->tr('Stránka[%s]: %s'), strtoupper($lang), $cat[Model_Category::COLUMN_NAME][$lang] ) 
+               : sprintf($this->tr('Stránka: %s'), $cat[Model_Category::COLUMN_NAME][$lang] );
          
-            $link = (string)$linkObj->lang()
-               ->category($cat[Model_Category::COLUMN_URLKEY][Locales::getDefaultLang()]);
+            $link = (string)$linkObj
+               ->lang($lang != Locales::getDefaultLang() ? $lang : null)
+               ->category($cat[Model_Category::COLUMN_URLKEY][$lang]);
          
             $this->addItem($label, 
                str_replace(Url_Link::getMainWebDir(), "/", $link) );
@@ -33,4 +34,3 @@ class Component_TinyMCE_List_Categories extends Component_TinyMCE_List {
    }
 
 }
-?>
