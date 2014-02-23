@@ -36,6 +36,7 @@ class Form_Element_TextArea extends Form_Element_Text {
          $this->html()->clearContent();
          foreach ($this->getLangs() as $langKey => $langLabel) {
             $container = clone $this->containerElement;
+            $this->html()->clearContent();
             $this->html()->setAttrib('lang', $langKey);
             if($this->isDimensional()){
                $this->html()->setAttrib('name', $this->getName().'['.$this->dimensional.']['.$langKey.']');
