@@ -88,7 +88,7 @@ class Url
 
    public function __construct($url = null)
    {
-      $this->parseUrl($url);
+      $this->parseUrl($url != null ? $url : $_SERVER['HTTP_REFERER']);
    }
 
    /**
