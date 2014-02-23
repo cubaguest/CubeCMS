@@ -23,7 +23,7 @@ class AppCore extends TrObject {
    /**
     * Verze enginu
     */
-   const ENGINE_VERSION = '8.0.1';
+   const ENGINE_VERSION = '8.0.2';
 
    /**
     * Obsahuje hlavní soubor aplikace
@@ -224,6 +224,10 @@ class AppCore extends TrObject {
       // spl_autoload_register(); PHP 5.3.10 make warnings here
       spl_autoload_register(array('AppCore', 'libLoader'));
       spl_autoload_register(array('AppCore', 'moduleLoader'));
+      // bootstrap
+      if(is_file(AppCore::getAppWebDir().'config'.DIRECTORY_SEPARATOR.'bootstrap.php')){
+         include_once AppCore::getAppWebDir().'config'.DIRECTORY_SEPARATOR.'bootstrap.php';
+      }
    }
 
    /**
@@ -278,7 +282,7 @@ class AppCore extends TrObject {
     */
    public static function getAppDataDir()
    {
-      return self::getAppWebDir().VVE_DATA_DIR.DIRECTORY_SEPARATOR;
+      return self::getAppWebDir().CUBE_CMS_DATA_DIR.DIRECTORY_SEPARATOR;
    }
 
    /**
@@ -382,6 +386,7 @@ class AppCore extends TrObject {
       $max_post = vve_parse_size(ini_get('post_max_size'));
       $memory_limit = vve_parse_size(ini_get('memory_limit'));
       define('VVE_MAX_UPLOAD_SIZE', min($max_upload, $max_post, $memory_limit));
+      define('CUBE_CMS_MAX_UPLOAD_SIZE', min($max_upload, $max_post, $memory_limit));
    }
 
    /**
@@ -430,13 +435,16 @@ class AppCore extends TrObject {
          }
       }
       foreach ($recs as $record) {
-         if(!defined('VVE_'.$record->{Model_Config::COLUMN_KEY})) {
+         if(!defined('CUBE_CMS_'.$record->{Model_Config::COLUMN_KEY})) {
             if($record->{Model_Config::COLUMN_VALUE} == 'true') {
                define(strtoupper('VVE_'.$record->{Model_Config::COLUMN_KEY}), true);
+               define(strtoupper('CUBE_CMS_'.$record->{Model_Config::COLUMN_KEY}), true);
             } else if($record->{Model_Config::COLUMN_VALUE} == 'false') {
                define(strtoupper('VVE_'.$record->{Model_Config::COLUMN_KEY}), false);
+               define(strtoupper('CUBE_CMS_'.$record->{Model_Config::COLUMN_KEY}), false);
             } else {
                define(strtoupper('VVE_'.$record->{Model_Config::COLUMN_KEY}), $record->{Model_Config::COLUMN_VALUE});
+               define(strtoupper('CUBE_CMS_'.$record->{Model_Config::COLUMN_KEY}), $record->{Model_Config::COLUMN_VALUE});
             }
          }
       }
@@ -449,10 +457,10 @@ class AppCore extends TrObject {
    {
       /* Upgrade jádra */
       // upgrade
-      if(defined('VVE_VERSION') AND VVE_VERSION != self::ENGINE_VERSION){ // kvůli neexistenci předchozí detekce
+      if(defined('CUBE_CMS_VERSION') AND CUBE_CMS_VERSION != self::ENGINE_VERSION){ // kvůli neexistenci předchozí detekce
          $core = new Install_Core();
          $core->upgrade();
-      } else if(!defined('VVE_VERSION')) {
+      } else if(!defined('CUBE_CMS_VERSION')) {
          $core = new Install_Core();
          $core->upgradeToMain();
       }
@@ -547,7 +555,7 @@ class AppCore extends TrObject {
     */
    private function _initMessagesAndErrors()
    {
-      if(VVE_DEBUG_LEVEL > 0){
+      if(CUBE_CMS_DEBUG_LEVEL > 0){
          error_reporting(-1);
          ini_set('display_errors', 1);
       } else {
@@ -628,8 +636,8 @@ class AppCore extends TrObject {
    public function assignMainVarsToTemplate()
    {
       // Hlavni promene strany
-      $this->getCoreTpl()->debug = VVE_DEBUG_LEVEL;
-      $this->getCoreTpl()->mainLangImagesPath = VVE_IMAGES_LANGS_DIR.URL_SEPARATOR;
+      $this->getCoreTpl()->debug = CUBE_CMS_DEBUG_LEVEL;
+      $this->getCoreTpl()->mainLangImagesPath = CUBE_CMS_IMAGES_LANGS_DIR.URL_SEPARATOR;
       $this->getCoreTpl()->categoryId = Category::getSelectedCategory()->getId();
       // Přiřazení jazykového pole
       $this->getCoreTpl()->setPVar("appLangsNames", Locales::getAppLangsNames());
@@ -903,7 +911,7 @@ class AppCore extends TrObject {
             $panels[$key] = array();
          }
       } else {
-         $panelPositions = vve_parse_cfg_value(VVE_PANEL_TYPES);
+         $panelPositions = vve_parse_cfg_value(CUBE_CMS_PANEL_TYPES);
          foreach($panelPositions as $pos){
             $panels[$pos] = array();
          }
@@ -1113,7 +1121,7 @@ class AppCore extends TrObject {
          die ();
       }
 
-      if(VVE_DEBUG_LEVEL >= 3 AND function_exists('xdebug_start_trace')){
+      if(CUBE_CMS_DEBUG_LEVEL >= 3 AND function_exists('xdebug_start_trace')){
          xdebug_start_trace(AppCore::getAppCacheDir().'trace.log');
       }
 
@@ -1244,7 +1252,7 @@ class AppCore extends TrObject {
          // render šablony
          $this->renderTemplate();
       }
-      if(VVE_DEBUG_LEVEL >= 3 AND function_exists('xdebug_stop_trace')){
+      if(CUBE_CMS_DEBUG_LEVEL >= 3 AND function_exists('xdebug_stop_trace')){
          xdebug_stop_trace();
       }
       return true;
