@@ -104,7 +104,16 @@ class Routes {
     * Metoda přidává cestu do seznamu cest
     * @param string -- název cesty
     */
-   final public function addRoute($name, $regexp, $action, $replacement, $respondClass = null) {
+   final public function addRoute($name, $regexp = null, $action = null, $replacement = null, $respondClass = null) {
+      if($regexp == null && $action == null){
+         $regexp =  strtolower(preg_replace('/(?<!^)([A-Z])/', '-\\1', $name)).'/';
+      }
+      if($action == null){
+         $action = $name;
+      }
+      if($replacement == null){
+         $replacement = $regexp;
+      }
       $rege = addcslashes($regexp, '/');
       $act = array('method' => $action, 'class' => null);
       // jestli bude existovat externí napojení
