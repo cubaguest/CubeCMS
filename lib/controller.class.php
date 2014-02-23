@@ -490,16 +490,21 @@ abstract class Controller extends TrObject {
       $ctrlAct = $this->actionViewer.'Controller';
       // spuštění kontroleru
       if(method_exists($this, $ctrlAct)) {
-         // kontroler obsahuje metodu pro obsluhu
-//          try {
-            if($this->{$ctrlAct}() === false){
-               throw new UnexpectedPageException();
-            }
-            $this->view()->runView($this->actionViewer, Template_Output::getOutputType());
-//          } catch (UnexpectedPageException $e) {
-//             AppCore::setErrorPage(true);
-//          }
-         
+         $reflect = new ReflectionClass($this);
+         $methodParametres = $reflect->getMethod($ctrlAct)->getParameters();
+         $requestParams = $this->routes()->getRouteParams();
+         $transmitParams = array();
+         // vytvoření parametrů pro předání do kontroleru
+         foreach ($methodParametres as $param) {
+            $transmitParams[$param->getName()] = isset($requestParams[$param->getName()]) ? $requestParams[$param->getName()] : null;
+         }
+         // spuštění kontroleru
+         $result = call_user_func_array(array($this, $ctrlAct), $transmitParams);
+         if($result === false){
+            // backward compatibility
+            throw new UnexpectedPageException();
+         }
+         $this->view()->runView($this->actionViewer, Template_Output::getOutputType());
       } else if(!empty ($this->registeredModules)) { // pokus spustit kontroller z jiného modulu
          foreach ($this->registeredModules as $module => $params) {
             $ctrlName = ucfirst($module).'_Controller';
