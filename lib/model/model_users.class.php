@@ -122,7 +122,7 @@ class Model_Users extends Model_ORM {
       return $model
              ->where(Model_Users::COLUMN_USERNAME.' = :username AND '.Model_Users::COLUMN_EXTERNAL_AUTH_ID." = :ident",
                array('username' => $username, 'ident' => $auth))
-             ->joinFK(Model_Users::COLUMN_ID_GROUP, array('group_name' => Model_Groups::COLUMN_NAME))
+             ->joinFK(Model_Users::COLUMN_ID_GROUP, array('group_name' => Model_Groups::COLUMN_NAME, '*'))
              ->record();
    }
    
@@ -131,7 +131,7 @@ class Model_Users extends Model_ORM {
       $model = new Model_Users();
       return $model
              ->where(Model_Users::COLUMN_USERNAME.' = :username', array('username' => $username))
-             ->joinFK(Model_Users::COLUMN_ID_GROUP, array('group_name' => Model_Groups::COLUMN_NAME))
+             ->joinFK(Model_Users::COLUMN_ID_GROUP, array('group_name' => Model_Groups::COLUMN_NAME, '*'))
              ->record();
    }
 

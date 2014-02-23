@@ -200,58 +200,6 @@ class Auth extends TrObject {
    }
 
    /**
-    * Metoda provade trvalé přihlášení do systému
-    * @return bool
-    */
-   private static function permanentLogin() {
-      if(isset ($_COOKIE[VVE_SESSION_NAME.'_pl'])){
-         // přepsat podle db asi?
-         
-//         $data = explode('|', $_COOKIE[VVE_SESSION_NAME.'_pl']);
-//         $user = self::getUser($data[0]);
-//         if($user != false AND $data[1] == self::getBrowserIdent()){
-//            // Uspesne prihlaseni do systemu
-//            self::$login = true;
-//            self::$userName = $user->{Model_Users::COLUMN_USERNAME};
-//            self::$userGroupId = $user->{Model_Users::COLUMN_ID_GROUP};
-//            self::$userGroupName = $user->{Model_Users::COLUMN_GROUP_NAME};
-//            self::$userId = $user->{Model_Users::COLUMN_ID};
-//            self::$userMail = $user->{Model_Users::COLUMN_MAIL};
-//            self::$userIsAdmin = (bool)$user->{Model_Groups::COLUMN_IS_ADMIN};
-//            self::$userIsSiteAdmin = false;
-//
-//            // mačteme všechny podweby, kde má uživatel přístup
-//            $modelSites = new Model_SitesGroups();
-//            $sites = $modelSites->joinFK(Model_SitesGroups::COLUMN_ID_SITE)
-//               ->where(Model_SitesGroups::COLUMN_ID_GROUP.' = :idg', array('idg' => $user->{Model_Users::COLUMN_ID_GROUP}))
-//               ->records();
-//
-//            if(!empty($sites)){
-//               foreach($sites as $site) {
-//                  self::$userSites[$site->{Model_Sites::COLUMN_ID}] = $site->{Model_Sites::COLUMN_DOMAIN};
-//               }
-//            }
-//            unset($sites);
-//            unset($modelSites);
-//
-//            if(self::$userIsAdmin AND (
-//               empty(self::$userSites)
-//                  OR (VVE_SUB_SITE_DOMAIN != null AND isset(self::$userSites[VVE_SUB_SITE_DOMAIN]))
-//                  OR (VVE_SUB_SITE_DOMAIN == null AND isset(self::$userSites['www']) ) )){
-//               self::$userIsSiteAdmin = true;
-//            }
-//
-//            self::saveUserDetailToSession();
-//            return true;
-//         }
-//         setcookie(VVE_SESSION_NAME.'_pl', '', time()-60*5, '/', '.'.Url_Request::getDomain()); // remove permament cookie
-//         $tr = new Translator();
-//         Log::msg(sprintf($tr->tr('Pokus o ukradení cookie s trvalým přihlášením. IP: %s'), $_SERVER['REMOTE_ADDR']), 'Auth', $data[0]);
-      }
-      return false;
-   }
-
-   /**
     * Metoda vrací identifikátor prohlížeče, pro částečnou autentizaci trvalého přihlášení uživatele
     * @return string
     */
