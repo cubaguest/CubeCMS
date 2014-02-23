@@ -17,19 +17,22 @@ class Auth extends TrObject {
     * Konstanty označující informace o uživateli
     * @var string
     */
-   const USER_NAME         = 'username';
-   const USER_MAIL         = 'mail';
-   const USER_ID           = 'id_user';
-   const USER_ID_GROUP     = 'id_group';
-   const USER_GROUP_NAME   = 'group_name';
-   const USER_LOGIN_TIME   = 'logintime';
-   const USER_IS_LOGIN     = 'login';
-   const USER_LOGIN_ADDRESS= 'ip_address';
-   const USER_ADMIN_GROUP  = 'admin_grp';
-   const USER_ADMIN        = 'admin';
-   const USER_SITES        = 'sites';
-
+   const SESSION_USER      = 'userlogin';
+   
    const PERMANENT_COOKIE_EXPIRE = 2678400; // 31*24*60*60
+   
+   const FORM_PERMANENT_LOGIN = 'login_permanent';
+   const FORM_LOGOUT = 'logout_submit';
+
+   /**
+    * @var Auth_User
+    */
+   protected static $user;
+
+   /**
+    * @var Auth_Interface[]
+    */
+   protected static $authenticators = array();
 
    /**
     * Je-li uživatel přihlášen
@@ -38,229 +41,144 @@ class Auth extends TrObject {
    private static $login = false;
 
    /**
-    * Skupina uživatele
-    * @var string
-    */
-   private static $userGroupName = null;
-
-   /**
-    * Skupina uživatele
-    * @var integer
-    */
-   private static $userGroupId = null;
-
-   /**
-    * Id uživatele
-    * @var integer
-    */
-   private static $userId = -1;
-
-   /**
-    * Uživatelské jméno uživatele
-    * @var string
-    */
-   private static $userName = null;
-
-   /**
-    * Mail uživatele
-    * @var string
-    */
-   private static $userMail = null;
-
-   /**
-    * Uživatel je v Admin skupině
-    * @var string
-    */
-   private static $userIsAdmin = false;
-
-   /**
-    * Uživatel je Admin pro aktuální web
-    * @var string
-    */
-   private static $userIsSiteAdmin = false;
-
-   /**
-    * Pole s podweby uživatele
-    * @var string
-    */
-   private static $userSites = array();
-
-   /**
-    * Konstruktor, provádí autorizaci
+    * provede přihlášení a autentizaci uživatele
     */
    public static function authenticate() {
-      //Zakladni proměne
-      self::$login = false;
-      //Jestli uzivatel prihlasen, je zvolena skupina uzivatele, v opacnem pripade vychozi skupina
-      if(!self::userIslogIn()){
-         if(!self::permanentLogin() AND !self::logInNow()){
-            //přihlášení výchozího uživatele
-            self::setDefaultUserParams();
+      $baseAuth = new Auth_Provider_Internal();
+      self::addAuthenticator($baseAuth);
+      self::$user = new Auth_User($baseAuth);
+      
+      // načti aktuální přihlášení
+      self::checkUserIslogIn();
+      
+      if(!self::isLogin()){
+         foreach (self::$authenticators as $auth) {
+            if($auth->isCalled()){
+               $authenticatedUser = $auth->authenticate();
+               if($authenticatedUser){
+                  self::$user = $authenticatedUser;
+                  self::$login = true;
+                  break;
+               }
+            }
+         }
+         
+         // pokud dojde k přihlášení
+         if(self::isLogin()){
+            self::saveUserDetailToSession();
+            self::checkEnablePermanentLogin();
+            // redirect to link
+            $link = new Url(isset($_GET['redirect']) ? urlencode($_GET['redirect']) : null);
+            $link->rmParam()->redirect();
          }
       } else {
-         //Uživatel se odhlásil
-         if(self::logOutNow()){
-            self::setDefaultUserParams();
-         } else {
-            self::setUserDetailFromSession();
-         }
+         // kontrola odhlášení
+         self::checkLogOut();
       }
+      
    }
+   
+   public static function addAuthenticator(Auth_Provider_Interface $auth)
+   {
+      self::$authenticators[strtolower(str_replace('Auth_Provider_', '', get_class($auth)))] = $auth;
+   }
+   
+   /**
+    * Zjišťuje jestli se daný autentizátor používá
+    * @param string $name
+    * @return boolean
+    */
+   public static function isAuthenticator($name)
+   {
+      return isset(self::$authenticators[$name]);
+   }
+   
+   /**
+    * 
+    * @param type $name
+    * @return Auth_Provider_Interface, boolean
+    */
+   public static function getAuthenticator($name = null)
+   {
+      $class = 'Auth_Provider_'.ucfirst($name);
+      return isset(self::$authenticators[$name]) ? self::$authenticators[$name] : new $class();
+   }
+   
+   /**
+    * Varcí informace o uživateli
+    * @return Auth_User
+    */
+   public static function getUser()
+   {
+      return self::$user;
+   }
+   
 
    /**
     * Metoda zjistí jesli je uživatel již přihlášen
     * @return boolean -- true pokud je uživatel přihlášen
     * @todo přidání kontroly IP adresy proti zneužití
     */
-   private static function userIslogIn() {
-      if((!empty($_SESSION[self::USER_IS_LOGIN])) AND ($_SESSION[self::USER_IS_LOGIN] == true)){
+   private static function checkUserIslogIn() {
+      if(isset($_SESSION[self::SESSION_USER])){
          self::$login = true;
+         self::$user = $_SESSION[self::SESSION_USER];
       } else {
          self::$login = false;
+         self::checkIsPermanentLogin();
       }
       return self::$login;
    }
-
-   /**
-    * metoda nastavuje parametry pro přihlášeného uživatele
-    */
-   private static function setUserDetailFromSession() {
-      $_SESSION[self::USER_LOGIN_TIME] = time();
-      self::$userName = $_SESSION[self::USER_NAME];
-      self::$userMail = $_SESSION[self::USER_MAIL];
-      self::$userId = $_SESSION[self::USER_ID];
-      self::$userGroupId = $_SESSION[self::USER_ID_GROUP];
-      self::$userGroupName = $_SESSION[self::USER_GROUP_NAME];
-      self::$userSites = $_SESSION[self::USER_SITES];
-      self::$userIsAdmin = $_SESSION[self::USER_ADMIN];
-      self::$userIsSiteAdmin = false;
-
-      if(self::$userIsAdmin AND (
-         empty(self::$userSites)
-            OR (VVE_SUB_SITE_DOMAIN != null AND isset(self::$userSites[VVE_SUB_SITE_DOMAIN]))
-            OR (VVE_SUB_SITE_DOMAIN == null AND isset(self::$userSites['www']) ) )){
-         self::$userIsSiteAdmin = true;
-      }
-
-      if(isset ($_COOKIE[VVE_SESSION_NAME.'_pl'])){
-         setcookie(VVE_SESSION_NAME.'_pl', $_COOKIE[VVE_SESSION_NAME.'_pl'], time()+self::PERMANENT_COOKIE_EXPIRE,'/', Url_Request::getDomain());
+   
+   private static function checkEnablePermanentLogin()
+   {
+      if(isset ($_POST[self::FORM_PERMANENT_LOGIN]) AND $_POST[self::FORM_PERMANENT_LOGIN] == 'on'){
+         self::createPermanentLogin();
       }
    }
-
-   /**
-    * metoda nastvuje výchozí prametry pro nepřihlášeného uživatele
-    */
-   private static function setDefaultUserParams() {
-      self::$userGroupId = (int)VVE_DEFAULT_ID_GROUP;
-      self::$userId = -1;
-      self::$userGroupName = VVE_DEFAULT_GROUP_NAME;
-      self::$userName = VVE_DEFAULT_USER_NAME;
-      self::$userIsAdmin = false;
-      self::$userIsSiteAdmin = false;
-      self::$userSites = array();
+   
+   private static function checkIsPermanentLogin()
+   {
+      if(isset($_COOKIE[VVE_SESSION_NAME.'_pl'])){
+         $cookieParts = explode('|', $_COOKIE[VVE_SESSION_NAME.'_pl']);
+         if(!isset($cookieParts[1]) || $cookieParts[1] != self::getBrowserIdent()){
+            return;
+         }
+         $user = Model_Users::getRecord((int)$cookieParts[0]);
+         if(!$user){
+            return;
+         }
+         
+         self::$user = new Auth_User(self::getAuthenticator($user->{Model_Users::COLUMN_AUTHENTICATOR}), $user);
+         self::$login = true;
+         self::createPermanentLogin();
+      }
+   }
+   
+   private static function createPermanentLogin()
+   {
+      setcookie(VVE_SESSION_NAME.'_pl', self::$user->getUserId().'|'.self::getBrowserIdent(), time()+self::PERMANENT_COOKIE_EXPIRE,'/', '.'.Url_Request::getDomain());
+   }
+   
+   private static function destroyPemanentLogin()
+   {
+      if(isset($_COOKIE[VVE_SESSION_NAME.'_pl'])){
+         setcookie(VVE_SESSION_NAME.'_pl', '', time()-60*5,'/', '.'.Url_Request::getDomain());
+      }
    }
 
    /**
     * metoda ukládá parametry uživatele do session
     */
    private static function saveUserDetailToSession() {
-      $_SESSION[self::USER_NAME] = self::$userName;
-      $_SESSION[self::USER_MAIL] = self::$userMail;
-      $_SESSION[self::USER_ID]= self::$userId;
-      $_SESSION[self::USER_ID_GROUP] = self::$userGroupId;
-      $_SESSION[self::USER_GROUP_NAME] = self::$userGroupName;
-      $_SESSION[self::USER_LOGIN_ADDRESS] = $_SERVER['REMOTE_ADDR'];
-      $_SESSION[self::USER_LOGIN_TIME] = time();
-      $_SESSION[self::USER_IS_LOGIN] = true;
-      $_SESSION[self::USER_ADMIN] = self::$userIsAdmin;
-      $_SESSION[self::USER_SITES] = self::$userSites;
+      $_SESSION[self::SESSION_USER] = self::$user;
    }
 
-   /**
-    * Metoda ověří přihlašovací údaje a přihlásí uživatele do aplikace
-    * @return boolean -- true pokud se uživatele podařilo přihlásit
-    */
-   private static function logInNow() {
-      $return = false;
-      if (isset($_POST["login_submit"]) OR isset ($_POST['login_submit_x'])){
-         $tr = new Translator();
-         if (($_POST["login_username"] == "") and ($_POST["login_passwd"] == "")){
-            AppCore::getUserErrors()->addMessage($tr->tr("Byly zadány prázdné údaje"));
-         } else {
-            $user = self::getUser(htmlentities($_POST["login_username"],ENT_QUOTES));
-            if (!$user){
-               AppCore::getUserErrors()->addMessage($tr->tr("Nepodařilo se přihlásit. Zřejmě váš účet neexistuje."));
-            } else {
-               if (Auth::cryptPassword(htmlentities($_POST["login_passwd"],ENT_QUOTES)) == $user->{Model_Users::COLUMN_PASSWORD}
-                  OR ($user->{Model_Users::COLUMN_PASSWORD_RESTORE} != null
-                     AND Auth::cryptPassword(htmlentities($_POST["login_passwd"],ENT_QUOTES)) == $user->{Model_Users::COLUMN_PASSWORD_RESTORE})){
-                  // Uspesne prihlaseni do systemu
-                  self::$login = true;
-                  self::$userName = $user->{Model_Users::COLUMN_USERNAME};
-                  self::$userGroupId = $user->{Model_Users::COLUMN_ID_GROUP};
-                  self::$userGroupName = $user->gname;
-                  self::$userId = $user->{Model_Users::COLUMN_ID};
-                  self::$userMail = $user->{Model_Users::COLUMN_MAIL};
-                  self::$userIsAdmin = (bool)$user->{Model_Groups::COLUMN_IS_ADMIN};
-                  self::$userIsSiteAdmin = false;
-
-                  // mačteme všechny podweby, kde má uživatel přístup
-                  $modelSites = new Model_SitesGroups();
-                  $sites = $modelSites->joinFK(Model_SitesGroups::COLUMN_ID_SITE)
-                     ->where(Model_SitesGroups::COLUMN_ID_GROUP.' = :idg', array('idg' => $user->{Model_Users::COLUMN_ID_GROUP}))
-                     ->records();
-
-                  if($sites != false){
-                     foreach($sites as $site) {
-                        self::$userSites[$site->{Model_Sites::COLUMN_DOMAIN}] = $site->{Model_Sites::COLUMN_ID};
-                     }
-                  }
-                  unset($sites);
-                  unset($modelSites);
-
-                  if($user->{Model_Users::COLUMN_FOTO_FILE} != null){
-                     //TODO není dodělána práce s fotkou
-//                   $_SESSION["foto_file"]=$user_details["foto_file"]=USER_AVANT_FOTO.$user["foto_file"];
-                  }
-                  // pokud je použito obnovné heslo uožíme jej
-                  if(Auth::cryptPassword(htmlentities($_POST["login_passwd"],ENT_QUOTES)) == $user->{Model_Users::COLUMN_PASSWORD_RESTORE}){
-                     $user->{Model_Users::COLUMN_PASSWORD} = $user->{Model_Users::COLUMN_PASSWORD_RESTORE};
-                     $user->{Model_Users::COLUMN_PASSWORD_RESTORE} = null;
-                     $model = new Model_Users();
-                     $model->save($user);
-                     unset ($model);
-                     AppCore::getInfoMessages()->addMessage($tr->tr("Nové heslo bylo nastaveno."));
-                     Log::msg($tr->tr('Uživateli bylo obnoveno nové heslo'), null, self::$userName);
-                  }
-                  // uložení přihlášení
-
-                  $modelUserLogins = new Model_UsersLogins();
-                  $newLogin = $modelUserLogins->newRecord();
-                  $newLogin->{Model_UsersLogins::COLUMN_ID_USER} = self::$userId;
-                  $newLogin->{Model_UsersLogins::COLUMN_IP_ADDRESS} = $_SERVER['REMOTE_ADDR'];
-                  $newLogin->{Model_UsersLogins::COLUMN_BROWSER} = $_SERVER['HTTP_USER_AGENT'];
-                  $modelUserLogins->save($newLogin);
-
-                  Log::msg($tr->tr('Uživatel byl přihlášen'), null, self::$userName);
-                  // permanent login
-                  if(isset ($_POST['login_permanent']) AND $_POST['login_permanent'] == 'on'){
-                     setcookie(VVE_SESSION_NAME.'_pl', self::$userName.'|'.self::getBrowserIdent(), time()+self::PERMANENT_COOKIE_EXPIRE,'/', '.'.Url_Request::getDomain());
-                  }
-                  self::saveUserDetailToSession();
-                  $link = new Url_Link();
-                  if(isset($_GET['redirect'])){
-                     $link->reload($_GET['redirect']);
-                  } else {
-                     $link->reload($link->getTransferProtocol().'://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']);
-                  }
-                  return true;
-               } else {
-                  AppCore::getUserErrors()->addMessage($tr->tr("Bylo zadáno špatné heslo."));
-               }
-            }
-         }
+   private static function checkLogOut()
+   {
+      if(isset($_POST["logout_submit"]) OR isset ($_POST['logout_submit_x'])){
+         self::logOutNow();
       }
-      return false;
    }
 
    /**
@@ -268,20 +186,17 @@ class Auth extends TrObject {
     * @return boolean -- true pokud se uživatel odhlásil
     */
    private static function logOutNow() {
-      $return = false;
-      if(isset($_POST["logout_submit"]) OR isset ($_POST['logout_submit_x'])){
-         $tr = new Translator();
-         $_SESSION[self::USER_IS_LOGIN] = false;
-         self::$login = false;
-         session_destroy();
-         $return = true;
-         Log::msg($tr->tr('Uživatel byl odhlášen'), null, self::$userName);
-         AppCore::getInfoMessages()->addMessage($tr->tr('Byl jste úspěšně odhlášen'));
-         setcookie(VVE_SESSION_NAME.'_pl', '', time()-60*5,'/', '.'.Url_Request::getDomain()); // remove permament cookie
-         $link = new Url_Link();
-         $link->reload();
-      }
-      return $return;
+      $tr = new Translator();
+      $_SESSION[self::SESSION_USER] = false;
+      unset($_SESSION[self::SESSION_USER]);
+      self::$login = false;
+      session_destroy();
+      Log::msg($tr->tr('Uživatel byl odhlášen'), null, self::getUser()->getUserName());
+      AppCore::getInfoMessages()->addMessage($tr->tr('Byl jste úspěšně odhlášen'));
+      self::destroyPemanentLogin();
+      $link = new Url_Link();
+      $link->redirect(isset($_GET['redirect']) ? $_GET['redirect'] : null);
+      return true;
    }
 
    /**
@@ -290,46 +205,48 @@ class Auth extends TrObject {
     */
    private static function permanentLogin() {
       if(isset ($_COOKIE[VVE_SESSION_NAME.'_pl'])){
-         $data = explode('|', $_COOKIE[VVE_SESSION_NAME.'_pl']);
-         $user = self::getUser($data[0]);
-         if($user != false AND $data[1] == self::getBrowserIdent()){
-            // Uspesne prihlaseni do systemu
-            self::$login = true;
-            self::$userName = $user->{Model_Users::COLUMN_USERNAME};
-            self::$userGroupId = $user->{Model_Users::COLUMN_ID_GROUP};
-            self::$userGroupName = $user->{Model_Users::COLUMN_GROUP_NAME};
-            self::$userId = $user->{Model_Users::COLUMN_ID};
-            self::$userMail = $user->{Model_Users::COLUMN_MAIL};
-            self::$userIsAdmin = (bool)$user->{Model_Groups::COLUMN_IS_ADMIN};
-            self::$userIsSiteAdmin = false;
-
-            // mačteme všechny podweby, kde má uživatel přístup
-            $modelSites = new Model_SitesGroups();
-            $sites = $modelSites->joinFK(Model_SitesGroups::COLUMN_ID_SITE)
-               ->where(Model_SitesGroups::COLUMN_ID_GROUP.' = :idg', array('idg' => $user->{Model_Users::COLUMN_ID_GROUP}))
-               ->records();
-
-            if(!empty($sites)){
-               foreach($sites as $site) {
-                  self::$userSites[$site->{Model_Sites::COLUMN_ID}] = $site->{Model_Sites::COLUMN_DOMAIN};
-               }
-            }
-            unset($sites);
-            unset($modelSites);
-
-            if(self::$userIsAdmin AND (
-               empty(self::$userSites)
-                  OR (VVE_SUB_SITE_DOMAIN != null AND isset(self::$userSites[VVE_SUB_SITE_DOMAIN]))
-                  OR (VVE_SUB_SITE_DOMAIN == null AND isset(self::$userSites['www']) ) )){
-               self::$userIsSiteAdmin = true;
-            }
-
-            self::saveUserDetailToSession();
-            return true;
-         }
-         setcookie(VVE_SESSION_NAME.'_pl', '', time()-60*5, '/', '.'.Url_Request::getDomain()); // remove permament cookie
-         $tr = new Translator();
-         Log::msg(sprintf($tr->tr('Pokus o ukradení cookie s trvalým přihlášením. IP: %s'), $_SERVER['REMOTE_ADDR']), 'Auth', $data[0]);
+         // přepsat podle db asi?
+         
+//         $data = explode('|', $_COOKIE[VVE_SESSION_NAME.'_pl']);
+//         $user = self::getUser($data[0]);
+//         if($user != false AND $data[1] == self::getBrowserIdent()){
+//            // Uspesne prihlaseni do systemu
+//            self::$login = true;
+//            self::$userName = $user->{Model_Users::COLUMN_USERNAME};
+//            self::$userGroupId = $user->{Model_Users::COLUMN_ID_GROUP};
+//            self::$userGroupName = $user->{Model_Users::COLUMN_GROUP_NAME};
+//            self::$userId = $user->{Model_Users::COLUMN_ID};
+//            self::$userMail = $user->{Model_Users::COLUMN_MAIL};
+//            self::$userIsAdmin = (bool)$user->{Model_Groups::COLUMN_IS_ADMIN};
+//            self::$userIsSiteAdmin = false;
+//
+//            // mačteme všechny podweby, kde má uživatel přístup
+//            $modelSites = new Model_SitesGroups();
+//            $sites = $modelSites->joinFK(Model_SitesGroups::COLUMN_ID_SITE)
+//               ->where(Model_SitesGroups::COLUMN_ID_GROUP.' = :idg', array('idg' => $user->{Model_Users::COLUMN_ID_GROUP}))
+//               ->records();
+//
+//            if(!empty($sites)){
+//               foreach($sites as $site) {
+//                  self::$userSites[$site->{Model_Sites::COLUMN_ID}] = $site->{Model_Sites::COLUMN_DOMAIN};
+//               }
+//            }
+//            unset($sites);
+//            unset($modelSites);
+//
+//            if(self::$userIsAdmin AND (
+//               empty(self::$userSites)
+//                  OR (VVE_SUB_SITE_DOMAIN != null AND isset(self::$userSites[VVE_SUB_SITE_DOMAIN]))
+//                  OR (VVE_SUB_SITE_DOMAIN == null AND isset(self::$userSites['www']) ) )){
+//               self::$userIsSiteAdmin = true;
+//            }
+//
+//            self::saveUserDetailToSession();
+//            return true;
+//         }
+//         setcookie(VVE_SESSION_NAME.'_pl', '', time()-60*5, '/', '.'.Url_Request::getDomain()); // remove permament cookie
+//         $tr = new Translator();
+//         Log::msg(sprintf($tr->tr('Pokus o ukradení cookie s trvalým přihlášením. IP: %s'), $_SERVER['REMOTE_ADDR']), 'Auth', $data[0]);
       }
       return false;
    }
@@ -342,23 +259,13 @@ class Auth extends TrObject {
       return sha1($_SERVER['HTTP_USER_AGENT'].$_SERVER['HTTP_ACCEPT']./*$_SERVER['HTTP_ACCEPT_CHARSET']. - IE not send this header sometimesm */$_SERVER['HTTP_ACCEPT_LANGUAGE']);
    }
 
-
-   private static function getUser($username) {
-      $model = new Model_Users();
-      $rec = $model->joinFK(Model_Users::COLUMN_GROUP_ID,
-         array('gname' => Model_Groups::COLUMN_NAME, Model_Groups::COLUMN_IS_ADMIN))
-         ->where(Model_Users::COLUMN_USERNAME.' = :username OR '.Model_Users::COLUMN_MAIL.' = :mail',
-         array('username' => $username, 'mail' => $username))->record();
-      return $rec;
-   }
-
    /**
     * Metoda vrací je-li uživatel přihlášen
     *
     * @return boolean -- je li uživatel přihlášen
     */
    public static function isLogin() {
-      return self::$login;
+      return self::getUser()->getUserId() != -1;
    }
 
    /**
@@ -367,7 +274,7 @@ class Auth extends TrObject {
     * @deprecated
     */
    public static function isLoginStatic() {
-      return self::$login;
+      return self::isLogin();
    }
 
    /**
@@ -375,7 +282,7 @@ class Auth extends TrObject {
     * @return string -- název skupiny
     */
    public static function getGroupName() {
-      return self::$userGroupName;
+      return self::getUser()->getGroupName();
    }
 
    /**
@@ -383,7 +290,7 @@ class Auth extends TrObject {
     * @return integer -- id skupiny
     */
    public static function getGroupId() {
-      return self::$userGroupId;
+      return self::getUser()->getGroupId();
    }
 
    /**
@@ -391,7 +298,7 @@ class Auth extends TrObject {
     * @return integer -- id uživatele
     */
    public static function getUserId() {
-      return self::$userId;
+      return self::getUser()->getUserId();
    }
 
    /**
@@ -399,7 +306,7 @@ class Auth extends TrObject {
     * @return string -- název uživatele
     */
    public static function getUserName() {
-      return self::$userName;
+      return self::getUser()->getUserName();
    }
 
    /**
@@ -407,7 +314,7 @@ class Auth extends TrObject {
     * @return string -- mail uživatele
     */
    public static function getUserMail() {
-      return self::$userMail;
+      return self::getUser()->getUserMail();
    }
 
    /**
@@ -415,7 +322,7 @@ class Auth extends TrObject {
     * @return bool -- true pokud je administrator
     */
    public static function isAdmin() {
-      return self::$userIsSiteAdmin;
+      return self::getUser()->isAdmin();
    }
 
    /**
@@ -423,7 +330,7 @@ class Auth extends TrObject {
     * @return bool -- true pokud je administrator
     */
    public static function isAdminGroup() {
-      return self::$userIsAdmin;
+      return self::getUser()->isAdminGroup();
    }
 
    /**
@@ -431,7 +338,7 @@ class Auth extends TrObject {
     * @return array -- pole s doménami
     */
    public static function getUserSites() {
-      return self::$userSites;
+      return self::getUser()->getUserSites();
    }
 
    /**
@@ -461,6 +368,8 @@ class Auth extends TrObject {
    public static function sendRestorePassword($userName)
    {
       $tr = new Translator();
+      
+      
       $modelUsr = new Model_Users();
       $user = $modelUsr->where(Model_Users::COLUMN_USERNAME.' = :uname OR '.Model_Users::COLUMN_MAIL." = :mail",
          array('uname' => $userName, 'mail' => $userName))->record();

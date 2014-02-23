@@ -12,18 +12,26 @@ if($this->panelObj()->getBackImage() != null){
 <div class="content" style="<?=$backImg?>">
 <form method="post" action="<?=$this->currentLink;?>">
    <p>
-      <? if(!Auth::isLoginStatic()){?>
+      <? if(!Auth::isLogin()){?>
       <label for="panel_login_username"><?=$this->tr('Jméno')?></label><br />
       <input id="panel_login_username" class="login_input" type="text" 
-             name="login_username" maxlength="20" size="15" value="" placeholder="<?=$this->tr('login') ?>" /><br />
+             name="<?=Auth_Provider_Internal::FORM_USERNAME?>" maxlength="20" size="15" value="" placeholder="<?=$this->tr('login') ?>" /><br />
       <label for="panel_login__passwd"><?=$this->tr('Heslo')?></label><br />
-      <input id="panel_login__passwd" type="password" name="login_passwd" maxlength="20" 
+      <input id="panel_login__passwd" type="password" name="<?=Auth_Provider_Internal::FORM_PASSWORD?>" maxlength="20" 
              size="15" value="" placeholder="<?=$this->tr('heslo') ?>" /><br />
-      <label><?=$this->tr('Trvalé přihlášení')?></label>&nbsp;<input type="checkbox" name="login_permanent" />&nbsp;<br />
-      <input id="login_submit" type="submit" name="login_submit" value="<?=$this->tr('přihlásit')?>" />
-      <? } else { ?>
+      <label><?=$this->tr('Trvalé přihlášení')?></label>&nbsp;<input type="checkbox" name="<?=Auth::FORM_PERMANENT_LOGIN?>" />&nbsp;<br />
+      <input id="login_submit" type="submit" name="<?=Auth_Provider_Internal::FORM_SUBMIT?>" value="<?=$this->tr('přihlásit')?>" />
+      
+      <?php if(Auth::isAuthenticator('google')){?>
+      <div>
+         <a href="<?=Auth::getAuthenticator('google')->getAuthUrl()?>"
+            ><img style="width: 100%" src="https://developers.google.com/accounts/images/sign-in-with-google.png" alt="" /></a>
+      </div>
+      <?php }?>
+         
+         <? } else { ?>
       <?=$this->tr('Přihlášen')?>: <a href="<?=$this->l();?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=Auth::getUserName()?></a><br />
-      <input id="login_submit" type="submit" name="logout_submit" value="<?=$this->tr('odhlásit')?>" />
+      <input id="login_submit" type="submit" name="<?=Auth::FORM_LOGOUT?>" value="<?=$this->tr('odhlásit')?>" />
       <? } ?>
    </p>
 </form>

@@ -37,7 +37,9 @@ class Model_Users extends Model_ORM {
    const COLUMN_FOTO_FILE  = 'foto_file'; // dyť není v db?
    const COLUMN_DELETED    = 'deleted';
    const COLUMN_CREATED    = 'created';
-   const COLUMN_LAST_LOGIN    = 'last_login';
+   const COLUMN_LAST_LOGIN = 'last_login';
+   const COLUMN_EXTERNAL_AUTH_ID    = 'external_auth_id';
+   const COLUMN_AUTHENTICATOR  = 'authenticator';
 
 
 
@@ -66,6 +68,8 @@ class Model_Users extends Model_ORM {
       $this->addColumn(self::COLUMN_MAIL, array('datatype' => 'varchar(500)', 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_CREATED, array('datatype' => 'datetime', 'pdoparam' => PDO::PARAM_STR, 'default' => 'CURRENT_TIMESTAMP'));
       $this->addColumn(self::COLUMN_LAST_LOGIN, array('datatype' => 'datetime', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_EXTERNAL_AUTH_ID, array('datatype' => 'varchar(200)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_AUTHENTICATOR, array('datatype' => 'varchar(20)', 'pdoparam' => PDO::PARAM_STR, 'default' => 'internal'));
 
       $this->setPk(self::COLUMN_ID);
       $this->addForeignKey(self::COLUMN_ID_GROUP, 'Model_Groups');
@@ -110,6 +114,25 @@ class Model_Users extends Model_ORM {
          }
       }
       return $usersIds;
+   }
+   
+   public static function getUsersByUsernameAndAuth($username, $auth) 
+   {
+      $model = new Model_Users();
+      return $model
+             ->where(Model_Users::COLUMN_USERNAME.' = :username AND '.Model_Users::COLUMN_EXTERNAL_AUTH_ID." = :ident",
+               array('username' => $username, 'ident' => $auth))
+             ->joinFK(Model_Users::COLUMN_ID_GROUP, array('group_name' => Model_Groups::COLUMN_NAME))
+             ->record();
+   }
+   
+   public static function getUsersByUsername($username) 
+   {
+      $model = new Model_Users();
+      return $model
+             ->where(Model_Users::COLUMN_USERNAME.' = :username', array('username' => $username))
+             ->joinFK(Model_Users::COLUMN_ID_GROUP, array('group_name' => Model_Groups::COLUMN_NAME))
+             ->record();
    }
 
 

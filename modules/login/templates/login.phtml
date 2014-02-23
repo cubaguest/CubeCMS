@@ -1,31 +1,46 @@
 <h1><?= $this->category()->getName(); ?></h1>
 <div class="main-content-form-edit" id="login-form">
    <div>
-      <form method="post" action="<?= $this->link(); ?>">
+      <form method="post" action="<?= $this->link()->param('login'); ?>">
          <p class="login-form-label">
             <h2><?= $this->tr('Přihlášení'); ?></h2>
          </p>
          <p>
             <label for="login-user"><?= $this->tr('Jméno / e-mail'); ?>:</label><br />
-            <input type="text" name="login_username" id="login-user" size="22" 
+            <input type="text" name="<?=Auth_Provider_Internal::FORM_USERNAME?>" id="login-user" size="22" 
                    value="<?= $this->post("login_username"); ?>" class="login-input-text" />
          </p>
          <p>
             <label for="login-password"><?= $this->tr('Heslo'); ?>:</label><br />
-            <input type="password" name="login_passwd" id="login-password" size="22" 
+            <input type="password" name="<?=Auth_Provider_Internal::FORM_PASSWORD?>" id="login-password" size="22" 
                    value="" class="login-input-text"/><br />
          </p>
          <p class="left-box login-permanent">
-            <input type="checkbox" name="login_permanent" id="login-permanent" />
+            <input type="checkbox" name="<?=Auth::FORM_PERMANENT_LOGIN?>" id="login-permanent" />
             <label for="login-permanent"><?=$this->tr('trvale')?></label>
          </p>
          <p class="right-box">
-            <input id="login_submit" type="submit" name="login_submit" value="<?= $this->tr('Přihlásit'); ?>" />
+            <input id="login_submit" type="submit" name="<?=Auth_Provider_Internal::FORM_SUBMIT?>" value="<?= $this->tr('Přihlásit'); ?>" />
          </p>
          <hr class="reseter" />
       </form>
       <p class="login-lost-password">
          <a href="<?= $this->link()->route('newPassword') ?>" title="<?= $this->tr('Obnovit zapomenuté heslo') ?>"><?= $this->tr('Zapomenuté heslo') ?></a>
       </p>
+      <?php if(Auth::isAuthenticator('google')){?>
+      <div>
+         <a href="<?=Auth::getAuthenticator('google')->getAuthUrl()?>"
+            ><img width="200" src="https://developers.google.com/accounts/images/sign-in-with-google.png" alt="" /></a>
+      </div>
+      <?php }?>
+      <?php if(Auth::isAuthenticator('openid')){?>
+      <div>
+         <form action="" method="post">
+            <label for="">OpenID</label>
+            <input type="text" name="<?=Auth_Provider_OpenID::FORM_ID_NAME?>" value="" />
+            <button type="submit" name="<?=Auth_Provider_OpenID::FORM_SUBMIT_NAME?>">Přihlásit</button>
+         </form>
+      </div>
+      <?php }?>
    </div>
 </div>
