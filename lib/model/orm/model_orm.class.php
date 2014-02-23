@@ -83,6 +83,12 @@ class Model_ORM extends Model implements ArrayAccess {
     */
    protected $currentSql = null;
    protected $bindValues = array();
+   
+   /**
+    * Název třídy s objektem záznamu
+    * @var string 
+    */
+   protected $rowClass = 'Model_ORM_Record';
 
    protected static $tablesLocked = array();
 
@@ -102,6 +108,9 @@ class Model_ORM extends Model implements ArrayAccess {
       $this->bindValues = array();
 
       $this->_initTable();
+      if($this->rowClass == 'Model_ORM_Record' && class_exists(get_class($this).'_Record')){
+         $this->rowClass = get_class($this).'_Record';
+      }
    }
 
    /**
@@ -247,6 +256,15 @@ class Model_ORM extends Model implements ArrayAccess {
       $this->pKey = $collname;
       $this->tableStructure[$collname]['pk'] = true;
    }
+   
+   /**
+    * Metoda vrací název primárního klíče
+    * @return string
+    */
+   protected function getPkName()
+   {
+      return $this->pKey;
+   }
 
    /**
     * Metoda nastavuje název tabulky
@@ -384,7 +402,7 @@ class Model_ORM extends Model implements ArrayAccess {
    {
       if ($pk == null AND $this->where == null AND empty($this->orders) AND empty($this->selectedColumns)) { // pokud nejsou žádné podmínky je vytvořen nový
          Log::msg('Using record for new row is deprecated!! Caller: '.  json_encode(debug_backtrace()));
-         return new Model_ORM_Record($this->tableStructure);
+         return new $this->rowClass($this->tableStructure);
       }
 
       $obj = clone $this;
@@ -399,7 +417,7 @@ class Model_ORM extends Model implements ArrayAccess {
 
    public function newRecord()
    {
-      return new Model_ORM_Record($this->tableStructure, false, $this);
+      return new $this->rowClass($this->tableStructure, false, $this);
    }
 
    protected function getRow(Model_ORM $obj = null, $fetchParams = self::FETCH_LANG_CLASS)
@@ -433,7 +451,7 @@ class Model_ORM extends Model implements ArrayAccess {
          $r = false;
 //         $timer = Debug_Timer::getInstance()->timerStart('SQL_record');
          if ($fetchParams == self::FETCH_LANG_CLASS OR $fetchParams == self::FETCH_PKEY_AS_ARR_KEY) {
-            $dbst->setFetchMode(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, 'Model_ORM_Record', array($obj->tableStructure, true, $this));
+            $dbst->setFetchMode(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, $this->rowClass, array($obj->tableStructure, true, $this));
             $dbst->execute();
             $r = $dbst->fetch(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE);
          } else {
@@ -488,9 +506,9 @@ class Model_ORM extends Model implements ArrayAccess {
       try {
 //         $timer = Debug_Timer::getInstance()->timerStart('SQL_records');
          if ($fetchParams == self::FETCH_LANG_CLASS OR $fetchParams == self::FETCH_PKEY_AS_ARR_KEY) {
-            $dbst->setFetchMode(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, 'Model_ORM_Record', array($this->tableStructure, true, $this));
+            $dbst->setFetchMode(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, $this->rowClass, array($this->tableStructure, true, $this));
             $dbst->execute();
-            $r = $dbst->fetchAll(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, 'Model_ORM_Record', array($this->tableStructure, true, $this));
+            $r = $dbst->fetchAll(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, $this->rowClass, array($this->tableStructure, true, $this));
          } else {
             $dbst->setFetchMode($fetchParams);
             $dbst->execute();
@@ -1166,9 +1184,9 @@ class Model_ORM extends Model implements ArrayAccess {
       $r = false;
       try {
          if ($fetchParams == self::FETCH_LANG_CLASS OR $fetchParams == self::FETCH_PKEY_AS_ARR_KEY) {
-            $dbst->setFetchMode(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, 'Model_ORM_Record', array($this->tableStructure, true, $this));
+            $dbst->setFetchMode(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, $this->rowClass, array($this->tableStructure, true, $this));
             $dbst->execute();
-            $r = $dbst->fetchAll(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, 'Model_ORM_Record', array($this->tableStructure, true, $this));
+            $r = $dbst->fetchAll(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, $this->rowClass, array($this->tableStructure, true, $this));
          } else {
             $dbst->setFetchMode($fetchParams);
             $dbst->execute();
@@ -1245,7 +1263,7 @@ class Model_ORM extends Model implements ArrayAccess {
     * Metoda přidá podmínky do dotazu
     * @param array $condArray -- pole s podmínkami
     * @param array $bindValues -- pole s předanými hodnotami - reference
-    * @return Model_ORM
+    * @return this
     */
    public function where($cond = null, $bindValues = null, $append = false)
    {
@@ -2066,6 +2084,17 @@ class Model_ORM extends Model implements ArrayAccess {
    public static function getRecord($id) {
       $m = new static();
       return $m->record($id);
+   }
+   
+   /**
+    * metoda vrací nový záznam
+    * @return Model_ORM_Record
+    * @since 8.0.1
+    * @depends PHP 5.3
+    */
+   public static function getNewRecord() {
+      $m = new static();
+      return $m->newRecord();
    }
    
    /*
