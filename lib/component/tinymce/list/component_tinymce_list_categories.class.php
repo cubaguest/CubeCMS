@@ -14,7 +14,7 @@ class Component_TinyMCE_List_Categories extends Component_TinyMCE_List {
       foreach($cats as $cat) {
          
          foreach (Locales::getAppLangs() as $lang) {
-            if($cat[Model_Category::COLUMN_URLKEY][$lang] == null){
+            if($cat[Model_Category::COLUMN_URLKEY][$lang] == null || $cat[Model_Category::COLUMN_NAME][$lang] == null){
                continue;
             }
             
