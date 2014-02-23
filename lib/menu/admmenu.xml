@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<!-- last ID: 32788 -->
+<!-- last ID: 32789 -->
 <adminmenu>
    <section icon="application_side_tree.png">
       <name lang="cs">Struktura</name>
@@ -83,6 +83,13 @@
          <urlkey lang="cs">admin/content/hpslideshow</urlkey>
          <urlkey lang="en">admin/content/hpslideshow</urlkey>
          <module>hpslideshow</module>
+      </item>
+      <item id="32788" icon="page_white_code_red.png">
+         <name lang="cs">Úprava zdrojů vzhledu</name>
+         <name lang="en">Face source edit</name>
+         <urlkey lang="cs">admin/content/faceedit</urlkey>
+         <urlkey lang="en">admin/content/faceedit</urlkey>
+         <module>faceedit</module>
       </item>
    </section>
    <section icon="email.png">
