@@ -101,14 +101,14 @@ function vve_create_full_url_path(&$string, $atrNames = 'src|href')
  * @param mixed $value -- samotný řetězec nebo pole
  * @return mixed -- řětezce nebo pole bez html tagů
  */
-function vve_strip_tags($value)
+function vve_strip_tags($value, $allowedtags = null)
 {
    if (is_array($value)) {
       foreach ($value as $key => $val) {
-         $value[$key] = vve_strip_tags($val);
+         $value[$key] = vve_strip_tags($val, $allowedtags);
       }
    } else {
-      $value = strip_tags($value);
+      $value = strip_tags($value, $allowedtags);
    }
    return $value;
 }
@@ -390,7 +390,16 @@ function vve_image_cacher($path, $width = null, $height = null, $crop = false){
    if(substr($path, 0, 4) != "http"){
       $path = Url_Request::getBaseWebDir().$path;
    }
-
+   
+   // explode by parts
+   $parts = explode('?', $path);
+   $getParasms = null;
+   $path = $parts[0];
+   if(isset($parts[1])){
+      $getParasms = $parts[1];
+   }
+   
+   
    $sizes = $width.'x'.$height.($crop == false ? '' : 'c');
    $origPath = str_replace(Url_Request::getBaseWebDir(), '', $path);
    $cachePath = 'cache/imgc/'.Template::face().'/'.$sizes.'/'.$origPath;
@@ -403,7 +412,8 @@ function vve_image_cacher($path, $width = null, $height = null, $crop = false){
    }
    // pokud je obrázek přímo z data
    else if(strpos($path, VVE_DATA_DIR."/") === 0){
-      $path = Url_Request::getBaseWebDir().'cache/imgc/'.Template::face().'/'.$sizes.'/'.$path."?hash=". urlencode($hash);
+      $path = Url_Request::getBaseWebDir().'cache/imgc/'.Template::face().'/'.$sizes.'/'.$path
+          ."?hash=". urlencode($hash);
    }
    // create abs paths
    $realOrigPath = realpath($origPath);
@@ -413,7 +423,7 @@ function vve_image_cacher($path, $width = null, $height = null, $crop = false){
       @unlink($realCachedPath);
       $path .= '&t='.time();
    }
-   return $path;
+   return $path.($getParasms != null ? '&'.$getParasms : null);
 }
 
 /**
