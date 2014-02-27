@@ -347,7 +347,7 @@ class Model_ORM extends Model implements ArrayAccess {
 
    /**
     * Metoda vrací pole s joiny
-    * @return string
+    * @return array
     */
    public function getJoins()
    {
@@ -375,7 +375,7 @@ class Model_ORM extends Model implements ArrayAccess {
    /**
     * Metoda nasatvuje, které jazyky se mají vybírat, jestli všechny, nebo jen aktuální jazyk
     * @param bool $all -- true pro všechny
-    * @return Model_ORM
+    * @return this
     */
    public function setSelectAllLangs($all = true)
    {
@@ -391,7 +391,7 @@ class Model_ORM extends Model implements ArrayAccess {
     * Metoda vrací záznam
     * @param string/int/array $pk -- (option) primární klíč
     * @param string/int $value -- (option) hodnota
-    * @return Model_ORM_Record
+    * @return Model_ORM_Record|false
     *
     * Možné zadání:<br />
     * record() -- nový zýznam
@@ -420,6 +420,12 @@ class Model_ORM extends Model implements ArrayAccess {
       return new $this->rowClass($this->tableStructure, false, $this);
    }
 
+   /**
+    * 
+    * @param Model_ORM $obj
+    * @param type $fetchParams
+    * @return Model_ORM_Record|false
+    */
    protected function getRow(Model_ORM $obj = null, $fetchParams = self::FETCH_LANG_CLASS)
    {
       if ($obj == null)
@@ -476,7 +482,7 @@ class Model_ORM extends Model implements ArrayAccess {
     * @param int $rows -- počet záznamů
     * @param string/array $conds -- podmínky
     * @param array $orders -- řazení
-    * @return array of Model_ORM_Record
+    * @return Model_ORM_Record[]|false
     */
    public function records($fetchParams = self::FETCH_LANG_CLASS)
    {
@@ -720,7 +726,7 @@ class Model_ORM extends Model implements ArrayAccess {
    /**
     * Metoda pro dotaz na model
     * @param string $stmt dotaz
-    * @return Model_ORM
+    * @return this
     *
     * Pokud je předán řetezec, je řetězec {THIS} nahrazen názvem tabulky
     */
@@ -747,7 +753,7 @@ class Model_ORM extends Model implements ArrayAccess {
     * Metoda přidá parametry do dotazu
     * @param type $values
     * @param type $merge
-    * @return Model_ORM
+    * @return this
     */
    public function setBindValues($values, $merge = false)
    {
@@ -782,6 +788,11 @@ class Model_ORM extends Model implements ArrayAccess {
       );
    }
 
+   /**
+    * Uloží záznam do databáze
+    * @param Model_ORM_Record $record
+    * @return int|string -- primární klíč nového záznamu
+    */
    public function save(Model_ORM_Record $record)
    {
       $returnPk = $record->getPK();
@@ -1129,6 +1140,7 @@ class Model_ORM extends Model implements ArrayAccess {
    /**
     * Metoda vrací záznamy z fulltext hledání v modelu
     * @param string $string -- řetězec, který se má hledat
+    * @return Model_ORM_Record[]|false -- pole s výsledky
     * @todo implementovat načítání pouze zvolených sloupců
     */
    public function search($string, $allLangs = false, $fetchParams = self::FETCH_LANG_CLASS)
@@ -1229,7 +1241,7 @@ class Model_ORM extends Model implements ArrayAccess {
     * Metoda přidává limit
     * @param int $fromRow -- od řádku
     * @param int $rows -- řádků
-    * @return Model_ORM
+    * @return this
     */
    public function limit($fromRow, $rows)
    {
@@ -1244,7 +1256,7 @@ class Model_ORM extends Model implements ArrayAccess {
     * <p>Použití: 'sloupce' => 'ASC/DESC' nebo jenom název sloupce<br />
     * Pokud je vloženo se zkratkou tabulky tak nejsou doplněny spec. db uvozovky
     * </p>
-    * @return Model_ORM
+    * @return this
     */
    public function order($arrayOrders, $merge = false)
    {
@@ -1296,7 +1308,7 @@ class Model_ORM extends Model implements ArrayAccess {
     * Metoda přidá podmínku HAVING do dotazu
     * @param null $cond
     * @param null $bindValues
-    * @return Model_ORM
+    * @return this
     */
    public function having($cond = null, $bindValues = null)
    {
@@ -1324,7 +1336,7 @@ class Model_ORM extends Model implements ArrayAccess {
     * @param int $joinType -- (optional) typ joinu (Model_ORM konstanta)
     * @param string $with -- (optional) další parametry co se připojí k joinu
     * @param array $withValues -- (optional) hodnoty přidaných parametrů připojených k joinu
-    * @return Model_ORM
+    * @return this
     */
    public function joinFK($colname, $columns = null, $joinType = self::JOIN_LEFT, $with = null, $withValues = array())
    {
@@ -1366,7 +1378,7 @@ class Model_ORM extends Model implements ArrayAccess {
     * @param int $joinType -- (optional) typ joinu (Model_ORM konstanta)
     * @param string $with -- (optional) další parametry co se připojí k joinu
     * @param array $withValues -- (optional) hodnoty přidaných parametrů připojených k joinu (název > hodnota)
-    * @return Model_ORM
+    * @return this
     */
    public function join($model1Column, $model2Name, $model2Column = null, $columns = null, $joinType = self::JOIN_LEFT, $with = null, $withValues = array(), $columnsPrefix = null)
    {
@@ -1399,7 +1411,7 @@ class Model_ORM extends Model implements ArrayAccess {
     * Metoda přidá parametr GROUP BY
     * @param array $cols -- sloupce, podle kterých se má seskupovat, key je možní použít jako alias tabulky
     * @param bool $merge -- (option) sloupčí s předešlými sloupci
-    * @return Model_ORM
+    * @return this
     */
    public function groupBy($cols, $merge = false)
    {
@@ -1415,7 +1427,7 @@ class Model_ORM extends Model implements ArrayAccess {
    /**
     * Metoda nastaví, které sloupce se budou vybírat
     * @param array $columnsArr -- pole se sloupci
-    * @return Model_ORM -- sám sebe
+    * @return this -- sám sebe
     * @example:
     * array(
     *    'alias' => 'colum',
@@ -1492,7 +1504,7 @@ class Model_ORM extends Model implements ArrayAccess {
    /**
     * Metoda vytváří sloupce pro join. Kvůli optimalizace je zde vytvořena i klauzule JOIN
     * @param <type> $columns
-    * @return <type>
+    * @return array
     */
    protected function createSQLSelectJoinColumns($columns)
    {
@@ -1574,6 +1586,14 @@ class Model_ORM extends Model implements ArrayAccess {
 
    /**
     * Metoda vytváří řetězec pro sloupce
+    * 
+    * <code>
+    * 0 => string 'Model_Groups_1' (length=14)
+    * 1 => string 'gname' (length=5)
+    * 2 => null
+    * 3 => boolean false
+    * 4 => string 'name' (length=4)
+    * </code>
     * @param <type> $tbPrefix
     * @param <type> $columnName
     * @param <type> $alias
@@ -1583,12 +1603,6 @@ class Model_ORM extends Model implements ArrayAccess {
     */
    protected function createSelectColumnString($tbPrefix, $columnName, $alias = null, $isLang = false, $columnOrigName = null)
    {
-//  Example of args
-//  0 => string 'Model_Groups_1' (length=14)
-//  1 => string 'gname' (length=5)
-//  2 => null
-//  3 => boolean false
-//  4 => string 'name' (length=4)
       $alias = is_numeric($alias) ? null : $alias; // numbers as alias not allowed
       if ($isLang == false) {// není jazyk
          if ($columnOrigName != null){
@@ -1999,7 +2013,7 @@ class Model_ORM extends Model implements ArrayAccess {
    /**
     * Metoda vrací PDO::PRAMA_ datovy typ
     * @param $val mixed -- proměnná
-    * @return boolean
+    * @return int|bool
     */
    private function getPdoParamType($val)
    {
@@ -2077,7 +2091,7 @@ class Model_ORM extends Model implements ArrayAccess {
    /**
     * metoda vrací daný objekt
     * @param int/string $id -- klíč položky
-    * @return Model_ORM_Record/false
+    * @return Model_ORM_Record|false
     * @since 8.0.1
     * @depends PHP 5.3
     */
@@ -2097,8 +2111,21 @@ class Model_ORM extends Model implements ArrayAccess {
       return $m->newRecord();
    }
    
-   /*
+   /**
+    * Metoda vrací všechny záznamy z db
+    * @return Model_ORM_Record[]
+    * @since 8.0.2
+    * @depends PHP 5.3
+    */
+   public static function getAllRecords()
+   {
+      $m = new static();
+      return $m->records();
+   }
+   
+   /**
     * Metoda vytvoří placeholdery pro klauzuli WHERE IN 
+    * @return string - řetězec s placeholdery
     */
    public static function getWhereINPlaceholders($array)
    {
@@ -2106,8 +2133,9 @@ class Model_ORM extends Model implements ArrayAccess {
       return implode(',', $array); 
    }
    
-   /*
+   /**
     * Metoda vytvoří pole s hodnotami pro klauzuli WHERE IN 
+    * @return array pole s elementy pro pro vložení
     */
    public static function getWhereINValues($array)
    {
