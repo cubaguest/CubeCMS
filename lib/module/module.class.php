@@ -197,7 +197,7 @@ class Module
       $versions = array();
       if(is_dir($updateDir)){
          $phpFiles = glob($updateDir."*.php");
-         if(sizeof($phpFiles) > 0){
+         if(is_array($phpFiles) && sizeof($phpFiles) > 0){
             foreach ($phpFiles as $filename) {
                $version = str_replace(".php", "", basename($filename));
                if(version_compare($version, $currentVersion) == 1){
@@ -206,7 +206,7 @@ class Module
             }
          }
          $sqlFiles = glob($updateDir."*.sql");
-         if(sizeof($sqlFiles) > 0){
+         if(is_array($sqlFiles) && sizeof($sqlFiles) > 0){
             foreach ($sqlFiles as $filename) {
                $version = str_replace(".sql", "", basename($filename));
                if(version_compare($version, $currentVersion) == 1){
@@ -221,7 +221,6 @@ class Module
 
       if(!empty($upgradeVersions)){
 
-         $model = new Model_Module();
          foreach($upgradeVersions as $version){
             /* php prepare update */
             $phpFile = $version.'.php';
@@ -242,7 +241,7 @@ class Module
                if (is_file($updateDir.$phpFile)) {
                   include $updateDir.$phpFile;
                }
-
+               $model = new Model_Module();
                $model
                   ->where(Model_Module::COLUMN_NAME." = :mname", array('mname' => $this->getName()))
                   ->update(array(Model_Module::COLUMN_VERSION => $version));
@@ -253,6 +252,9 @@ class Module
             }
          }
          AppCore::getInfoMessages()->addMessage(sprintf('Aktualizace modulu %s broběhla úspěšně.', $this->getName()));
+         // tohle by šlo řešit také aktualizací verze přímo v objektu modulu
+         $link = new Url_Link();
+         $link->redirect();
       }
    }
 
