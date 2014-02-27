@@ -85,6 +85,10 @@ class Model_Module extends Model_ORM {
     * Metoda vrací verzi modulu
     * @param string $name -- název modulu
     * @return string -- verze
+    * @todo dodělat kešování nebo načítání pouze jednou, takhle se tato metoda 
+    * volá několikrát pro každý modul zvláště. Možností je přesunout tohle do joinu 
+    * ke kategoriím a přiřazovat to s tama. Rychlá by byla potom asi i aktulaizace 
+    * nazpět do objektu kategorie.
     */
    public static function getVersion($name) {
       $m = new self();
