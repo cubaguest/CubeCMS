@@ -65,7 +65,7 @@ class Contact_Controller extends Controller {
       $formQuestion->addElement($elemText);
       
       if(!Auth::isLogin()){
-         $elemCaptcha = new Form_Element_Captcha('captcha', $this->tr('OvYen�'));
+         $elemCaptcha = new Form_Element_Captcha('captcha', $this->tr('Ověření'));
          $formQuestion->addElement($elemCaptcha);
       }
 
