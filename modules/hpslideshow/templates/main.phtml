@@ -25,7 +25,7 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
                <li><a class="tab-link" href="<?=$this->link()?>#edit-<?=$img->getPK()?>"><?ps($this->tr('Úprava'))?></a></li>
             </ul>
             <div class="tab tab-preview" id="preview-<?=$img->getPK()?>">
-               <img class="image-slide" src="<?=$this->imagesUrl.$img->getPK().'.jpg'?>" />
+               <img class="image-slide" src="<?=vve_image_cacher($this->imagesUrl.$img->{HPSlideShow_Model::COLUMN_FILE}, 700, 400)?>" />
                <?if((string)$img->{HPSlideShow_Model::COLUMN_LABEL} != null){?>
                   <div class="image-label"><?ps(vve_get_lang_string($img->{HPSlideShow_Model::COLUMN_LABEL}))?></div>
                <?}?>

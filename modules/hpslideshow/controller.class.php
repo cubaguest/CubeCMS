@@ -32,7 +32,7 @@ class HPSlideShow_Controller extends Controller {
 
       $elemFile = new Form_Element_File('images', $this->tr('Obrázky'));
       $elemFile->setMultiple(true);
-      $elemFile->addValidation(new Form_Validator_FileExtension('jpg'));
+      $elemFile->addValidation(new Form_Validator_FileExtension('jpg;png'));
       $formUpload->addElement($elemFile, $grp);
 
       $elemUpload = new Form_Element_Submit('upload', $this->tr('Nahrát'));
@@ -53,6 +53,9 @@ class HPSlideShow_Controller extends Controller {
             $image->getData()
                ->resize($dimensions['width'], $dimensions['height'], File_Image_Base::RESIZE_CROP)
                ->save();
+
+            $imgRec->{HPSlideShow_Model::COLUMN_FILE} = $imgRec->getPK().'.'.$image->getExtension();
+            $imgRec->save();
          }
          $this->infoMsg()->addMessage($this->tr('Obrázky byly nahrány'));
          $this->link()->redirect();
@@ -125,7 +128,7 @@ class HPSlideShow_Controller extends Controller {
 
          $rec = $model->record($this->getRequestParam('id'));
 
-         $file = new File($rec->getPK().'.jpg', $this->module()->getDataDir());
+         $file = new File($rec->{HPSlideShow_Model::COLUMN_FILE}, $this->module()->getDataDir());
          try {
             $file->delete();
          } catch (File_Exception $e){

@@ -13,7 +13,7 @@
       <? if($href != null){?>
       <a href="<?=$href?>">
       <?}?>
-      <img src="<?echo $this->imagesUrl.$img->getPK().".jpg";?>" />
+      <img src="<?echo $this->imagesUrl.$img->{HPSlideShow_Model::COLUMN_FILE};?>" />
       <? if($href != null){?>
       </a>
       <?}?>

@@ -14,6 +14,7 @@ class HPSlideShow_Model extends Model_ORM {
    const COLUMN_LINK          = 'image_link';
    const COLUMN_ACTIVE 			= 'image_active';
    const COLUMN_ORDER 			= 'image_order';
+   const COLUMN_FILE 			= 'image_file';
 
    protected function  _initTable() {
       $this->setTableName(self::DB_TABLE, 't_ph_imgs');
@@ -26,6 +27,7 @@ class HPSlideShow_Model extends Model_ORM {
 
       $this->addColumn(self::COLUMN_ORDER, array('datatype' => 'smallint', 'pdoparam' => PDO::PARAM_INT, 'default' => 0));
       $this->addColumn(self::COLUMN_ACTIVE, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => true));
+      $this->addColumn(self::COLUMN_FILE, array('datatype' => 'varchar(40)', 'pdoparam' => PDO::PARAM_STR, 'nn' => true));
 
       $this->setPk(self::COLUMN_ID);
       

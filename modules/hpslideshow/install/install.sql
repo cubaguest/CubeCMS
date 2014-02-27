@@ -11,5 +11,6 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}hpslideshow_images` (
   `image_link_sk` varchar(100) DEFAULT NULL,
   `image_order` smallint(6) NOT NULL DEFAULT '0',
   `image_active` tinyint(1) NOT NULL DEFAULT '1',
+  `image_file` VARCHAR(60) DEFAULT NULL,
   PRIMARY KEY (`id_image`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
