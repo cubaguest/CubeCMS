@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}dwfiles` (
   `dwfile_text_sk` varchar(500) CHARACTER SET utf8 COLLATE utf8_slovak_ci DEFAULT NULL,
   `dwfile` varchar(100) CHARACTER SET utf8 NOT NULL,
   `dwfile_column` smallint(3) DEFAULT '1',
+  `dwfile_active` TINYINT(1) NULL DEFAULT 1,
   `time_add` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id_dwfile`),
   KEY `id_category` (`id_category`),
