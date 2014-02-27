@@ -59,7 +59,8 @@ class Banners_View extends View {
       
       $model->where(Banners_Model::COLUMN_BOX." = :box AND ".Banners_Model::COLUMN_ACTIVE." = 1", 
               array('box' => $boxName));
-      
+     
+      $model->order(array(Banners_Model::COLUMN_ORDER => Model_ORM::ORDER_ASC));
       if(isset($boxes[$boxName]['random']) && $boxes[$boxName]['random'] == true){
          // náhodně poskládat
          //shuffle($banners);

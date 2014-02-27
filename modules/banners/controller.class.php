@@ -179,11 +179,6 @@ class Banners_Controller extends Controller {
       $model = new Banners_Model();
       if($banner == null){
          $banner = $model->newRecord();
-         
-         // dopočet maximální pozice
-         $lastPos = $model->where(Banners_Model::COLUMN_BOX." = :box", 
-                 array('box' => $form->box->getValues()))->count();
-         $banner->{Banners_Model::COLUMN_ORDER} = $lastPos+1;
       }
       
       $banner->{Banners_Model::COLUMN_NAME} = $form->name->getValues();
@@ -196,13 +191,7 @@ class Banners_Controller extends Controller {
       
       $banner->{Banners_Model::COLUMN_BOX} = $form->box->getValues();
       $banner->{Banners_Model::COLUMN_ACTIVE} = $form->active->getValues();
-      //       $banner->{Banners_Model::COLUMN_} = $form->->getValues();
-      //       $banner->{Banners_Model::COLUMN_} = $form->->getValues();
-
-      // recalculate orders ?
-      
       $model->save($banner);
-      
    }
    
    protected static function getBoxes() 
@@ -220,13 +209,26 @@ class Banners_Controller extends Controller {
       $model = new Banners_Model_Clicks();
       $modelBanner = new Banners_Model();
       $banner = $modelBanner->record((int)$_GET['bid']);
-      
+
       $link = new Url_Link(true);
-      
+
       if($banner == false){
          $link->clear(true)->reload();
       }
-      
+
+      // ignore boots
+      $spiders = array('aspseek','abachobot','accoona','acoirobot','adsbot','alexa','alta vista','altavista','ask jeeves',
+         'baidu','crawler','croccrawler','dumbot','estyle','exabot','fast-enterprise','fast-webcrawler','francis','facebook',
+         'geonabot','gigabot','google','heise','heritrix','ibm','iccrawler','idbot','ichiro','lycos','msn','msrbot',
+         'majestic-12','metager','ng-search','nutch','omniexplorer','psbot','rambler','seosearch','scooter','scrubby',
+         'seekport','sensis','seoma','seznam','snappy','steeler','synoo','telekom','turnitinbot','voyager','wisenut','yacy','yahoo');
+      foreach($spiders as $spider) {
+         if(stripos($_SERVER['HTTP_USER_AGENT'], $spider) !== false) {
+            $link->reload($banner->{Banners_Model::COLUMN_URL},302);
+            return;
+         }
+      }
+
       $click = $model->newRecord();
       
       $click->{Banners_Model_Clicks::COLUMN_ID_BANNER} = $banner->{Banners_Model::COLUMN_ID};
@@ -278,7 +280,6 @@ class Banners_Controller extends Controller {
       $this->view()->newpos = $newPos;
       
       $model = new Banners_Model();
-      $model->lock(Model_ORM::LOCK_WRITE);
       $banner = $model->record($idb);
       if(!$banner){
          $this->errMsg()->addMessage($this->tr('Banner se nepodařilo přesunout, protože neexistuje'));
@@ -289,46 +290,13 @@ class Banners_Controller extends Controller {
       
       try {
          if($oldBoxName == $boxName){
-            // přesun ve stejném boxu
-            if($newPos > $banner->{Banners_Model::COLUMN_ORDER}){
-               // přesun dolů
-               $model->where(
-                     Banners_Model::COLUMN_ORDER.' > :opos AND '.Banners_Model::COLUMN_ORDER." <= :npos AND ".Banners_Model::COLUMN_BOX." = :box",
-                     array( 'npos' => $newPos, 'opos' => $oldPos, 'box' => $boxName )
-                     )
-               ->update(array(Banners_Model::COLUMN_ORDER => array( 'stmt' => Banners_Model::COLUMN_ORDER.'-1') ));
-            
-            } else if($newPos < $banner->{Banners_Model::COLUMN_ORDER}){
-               $this->infoMsg()->addMessage('přesun nahoru');
-               $model->where(
-                     Banners_Model::COLUMN_ORDER.' >= :npos AND '.Banners_Model::COLUMN_ORDER." < :opos AND ".Banners_Model::COLUMN_BOX." = :box",
-                     array( 'npos' => $newPos, 'opos' => $oldPos, 'box' => $boxName )
-                     )
-               ->update(array(Banners_Model::COLUMN_ORDER => array( 'stmt' => Banners_Model::COLUMN_ORDER.'+1') ));
-            }
-            $banner->{Banners_Model::COLUMN_ORDER} = $newPos;
-            $model->save($banner);
+            Banners_Model::move($idb, $newPos);
          } else {
-            // update všech pod novou pozicí
-            // nový box - vytvořit místo pro banner
-            $model->where( Banners_Model::COLUMN_ORDER.' >= :npos AND '.Banners_Model::COLUMN_BOX." = :box",
-                  array( 'npos' => $newPos, 'box' => $boxName ))
-                  ->update(array(Banners_Model::COLUMN_ORDER => array( 'stmt' => Banners_Model::COLUMN_ORDER.'+1') ));
-         
-            // přesun do jiného boxu a update pozice
-            $banner->{Banners_Model::COLUMN_BOX} = $boxName;
-            $banner->{Banners_Model::COLUMN_ORDER} = $newPos;
-            $model->save($banner);
-         
-            // starý box - přesunutí všech pozic pod banerem nahoru
-            $model->where( Banners_Model::COLUMN_ORDER.' >= :opos AND '.Banners_Model::COLUMN_BOX." = :box",
-                  array( 'opos' => $oldPos, 'box' => $oldBoxName ))
-                  ->update(array(Banners_Model::COLUMN_ORDER => array( 'stmt' => Banners_Model::COLUMN_ORDER.'-1') ));
+            Banners_Model::moveToNewBox($idb, $boxName, $newPos);
          }
+         $this->infoMsg()->addMessage($this->tr('Banner byl přesunut'));
       } catch (Exception $e) {
          $this->view()->excp = $e->getTraceAsString();
       }
-      $model->unLock();
    }
 }
-?>

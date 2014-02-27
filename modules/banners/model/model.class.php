@@ -37,8 +37,83 @@ class Banners_Model extends Model_ORM {
       $this->addColumn(self::COLUMN_NEW_WINDOW, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => true));
       
       $this->setPk(self::COLUMN_ID);
-//       $this->addRelatioOneToMany(self::COLUMN_ID, 'Articles_Model_TagsConnection', Articles_Model_TagsConnection::COLUMN_ID_ARTICLE);
+   }
+
+   public static function move($idBanner, $newPos)
+   {
+      $model = new self();
+      $model->lock(Model_ORM::LOCK_WRITE);
+      $banner = $model->record($idBanner);
+      if($newPos > $banner->{Banners_Model::COLUMN_ORDER}){
+         // přesun dolů
+         $model->where(
+            Banners_Model::COLUMN_ORDER.' > :opos AND '.Banners_Model::COLUMN_ORDER." <= :npos AND ".Banners_Model::COLUMN_BOX." = :box",
+            array( 'npos' => $newPos, 'opos' => $banner->{Banners_Model::COLUMN_ORDER}, 'box' => $banner->{Banners_Model::COLUMN_BOX} )
+         )
+            ->update(array(Banners_Model::COLUMN_ORDER => array( 'stmt' => Banners_Model::COLUMN_ORDER.'-1') ));
+
+      } else if($newPos < $banner->{Banners_Model::COLUMN_ORDER}){
+         $model->where(
+            Banners_Model::COLUMN_ORDER.' >= :npos AND '.Banners_Model::COLUMN_ORDER." < :opos AND ".Banners_Model::COLUMN_BOX." = :box",
+            array( 'npos' => $newPos, 'opos' => $banner->{Banners_Model::COLUMN_ORDER}, 'box' => $banner->{Banners_Model::COLUMN_BOX} )
+         )
+            ->update(array(Banners_Model::COLUMN_ORDER => array( 'stmt' => Banners_Model::COLUMN_ORDER.'+1') ));
+      }
+      $banner->{Banners_Model::COLUMN_ORDER} = $newPos;
+      $model->save($banner);
+      $model->unLock();
+      return $banner;
+   }
+
+   public static function moveToNewBox($idBanner, $boxName, $newPos)
+   {
+      $model = new self();
+      $model->lock(Model_ORM::LOCK_WRITE);
+      $banner = $model->record($idBanner);
+
+      $oldPos = $banner->{self::COLUMN_ORDER};
+      $oldBoxName = $banner->{self::COLUMN_BOX};
+
+      // nový box - vytvořit místo pro banner
+      $model->where( self::COLUMN_ORDER.' >= :npos AND '.self::COLUMN_BOX." = :box",
+         array( 'npos' => $newPos, 'box' => $boxName ))
+         ->update(array(self::COLUMN_ORDER => array( 'stmt' => self::COLUMN_ORDER.'+1') ));
+
+      // přesun do jiného boxu a update pozice
+      $banner->{self::COLUMN_BOX} = $boxName;
+      $banner->{self::COLUMN_ORDER} = $newPos;
+      $model->save($banner);
+
+      // starý box - přesunutí všech pozic pod banerem nahoru
+      $model->where( self::COLUMN_ORDER.' >= :opos AND '.self::COLUMN_BOX." = :box",
+         array( 'opos' => $oldPos, 'box' => $oldBoxName ))
+         ->update(array(self::COLUMN_ORDER => array( 'stmt' => self::COLUMN_ORDER.'-1') ));
+      return $banner;
+   }
+
+   protected function beforeSave(Model_ORM_Record $record, $type = 'U')
+   {
+      // doplníme max order
+      if($record->isNew() || $record->{self::COLUMN_ORDER} == 0){
+         $model = new self();
+         $lastPos = $model->where(self::COLUMN_BOX." = :box",
+            array('box' => $record->{self::COLUMN_BOX}))->count();
+         $record->{Banners_Model::COLUMN_ORDER} = $lastPos+1;
+      }
+      parent::beforeSave($record, $type);
+   }
+
+   protected function beforeDelete($pk)
+   {
+      $model = new self();
+      $record = $model->record($pk);
+
+      // aktualizujeme všechny pozice co jsou pod banerem
+      $model->where(self::COLUMN_ORDER.' > :ord AND '.self::COLUMN_BOX." = :box",
+         array('ord' => $record->{self::COLUMN_ORDER}, 'box' => $record->{self::COLUMN_BOX}))
+         ->update(array(self::COLUMN_ORDER => array( 'stmt' => self::COLUMN_ORDER.'-1') ));
+
+      parent::beforeDelete($pk);
    }
 
 }
-?>
