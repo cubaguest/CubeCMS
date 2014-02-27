@@ -10,7 +10,7 @@
 	<div id="mails-export">
       <?
       echo $this->formExport;
-      echo $this->tr('Podporován je momentálně export do souboru typu xlx, csv a txt. V txt exportu jsou pouze e-mailové adresy.');
+      echo $this->tr('Podporován je momentálně export do souboru typu xls, csv a txt. V txt exportu jsou pouze e-mailové adresy.');
       ?>
 	</div>
 	<div id="mails-import">
@@ -31,17 +31,24 @@
       echo '<h3>'.$this->tr('Odstranění duplicitních emailů z adresáře.').'</h3>';
       echo $this->formRemoveDuplicity;
       echo $this->tr('Odstraněny budou všechny duplicitní e-mailové adresy.');
+      echo "<br />";
+      echo '<h3>'.$this->tr('Oprava uložených emailů').'</h3>';
+      echo $this->formRepair;
+      echo $this->tr('Opraví se duplicitní položky a odstraní špatné zanyk v emailu.');
       ?>
       <hr class="reseter" />
 	</div>
    <?
    $jQuery = new JsPlugin_JQuery();
+   $jQuery->addPluginCookie();
    $jQuery->addUITabs();
    $this->addJsPlugin($jQuery);   
    ?>
    <script type="text/javascript">
       $(document).ready(function(){
-         $('#mails-tools').tabs({});
+         $('#mails-tools').tabs({
+            cookie : { expires : 10, path: "/"}
+         });
       });
    </script>
    </div>

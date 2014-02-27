@@ -482,9 +482,64 @@ class MailsAddressBook_Controller extends Controller {
       $formRemoveDuplicity->addElement($eSubmit);
 
       if($formRemoveDuplicity->isValid()){
-
+         $modelDup = new Mails_Model_Addressbook();
+         $duplications = $modelDup
+             ->columns(array(Mails_Model_Addressbook::COLUMN_MAIL))
+             ->groupBy(array(Mails_Model_Addressbook::COLUMN_MAIL))
+             ->having('COUNT(*) > 1')
+             ->records();
+         
+         if($duplications){
+            foreach ($duplications as $dup) {
+               Debug::log($dup->{Mails_Model_Addressbook::COLUMN_MAIL});
+            }
+         }
+         
       }
       $this->view()->formRemoveDuplicity = $formRemoveDuplicity;
+      
+      $formRepair = new Form('repairMails');
+      $eSubmit = new Form_Element_Submit('submit', $this->tr('Opravit emaily'));
+      $formRepair->addElement($eSubmit);
+
+      if($formRepair->isValid()){
+         // načteme vaechyn emaily
+         $model = new Mails_Model_Addressbook();
+         $mails = $model->records();
+         
+         foreach ($mails as $mail) {
+            $pattern = '/([A-Za-z0-9_-]+@[A-Za-z0-9_-]+\.[A-Za-z0-9_-][A-Za-z0-9_]+)/';
+            $matches = array();
+            preg_match_all($pattern, $mail->{Mails_Model_Addressbook::COLUMN_MAIL}, $matches);
+            if(sizeof($matches[1]) == 0){
+               // delete record
+               $model->delete($mail);
+            } else {
+               if($matches[1][0] != $mail->{Mails_Model_Addressbook::COLUMN_MAIL}){
+                  // update
+                  $mail->{Mails_Model_Addressbook::COLUMN_MAIL} = $matches[1][0];
+                  $mail->save();
+                  unset($matches[1][0]);
+               }
+               
+               if(sizeof($matches[1]) > 0){
+                  // create new mails
+                  foreach ($matches[1] as $newMailString) {
+                     $newMail = $model->newRecord();
+                     $newMail->{Mails_Model_Addressbook::COLUMN_ID_GRP} = $mail->{Mails_Model_Addressbook::COLUMN_ID_GRP};
+                     $newMail->{Mails_Model_Addressbook::COLUMN_NAME} = $mail->{Mails_Model_Addressbook::COLUMN_NAME};
+                     $newMail->{Mails_Model_Addressbook::COLUMN_NOTE} = $mail->{Mails_Model_Addressbook::COLUMN_NOTE};
+                     $newMail->{Mails_Model_Addressbook::COLUMN_SURNAME} = $mail->{Mails_Model_Addressbook::COLUMN_SURNAME};
+                     $newMail->{Mails_Model_Addressbook::COLUMN_MAIL} = $newMailString;
+                     $newMail->save();
+                  }
+               }
+            }
+         }
+         $this->infoMsg()->addMessage($this->tr('Emailové adresy byly opraveny'));
+         $this->link()->reload();
+      }
+      $this->view()->formRepair = $formRepair;
    }
 
    /**
