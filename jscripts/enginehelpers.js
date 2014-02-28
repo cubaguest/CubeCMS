@@ -183,6 +183,7 @@ CubeCMS.Tools = {
 };
 
 CubeCMS.ToolBox = {
+   enablePageTracking : true,
    init : function() {
 
    }
@@ -397,30 +398,32 @@ function initToolboxEvents(){
    });
 
    // move toolbox with document when scrolling
-   $(document).unbind('scroll');
+   if(CubeCMS.ToolBox.enablePageTracking){
+      $(document).unbind('scroll');
 
-   if(typeof document.toolboxTop == "undefined"){
-      document.toolboxTop = 30;
-   }
-   $(document).scroll(function(){
-      var top = $(this).scrollTop();
-      toolboxButtons.each(function(){
-         var $container = $(this).parent();
-         if($container.offset().top < top+document.toolboxTop && top < $container.offset().top+$container.height()-document.toolboxTop){
-            $(this).css({
-               position : "fixed",
-               top: document.toolboxTop,
-               left: $(this).offset().left
-            });
-         } else {
-            $(this).css({
-               position : "absolute",
-               top: 1,
-               right: 1, left : "auto"
-            });
-         }
+      if(typeof document.toolboxTop === "undefined"){
+         document.toolboxTop = 30;
+      }
+      $(document).scroll(function(){
+         var top = $(this).scrollTop();
+         toolboxButtons.each(function(){
+            var $container = $(this).parent();
+            if($container.offset().top < top+document.toolboxTop && top < $container.offset().top+$container.height()-document.toolboxTop){
+               $(this).css({
+                  position : "fixed",
+                  top: document.toolboxTop,
+                  left: $(this).offset().left
+               });
+            } else {
+               $(this).css({
+                  position : "absolute",
+                  top: 1,
+                  right: 1, left : "auto"
+               });
+            }
+         });
       });
-   });
+   }
 }
 
 function str2url(str,encoding,ucfirst){ return CubeCMS.Tools.str2url(str, ucfirst); }
