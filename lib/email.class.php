@@ -94,7 +94,8 @@ class Email {
          return null;
       }
       if(empty ($this->iconvParams)) return $str;
-      return iconv($this->iconvParams[0], $this->iconvParams[1], $str);
+//      return iconv($this->iconvParams[0], $this->iconvParams[1], $str);
+      return $str;
    }
 
    /**
@@ -116,7 +117,7 @@ class Email {
     */
    public function setSubject($subject)
    {
-      $this->message()->setSubject($this->sanitize($subject));
+      $this->message()->setSubject(iconv($this->iconvParams[0], $this->iconvParams[1], $subject));
       return $this;
    }
 
