@@ -333,6 +333,11 @@ abstract class View extends TrObject {
       }
    }
    
+   /**
+    * Metoda vrací název šablony pro aktuální nebo danou akci
+    * @param string|null $action -- název akce
+    * @return string -- tpl:// resource
+    */
    public function getTemplate($action = null)
    {
       $action = $action !== null ? $action : $this->actionName;
@@ -347,5 +352,18 @@ abstract class View extends TrObject {
          }
       }
       return 'tpl://'.$action.'.phtml';
+   }
+   
+   /**
+    * Metodfa vrací parametr aktuální šablony
+    * @param string $param -- název parametru
+    * @param mixed $default -- výchozí hodnota
+    * @param string $action -- název akce
+    * @return mixed
+    */
+   public function getCurrentTemplateParam($param, $default = false, $action = null)
+   {
+      $action = $action == null ? $this->actionName : $action;
+      return $this->category()->module()->getTemplateParam($action, $this->category()->getParam('tpl_action_'.$action, false), $param, $default);
    }
 }

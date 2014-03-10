@@ -137,18 +137,6 @@ class Category extends Category_Core {
    }
    
    /**
-    * Vrací parametr aktuální šablony
-    * @param string $action
-    * @param string $param
-    * @param mixed $default
-    * @return mixed
-    */
-   public function getCurrentTemplateParam($action, $param, $default)
-   {
-      return $this->module()->getTemplateParam($action, $this->getParam('tpl_action_'.$action), $param, $default);
-   }
-
-   /**
     * Metoda vrací požadovaný parametr
     * @param string $param -- index parametru
     * @param mixed $defaultParam -- výchozí hodnota
