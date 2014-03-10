@@ -185,6 +185,9 @@ class Text_Controller extends Controller {
                // odtranění script, nebezpečných tagů a komentřů
                $this->processFormData($form, $textRec, self::TEXT_MAIN_KEY);
                foreach($this->customFields as $key => $label){
+                  if(!isset($customFields[$key])){
+                     $customFields[$key] = $this->textModel->newRecord();
+                  }
                   $this->processFormData($form, $customFields[$key], $key, 'filed_'.$key);
                }
                $this->clearTempRecord();
@@ -292,7 +295,7 @@ class Text_Controller extends Controller {
     * @param type $subkey -- subklíč dat
     * @param type $elementName -- název elementu s daty
     */
-   protected function processFormData(Form $form, $textRec, $subkey = self::TEXT_MAIN_KEY, $elementName = 'text', $toTemp = false)
+   protected function processFormData(Form $form, Model_ORM_Record $textRec, $subkey = self::TEXT_MAIN_KEY, $elementName = 'text', $toTemp = false)
    {
       if(!isset ($form->{$elementName})){
          throw new InvalidArgumentException($this->tr('Nebyl předán správný název formulářového prvku s daty'));
@@ -319,7 +322,7 @@ class Text_Controller extends Controller {
       if($toTemp){
          $this->seveTempRecord($textRec, $subkey);
       } else {
-         $this->textModel->save($textRec);
+         $textRec->save();
       }
       return $textRec;
    }
