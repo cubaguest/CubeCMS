@@ -27,7 +27,7 @@ class Text_Controller extends Controller {
       parent::init();
       $this->textModel = new Text_Model();
 
-      $fields = $this->module()->getTemplateParam($this->category()->getParam(self::PARAM_TPL_MAIN), 'customFields', false);
+      $fields = $this->view()->getCurrentTemplateParam('customFields', false);
       if($fields){
          foreach($fields as $tpl => $labels){
             $this->customFields[$tpl] = $labels[Locales::getLang()];

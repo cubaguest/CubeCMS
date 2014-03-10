@@ -114,9 +114,10 @@ class Text_View extends View {
       Template_Navigation::addItem($this->tr('Úprava obsahu'), $this->link());
 
       if($this->fields){
+         $filedsEditor = $this->getCurrentTemplateParam('customFieldsEditor', array(), 'main');
          foreach($this->fields as $field){
             $element = 'filed_'.$field;
-            $this->setTinyMCE($this->form->$element, 'simple');
+            $this->setTinyMCE($this->form->$element, isset($filedsEditor[$field]) ? $filedsEditor[$field] : 'simple');
          }
       }
    }

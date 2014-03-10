@@ -1,4 +1,7 @@
 <?
+/**
+ * @template "Hlavní šablona"
+ */
 if($this->text != false AND (string)$this->text->{Text_Model::COLUMN_LABEL} != null) {
    $this->addPageTitle($this->text->{Text_Model::COLUMN_LABEL});
    $h1 = $this->text->{Text_Model::COLUMN_LABEL};

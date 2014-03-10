@@ -67,11 +67,54 @@ class Text_Model extends Model_ORM {
    /**
     * Metoda provede načtení textu z db podle kategorie a subklíče
     *
+    * @return Model_ORM_Record -- načtený text
+    */
+   public static function getText($idCat, $subkey = self::DEFAULT_SUBKEY, $returnEmptyRecord = false) {
+      $m = new self();
+      $rec = $m->where(self::COLUMN_ID_CATEGORY." = :idc AND ".self::COLUMN_SUBKEY." = :subkey",
+         array('idc' => $idCat, 'subkey' => $subkey) )->record();
+      if(!$rec && $returnEmptyRecord){
+         $rec = $m->newRecord();
+         $rec->{self::COLUMN_ID_CATEGORY} = $idCat;
+         $rec->{self::COLUMN_SUBKEY} = $subkey;
+      }
+      return $rec;
+   }
+   
+   /**
+    * Metoda provede načtení textů z db podle kategorie a subklíčů. Pole je asociované podle subklíčů
+    * @param int $idCat -- id kategorie
+    * @param array $keys -- pole se subklíči
     * @return string -- načtený text
     */
-   public function getText($idCat, $subkey = self::DEFAULT_SUBKEY) {
-      return $this->where(self::COLUMN_ID_CATEGORY." = :idc AND ".self::COLUMN_SUBKEY." = :subkey", 
-            array('idc' => $idCat, 'subkey' => $subkey) )->record();
+   public static function getTextsByKeys($idCat, $keys = array(self::TEXT_MAIN_KEY), $returnEmptyRecords = false) {
+      $m = new self();
+      $where = array();
+      foreach($keys as $c => $key){
+         $where[':key_'.$c] = $key;
+      }
+
+      $tmp = $m
+         ->where(self::COLUMN_ID_CATEGORY." = :idc AND ".self::COLUMN_SUBKEY." IN (".implode(',', array_keys($where)).")",
+         array_merge(array('idc' => $idCat), $where) )
+         ->records();
+
+      $records = array();
+      if($tmp){
+         foreach($tmp as $rec){
+            $records[$rec->{self::COLUMN_SUBKEY}] = $rec;
+         }
+      }
+      if($returnEmptyRecords){
+         foreach ($keys as $key) {
+            if(!isset($records[$key])){
+               $records[$key] = $m->newRecord();
+               $records[$key]->{self::COLUMN_ID_CATEGORY} = $idCat;
+               $records[$key]->{self::COLUMN_SUBKEY} = $key;
+            }
+         }
+      }
+      return $records;
    }
 
    /**
@@ -104,52 +147,25 @@ class Text_Model extends Model_ORM {
    public function saveText($texts, $label, $idCat, $subKey = self::DEFAULT_SUBKEY, $id = null) {
       // zjištění jestli existuje záznam
       // globalní prvky
-      $dbc = Db_PDO::getInstance();
-      $this->setIUValues(array(self::COLUMN_TEXT => $texts,
-          self::COLUMN_TEXT_CLEAR => vve_strip_tags($texts)));
-      if ($label !== null) {
-          $this->setIUValues(array(self::COLUMN_LABEL => $label));
+      $model = new self();
+      if($id == null){
+         $record = $model->where(self::COLUMN_ID_CATEGORY." = :idc AND ".self::COLUMN_SUBKEY." = :subkey",
+             array('idc' => $idCat, 'subkey' => $subKey))->record();
+      } else {
+         $record = $model->record($id);
       }
       
-      if ($id === null) {
-         $dbst = $dbc->prepare("SELECT * FROM " . Db_PDO::table(self::DB_TABLE)
-                 . " WHERE (" . self::COLUMN_ID_CATEGORY . " = :idCat AND "
-                 . self::COLUMN_SUBKEY . " = :subkey)");
-         $dbst->bindValue(':subkey', $subKey, PDO::PARAM_STR);
-         $dbst->bindValue(':idCat', $idCat, PDO::PARAM_INT);
-         $dbst->execute();
-         $data = $dbst->fetchObject();
-
-//         var_dump($data);flush();exit();
-
-         $count = $dbst->rowCount();
-
-         
-
-         if ($count != 0) {
-            // je už uloženo
-            $dbst = $dbc->prepare("UPDATE " . Db_PDO::table(self::DB_TABLE)
-                            . " SET " . $this->getUpdateValues()
-                            . " WHERE (" . self::COLUMN_ID_CATEGORY . " = :idCat AND " . self::COLUMN_SUBKEY . " = :subkey)");
-            $dbst->execute(array(':idCat' => $idCat, ':subkey' => $subKey));
-            $id = $data->{self::COLUMN_ID};
-         } else {
-            // není uloženo
-            $this->setIUValues(array(self::COLUMN_ID_CATEGORY => $idCat, self::COLUMN_SUBKEY => $subKey));
-            $dbc->query("INSERT INTO " . Db_PDO::table(self::DB_TABLE)
-                    . " " . $this->getInsertLabels() . " VALUES " . $this->getInsertValues());
-            $id = $dbc->lastInsertId();
-         }
-      } else {
-         // je už uloženo
-         $dbst = $dbc->prepare("UPDATE " . Db_PDO::table(self::DB_TABLE)
-                         . " SET " . $this->getUpdateValues()
-                         . " WHERE (" . self::COLUMN_ID . " = :id AND " . self::COLUMN_SUBKEY . " = :subkey)");
-         $dbst->execute(array(':id' => (int)$id, ':subkey' => $subKey));
-         $id = $dbc->lastInsertId();
+      if(!$record){
+         $record = $this->newRecord();
+         $record->{self::COLUMN_ID_CATEGORY} = $idCat;
+         $record->{self::COLUMN_SUBKEY} = $subKey;
       }
-
-      return $id;
+      
+      $record->{self::COLUMN_LABEL} = $subKey;
+      $record->{self::COLUMN_TEXT} = $texts;
+      
+      $record->save();
+      return $record->getPK();
    }
 
    public function getLastChange($idCat, $subKey = self::DEFAULT_SUBKEY) {
@@ -244,4 +260,14 @@ class Text_Model extends Model_ORM {
    }
 }
 
-?>
+class Text_Model_Record extends Model_ORM_Record {
+   public function getText()
+   {
+      return $this->{Text_Model::COLUMN_TEXT};
+   }
+   
+   public function __toString()
+   {
+      return (string)$this->{Text_Model::COLUMN_TEXT};
+   }
+}
