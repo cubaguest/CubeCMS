@@ -449,10 +449,9 @@ class Module
    {
       if(isset(self::$templates[$this->getName()][$action]) 
           && isset(self::$templates[$this->getName()][$action][$tpl])
-          && isset(self::$templates[$this->getName()][$action][$tpl][$param])
-          
+          && isset(self::$templates[$this->getName()][$action][$tpl]['params'][$param])
           ){
-         return self::$templates[$this->getName()][$action][$tpl][$param];
+         return self::$templates[$this->getName()][$action][$tpl]['params'][$param];
       }
       return $default;
    }
