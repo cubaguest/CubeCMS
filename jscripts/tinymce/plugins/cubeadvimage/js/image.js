@@ -522,6 +522,8 @@ var TinyMCEFileUploader = {
    uploadUrl : "/component/tinymce_uploader/0/imageUpload.php",
    dirListUrl : "/component/tinymce_uploader/0/dirsList.json",
    init : function(){
+     this.uploadUrl = "/component/tinymce_uploader/"+tinyMCE.activeEditor.getParam('cid')+"/imageUpload.php";
+     this.dirListUrl = "/component/tinymce_uploader/"+tinyMCE.activeEditor.getParam('cid')+"/dirsList.json";
 	  var aDirs = tinyMCE.activeEditor.getParam('alloweddirs');
 	  if(aDirs && aDirs.length > 0){
 		  var dirsStr = '?';
