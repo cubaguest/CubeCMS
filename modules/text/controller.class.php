@@ -295,7 +295,7 @@ class Text_Controller extends Controller {
     * @param type $subkey -- subklíč dat
     * @param type $elementName -- název elementu s daty
     */
-   protected function processFormData(Form $form, Model_ORM_Record $textRec, $subkey = self::TEXT_MAIN_KEY, $elementName = 'text', $toTemp = false)
+   protected function processFormData(Form $form, $textRec, $subkey = self::TEXT_MAIN_KEY, $elementName = 'text', $toTemp = false)
    {
       if(!isset ($form->{$elementName})){
          throw new InvalidArgumentException($this->tr('Nebyl předán správný název formulářového prvku s daty'));
