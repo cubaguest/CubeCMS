@@ -40,6 +40,11 @@ input.button {float: right;}
    outline: 0;
    text-decoration: none;
 }
+/* drag & drop */
+#itemsList.draging {
+   border: 1px dotted red;
+   background-color: #ffcccc;
+}
 
 #mainTable th {
    text-align:left;

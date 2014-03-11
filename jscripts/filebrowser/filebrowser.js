@@ -20,7 +20,7 @@ var FileBrowserDialogue = {
    submitFile : function () {
       // insert information now
       FileBrowserDialogue.win.document.getElementById(tinyMCEPopup.getWindowArg("input"))
-      .value = FileBrowser.getSelected().data('realpath');
+         .value = FileBrowser.getSelected().data('realpath');
       // are we an image browser
       if (typeof(FileBrowserDialogue.win.ImageDialog) != "undefined") {
          // we are, so update image dimensions...
@@ -93,11 +93,11 @@ var FileBrowser = {
       this.cmsPluginUrl = window.location.toString().replace('browser.php', 'jscripts/tinymce/');
       if(this.currentDir == null){
     	  if(openDir){
-    		 this.currentDir = openDir;
-    	  } else {
-    		 // load previous path
-    		 this.currentDir = this.loadPath();
-    	  }
+            this.currentDir = openDir;
+         } else {
+            // load previous path
+            this.currentDir = this.loadPath();
+         }
       }
       // UPLOAD POST PARAMS
       this.uploadFilesPosParams = {
@@ -132,19 +132,19 @@ var FileBrowser = {
       // assign our event handlers
       $('.swfupload-control')
       .bind('fileQueued', function(event, file){
-         FileBrowser.uploadFilesPosParams.path = FileBrowser.currentDir;
+            FileBrowser.uploadFilesPosParams.path = FileBrowser.currentDir;
          $(this).swfupload('setPostParams', FileBrowser.uploadFilesPosParams );
-         $(this).swfupload('startUpload');
-      })
+            $(this).swfupload('startUpload');
+         })
       .bind('uploadComplete', function(event, file){$(this).swfupload('startUpload');})
       .bind('uploadStart', function(event, file){$('#uploading-files').show();})
       .bind('fileQueueError', function(event, file, errorCode, message){FileBrowser.showResult([], ['Velikost souboru '+file.name+' je větší než povolený limit']);})
       .bind('uploadSuccess', function(event, file, serverData){
-         FileBrowser.load();
-         $('#uploading-files').hide();
-         var data = $.parseJSON(serverData);
-         FileBrowser.showResult(data.infomsg, data.errmsg);
-      });
+            FileBrowser.load();
+            $('#uploading-files').hide();
+            var data = $.parseJSON(serverData);
+            FileBrowser.showResult(data.infomsg, data.errmsg);
+         });
 
       // init items box
       this.$itemsBox = $('#itemsList');
@@ -190,32 +190,32 @@ var FileBrowser = {
 
             if(event.ctrlKey){ // ctrl
                if($.isMarkedItem(this)){
-                  $(this).unmarkItem();
-               } else {
-                  $(this).markItem();
-               }
-            } else if(event.shiftKey){ // shift
-               var selected = FileBrowser.getSelected();
-               var fIndex = $('li').index(selected.parent('li'));
-               var tIndex = $('li').index($(this).parent('li'));
-               var items = FileBrowser.getAllItems();
-               // move down
-               if(fIndex <= tIndex){
-                  for (var i = fIndex; i <= tIndex; i++) {
-                     $(items[i]).markItem();
-                  }
-               } else {
-                  for (var y = fIndex; y >= tIndex; y--) {
-                     $(items[y]).markItem();
-                  }
-               }
+               $(this).unmarkItem();
             } else {
-               FileBrowser.getMarked().unmarkItem();
                $(this).markItem();
             }
-            FileBrowser.getSelected().unselectItem();
-            $(this).selectItem(); // vybereme označený
-            FileBrowser.showData($(this)); // show info
+            } else if(event.shiftKey){ // shift
+            var selected = FileBrowser.getSelected();
+            var fIndex = $('li').index(selected.parent('li'));
+            var tIndex = $('li').index($(this).parent('li'));
+            var items = FileBrowser.getAllItems();
+            // move down
+               if(fIndex <= tIndex){
+               for (var i = fIndex; i <= tIndex; i++) {
+                  $(items[i]).markItem();
+               }
+            } else {
+               for (var y = fIndex; y >= tIndex; y--) {
+                  $(items[y]).markItem();
+               }
+            }
+         } else {
+            FileBrowser.getMarked().unmarkItem();
+            $(this).markItem();
+         }
+         FileBrowser.getSelected().unselectItem();
+         $(this).selectItem(); // vybereme označený
+         FileBrowser.showData($(this)); // show info
          return;
       });
       // dbclick
@@ -228,6 +228,29 @@ var FileBrowser = {
          }
          return;
       });
+
+      // init drag & drop to area
+      $(document).on('dragenter', function(e) {
+         e.stopPropagation();
+         e.preventDefault();
+      })
+      .on('dragover', function(e) {
+         e.stopPropagation();
+         e.preventDefault();
+         _that.$itemsBox.addClass('draging');
+      })
+      .on('dragleave', function(e) {
+         _that.$itemsBox.removeClass('draging');
+      })
+      .on('drop', function(e){
+         e.stopPropagation();
+         e.preventDefault();
+         _that.$itemsBox.removeClass('draging');
+         var files = e.originalEvent.dataTransfer.files;
+         //We need to send dropped files to Server
+         _that.handleFileUpload(files);
+      });
+
       // load all items
       this.load();
       // show tip
@@ -253,7 +276,7 @@ var FileBrowser = {
 
       $('#currentFile').text(info.name);
       if(info.type == 'dir') {
-            // není zapisovatelný
+         // není zapisovatelný
          if(info.access.write == true){
             var $abox = $('<p></p>');
             var $select = $('<select></select>').attr({name : 'users', size : 6, multiple : true});
@@ -289,9 +312,9 @@ var FileBrowser = {
             }
             var time = new Date;
             $img.attr('src', FileBrowser.baseUrl+info.realpath+'?t='+(time.getTime()/1000).toString())
-            .css({
+               .css({
                width: w, height : h-5//, 'padding-top' : ((imgSize-h)/2)-2 // centering
-            });
+               });
             $infoBox.append($('<p></p>').addClass('imgprev-box').html($img));
             // file info
             var $sizes = $('<p></p>').addClass('file-info')
@@ -313,7 +336,7 @@ var FileBrowser = {
                +'<input type="checkbox" name="img_ratio" checked="checked" /> Zachovat poměr '
                +'<input type="checkbox" name="img_crop" /> Ořezat'
                +'<hr />'
-            );
+               );
 
             var $iW = $('input[name="img_w"]', $abox).val(info.info.dimension.w).data('origsize', info.info.dimension.w);
             var $iH = $('input[name="img_h"]', $abox).val(info.info.dimension.h).data('origsize', info.info.dimension.h);
@@ -322,27 +345,27 @@ var FileBrowser = {
                if($('input[name="img_ratio"]',$abox).is(':checked')){
                   $('input[name="img_h"]', $abox).val(
                      Math.round(parseInt($(this).val())/parseInt($('input[name="img_w"]', $abox).data('origsize'))*parseInt($('input[name="img_h"]', $abox).data('origsize')))
-                  );
+                     );
                }
             });
             $iH.change(function(){
                if($('input[name="img_ratio"]',$abox).is(':checked')){
                   $('input[name="img_w"]', $abox).val(
                      Math.round(parseInt($(this).val())/parseInt($('input[name="img_h"]', $abox).data('origsize'))*$('input[name="img_w"]', $abox).data('origsize'))
-                  );
+                     );
                }
             });
 
             $abox.append('<strong>Otočit doprava:</strong><br />');
             $abox.append(
-                '<select name="img_degree">'
+               '<select name="img_degree">'
                +'<option value="90">90°</option>'
                +'<option value="180">180°</option>'
                +'<option value="270">270°</option>'
                +'</select>&nbsp;'
                +'<input type="button" name="img_rotate" value="Otočit" onClick="FileBrowser.imageRotate()" />'
                +'<hr />'
-            );
+               );
 
             $abox.append('<strong>Vytvořit obrázky v systémové velikosti:</strong><br />');
             $abox.append(
@@ -350,7 +373,7 @@ var FileBrowser = {
                +'&nbsp;<input type="button" name="img_system_sizes" value="Vytvořit" onClick="FileBrowser.imageSystemResize()" /><br />'
                +'<input type="checkbox" name="img_createdirs" checked="checked" /> Zařadit do adresářů (small, medium) '
                +'<hr />'
-            );
+               );
             $actionsBox.html($abox);
          } else if(info.info.type == 'flash'){// flash
             $infoBox.html(''); // clear box
@@ -398,9 +421,9 @@ var FileBrowser = {
          extensions = Array('swf', // falsh
             'mp4','m4v', 'ogv', 'mov' , 'flv', 'rm', 'qt', 'avi', // video
             'mp3', 'ogg', 'wma', 'wav' // audio
-         );
+            );
       }
-      
+
       if(extensions.length != 0){
          var len = extensions.length;
          for ( var i = 0; i < len ; i++ ) {
@@ -439,64 +462,112 @@ var FileBrowser = {
    getAllItems : function(){
       return this.$itemsBox.find('li a');
    },
-   // load dirs
+   // uploading ober html5
+   handleFileUpload: function(files) {
+      for (var i = 0; i < files.length; i++) {
+         var fd = new FormData();
+         fd.append('upload_file', files[i]);
+         
+         $.each(FileBrowser.uploadFilesPosParams, function(index, value){
+            fd.append(index, value);
+         });
+         var statusBar = new FileBrowserStatusBar(); //Using this we can set progress.
+         statusBar.setFileNameSize(files[i].name,files[i].size);
+         this.sendFileToServer(fd, statusBar);
+      }
+   },
+   sendFileToServer: function(formData, statusBar)
+   {
+      var _that = this;
+      var jqXHR = $.ajax({
+         xhr: function() {
+            var xhrobj = $.ajaxSettings.xhr();
+            if (xhrobj.upload) {
+               xhrobj.upload.addEventListener('progress', function(event) {
+                  var percent = 0;
+                  var position = event.loaded || event.position;
+                  var total = event.total;
+                  if (event.lengthComputable) {
+                     percent = Math.ceil(position / total * 100);
+                  }
+                  //Set progress
+                  statusBar.setProgress(percent);
+               }, false);
+            }
+            return xhrobj;
+         },
+         url: FileBrowser.uploadLink,
+         type: "POST",
+         contentType: false,
+         processData: false,
+         cache: false,
+         data: formData,
+         success: function(data) {
+            statusBar.setProgress(100);
+            FileBrowser.showResult(data.infomsg, data.errmsg);
+            _that.load();
+         }
+      });
+      statusBar.setAbort(jqXHR);
+   },
+      // load dirs
    load : function(path){
       if(typeof(path) == 'undefined') path = this.currentDir;
-      FileBrowser.showWorking();
+         FileBrowser.showWorking();
       this.request('getitems', {path:path, type: FileBrowser.listType}, function(data){
-         FileBrowser.hideWorking();
-         var selectedItemPath = FileBrowser.getSelected().data('realpath');
-         // clear box
-         FileBrowser.$itemsBox.html('');
+            FileBrowser.hideWorking();
+            var selectedItemPath = FileBrowser.getSelected().data('realpath');
+            // clear box
+            FileBrowser.$itemsBox.html('');
          if(typeof(data.items) != "undefined"){
             $.each(data.items, function(){
-               var $item = $('<a>');
-               $item
+                  var $item = $('<a>');
+                  $item
 //            .append($('<input name="selected" value="'+this.name+'" type="checkbox" />'))
-               .append(this.name)
-               .attr({
+                     .append(this.name)
+                     .attr({
                   title : this.name,
                   href : this.realpath
-               }).data(this);
+                     }).data(this);
 
                if(this.type == 'dir') {
-                  $item.addClass('dir');
+                     $item.addClass('dir');
                   if(this.info.type == 'home'){
-                     $item.addClass('dir-home');
+                        $item.addClass('dir-home');
                   } else if(this.info.type == 'public'){
-                     $item.addClass('dir-pub');
-                  }
+                        $item.addClass('dir-pub');
+                     }
                   if(this.access.write == true) $item.addClass('dir-writable');
                } else if(this.type == 'dot'){
-                  $item.addClass('dir');
-                  $item.addClass('dir-up');
-               } else {
-            // file
-                  $item.addClass('file')
+                     $item.addClass('dir');
+                     $item.addClass('dir-up');
+                  } else {
+                     // file
+                     $item.addClass('file')
                      .css('background-image', 'url('+FileBrowser.baseUrl+FileBrowser.iconsDir+this.info.type+'_icon.png)');
                   if(this.access.write == true) $item.addClass('file-writable');
-               }
-               FileBrowser.$itemsBox.append($('<li></li>').append($item));
-            });
+                  }
+                  FileBrowser.$itemsBox.append($('<li></li>').append($item));
+               });
 
-            FileBrowser.writable = data.writable;
+               FileBrowser.writable = data.writable;
             if(FileBrowser.currentDir == data.current && typeof(selectedItemPath) != 'undefined'){ // same dir
                var elem = FileBrowser.$itemsBox.find('a[href="'+selectedItemPath+'"]');
                if(elem.length > 0) {elem.click();}
-               else {
+                  else {
+                     FileBrowser.$itemsBox.children('li:first a').click();// select first item
+                  }
+               } else { // jiný adresář
                   FileBrowser.$itemsBox.children('li:first a').click();// select first item
+                  FileBrowser.storePath(data.current);
                }
-            } else { // jiný adresář
-               FileBrowser.$itemsBox.children('li:first a').click();// select first item
-               FileBrowser.storePath(data.current);
+               FileBrowser.currentDir = data.current;
+               $('#currentPath').text(data.current);
+            } else {
+               FileBrowser.goPublic();
             }
-            FileBrowser.currentDir = data.current;
-            $('#currentPath').text(data.current);
-         } else {
-            FileBrowser.goPublic();
-         }
-      });
-   },
+         });
+      },
    goHome : function(){
       this.currentDir = 'home';
       this.load();
@@ -636,7 +707,7 @@ var FileBrowser = {
       }
       var files = new Array;
       $items.each(function(){
-            files.push($(this).data('name'));
+         files.push($(this).data('name'));
       });
       FileBrowser.request('imageResized', {
          path : FileBrowser.currentDir,file : files,
@@ -644,8 +715,8 @@ var FileBrowser = {
          newW : $('input[name="img_w"]').val(), newH : $('input[name="img_h"]').val(),
          crop : $('input[name="img_crop"]').is(':checked')
          }, function(){
-            FileBrowser.hideWorking();
-            FileBrowser.load();
+         FileBrowser.hideWorking();
+         FileBrowser.load();
       });
    },
    imageSystemResize : function(){
@@ -658,7 +729,7 @@ var FileBrowser = {
       }
       var files = new Array;
       $items.each(function(){
-            files.push($(this).data('name'));
+         files.push($(this).data('name'));
       });
       FileBrowser.request('createSystemImages', {
          path : FileBrowser.currentDir, file : files,
@@ -675,7 +746,7 @@ var FileBrowser = {
       }
       var files = new Array;
       $items.each(function(){
-            files.push($(this).data('name'));
+         files.push($(this).data('name'));
       });
       FileBrowser.request('imageRotate', {
          path : FileBrowser.currentDir,
@@ -697,4 +768,46 @@ var FileBrowser = {
    showTip : function(){
       $('#log').html($('<span></span>').addClass('tip').text('TIP: '+tips[Math.floor(Math.random()*tips.length)]));
    }
+};
+
+var rowCount = 0;
+function FileBrowserStatusBar() {
+   rowCount++;
+   var row = "odd";
+   if (rowCount % 2 === 0) {
+      row = "even";
+   }
+//   this.statusbar = $("<div class='statusbar " + row + "'></div>");
+//   this.filename = $("<div class='filename'></div>").appendTo(this.statusbar);
+//   this.size = $("<div class='filesize'></div>").appendTo(this.statusbar);
+//   this.progressBar = $("<div class='progressBar'><div></div></div>").appendTo(this.statusbar);
+//   this.abort = $("<div class='abort'>Abort</div>").appendTo(this.statusbar);
+//   obj.after(this.statusbar);
+
+   this.setFileNameSize = function(name, size) {
+//      var sizeStr = "";
+//      var sizeKB = size / 1024;
+//      if (parseInt(sizeKB) > 1024) {
+//         var sizeMB = sizeKB / 1024;
+//         sizeStr = sizeMB.toFixed(2) + " MB";
+//      } else {
+//         sizeStr = sizeKB.toFixed(2) + " KB";
+//      }
+//      this.filename.html(name);
+//      this.size.html(sizeStr);
+   };
+   this.setProgress = function(progress) {       
+//      var progressBarWidth = progress * this.progressBar.width() / 100;  
+//      this.progressBar.find('div').animate({width: progressBarWidth}, 10).html(progress + "% ");
+//      if (parseInt(progress) >= 100) {
+//         this.abort.hide();
+//      }
+   };
+   this.setAbort = function(jqxhr) {
+//      var sb = this.statusbar;
+//      this.abort.click(function(){
+//         jqxhr.abort();
+//         sb.hide();
+//      });
+   };
 };

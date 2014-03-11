@@ -327,7 +327,8 @@ class Component_TinyMCE_Browser extends Component_TinyMCE {
       $form = $this->createUploadForm($dir);
 
       if($form->isValid()) {
-         $this->infoMsg()->addMessage($this->tr('Soubor byl nahrán'));
+         $file = $form->file->getValues();
+         $this->infoMsg()->addMessage(sprintf($this->tr('Soubor "%s" byl nahrán'), $file['name']));
       }
    }
    

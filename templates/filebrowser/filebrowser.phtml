@@ -10,21 +10,21 @@ if(Auth::isLogin() == false){
    echo 'Nemáte práv k přístupu. Zkuste se přihlásit.';
    die;
 }
-
-echo ('<?xml version="1.0" encoding="utf-8"?>');
-?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?=Locales::getLang()?>" lang="<?=Locales::getLang()?>">
+?>
+<!DOCTYPE html>
+<html>
    <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/tinymce/tiny_mce.js"></script>
-<script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/tinymce/tiny_mce_popup.js"></script>
-<?if(VVE_DEBUG_LEVEL > 1){?>
-   <script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/filebrowser/filebrowser.js"></script>
-<?} else {?>
-   <script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/filebrowser/filebrowser.min.js"></script>
-<?}?>
-{*-STYLESHEETS-*}
-{*-JAVASCRIPTS-*}
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <?$this->renderHeaderCSSJS()?>
+      <script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/enginehelpers.min.js"></script>
+      <script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/tinymce/tiny_mce.js"></script>
+      <script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/tinymce/tiny_mce_popup.js"></script>
+      <?if(VVE_DEBUG_LEVEL > 1){?>
+         <script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/filebrowser/filebrowser.js"></script>
+      <?} else {?>
+         <script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/filebrowser/filebrowser.min.js"></script>
+      <?}?>
+      <script type="text/javascript">/* <![CDATA[ */<?$this->renderHeaderScripts()?>/* ]]> */</script>
    </head>
    <body>
    <script language="javascript" type="text/javascript">
@@ -42,12 +42,12 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
    var imageSmallSizeH = <?=VVE_IMAGE_THUMB_H?>;
    var maxUploadFileSize = <?=VVE_MAX_UPLOAD_SIZE?>; // in MB
    var cookieName = '<?=VVE_SESSION_NAME?>_Cube_Cms_brpath';
-   var tips = new Array('Pomocí klávesy CTRL a SHIFT lze označit více položek najednou.',
-                        'Při označení více obrázků jsou akce aplikovány na všechny.',
-                        'Přesun a kopírování položek lze pomocí chránky.',
-                        'Při nahrávání obrázků z fotoaparátu je nutné obrázek zmenšit.'
+   var tips = new Array('<?php ps($this->tr('Pomocí klávesy CTRL a SHIFT lze označit více položek najednou.'))?>',
+                        '<?php ps($this->tr('Soubor lze také nahrát přetažením do otevřené složky.'))?>',
+                        '<?php ps($this->tr('Při označení více obrázků jsou akce aplikovány na všechny.'))?>',
+                        '<?php ps($this->tr('Přesun a kopírování položek lze pomocí chránky.'))?>',
+                        '<?php ps($this->tr('Při nahrávání obrázků z fotoaparátu je nutné obrázek zmenšit.'))?>'
                         );
-
    var baseLoadPath = '<? echo Auth::isAdmin() ? '/public/' : '/home/'.Auth::getUserName().'/'; ?>';
    var openDir = <?
       echo (isset($_GET['forcedir']) && $_GET['forcedir'] != null ) ? "'".urldecode($_GET['forcedir'])."'" : 'false';?>;                        
