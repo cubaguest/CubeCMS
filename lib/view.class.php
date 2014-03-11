@@ -224,13 +224,13 @@ abstract class View extends TrObject {
    final public function viewSettingsView() {
       $this->template()->addFile('tpl://engine:vsettings.phtml');
       Template_Module::setEdit(true);
-      Template_Navigation::addItem($this->tr('Nastavení'), $this->link());
+      Template_Navigation::addItem($this->tr('Nastavení a vzhled'), $this->link());
    }
    
    final public function viewMetadataView() {
       $this->template()->addFile('tpl://engine:vmetadata.phtml');
       Template_Module::setEdit(true);
-      Template_Navigation::addItem($this->tr('Úprava metadat'), $this->link());
+      Template_Navigation::addItem($this->tr('Úprava metadat a popisků'), $this->link());
    }
 
    /**
@@ -319,15 +319,15 @@ abstract class View extends TrObject {
          }
          $this->template()->toolbox->setIcon(Template_Toolbox2::ICON_WRENCH);
          if(!isset ($this->template()->toolbox->edit_view)){
-            $toolEView = new Template_Toolbox2_Tool_PostRedirect('edit_view', $this->tr("Nastavení"),
+            $toolEView = new Template_Toolbox2_Tool_PostRedirect('edit_view', $this->tr("Nastavení a vzhled"),
                $this->link()->route(Routes::MODULE_SETTINGS));
-            $toolEView->setIcon(Template_Toolbox2::ICON_WRENCH)->setTitle($this->tr('Upravit nastavení kategorie'));
+            $toolEView->setIcon(Template_Toolbox2::ICON_WRENCH)->setTitle($this->tr('Upravit nastavení a vzhled kategorie'));
             $this->template()->toolbox->addTool($toolEView);
          }
          if(!isset ($this->template()->toolbox->edit_metadata)){
-            $toolEMetaData = new Template_Toolbox2_Tool_PostRedirect('edit_metadata', $this->tr("Metadata"),
+            $toolEMetaData = new Template_Toolbox2_Tool_PostRedirect('edit_metadata', $this->tr("Metadata a popisky"),
                $this->link()->route(Routes::MODULE_METADATA));
-            $toolEMetaData->setIcon(Template_Toolbox2::ICON_PEN)->setTitle($this->tr('Upravit metadata kategorie'));
+            $toolEMetaData->setIcon(Template_Toolbox2::ICON_PEN)->setTitle($this->tr('Upravit metadata a popisky kategorie'));
             $this->template()->toolbox->addTool($toolEMetaData);
          }
       }
