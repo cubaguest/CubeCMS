@@ -90,10 +90,11 @@ $this->addFile("css://photogalery:style.less");
                   </div>
                </td>
                <td valign="top">
+                  <div class="photo-desc">
                      <?
                      $this->editForm->desc->setDimensional($image->{PhotoGalery_Model_Images::COLUMN_ID});
                      $this->editForm->desc->setValues(array($image->{PhotoGalery_Model_Images::COLUMN_ID} =>
-                             $image->{PhotoGalery_Model_Images::COLUMN_DESC}));
+                     $image->{PhotoGalery_Model_Images::COLUMN_DESC}));
                      echo ($this->editForm->desc->label()."<br />");
                      echo ($this->editForm->desc->labelLangs());
                      echo ($this->editForm->desc->control());
@@ -103,9 +104,10 @@ $this->addFile("css://photogalery:style.less");
                      $this->editForm->id->setDimensional($image->{PhotoGalery_Model_Images::COLUMN_ID});
                      $this->editForm->id->setValues($image->{PhotoGalery_Model_Images::COLUMN_ID});
                      echo ($this->editForm->id->control());?>
-                  <a href="<?=$this->link()?>#delete-image" title="<?=$this->tr('Smazat obrázek')?>"
-                     class="button-delete-image" data-id="<?=$image->{PhotoGalery_Model_Images::COLUMN_ID}?>"
-                          ><span class="ui-icon ui-icon-closethick"> </span></a>
+                     <a href="<?=$this->link()?>#delete-image" title="<?=$this->tr('Smazat obrázek')?>"
+                        class="button-delete-image" data-id="<?=$image->{PhotoGalery_Model_Images::COLUMN_ID}?>"
+                             ><span class="ui-icon ui-icon-closethick"> </span></a>
+                  </div>
                </td>
             </tr>
             <?}?>

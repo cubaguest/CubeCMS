@@ -718,7 +718,6 @@ class Photogalery_Controller extends Controller {
          $settings[self::PARAM_MEDIUM_H] = $form->medium_height->getValues();
          $settings[self::PARAM_MEDIUM_C] = $form->medium_crop->getValues();
          $settings[self::PARAM_EDITOR_TYPE] = $form->editor_type->getValues();
-         $settings[self::PARAM_TPL_MAIN] = $form->tplMain->getValues();
       }
    }
 }
