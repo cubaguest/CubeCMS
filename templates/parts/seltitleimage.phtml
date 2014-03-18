@@ -1,10 +1,11 @@
-<? 
-if (isset($this->form->titleImage) && Template::pVar('DIALOG_TITLE_IMAGE') != true) { 
+<?
+if (isset($this->form->titleImage) && Template::pVar('DIALOG_TITLE_IMAGE') != true) {
    Template::setPVar('DIALOG_TITLE_IMAGE', true);
    $jq = new JsPlugin_JQuery();
    $jq->addUIResizable();
    $jq->addUIDialog();
    $this->addJsPlugin($jq);
+   $baseDir = $this->titleImagesURL != null ? $this->titleImagesURL : vve_tpl_art_title_image('');
    ?>
    <div id="dialog-title-image" title="<?= $this->tr('Výběr titulního obrázku') ?>">
    <?
@@ -12,7 +13,7 @@ if (isset($this->form->titleImage) && Template::pVar('DIALOG_TITLE_IMAGE') != tr
       if ($image == null) {
          echo '<a href="' . $this->link() . '#" class="button-select-title-image" data-file="" >' . $key . '</a>';
       } else {
-         $imgSrc = vve_image_cacher(vve_tpl_art_title_image($image), 100, 100, false );
+         $imgSrc = vve_image_cacher($baseDir.$image, 100, 100, false );
          echo '<a href="' . $this->link() . '#' . $image . '" class="button-select-title-image" data-file="' . $image . '" title="' . $image . '">'
          . '<img src="'.$imgSrc.'" alt="'.htmlspecialchars($imgSrc).'" /></a>';
       }
@@ -22,8 +23,12 @@ if (isset($this->form->titleImage) && Template::pVar('DIALOG_TITLE_IMAGE') != tr
    <script type="text/javascript">
    /* <![CDATA[ */
    $(document).ready(function(){
-      $('select[name$="titleImage"]')
-         .after('<a href="<?=$this->link()?>#select-title-image" class="button-open-title-image-galery" title="<?ps($this->tr('Vybrat z již uložených obrázků'))?>"><?=$this->tr('Vybrat z galerie')?></a>');
+      CubeCMS.Form.addButton($('select[name$="titleImage"]'), {
+         elementClass : 'button-open-title-image-galery',
+         title : '<?php ps($this->tr('Vybrat z již uložených obrázků'))?>',
+         icon : 'folder-open'
+      });
+      
       var $select = null;
       
       // zobraz galerii
@@ -33,7 +38,7 @@ if (isset($this->form->titleImage) && Template::pVar('DIALOG_TITLE_IMAGE') != tr
          $('#dialog-title-image a').removeClass('selected');
          $('#dialog-title-image a[data-file="'+$select.val()+'"]').addClass('selected');
          
-         $( "#dialog-title-image" ).dialog({width: 560, height: 365, resizable : true});          
+         $( "#dialog-title-image" ).dialog({width: 580, height: 365, resizable : true});          
       });
       // výběr z galerie
       $('.button-select-title-image').click(function(e){
