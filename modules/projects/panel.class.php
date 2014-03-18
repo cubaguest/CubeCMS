@@ -40,17 +40,6 @@ class Articles_Panel extends Panel {
          $form->num->setValues($settings['num']);
       }
 
-      // šablony
-      $componentTpls = new Component_ViewTpl();
-      $componentTpls->setConfig(Component_ViewTpl::PARAM_MODULE, $settings['_module']);
-
-      $elemTplPanel = new Form_Element_Select('tplPanel', 'Šablona panelu');
-      $elemTplPanel->setOptions(array_flip($componentTpls->getTpls('panel')));
-      if(isset($settings[self::PARAM_TPL_PANEL])) {
-         $elemTplPanel->setValues($settings[self::PARAM_TPL_PANEL]);
-      }
-      $form->addElement($elemTplPanel, 'basic');
-
       $elemType = new Form_Element_Select('type', 'Řazení');
       $types = array('Podle data' => 'list', 'Podle počtu přečtění' => 'top', 'Náhodně' => 'rand');
       $elemType->setOptions($types);
@@ -63,7 +52,6 @@ class Articles_Panel extends Panel {
 
       if($form->isValid()) {
          $settings['num'] = $form->num->getValues();
-         $settings[self::PARAM_TPL_PANEL] = $form->tplPanel->getValues();
          // protože je vždy hodnota
          if($form->type->getValues() != self::DEFAULT_TYPE){
             $settings['type'] = $form->type->getValues();
