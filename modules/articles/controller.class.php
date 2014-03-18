@@ -10,9 +10,6 @@ class Articles_Controller extends Controller {
    const PARAM_SHOW_CATS = 'shc';
    const PARAM_NOTIFY_RECIPIENTS = 'nfrecid';
 
-   const PARAM_TPL_LIST = 'tpllist';
-   const PARAM_TPL_DETAIL = 'tpldet';
-   const PARAM_TPL_ARCHIVE = 'tplarchive';
    const PARAM_MOUNTED_CATS = 'moc';
 
    const PARAM_MAIL_NAME = 'mname';
@@ -269,7 +266,7 @@ class Articles_Controller extends Controller {
       $this->view()->linkBack = $this->link()->back($this->link()->route(), 0);
    }
 
-   public function showController() {
+   public function showController($urlkey) {
       $this->checkReadableRights();
 
       $artM = new Articles_Model();
@@ -279,7 +276,7 @@ class Articles_Controller extends Controller {
       
       if($this->rights()->isControll()){
           $whereStr = Articles_Model::COLUMN_URLKEY.' = :urlkey AND '.Articles_Model::COLUMN_ID_CATEGORY.' = :idc';
-          $whereBind = array('urlkey' => $this->getRequest('urlkey'), 'idc' => $this->category()->getId());
+          $whereBind = array('urlkey' => $urlkey, 'idc' => $this->category()->getId());
       } else if($this->rights()->isWritable()){
          $whereStr = Articles_Model::COLUMN_URLKEY.' = :urlkey AND '.Articles_Model::COLUMN_ID_CATEGORY.' = :idc '
             .'AND ('.Articles_Model::COLUMN_ADD_TIME.' <= NOW() OR  '.Articles_Model::COLUMN_ID_USER.' = :idusr2)'
@@ -312,7 +309,7 @@ class Articles_Controller extends Controller {
             
             $whereStr = Articles_Model::COLUMN_URLKEY.' = :urlkey '
                .' AND '.Articles_Model::COLUMN_ID_CATEGORY." IN(".implode(',', array_keys($eCatPl)).")";
-            $whereBind = array_merge( array('urlkey' => $this->getRequest('urlkey')) , $eCatPl );
+            $whereBind = array_merge( array('urlkey' => $urlkey) , $eCatPl );
             
             $artM->joinFK(Articles_Model::COLUMN_ID_CATEGORY, array(Model_Category::COLUMN_URLKEY));
             $externalArt = $artM->where($whereStr, $whereBind)
@@ -1062,11 +1059,11 @@ class Articles_Controller extends Controller {
       $model->where(Articles_Model::COLUMN_ID_CATEGORY, $category->getId())->delete();
    }
 
-   public function exportArticleController(){
+   public function exportArticleController($urlkey, $output){
       $this->checkReadableRights();
       $model= new Articles_Model();
       $article = $model->where(Articles_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Articles_Model::COLUMN_URLKEY.' = :ukey',
-         array('idc' => $this->category()->getId(), 'ukey' => $this->getRequest('urlkey')))->record();
+         array('idc' => $this->category()->getId(), 'ukey' => $urlkey))->record();
       if($article === false) return false;
       $this->view()->article = $article;
 
@@ -1565,9 +1562,6 @@ class Articles_Controller extends Controller {
          $settings['discussion_not_public'] = $form->discussion_not_public->getValues();
          $settings['discussion_closed'] = $form->discussion_closed->getValues();
          $settings[self::PARAM_PRIVATE_ZONE] = (bool)$form->allow_private_zone->getValues();
-         $settings[self::PARAM_TPL_LIST] = $form->tplList->getValues();
-         $settings[self::PARAM_TPL_DETAIL] = $form->tplDetail->getValues();
-         $settings[self::PARAM_TPL_ARCHIVE] = $form->tplArchive->getValues();
 
          $mCats = $form->mountedCats->getValues() == null ? array() : $form->mountedCats->getValues();
 
