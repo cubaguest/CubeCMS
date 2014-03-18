@@ -26,6 +26,86 @@ function vve_get_tpl_file($file, $type) {
    }
 }
 
+
+/**
+ * Author prajwala
+ * email  m.prajwala@gmail.com
+ * Date   12/04/2009
+ * version 1.1
+ */
+class HtmlCutString {
+   protected $tempDiv;
+   protected $charCount = 0;
+   protected $encoding = 'UTF-8';
+   protected $endChars;
+   protected $endString;
+
+   public function __construct($string, $limit, $endChars = '...'){
+      // create dom element using the html string
+      $this->tempDiv = new DomDocument;
+      $this->tempDiv->loadXML('<div>'.$string.'</div>');
+      // character limit need to check
+      $this->limit = $limit;
+      $this->endChars = $endChars;
+   }
+  
+   public function cut(){
+      // create empty document to store new html
+      $this->newDiv = new DomDocument;
+      // cut the string by parsing through each element
+      $this->searchEnd($this->tempDiv->documentElement,$this->newDiv);
+      $newhtml = $this->newDiv->saveHTML();
+      return $newhtml;
+   }
+
+   protected function deleteChildren($node) {
+      while (isset($node->firstChild)) {
+         $this->deleteChildren($node->firstChild);
+         $node->removeChild($node->firstChild);
+      }
+   } 
+  
+   protected function searchEnd($parseDiv, $newParent){
+      foreach($parseDiv->childNodes as $ele){
+      // not text node
+         if($ele->nodeType != 3){
+             $newEle = $this->newDiv->importNode($ele,true);
+            if(count($ele->childNodes) === 0){
+               $newParent->appendChild($newEle);
+               continue;
+            }
+            $this->deleteChildren($newEle);
+            $newParent->appendChild($newEle);
+            $res = $this->searchEnd($ele,$newEle);
+            if($res) {
+               return $res;
+            } else {
+               continue;
+            }
+         }
+
+         // the limit of the char count reached
+         if(mb_strlen($ele->nodeValue,$this->encoding) + $this->charCount >= $this->limit){
+            $newEle = $this->newDiv->importNode($ele);
+            $newEle->nodeValue = 
+                substr($newEle->nodeValue,0, $this->limit - $this->charCount)
+                . $this->endChars;
+            $newParent->appendChild($newEle);
+            return true;
+         }
+         $newEle = $this->newDiv->importNode($ele);
+         $newParent->appendChild($newEle);
+         $this->charCount += mb_strlen($newEle->nodeValue,$this->encoding);
+      }
+      return false;
+   }
+   
+   public function __toString()
+   {
+      return $this->cut();
+   }
+}
+
 /**
  * Zkrácení textu s XHTML značkami
  * @param string $s -- zkracovaný řetězec bez komentářů a bloků skriptu
@@ -41,6 +121,8 @@ function vve_tpl_xhtml_cut($text, $length = 100, $ending = '...', $exact = false
 {
    // only execute if text is longer than desired length
    if (mb_strlen(strip_tags($text)) > $length) {
+      $cutter = new HtmlCutString($text, $length);
+      return $cutter->cut();
       if ($considerHtml) {
          // if the plain text is shorter than the maximum length, return the whole text
          if (strlen(preg_replace('/<.*?>/', '', $text)) <= $length) {
