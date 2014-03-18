@@ -441,7 +441,7 @@ class Install_Core {
     * Metoda pro aktualizaci jazyků
     * @param array $langs pole s jazyky
     */
-   public static function updateIsntaledLangs($langs)
+   public static function updateInstalledLangs($langs)
    {
       $modelCat = new Model_Category();
       $modelPanels = new Model_Panel();
