@@ -43,11 +43,10 @@ class Form_Element_File extends Form_Element {
 
    /**
     * Metoda naplní element
-    * @param string $method -- typ metody přes kterou je prvek odeslán (POST|GET)
     * @todo dodělat vytváření unikátních názvů souborů a overwrite
     */
    public function populate() {
-      if(isset ($_FILES[$this->getName()])) {
+      if(isset ($_FILES[$this->getName()]) && $_FILES[$this->getName()]['error'] != UPLOAD_ERR_NO_FILE) {
          if($this->isDimensional()) {
             foreach ($_FILES[$this->getName()]['name'] as $key => $filename) {
                $this->uploadFile(
