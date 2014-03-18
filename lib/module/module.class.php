@@ -44,8 +44,11 @@ class Module
     * @param array $params
     * @param null $version - verze instalovaného modulu
     */
-   public function  __construct($name, $params = array(), $version = null)
+   public function  __construct($name = null, $params = array(), $version = null)
    {
+      if(!$name){
+         $name = strtolower(str_replace('_Module', '', get_class($this)));
+      }
       $this->name = $name;
       $this->params = $params;
       $this->dataDir = $name;
@@ -168,6 +171,10 @@ class Module
       if (is_file($installDir.$phpFile)) {
          include $installDir.$phpFile;
       }
+      // install langs
+      foreach (Locales::getAppLangs() as $lang) {
+         $this->installLang($lang);
+      }
       // register module
       $model = new Model_Module();
       $model->registerInstaledModule($this->name, $this->version);
@@ -179,9 +186,11 @@ class Module
    protected function installDependentModules()
    {
       foreach ($this->depModules as $module) {
-//         Debug::log($module, Model_Module::isInstalled($module));
          if(!Model_Module::isInstalled($module)){
             $mClass = ucfirst($module) . '_Module';
+            /**
+             * @todo dodělat dinamické generování třídy modulu
+             */
             if(!class_exists($mClass)){
                $mClass = 'Module';
             }
@@ -257,8 +266,47 @@ class Module
          $link->redirect();
       }
    }
+   
+   /**
+    * metoda pro instalaci požadovaného jazyka
+    * @param type $lang
+    */
+   public function installLang($lang)
+   {
+      $models = $this->getModels();
+      if(!empty($models)){
+         foreach ($models as $modelName) {
+            $model = new $modelName();
+            if($model instanceof Model_ORM){
+               $model->updateLangColumns($lang);
+            }
+         }
+      }
+   }
 
-   protected function replaceDBPrefix($cnt)
+   protected function getModels() {
+      $dir = $this->getModuleDir().'model'.DIRECTORY_SEPARATOR;
+      $files = glob($dir.'*.php');
+      if(empty($files)){
+         return;
+      }
+      
+      $models = array();
+      foreach ($files as $file) {
+         $file = str_replace('.class.php', '', basename($file));
+         if($file == 'model'){
+            $modelClass = ucfirst($this->getName()).'_'.ucfirst($file);
+         } else {
+            $modelClass = ucfirst($this->getName()).'_Model_'.ucfirst($file);
+         }
+         if(class_exists($modelClass)){
+            $models[] = $modelClass;
+         }
+      }
+      return $models;
+   }
+
+protected function replaceDBPrefix($cnt)
    {
       return str_replace(Install_Core::SQL_TABLE_PREFIX_REPLACEMENT, VVE_DB_PREFIX, $cnt);
    }

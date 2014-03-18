@@ -53,6 +53,7 @@ class Model_ORM extends Model implements ArrayAccess {
       'comment' => null,
       'characterset' => 'utf8',
       'collate' => 'utf8_general_ci',
+      'collateautodetect' => true,
       'lenght' => null,
       'readonly' => false,
       'name' => null,
@@ -1825,6 +1826,122 @@ class Model_ORM extends Model implements ArrayAccess {
       if ($this->joinString == null)
          $this->createSQLSelectJoinColumns(array()); // provede vytvoření sloupců
       $sql .= $this->joinString; // je vytvořen v přípravě sloupců
+   }
+   
+   /**
+    * Aktualizace sloupce s jazykovými mutacemi
+    * @param string $lang -- kód jazyka
+    */
+   public function updateLangColumns($lang)
+   {
+      if($this->tableExist()){
+         foreach ($this->tableStructure as $colName => $colParams) {
+            if($colParams['lang'] && !$this->columnExist($colName.'_'.$lang)){
+               $this->createColumn($colName.'_'.$lang, $colParams);
+            }
+         }
+      }
+   }
+
+   public function columnExist($name)
+   {
+      $sql = 'SELECT COUNT(*) AS count FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE table_name = :tablename AND table_schema = DATABASE() AND column_name = :colname';
+      
+      $db = $this->getDb()->prepare($sql);
+      $db->bindValue(':colname', $name);
+      $db->bindValue(':tablename', $this->getTableName());
+      $db->setFetchMode(PDO::FETCH_OBJ);
+      $db->execute();
+      $result = $db->fetch();
+      return (isset($result->count) && $result->count > 0 ) ? true : false;
+   }
+   
+   public function tableExist()
+   {
+      $sql = 'SELECT COUNT(*) AS count FROM INFORMATION_SCHEMA.TABLES
+        WHERE table_name = :tablename AND table_schema = DATABASE()';
+      
+      $db = $this->getDb()->prepare($sql);
+      $db->bindValue(':tablename', $this->getTableName());
+      $db->setFetchMode(PDO::FETCH_OBJ);
+      $db->execute();
+      $result = $db->fetch();
+      return (isset($result->count) && $result->count > 0 ) ? true : false;
+   }
+   
+   public function createColumn($name, $params = array())
+   {
+      $params += self::$defaultColumnParams;
+      $datatype = strtoupper($params['datatype']);
+      
+      $sql = 'ALTER TABLE '.$this->getTableName();
+      // column
+      $sql .= ' ADD '.$name.' '.$datatype;
+      // kódování
+      if(strpos($datatype, 'CHAR') !== false || strpos($datatype, 'TEXT') !== false){
+         $collate = $params['collate'];
+         // korekce podle jazyka
+         if($params['lang'] && $params['collateautodetect']){
+            switch (substr($name, -2)) {
+               case 'cs':
+                  $collate = 'utf8_czech_ci';
+                  break;
+               case 'sk':
+                  $collate = 'utf8_slovak_ci';
+                  break;
+               case 'da':
+                  $collate = 'utf8_danish_ci';
+                  break;
+               case 'es':
+                  $collate = 'utf8_spanish_ci';
+                  break;
+               case 'pl':
+                  $collate = 'utf8_polish_ci';
+                  break;
+               case 'sv':
+                  $collate = 'utf8_swedish_ci';
+                  break;
+               case 'hu':
+                  $collate = 'utf8_hungarian_ci';
+                  break;
+               case 'lt':
+                  $collate = 'utf8_lithuanian_ci';
+                  break;
+               case 'et':
+                  $collate = 'utf8_estonian_ci';
+                  break;
+               case 'sl':
+                  $collate = 'utf8_slovenian_ci';
+                  break;
+               case 'is':
+                  $collate = 'utf8_icelandic_ci';
+                  break;
+               case 'lv':
+                  $collate = 'utf8_latvian_ci';
+                  break;
+               default:
+                  $collate = 'utf8_general_ci';
+                  break;
+            }
+         }
+         
+         $sql .= ' CHARACTER SET \'utf8\' COLLATE \''.$collate.'\'';
+      }
+      // výchozí parametry a nulová hodnota
+      $sql .= ' '.($params['nn'] ? 'NOT NULL' : 'NULL');
+      if($params['default'] !== null){
+         $sql .= ' DEFAULT '.$params['default'];
+      }
+      
+      // fulltext
+      if($params['fulltext']){
+         $sql .= ', ADD FULLTEXT INDEX `'.$name.'` (`'.$name.'` ASC)';
+      }
+      
+      $sql .= ';';
+      $this->getDb()->exec($sql);
+//      var_dump($sql);
    }
 
    /* vložení hodnot so sql částí */

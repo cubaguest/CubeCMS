@@ -436,4 +436,35 @@ class Install_Core {
          setcookie('upgrade', '', time() - 3600);
       }
    }
+   
+    /**
+    * Metoda pro aktualizaci jazyků
+    * @param array $langs pole s jazyky
+    */
+   public static function updateIsntaledLangs($langs)
+   {
+      $modelCat = new Model_Category();
+      $modelPanels = new Model_Panel();
+      $modelCfgGroups = new Model_ConfigGroups();
+      foreach ($langs as $lang) {
+         $modelCat->updateLangColumns($lang);
+         $modelPanels->updateLangColumns($lang);
+         $modelCfgGroups->updateLangColumns($lang);
+      }
+      
+      $modelModules = new Model_Module();
+      $modules = $modelModules->records();
+      foreach ($modules as $module) {
+         $className = ucfirst($module->{Model_Module::COLUMN_NAME}).'_Module';
+         if(class_exists($className)){
+            $mod = new $className();
+//            var_dump('Aktualizace modulu '.$className.' '.$mod->getName());
+            foreach ($langs as $lang) {
+               $mod->installLang($lang);
+            }
+         }
+      }
+      Log::msg('Proběhla aktualizace jazykových sloupů');
+      AppCore::getInfoMessages()->addMessage('Aktualizace jazyků proběhla úspěšně');
+   }
 }

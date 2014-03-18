@@ -1,0 +1,8 @@
+NEW:
+- Přidána podpora pro callback funkce v konfiguraci
+- Přidána implementace automatické instalace jazykových sloupců
+- Přidána jazyk Dánštině, Australská angličtina, Americká angličtina
+
+FIXED:
+- oprava vytváření složek pro less v keši
+

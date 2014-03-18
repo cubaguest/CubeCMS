@@ -57,9 +57,21 @@ class Locales extends TrObject {
    private static $locales = array("cs" => "cs_CZ.UTF-8",
                                    "en" => "en_US.UTF-8",
                                    "de" => "de_DE.UTF-8",
-                                   "sk" => "sk_SK.UTF-8",
                                    "ru" => "ru_RU.UTF-8",
-                                   "pl" => "pl_PL.UTF-8");
+                                   "sk" => "sk_SK.UTF-8",
+                                   "au" => "en_AU.UTF-8",
+                                   "us" => "en_US.UTF-8",
+                                   "da" => "da_DK.UTF-8",
+                                   "es" => "es_ES.UTF-8",
+                                   "pl" => "pl_PL.UTF-8",
+                                   "lv" => "lat.UTF-8",
+                                   "is" => "is_IS.UTF-8",
+                                   "sl" => "sl_SL.UTF-8",
+                                   "et" => "et_EE.UTF-8",
+                                   "lt" => "lt_LT.UTF-8",
+                                   "hu" => "hu.UTF-8",
+                                   "sv" => "sv_SE.UTF-8",
+       );
 
    /**
     * Pole s podobnými jazyky (je použito při výchozím nasatvení jazyku)
@@ -233,10 +245,22 @@ class Locales extends TrObject {
       $tr = new Translator();
       self::$localesNames = array("cs" => $tr->tr('Česky'),
                                   "en" => $tr->tr('English'),
+                                  "au" => $tr->tr('English (AUS)'),
+                                  "us" => $tr->tr('English (USA)'),
                                   "de" => $tr->tr('Deutsch'),
                                   "ru" => $tr->tr('Pусский'),
                                   "sk" => $tr->tr('Slovensky'),
-                                  "pl" => $tr->tr('Polski'));
+                                  "da" => $tr->tr('Danish'),
+                                  "es" => $tr->tr('Spanish'),
+                                  "pl" => $tr->tr('Polski'),
+                                  "lv" => $tr->tr('Latvian'),
+                                  "is" => $tr->tr('Icelandic'),
+                                  "sl" => $tr->tr('Slovenian'),
+                                  "et" => $tr->tr('Estonian'),
+                                  "lt" => $tr->tr('Lithuanian'),
+                                  "hu" => $tr->tr('Hungarian'),
+                                  "sv" => $tr->tr('Swedish'),
+          );
    }
 
    /**

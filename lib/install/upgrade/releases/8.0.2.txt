@@ -1,0 +1,17 @@
+NEW:
+- Podpora dalších autentizačních mechanismů (zatím google a openid)
+- Všechny VVE_ konstany jsou nyní přístupné i přes CUBE_CMS_ konstanty
+- Přidána podpora pro bootstrap soubor pro nastavení aplikace /config/bootstrap.php
+- Kontroler nyní podporuje parametry stejných názvů jaké jsou definovány v cestě modulu.
+- V ORM modelu lze nyní definovat třído pro obsluhu jednotlivých záznamů. Stačí do proměnné $rowClass přiřadit název třídy se záznamem.
+- Implementace základní kostry pro tree záznamy v DB
+
+EDIT:
+- Přepsání systému autentizace.
+- Přespání vytváření cest modulu. Nyní nejsou všechny parametry povinné.
+- Přidání metody pro výběr parametru z aktuální šablony
+
+FIXED:
+- seznam souborů a kategorií pro TinyMCE
+- oprava výběru parametru šablony
+

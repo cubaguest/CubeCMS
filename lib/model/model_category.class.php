@@ -84,7 +84,7 @@ class Model_Category extends Model_ORM {
 
       $this->addColumn(self::COLUMN_ID, array('datatype' => 'smallint', 'ai' => true, 'nn' => true, 'pk' => true));
       $this->addColumn(self::COLUMN_ID_USER_OWNER, array('datatype' => 'smallint', 'nn' => true, 'default' => 0));
-      $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(100)', 'lang' => true, 'pdoparam' => PDO::PARAM_STR, 'fulltext' => true, 'fulltextRel' => VVE_SEARCH_ARTICLE_REL_MULTIPLIER+1));
+      $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(200)', 'lang' => true, 'pdoparam' => PDO::PARAM_STR, 'fulltext' => true, 'fulltextRel' => VVE_SEARCH_ARTICLE_REL_MULTIPLIER+1));
       $this->addColumn(self::COLUMN_ALT, array('datatype' => 'varchar(200)', 'lang' => true, 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_URLKEY, array('datatype' => 'varchar(100)', 'lang' => true, 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_DISABLE, array('datatype' => 'tinyint(1)', 'lang' => true, 'pdoparam' => PDO::PARAM_BOOL, 'nn' => true, 'default' => 0));

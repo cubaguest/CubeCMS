@@ -28,6 +28,7 @@ class Model_Config extends Model_ORM {
    const COLUMN_TYPE = 'type';
    const COLUMN_LABEL = 'label';
    const COLUMN_HIDDEN = 'hidden_value';
+   const COLUMN_CALLBACK = 'callback_func';
 
    const TYPE_STRING = 'string';
    const TYPE_NUMBER = 'number';
@@ -48,6 +49,7 @@ class Model_Config extends Model_ORM {
       $this->addColumn(self::COLUMN_PROTECTED, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => false));
       $this->addColumn(self::COLUMN_TYPE, array('datatype' => 'varchar(15)', 'pdoparam' => PDO::PARAM_STR, 'default' => 'string')); // ENUM
       $this->addColumn(self::COLUMN_HIDDEN, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => false));
+      $this->addColumn(self::COLUMN_CALLBACK, array('datatype' => 'varchar(40)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
 
       $this->setPk(self::COLUMN_ID);
 
