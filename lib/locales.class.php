@@ -71,6 +71,7 @@ class Locales extends TrObject {
                                    "lt" => "lt_LT.UTF-8",
                                    "hu" => "hu.UTF-8",
                                    "sv" => "sv_SE.UTF-8",
+                                   "fr" => "fr_FR.UTF-8",
        );
 
    /**
@@ -260,6 +261,7 @@ class Locales extends TrObject {
                                   "lt" => $tr->tr('Lithuanian'),
                                   "hu" => $tr->tr('Hungarian'),
                                   "sv" => $tr->tr('Swedish'),
+                                  "fr" => $tr->tr('Français'),
           );
    }
 
