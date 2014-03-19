@@ -726,7 +726,7 @@ class Form_Element extends TrObject implements Form_Element_Interface {
             } else {
                $this->html()->setAttrib('name', $this->getName().'['.$langKey.']');
                $this->html()->setAttrib('id', $this->getName().'_'.$rKey.'_'.$langKey);
-               $this->html()->setAttrib('value', htmlspecialchars($values[$langKey]));
+               $this->html()->setAttrib('value', htmlspecialchars(isset($values[$langKey]) ? $values[$langKey] : null));
                $container->setAttrib('id', $this->getName().'_container_'.$langKey);
             }
             $this->html()->setAttrib('lang', $langKey);
