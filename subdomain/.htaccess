@@ -20,6 +20,9 @@ Rewriterule ^jscripts/(.*)$ http://www.cube-cms.com/jscripts/$1 [R=301,L,QSA]
 RewriteCond $1 ^images/
 RewriteCond %{REQUEST_FILENAME} !-f
 Rewriterule (.*) http://www.cube-cms.com/$1 [L]
+RewriteCond $1 ^fonts/
+RewriteCond %{REQUEST_FILENAME} !-f
+Rewriterule (.*) http://www.cube-cms.com/$1 [L]
 RewriteCond $1 ^data/
 RewriteCond %{REQUEST_FILENAME} !-f
 Rewriterule (.*) http://www.cube-cms.com/$1 [L]
