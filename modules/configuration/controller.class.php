@@ -71,7 +71,7 @@ class Configuration_Controller extends Controller {
       $modelCfgLocal->joinFK(Model_Config::COLUMN_ID_GROUP, array('gname' => Model_ConfigGroups::COLUMN_NAME, 'gdesc' => Model_ConfigGroups::COLUMN_DESC))
          ->where(Model_Config::COLUMN_PROTECTED.' != 1 AND '.Model_Config::COLUMN_ID_GROUP.' != 1', array())
          ->order(array(Model_Config::COLUMN_ID_GROUP, Model_Config::COLUMN_KEY));//, 'ISNULL('.Model_Config::COLUMN_LABEL.')'
-
+      
       $configsRecordsLocal = $modelCfgLocal->records();
       
 
@@ -88,8 +88,8 @@ class Configuration_Controller extends Controller {
       foreach (array_merge($configsRecordsGlobal, $configsRecordsLocal) as $record) {
          if(!isset ($groups[$record->{Model_Config::COLUMN_ID_GROUP}])){
             $groups[$record->{Model_Config::COLUMN_ID_GROUP}] = array(
-               'name' => $record->gname,
-               'desc' => $record->gdesc,
+               'name' => $record->gname->getValue(false, 'cs'),
+               'desc' => $record->gdesc->getValue(false, 'cs'),
             );
             $options[$record->{Model_Config::COLUMN_ID_GROUP}] = array();
          }
@@ -197,19 +197,33 @@ class Configuration_Controller extends Controller {
       }
 
       if($form->isValid()){
+         $vals = $form->value->getValues();
          if($form->value instanceof Form_Element_TextArea
             OR $form->value instanceof Form_Element_Text
             OR $form->value instanceof Form_Element_Radio){
-            $opt->{Model_Config::COLUMN_VALUE} = $form->value->getValues();
+            $opt->{Model_Config::COLUMN_VALUE} = $vals;
          } else if($form->value instanceof Form_Element_Select){
-            $vals = $form->value->getValues();
             if(is_array($vals)){
                $opt->{Model_Config::COLUMN_VALUE} = implode(';', $vals);
             } else {
                $opt->{Model_Config::COLUMN_VALUE} = $vals;
             }
          }
-
+         
+         if($opt->{Model_Config::COLUMN_CALLBACK} != null){
+            $fnParts = explode('::', $opt->{Model_Config::COLUMN_CALLBACK});
+            
+            if(count($fnParts) == 1){
+               // funkce
+               $handler = $fnParts[0];
+            } else if (count($fnParts) == 2){
+               // metoda
+               $handler = array($fnParts[0], $fnParts[1]);
+            }
+            if(is_callable($handler)){
+               call_user_func_array($handler, array($vals));
+            }
+         }
          $model->save($opt);
          $this->infoMsg()->addMessage($this->tr('Volba byla uložena'));
          $this->link()->route()->reload();
