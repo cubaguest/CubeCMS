@@ -402,7 +402,8 @@ protected function replaceDBPrefix($cnt)
       // kvůli pozdější implementaci překladače, tady nechme převod na řetězec
       $l = null;
       if(is_array($labels)){
-         $l = isset($labels[Locales::getLang()]) ? $labels[Locales::getLang()] : $labels[Locales::getDefaultLang()];
+         $l = isset($labels[Locales::getLang()]) ? $labels[Locales::getLang()] : 
+            ( isset($labels[Locales::getDefaultLang()]) ? $labels[Locales::getDefaultLang()] : $labels['cs'] );
       } else {
          $l = (string)$labels;
       }
@@ -432,7 +433,8 @@ protected function replaceDBPrefix($cnt)
       // kvůli pozdější implementaci překladače, tady nechme převod na řetězec
       $l = null;
       if(is_array($labels)){
-         $l = isset($labels[Locales::getLang()]) ? $labels[Locales::getLang()] : $labels[Locales::getDefaultLang()];
+         $l = isset($labels[Locales::getLang()]) ? $labels[Locales::getLang()] : 
+            ( isset($labels[Locales::getDefaultLang()]) ? $labels[Locales::getDefaultLang()] : $labels['cs'] );
       } else {
          $l = (string)$labels;
       }

@@ -179,4 +179,21 @@ class Model_ORM_LangCell implements ArrayAccess, Countable, Iterator {
    {
       return $this->values;
    }
+   
+   public function getValue($lang = false, $backupLang = false)
+   {
+      if(!$lang ){
+         $lang = Locales::getLang();
+      }
+      
+      if(isset($this->values[$lang]) && $this->values[$lang] != null){
+         return $this->values[$lang];
+      }
+      
+      if($backupLang && isset($this->values[$backupLang])){
+         return $this->values[$backupLang];
+      }
+      return (string)null;
+   }
+
 }

@@ -452,6 +452,25 @@ class Install_Core {
          $modelCfgGroups->updateLangColumns($lang);
       }
       
+      if(CUBE_CMS_SHOP){
+         $dir = AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR.DIRECTORY_SEPARATOR.'shop'.DIRECTORY_SEPARATOR.'model'.DIRECTORY_SEPARATOR;
+         $files = glob($dir.'*.php');
+         if(!empty($files)){
+            foreach ($files as $file) {
+               $file = str_replace(arraY('.class.php', 'shop_model_'), array('', ''), basename($file));
+               $modelClass = 'Shop_Model_'.ucfirst($file);
+               if(class_exists($modelClass)){
+                  $model = new $modelClass();
+                  if($model instanceof Model_ORM){
+                     foreach ($langs as $lang) {
+                        $model->updateLangColumns($lang);
+                     }
+                  }
+               }
+            }  
+         }
+      }
+      
       $modelModules = new Model_Module();
       $modules = $modelModules->records();
       foreach ($modules as $module) {
