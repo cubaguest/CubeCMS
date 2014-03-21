@@ -40,6 +40,7 @@ class Model_ORM extends Model implements ArrayAccess {
    private $pKey = null;
    private $foreignKeys = array();
    private $getAllLangs = true;
+   private $assignLang = false;
    private static $defaultColumnParams = array(
       // parametry v db
       'datatype' => 'VARCHAR(45)', // typ sloupce
@@ -416,6 +417,10 @@ class Model_ORM extends Model implements ArrayAccess {
       return $this->getRow($obj, $fetchParams);
    }
 
+   /**
+    * Nový objekt záznamu
+    * @return Model_ORM_Record
+    */
    public function newRecord()
    {
       return new $this->rowClass($this->tableStructure, false, $this);
@@ -1285,10 +1290,14 @@ class Model_ORM extends Model implements ArrayAccess {
          $this->where = null;
          $this->whereBindValues = array();
       }
-      // pokud je jenom hodnota bere se primary key
-      else if ($bindValues === null) {
+      // pokud je jenom hodnota bere se primary key, nesmí obsahovat rovnítko a mezeru
+      else if ($bindValues === null && strpos($cond, '=') === false && strpos($cond, ' ') === false) {
          $bindValues = array('col' => $cond);
          $cond = $this->pKey . ' = :col';
+      }
+      // pokud je jenom podmínka
+      else if ($bindValues === null) {
+         $bindValues = array();
       }
       // pokud je sloupec a hodnota
       else if ($bindValues !== null AND !is_array($bindValues)) {
@@ -1303,6 +1312,28 @@ class Model_ORM extends Model implements ArrayAccess {
          $this->whereBindValues = array_merge($this->whereBindValues, $bindValues);
       }
       return $this;
+   }
+   
+   /**
+    * Podmínka s AND
+    * @param string $cond - podmínka
+    * @param array $values - hodnoty
+    * @return Model_ORM
+    */
+   public function whereAnd($cond, $values)
+   {
+      return $this->where(' AND '.$cond, $values, true);
+   }
+   
+   /**
+    * Podmínka s OR
+    * @param string $cond - podmínka
+    * @param array $values - hodnoty
+    * @return Model_ORM
+    */
+   public function whereOr($cond, $values)
+   {
+      return $this->where(' OR '.$cond, $values, true);
    }
 
    /**
