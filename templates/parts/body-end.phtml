@@ -1,12 +1,12 @@
 <?php
-if(VVE_DEBUG_LEVEL > 1) {
+if(VVE_DEBUG_LEVEL > 1 && !Template::browser()->isMobile() ) {
    $this->addFile('css://debug.less');
    ?>
    <div id="debug">
       <div>
          <table>
             <caption><?php ps($this->tr('Infomrace o jádře'))?></caption>
-            <tr class="row">
+            <tr class="section-name">
                <td colspan="4">CORE</td>
             </tr>
             <tr>
@@ -46,7 +46,7 @@ if(VVE_DEBUG_LEVEL > 1) {
                <td><?php ps(Category::getSelectedCategory()->getId())?></td>
             </tr>
             <?if(function_exists('xdebug_get_function_count')){?>
-            <tr class="row">
+            <tr class="section-name">
                <td colspan="4">XDEBUG</td>
             </tr>
             <tr>
@@ -64,7 +64,7 @@ if(VVE_DEBUG_LEVEL > 1) {
                <td><?php ps(xdebug_time_index())?></td>
             </tr>
             <?}?>
-            <tr class="row">
+            <tr class="section-name">
                <td colspan="4">Optimalizace</td>
             </tr>
             <tr>
