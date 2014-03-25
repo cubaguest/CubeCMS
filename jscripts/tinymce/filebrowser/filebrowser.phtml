@@ -1,0 +1,123 @@
+<?php
+$jq = new JsPlugin_JQuery();
+//$jq->addUISelectable();
+//$jq->addUIDraggable();
+$this->addJsPlugin($jq);
+$this->addCssFile('filebrowser.css');
+$this->addJsPlugin(new JsPlugin_SWFUpload());
+
+if(Auth::isLogin() == false){
+   echo 'Nemáte práv k přístupu. Zkuste se přihlásit.';
+   die;
+}
+
+echo ('<?xml version="1.0" encoding="utf-8"?>');
+?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?=Locales::getLang()?>" lang="<?=Locales::getLang()?>">
+   <head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/tinymce/tiny_mce.js"></script>
+<script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/tinymce/tiny_mce_popup.js"></script>
+<script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/filebrowser/filebrowser.js"></script>
+{*-STYLESHEETS-*}
+{*-JAVASCRIPTS-*}
+   </head>
+   <body>
+   <script language="javascript" type="text/javascript">
+   $(document).ready(function(){
+      // počáteční nastavení
+      FileBrowser.uploadLink = '<?=$this->uploadLink?>';
+      FileBrowser.baseUrl = '<?=Url_Request::getBaseWebDir();?>';
+      FileBrowser.sessionId = '<?=session_id()?>';
+      FileBrowser.listType = 'fil';
+      tinyMCEPopup.onInit.add(FileBrowserDialogue.init, FileBrowserDialogue);
+   });
+   var imageBigSizeW = <?=VVE_DEFAULT_PHOTO_W?>;
+   var imageBigSizeH = <?=VVE_DEFAULT_PHOTO_H?>;
+   var imageSmallSizeW = <?=VVE_IMAGE_THUMB_W?>;
+   var imageSmallSizeH = <?=VVE_IMAGE_THUMB_H?>;
+   var maxUploadFileSize = <?=VVE_MAX_UPLOAD_SIZE?>; // in MB
+   var cookieName = '<?=VVE_SESSION_NAME?>_Cube_Cms_brpath';
+   var tips = new Array('Pomocí klávesy CTRL a SHIFT lze označit více položek najednou.',
+                        'Při označení více obrázků jsou akce aplikovány na všechny.',
+                        'Přesun a kopírování položek lze pomocí chránky.',
+                        'Při nahrávání obrázků z fotoaparátu je nutné obrázek zmenšit.'
+                        );
+   </script>
+      <table style="" id="mainTable" cellpadding="0" cellspacing="3">
+   <tr>
+      <th style="width: 400px; height: 30px;">
+         Cesta:&nbsp;<span id="currentPath" class="small-font"></span>
+      </th>
+      <th style="width: 330px;">Info:&nbsp;<span id="currentFile" class="small-font"></span></th>
+   </tr>
+   <tr valign="top">
+      <td rowspan="3" style="width: 400px; height: 350px;">
+         <ul id="itemsList">
+            <li><?=_('Nenačteno')?></li>
+         </ul>
+      </td>
+      <td style="height: 150px;padding: 0;margin: 0;">
+         <div id="infoBox"></div>
+      </td>
+   </tr>
+   <tr>
+      <th>Nástroje: <input type="checkbox" name="apply_all" checked="checked" />&nbsp;<span class="small-font">Použít na všechny označené položky</span></th>
+   </tr>
+   <tr>
+      <td style="height: 170px;">
+         <div id="fileActions"></div>
+      </td>
+   </tr>
+   <tr valign="top">
+      <td>
+         <div>
+            <div style="float: left" class="swfupload-control"><span id="spanButtonPlaceholder"></span></div>
+            <span id="uploading-files"><img src="../../../images/progress.gif" alt="loading..." width="16"/></span>&nbsp;Max:<?=VVE_MAX_UPLOAD_SIZE?>MB
+            <div style="float: right">
+               <input id="buttonGoPublic" type="image" src="../../../images/icons/folder_star.png" title="Přejít do veřejné složky" onclick="FileBrowser.goPublic()" />
+               <input id="buttonGoHome" type="image" src="../../../images/icons/house.png" title="Přejít do osobní složky" onclick="FileBrowser.goHome()" />
+               <span class="buttons-separator">&nbsp;</span>
+               <input id="buttonCreateDir" class="buttons" type="image" src="../../../images/icons/folder_add.png"
+                      title="Vytvořit složku" onclick="FileBrowser.createDir()" />
+               <span class="buttons-separator">&nbsp;</span>
+               <input id="buttonDelete" class="buttons" type="image" src="../../../images/icons/delete.png"
+                      title="Smazat" onclick="FileBrowser.deleteItems()" />
+               <input id="buttonRename" class="buttons" type="image" src="../../../images/icons/pencil.png"
+                   title="Přejmenovat" onclick="FileBrowser.renameItems()" />
+               <span class="buttons-separator">&nbsp;</span>
+               <input id="buttonCopy" class="buttons" type="image" src="../../../images/icons/page_copy.png"
+                   title="Kopírovat" onclick="FileBrowser.clipboardCopy()" />
+               <input id="buttonCut" class="buttons" type="image" src="../../../images/icons/cut.png"
+                   title="Vyjmout" onclick="FileBrowser.clipboardCut()" />
+               <input id="buttonPaste" class="buttons" type="image" src="../../../images/icons/page_paste.png"
+                   title="Vložit" onclick="FileBrowser.clipboardPaste()" />
+               <span class="buttons-separator">&nbsp;</span>
+               <input id="buttonRefresh" type="image" src="../../../images/icons/view-refresh.png"
+                      title="Obnovit složky" onclick="FileBrowser.load()" />
+            </div>
+         </div>
+      </td>
+      <td align="right">
+         <form name="form">
+            <input type="button" value="Vložit" onClick="FileBrowserDialogue.submitFile();" />
+         </form>
+      </td>
+   </tr>
+   <tr>
+      <td style="position: relative;">Log:
+         <a href="#" title="Vyčistit" onclick="FileBrowser.clearLog();return false;">vyčistit</a>
+         <a href="#" title="Další TIP" onclick="FileBrowser.showTip();return false;">další TIP</a>
+         <div id="log" style="height: 50px;"></div></td>
+      <td>Schránka: <a href="#" title="Vyčistit" onclick="FileBrowser.clipboardClear();return false;">vyčistit</a><ul id="clipboard" style="height: 50px;"></ul></td>
+   </tr>
+</table>
+      <div id="working" style="display: none;">
+         <p>
+            Zpracovávám...
+            <img src="<?=Url_Request::getBaseWebDir()?>images/ajaxProgress.gif" alt="..." /><br />
+            <span style="font-size: xx-small">(Pokud zpracování trvá příliš dlouho, zkuste klávesou F5 obnovit stránku.)</span>
+         </p>
+      </div>
+</body>
+</html>

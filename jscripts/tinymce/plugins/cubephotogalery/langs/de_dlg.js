@@ -1,1 +1,43 @@
-tinyMCE.addI18n('de.advimage_dlg',{"image_list":"Bilderliste","align_right":"Rechts","align_left":"Links","align_textbottom":"Unten im Text","align_texttop":"Oben im Text","align_bottom":"Unten","align_middle":"Mittig","align_top":"Oben","align_baseline":"Zeile",align:"Ausrichtung",hspace:"Horizontaler Abstand",vspace:"Vertikaler Abstand",dimensions:"Ausma\u00dfe",border:"Rahmen",list:"Bilderliste",alt:"Beschreibung",src:"Adresse","dialog_title":"Bild einf\u00fcgen/ver\u00e4ndern","missing_alt":"Wollen Sie wirklich keine Beschreibung eingeben? Bestimmte Benutzer mit k\u00f6rperlichen Einschr\u00e4nkungen k\u00f6nnen so nicht darauf zugreifen, ebenso solche, die einen Textbrowser benutzen oder die Anzeige von Bildern deaktiviert haben.","example_img":"Vorschau auf das Aussehen",misc:"Verschiedenes",mouseout:"bei keinem Mauskontakt",mouseover:"bei Mauskontakt","alt_image":"Alternatives Bild","swap_image":"Bild austauschen",map:"Image-Map",id:"ID",rtl:"Rechts nach links",ltr:"Links nach rechts",classes:"Klassen",style:"Format","long_desc":"Ausf\u00fchrliche Beschreibung",langcode:"Sprachcode",langdir:"Schriftrichtung","constrain_proportions":"Seitenverh\u00e4ltnis beibehalten",preview:"Vorschau",title:"Titel",general:"Allgemein","tab_advanced":"Erweitert","tab_appearance":"Aussehen","tab_general":"Allgemein"});
+tinyMCE.addI18n('de.cubephotogalery_dlg',{
+   tab_general:"Z\u00E1kladn\u00ED",
+   //tab_appearance:"Appearance",
+   tab_advanced:"Pokro\u010Dil\u00E9",
+   tab_html:"HTML",
+   dialog_title:"Vlo\u017Een\u00ED fotogalerie", 
+   
+   general:"Z\u00E1kladn\u00ED",
+   uploadstatus:"Nahr\u00E1v\u00E1n\u00ED",
+   
+   images:"Obr\u00E1zky",
+   select_images:"Vybrat obr\u00E1zky",
+   selected_images:"Vybr\u00E1not obr\u00E1zk\u016F",
+   directory:"Adres\u00E1\u0159",
+   galery_name:"N\u00E1zev galerie",
+   dir_name:"N\u00E1zev adres\u00E1\u0159e",
+   
+   statusuploading : "Nahr\u00E1v\u00E1m",
+   statusready : "P\u0159ipraveno",
+   statusnotready : "Nen\u00ED vybr\u00E1n",
+   uploaded : "Nahr\u00E1no",
+   images_loaded : "Nahran\u00e9 a  p\u0159ipraven\u00e9 obr\u00e1zky",
+   insert_with_error_upload : "Nekter\u00e9 obr\u00e1zky se nepoda\u0159ilo nahr\u00e1t. Chcete opravdu vlo\u017eit nekompletn\u00ed galerii?",
+   
+   classes : "T\u0159\u00eddy",
+   label : "Popisek",
+   label_add : "P\u0159idat popisek",
+   style : "Styly",
+   html_settings : "Nastaven\u00ed HTML",
+   image_settings : "Nastaven\u00ed obr\u00e1zk\u016f",
+   link_settings : "Nastaven\u00ed odkaz\u016f",
+   preview_in : "N\u00e1hled v",
+   wrapper:"Element obalu",
+   
+   /* msgs */
+   error_unknown : 'Nezn\u00E1m\u00E1 chyba',
+   error_file_queue_size_limit : 'Obr\u00E1zek "{0}" je p\u0159\u00EDli\u0161 velk\u00FD',
+   error_file_queue_indorrect_file : 'Neplatn\u00FD typ obr\u00E1zku. Soubor "{0}".',
+   error_file_queue_zero_file : 'Obr\u00E1zek "{0}" m\u00E1 nulovou velikost',
+   error_no_galery : '\u017D\u00E1dn\u00FD obr\u00E1zek nebyl vybr\u00E1n. Chcete pokra\u010Dovat?',
+   
+   image_list:"Image list"
+});

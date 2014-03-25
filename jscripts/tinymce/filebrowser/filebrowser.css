@@ -1,0 +1,136 @@
+body {position: relative;}
+div,p,span,ul,ol,li,a,a:link,input,button, hr {
+   margin: 0;
+   list-style: none;
+   padding: 0;
+   outline: none;
+}
+
+#itemsList, #fileActions, #infoBox, #log, #clipboard {
+   background:white none repeat scroll 0 0;
+   border:1px solid gray;
+   font-size:10px !important;
+   height:100%;
+   width: 100%;
+   overflow:auto;
+}
+
+#fileActions, #infoBox {
+   overflow: auto;
+   white-space: pre-wrap;
+   width: 330px;
+}
+#fileActions p {
+   padding: 5px;
+}
+#fileActions hr {
+   height: 1px;
+   margin: 3px 0;
+}
+
+#itemsList {
+   list-style: none;
+   overflow: auto;
+   /*      width:200px;*/
+   /*      height: 350px;*/
+}
+
+#itemsList li a, #itemsList li a:link, #itemsList li a:visited {
+   cursor: pointer;
+   outline: 0;
+   text-decoration: none;
+}
+
+#mainTable th {
+   text-align:left;
+   height: 20px;
+   font-size: xx-small;
+}
+
+/* DIRS + FILES */
+a.dir, a.file {
+   display: block;
+   padding: 3px 3px 2px 20px;
+   font-weight: bold;
+   background: transparent url('../images/icons/folder_key.png') no-repeat left center;
+   border-width: 1px;
+   border-color: transparent;
+   border-style: solid;
+}
+a.dir-writable {
+   background-image: url('../images/icons/folder.png');
+}
+a.dir-up {
+   background-image: url('../images/icons/go-up.png');
+}
+a.dir-home {background-image: url('../images/icons/house.png');}
+a.dir-pub {background-image: url('../images/icons/group.png');}
+a.file {
+   background-image: url('../images/files/file_icon.png');
+}
+a.item-marked {
+   background-color: #ecf6ff;
+   color: #ff3333;
+}
+a.item-selected {
+   background-color: #dbeeff;
+   border-right-color: #0099ff;
+   border-left-color: #0099ff;
+   border-bottom-color: #0099ff;
+   border-top-color: #0099ff;
+}
+a.item-cut {
+   background-color: #f5f4f4;
+   color: gray;
+}
+
+/* info box */
+.small-font {font-size: xx-small;}
+p.imgprev-box {
+   text-align: center;
+   float: right;
+   width: 150px;
+   height: 150px;
+   border-left: 1px solid grey;
+}
+p.file-info {
+   margin: 5px;
+}
+
+input[type="image"], input[type="hidden"], input[type="checkbox"], input[type="radio"]{
+   border:none;
+   background-color:transparent;
+}
+
+#uploading-files {
+   display: none;
+}
+
+span.errmsg {
+   font-weight: bold;
+   color: #cc0000;
+}
+span.msg {color: #006600;}
+span.tip {color: #0066ff;}
+
+#working {
+   display: none;
+   position: absolute;
+   width: 100%;
+   height: 100%;
+   background-color: white;
+   top: 0;
+   left: 0;
+   background: transparent url('../images/bg_w_70.png') top left repeat;
+}
+#working p {
+   padding-top: 25%;
+   font-weight: bold;
+   font-size: medium;
+   text-align: center;
+}
+
+/* clipboard */
+#clipboard li {
+   border-bottom: 1px solid gray;
+}
