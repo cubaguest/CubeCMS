@@ -45,8 +45,8 @@ class Form_Validator_Regexp extends Form_Validator implements Form_Validator_Int
             if($elemObj->isDimensional() OR $elemObj->isMultiLang()) {
 
             } else {
-               if(preg_match($this->regexp, $elemObj->getUnfilteredValues()) == 0
-                  OR preg_match($this->regexp, $elemObj->getUnfilteredValues()) === false ){
+               $match = preg_match($this->regexp, $elemObj->getUnfilteredValues());
+               if($match == 0 OR $match === false ){
                   $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
                   return false;
                }
