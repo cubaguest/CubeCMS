@@ -6,25 +6,75 @@ if( !empty($this->moduleButtons) ){
    $this->addFile('css://engine:style-admin.less');// need for buttons style
    ?>
    <ul class="module-tool-buttons clearfix">
-   <?foreach ($this->moduleButtons as $button) {
-      $attrStr = null;
-      $button['attributes']['href'] = $button['link'];
-      $button['attributes']['title'] = $button['title'];
-      if(isset($button['confirm'])){ $button['attributes']['onclick'] = 'return confirm(\''.htmlspecialchars($button['confirm']).'\')'; }
-      if(isset($button['id'])){ $button['attributes']['id'] = $button['id']; }
-      foreach($button['attributes'] as $name => $value){
-         $attrStr .= $name.'="'.$value.'" ';
+   <?foreach ($this->moduleButtons as $id => $button) {
+      if(is_array($button)){
+         
+         $button += array(
+             'id' => null,
+             'name' => null,
+             'title' => null,
+             'link' => null,
+             'faicon' => null,
+             'icon' => null,
+             'type' => 'button',
+             'state' => null, // warning, error, ok
+             'attributes' => array(
+                 'id' => isset($button['id']) ? $button['id'] : ( !is_int($id) ? $id : null ),
+                 'onclick' => isset($button['confirm']) ? 'return confirm(\''.htmlspecialchars($button['confirm']).'\')' : null
+             ),
+         );
+
+         $iconSrc = (strpos($button['icon'], 'http') !== false ? $button['icon'] : '/images/icons/'.$button['icon']);
+
+         $cnt = null;
+         switch ($button['type']){
+            case 'text':
+               $cnt .= '<div class="ui-button">';
+               $cnt .= '<input type="text" ';
+               foreach($button['attributes'] as $name => $value){
+                  $cnt .= $name.'="'.$value.'" ';
+               }
+               $cnt .= '/>';
+               $cnt .= '</div>';
+               break;
+            case 'button':
+            case 'default':
+            default:
+               $button['attributes']['href'] = $button['link'];
+               $button['attributes']['title'] = $button['title'];
+
+               $cnt = '<a class="ui-button '.($button['name'] != null ? 'text-button' : '').'" ';
+               foreach($button['attributes'] as $name => $value){
+                  $cnt .= $value != null ? $name.'="'.$value.'" ' : null;
+               }
+
+               $cnt .= '>';
+               if(isset($button['faicon'])){
+                  $cnt .= '<span class="icon icon-'.$button['faicon'].'"></span>';
+               } else if($button['icon']){
+                  $cnt .= '<img src="'.$iconSrc.'" alt="back" />';
+               }
+               $cnt .= htmlspecialchars($button['name']).'</a>';
+
+               break;
+         }
+
+         ?>
+         <li><?echo $cnt;?></li>
+         <?
+      } else if(is_string($button)) {
+         ?>
+         <li><div><?echo $button;?></div></li>
+         <?
       }
-      ?>
-      <li><a class="ui-button" <?=$attrStr?> ><img src="<?echo strpos($button['icon'], 'http') !== false
-         ? $button['icon'] : '/images/icons/'.$button['icon']?>" alt="back" /><?ps($button['name'])?></a></li>
-   <?}?>
+   }?>
    </ul>
-   <hr class="reseter" />
-   <?if(Template::pVar('_module-tool-buttons') == null){?>
+   <?
+   if(Template::pVar('_module-tool-buttons') == null){
+   ?>
    <script type="text/javascript">
       $(document).ready(function(){
-         $(".module-tool-buttons a" ).button();
+         $(".module-tool-buttons a, .module-tool-buttons div" ).button();
       });
    </script>
    <?
