@@ -36,6 +36,7 @@ class Template_Toolbox2 extends Template {
    const ICON_HOME = 'home';
    const ICON_EXPORT = 'share-square-o';
    const ICON_SHARE = 'share';
+   const ICON_CLOSE = 'times-circle';
    
    const TEMPLATE_NORMAL = "toolbox.phtml";
    const TEMPLATE_INLINE = "toolbox_inline.phtml";
