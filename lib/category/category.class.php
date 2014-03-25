@@ -44,7 +44,7 @@ class Category extends Category_Core {
    // zjistíme jestli nemáme načtená data
       if($catDataObj === null) {
          $catModel = new Model_Category();
-         if(intval($catKey)){
+         if(preg_match ("/^([0-9]+)$/", $catKey)){
             $catModel
                ->withRights()
                ->withModule()
