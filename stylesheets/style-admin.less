@@ -1,4 +1,5 @@
 /* jen pro pořádek */
+@import "fontawesome/font-awesome.less";
 body.with-admin-menu {padding: 0; margin: 0; margin-top: 25px}
 /* fonty */
 .admin-font, .toolbox, #adminMenuWrapper ul.dropdown li a {
@@ -98,6 +99,9 @@ body.with-admin-menu {padding: 0; margin: 0; margin-top: 25px}
          padding-left: 5px;
       }
       button, input[type="submit"], a {
+         &:hover {
+            color: black;
+         }
          span.icon {
             display: inline-block;
             margin-right: 7px;
@@ -298,7 +302,7 @@ form {
    padding: 5px 3px;
    padding-left: 26px;
    border: 1px solid #999999;
-   background: transparent url('@{dirCoreImages}icons/error.png') 3px 3px no-repeat;
+   background: #fff url('@{dirCoreImages}icons/error.png') 3px 3px no-repeat;
 }
 
 /* titulní obrázky u článků */
@@ -354,6 +358,7 @@ form {
    height: 90%;
    overflow: auto;
    text-align: left;
+   z-index: 2000;
 
    &.thin {
       width: 22px !important;
@@ -384,10 +389,27 @@ form {
 }
 
 ul.module-tool-buttons {
-   margin: 0; padding: 0 0 10px 0;
-   li a, div { float: left; margin-right: 5px; margin-bottom: 5px; }
-   li a img { vertical-align: -2px; margin-right: 5px; }
-   li .ui-button-text { padding: 3px 5px; }
+   li {
+      a, div { 
+         float: left; 
+         margin-right: 5px; 
+         margin-bottom: 5px; 
+      }
+      a img { 
+         vertical-align: -2px; 
+         margin-right: 5px; 
+      }
+      .text-button {
+         .icon {
+            margin-right: 5px;
+         }
+      }
+      .ui-button-text { 
+         padding: 3px 5px; 
+      }
+   }
+   margin: 0; 
+   padding: 0 0 10px 0;
 }
 .module-row-tool-buttons { float: right; }
 .module-row-tool-buttons *, .module-tool-buttons * { display: inline; }
