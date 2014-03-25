@@ -69,7 +69,7 @@ class Locales extends TrObject {
                                    "sl" => "sl_SL.UTF-8",
                                    "et" => "et_EE.UTF-8",
                                    "lt" => "lt_LT.UTF-8",
-                                   "hu" => "hu.UTF-8",
+                                   "hu" => "hu_HU.UTF-8",
                                    "sv" => "sv_SE.UTF-8",
                                    "fr" => "fr_FR.UTF-8",
        );
