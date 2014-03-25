@@ -192,7 +192,7 @@ input[type="submit"].exclusive:hover, button[type="submit"].exclusive:hover {
    background: #fff7d4 url('@{imgdir}forms/buttons_back.gif') 0 0 repeat-x;
    text-decoration: none;
 }
-input[type="submit"]:hover, button[type="submit"]:hover {
+input[type="submit"]:hover, button[type="submit"]:hover, .button-ok:hover {
    background-color: #a7fead;
    background-position: 0 -20px;
 }
@@ -273,10 +273,10 @@ form {
          right: 5px;
       }
       &.input-file-multiple {
-         border: 1px solid #ccc;
-         padding: 6px 12px;
-         .border-top-radius(5px); 
-         .border-bottom-radius(5px); 
+         /*border: 1px solid #ccc;*/
+         /*padding: 6px 12px;*/
+         /*.border-top-radius(5px);*/ 
+         /*.border-bottom-radius(5px);*/ 
       }
       margin-bottom: 10px;
    }
@@ -428,7 +428,13 @@ form {
 }
 input.mini, input.captcha{ width: 50px;}
 input.captcha {vertical-align: top;}
-img.captcha {}
+input.captcha, input.captcha + img, input.captcha + img + .help-block { 
+   float: left;
+   margin-right: 10px;
+}
+img.captcha {
+   margin-top: 0.5em;
+}
 
 .form-control, .form-element-long {
    &.form-element-short {
