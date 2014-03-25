@@ -452,7 +452,7 @@ class Install_Core {
          $modelCfgGroups->updateLangColumns($lang);
       }
       
-      if(CUBE_CMS_SHOP){
+      if(defined('CUBE_CMS_SHOP') && CUBE_CMS_SHOP){
          $dir = AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR.DIRECTORY_SEPARATOR.'shop'.DIRECTORY_SEPARATOR.'model'.DIRECTORY_SEPARATOR;
          $files = glob($dir.'*.php');
          if(!empty($files)){
