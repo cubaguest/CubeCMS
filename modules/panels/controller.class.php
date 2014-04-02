@@ -96,9 +96,6 @@ class Panels_Controller extends Controller {
       $this->checkWritebleRights();
 
       $this->createEditForm(true);
-      // odstranění checkboxů
-      $this->editForm->removeElement('icon_delete');
-      $this->editForm->removeElement('background_delete');
 
       if($this->editForm->isSend() AND $this->editForm->send->getValues() == false){
          $this->infoMsg()->addMessage($this->tr('Změny byly zrušeny'));
@@ -108,6 +105,20 @@ class Panels_Controller extends Controller {
       if($this->editForm->isValid()) {
          $model = new Model_Panel();
          $panel = $model->newRecord();
+         
+         $panel->{Model_Panel::COLUMN_ID_CAT} = $this->editForm->panel_cat->getValues();
+         $panel->{Model_Panel::COLUMN_POSITION} = $this->editForm->panel_box->getValues();
+         $panel->{Model_Panel::COLUMN_NAME} = $this->editForm->panel_name->getValues();
+         $panel->{Model_Panel::COLUMN_ORDER} = $this->editForm->panel_order->getValues();
+         $panel->{Model_Panel::COLUMN_FORCE_GLOBAL} = $this->editForm->forceGlobal->getValues();
+         
+         if(isset ($this->editForm->iconStored)){
+            $panel->{Model_Panel::COLUMN_ICON} = $this->editForm->iconStored->getValues();
+         }
+         if(isset ($this->editForm->imageStored)){
+            $panel->{Model_Panel::COLUMN_IMAGE} = $this->editForm->imageStored->getValues();
+         }
+         
          // ikona
          if($this->editForm->icon->getValues() != null) {
             $f = $this->editForm->icon->getValues();
@@ -118,13 +129,6 @@ class Panels_Controller extends Controller {
             $f = $this->editForm->image->getValues();
             $panel->{Model_Panel::COLUMN_IMAGE} = $f['name'];
          }
-
-
-         $panel->{Model_Panel::COLUMN_ID_CAT} = $this->editForm->panel_cat->getValues();
-         $panel->{Model_Panel::COLUMN_POSITION} = $this->editForm->panel_box->getValues();
-         $panel->{Model_Panel::COLUMN_NAME} = $this->editForm->panel_name->getValues();
-         $panel->{Model_Panel::COLUMN_ORDER} = $this->editForm->panel_order->getValues();
-         $panel->{Model_Panel::COLUMN_FORCE_GLOBAL} = $this->editForm->forceGlobal->getValues();
          
          if($this->editForm->panel_show_cat->getValues() == null || $this->editForm->forceGlobal->getValues() == true){
             $panel->{Model_Panel::COLUMN_ID_SHOW_CAT} = 0;
@@ -170,11 +174,12 @@ class Panels_Controller extends Controller {
       $this->editForm->panel_show_cat->setValues($panel->{Model_Panel::COLUMN_ID_SHOW_CAT});
       $this->editForm->forceGlobal->setValues($panel->{Model_Panel::COLUMN_FORCE_GLOBAL});
       
-      if($panel->{Model_Panel::COLUMN_ICON} == null){
-         $this->editForm->removeElement('icon_delete');
+      if(isset ($this->editForm->iconStored)){
+         $this->editForm->iconStored->setValues($panel->{Model_Panel::COLUMN_ICON});
       }
-      if($panel->{Model_Panel::COLUMN_IMAGE} == null){
-         $this->editForm->removeElement('image_delete');
+      
+      if(isset ($this->editForm->imageStored)){
+         $this->editForm->imageStored->setValues($panel->{Model_Panel::COLUMN_IMAGE});
       }
 
       $elemId = new Form_Element_Hidden('id');
@@ -187,38 +192,33 @@ class Panels_Controller extends Controller {
       }
 
       if($this->editForm->isValid()){
-         // ikona
-         if($panel->{Model_Panel::COLUMN_ICON} != null AND ($this->editForm->icon->getValues() != null
-                 OR ($this->editForm->haveElement('icon_delete') AND $this->editForm->icon_delete->getValues() == true))){
-//             $file = new Filesystem_File($icon, Panel_Obj::getIconDir(false));
-//             if($file->exist()) $file->delete();
-            $panel->{Model_Panel::COLUMN_ICON} = null;
-         }
-         if($this->editForm->icon->getValues() != null) {
-            $f = $this->editForm->icon->getValues();
-            $panel->{Model_Panel::COLUMN_ICON} = $f['name'];
-         }
-         // pozadí
-         if($panel->{Model_Panel::COLUMN_IMAGE} != null AND ($this->editForm->image->getValues() != null
-                 OR ($this->editForm->haveElement('image_delete') AND $this->editForm->image_delete->getValues() == true))){
-//             $file = new Filesystem_File($image, Panel_Obj::getImgDir(false));
-//             $file->delete();
-            $panel->{Model_Panel::COLUMN_IMAGE} = null;
-         }
-         if($this->editForm->image->getValues() != null) {
-            $f = $this->editForm->image->getValues();
-            $panel->{Model_Panel::COLUMN_IMAGE} = $f['name'];
-         }
-
+         
          $panel->{Model_Panel::COLUMN_ID_CAT} = $this->editForm->panel_cat->getValues();
          $panel->{Model_Panel::COLUMN_POSITION} = $this->editForm->panel_box->getValues();
          $panel->{Model_Panel::COLUMN_NAME} = $this->editForm->panel_name->getValues();
          $panel->{Model_Panel::COLUMN_ORDER} = $this->editForm->panel_order->getValues();
          $panel->{Model_Panel::COLUMN_ID_SHOW_CAT} = $this->editForm->panel_show_cat->getValues();
          $panel->{Model_Panel::COLUMN_FORCE_GLOBAL} = $this->editForm->forceGlobal->getValues();
+         if(isset ($this->editForm->iconStored)){
+            $panel->{Model_Panel::COLUMN_ICON} = $this->editForm->iconStored->getValues();
+         }
+         if(isset ($this->editForm->imageStored)){
+            $panel->{Model_Panel::COLUMN_IMAGE} = $this->editForm->imageStored->getValues();
+         }
 
          if($panel->{Model_Panel::COLUMN_FORCE_GLOBAL} == true){
             $panel->{Model_Panel::COLUMN_ID_SHOW_CAT} = 0;
+         }
+         
+         // ikona
+         if($this->editForm->icon->getValues() != null) {
+            $f = $this->editForm->icon->getValues();
+            $panel->{Model_Panel::COLUMN_ICON} = $f['name'];
+         }
+         // pozadí
+         if($this->editForm->image->getValues() != null) {
+            $f = $this->editForm->image->getValues();
+            $panel->{Model_Panel::COLUMN_IMAGE} = $f['name'];
          }
          
          $model->save($panel);
@@ -312,17 +312,31 @@ class Panels_Controller extends Controller {
       $elemIcon->addValidation(new Form_Validator_FileExtension('jpg;png;gif'));
       $form->addElement($elemIcon,'view');
 
-      $elemIconDelete = new Form_Element_Checkbox('icon_delete', $this->tr('Smazat ikonu')."?");
-      $form->addElement($elemIconDelete,'view');
-
+      $dir = Panel_Obj::getIconDir(false);
+      if(is_dir($dir)){
+         $elemIconStored = new Form_Element_Select('iconStored', $this->tr('Uložené ikony'));
+         $elemIconStored->addOption($this->tr('Žádný'), null);
+         foreach (glob($dir."*.{jpg,jpeg,gif,png,JPG,JPEG,GIF,PNG}", GLOB_BRACE) as $filename) {
+            $elemIconStored->addOption(basename($filename), basename($filename));
+         }
+         $form->addElement($elemIconStored,'view');
+      }
+      
       $elemImage = new  Form_Element_File('image', $this->tr('Obrázek panelu'));
       $elemImage->setSubLabel($this->tr('Obrázek panelu nebo pozadí dle vytvořené šablony.'));
       $elemImage->setUploadDir(Panel_Obj::getImgDir(false));
       $elemImage->addValidation(new Form_Validator_FileExtension('jpg;png;gif'));
       $form->addElement($elemImage,'view');
-
-      $elemImageDelete = new Form_Element_Checkbox('image_delete', $this->tr('Smazat obrázek?'));
-      $form->addElement($elemImageDelete,'view');
+      
+      $dir = Panel_Obj::getImgDir(false);
+      if(is_dir($dir)){
+         $elemImgStored = new Form_Element_Select('imageStored', $this->tr('Uložené obrázky'));
+         $elemImgStored->addOption($this->tr('Žádný'), null);
+         foreach (glob($dir."*.{jpg,jpeg,gif,png,JPG,JPEG,GIF,PNG}", GLOB_BRACE) as $filename) {
+            $elemImgStored->addOption(basename($filename), basename($filename));
+         }
+         $form->addElement($elemImgStored,'view');
+      }
 
       $submitButton = new Form_Element_SaveCancel('send');
       $form->addElement($submitButton);

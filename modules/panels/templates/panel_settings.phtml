@@ -3,8 +3,8 @@ $h = $this->tr('úprava parametrů panelu').' '.$this->catName;
 $this->addPageTitle($h);
 ?>
 
-<h1><?=$h;?></h1>
-<div class="main-content-form-edit">
+<h1><?ps($h);?></h1>
+<div class="content-admin">
 <?
 if($this->includeTpl != null){
    $this->includeTplObj($this->includeTpl);
