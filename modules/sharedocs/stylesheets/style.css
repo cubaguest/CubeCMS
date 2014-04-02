@@ -33,14 +33,15 @@
 
 .ui-file-number { width: 5%;}
 .ui-file-date { width: 18%;}
-.ui-file-user, 
-.ui-file-actions 
+.ui-file-user,
+.ui-file-actions
 { width: 12%;}
 
-.ui-file-actions img, 
-#button-file-public-link-generate img 
+.ui-file-actions img,
+#button-file-public-link-generate img
 { vertical-align:  -3px; }
 
 .module-tool-buttons { margin-bottom: 0.5em; }
 .module-row-tool-buttons { float: right; }
-.module-row-tool-buttons *, .module-tool-buttons * { display: inline; }
+.module-row-tool-buttons * { display: inline; padding:0; margin: 0;}
+.module-tool-buttons * { display: inline; }

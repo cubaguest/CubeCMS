@@ -74,7 +74,7 @@ $this->addFile('css://style.css');
             title="<?=$file->{ShareDocs_Model_Files::COLUMN_NAME}?>" class="file-name item-name">
             <?=$file->{ShareDocs_Model_Files::COLUMN_NAME}?>
          </a>
-         <span class="font-small">(<?=$this->tr('Poslední změna')?>: <?=vve_date('%x %G:%i', new DateTime($file->{ShareDocs_Model_Revs::COLUMN_DATE_ADD}))?>)</span>
+         <span class="font-small">(<?=$this->tr('Přidáno')?>: <?=vve_date('%x %G:%i', new DateTime($file->{ShareDocs_Model_Revs::COLUMN_DATE_ADD}))?>)</span>
          <?/* if($this->controll){?>
          <div class="module-row-edit-buttons">
             <?
