@@ -12,7 +12,7 @@ class PressReports_View extends View {
          $this->controlls = true;
          
          $toolbox = new Template_Toolbox2();
-         $toolAdd = new Template_Toolbox2_Tool_PostRedirect('press_report_add', $this->tr('Přidat zprávu'), $this->link()->route('add'));
+         $toolAdd = new Template_Toolbox2_Tool_Redirect('press_report_add', $this->tr('Přidat zprávu'), $this->link()->route('add'));
          $toolAdd->setIcon('page_add.png')->setTitle($this->tr("Přidat novou zprávu"));
          $toolbox->addTool($toolAdd);
          
