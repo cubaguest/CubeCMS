@@ -207,7 +207,7 @@ class Url_Link extends Url {
     * @return string -- objekt jako řetězec
     */
    public function __toString() {
-      $returnString = Url_Request::getBaseWebDir();
+      $returnString = $this->getBaseUrl().'/';
       if($this->lang != null) {
          $returnString.=$this->getLang();
       }

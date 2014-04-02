@@ -190,6 +190,15 @@ class Url
     * Metoda nastaví aktuální soubor
     * @param string $file -- název souboru
     */
+   public function host($host = null) {
+      $this->host = $host;
+      return $this;
+   }
+   
+   /**
+    * Metoda nastaví aktuální soubor
+    * @param string $file -- název souboru
+    */
    public function file($file = null) {
       $this->file = $file;
       return $this;
@@ -343,6 +352,20 @@ class Url
       }
    }
 
+   protected function getBaseUrl()
+   {
+      $l = '';
+      $l .= $this->transferProtocol."://";
+      if($this->user != null){
+         $l .= $this->user != null ? $this->user.( $this->password != null ? ":".$this->password : null ) : null;
+         $l .= "@";
+      }
+      $l .= $this->host;
+      $l .= ($this->port != null && $this->port != 80 ) ? ':'.$this->port : null;
+      return $l;
+   }
+
+
    /**
     * Overloading
     */
@@ -353,14 +376,7 @@ class Url
     */
    public function __toString()
    {
-      $l = '';
-      $l .= $this->transferProtocol."://";
-      if($this->user != null){
-         $l .= $this->user != null ? $this->user.( $this->password != null ? ":".$this->password : null ) : null;
-         $l .= "@";
-      }
-      $l .= $this->host;
-      $l .= ($this->port != null && $this->port != 80 ) ? ':'.$this->port : null;
+      $l = $this->getBaseUrl();
       $l .= $this->path.$this->file;
       $l .= $this->getParams();
       $l .= $this->anchor != null ? '#'.$this->anchor : null;
