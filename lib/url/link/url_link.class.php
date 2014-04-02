@@ -351,6 +351,9 @@ class Url_Link extends Url {
    public static function getCategoryAdminLink($idc){
       $link = new Url_Link_Module(true);
       $cat = Model_CategoryAdm::getCategoryByID($idc);
+      if(!$cat){
+         return new Url_Link(true);
+      }
       $link->setModuleRoutes(Routes::createModuleRoutes(new Category_Admin(null, false, $cat)));
       return $link->clear(true)->category( is_object($cat) ? $cat->{Model_Category::COLUMN_URLKEY} : null);
    }
@@ -362,6 +365,9 @@ class Url_Link extends Url {
    public static function getCategoryLink($idc){
       $link = new Url_Link_Module(true);
       $cat = Category_Structure::getStructure(Category_Structure::ALL)->getCategory($idc);
+      if(!$cat){
+         return new Url_Link(true);
+      }
       $link->setModuleRoutes(Routes::createModuleRoutes($cat->getCatObj()));
       return $link->clear(true)->category( is_object($cat) ? $cat->getCatObj()->getUrlKey() : null);
    }
@@ -373,6 +379,9 @@ class Url_Link extends Url {
    public static function getCategoryAdminLinkByModule($module){
       $link = new Url_Link_Module(true);
       $cat = Model_CategoryAdm::getCategoryByModule($module);
+      if(!$cat){
+         return new Url_Link(true);
+      }
       $link->setModuleRoutes(Routes::createModuleRoutes(new Category_Admin(null, false, $cat)));
       return $link->clear(true)->category(is_object($cat) ? $cat->{Model_Category::COLUMN_URLKEY} : null);
 
