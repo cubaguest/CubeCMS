@@ -149,10 +149,9 @@ class Navigation_Controller extends Controller {
 
       // znovu protože mohl být už jednou validován bez těchto hodnot
       if ($form->isValid()) {
-         Debug::log($form->ignore->getValues());
+         $ignoreValue = $form->ignore->getValues();
          $settings[self::PARAM_NESTED_LEVEL] = $form->level->getValues();
-         $settings[self::PARAM_IGNORE_IDS] = ($form->ignore->getValues() != null && !empty($form->ignore->getValues())) 
-             ? implode(';', $form->ignore->getValues()) : null;
+         $settings[self::PARAM_IGNORE_IDS] = ($ignoreValue != null && !empty($ignoreValue)) ? implode(';', $ignoreValue) : null;
       }
    }
 
