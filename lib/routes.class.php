@@ -114,6 +114,9 @@ class Routes {
       if($replacement == null){
          $replacement = $regexp;
       }
+      if(strpos($regexp, '{') !== false && strpos($regexp, '}') !== false){
+         $regexp = preg_replace("/\{([a-z0-9-_]+)?\}/i", '::\1::', $regexp);
+      }
       $rege = addcslashes($regexp, '/');
       $act = array('method' => $action, 'class' => null);
       // jestli bude existovat externí napojení
