@@ -5,7 +5,8 @@
  *
  */
 class Categories_Controller extends Controller {
-   const MODULE_SPEC_FILE = 'spicifikation.html';
+   const MODULE_SPEC_FILE = 'specifikation.html';
+   const MODULE_SPEC_FILE_OLD = 'spicifikation.html';
    const MODULE_ADMIN_FILE = 'admin';
 
    private $categoriesArray = array();
@@ -279,9 +280,15 @@ class Categories_Controller extends Controller {
 
          // vytvoření tabulek
          // instalace
-         $mInsClass = ucfirst($form->module->getValues()) . '_Install';
-         $mInstall = new $mInsClass();
-         $mInstall->installModule();
+//         $mInsClass = ucfirst($form->module->getValues()) . '_Install';
+//         $mInstall = new $mInsClass();
+//         $mInstall->installModule();
+
+         $mClass = ucfirst($form->module->getValues()) . '_Module';
+         if(!class_exists($mClass)){
+            $mClass = 'Module';
+         }
+         $m = new $mClass($form->module->getValues());
 
          $this->infoMsg()->addMessage('Kategorie byla uložena');
          $this->log('Upravena kategorie "' . $record[Model_Category::COLUMN_NAME][Locales::getDefaultLang()] . '"');
@@ -386,10 +393,18 @@ class Categories_Controller extends Controller {
          $record->{Model_Category::COLUMN_ID_USER_OWNER} = $form->owner->getValues();
 
          // instalace
-         $mInsClass = ucfirst($form->module->getValues()) . '_Install';
-         if(!class_exists($mInsClass, true)){
-            throw new UnexpectedValueException($this->tr('Neexistuje třída pro instalaci tohoto modulu'));
+//         $mInsClass = ucfirst($form->module->getValues()) . '_Install';
+//         if(!class_exists($mInsClass, true)){
+//            throw new UnexpectedValueException($this->tr('Neexistuje třída pro instalaci tohoto modulu'));
+//         }
+
+         $mClass = ucfirst($form->module->getValues()) . '_Module';
+         if(!class_exists($mClass)){
+            $mClass = 'Module';
          }
+         $m = new $mClass($form->module->getValues());
+
+
          $lastId = $categoryModel->save($record);
          // práva
          $this->assignRights($lastId, $form);
@@ -401,8 +416,6 @@ class Categories_Controller extends Controller {
             $newStructure->saveStructure();
          }
  
-         $mInstall = new $mInsClass();
-         $mInstall->installModule();
          $this->log('Přidána nová kategorie "' . $names[Locales::getDefaultLang()] . '"');
          $this->infoMsg()->addMessage('Kategorie byla uložena');
          if ($form->gotoSettings->getValues() == true) {
@@ -534,6 +547,14 @@ class Categories_Controller extends Controller {
                . $module . DIRECTORY_SEPARATOR . 'docs' . DIRECTORY_SEPARATOR . self::MODULE_SPEC_FILE)) {
             $mcnt = file_get_contents(AppCore::getAppLibDir() . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR
                   . $module . DIRECTORY_SEPARATOR . 'docs' . DIRECTORY_SEPARATOR . self::MODULE_SPEC_FILE);
+            $matches = array();
+            if (preg_match('/class="moduleName">([^<]*)</', $mcnt, $matches)) {
+               $moduleName .= $matches[1] . ' - ';
+            }
+         } else if (file_exists(AppCore::getAppLibDir() . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR
+            . $module . DIRECTORY_SEPARATOR . 'docs' . DIRECTORY_SEPARATOR . self::MODULE_SPEC_FILE_OLD)) {
+            $mcnt = file_get_contents(AppCore::getAppLibDir() . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR
+               . $module . DIRECTORY_SEPARATOR . 'docs' . DIRECTORY_SEPARATOR . self::MODULE_SPEC_FILE_OLD);
             $matches = array();
             if (preg_match('/class="moduleName">([^<]*)</', $mcnt, $matches)) {
                $moduleName .= $matches[1] . ' - ';
@@ -697,6 +718,10 @@ class Categories_Controller extends Controller {
             . $this->getRequestParam('module') . DIRECTORY_SEPARATOR . 'docs' . DIRECTORY_SEPARATOR . self::MODULE_SPEC_FILE)) {
          $this->view()->doc = file_get_contents(AppCore::getAppLibDir() . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR
                . $this->getRequestParam('module') . DIRECTORY_SEPARATOR . 'docs' . DIRECTORY_SEPARATOR . self::MODULE_SPEC_FILE);
+      } else if (file_exists(AppCore::getAppLibDir() . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR
+         . $this->getRequestParam('module') . DIRECTORY_SEPARATOR . 'docs' . DIRECTORY_SEPARATOR . self::MODULE_SPEC_FILE_OLD)) {
+         $this->view()->doc = file_get_contents(AppCore::getAppLibDir() . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR
+            . $this->getRequestParam('module') . DIRECTORY_SEPARATOR . 'docs' . DIRECTORY_SEPARATOR . self::MODULE_SPEC_FILE_OLD);
       } else {
          $this->view()->doc = $this->tr('Dokumentace k modulu neexistuje');
       }
@@ -1039,7 +1064,8 @@ class Categories_Controller extends Controller {
    
       // spuštění metody kontroleru pro duplikování kategorie Controller::categoryDuplicate
       $class = ucfirst($cat->{Model_Category::COLUMN_MODULE})."_Controller";
-      $class::categoryDuplicate(new Category(null, false, $originalCat), new Category(null, false, $cat));
+      // $class::categoryDuplicate(new Category(null, false, $originalCat), new Category(null, false, $cat)); PHP 5.3
+      call_user_func_array(array($class, 'categoryDuplicate'), array(new Category(null, false, $originalCat), new Category(null, false, $cat)));
    }
     
    /**
