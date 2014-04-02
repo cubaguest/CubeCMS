@@ -594,6 +594,7 @@ class MailsNewsletters_Controller extends Controller {
     */
    protected static function createUnscribeText($mail, $idGroups = null){
       $cnt = null;
+      return null;
       $unscribeLinkObj = new Url_Link_ModuleStatic(true);
       $unscribeLinkObj
          ->module('mailsnewsletters')
@@ -748,7 +749,11 @@ class MailsNewsletters_Controller extends Controller {
 
       $mailObj = null;
       $curIdN = 0;
+      $sended = 0;
       foreach ($mails as $mail) {
+         if($sended >= 500){ // sen donly 500 mail per hour
+            return;
+         }
          if($curIdN != $mail->{MailsNewsletters_Model_Queue::COLUMN_ID_NEWSLETTER}){
             $curIdN = $mail->{MailsNewsletters_Model_Queue::COLUMN_ID_NEWSLETTER};
             // pokud se nejdná o stejný newsletter, načteme jej
@@ -782,6 +787,7 @@ class MailsNewsletters_Controller extends Controller {
             // log
             file_put_contents(AppCore::getAppCacheDir()."newsletter.log", "ERROR:".$e->getTraceAsString()."\n\n", FILE_APPEND);
          }
+         $sended++;
       }
    }
 }
