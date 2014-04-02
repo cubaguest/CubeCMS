@@ -36,7 +36,7 @@ class CustomMenu_View extends View {
 
       $tpl->items = $items;
 
-      if($tpl->existTpl('menu-'.$name.'.phtml')){
+      if($tpl->existTpl('menu-'.$name.'.phtml', 'custommenu')){
          $tpl->addFile('tpl://custommenu:menu-'.$name.'.phtml');
       } else {
          $tpl->addFile('tpl://custommenu:menu.phtml');

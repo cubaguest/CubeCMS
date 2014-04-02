@@ -26,7 +26,7 @@ $this->addJsPlugin($jq);
             <tfoot>
                <tr class="ui-widget-content">
                   <td colspan="4">
-                     <button onclick="CustomMenu.addCustomMenuItem();"><?ps($this->tr('Přidat'))?></button>
+                     <button onclick="CustomMenu.addCustomMenuItem('<?=$key?>');"><?ps($this->tr('Přidat'))?></button>
                   </td>
                </tr>
             </tfoot>
@@ -34,9 +34,9 @@ $this->addJsPlugin($jq);
                <?
                if(!empty($box['items'])){
                   foreach ($box['items'] as $item) {?>
-                  <tr id="menu-item-<?=$item->getPK()?>" class="menu-item ui-widget-content"
+                  <tr id="custom-menu-item-<?=$item->getPK()?>" class="custom-menu-item ui-widget-content"
                       data-id="<?=$item->getPK()?>"
-                      data-name='<?=json_encode($item->{CustomMenu_Model_Items::COLUMN_NAME}->getArray())?>'
+                      data-name='<?=htmlentities(json_encode($item->{CustomMenu_Model_Items::COLUMN_NAME}->getArray()))?>'
                       data-box='<?=$item->{CustomMenu_Model_Items::COLUMN_BOX}?>'
                       data-active="<?=$item->{CustomMenu_Model_Items::COLUMN_ACTIVE} ? "true" : "false" ?>"
                       data-link="<?=$item->{CustomMenu_Model_Items::COLUMN_LINK}?>"
@@ -52,14 +52,14 @@ $this->addJsPlugin($jq);
                         <a href="<?=$href?>" title="<?ps($href);?>"><?echo(vve_tpl_xhtml_cut($href, 30))?></a>
                      </td>
                      <td class="actions">
-                        <?$src = $item->{CustomMenu_Model_Items::COLUMN_ACTIVE} ? 'enable.png' : "disable.png";?>
-                        <a href="<?=$this->link()->route('edit')->param('action', 'changeState')->param('id', $item->getPK())?>"><img src="images/icons/<?=$src?>" /></a>
+                        <?$icon = $item->{CustomMenu_Model_Items::COLUMN_ACTIVE} ? 'eye' : "eye-slash";?>
+                        <a href="<?=$this->link()->route('edit')->param('action', 'changeState')->param('id', $item->getPK())?>"><span class="icon icon-<?=$icon?>"></span></a>
                         <a href="<?=$this->link()->param('action', 'edit')->param('id', $item->getPK())?>"
                            onclick="CustomMenu.editCustomMenuItem(<?=$item->getPK()?>); return false;"
-                           class="button-edit-param"><img src="images/icons/pencil.png" /></a>
+                           class="button-edit-param"><span class="icon icon-pencil"></span></a>
                         <a href="<?=$this->link()->route('edit')->param('action', 'delete')->param('id', $item->getPK())?>"
                            onclick="CustomMenu.deleteCustomMenuItem(<?=$item->getPK()?>);"
-                           class="button-delete-param"><img src="images/icons/delete.png" /></a>
+                           class="button-delete-param"><span class="icon icon-times"></span></a>
                      </td>
                   </tr>
                   <?

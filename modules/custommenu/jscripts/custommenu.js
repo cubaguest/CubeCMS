@@ -1,17 +1,17 @@
 CustomMenu = {
    editUrl : null,
    dialogTitle : { add : null, edit : null},
-
+   
    // objects
    $formAddDialog : null,
    $tables : null,
-
+   
    init : function(params){
       $.extend(this, params);
-
+      
       this.$formAddDialog = $( "#form-edit-menu-item" );
       this.$tables = $('.menu-box tbody');
-
+      
       this.initDialog();
       this.initSorting();
    },
@@ -21,7 +21,7 @@ CustomMenu = {
          modal: true,
          resizable: false,
          autoOpen: false,
-         width : 600, height : 450,
+         width : 600, height : 550,
          title : cMenu.dialogTitle.add
       });
    },
@@ -38,23 +38,23 @@ CustomMenu = {
             return ui;
          },
          update: function( event, ui ) {
-                  $.ajax({
-                     type : 'POST', url : cMenu.editUrl,
-                     data : {action : 'changepos', id : ui.item.data('id'), pos : ui.item.index()+1},
-                     success : function(data){
-                        if(data.errmsg.length != 0){
-                           $('tbody', cMenu.$tables).sortable( "cancel" );
-                           alert('Chyba při přesunu: '+data.errmsg.join(";"));
-                        }
-                     }
-                  });
+            $.ajax({
+               type : 'POST', url : cMenu.editUrl,
+               data : {action : 'changepos', id : ui.item.data('id'), pos : ui.item.index()+1},
+               success : function(data){
+                  if(data.errmsg.length != 0){
+                     $('tbody', cMenu.$tables).sortable( "cancel" );
+                     alert('Chyba při přesunu: '+data.errmsg.join(";"));
+                  }
+               }
+            });
          },
          start: function(e, ui ){
             ui.placeholder.height(ui.helper.outerHeight()).append('<td colspan="4"></td>').addClass('ui-state-highlight');
          }
       });
    },
-   addCustomMenuItem : function(){
+   addCustomMenuItem : function(box){
       $('input.edit_menu_item_name_class', this.$formAddDialog).val("");
       $('input[name="edit_menu_item_id"]', this.$formAddDialog).val("");
       $('input[name="edit_menu_item_link"]', this.$formAddDialog).val("");
@@ -62,6 +62,10 @@ CustomMenu = {
       $('select[name="edit_menu_item_box"]', this.$formAddDialog).val("");
       $('input[name="edit_menu_item_active"]', this.$formAddDialog).attr('checked', true);
       $('input[name="edit_menu_item_newWin"]', this.$formAddDialog).attr('checked', false);
+      if(typeof box != 'undefined'){
+         $('select[name="edit_menu_item_box"]', this.$formAddDialog).val(box);
+      }
+      
       this.$formAddDialog.dialog("option", 'title', this.dialogTitle.add).dialog('open');
    },
    editCustomMenuItem : function(id){
@@ -84,7 +88,8 @@ CustomMenu = {
       }
    },
    getRowData : function(id){
-      var $row = $('#menu-item-'+id);
+      var $row = $('#custom-menu-item-'+id);
+      
       return {
          id : $row.data('id'),
          name : $row.data('name'),
@@ -95,5 +100,5 @@ CustomMenu = {
          newwin : $row.data('newwin')
       }
    }
-
+   
 }
