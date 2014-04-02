@@ -173,13 +173,21 @@ class Services_Controller extends Controller {
    public function backupController() 
    {
       $form = new Form('backup_db_');
-      $eS = new Form_Element_Submit('backup', $this->tr('Provést zálohu'));
-      $form->addElement($eS);
+      $eType = new Form_Element_Select('type', $this->tr('Zálohovat'));
+      $eType->setOptions(array(
+          $this->tr('Vše') => self::BACKUP_ALL,
+          $this->tr('Databázi') => self::BACKUP_DB,
+          $this->tr('Data') => self::BACKUP_DATA,
+      ));
+      $form->addElement($eType);
+      
+      $eSubmit = new Form_Element_Submit('backup', $this->tr('Provést zálohu'));
+      $form->addElement($eSubmit);
       
       if($form->isValid()){
-         $file = self::createBackup();
+         $file = self::createBackup($form->type->getValues());
          $this->infoMsg()->addMessage( sprintf( $this->tr('Záloha DB byla uložena do souboru %s.'),$file ) );
-//         $this->link()->reload();
+         $this->link()->reload();
       }
       $this->view()->form = $form;
       

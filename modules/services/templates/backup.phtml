@@ -8,7 +8,9 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
    <h2><?=$this->tr('Vytvoření zálohy')?></h2>
    <? 
    echo $this->form->renderStart();
-   echo $this->form->backup->controll();
+   echo $this->form->type->label();
+   echo $this->form->type->control();
+   echo $this->form->backup->control();
    echo $this->form->renderEnd();
    ?>
    <br />
