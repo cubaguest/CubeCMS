@@ -399,6 +399,12 @@ ul.module-tool-buttons {
          vertical-align: -2px; 
          margin-right: 5px; 
       }
+      label  {
+         font-weight: normal;
+      }
+      select {
+         font-size: 75%;
+      }
       .text-button {
          .icon {
             margin-right: 5px;
@@ -454,7 +460,20 @@ ul.module-tool-buttons {
       }
       padding: @padding-widget;
    }
-
+}
+.ui-list-widget {
+   li {
+      list-style: none;
+      margin: 0 0 1px 0;
+      padding: 0;
+      clear: both;
+      padding: @padding-widget;
+   }
+   .ui-widget-buttons {
+      float: right;
+   }
+   margin: 0;
+   padding: 0;
 }
 .ui-table-widget {
    td, th {
