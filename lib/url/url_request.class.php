@@ -165,7 +165,6 @@ class Url_Request {
          self::$transferProtocol = "https://";
          Url_Link::setTransferProtocol(self::$transferProtocol);
       }
-      
       if(self::$serverName != 'localhost'){
          $pos = strpos(self::$serverName, '.');
          self::$domain = substr(self::$serverName, $pos+1);
@@ -176,17 +175,34 @@ class Url_Request {
          $fullUrl = str_replace(VVE_SUB_SITE_DOMAIN, '', $fullUrl);
          $scriptName = str_replace('/'.VVE_SUB_SITE_DOMAIN, '', $scriptName);
       }
-
-      //		Vytvoříme základní URL cestu k aplikaci
+      // Najdeme co je cesta k aplikaci a co je předaná url
+      //	Vytvoříme základní URL cestu k aplikaci
       self::$baseWebUrl = self::$baseMainWebUrl = self::$transferProtocol.self::$serverName.substr($scriptName, 0, strpos($scriptName, '/')).'/';
       if(VVE_SUB_SITE_DOMAIN != null){
          self::$baseMainWebUrl = str_replace(self::$serverName, 'www.'.self::$domain, self::$baseWebUrl);
       }
-//    Najdeme co je cesta k aplikaci a co je předaná url
-      self::$fullUrl = substr($fullUrl, strpos($scriptName, AppCore::APP_MAIN_FILE));
+      
+      // jsme v adresáři
+      if(substr_count($scriptName, '/') >= 2) {
+         if(VVE_SUB_SITE_DOMAIN == null){
+            // remove dir from script, it's on virtula root
+            self::$fullUrl = substr($fullUrl, strpos(preg_replace('/\/[a-z0-9_-]+\//i', "/", $scriptName), AppCore::APP_MAIN_FILE));
+         } else if(VVE_SUB_SITE_USE_HTACCESS == true) {
+            // sub web na subdoméně
+            throw new Exception('Metoda není implementována!');
+//            if(strpos(VVE_SUB_SITE_DOMAIN.'.', self::$serverName) === false) {
+////               Debug::log('sub web na doméně přes htaccess');
+//            } else {
+////               Debug::log('sub web na subdoméně přes htaccess');
+//            }             
+         } else {
+            self::$fullUrl = substr($fullUrl, strpos(preg_replace('/\/[a-z0-9_-]+\//i', "/", $scriptName), AppCore::APP_MAIN_FILE));
+         }
+      } else {
+         self::$fullUrl = substr($fullUrl, strpos($scriptName, AppCore::APP_MAIN_FILE));
+      }
       // odstraníme dvojté lomítka
       self::$fullUrl = preg_replace('/[\/]{2,}/', '/', self::$fullUrl);
-
       self::$webUrl = str_replace(self::$baseWebUrl, '', self::$fullUrl);
       if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'
           || isset($_GET['SIMULATE_XHR'])) {
