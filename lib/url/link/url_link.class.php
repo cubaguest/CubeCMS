@@ -80,6 +80,7 @@ class Url_Link extends Url {
     */
    function __construct($clear = false) {
       //      $this->onlyWebRoot = $onlyWebRoot;
+      parent::__construct();
       $this->_init();
       if($clear) {
          $this->clear();
