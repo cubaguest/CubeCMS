@@ -89,7 +89,7 @@ $expire->modify('+1 year');
                            }
                            printf($tr->tr('Přidáno: %s'), vve_date('%d.%m.%Y %G:%i', new DateTime($message->{Forum_Model_Messages::COLUMN_DATE_ADD})));
                            if($message->{Forum_Model_Messages::COLUMN_CENSORED}){
-                              echo '<p class="font-small">'.$_this->tr('PY�spvek byl cenzurován').'</p>';
+                              echo '<p class="font-small">'.$tr->tr('Příspěvek byl cenzurován').'</p>';
                            }
                            ?>
                            </div>

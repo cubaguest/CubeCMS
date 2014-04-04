@@ -104,6 +104,7 @@ class Forum_Model_Messages extends Model_ORM {
                   array('idt' => $record->{self::COLUMN_ID_TOPIC}, 
                         'rorder' => $parent->{self::COLUMN_ORDER}, 
                         'rdepth' => $parent->{self::COLUMN_DEPTH}))
+               ->groupBy(array(self::COLUMN_ID_TOPIC))
                ->record();
                         
            if($replacedComment->min > 0){// bude se vkládat doprostřed tabulky, posunout následující záznamy
@@ -144,6 +145,7 @@ class Forum_Model_Messages extends Model_ORM {
                ->columns(array('maxord' => 'MIN('.self::COLUMN_ORDER.')'))
                ->where(self::COLUMN_ORDER." > :rorder AND ".self::COLUMN_DEPTH." <= :rdepth AND ".self::COLUMN_ID_TOPIC." = :idt",
                array('rorder' => $rec->{self::COLUMN_ORDER}, 'rdepth' => $rec->{self::COLUMN_DEPTH}, 'idt' => $rec->{self::COLUMN_ID_TOPIC}))
+               ->groupBy(array(self::COLUMN_ID_TOPIC))
                ->record();
             if($recsForDelete->maxord != null){ // je následující zpráva
                // smazání pouze omezeného počtu
