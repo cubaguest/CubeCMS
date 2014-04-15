@@ -116,6 +116,17 @@ class Model_Users extends Model_ORM {
       return $usersIds;
    }
    
+   /**
+    * Vrací uživatele se skupinou
+    * @param int $idUser
+    * @return Model_ORM_Record
+    */
+   public static function getUsersWithGroup($idUser)
+   {
+      $model = new self();
+      return $model->joinFK(self::COLUMN_GROUP_ID)->where(self::COLUMN_ID." = :idu", array('idu' => $idUser))->record();
+   }
+   
    public static function getUsersByUsernameAndAuth($username, $auth) 
    {
       $model = new Model_Users();

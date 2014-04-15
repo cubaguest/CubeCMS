@@ -144,7 +144,7 @@ class Auth extends TrObject {
          if(!isset($cookieParts[1]) || $cookieParts[1] != self::getBrowserIdent()){
             return;
          }
-         $user = Model_Users::getRecord((int)$cookieParts[0]);
+         $user = Model_Users::getUsersWithGroup((int)$cookieParts[0]);
          if(!$user){
             return;
          }
