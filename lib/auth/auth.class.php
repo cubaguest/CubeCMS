@@ -74,6 +74,7 @@ class Auth extends TrObject {
       } else {
          // kontrola odhlášení
          self::checkLogOut();
+         self::saveUserDetailToSession();
       }
       
    }
@@ -204,7 +205,7 @@ class Auth extends TrObject {
     * @return string
     */
    private static function getBrowserIdent() {
-      return sha1($_SERVER['HTTP_USER_AGENT'].$_SERVER['HTTP_ACCEPT']./*$_SERVER['HTTP_ACCEPT_CHARSET']. - IE not send this header sometimesm */$_SERVER['HTTP_ACCEPT_LANGUAGE']);
+      return sha1($_SERVER['HTTP_USER_AGENT'].$_SERVER['HTTP_ACCEPT_LANGUAGE']);
    }
 
    /**
@@ -213,7 +214,7 @@ class Auth extends TrObject {
     * @return boolean -- je li uživatel přihlášen
     */
    public static function isLogin() {
-      return self::getUser()->getUserId() != -1;
+      return self::getUser()->getGroupId() != CUBE_CMS_DEFAULT_ID_GROUP;
    }
 
    /**
