@@ -81,7 +81,7 @@ class SiteMap extends TrObject {
     */
    function __construct(Category $category, Routes $routes) {
       $this->category = $category;
-      $link = new Url_Link_Module();
+      $link = new Url_Link_Module(true);
       $link->setModuleRoutes($routes);
       $link->category($this->category()->getUrlKey());
       $this->link = $link;
