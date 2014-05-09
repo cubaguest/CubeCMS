@@ -672,14 +672,13 @@ abstract class Controller extends TrObject {
       }
       $form->addElement($elemShareTools, $grpView);
       
-      /* BUTTONS SAVE AND CANCEL */
-      $submitButton = new Form_Element_SaveCancel('send');
-      $form->addElement($submitButton);
-
-      
       if(function_exists('extendCategorySettings')){
          extendCategorySettings($this->category(), $form, $settings, $this->translator);
       }
+      
+      /* BUTTONS SAVE AND CANCEL */
+      $submitButton = new Form_Element_SaveCancel('send');
+      $form->addElement($submitButton);
 
       if($form->isSend() AND $form->send->getValues() == false){
          $this->infoMsg()->addMessage($this->tr('Změny byly zrušeny'));
