@@ -170,6 +170,15 @@ class File extends TrObject implements File_Interface {
    {
       return $this->name;
    }
+   
+   /**
+    * vrací název souboru bez přípony
+    * @return string
+    */
+   public function getBaseName()
+   {
+      return basename($this->name, '.'.$this->getExtension());
+   }
 
    /**
     * Nastaví cestu k souboru
