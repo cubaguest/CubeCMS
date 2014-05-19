@@ -33,34 +33,49 @@ class Form_Validator_Date extends Form_Validator implements Form_Validator_Inter
          case 'Form_Element_Password':
             $values = $elemObj->getUnfilteredValues();
             if(!$elemObj->isMultiLang()) {
-               $date = array();
-               if(empty ($values)) return true;
-
-               $correctDate = false;
-               if(preg_match("/^([0-3]?[0-9]{1})\.([0-1]?[0-9]{1})\.([1-2]{1}[0-9]{3})$/", $values, $date) == 1 
-                     AND checkdate($date[2],$date[1],$date[3])){
-                  // dd.mm.yyyy
+               
+               if($elemObj->isDimensional()){
                   $correctDate = true;
-               } else if(preg_match('/^([1-2]{1}[0-9]{3}).([0-1]?[0-9]{1}).([0-3]?[0-9]{1})$/', $values, $date) == 1
-                       AND checkdate($date[1], $date[2], $date[3])) {
-                  // yyyy.mm.dd
-                  $correctDate = true;
-               } else if(preg_match('/^([0-1]?[0-9]{1})\/([0-3]?[0-9]{1})\/([1-2]{1}[0-9]{3})$/', $values, $date) == 1
-                       AND checkdate($date[1], $date[2], $date[3])) {
-                  // mm/dd/yyyy
-                  $correctDate = true;
-               }
-
-               if(!$correctDate){
-                  $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
-                  return false;
+                  $someValidate = false;
+                  foreach ($values as $value) {
+                     if(!empty($value) && !$this->validateDate($value)){
+                        $correctDate = false;
+                        $someValidate = true;
+                     }
+                  }
+                  if($someValidate && !$correctDate){
+                     $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
+                     return false;
+                  }
+               } else {
+                  if(!empty($values) && !$this->validateDate($values)){
+                     $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
+                     return false;
+                  }
                }
             } else {
                throw new RuntimeException($this->tr('Neimplementovaná Validace Data'));
             }
       }
       return true;
-
+   }
+   
+   private function validateDate($dateStr)
+   {
+      $date = array();
+      if(preg_match("/^([0-3]?[0-9]{1})\.([0-1]?[0-9]{1})\.([1-2]{1}[0-9]{3})$/", $dateStr, $date) == 1 
+            AND checkdate($date[2],$date[1],$date[3])){
+         // dd.mm.yyyy
+         return true;
+      } else if(preg_match('/^([1-2]{1}[0-9]{3}).([0-1]?[0-9]{1}).([0-3]?[0-9]{1})$/', $dateStr, $date) == 1
+              AND checkdate($date[1], $date[2], $date[3])) {
+         // yyyy.mm.dd
+         return true;
+      } else if(preg_match('/^([0-1]?[0-9]{1})\/([0-3]?[0-9]{1})\/([1-2]{1}[0-9]{3})$/', $dateStr, $date) == 1
+              AND checkdate($date[1], $date[2], $date[3])) {
+         // mm/dd/yyyy
+         return true;
+      }
+      return false;
    }
 }
-?>

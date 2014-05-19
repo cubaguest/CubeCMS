@@ -34,14 +34,24 @@ class Form_Validator_Time extends Form_Validator implements Form_Validator_Inter
          case 'Form_Element_Password':
             $values = $elemObj->getUnfilteredValues();
             if(!$elemObj->isMultiLang()) {
-               if(empty ($values)) return true;
-
-               $time = array();
-               if(preg_match("/^([0-2]?[0-9]{1}):([0-5]?[0-9]{1})(:([0-5]?[0-9]{1}))?$/", $values, $time) == 0
-                       OR $time[1] > 23 OR $time[2] > 59 OR (isset ($time[3]) AND $time[3] > 59)
-                  ) {
-                  $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
-                  return false;
+               if($elemObj->isDimensional()){
+                  $correctTime = true;
+                  $someValidate = false;
+                  foreach ($values as $value) {
+                     if(!empty($value) && !$this->validateTime($value)){
+                        $correctTime = false;
+                        $someValidate = true;
+                     }
+                  }
+                  if($someValidate && !$correctTime){
+                     $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
+                     return false;
+                  }
+               } else {
+                  if(empty ($values)) return true;
+                  if(!$this->validateTime($values)){
+                     $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
+                  }
                }
             } else {
                throw new RuntimeException($this->tr('Neimplementovaná Validace času'));
@@ -49,6 +59,17 @@ class Form_Validator_Time extends Form_Validator implements Form_Validator_Inter
       }
       return true;
 
+   }
+   
+   protected function validateTime($timeStr)
+   {
+      $time = array();
+      if(preg_match("/^([0-2]?[0-9]{1}):([0-5]?[0-9]{1})(:([0-5]?[0-9]{1}))?$/", $timeStr, $time) == 0
+              OR $time[1] > 23 OR $time[2] > 59 OR (isset ($time[3]) AND $time[3] > 59)
+         ) {
+         return false;
+      }
+      return true;
    }
 }
 ?>
