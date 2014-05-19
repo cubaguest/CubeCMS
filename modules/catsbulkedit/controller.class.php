@@ -38,6 +38,7 @@ class CatsBulkEdit_Controller extends Controller {
                $this->tr('Individuální panely') => 'indpanels',
                $this->tr('Výchozí práva') => 'def_rights',
                $this->tr('RSS exporty') => 'rss_exports',
+               $this->tr('Titulní obrázek') => 'title_image',
 //                $this->tr('Vlastník') => 'owner',
             ),
             $this->tr('Mapa stránek') => array(
@@ -143,6 +144,22 @@ class CatsBulkEdit_Controller extends Controller {
             $elem = new Form_Element_Checkbox('param', $paramName);
             $elem->setDimensional();
             break;
+         case 'title_image':
+            $paramName = $this->tr('Titulní obrázek kategorie');
+            $param = Model_Category::COLUMN_IMAGE;
+            $elem = new Form_Element_Select('param', $paramName);
+            if(file_exists(Category::getImageDir(Category::DIR_ICON, true))){
+               $dirIterator = new DirectoryIterator(Category::getImageDir(Category::DIR_ICON, true));
+               $elem->setOptions(array($this->tr('Žádný') => ''), true);
+               foreach ($dirIterator as $item) {
+                  if($item->isDir() OR $item->isDot()) {
+                     continue;
+                  }
+                  $elem->setOptions(array($item->getFilename() => $item->getFilename()), true);
+               }
+            }
+            $elem->setDimensional();
+            break;
          case 'def_rights':
             $paramName = $this->tr('výchozí práva');
             $param = Model_Category::COLUMN_DEF_RIGHT;
@@ -213,6 +230,7 @@ class CatsBulkEdit_Controller extends Controller {
             $this->generateNewUrlkeys(Category_Structure::getStructure(Category_Structure::ALL));
          }
          $this->infoMsg()->addMessage($this->tr('Parametry byly uloženy'));
+         Category_Structure::clearCache();
          $this->link(true)->reload();
       }
       
