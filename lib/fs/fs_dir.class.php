@@ -115,11 +115,14 @@ class FS_Dir extends TrObject {
    public static function deleteStatic($dir)
    {
       if (is_dir($dir) && !is_link($dir)){
-         foreach(glob($dir . '/*') as $file) {
-            if(is_dir($file))
-               self::deleteContentStatic($file);
-            else
-               unlink($file);
+         $files = glob($dir . '/*');
+         if($files){
+            foreach($files as $file) {
+               if(is_dir($file))
+                  self::deleteContentStatic($file);
+               else
+                  unlink($file);
+            }
          }
          @rmdir($dir);
       }
@@ -226,5 +229,27 @@ class FS_Dir extends TrObject {
    {
       return null;
    }
+
+   /**
+    * Kopíruje adresář
+    * @param string/FS_Dir $targetDir
+    */
+   public function copy($targetDir)
+   {
+      if(!($targetDir instanceof FS_Dir)){
+         $targetDir = new FS_Dir($this->getName(), $targetDir);
+      }
+      $targetDir->check();
+      foreach (
+         $iterator = new RecursiveIteratorIterator(
+          new RecursiveDirectoryIterator((string)$this, RecursiveDirectoryIterator::SKIP_DOTS),
+          RecursiveIteratorIterator::SELF_FIRST) as $item
+        ) {
+          if ($item->isDir()) {
+            mkdir((string)$targetDir . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
+          } else {
+            copy($item, (string)$targetDir . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
+          }
+      }
+   }
 }
-?>
