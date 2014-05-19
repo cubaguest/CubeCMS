@@ -22,7 +22,7 @@ class Component_TinyMCE_Browser extends Component_TinyMCE {
    const TYPE_DOT = 'dot';
    const TYPE_FILE = 'file';
    const TYPE_IMAGE = 'flash';
-
+   
    const LIST_TYPE_IMAGES = 'image';
    const LIST_TYPE_FILES = 'file';
    const LIST_TYPE_MEDIA = 'media';
@@ -63,8 +63,8 @@ class Component_TinyMCE_Browser extends Component_TinyMCE {
       $this->template()->linkC = $this->link();
       
       $this->template()->addTplFile('filebrowser/filebrowser.phtml');
+      $this->template()->uploadForm = $this->createUploadForm();
       echo $this->template();flush();
-//      exit();
    }
 
    public static function getUploaderFunction(Component_TinyMCE_Settings_Advanced $settings)
@@ -77,7 +77,7 @@ class Component_TinyMCE_Browser extends Component_TinyMCE {
       var cmsURL = location.toString();    // script URL - use an absolute path!
       tinyMCE.activeEditor.windowManager.open({
       file : "'.$browserUrl.'",
-      title : "Cube File Browser", width : 750, height : 500, resizable : "yes", inline : "yes",  close_previous : "no"
+      title : "Cube File Browser", width : 810, height : 505, resizable : "yes", inline : "yes",  close_previous : "no"
       }, {
       window : win,
       input : field_name,
@@ -101,6 +101,7 @@ class Component_TinyMCE_Browser extends Component_TinyMCE {
       $this->checkRights();
 
       $reqDir = $this->getDir();
+      $this->template()->request = $reqDir;
       $dataDir = substr(AppCore::getAppDataDir(),0,-1);
       $currDirRealPath = $dataDir . str_replace(URL_SEPARATOR, DIRECTORY_SEPARATOR, $reqDir);
 
@@ -125,14 +126,19 @@ class Component_TinyMCE_Browser extends Component_TinyMCE {
             'name' => null,
             'path' => null,
             'realpath' => null,
-            'type' => 'file', // typ položky (dot, dir, file, image)
+            'type' => 'file', // typ položky (dot, dir, file)
             'access' => array('read' => true, 'write' => false),
             'info' => array( // info
                'size' => 0, // velikost v bytech
                'modified' => null, // datum a čas modifikace
                'type' => null, // typ souboru nebo adresáře (image, flash, movie, doc, home, public, atd)
-               'dimension' => array('w' => 0, 'h' => 0) // rozměry (obr a flash)
-               )
+               'dimension' => array('w' => 0, 'h' => 0), // rozměry (obr a flash)
+               'sizeFormated' => 0, // velikost v bytech
+               ),
+             // nové
+            'itemclass' => null, // typ souboru nebo adresáře (image, flash, movie, doc, home, public, atd)
+            'target' => null, // typ položky (dot, dir, file, image)
+             
             );
 
          // base info
@@ -142,31 +148,48 @@ class Component_TinyMCE_Browser extends Component_TinyMCE {
          // name
          $it['name'] = $item->getFilename();
          $it['info']['size'] = filesize($item->getRealPath());
+         $it['info']['sizeFormated'] = vve_create_size_str(filesize($item->getRealPath()));
          // access controll
          $it['access']['write'] = $this->isWritable($item->getRealPath());
 
          if($item->isDir() AND !$item->isDot()){
             $it['type'] = self::TYPE_DIR;
+            $it['itemclass'] = 'dir';
             // home dir
             if($reqDir.$item->getFilename().URL_SEPARATOR == URL_SEPARATOR.self::DIR_HOME.URL_SEPARATOR
                OR $reqDir.$item->getFilename().URL_SEPARATOR == URL_SEPARATOR.self::DIR_HOME.URL_SEPARATOR.Auth::getUserName().URL_SEPARATOR){
                $it['info']['type'] = 'home';
+               $it['itemclass'] = 'home';
             }
             // public dir
             if($reqDir.$item->getFilename().URL_SEPARATOR == URL_SEPARATOR.self::DIR_PUBLIC.URL_SEPARATOR){
                $it['info']['type'] = 'public';
+               $it['itemclass'] = 'public';
             }
-            
+            $it['target'] = $it['path'].$item->getFilename().'/';
+//            $size = 0;
+//            foreach(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($item->getRealPath())) as $file){
+//               if($file->getFileName() != ".."){
+//                  $size+=$file->getSize();
+//               }
+//            }
+//            $it['info']['size'] = $size;
+//            $it['info']['sizeFormated'] = vve_create_size_str($size);
          } else if($item->isDot()){
             $it['type'] = self::TYPE_DOT;
+            $it['target'] = dirname($it['path']);
+            if(dirname($it['path']) != "/"){
+               $it['target'] .= "/";
+            }
+            $it['itemclass'] = 'dot';
          }
          // file
          else {
             $it['type'] = self::TYPE_FILE;
             // typ listu
-            if($_POST['type'] == 'image' AND (($info = @getimagesize($item->getRealPath())) == false OR $info[2] == IMAGETYPE_SWF OR $info[2] == IMAGETYPE_SWC)){
+            if($_REQUEST['type'] == 'image' AND (($info = @getimagesize($item->getRealPath())) == false OR $info[2] == IMAGETYPE_SWF OR $info[2] == IMAGETYPE_SWC)){
                continue;
-            } else if($_POST['type'] == 'media' AND !in_array(pathinfo($item->getRealPath(), PATHINFO_EXTENSION), self::$mediaExtensions)){
+            } else if($_REQUEST['type'] == 'media' AND !in_array(pathinfo($item->getRealPath(), PATHINFO_EXTENSION), self::$mediaExtensions)){
                continue;
             }
             if(($info = @getimagesize($item->getRealPath())) != false){ // img + flash
@@ -213,6 +236,7 @@ class Component_TinyMCE_Browser extends Component_TinyMCE {
                      break;
                }
             }
+            $it['itemclass'] = $fType;
             $it['info']['type'] = $fType;
          }
 
@@ -223,16 +247,129 @@ class Component_TinyMCE_Browser extends Component_TinyMCE {
       $this->template()->access = array('write' => $this->isWritable($currDirRealPath), 'read' => true);
    }
 
+   public function getDirsController()
+   {
+      // base vars
+      $dirPublic = AppCore::getAppDataDir().Component_TinyMCE_Browser::DIR_PUBLIC.DIRECTORY_SEPARATOR;
+      $dirHome = AppCore::getAppDataDir().Component_TinyMCE_Browser::DIR_HOME.DIRECTORY_SEPARATOR.Auth::getUserName().DIRECTORY_SEPARATOR;
+   
+      // iterate over public dir only if admin
+      if(Auth::isAdmin()){
+         if(!empty($this->allowedDirs)){
+            
+            $allowedDirs = array();
+            
+            foreach ($this->allowedDirs as $dir) {
+               $allowedDirs[] = $dir;
+               $dir = realpath( AppCore::getAppDataDir().str_replace('/', DIRECTORY_SEPARATOR, $dir));
+               $ite = new RecursiveDirectoryIterator($dir );
+               foreach (new RecursiveIteratorIterator($ite, RecursiveIteratorIterator::SELF_FIRST)
+                     as $name => $item) {
+                  if($item->isDir() && $item->isWritable()
+                        && ( strpos($item->getPathname(), "small") === false
+                              && strpos($item->getPathname(), "medium") === false ) ){
+                     array_push($allowedDirs, $this->encodeDir($item->getPathname()));
+                  }
+               }
+            }
+            $this->template()->dirsAllowed = $allowedDirs;
+         }
+         
+         $publicDirs = array("/".Component_TinyMCE_Browser::DIR_PUBLIC."/");
+         if(!is_dir($dirPublic)){// create dir if not exist;
+            @mkdir( $dirPublic );
+         }
+         $ite = new RecursiveDirectoryIterator($dirPublic );
+         foreach (new RecursiveIteratorIterator($ite, RecursiveIteratorIterator::SELF_FIRST) 
+            as $item) {
+            // @todo vymyslet jak filtrovat small a medium, protože to jsou adresáře galerií
+            if($item->isDir() && $item->isWritable() && $item->getFilename() != "." && $item->getFilename() != ".."
+               && ( strpos($item->getPathname(), "small") === false
+               && strpos($item->getPathname(), "medium") === false ) ){
+               array_push($publicDirs, $this->encodeDir($item->getPathname()));
+            }
+         }
+         // assign to output
+         $this->template()->dirsPublic = $publicDirs ;
+      }
+      
+      // interate over user dir
+      $homeDirs = array("/".Component_TinyMCE_Browser::DIR_HOME."/".Auth::getUserName()."/");
+      if(!is_dir($dirHome)){// create dir if not exist;
+         @mkdir( $dirHome ); 
+      }
+      $ite = new RecursiveDirectoryIterator($dirHome );
+      foreach (new RecursiveIteratorIterator($ite, RecursiveIteratorIterator::SELF_FIRST) 
+         as $item) {
+         // @todo vymyslet jak filtrovat small a medium, protože to jsou adresáře galerií
+         if($item->isDir() && $item->isWritable() && $item->getFilename() != "." && $item->getFilename() != ".."
+              && ( strpos($item->getPathname(), "small") === false
+            && strpos($item->getPathname(), "medium") === false ) ){
+            array_push($homeDirs, $this->encodeDir($item->getPathname()));
+         }
+      }
+      // assign to output
+      $this->template()->dirsHome = $homeDirs ;
+   }
+   
+   protected function encodeDir($dir)
+   {
+      $dir = str_replace(
+         array(
+            AppCore::getAppDataDir(),
+            DIRECTORY_SEPARATOR
+         ), 
+         array(
+            "/",
+            "/"
+         ), 
+         $dir );
+      
+      if(substr($dir, -1, 1) != "/"){
+         $dir .= "/";
+      }
+      
+      return $dir;
+   }
+   
+   /*
+    * Převede adresář na reálnou cestu
+    */
+   protected function decodeDir($dir)
+   {
+      $dir = preg_replace(
+         array(
+            "/\./",
+            "/\/{2,}/",
+            "/\//"
+         ), 
+         array(
+            "",
+            "/",
+            DIRECTORY_SEPARATOR
+         ), 
+         $dir );
+      if(substr($dir, -1, 1) != DIRECTORY_SEPARATOR){
+         $dir .= DIRECTORY_SEPARATOR;
+      }
+      if(substr($dir, 0, 1) == DIRECTORY_SEPARATOR){
+         $dir = substr($dir, 1);
+      }
+      
+      return AppCore::getAppDataDir().$dir;
+   }
+   
+   
    /**
     * Vrací požadovanou cestu předanou v požadavku (např: /home/admin/fotky/)
     * @return string
     */
    private function getDir()
    {
-      if(!isset($_POST[self::REQ_PATH]) || $_POST[self::REQ_PATH] == self::DIR_HOME || $_POST[self::REQ_PATH] == null){ // domácí adresář
+      if(!isset($_REQUEST[self::REQ_PATH]) || $_REQUEST[self::REQ_PATH] == self::DIR_HOME || $_REQUEST[self::REQ_PATH] == null){ // domácí adresář
          $dirName = URL_SEPARATOR.self::DIR_HOME.URL_SEPARATOR.Auth::getUserName().URL_SEPARATOR;
       } else { // ostatní adresáře
-         $dirName = preg_replace('/[^\/]+\/\.\.\//i', '', $_POST[self::REQ_PATH]); // check chars
+         $dirName = preg_replace('/[^\/]+\/\.\.\//i', '', $_REQUEST[self::REQ_PATH]); // check chars
          if($dirName == '..'.URL_SEPARATOR) $dirName = URL_SEPARATOR; // if is root remove parents
       }
       return $dirName;
@@ -245,32 +382,23 @@ class Component_TinyMCE_Browser extends Component_TinyMCE {
     */
    private function isWritable($item)
    {
-      $w = is_writable($item);
+      return self::hasWritableRights($item);
+   }
+   
+   public static function hasWritableRights($item)
+   {
+      if(file_exists($item) && !is_writable($item)){
+         return false;
+      }
       // kontrola home directory
-      if($w && preg_match('/^'.preg_quote(AppCore::getAppDataDir().self::DIR_HOME.DIRECTORY_SEPARATOR
-            .Auth::getUserName().DIRECTORY_SEPARATOR,'/')."/",$item)){
+      if(strpos($item, AppCore::getAppDataDir().Component_TinyMCE_Browser::DIR_HOME
+              .DIRECTORY_SEPARATOR.Auth::getUserName().DIRECTORY_SEPARATOR) === 0){
          return true; 
       }
-      
-      if(Auth::isAdmin()){
-         // kontrola public
-         if($w && preg_match('/^'.preg_quote(AppCore::getAppDataDir().self::DIR_PUBLIC.DIRECTORY_SEPARATOR,'/')
-               ."/", $item)){
-            return true;
-         } 
-         // allowed dirs
-         foreach ($this->allowdDirs as $aDir) {
-            $aDir = str_replace('/', DIRECTORY_SEPARATOR, $aDir);
-            if($w && preg_match('/^'.preg_quote(realpath(AppCore::getAppDataDir().$aDir),'/')."/", $item)){
-               return true;
-            } 
-         }
-      }
-      
-      // kontrola podle práv
-      $aclf = pathinfo($item, PATHINFO_DIRNAME).DIRECTORY_SEPARATOR.self::ACL_FILE;
-      // in dir with ACL
-      if(is_dir($item) && file_exists($aclf) && in_array(Auth::getUserId(), explode(';',file_get_contents($aclf))) ){
+      if(Auth::isAdmin() && (
+          strpos($item, AppCore::getAppDataDir().Component_TinyMCE_Browser::DIR_PUBLIC.DIRECTORY_SEPARATOR) === 0
+          || strpos($item, AppCore::getAppDataDir().Component_TinyMCE_Browser::DIR_HOME.DIRECTORY_SEPARATOR) === 0
+          )){
          return true;
       }
       return false;
@@ -325,11 +453,28 @@ class Component_TinyMCE_Browser extends Component_TinyMCE {
       $dir = substr(AppCore::getAppDataDir(),0,-1).$this->getDir();
       $this->chekWritableDir($dir);
       $form = $this->createUploadForm($dir);
-
       if($form->isValid()) {
-         $file = $form->file->getValues();
-         $this->infoMsg()->addMessage(sprintf($this->tr('Soubor "%s" byl nahrán'), $file['name']));
+         $files = $form->file->getValues();
+         $dir = $this->getUploadPath($form->path->getValues());
+         
+         // kontrola zápisu
+         
+         foreach ($files as $file) {
+            $f = new File($file);
+            $f->move($dir);
+            $this->infoMsg()->addMessage(sprintf($this->tr('Soubor "%s" byl nahrán'), $file['name']));
+         }
+         if($form->iframe->getValues() == 1){
+            AppCore::getInfoMessages()->changeSaveStatus(false);
+            echo '<script type="text/javascript">';
+            echo 'document.domain = \''.Url_Request::getDomain().'\';';
+            echo 'info = '.json_encode(AppCore::getInfoMessages()->getMessages()).';';
+            echo 'error = '.json_encode(AppCore::getUserErrors()->getMessages()).';';
+            echo '</script>';
+            die;
+         }
       }
+      
    }
    
    /**
@@ -337,17 +482,34 @@ class Component_TinyMCE_Browser extends Component_TinyMCE {
     * @return Form 
     * @todo přidat validaci ostatních souborů? (spíše zakázat php, html, js, atd.)
     */
-   private function createUploadForm($datadir)
+   private function createUploadForm($datadir = null)
    {
+      $this->checkRights();
+      if($datadir == null){
+         $datadir = $this->getDir();
+      }
       $form = new Form('upload_');
+      $form->setAction($this->link()->onlyAction('upload', 'php'));
       
-      $file = new Form_Element_File('file');
+      $eIframe = new Form_Element_Hidden('iframe', 'iframe');
+      $eIframe->setValues('1');
+      $form->addElement($eIframe);
+      
+      $ePath = new Form_Element_Hidden('path', 'path');
+      $form->addElement($ePath);
+      
+      $eType = new Form_Element_Hidden('type', 'type');
+      $eType->setValues(isset($_GET['t']) ? $_GET['t'] : Component_TinyMCE_Browser::LIST_TYPE_FILES);
+      $form->addElement($eType);
+      
+      $file = new Form_Element_File('file', $this->tr('Soubor'));
+      $file->setMultiple(true);
       $file->addValidation(new Form_Validator_NotEmpty());
 
-      if($_POST[self::REQ_LIST_TYPE] == self::LIST_TYPE_IMAGES) {
+      if($eType->getValues() == self::LIST_TYPE_IMAGES) {
          $validOnlyImage = new Form_Validator_FileExtension(array('jpg', 'jpeg', 'png', 'gif', 'bmp', 'tga', 'wmf'));
          $file->addValidation($validOnlyImage);
-      } else if($_POST[self::REQ_LIST_TYPE] == self::LIST_TYPE_MEDIA) {
+      } else if($eType->getValues() == self::LIST_TYPE_MEDIA) {
          $validOnlyImage = new Form_Validator_FileExtension(array(
             'swf', // falsh
             'mp4','m4v', 'ogv', 'mov' , 'flv', 'rm', 'qt', 'avi', // video
@@ -356,109 +518,191 @@ class Component_TinyMCE_Browser extends Component_TinyMCE {
          $file->addValidation($validOnlyImage);
       } else {
       }
-      $file->setUploadDir($datadir);
       $form->addElement($file);
       $submit = new Form_Element_Submit('send');
       $form->addElement($submit);
       return $form;
    }
+   
+   /**
+    * Vrací adresář pro upload souborů
+    * @param string $path
+    * @return string
+    */
+   protected function getUploadPath($path = false)
+   {
+      if(!$path){
+         $path = self::DIR_PUBLIC."/";
+      }
+      
+      // tady dodělat kontroly adresáře (..;//; a podobně)
+      $path = str_replace('/', DIRECTORY_SEPARATOR, $path);
+      return AppCore::getAppDataDir().$path;
+   }
 
    public function createDirController()
    {
       $this->checkRights();
-      $dir = substr(AppCore::getAppDataDir(),0,-1).$this->getDir();
-      $this->chekWritableDir($dir);
-      $newDir = vve_cr_safe_file_name($_POST[self::REQ_NEWNAME]);
-      $dir = new Filesystem_Dir($dir.$newDir);
-      if($dir->exist()){
-         throw new UnexpectedValueException(sprintf('Složka "%s" již existuje', $newDir));
-      } else {
-         $dir->createDir();
-         $this->infoMsg()->addMessage(sprintf('Složka "%s" byla vytvořena', $newDir));
+      if($_POST['name'] == null || $_POST['item'] == null){
+         throw new InvalidArgumentException($this->tr('Nebyly předány všechny parametry'));
       }
+      $item = new ItemInfo($_POST['item'].vve_cr_safe_file_name($_POST['name']));
+      if(!self::hasWritableRights($item->getDir())){
+         throw new Auth_Exception($this->tr('Pro vytvořerní adresáře nemáte dostatečná opravnění'));
+      }
+      mkdir($item->getRealPath());
+      $this->infoMsg()->addMessage(sprintf($this->tr('Složka %s byla vytvořena'), $item->getName()));
    }
 
    public function deleteController()
    {
       $this->checkRights();
-      if(!isset ($_POST['items'])){
-         throw new UnexpectedValueException($this->tr('Nebyl předán parametr se seznamem položek'));
+      $item = new ItemInfo($_POST['item']);
+      if(!$item->exist()){
+         throw new Exception(sprintf($this->tr("Objekt %s neexistuje"), $item->getName()));
       }
-      foreach ($_POST['items'] as $item) {
-         $path = substr(AppCore::getAppDataDir(),0,-1).str_replace(URL_SEPARATOR, DIRECTORY_SEPARATOR, $item[0]);
-         try {
-            if($item[1] == '..') throw new UnexpectedValueException($this->tr('Nadřazený adresář nelze smazat'));
-            $this->chekWritableDir($path);
-            // kontrola adresáře na zápis
-            if (is_dir($path . $item[1])) {
-               $dir = new Filesystem_Dir($path . $item[1]);
-               $dir->rmDir();
-               $this->infoMsg()->addMessage(sprintf($this->tr('Adresář "%s" byl smazán '), $item[1]));
-            } else {
-               $file = new Filesystem_File($item[1], $path);
-               $file->delete();
-               $this->infoMsg()->addMessage(sprintf($this->tr('Soubor "%s" byl smazán '), $item[1]));
-            }
-         } catch (UnexpectedValueException $exc) {
-            $this->errMsg()->addMessage($exc->getMessage());
-         }
+      // kontrola oprávnění
+      if(!$item->hasWritableRight()){
+         throw new Exception(sprintf($this->tr("Objekt %s nelze smazat"), $item->getName()));
       }
-      sleep(1);
+      
+      $this->template()->realpath = $item->getRealPath();
+      $this->template()->name = $item->getName();
+      $this->template()->dir = $item->getDir();
+      $this->template()->isdir = $item->isDir();
+      $this->template()->hasrights = $item->hasWritableRight();
+      
+      // smazání
+      if($item->isDir()){
+         FS_Dir::deleteStatic($item->getRealPath());
+      } else {
+         @unlink($item->getRealPath());
+      }
+      $this->infoMsg()->addMessage(sprintf($this->tr('Objekt "%s" byl smazán '), $item->getName()));
    }
    // kontroler pro přejmenování
    public function renameController()
    {
       $this->checkRights();
-      if(!isset ($_POST['items'])){
-         throw new UnexpectedValueException($this->tr('Nebyl předán parametr se seznamem položek'));
+      if($_POST['name'] == null || $_POST['item'] == null){
+         throw new InvalidArgumentException($this->tr('Nebyly předány všechny parametry'));
       }
-      foreach ($_POST['items'] as $item) {
-         $path = substr(AppCore::getAppDataDir(),0,-1).str_replace(URL_SEPARATOR, DIRECTORY_SEPARATOR, $item[0]);
-         try {
-            if($item[1] == '..') throw new UnexpectedValueException($this->tr('Nadřazený adresář nelze přejmenovat'));
-            $this->chekWritableDir($path);
-            $newName = vve_cr_safe_file_name($item[2]);
-
-            if(!rename($path.$item[1], $path.$newName)){
-               throw new UnexpectedValueException(sprintf($this->tr('Položku %s se nepodařilo přejmenovat'), $item[1]));
-            }
-            $this->infoMsg()->addMessage(sprintf($this->tr('Položka %s byla přejmenována na %s '), $item[1], $newName));
-         } catch (UnexpectedValueException $exc) {
-            $this->errMsg()->addMessage($exc->getMessage());
-         }
+      $item = new ItemInfo($_POST['item']);
+      $name = vve_cr_safe_file_name($_POST['name']);
+      // kontrola oprávnění
+      if(!$item->hasWritableRight()){
+         throw new Exception(sprintf($this->tr("Objekt %s nelze přejmenovat"), $item->getName()));
       }
-      sleep(1);
+      
+      $file = new File($item->getRealPath());
+      $file->rename($name);
+      
+      $this->template()->name = $name;
+      $this->template()->path = $item->getRealPath();
+      
+      $this->infoMsg()->addMessage(sprintf($this->tr('Objekt %s byl přejmenován na %s'), $item->getName(), $name));
    }
 
+   public function copyController()
+   {
+      $this->checkRights();
+      if($_POST['item'] == null || $_POST['target'] == null){
+         throw new InvalidArgumentException($this->tr('Nebyly předány všechny parametry'));
+      }
+      
+      $item = new ItemInfo($_POST['item']);
+      $target = new ItemInfo($_POST['target']);
+      if(!self::hasWritableRights($target->getRealPath().DIRECTORY_SEPARATOR.$item->getName())){
+         throw new Exception(sprintf($this->tr("Nemáte právo zápisu do objektu %s"), $target->getName()));
+      }
+      
+      $this->template()->item = $item->getRealPath();
+      $this->template()->target = $target->getRealPath();
+      
+      if($item->isDir()){
+         $dir = new FS_Dir($item->getRealPath());
+         $dir->copy($target->getRealPath());
+      } else {
+         $file = new File($item->getRealPath());
+         $file->copy($target->getRealPath());
+      }
+      $this->infoMsg()->addMessage(sprintf($this->tr('Objekt %s byl kopírován do %s'), $item->getName(), $target->getName()));
+   }
+
+   public function moveController()
+   {
+      $this->checkRights();
+      if($_POST['item'] == null || $_POST['target'] == null){
+         throw new InvalidArgumentException($this->tr('Nebyly předány všechny parametry'));
+      }
+      
+      $item = new ItemInfo($_POST['item']);
+      $target = new ItemInfo($_POST['target']);
+      
+      if(!self::hasWritableRights($target->getRealPath().DIRECTORY_SEPARATOR.$item->getName())){
+         throw new Exception(sprintf($this->tr("Nemáte právo zápisu do objektu %s"), $target->getName()));
+      }
+      if(!$item->hasWritableRight()){
+         throw new Exception(sprintf($this->tr("Nemáte právo mazání objektu %s"), $item->getName()));
+      }
+      
+      $this->template()->item = $item->getRealPath();
+      $this->template()->target = $target->getRealPath();
+      
+      if($item->isDir()){
+         $dir = new FS_Dir($item->getRealPath());
+         $dir->copy($target->getRealPath());
+         $dir->delete();
+      } else {
+         $file = new File($item->getRealPath());
+         $file->move($target->getRealPath());
+//         copy($item->getRealPath(), $target->getRealPath());
+//         unlink($item->getRealPath());
+      }
+      $this->infoMsg()->addMessage(sprintf($this->tr('Objekt %s byl přesunut do %s'), $item->getName(), $target->getName()));
+   }
+   
+   
    /* Images function */
    /**
     * Create new resized image
     */
-   public function imageResizedController()
+   public function imageResizeController()
    {
       $this->checkRights();
-      $dir = substr(AppCore::getAppDataDir(), 0,-1).$this->getDir();
-      $this->chekWritableDir($dir);
-      $w = (int)$_POST['newW'];
-      $h = (int)$_POST['newH'];
-
-      $crop = false;
-      if($_POST['crop'] == 'true'){
-         $crop = true;
+      if(!isset($_REQUEST['item']) || !isset($_REQUEST['width']) || !isset($_REQUEST['height']) || !isset($_REQUEST['ratio']) || !isset($_REQUEST['crop'])){
+         throw new InvalidArgumentException($this->tr('Nebyly předány všechny parametry'));
       }
-
-      foreach ($_POST[self::REQ_FILE] as $file){
-         try {
-            $image = new Filesystem_File_Image($file, $dir);
-            $fInfo = pathinfo($dir . $file);
-            $newName = $fInfo['filename'] . '_' . $w . 'x' . $h . '.' . $fInfo['extension'];
-            $image->saveAs($dir, $w, $h, $crop, $newName);
-            unset($image);
-         } catch (Exception $exc) {
-            $this->errMsg()->addMessage(sprintf('Chyba při vatváření obrázku "%s": %s', $file, $exc->getMessage()));
+      $item = new ItemInfo($_REQUEST['item']);
+      if(!$item->exist()){
+         throw new UnexpectedValueException($this->tr('Obrázek neexistuje'));
+      }
+      if(!self::hasWritableRights($item->getDir())){
+         throw new UnauthorizedAccessException($this->tr('Nemáte oprávnění zápisu do této složky'));
+      }
+      
+      $width = (int)$_REQUEST['width'];
+      $height = (int)$_POST['height'];
+      $crop = (bool)$_POST['crop'];
+      $ration = (bool)$_POST['ratio'];
+      $resizeType = File_Image_Base::RESIZE_AUTO;
+      if($crop){
+         $resizeType = File_Image_Base::RESIZE_CROP;
+      } else {
+         if(!$ration){
+            $resizeType = File_Image_Base::RESIZE_EXACT;
          }
       }
-      $this->infoMsg()->addMessage(sprintf('Obrázky byly vytvořeny.'));
+      
+      $image = new File_Image($item->getRealPath());
+      if(isset($_REQUEST['createNew']) && (bool)$_REQUEST['createNew']){
+         $newFileName = $image->getBaseName().'_'.$width.'x'.$height.($crop ? 'c' : '').($ration ? '' : 'r').'.'.$image->getExtension();
+         $image = $image->copy($item->getDir(), true, $newFileName);
+      }
+      $image->getData()->resize($width, $height, $resizeType);
+      $image->save();
+      
+      $this->infoMsg()->addMessage(sprintf('Obrázek byl upraven.'));
    }
 
    /**
@@ -467,21 +711,175 @@ class Component_TinyMCE_Browser extends Component_TinyMCE {
    public function imageRotateController()
    {
       $this->checkRights();
-      $dir = substr(AppCore::getAppDataDir(), 0,-1).$this->getDir();
-      $this->chekWritableDir($dir);
-      $r = (int)$_POST['degree'];
-      foreach ($_POST[self::REQ_FILE] as $file) {
-         try {
-            $image = new Filesystem_File_Image($file, $dir);
-            $image->rotateImage(-(int) $r);
-            $image->save();
-            unset($image);
-         } catch (Exception $exc) {
-            $this->errMsg()->addMessage(sprintf('Chyba při otáčení obrázku "%s": %s', $file ,$exc->getMessage()));
+      if(!isset($_REQUEST['item']) || !isset($_REQUEST['degree'])){
+         throw new InvalidArgumentException($this->tr('Nebyly předány všechny parametry'));
+      }
+      $item = new ItemInfo($_REQUEST['item']);
+      if(!$item->exist()){
+         throw new UnexpectedValueException($this->tr('Obrázek neexistuje'));
+      }
+      if(!self::hasWritableRights($item->getDir())){
+         throw new UnauthorizedAccessException($this->tr('Nemáte oprávnění zápisu do této složky'));
+      }
+      
+      $degree = (int)$_REQUEST['degree'];
+      $image = new File_Image($item->getRealPath());
+      if(isset($_REQUEST['createNew']) && (bool)$_REQUEST['createNew']){
+         $newFileName = $image->getBaseName().'_'.$degree.'.'.$image->getExtension();
+         $image = $image->copy($item->getDir(), true, $newFileName);
+      }
+      $image->getData()->rotate($degree);
+      $image->save();
+      
+      $this->infoMsg()->addMessage(sprintf('Obrázek byl otočen.'));
+   }
+   
+   public function imageFlipController()
+   {
+      $this->checkRights();
+      if(!isset($_REQUEST['item']) || !isset($_REQUEST['flip'])){
+         throw new InvalidArgumentException($this->tr('Nebyly předány všechny parametry'));
+      }
+      $item = new ItemInfo($_REQUEST['item']);
+      if(!$item->exist()){
+         throw new UnexpectedValueException($this->tr('Obrázek neexistuje'));
+      }
+      if(!self::hasWritableRights($item->getDir())){
+         throw new UnauthorizedAccessException($this->tr('Nemáte oprávnění zápisu do této složky'));
+      }
+      
+      $flip = $_REQUEST['flip'] == IMG_FLIP_HORIZONTAL ? 'fh' : 'fv';
+      $image = new File_Image($item->getRealPath());
+      if(isset($_REQUEST['createNew']) && (bool)$_REQUEST['createNew']){
+         $newFileName = $image->getBaseName().'_'.$flip.'.'.$image->getExtension();
+         $image = $image->copy($item->getDir(), true, $newFileName);
+      }
+      $image->getData()->flip((int)$_REQUEST['flip']);
+      $image->save();
+      
+      $this->infoMsg()->addMessage(sprintf('Obrázek byl převrácen.'));
+   }
+   
+   public function imageWatermarkController()
+   {
+      $this->checkRights();
+      if(!isset($_REQUEST['item']) || !isset($_REQUEST['text']) || !isset($_REQUEST['color'])){
+         throw new InvalidArgumentException($this->tr('Nebyly předány všechny parametry'));
+      }
+      $item = new ItemInfo($_REQUEST['item']);
+      if(!$item->exist()){
+         throw new UnexpectedValueException($this->tr('Obrázek neexistuje'));
+      }
+      if(!self::hasWritableRights($item->getDir())){
+         throw new UnauthorizedAccessException($this->tr('Nemáte oprávnění zápisu do této složky'));
+      }
+      
+      $image = new File_Image($item->getRealPath());
+      if(isset($_REQUEST['createNew']) && (bool)$_REQUEST['createNew']){
+         $newFileName = $image->getBaseName().'_wtr.'.$image->getExtension();
+         $image = $image->copy($item->getDir(), true, $newFileName);
+      }
+      $color = str_replace('#', '', $_REQUEST['color']);
+      $color = substr($color, 0, 6);
+      $colorBg = null;
+      if(isset($_REQUEST['colorBg']) && $_REQUEST['colorBg'] != null){
+         $colorBg = str_replace('#', '', $_REQUEST['colorBg']);
+         $colorBg = substr($colorBg, 0, 6);
+      }
+      $params = array(
+          'color' => $color,
+          'bgColor' => $colorBg,
+          'horizontal' => isset($_REQUEST['posX']) ? $_REQUEST['posX'] : 'right',
+          'vertical' => isset($_REQUEST['posY']) ? $_REQUEST['posY'] : 'bottom',
+          'alpha' => $colorBg == null ? 1 : 0.5,
+      );
+      
+      $image->getData()->textWatermark($_REQUEST['text'], $params);
+      $image->save();
+      
+      $this->infoMsg()->addMessage(sprintf('Obrázek byl převrácen.'));
+   }
+   
+   /**
+    * grayscale img
+    */
+   public function imageFilterController()
+   {
+      $this->checkRights();
+      if(!isset($_REQUEST['item']) || !isset($_REQUEST['filter'])){
+         throw new InvalidArgumentException($this->tr('Nebyly předány všechny parametry'));
+      }
+      $item = new ItemInfo($_REQUEST['item']);
+      if(!$item->exist()){
+         throw new UnexpectedValueException($this->tr('Obrázek neexistuje'));
+      }
+      if(!self::hasWritableRights($item->getDir())){
+         throw new UnauthorizedAccessException($this->tr('Nemáte oprávnění zápisu do této složky'));
+      }
+      
+      $image = new File_Image($item->getRealPath());
+      $fileSufix = '_filter';
+      
+      if(is_numeric($_REQUEST['filter'])){
+         $args = array((int)$_REQUEST['filter']);
+         switch ($_REQUEST['filter']) {
+            case IMG_FILTER_BRIGHTNESS:
+               $args[] = (int)$_REQUEST['arg'];
+               $fileSufix = 'brig';
+               break;
+            case IMG_FILTER_CONTRAST:
+               $args[] = (int)$_REQUEST['arg'];
+               $fileSufix = 'contrast';
+               break;
+            case IMG_FILTER_EDGEDETECT:
+               $fileSufix = 'edge';
+               break;
+            case IMG_FILTER_GAUSSIAN_BLUR:
+               $fileSufix = 'gblur';
+               break;
+            case IMG_FILTER_GRAYSCALE:
+               $fileSufix = 'gray';
+               break;
+            case IMG_FILTER_NEGATE:
+               $fileSufix = 'negate';
+               break;
+            case IMG_FILTER_PIXELATE:
+               $args[] = (int)$_REQUEST['arg'];
+               $fileSufix = 'pixelate';
+               break;
+            case IMG_FILTER_SELECTIVE_BLUR:
+               $fileSufix = 'sblur';
+               break;
+            default:
+               throw new InvalidArgumentException($this->tr('Nepodporovaný filtr'));
+         }
+         $image = new File_Image($item->getRealPath());
+         if(isset($_REQUEST['createNew']) && (bool)$_REQUEST['createNew']){
+            $newFileName = $image->getBaseName().'_'.$fileSufix.'.'.$image->getExtension();
+            $image = $image->copy($item->getDir(), true, $newFileName);
+         }
+         call_user_func_array(array($image->getData(), 'filter'), $args);
+         $image->save();
+         
+      } else {
+         switch ($_REQUEST['filter']) {
+            case 'sepia':
+               if(isset($_REQUEST['createNew']) && (bool)$_REQUEST['createNew']){
+                  $newFileName = $image->getBaseName().'_sepia_'.(int)$_REQUEST['arg'].'_'.(int)$_REQUEST['arg'].'.'.$image->getExtension();
+                  $image = $image->copy($item->getDir(), true, $newFileName);
+               }
+               
+               $image->getData()
+                   ->filter(IMG_FILTER_GRAYSCALE)
+                   ->filter(IMG_FILTER_COLORIZE, (int)$_REQUEST['arg'], (int)$_REQUEST['arg'], 0);
+               $image->save();
+               break;
+            default :
+               throw new InvalidArgumentException($this->tr('Nepodporovaný filtr'));
          }
       }
-      $this->infoMsg()->addMessage(sprintf('Obrázek byl otočen.'));
-      sleep(1);
+      
+      $this->infoMsg()->addMessage(sprintf('Filtr by aplikován.'));
    }
 
    public function createSystemImagesController()
@@ -525,36 +923,7 @@ class Component_TinyMCE_Browser extends Component_TinyMCE {
       $this->infoMsg()->addMessage(sprintf('Obrázky byly vytvořeny.'));
    }
 
-   public function copyController()
-   {
-      $this->checkRights();
-      $targetDir = substr(AppCore::getAppDataDir(),0,-1).  str_replace(URL_SEPARATOR, DIRECTORY_SEPARATOR, $_POST['target']);
-      $this->chekWritableDir($targetDir);
-      foreach ($_POST['items'] as $item) {
-         $path = substr(AppCore::getAppDataDir(),0,-1).str_replace(URL_SEPARATOR, DIRECTORY_SEPARATOR, $item[0]);
-         try {
-            $this->chekWritableDir($targetDir);
-            if (!@copy($path.$item[1], $targetDir . $item[1])) {
-               throw new UnexpectedValueException(sprintf($this->tr('Položku "%s" se nepodařilo kopírovat.'), $item[1]));
-            }
-            if($_POST['move'] == 'true') {
-               if(is_dir($path.$item[1]) AND !@rmdir($path.$item[1])){
-                  throw new UnexpectedValueException(sprintf($this->tr('Položku "%s" se nepodařilo vymazat.'), $item[1]));
-               } else if(is_file ($path.$item[1]) AND !@unlink($path.$item[1])) {
-                  throw new UnexpectedValueException(sprintf($this->tr('Položku "%s" se nepodařilo vymazat.'), $item[1]));
-               }
-            }
-            if($_POST['move'] == 'true') {
-               $this->infoMsg()->addMessage(sprintf('Položka "%s" byla přesunuta.', $item[1]));
-            } else {
-               $this->infoMsg()->addMessage(sprintf('Položka "%s" byla kopírována.', $item[1]));
-            }
-         } catch (UnexpectedValueException $exc) {
-            new CoreErrors($exc);
-         }
-      }
-      sleep(1);
-   }
+   
 
    public function getUsersController()
    {
@@ -591,4 +960,65 @@ class Component_TinyMCE_Browser extends Component_TinyMCE {
 
    }
 }
-?>
+
+class ItemInfo extends Object {
+   private $item;
+
+   public function __construct($item)
+   {
+      $this->item = $item;
+   }
+   
+   public function getRealPath()
+   {
+      $prefix = (strpos($this->item, 'data') === 0 ? AppCore::getAppWebDir() : AppCore::getAppDataDir());
+      $path = $this->normalizePath($prefix.str_replace(array('/'), array(DIRECTORY_SEPARATOR), $this->item));
+      return $path;
+   }
+   
+   public function getDir()
+   {
+      $item = $this->getRealPath();
+      return pathinfo($item, PATHINFO_DIRNAME).DIRECTORY_SEPARATOR;
+   }
+   
+   public function getName()
+   {
+      return pathinfo($this->item, PATHINFO_BASENAME);
+   }
+   
+   public function isWritable()
+   {
+      return is_writable($this->getRealPath());
+   }
+   
+   public function isDir()
+   {
+      return is_dir($this->getRealPath());
+   }
+   
+   public function hasWritableRight()
+   {
+      return Component_TinyMCE_Browser::hasWritableRights($this->getRealPath());
+   }
+   
+   public function exist()
+   {
+      return file_exists($this->getRealPath());
+   }
+   
+   private function normalizePath($path) {
+      return array_reduce(explode('/', $path), create_function('$a, $b', '
+         if($a === 0) $a = "/";
+
+         if($b === "" || $b === ".")
+             return $a;
+
+         if($b === "..")
+             return dirname($a);
+
+         return preg_replace("/\/+/", DIRECTORY_SEPARATOR, "$a/$b");
+     '), 0);
+}
+
+}

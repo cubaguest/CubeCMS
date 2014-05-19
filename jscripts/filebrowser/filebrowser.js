@@ -1,484 +1,1039 @@
-var FileBrowserDialogue = {
+(function($){
+    $.fn.disableSelection = function() {
+        return this
+                 .attr('unselectable', 'on')
+                 .css('user-select', 'none')
+                 .on('selectstart', false);
+    };
+})(jQuery);
+
+Storage.prototype.setObj = function(key, obj) {
+   return this.setItem(key, JSON.stringify(obj));
+};
+Storage.prototype.getObj = function(key) {
+   return JSON.parse(this.getItem(key));
+};
+
+function openInNewTab(url) {
+  var win = window.open(url, '_blank');
+  win.focus();
+}
+
+var CubeBrowser = {
+   params : {
+      // základní adresy
+      uploadLink: null,
+      baseUrl: null,
+      sessionId: null,
+      listType: "images",
+      imageBigSizeW: 1024,
+      imageBigSizeH: 768,
+      imageSmallSizeW: 200,
+      imageSmallSizeH: 200,
+      cookieName: 'Cube_Cms_brpath',
+      baseListPath: '/home/',
+      openDir: null,
+      translations : {}
+   },
    listType : null,
+   currentPath : '/public/',
+   currentAccess : {read : true, write : false},
    win : null,
    category : 0,
-   init : function () {
-      // Here goes your code for setting your custom things onLoad.
-      FileBrowser.listType = tinyMCEPopup.getWindowArg("listType");
-      FileBrowserDialogue.win = tinyMCEPopup.getWindowArg("window");
-      FileBrowserDialogue.category = tinyMCEPopup.getWindowArg("cat");
+
+   init : function(params){
+      $.extend(this.params, params);
+      this.listType = tinyMCEPopup.getWindowArg("listType");
+      this.win = tinyMCEPopup.getWindowArg("window");
+      this.category = tinyMCEPopup.getWindowArg("cat");
       var path = tinyMCEPopup.getWindowArg("url");
-      if(path != ""){
+      
+      if(path !== ""){
          var regex = /data(\/.*\/)[a-z0-9._-]+/i;
          var matches = path.match(regex);
          if(matches){
-            FileBrowser.currentDir = matches[1];
+            this.params.baseListPath = matches[1];
+         }
+      } else {
+         var lastPath = localStorage.getItem('lastpath');
+         if(lastPath !== null){
+            this.params.baseListPath = lastPath;
          }
       }
-      FileBrowser.init();
+      
+      CubeBrowserPathWidget.init();
+      CubeBrowserPreviewWidget.init();
+      
+      CubeBrowserListWidget.init(this.params.baseListPath);
+      CubeBrowserTipsWidget.init();
+      CubeBrowserToolboxWidget.init();
+      CubeBrowserFileActionsWidget.init();
+      CubeBrowserUploader.init(this.params);
+      CubeBrowserLogsWidget.init();
+      CubeBrowserProgressBarWidget.init();
+      CubeBrowserFilterWidget.init();
+      CubeBrowserClipBoardWidget.init();
+      
+      
+      
    },
-   submitFile : function () {
+   submitFile : function (filepath) {
       // insert information now
-      FileBrowserDialogue.win.document.getElementById(tinyMCEPopup.getWindowArg("input"))
-         .value = FileBrowser.getSelected().data('realpath');
+      this.win.document.getElementById(tinyMCEPopup.getWindowArg("input")).value = filepath;
       // are we an image browser
-      if (typeof(FileBrowserDialogue.win.ImageDialog) != "undefined") {
+      if (typeof(this.win.ImageDialog) !== "undefined") {
          // we are, so update image dimensions...
-         if (FileBrowserDialogue.win.ImageDialog.getImageData)
-            FileBrowserDialogue.win.ImageDialog.getImageData();
+         if (this.win.ImageDialog.getImageData) {
+            this.win.ImageDialog.getImageData();
+         }
          // ... and preview if necessary
-         if (FileBrowserDialogue.win.ImageDialog.showPreviewImage)
-            FileBrowserDialogue.win.ImageDialog.showPreviewImage(FileBrowser.getSelected().data('realpath'));
+         if (this.win.ImageDialog.showPreviewImage) {
+            this.win.ImageDialog.showPreviewImage(CubeBrowserListWidget.getSelectedItems().first().data('realpath'));
+         }
       }
       // close popup window
       tinyMCEPopup.close();
-   }
-};
-
-var FileBrowser = {
-   cmsPluginUrl : null,
-   currentDir : null,
-   baseUrl : null,
-   iconsDir : 'images/files/',
-   uploadLink : null,
-   sessionId : null,
-   listType : null,
-   uploadFilesPosParams : null,
-   $itemsBox : null,
-   $dirCnt : null,
-   writable : false,
-   clipboard : {cut : false, items : new Array},
-   extendJQ : function(){
-      $.fn.selectItem = function() {
-         $(this).addClass('item-selected');
-      };
-      $.fn.markItem = function() {
-         $(this).addClass('item-marked');
-      };
-      $.fn.unselectItem = function() {
-         $(this).removeClass('item-selected');
-      };
-      $.fn.unmarkItem = function() {
-         $(this).removeClass('item-marked');
-      };
-      $.fn.clipCutItem = function() {
-         $(this).addClass('item-cut');
-         // logika pro vyjmutí
-
-      };
-      $.fn.clipUncutItem = function() {
-         $(this).removeClass('item-cut');
-      };
-      $.extend( {
-         isSelectedItem: function(item) {
-            return $(item).hasClass('item-selected');
-         },
-         isMarkedItem: function(item) {
-            return $(item).hasClass('item-marked');
-         },
-         getItemSize: function(size){
-            var size = parseFloat(size);
-            if(size > 1048576){ // MB
-               return Number(size/1048576).toFixed(2).toString()+' MB';
-            } else if(size > 1024) { // KB
-               return Number(size/1024).toFixed(2).toString()+' KB';
-            } else { // B
-               return size.toString()+' B';
-            }
-         }
-      });
    },
-   init : function(){
-      this.extendJQ();
-      this.cmsPluginUrl = window.location.toString().replace('browser.php', 'jscripts/tinymce/');
-      if(this.currentDir == null){
-    	  if(openDir){
-            this.currentDir = openDir;
-         } else {
-            // load previous path
-            this.currentDir = this.loadPath();
-         }
-      }
-      // UPLOAD POST PARAMS
-      this.uploadFilesPosParams = {
-         sessionid: FileBrowser.sessionId,
-         'upload_send' : 'send',
-         path: FileBrowser.currentDir,
-         type : FileBrowser.listType
-      };
-
-      // SWF UPLOAD
-      $('.swfupload-control').swfupload({
-         // Backend Settings
-         upload_url: FileBrowser.uploadLink,    // Relative to the SWF file (or you can use absolute paths)
-         file_post_name: "upload_file",
-         post_params: FileBrowser.uploadFilesPosParams,
-         file_size_limit : (maxUploadFileSize/1024), // global upload size - 1KB
-         file_types : FileBrowser.getFileTypes(),
-         file_types_description : "files",
-         file_upload_limit : 150,
-         file_queue_limit : 0,
-         button_image_url : FileBrowser.baseUrl+"/images/upload_cs.png", // Relative to the SWF file
-         button_placeholder_id : "spanButtonPlaceholder",
-         button_width: 61,
-         button_height: 22,
-         button_window_mode : SWFUpload.WINDOW_MODE.OPAQUE,
-//         debug: true,
-         // Flash Settings
-         flash_url : FileBrowser.baseUrl+"/jscripts/swfupload/swfupload.swf",
-         flash9_url : FileBrowser.baseUrl+"/jscripts/swfupload/swfupload_fp9.swf"
-      });
-
-      // assign our event handlers
-      $('.swfupload-control')
-      .bind('fileQueued', function(event, file){
-            FileBrowser.uploadFilesPosParams.path = FileBrowser.currentDir;
-         $(this).swfupload('setPostParams', FileBrowser.uploadFilesPosParams );
-            $(this).swfupload('startUpload');
-         })
-      .bind('uploadComplete', function(event, file){$(this).swfupload('startUpload');})
-      .bind('uploadStart', function(event, file){$('#uploading-files').show();})
-      .bind('fileQueueError', function(event, file, errorCode, message){FileBrowser.showResult([], ['Velikost souboru '+file.name+' je větší než povolený limit']);})
-      .bind('uploadSuccess', function(event, file, serverData){
-            FileBrowser.load();
-            $('#uploading-files').hide();
-            var data = $.parseJSON(serverData);
-            FileBrowser.showResult(data.infomsg, data.errmsg);
-         });
-
-      // init items box
-      this.$itemsBox = $('#itemsList');
-
-      // EVENTS
-      // keys
-      $('#itemsList li a').live('keypress',function(event){
-         if(event.keyCode == 38 || event.keyCode == 40 // cursor
-            || event.keyCode == 13 // enter
-            || event.keyCode == 46 //delete
-            || event.keyCode == 45 // insert
-         ){
-            event.preventDefault();
-
-            switch (event.keyCode) {
-               case 38:// up
-                  $(this).parent('li').prev().children('a').trigger('click', event.shiftKey);
-                  break;
-               case 40:// down
-                  $(this).parent('li').next().children('a').trigger('click', event.shiftKey);
-                  break;
-               case 13:// enter
-                  $(this).trigger('dblclick', false);
-                  break;
-               case 45:// insert (move down and mark item)
-                  $(this).parent('li').next().children('a').trigger('click', true);
-                  break;
-               case 46:// delete
-                  $('#buttonDelete').click();
-                  break;
-               default:
-                  alert(event.keyCode);
-                  break;
-            }
-         }
-      });
-      // click
-      $('#itemsList li a').live('click',function(event, ctrlKey){
-         event.preventDefault();
-         $(this).focus();
-         if(typeof(ctrlKey) != 'undefined') event.ctrlKey = ctrlKey;
-         if(typeof(event.shiftKey) == 'undefined') event.shiftKey = false;
-
-            if(event.ctrlKey){ // ctrl
-               if($.isMarkedItem(this)){
-               $(this).unmarkItem();
-            } else {
-               $(this).markItem();
-            }
-            } else if(event.shiftKey){ // shift
-            var selected = FileBrowser.getSelected();
-            var fIndex = $('li').index(selected.parent('li'));
-            var tIndex = $('li').index($(this).parent('li'));
-            var items = FileBrowser.getAllItems();
-            // move down
-               if(fIndex <= tIndex){
-               for (var i = fIndex; i <= tIndex; i++) {
-                  $(items[i]).markItem();
-               }
-            } else {
-               for (var y = fIndex; y >= tIndex; y--) {
-                  $(items[y]).markItem();
-               }
-            }
-         } else {
-            FileBrowser.getMarked().unmarkItem();
-            $(this).markItem();
-         }
-         FileBrowser.getSelected().unselectItem();
-         $(this).selectItem(); // vybereme označený
-         FileBrowser.showData($(this)); // show info
-         return;
-      });
-      // dbclick
-      $('#itemsList li a').live('dblclick',function(event, ctrlKey){
-         if($(this).data('type') == 'dir' || $(this).data('type') == 'dot'){ // is dir or dot
-            FileBrowser.load($(this).data('path')+$(this).data('name')+'/');
-         } else { // is file
-            //alert('selected: '+$(this).data('realpath'));
-            FileBrowserDialogue.submitFile();
-         }
-         return;
-      });
-
-      // init drag & drop to area
-      $(document).on('dragenter', function(e) {
-         e.stopPropagation();
-         e.preventDefault();
-      })
-      .on('dragover', function(e) {
-         e.stopPropagation();
-         e.preventDefault();
-         _that.$itemsBox.addClass('draging');
-      })
-      .on('dragleave', function(e) {
-         _that.$itemsBox.removeClass('draging');
-      })
-      .on('drop', function(e){
-         e.stopPropagation();
-         e.preventDefault();
-         _that.$itemsBox.removeClass('draging');
-         var files = e.originalEvent.dataTransfer.files;
-         //We need to send dropped files to Server
-         _that.handleFileUpload(files);
-      });
-
-      // load all items
-      this.load();
-      // show tip
-      FileBrowser.showTip();
+   getCurrentPath : function(){
+      return this.currentPath;
    },
-   showResult : function(infomsg, errmsg){
-      if(errmsg.length > 0){
-         $('#log').prepend('<br />').prepend($('<span></span>').text(errmsg.join(', ')).addClass("errmsg"));
-      }
-      if(infomsg.length > 0){
-         $('#log').prepend('<br />').prepend($('<span></span>').text(infomsg.join(', ')).addClass("msg"));
-      }
+   setCurrentPath : function(path){
+      this.currentPath = path;
+      localStorage.setItem('lastpath', path);
    },
-   logMsg : function(msg){},
-   clearLog : function(){$('#log').html('');},
-   showData : function(item){
-      var imgSize = 150;
-      var info = item.data();
-      var $infoBox = $('#infoBox');
-      var $actionsBox = $('#fileActions').html('<p>Žádné nástroje nejsou k dispozici.</p>');
-      // clear boxs
-      $infoBox.html('');
-
-      $('#currentFile').text(info.name);
-      if(info.type == 'dir') {
-         // není zapisovatelný
-         if(info.access.write == true){
-            var $abox = $('<p></p>');
-            var $select = $('<select></select>').attr({name : 'users', size : 6, multiple : true});
-            var $selI = FileBrowser.getSelected();
-
-            FileBrowser.request('getUsers', {path : $selI.data('path'), name : $selI.data('name')}, function(data){
-               var $opt = $('<option></option>');
-               $.each(data.users, function(index){
-                  var $o = $opt.clone();
-                  $o.attr({value : this.id, selected : this.selected}).text(this.name);
-                  $select.append($o);
-               });
-            });
-            $abox.append('<strong>Povolení zápisu pro:</strong><br />');
-            $abox.append($select);
-            $abox.append('<br />');
-            $abox.append('<input name="chenge_perms" value="Přiřadit" type="button" onClick="FileBrowser.setDirPerms()" />');
-            $actionsBox.html($abox);
-         }
-      } else if(info.type == 'file'){
-         if(info.info.type == 'image'){ // IMAGE
-            var $img = $('<img />');
-            var w = info.info.dimension.w;
-            var h = info.info.dimension.h;
-            if(info.info.dimension.w > imgSize || info.info.dimension.h > imgSize){ // must be resized
-               if(info.info.dimension.w > info.info.dimension.h){ // width
-                  h = info.info.dimension.h/info.info.dimension.w*imgSize;
-                  w = imgSize;
-               } else { //height
-                  w = info.info.dimension.w/info.info.dimension.h*imgSize;
-                  h = imgSize;
-               }
-            }
-            var time = new Date;
-            $img.attr('src', FileBrowser.baseUrl+info.realpath+'?t='+(time.getTime()/1000).toString())
-               .css({
-               width: w, height : h-5//, 'padding-top' : ((imgSize-h)/2)-2 // centering
-               });
-            $infoBox.append($('<p></p>').addClass('imgprev-box').html($img));
-            // file info
-            var $sizes = $('<p></p>').addClass('file-info')
-               .html('Rozměry:<br/>'+info.info.dimension.w+'x'+info.info.dimension.h+' px<br />'+'Velikost:<br/>'+$.getItemSize(info.info.size)+'<br />');
-
-            if(info.info.dimension.w > imageBigSizeW){
-               $sizes.append('<br /><strong>Obázek je příliš velký pro vložení do stránky!!!. Doporučujeme zmenšit alespoň na '+imageBigSizeW+'x'+imageBigSizeH+' px.</strong><br />');
-            }
-            $infoBox.append($sizes);
-
-            // action box
-            var $abox = $('<p></p>');
-
-            $abox.append('<strong>Vytvořit zmenšeninu:</strong><br />');
-            $abox.append(
-               '<input type="text" size="5" maxlength="5" name="img_w" value="0" />&times;'
-               +'<input type="text" size="5" maxlength="5" name="img_h" value="0" /> px '
-               +'<input type="button" name="img_resize" value="Vytvořit" onClick="FileBrowser.imageResize()" /><br />'
-               +'<input type="checkbox" name="img_ratio" checked="checked" /> Zachovat poměr '
-               +'<input type="checkbox" name="img_crop" /> Ořezat'
-               +'<hr />'
-               );
-
-            var $iW = $('input[name="img_w"]', $abox).val(info.info.dimension.w).data('origsize', info.info.dimension.w);
-            var $iH = $('input[name="img_h"]', $abox).val(info.info.dimension.h).data('origsize', info.info.dimension.h);
-
-            $iW.change(function(){
-               if($('input[name="img_ratio"]',$abox).is(':checked')){
-                  $('input[name="img_h"]', $abox).val(
-                     Math.round(parseInt($(this).val())/parseInt($('input[name="img_w"]', $abox).data('origsize'))*parseInt($('input[name="img_h"]', $abox).data('origsize')))
-                     );
-               }
-            });
-            $iH.change(function(){
-               if($('input[name="img_ratio"]',$abox).is(':checked')){
-                  $('input[name="img_w"]', $abox).val(
-                     Math.round(parseInt($(this).val())/parseInt($('input[name="img_h"]', $abox).data('origsize'))*$('input[name="img_w"]', $abox).data('origsize'))
-                     );
-               }
-            });
-
-            $abox.append('<strong>Otočit doprava:</strong><br />');
-            $abox.append(
-               '<select name="img_degree">'
-               +'<option value="90">90°</option>'
-               +'<option value="180">180°</option>'
-               +'<option value="270">270°</option>'
-               +'</select>&nbsp;'
-               +'<input type="button" name="img_rotate" value="Otočit" onClick="FileBrowser.imageRotate()" />'
-               +'<hr />'
-               );
-
-            $abox.append('<strong>Vytvořit obrázky v systémové velikosti:</strong><br />');
-            $abox.append(
-               'Velký:'+imageBigSizeW+'x'+imageBigSizeH+' Malý:'+imageSmallSizeW+'x'+imageSmallSizeH
-               +'&nbsp;<input type="button" name="img_system_sizes" value="Vytvořit" onClick="FileBrowser.imageSystemResize()" /><br />'
-               +'<input type="checkbox" name="img_createdirs" checked="checked" /> Zařadit do adresářů (small, medium) '
-               +'<hr />'
-               );
-            $actionsBox.html($abox);
-         } else if(info.info.type == 'flash'){// flash
-            $infoBox.html(''); // clear box
-            var w = info.info.dimension.w;
-            var h = info.info.dimension.h;
-            if(info.info.dimension.w > imgSize || info.info.dimension.h > imgSize){ // must be resized
-               if(info.info.dimension.w > info.info.dimension.h){ // width
-                  h = info.info.dimension.h/info.info.dimension.w*imgSize;
-                  w = imgSize;
-               } else { //height
-                  w = info.info.dimension.w/info.info.dimension.h*imgSize;
-                  h = imgSize;
-               }
-            }
-            var $flash = $('<p></p>').addClass('imgprev-box');
-            $flash.html('<object width="'+w+'" height="'+h+'">'
-               +'<param name="movie" value="'+FileBrowser.baseUrl+info.realpath+'">'
-               +'<embed src="'+FileBrowser.baseUrl+info.realpath+'" width="'+w+'" height="'+h+'">'
-               +'</embed></object>');
-            $infoBox.append($flash);
-
-            $infoBox.append($('<p></p>').addClass('file-info')
-            .html('Rozměry:<br/>'+info.info.dimension.w+'x'+info.info.dimension.h+' px<br />'+'Velikost:<br/>'+$.getItemSize(info.info.size)+'<br />'));
-         } else { // OTHER FILES
-            $infoBox.html($('<p></p>').addClass('file-info').html('Velikost:<br/>'+$.getItemSize(info.info.size)+'<br />'));
-         }
-      }
+   getCurrentAccess : function(){
+      return this.currentAccess;
    },
-   timer : null,
-   showWorking : function(){
-      FileBrowser.timer = setTimeout(function(){
-         $("#working").show();
-      }, 500);
-//      $("#working").show();
+   setCurrentAccess : function(access){
+      this.currentAccess = access;
    },
-   hideWorking : function(){
-      clearTimeout(FileBrowser.timer);
-      $("#working").hide()
-   },
-   getFileTypes : function(){
-      var extensions = Array();
-      if(this.listType == 'image'){
-         extensions = Array('jpg','jpeg','png','gif','bmp','wmf');
-      } else if(this.listType == 'media'){
-         extensions = Array('swf', // falsh
-            'mp4','m4v', 'ogv', 'mov' , 'flv', 'rm', 'qt', 'avi', // video
-            'mp3', 'ogg', 'wma', 'wav' // audio
-            );
-      }
-
-      if(extensions.length != 0){
-         var len = extensions.length;
-         for ( var i = 0; i < len ; i++ ) {
-            extensions[i] = '*.'+extensions[i]; 
-            extensions[i+len] = extensions[i].toUpperCase(); 
-         }
-         return extensions.join(';');
-      }
-      return "*.*";
-   },
+   
    request : function(action, postValues, sucessfunc, errfunc){
       $.ajax({
          type : 'POST', data : postValues, url : window.location.toString().replace('browser.php', action+'.php'),
          cache : false,
 //         async : false,
          success: function(data){
-            if(typeof (sucessfunc)== 'function') {
-               sucessfunc.call(this, data);
+            if($.isFunction(sucessfunc)) {
+               sucessfunc.call(data);
             }
-            if(data.infomsg.length > 0 || data.errmsg.length > 0){
-               FileBrowser.showResult(data.infomsg, data.errmsg)
+            if(data.infomsg.length > 0){
+               $.each(data.infomsg, function(index, msg){
+                  CubeBrowserLogsWidget.add(msg, 'info');
+               });
+            }
+            if(data.errmsg.length > 0){
+               $.each(data.errmsg, function(index, msg){
+                  CubeBrowserLogsWidget.add(msg, 'err');
+               });
             }
          },
          error: function(){
-            FileBrowser.showResult([], ['Chyba při komunikaci se serverem. Zkuste znovu.']);
+//            FileBrowser.showResult([], ['Chyba při komunikaci se serverem. Zkuste znovu.']);
          },
          complete : function(){}
-      })
+      });
    },
-   getSelected : function(){
-      return this.$itemsBox.find('li a.item-selected');
+   
+   submitSelectedFile : function(){
+      var $items = CubeBrowserListWidget.getSelectedItems();
+      $items.each(function(){
+         if($(this).data('itemclass') !== "dir" && $(this).data('itemclass') !== "dot") {
+            CubeBrowser.submitFile($(this).data('realpath'));
+            return;
+         } 
+      });
    },
-   getMarked : function(){
-      return this.$itemsBox.find('li a.item-marked');
+   
+   loadDirectories : function()
+   {
+      var $select = $('.directory-select');
+      $.ajax({
+         type : 'GET', url : window.location.toString().replace('browser.php', 'getdirs.php'),
+         cache : false,
+         async : false,
+         success: function(data){
+            $select.html("");
+            var $grp2 = $('<optgroup></optgroup>').prop('label', 'Veřejné adresáře');
+            $.each(data.dirsPublic, function(index, value){
+               $grp2.append($('<option></option>').prop('value', value).text(value));
+            });
+            $select.append($grp2);
+            
+            var $grp1 = $('<optgroup></optgroup>').prop('label', 'Adresáře v domovské složce');
+            $.each(data.dirsHome, function(index, value){
+               $grp1.append($('<option></option>').prop('value', value).text(value));
+            });
+            $select.append($grp1);
+         }
+      });
    },
-   getAllItems : function(){
-      return this.$itemsBox.find('li a');
+   
+   openMoveDialog : function()
+   {
+      $('#dialog-move').fadeIn(300);
    },
-   // uploading ober html5
-   handleFileUpload: function(files) {
-      for (var i = 0; i < files.length; i++) {
-         var fd = new FormData();
-         fd.append('upload_file', files[i]);
-         
-         $.each(FileBrowser.uploadFilesPosParams, function(index, value){
-            fd.append(index, value);
+   openRenameDialog : function(button)
+   {
+      if(typeof (button) === "undefined"){
+         button = CubeBrowserListWidget.getSelectedItems().first();
+      }
+      
+      var $item = $(button).closest('li');
+      $('#dialog-rename').fadeIn(300).find('input[type="text"]').val($item.data('name'));
+   },
+   openCopyDialog : function()
+   {
+      $('#dialog-copy').fadeIn(300);
+   },
+   openNewDirDialog : function()
+   {
+      $('#dialog-new-dir').fadeIn(300);
+   },
+   openDeleteDialog : function(button)
+   {
+      var names = new Array();
+      if(typeof (button) === 'undefined'){
+         CubeBrowserListWidget.getSelectedItems().each(function(index){
+            names.push($(this).data('name'));
          });
-         var statusBar = new FileBrowserStatusBar(); //Using this we can set progress.
-         statusBar.setFileNameSize(files[i].name,files[i].size);
-         this.sendFileToServer(fd, statusBar);
+      } else {
+         var $item = $(button).closest('li');
+         names.push($item.data('name'));
+      }
+      $('#dialog-delete').find('.files-list').text(names.join(', '));
+      $('#dialog-delete').fadeIn(300);
+   },
+   closeDialog : function(obj)
+   {
+      $(obj).closest('.dialog').fadeOut(300);
+   },
+   
+   
+   // METODY pro zpracování
+   renameItem : function(newname){
+      var that = this;
+      var $item = CubeBrowserListWidget.getSelectedItems().first();
+      this.request('rename', 
+      { item : $item.data('realpath'), name : newname },
+      function(){
+         CubeBrowserListWidget.refreshPath();
+      });
+   },
+   renameItems : function(newname){
+      var $items = CubeBrowserListWidget.getSelectedItems().filter('.item-image');
+      var queue = $items.length;
+      var that = this;
+      var $box = $('#image-flip');
+      if(queue === 0){
+         CubeBrowserLogsWidget.add('Nebyl vybrán žádný soubor', 'err');
+         return;
+      }
+      var itemProgress = Math.round(100/$items.length);
+      CubeBrowserProgressBarWidget.setProgress(0);
+      $items.each(function(){
+         CubeBrowser.request('rename', {
+            item : $(this).data('realpath'),
+            name : newname
+         }, function(){
+            CubeBrowserProgressBarWidget.addProgress(itemProgress);
+            queue--;
+            if(queue === 0){
+               CubeBrowserProgressBarWidget.setProgress(100);
+               CubeBrowserListWidget.refreshPath();
+            }
+         });
+      });
+   },
+   deleteItem : function($item){
+      
+   },
+   moveSelectedItems : function(target){
+      var $items = CubeBrowserListWidget.getSelectedItems();
+      var queue = $items.length;
+     
+      var itemProgress = Math.round(100/$items.length);
+      CubeBrowserProgressBarWidget.setProgress(0);
+      $items.each(function(){
+         CubeBrowser.request('move', 
+            { item : $(this).data('realpath'), target : target },
+         function(){
+            CubeBrowserProgressBarWidget.addProgress(itemProgress);
+            queue--;
+            if(queue === 0){
+               CubeBrowserProgressBarWidget.setProgress(100);
+               CubeBrowserListWidget.refreshPath();
+            }
+         });
+      });
+   },
+   copySelectedItems : function(target){
+      var $items = CubeBrowserListWidget.getSelectedItems();
+      var queue = $items.length;
+     
+      var itemProgress = Math.round(100/$items.length);
+      CubeBrowserProgressBarWidget.setProgress(0);
+      $items.each(function(){
+         CubeBrowser.request('copy', 
+            { item : $(this).data('realpath'), target : target },
+         function(){
+            CubeBrowserProgressBarWidget.addProgress(itemProgress);
+            queue--;
+            if(queue === 0){
+               CubeBrowserProgressBarWidget.setProgress(100);
+               CubeBrowserListWidget.refreshPath();
+            }
+         });
+      });
+   },
+   deleteSelectedItems: function(){
+      var $items = CubeBrowserListWidget.getSelectedItems();
+      var queue = $items.length;
+      var that = this;
+
+      var itemProgress = Math.round(100/$items.length);
+      CubeBrowserProgressBarWidget.setProgress(0);
+      $items.each(function(){
+         that.request('delete', {
+            item : $(this).data('realpath')
+         }, function(){
+            CubeBrowserProgressBarWidget.addProgress(itemProgress);
+            queue--;
+            if(queue === 0){
+                CubeBrowserProgressBarWidget.setProgress(100);
+                CubeBrowserListWidget.refreshPath();
+            }
+         });
+      });
+   },
+   createDir: function(name){
+      var that = this;
+      this.request('createDir', 
+      { item : CubeBrowser.getCurrentPath(), name : name },
+      function(){
+         CubeBrowserListWidget.refreshPath();
+         $('#form-new-dir input[name="newname"]').val("");
+         that.loadDirectories();
+      });
+   }
+};
+
+var CubeBrowserListWidget = {
+   $browser : null,
+   $area : null,
+   path : null,
+   lastSelecteRow : false,
+   previewTimer : false,
+   currentFolder : false,
+   
+   init : function(path)
+   {
+      this.$browser = $('#browser');
+      this.$area = this.$browser.find('.list');
+      
+      // detekce cookie s cestou
+      this.path = path;
+
+      // načtení
+      this.loadDefaultPath();
+      
+      var that = this;
+      // inicializace eventů
+      // označení
+      $(this.$area).on('click','li,.name a',function(event){
+         var $row = $(this);
+         if($row.is('a')){
+            $row = $(this).closest('li');
+         }
+         // neoznačovat tečky pro přechod
+         if($row.data('type') === 'dot'){
+            return false;
+         }
+         if(!event.ctrlKey && !event.shiftKey){
+            that.unSelectAllItems();
+         }
+         if(event.shiftKey && that.lastSelecteRow){
+            var $first = that.lastSelecteRow;
+            var fIndex = $first.index() < $row.index() ? $first.index() : $row.index();
+            var tIndex = $first.index() < $row.index() ? $row.index() : $first.index();
+            
+            that.getAllItems().slice(fIndex, tIndex).each(function(){
+               that.selectItem($(this));
+            });
+         }
+         if(event.ctrlKey && that.lastSelecteRow && that.isSelected($row)){
+            that.unSelectItem($row);
+         } else {
+            that.selectItem($row);
+         }
+         
+         return false;
+      });
+      // checkbox
+      $(this.$area).on('click','li .selector input',function(event){
+         event.stopPropagation();
+         if($(this).is(":checked")){
+            that.selectItem($(this).closest('li'));
+         } else {
+            that.unSelectItem($(this).closest('li'));
+         }
+         return;
+      });
+      $(this.$area).on('click','li .selector label',function(event){
+         if($(this).prev('input').is(":checked")){
+            that.selectItem($(this).closest('li'));
+         } else {
+            that.unSelectItem($(this).closest('li'));
+         }
+         event.stopPropagation();
+      });
+      // dvojklik
+      $(this.$area).on('dblclick','li,.name a',function(){
+         var $row = $(this);
+         if($row.is('a')){
+            $row = $(this).closest('li');
+         }
+         // přejdi do složky
+         if($row.data('type') === 'dot' || $row.data('type') === 'dir'){
+            that.loadPath($row.data('target'));
+         } 
+         // vyber soubor
+         else {
+            CubeBrowser.submitFile($row.data('realpath'));
+         }
+         return false;
+      });
+      
+      // preview
+      $(this.$area).on('mouseenter','.name a',function() {
+         var $row = $(this).closest('li');
+         if(that.previewTimer) {
+            clearTimeout(that.previewTimer);
+            that.previewTimer = null;
+         }
+         that.previewTimer = setTimeout(function() {
+            that.showImagePreview($row);
+         }, 500);
+      });
+      $(this.$area).on('mouseleave','.name a',function() {
+         var $row = $(this).closest('li');
+         clearTimeout(that.previewTimer);
+         that.previewTimer = null;
+         that.hideImagePreview($row);
+      });
+      
+      // drop 
+      // init drag & drop to area
+//      var $dropArea = $('#drop-area');
+//      $('#fb-wrap')
+//      .on('dragenter, dragover', function(){
+//         $dropArea.addClass('visible');
+//      })
+//      .on('dragleave', function(){
+//         $dropArea.removeClass('visible');
+//      });
+      // drag drop
+      
+      // items
+      $(this.$area)
+      .on('dragenter', 'li', function(e) {
+         e.stopPropagation();
+//         e.preventDefault();
+          $(this).addClass('draging');
+         console.log('enter');
+      })
+      .on('dragover','li', function(e) {
+         e.stopPropagation();
+//         e.preventDefault();
+         $(this).addClass('draging');
+      })
+      .on('dragleave','li', function(e) {
+         e.stopPropagation();
+         $(this).removeClass('draging');
+         console.log('leave');
+      });
+      
+      
+      $(this.$area).parent()
+      .on('dragenter', 'ul,#drop-area', function(e) {
+         e.stopPropagation();
+         e.preventDefault();
+//          $(this).addClass('draging');
+//         console.log('enter');
+      })
+      .on('dragover','ul,#drop-area', function(e) {
+         e.stopPropagation();
+         e.preventDefault();
+//         if($(this).is('li')){
+//            var data = $(this).data();
+//            if(data.itemclass === 'dir' && data.access.write === false){
+//               $(this).addClass('draging');
+//            }
+//         }
+         $(this).addClass('draging');
+//         console.log('over');
+      })
+      .on('dragleave','ul,#drop-area', function(e) {
+         e.stopPropagation();
+         $(this).removeClass('draging');
+//         console.log('leave');
+      })
+      .on('drop', 'ul,#drop-area', function(e){
+         e.stopPropagation();
+         e.preventDefault();
+         $(this).removeClass('draging');
+         var files = e.originalEvent.dataTransfer.files;
+         CubeBrowserUploader.handleFileUpload(files);
+      })
+      .on('drop', 'li', function(e){
+         e.stopPropagation();
+         e.preventDefault();
+         $(this).removeClass('draging');
+         var files = e.originalEvent.dataTransfer.files;
+         var itemData = $(this).data();
+         if(itemData.itemclass === 'dir' || itemData.itemclass === 'dot'){
+            if(itemData.access.write === true){
+               CubeBrowserUploader.handleFileUpload(files, itemData.target);
+            } else {
+               tinyMCEPopup.alert('Do tohoto adresáře není možné ukládat');
+            }
+         } else {
+            CubeBrowserUploader.handleFileUpload(files);
+         }
+      });
+      
+      $(this.$area).on('click', 'a.button-open-external', function(e){
+         e.stopPropagation();
+         openInNewTab(this.href);
+         return false;
+      });
+      
+   },
+   selectItem : function($item)
+   {
+      // select row
+      $item.addClass('active').find('input[type="checkbox"]').prop('checked', true);
+      this.lastSelecteRow = $item;
+      // if image, update image preview
+      CubeBrowserPreviewWidget.hidePreview();
+      if($item.data('itemclass') === 'image'){
+         CubeBrowserPreviewWidget.showPreview($item);
+      }
+      this.updateSubmitButton();
+      console.log('item selected');
+      // update file actions
+      CubeBrowserFileActionsWidget.updateActions();
+      CubeBrowserToolboxWidget.updateButtons();
+   },
+   unSelectItem : function($item)
+   {
+      $item.removeClass('active').find('input[type="checkbox"]').prop('checked', false);
+      // update file actions
+      CubeBrowserFileActionsWidget.updateActions();
+      CubeBrowserToolboxWidget.updateButtons();
+//      this.updateSubmitButton();
+//      CubeBrowserPreviewWidget.hidePreview();
+   },
+   unSelectAllItems : function()
+   {
+      this.getSelectedItems().each(function(){
+         CubeBrowserListWidget.unSelectItem($(this));
+      });
+   },
+   isSelected : function($item)
+   {
+      return $item.hasClass('active');
+   },
+   /**
+    * načte požadovanou cestu a překreslí widget
+    * @param {type} path
+    * @returns {undefined}
+    */
+   loadPath : function(path, force, restoreSelection)
+   {
+      if(typeof (force) === 'undefined'){ force = false; }
+      if(typeof (restoreSelection) === 'undefined'){ restoreSelection = false; }
+      
+      if(path === this.path && this.$area.find('li').length > 0 && force === false){
+         return;
+      }
+
+      var selectedItems = [];
+      if(restoreSelection){
+         this.getSelectedItems().each(function(){
+            selectedItems.push($(this).data('realpath'));
+         });
+      }
+      
+      var that = this;
+      this.clearList();
+      CubeBrowserPathWidget.setPath(path);
+      $.ajax({
+         type : 'GET', data : { path : path, type: CubeBrowser.listType }, url : window.location.toString().replace('browser.php', 'getitems.php'),
+         cache : false,
+         async : false,
+         success: function(data){
+            if(data.errmsg.length === 0){
+               $.each(data.items, function(index, item){
+                  that.createRow(item);
+               });
+               that.path = data.current;
+               that.currentFolder = data;
+               CubeBrowser.setCurrentPath(data.current);
+               CubeBrowser.setCurrentAccess(data.access);
+               
+               if(selectedItems.length > 0){
+                  $('li', that.$area).each(function(){
+                     if($.inArray($(this).data('realpath'), selectedItems) !== -1){
+                        that.selectItem($(this));
+                     }
+                  });
+               }
+            } else {
+               alert(data.errmsg.join(', '));
+            }
+            CubeBrowserToolboxWidget.updateButtons();
+            CubeBrowser.loadDirectories();
+            console.log('path loaded');
+         },
+         error: function(){
+//            FileBrowser.showResult([], ['Chyba při komunikaci se serverem. Zkuste znovu.']);
+         }
+      });
+      this.updateSubmitButton();
+   },
+   getFolderUp : function()
+   {
+      var path = null;
+      if(this.currentFolder && this.currentFolder.current === "/"){
+         path = this.currentFolder.current+"/";
+      } else {
+         path = this.$area.find('li').first().data('target');
+      }
+      this.loadPath(path);
+   },
+   /**
+    * znovu načte požadovanou cestu a překreslí widget
+    * @returns {undefined}
+    */
+   refreshPath : function()
+   {
+      this.loadPath(this.path, true, true);
+   },
+   /**
+    * Načte výchozí cestu buď z cookie nebo z nasatvení
+    * @returns {undefined}
+    */
+   loadDefaultPath : function()
+   {
+      this.loadPath(this.path);
+   },
+   
+   // Private
+   createRow : function (itemData)
+   {
+      var $newRow = $('#item-tpl li').first().clone();
+      var randID = Math.round(Math.random()*10000000);
+      
+      $newRow.prop('id', 'item-'+randID);
+      $newRow.find('.filename').text(itemData.name);
+//      var sizeStr = itemData.type === "file" ? itemData.info.sizeFormated : "";
+      var sizeStr = itemData.info.sizeFormated;
+      if(itemData.info.dimension.w !== 0){
+         sizeStr += ' ('+itemData.info.dimension.w+"x"+itemData.info.dimension.h+"px)";
+      }
+      $newRow.find('.size').text(sizeStr);
+      if(itemData.access.write === false){
+         $newRow.addClass('readonly');
+      }
+      
+      $newRow.find('input[type="checkbox"]').prop('id', 'checkbox-'+randID);
+      $newRow.find('input[type="checkbox"]').next('label').prop('for', 'checkbox-'+randID);
+      
+      $newRow.data(itemData);
+      $newRow.disableSelection();
+      // tlačítka akcí
+      if(itemData.type === "dot" || itemData.access.write === false){
+         $newRow.find('.actions').remove();
+      }
+      
+      // přesun (dot)
+      if(itemData.type === "dot"){
+         $newRow.find('.selector input').remove();
+         $newRow.find('.selector label').remove();
+         $newRow.find('a.button-open-external').remove();
+         $newRow.find('.preview').remove();
+      } 
+      // adresář
+      else if(itemData.type === "dir"){
+         if(itemData.itemclass === 'home'){
+            $newRow.find('.name .icon').addClass('icon-home');
+         } else if(itemData.itemclass === 'public'){
+            $newRow.find('.name .icon').addClass('icon-globe');
+         } else {
+            $newRow.find('.name .icon').addClass('icon-folder-o');
+         }
+         $newRow.addClass('item-dir');
+         $newRow.find('.preview').remove();
+         $newRow.find('a.button-open-external').remove();
+      } 
+      // soubory
+      else if(itemData.type === "file"){
+         if(itemData.itemclass === "image"){
+            $newRow.addClass('item-image');
+            $newRow.find('.name .icon').addClass('icon-picture-o');
+            $newRow.find('.preview img').prop('src', CubeBrowser.params.baseUrl+itemData.realpath+"?h="+encodeURIComponent( sizeStr));
+         } else if(itemData.itemclass === "video"){
+            $newRow.addClass('item-video');
+            $newRow.find('.name .icon').addClass('icon-video-camera');
+            $newRow.find('.preview').remove();
+         } else if(itemData.itemclass === "flash"){
+            $newRow.addClass('item-flash');
+            $newRow.find('.name .icon').addClass('icon-falsh');
+            $newRow.find('.preview').remove();
+         } else{
+            $newRow.addClass('item-text');
+            $newRow.find('.name .icon').addClass('icon-file-text');
+            $newRow.find('.preview').remove();
+         }
+         $newRow.find('a.button-open-external').prop('href', CubeBrowser.params.baseUrl+itemData.realpath);
+      }
+      this.$area.append($newRow);
+   },
+   clearList : function(){
+      this.$area.find('li').remove();
+      this.lastSelecteRow = false;
+   },
+   getAllItems : function()
+   {
+      return this.$area.find('li');
+   },
+   getSelectedItems : function()
+   {
+      return this.$area.find('li.active');
+   },
+   getItem : function()
+   {
+      
+   },
+   showImagePreview : function($item)
+   {
+      $item.find('.preview').show();
+   },
+   hideImagePreview : function($item)
+   {
+      $item.find('.preview').hide();
+   },
+  
+   updateSubmitButton : function()
+   {
+      var $items = this.getSelectedItems();
+      $('#button-insert').prop('disabled', true);
+      if($items.length === 1){
+         if($items.first().data('itemclass') !== "dir" && $items.first().data('itemclass') !== "dot") {
+            $('#button-insert').prop('disabled', false);
+         } 
+      }
+   }
+};
+
+/**
+ * Widget s tooltipy
+ * @returns {CubeBrowserTipsWidget}
+ */
+var CubeBrowserTipsWidget = {
+   $area : null,
+   init : function(path){
+      this.$area = $('#tip-content');
+      this.showRandomTip();
+      var that = this;
+      $('#button-show-tips').on('click', function(){
+         if(that.$area.is(':visible')){
+            that.$area.hide();
+         } else {
+            that.$area.slideDown();
+         }
+         return false;
+      });
+   },
+   
+   showRandomTip : function(){
+      this.hideTips();
+      var rand = Math.round(Math.random()*this.$area.find('p').length);
+      this.$area.find('p').eq(rand-1).show();
+   },
+   
+   hideTips : function(){
+      this.$area.find('p').hide();
+   }
+};
+
+/**
+ * Widget se zprávami
+ * @returns {CubeBrowserLogsWidget}
+ */
+var CubeBrowserLogsWidget = {
+   $area : null,
+   init : function(){
+      this.$area = $('#logs .list');
+   },
+   add : function(string, type, $control){
+      if(typeof (type) === 'undefined'){
+         type = 'info';
+      }
+      
+      var $newItem = $('<li></li>').addClass('msg').data('created', new Date().getTime()).html(string);
+      switch (type) {
+         case "info":
+            $newItem.addClass('msg-info');
+            break;
+         case "warn":
+            $newItem.addClass('msg-warning');
+            break;
+         case "err":
+            $newItem.addClass('msg-error');
+            break;
+      }
+      if(typeof ($control) !== 'undefined'){
+         $newItem.append($control);
+      }
+      this.$area.append($newItem);
+      this.$area.scrollTop(this.$area[0].scrollHeight - this.$area.height());
+   },
+   clear : function(){
+      this.$area.html(null);
+   }
+};
+
+/**
+ * Widget pro práci se schránkou
+ * @returns {CubeBrowserClipBoardWidget}
+ */
+var CubeBrowserClipBoardWidget = {
+   $area : null,
+   $list : null,
+   init : function()
+   {
+      this.$area = $('#clipboard');
+      this.$list = $('.list', this.$area);
+      
+      // načtení dat z local storage
+      var list = localStorage.getObj('clipboard');
+      if(list === null){
+         list = [];
+      }
+      localStorage.setObj('clipboard', list);
+      this.createItems(list);
+   },
+   isEmpty : function()
+   {
+      var items = localStorage.getObj('clipboard');
+      return items.length > 0 ? false : true;
+   },
+   clear : function()
+   {
+      // vyčistí local storage
+      localStorage.setObj('clipboard', []); 
+      // remove from list
+      this.$list.html("");
+   },
+   addItem : function($item)
+   {
+   },
+   createItems : function(objs)
+   {
+      var that = this;
+      this.$list.html("");
+      $.each(objs, function(index, val){
+         var $newItem = $('<li></li>').addClass(val.type === 'cut' ? 'item-cut' : 'item-copy').html(val.path);
+         that.$list.append($newItem);
+      });
+   },
+   copySelected : function()
+   {
+      var $items = CubeBrowserListWidget.getSelectedItems();
+      var list = [];
+      $items.each(function(){
+         list.push({
+            name : $(this).data('name'),
+            path : $(this).data('realpath'),
+            type : "copy"
+         });
+      });
+      localStorage.setObj('clipboard', list);
+      this.createItems(list);
+   },
+   cutSelected : function()
+   {
+      var $items = CubeBrowserListWidget.getSelectedItems();
+      var list = [];
+      $items.each(function(){
+         list.push({
+            name : $(this).data('name'),
+            path : $(this).data('realpath'),
+            type : "cut"
+         });
+      });
+      localStorage.setObj('clipboard', list);
+      this.createItems(list);
+   },
+   paste : function()
+   {
+      var list = localStorage.getObj('clipboard');
+      var itemProgress = Math.round(100/list.length);
+      CubeBrowserProgressBarWidget.setProgress(0);
+      var queue = list.length;
+      $.each(list, function(i, item){
+         CubeBrowser.request(item.type === "cut" ? 'move' : 'copy', 
+            { item : item.path, target : CubeBrowser.getCurrentPath() },
+         function(){
+            CubeBrowserProgressBarWidget.addProgress(itemProgress);
+            queue--;
+            if(queue === 0){
+               if(item.type === "cut"){
+                  CubeBrowserClipBoardWidget.clear();
+               }
+               CubeBrowserProgressBarWidget.setProgress(100);
+               CubeBrowserListWidget.refreshPath();
+            }
+         });
+      });
+   }
+};
+
+/**
+ * Toolbar widget
+ * @returns {CubeBrowserToolboxWidget}
+ */
+var CubeBrowserToolboxWidget =  {
+   $area : null,
+   init : function(){
+      this.$area = $('#toolbox');
+      this.updateButtons();
+      
+   },
+   updateButtons : function(){
+      var $selectedItems = CubeBrowserListWidget.getSelectedItems();
+      if(CubeBrowserListWidget.currentFolder){
+         // omezení zápisu
+         if(CubeBrowserListWidget.currentFolder.access.write){
+            $('#toolbox-button-clipboard-paste, #button-create-folder, #toolbox-button-upload',this.$area).prop('disabled', false);
+         } else {
+            $('#toolbox-button-clipboard-paste, #button-create-folder, #toolbox-button-upload',this.$area).prop('disabled', true);
+         }
+         // přejít nahoru
+         if(CubeBrowserListWidget.currentFolder.current === "/") {
+            $('#toolbox-button-folder-up',this.$area).prop('disabled', true);
+         } else {
+            $('#toolbox-button-folder-up',this.$area).prop('disabled', false);
+         }
+      }
+      
+      // první tlačítka které závisí na vybrané položce
+      var needItemsIDS = new Array(
+         '#toolbox-button-clipboard-cut',
+         '#toolbox-button-rename',
+         '#toolbox-button-move',
+         '#toolbox-button-delete'
+         );
+      if($selectedItems.length > 0){
+         
+         $(needItemsIDS.join(','),this.$area).prop('disabled', false);
+         
+         $selectedItems.each(function(){
+            if($(this).data('access').write === false){
+               $(needItemsIDS.join(','),this.$area).prop('disabled', true);
+            }
+         });
+         
+         $('#toolbox-button-clipboard-copy',this.$area).prop('disabled', false);
+         $('#toolbox-button-copy',this.$area).prop('disabled', false);
+      } else {
+         $(needItemsIDS.join(','),this.$area).prop('disabled', true);
+         $('#toolbox-button-clipboard-copy',this.$area).prop('disabled', true);
+         $('#toolbox-button-copy',this.$area).prop('disabled', true);
+      }
+      
+      if(CubeBrowserClipBoardWidget.isEmpty() || CubeBrowser.currentAccess.write === false){
+         $('#toolbox-button-clipboard-paste',this.$area).prop('disabled', true);
+      } else {
+         $('#toolbox-button-clipboard-paste',this.$area).prop('disabled', false);
+      }
+   }
+};
+
+var CubeBrowserUploader = {
+   iframeinicialized : false,
+   uploadUrl : null,
+   init : function(params){
+      var that = this;
+      this.uploadUrl = params.uploadLink;
+      // uploader
+      $('#toolbox-button-upload').on('click', function(){
+         $(this).closest('form').find('input[type="file"]').click();
+      });
+      
+      if(window.FileReader) {
+         // html5 upload
+//         $('#upload_iframe_1').val(null);
+         $('#upload_file_1').on('change', function(){
+            that.handleFileUpload($(this)[0].files, CubeBrowser.getCurrentPath());
+         });
+      } else {
+         // standart upload
+         $('#upload_file_1').on('change', function(){
+            $('input[name="upload_path"]').val(CubeBrowser.getCurrentPath());
+            $(this).closest('form').submit();
+            CubeBrowserProgressBarWidget.setProgress(10);
+         });
+         // upload kompletní
+         $('#upload_target').load(function(){
+            if(that.iframeinicialized){
+               var error = $('#upload_target').get(0).contentWindow.error;
+               var info = $('#upload_target').get(0).contentWindow.info;
+               $.each(error, function(index, cnt){
+                  CubeBrowserLogsWidget.add(cnt, 'err');
+               });
+               $.each(info, function(index, cnt){
+                  CubeBrowserLogsWidget.add(cnt, 'info');
+               });
+               CubeBrowserListWidget.refreshPath();
+               CubeBrowserProgressBarWidget.setProgress(100);
+            } else {
+               that.iframeinicialized = true;
+            }
+         });
       }
    },
-   sendFileToServer: function(formData, statusBar)
+   
+   // uploading přes html5
+   handleFileUpload: function(files, path) {
+      if(typeof (path) === 'undefined'){
+         path = CubeBrowser.currentPath;
+      }
+//      FileBrowser.uploadFilesPosParams.path = FileBrowser.currentDir;
+      // create form
+      var fd = new FormData();
+      fd.append('upload_path', path);
+      fd.append('upload_iframe', 0);
+      fd.append('_upload__check', 1);
+      $.each(files, function(index, file){
+         fd.append('upload_file[]', file);
+      });
+      
+      this.sendFilesToServer(fd);
+   },
+   /*
+    * Odešle soubor na server
+    * @param {type} formData
+    * @param {type} statusBar
+    * @returns {undefined}
+    */
+   sendFilesToServer: function(formData)
    {
-      var _that = this;
+      var that = this;
+      CubeBrowserProgressBarWidget.hideProgress();
+      CubeBrowserProgressBarWidget.setText('Nahrávám');
       var jqXHR = $.ajax({
          xhr: function() {
             var xhrobj = $.ajaxSettings.xhr();
@@ -491,323 +1046,415 @@ var FileBrowser = {
                      percent = Math.ceil(position / total * 100);
                   }
                   //Set progress
-                  statusBar.setProgress(percent);
+                  CubeBrowserProgressBarWidget.setProgress(percent);
                }, false);
             }
             return xhrobj;
          },
-         url: FileBrowser.uploadLink,
+         url: that.uploadUrl,
          type: "POST",
          contentType: false,
          processData: false,
          cache: false,
          data: formData,
          success: function(data) {
-            statusBar.setProgress(100);
-            FileBrowser.showResult(data.infomsg, data.errmsg);
-            _that.load();
+            CubeBrowserProgressBarWidget.setProgress(100);
+            $.each(data.errmsg, function(index, cnt){
+               CubeBrowserLogsWidget.add(cnt, 'err');
+            });
+            $.each(data.infomsg, function(index, cnt){
+               CubeBrowserLogsWidget.add(cnt, 'info');
+            });
+            CubeBrowserListWidget.refreshPath(true);
          }
       });
-      statusBar.setAbort(jqXHR);
-   },
-      // load dirs
-   load : function(path){
-      if(typeof(path) == 'undefined') path = this.currentDir;
-         FileBrowser.showWorking();
-      this.request('getitems', {path:path, type: FileBrowser.listType}, function(data){
-            FileBrowser.hideWorking();
-            var selectedItemPath = FileBrowser.getSelected().data('realpath');
-            // clear box
-            FileBrowser.$itemsBox.html('');
-         if(typeof(data.items) != "undefined"){
-            $.each(data.items, function(){
-                  var $item = $('<a>');
-                  $item
-//            .append($('<input name="selected" value="'+this.name+'" type="checkbox" />'))
-                     .append(this.name)
-                     .attr({
-                  title : this.name,
-                  href : this.realpath
-                     }).data(this);
-
-               if(this.type == 'dir') {
-                     $item.addClass('dir');
-                  if(this.info.type == 'home'){
-                        $item.addClass('dir-home');
-                  } else if(this.info.type == 'public'){
-                        $item.addClass('dir-pub');
-                     }
-                  if(this.access.write == true) $item.addClass('dir-writable');
-               } else if(this.type == 'dot'){
-                     $item.addClass('dir');
-                     $item.addClass('dir-up');
-                  } else {
-                     // file
-                     $item.addClass('file')
-                     .css('background-image', 'url('+FileBrowser.baseUrl+FileBrowser.iconsDir+this.info.type+'_icon.png)');
-                  if(this.access.write == true) $item.addClass('file-writable');
-                  }
-                  FileBrowser.$itemsBox.append($('<li></li>').append($item));
-               });
-
-               FileBrowser.writable = data.writable;
-            if(FileBrowser.currentDir == data.current && typeof(selectedItemPath) != 'undefined'){ // same dir
-               var elem = FileBrowser.$itemsBox.find('a[href="'+selectedItemPath+'"]');
-               if(elem.length > 0) {elem.click();}
-                  else {
-                     FileBrowser.$itemsBox.children('li:first a').click();// select first item
-                  }
-               } else { // jiný adresář
-                  FileBrowser.$itemsBox.children('li:first a').click();// select first item
-                  FileBrowser.storePath(data.current);
-               }
-               FileBrowser.currentDir = data.current;
-               $('#currentPath').text(data.current);
-            } else {
-               FileBrowser.goPublic();
-            }
-         });
-      },
-   goHome : function(){
-      this.currentDir = 'home';
-      this.load();
-   },
-   goPublic : function(){
-      this.currentDir = '/public/';
-      this.load();
-   },
-   storePath : function(path){
-      var value = cookieName+'='+escape(path)+';';
-      // expirace
-      var date = new Date();
-      date.setTime(date.getTime() + 30 * 60 * 1000); // 30 minut
-      value+='expires=' + date.toGMTString()+';';
-      value+='path=/;';
-      document.cookie = value;
-   },
-   loadPath : function(){
-      if (document.cookie.length>0 && FileBrowser.currentDir == null){
-         var c_start = document.cookie.indexOf(cookieName+"=");
-         if (c_start!=-1){
-            c_start=c_start + cookieName.length+1;
-            var c_end=document.cookie.indexOf(";",c_start);
-            if (c_end==-1) c_end=document.cookie.length;
-            return unescape(document.cookie.substring(c_start,c_end));
-         }
-      }
-      return baseLoadPath;
-   },
-   // funkce pro obsluhu vytváření, mazání
-   createDir : function(){
-      if(this.writable == false){
-         alert('Nemáte dostatečná práva pro vytvoření adresáře');
-         return false;
-      }
-      var newDir = prompt('Zadejte název nového adresáře');
-      if(newDir == null || newDir == '') return false;
-      FileBrowser.request('createdir', {path : this.currentDir, newname : newDir}, function(){
-         FileBrowser.load();
+      CubeBrowserProgressBarWidget.setAbort(function (){
+         jqXHR.abort();
+         CubeBrowserListWidget.refreshPath(true);
+         CubeBrowserLogsWidget.add('nahrávání zrušeno', 'warn');
       });
-      return true;
-   },
-   deleteItems : function(){
-      if(confirm('Opravdu smazat označené položky?') == false) return;
-      this.showWorking();
-      var items = new Array;
-      this.getMarked().each(function(){
-         items.push(new Array($(this).data('path'),$(this).data('name')));
-      });
-      if(items.length > 0){
-         this.request('delete', {items : items}, function(){
-            FileBrowser.hideWorking();
-            FileBrowser.load();
-         });
-      }
-      return;
-   },
-   renameItems : function(){
-      var items = new Array;
-      var newName = "";
-      this.getMarked().each(function(){
-         var data = $(this).data();
-         if(data.type != 'dot' && data.access.write == true) {
-            // zeptáme se na každý nový název
-            newName = window.prompt("Přejmenovat na", data.name);
-            if(newName != null && newName != "" && newName != data.name){
-               items.push(new Array(data.path,data.name, newName));
-            }
-         }
-      });
-      if(items.length > 0){
-         FileBrowser.showWorking();
-         this.request('rename', {items : items}, function(){
-            FileBrowser.hideWorking();
-            FileBrowser.load();
-         });
-      }
-   },
-   // Schránka
-   clipboardCut : function(){
-      this.clipboardClear();
-      FileBrowser.clipboard.cut = true;
-      this.getMarked().each(function(){
-         if($(this).data('type') != 'dot'){
-            $(this).addClass('item-cut');
-            FileBrowser.clipboard.items.push($(this).data());
-         }
-      });
-      this.clipboardShow();
-      return;
-   },
-   clipboardCopy : function(){
-      this.clipboardClear();
-      FileBrowser.clipboard.cut = false;
-      this.getMarked().each(function(){
-         if($(this).data('type') != 'dot'){
-            $(this).addClass('item-copy');
-            FileBrowser.clipboard.items.push($(this).data());
-         }
-      });
-      this.clipboardShow();
-      return;
-   },
-   clipboardPaste : function(){
-      this.showWorking();
-      var items = new Array;
-      $.each(this.clipboard.items , function(){
-         var info = this;
-         // kopie
-         items.push(new Array(info.path, info.name));
-      });
-      this.request('copy', {target: this.currentDir, items:items, move : this.clipboard.cut}, function(){
-         FileBrowser.clipboardClear();
-         FileBrowser.hideWorking();
-         FileBrowser.load();
-      })
-   },
-   clipboardClear : function(){
-      this.clipboard.cut = false;
-      this.clipboard.items = new Array;
-      FileBrowser.getMarked().removeClass('item-cut').removeClass('item-copy');
-      $('#clipboard').html('');
-   },
-   clipboardShow : function(){
-      var $box = $('#clipboard');
-      $.each(FileBrowser.clipboard.items , function(){
-         $box.append('<li><span>'+this.realpath+'</span></li>');
-      });
-   },
-   imageResize : function(){
-      FileBrowser.showWorking();
-      var $items = Array;
-      if($('input[name="apply_all"]').is(':checked')){
-         $items = FileBrowser.getMarked();
-      } else {
-         $items = FileBrowser.getSelected();
-      }
-      var files = new Array;
-      $items.each(function(){
-         files.push($(this).data('name'));
-      });
-      FileBrowser.request('imageResized', {
-         path : FileBrowser.currentDir,file : files,
-         ratio : $('input[name="img_ratio"]').is(':checked'),
-         newW : $('input[name="img_w"]').val(), newH : $('input[name="img_h"]').val(),
-         crop : $('input[name="img_crop"]').is(':checked')
-         }, function(){
-         FileBrowser.hideWorking();
-         FileBrowser.load();
-      });
-   },
-   imageSystemResize : function(){
-      FileBrowser.showWorking();
-      var $items = Array;
-      if($('input[name="apply_all"]').is(':checked')){
-         $items = FileBrowser.getMarked();
-      } else {
-         $items = FileBrowser.getSelected();
-      }
-      var files = new Array;
-      $items.each(function(){
-         files.push($(this).data('name'));
-      });
-      FileBrowser.request('createSystemImages', {
-         path : FileBrowser.currentDir, file : files,
-         createdirs : $('input[name="img_createdirs"]').is(':checked')
-      }, function(){FileBrowser.hideWorking();FileBrowser.load();});
-   },
-   imageRotate : function(){
-      FileBrowser.showWorking();
-      var $items = Array;
-      if($('input[name="apply_all"]').is(':checked')){
-         $items = FileBrowser.getMarked();
-      } else {
-         $items = FileBrowser.getSelected();
-      }
-      var files = new Array;
-      $items.each(function(){
-         files.push($(this).data('name'));
-      });
-      FileBrowser.request('imageRotate', {
-         path : FileBrowser.currentDir,
-         file : files,
-         degree : $('select[name="img_degree"]').val()
-      }, function(){
-         FileBrowser.hideWorking();
-         FileBrowser.load();
-      });
-   },
-   setDirPerms : function(){
-      var users = $('select[name="users"]').val();
-      FileBrowser.getMarked().each(function(){
-         if($(this).data('type') == 'dir'){ // only dirs
-            FileBrowser.request('storeDirPerms', {path:$(this).data('path'), name : $(this).data('name'), users : users});
-         }
-      });
-   },
-   showTip : function(){
-      $('#log').html($('<span></span>').addClass('tip').text('TIP: '+tips[Math.floor(Math.random()*tips.length)]));
    }
 };
 
-var rowCount = 0;
-function FileBrowserStatusBar() {
-   rowCount++;
-   var row = "odd";
-   if (rowCount % 2 === 0) {
-      row = "even";
+/**
+ * Cureent path widget
+ * @returns {CubeBrowserPathWidget}
+ */
+var CubeBrowserPathWidget = {
+   $area : null,
+   init : function(){
+      this.$area = $('#current-path');
+      $('#form-change-path', this.$area).submit(function(){
+         CubeBrowserListWidget.loadPath($(this).find('input').val());
+         return false;
+      });
+   },
+  
+   setPath : function(path){
+      this.$area.find('#input-current-path').val(path);
    }
-//   this.statusbar = $("<div class='statusbar " + row + "'></div>");
-//   this.filename = $("<div class='filename'></div>").appendTo(this.statusbar);
-//   this.size = $("<div class='filesize'></div>").appendTo(this.statusbar);
-//   this.progressBar = $("<div class='progressBar'><div></div></div>").appendTo(this.statusbar);
-//   this.abort = $("<div class='abort'>Abort</div>").appendTo(this.statusbar);
-//   obj.after(this.statusbar);
+};
 
-   this.setFileNameSize = function(name, size) {
-//      var sizeStr = "";
-//      var sizeKB = size / 1024;
-//      if (parseInt(sizeKB) > 1024) {
-//         var sizeMB = sizeKB / 1024;
-//         sizeStr = sizeMB.toFixed(2) + " MB";
-//      } else {
-//         sizeStr = sizeKB.toFixed(2) + " KB";
-//      }
-//      this.filename.html(name);
-//      this.size.html(sizeStr);
-   };
-   this.setProgress = function(progress) {       
-//      var progressBarWidth = progress * this.progressBar.width() / 100;  
-//      this.progressBar.find('div').animate({width: progressBarWidth}, 10).html(progress + "% ");
-//      if (parseInt(progress) >= 100) {
-//         this.abort.hide();
-//      }
-   };
-   this.setAbort = function(jqxhr) {
-//      var sb = this.statusbar;
-//      this.abort.click(function(){
-//         jqxhr.abort();
-//         sb.hide();
-//      });
-   };
+var CubeBrowserFilterWidget = {
+   $input : null,
+   $list : null,
+   init : function(){
+      this.$input = $('#browser-filter-input');
+      this.$input.on("keyup", function(){
+         var search = $(this).val();
+         if(search !== ""){
+            CubeBrowserFilterWidget.filterList(search);
+         } else {
+            CubeBrowserFilterWidget.showAll();
+         }
+      }).val("");
+   },
+   filterList : function(string){
+      $('#browser .list>li').each(function(){
+         var text = $(".filename",this).text().toLowerCase()+" "+$(".size",this).text().toLowerCase();
+         if(text.indexOf(string) >= 0){
+            $(this).show();
+         } else {
+            $(this).hide();
+         }
+      });
+   },
+   showAll : function(){
+      $('#browser .list>li').show();
+   }
+};
+
+/**
+ * Objekt pro práci se soubory
+ * @returns {CubeBrowserFileActionsWidget}
+ */
+var CubeBrowserFileActionsWidget = {
+   $area : null,
+   init : function(){
+      this.$area = $('#file-operations');
+      this.$selector = $('#file-operations-selector', this.$area);
+      
+      this.disableSelector();
+      
+      var that = this;
+      this.$selector.change(function(){
+         $('div.file-operations-box', that.$area).hide();
+         var target = $(this).find(":selected").data('target');
+         $(target).slideDown();
+         if(target === "#image-resize"){
+            that.initImageResize();
+         }
+      });
+      // fitlry a argumenty
+      $('#image-filter-select', this.$area).change(function(){
+         if($(this).find(":selected").data('adv') === 1){
+            $('#fitler-settings', that.$area).show();
+            $('#fitler-settings span', that.$area).text($(this).find(":selected").data('advtitle'));
+            $('#fitler-settings input[name="filter_arg"]', that.$area).val($(this).find(":selected").data('advdefault'));
+         } else {
+            $('#fitler-settings', that.$area).hide();
+         }
+      }).change();
+      
+   },
+   disableSelector : function(){
+      this.$selector.val($("option:first", this.$selector).val());
+      this.$selector.find('option').not(':first').prop('disabled', true);
+   },
+   updateActions : function(){
+      var that = this;
+      var $items = CubeBrowserListWidget.getSelectedItems();
+      if($items.length === 0){
+         this.disableSelector();
+         $('div.file-operations-box', this.$area).hide();
+      } else {
+         var imageOperations = false;
+         var fileOperations = false;
+         
+         $items.each(function(){
+            if($(this).data('type') === 'file' && $(this).data('access').write === true){
+               fileOperations = true;
+            }
+            if($(this).data('itemclass') === "image"){
+               imageOperations = true;
+            }
+         });
+         this.$selector.find('option.image-operation').prop('disabled', !imageOperations);
+         this.$selector.find('option.file-operation').prop('disabled', !fileOperations);
+         
+         // hide boxes 
+         if(!imageOperations){
+            $('div.image-operation').hide();
+            // select first
+            this.$selector.val($("option:first", this.$selector).val());
+         } else {
+            this.$selector.change();
+         } 
+         if(!fileOperations){
+            $('div.file-operation').hide();
+            // select forst
+            this.$selector.val($("option:first", this.$selector).val());
+         } else {
+            this.$selector.change();
+         }
+         
+      }
+   },
+   
+   initImageResize : function(){
+      var $box = $('#image-resize');
+      // přepočet rozměrů
+      $('input[name="image_size_x"]', $box).val(CubeBrowserPreviewWidget.realWidth);
+      $('input[name="image_size_y"]', $box).val(CubeBrowserPreviewWidget.realHeight);
+      $('input[name="image_size_x"]', $box).off('change').on('change', function(){
+         if($('input[name="mantain_ratio"]', $box).is(':checked')){
+            var ratio = CubeBrowserPreviewWidget.realWidth/CubeBrowserPreviewWidget.realHeight;
+            $('input[name="image_size_y"]', $box).val(Math.round($(this).val()/ratio));
+         }
+      });
+      $('input[name="image_size_y"]', $box).off('change').on('change', function(){
+         if($('input[name="mantain_ratio"]', $box).is(':checked')){
+            var ratio = CubeBrowserPreviewWidget.realHeight/CubeBrowserPreviewWidget.realWidth;
+            $('input[name="image_size_x"]', $box).val(Math.round($(this).val()/ratio));
+         }
+      });
+   },
+   resizeImages : function(){
+      var $items = CubeBrowserListWidget.getSelectedItems().filter('.item-image');
+      var queue = $items.length;
+      var that = this;
+      var $box = $('#image-resize');
+      if(queue === 0){
+         CubeBrowserLogsWidget.add('Nebyl vybrán žádný obrázek', 'err');
+         return;
+      }
+      var itemProgress = Math.round(100/$items.length);
+      CubeBrowserProgressBarWidget.setProgress(0);
+      $items.each(function(){
+         CubeBrowser.request('imageResize', {
+            item : $(this).data('realpath'),
+            width : $('input[name="image_size_x"]', $box).val(),
+            height : $('input[name="image_size_y"]', $box).val(),
+            ratio : $('input[name="mantain_ratio"]', $box).is(":checked") ? 1 : 0,
+            crop : $('input[name="image_crop"]', $box).is(":checked") ? 1 : 0,
+            createNew : $('input[name="create_new"]', $box).is(":checked") ? 1 : 0
+         }, function(){
+            CubeBrowserProgressBarWidget.addProgress(itemProgress);
+            queue--;
+            if(queue === 0){
+               CubeBrowserProgressBarWidget.setProgress(100);
+               CubeBrowserListWidget.refreshPath();
+               $('div.file-operations-box', that.$area).hide();
+            }
+         });
+      });
+   },
+   rotateImages : function(){
+      var $items = CubeBrowserListWidget.getSelectedItems().filter('.item-image');
+      var queue = $items.length;
+      var that = this;
+      var $box = $('#image-rotate');
+      if(queue === 0){
+         CubeBrowserLogsWidget.add('Nebyl vybrán žádný obrázek', 'err');
+         return;
+      }
+      var itemProgress = Math.round(100/$items.length);
+      CubeBrowserProgressBarWidget.setProgress(0);
+      $items.each(function(){
+         CubeBrowser.request('imageRotate', {
+            item : $(this).data('realpath'),
+            degree : $('select[name="degree"]', $box).val(),
+            createNew : $('input[name="create_new"]', $box).is(":checked") ? 1 : 0
+         }, function(){
+            CubeBrowserProgressBarWidget.addProgress(itemProgress);
+            queue--;
+            if(queue === 0){
+               CubeBrowserProgressBarWidget.setProgress(100);
+               CubeBrowserListWidget.refreshPath();
+               $('div.file-operations-box', that.$area).hide();
+            }
+         });
+      });
+   },
+   filterImages : function(){
+      var $items = CubeBrowserListWidget.getSelectedItems().filter('.item-image');
+      var queue = $items.length;
+      var that = this;
+      var $box = $('#image-filter');
+      if(queue === 0){
+         CubeBrowserLogsWidget.add('Nebyl vybrán žádný obrázek', 'err');
+         return;
+      }
+      var itemProgress = Math.round(100/$items.length);
+      CubeBrowserProgressBarWidget.setProgress(0);
+      $items.each(function(){
+         CubeBrowser.request('imageFilter', {
+            item : $(this).data('realpath'),
+            filter : $('select[name="filter"]', $box).val(),
+            arg : $('input[name="filter_arg"]', $box).val(),
+            createNew : $('input[name="create_new"]', $box).is(":checked") ? 1 : 0
+         }, function(){
+            CubeBrowserProgressBarWidget.addProgress(itemProgress);
+            queue--;
+            if(queue === 0){
+               CubeBrowserProgressBarWidget.setProgress(100);
+               CubeBrowserListWidget.refreshPath();
+               $('div.file-operations-box', that.$area).hide();
+            }
+         });
+      });
+   },
+   flipImages : function(){
+      var $items = CubeBrowserListWidget.getSelectedItems().filter('.item-image');
+      var queue = $items.length;
+      var that = this;
+      var $box = $('#image-flip');
+      if(queue === 0){
+         CubeBrowserLogsWidget.add('Nebyl vybrán žádný obrázek', 'err');
+         return;
+      }
+      var itemProgress = Math.round(100/$items.length);
+      CubeBrowserProgressBarWidget.setProgress(0);
+      $items.each(function(){
+         CubeBrowser.request('imageFlip', {
+            item : $(this).data('realpath'),
+            flip : $('select[name="flip"]', $box).val(),
+            createNew : $('input[name="create_new"]', $box).is(":checked") ? 1 : 0
+         }, function(){
+            CubeBrowserProgressBarWidget.addProgress(itemProgress);
+            queue--;
+            if(queue === 0){
+               CubeBrowserProgressBarWidget.setProgress(100);
+               CubeBrowserListWidget.refreshPath();
+               $('div.file-operations-box', that.$area).hide();
+            }
+         });
+      });
+   },
+   watermarkImages : function(){
+      var $items = CubeBrowserListWidget.getSelectedItems().filter('.item-image');
+      var queue = $items.length;
+      var that = this;
+      var $box = $('#image-watermark');
+      if(queue === 0){
+         CubeBrowserLogsWidget.add('Nebyl vybrán žádný obrázek', 'err');
+         return;
+      }
+      
+      if (/^[0-9a-f]{6}$/i.test($('input[name="color"]', $box).val()) === false) {
+         //Match
+         alert('Nesprávně zadaná barva textu');
+         return false;
+      }
+      if ($('input[name="colorBg"]', $box).val() !== "" 
+         && /^[0-9a-f]{6}$/i.test($('input[name="colorBg"]', $box).val()) === false) {
+         //Match
+         alert('Nesprávně zadaná barva pozadí');
+         return false;
+      }
+      
+      var itemProgress = Math.round(100/$items.length);
+      CubeBrowserProgressBarWidget.setProgress(0);
+      $items.each(function(){
+         CubeBrowser.request('imageWatermark', {
+            item : $(this).data('realpath'),
+            text : $('input[name="text"]', $box).val(),
+            color : $('input[name="color"]', $box).val(),
+            colorBg : $('input[name="colorBg"]', $box).val(),
+            posX : $('select[name="posX"]', $box).val(),
+            posY : $('select[name="posY"]', $box).val(),
+            createNew : $('input[name="create_new"]', $box).is(":checked") ? 1 : 0
+         }, function(){
+            CubeBrowserProgressBarWidget.addProgress(itemProgress);
+            queue--;
+            if(queue === 0){
+               CubeBrowserProgressBarWidget.setProgress(100);
+               CubeBrowserListWidget.refreshPath();
+               $('div.file-operations-box', that.$area).hide();
+            }
+         });
+      });
+   }
+};
+
+
+/**
+ * Widget s náhledem
+ * @returns {CubeBrowserPreviewWidget}
+ */
+var CubeBrowserPreviewWidget = {
+   $area : null,
+   realWidth : 0,
+   realHeight : 0,
+   init : function(){
+      this.$area = $('#preview');
+   },
+   showPreview : function($item){
+      var src = CubeBrowser.params.baseUrl + $item.data("realpath") + "?time="+ new Date().getTime();
+      this.$area.find('img').prop('src', src).show();
+      this.$area.find('span.icon').hide();
+      var that = this;
+      $("<img/>") // Make in memory copy of image to avoid css issues
+         .attr("src", src)
+         .load(function() {
+            that.realWidth = this.width;
+            that.realHeight = this.height;
+      });
+   },
+   hidePreview : function(){
+      this.$area.find('img').prop('src', null).hide();
+      this.$area.find('span.icon').show();
+   }
+};
+
+
+var rowCount = 0;
+var CubeBrowserProgressBarWidget = {
+   $area : null,
+   $meter : null,
+   text : null,
+   progress : 0,
+   init : function(){
+      this.$area = $('#progress-bar');
+      this.$meter = this.$area.find('span.progress');
+      this.$percents = this.$area.find('span.percent');
+      
+      this.hideProgress();
+   },
+   addProgress : function(progress) {       
+      this.setProgress(this.progress+progress);
+   },
+   setProgress : function(progress) {       
+      this.$area.show();
+      this.progress = progress >= 100 ? 100 : progress;
+      this.$meter.css('width', this.progress+"%");
+      this.$percents.text( (this.text !== null ? this.text+" " : null)+this.progress+"%");
+      
+      if(this.progress === 100){
+         // nastavit zmizeni
+         setTimeout(function(){
+            CubeBrowserProgressBarWidget.hideProgress();
+         }, 2000);
+      }
+   },
+   setAbort : function(func){
+      var that = this;
+      this.$area.find('.button-cancel')
+         .unbind('click')
+         .bind('click', function(){
+            func.call();
+            that.hideProgress();
+         })
+         .show();
+   },
+   hideProgress : function(){
+      this.$area.hide();
+      this.$meter.css('width', "0%");
+      this.$percents.text("0%");
+      this.$area.find('.button-cancel').hide();
+      this.text = null;
+   },
+   setText : function(text){
+      this.text = text;
+   }
 };

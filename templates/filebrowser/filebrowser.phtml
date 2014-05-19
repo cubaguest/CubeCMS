@@ -1,13 +1,13 @@
 <?php
 $jq = new JsPlugin_JQuery();
-//$jq->addUISelectable();
-//$jq->addUIDraggable();
+$jq->addJQPlugin('hoverIntent');
 $this->addJsPlugin($jq);
-$this->addCssFile('filebrowser.css');
-$this->addJsPlugin(new JsPlugin_SWFUpload());
+$this->addFile('css://fontawesome/font-awesome.less');
+$this->addFile('css://filebrowser/filebrowser.less');
+//$this->addJsPlugin(new JsPlugin_SWFUpload());
 
 if(Auth::isLogin() == false){
-   echo 'Nemáte práv k přístupu. Zkuste se přihlásit.';
+   echo 'Nemáte oprávnění k přístupu. Zkuste se přihlásit.';
    die;
 }
 ?>
@@ -19,115 +19,471 @@ if(Auth::isLogin() == false){
       <script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/enginehelpers.min.js"></script>
       <script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/tinymce/tiny_mce.js"></script>
       <script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/tinymce/tiny_mce_popup.js"></script>
-      <?if(VVE_DEBUG_LEVEL > 1){?>
-         <script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/filebrowser/filebrowser.js"></script>
-      <?} else {?>
-         <script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/filebrowser/filebrowser.min.js"></script>
-      <?}?>
       <script type="text/javascript">/* <![CDATA[ */<?$this->renderHeaderScripts()?>/* ]]> */</script>
+      <?if(VVE_DEBUG_LEVEL > 1){?>
+         <script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/filebrowser/filebrowser_v2.js"></script>
+      <?} else {?>
+         <script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/filebrowser/filebrowser_v2.js"></script>
+      <?}?>
    </head>
-   <body>
+   <body id="cubecms-filebrowser">
    <script language="javascript" type="text/javascript">
-   $(document).ready(function(){
+   
+   var browserParams = {
+      // základní adresy
+      uploadLink: '<?=$this->uploadLink?>',
+      baseUrl: '<?=Url_Request::getBaseWebDir();?>',
+      sessionId: '<?=session_id()?>',
+      listType: '<?echo isset($_GET['t']) ? $_GET['t'] : Component_TinyMCE_Browser::LIST_TYPE_FILES;?>',
+      imageBigSizeW: <?=VVE_DEFAULT_PHOTO_W?>,
+      imageBigSizeH: <?=VVE_DEFAULT_PHOTO_H?>,
+      imageSmallSizeW: <?=VVE_IMAGE_THUMB_W?>,
+      imageSmallSizeH: <?=VVE_IMAGE_THUMB_H?>,
+      maxUploadFileSize: <?=VVE_MAX_UPLOAD_SIZE?>, // in MB
+      cookieName: '<?=VVE_SESSION_NAME?>_Cube_Cms_brpath',
+      baseListPath: '<? echo Auth::isAdmin() ? '/public/' : '/home/'.Auth::getUserName().'/'; ?>',
+      openDir: <?echo (isset($_GET['forcedir']) && $_GET['forcedir'] != null ) ? "'".urldecode($_GET['forcedir'])."'" : 'false';?>,
+      translations : {}
+   };
+//   $(document).ready(function(){
       // počáteční nastavení
-      FileBrowser.uploadLink = '<?=$this->uploadLink?>';
-      FileBrowser.baseUrl = '<?=Url_Request::getBaseWebDir();?>';
-      FileBrowser.sessionId = '<?=session_id()?>';
-      FileBrowser.listType = '<?echo isset($_GET['t']) ? $_GET['t'] : Component_TinyMCE_Browser::LIST_TYPE_FILES;?>';
-      tinyMCEPopup.onInit.add(FileBrowserDialogue.init, FileBrowserDialogue);
-   });
-   var imageBigSizeW = <?=VVE_DEFAULT_PHOTO_W?>;
-   var imageBigSizeH = <?=VVE_DEFAULT_PHOTO_H?>;
-   var imageSmallSizeW = <?=VVE_IMAGE_THUMB_W?>;
-   var imageSmallSizeH = <?=VVE_IMAGE_THUMB_H?>;
-   var maxUploadFileSize = <?=VVE_MAX_UPLOAD_SIZE?>; // in MB
-   var cookieName = '<?=VVE_SESSION_NAME?>_Cube_Cms_brpath';
-   var tips = new Array('<?php ps($this->tr('Pomocí klávesy CTRL a SHIFT lze označit více položek najednou.'))?>',
-                        '<?php ps($this->tr('Soubor lze také nahrát přetažením do otevřené složky.'))?>',
-                        '<?php ps($this->tr('Při označení více obrázků jsou akce aplikovány na všechny.'))?>',
-                        '<?php ps($this->tr('Přesun a kopírování položek lze pomocí chránky.'))?>',
-                        '<?php ps($this->tr('Při nahrávání obrázků z fotoaparátu je nutné obrázek zmenšit.'))?>'
-                        );
-   var baseLoadPath = '<? echo Auth::isAdmin() ? '/public/' : '/home/'.Auth::getUserName().'/'; ?>';
-   var openDir = <?
-      echo (isset($_GET['forcedir']) && $_GET['forcedir'] != null ) ? "'".urldecode($_GET['forcedir'])."'" : 'false';?>;                        
+      tinyMCEPopup.onInit.add(function(){ CubeBrowser.init(browserParams); });
+//   });
    </script>
-      <table style="" id="mainTable" cellpadding="0" cellspacing="3">
-   <tr>
-      <th style="width: 400px; height: 30px;">
-         Cesta:&nbsp;<span id="currentPath" class="small-font"></span>
-      </th>
-      <th style="width: 330px;">Info:&nbsp;<span id="currentFile" class="small-font"></span></th>
-   </tr>
-   <tr valign="top">
-      <td rowspan="3" style="width: 400px; height: 350px;">
-         <ul id="itemsList">
-            <li><?=_('Nenačteno')?></li>
-         </ul>
-      </td>
-      <td style="height: 150px;padding: 0;margin: 0;">
-         <div id="infoBox"></div>
-      </td>
-   </tr>
-   <tr>
-      <th>Nástroje: <input type="checkbox" name="apply_all" checked="checked" />&nbsp;<span class="small-font">Použít na všechny označené položky</span></th>
-   </tr>
-   <tr>
-      <td style="height: 170px;">
-         <div id="fileActions"></div>
-      </td>
-   </tr>
-   <tr valign="top">
-      <td>
-         <div>
-            <div style="float: left" class="swfupload-control"><span id="spanButtonPlaceholder"></span></div>
-            <span id="uploading-files"><img src="../../../images/progress.gif" alt="loading..." width="16"/></span>&nbsp;Max:<?=vve_create_size_str(VVE_MAX_UPLOAD_SIZE)?>
-            <div style="float: right">
-               <? if(Auth::isAdmin()){?>
-               <input id="buttonGoPublic" type="image" src="../../../images/icons/folder_star.png" title="Přejít do veřejné složky" onclick="FileBrowser.goPublic()" />
-               <?}?>
-               <input id="buttonGoHome" type="image" src="../../../images/icons/house.png" title="Přejít do osobní složky" onclick="FileBrowser.goHome()" />
-               <span class="buttons-separator">&nbsp;</span>
-               <input id="buttonCreateDir" class="buttons" type="image" src="../../../images/icons/folder_add.png"
-                      title="Vytvořit složku" onclick="FileBrowser.createDir()" />
-               <span class="buttons-separator">&nbsp;</span>
-               <input id="buttonDelete" class="buttons" type="image" src="../../../images/icons/delete.png"
-                      title="Smazat" onclick="FileBrowser.deleteItems()" />
-               <input id="buttonRename" class="buttons" type="image" src="../../../images/icons/pencil.png"
-                   title="Přejmenovat" onclick="FileBrowser.renameItems()" />
-               <span class="buttons-separator">&nbsp;</span>
-               <input id="buttonCopy" class="buttons" type="image" src="../../../images/icons/page_copy.png"
-                   title="Kopírovat" onclick="FileBrowser.clipboardCopy()" />
-               <input id="buttonCut" class="buttons" type="image" src="../../../images/icons/cut.png"
-                   title="Vyjmout" onclick="FileBrowser.clipboardCut()" />
-               <input id="buttonPaste" class="buttons" type="image" src="../../../images/icons/page_paste.png"
-                   title="Vložit" onclick="FileBrowser.clipboardPaste()" />
-               <span class="buttons-separator">&nbsp;</span>
-               <input id="buttonRefresh" type="image" src="../../../images/icons/view-refresh.png"
-                      title="Obnovit složky" onclick="FileBrowser.load()" />
+   <div id="fb-wrap" class="clearfix">
+      <div id="col-left">
+         <div id="brand">
+            <div>
+               <span>CubeCMS</span><br/> Browser
             </div>
          </div>
-      </td>
-      <td align="right">
-         <form name="form">
-            <input type="button" class="button" value="Vložit" onClick="FileBrowserDialogue.submitFile();" />
-         </form>
-      </td>
-   </tr>
-   <tr>
-      <td style="position: relative;">Log:
-         <a href="#" title="Vyčistit" onclick="FileBrowser.clearLog();return false;">vyčistit</a>
-         <a href="#" title="Další TIP" onclick="FileBrowser.showTip();return false;">další TIP</a>
-         <div id="log" style="height: 50px;"></div></td>
-      <td>Schránka: <a href="#" title="Vyčistit" onclick="FileBrowser.clipboardClear();return false;">vyčistit</a><ul id="clipboard" style="height: 50px;"></ul></td>
-   </tr>
-</table>
-      <div id="working" style="display: none;">
-         <p>
-            Zpracovávám...
-            <img src="<?=Url_Request::getBaseWebDir()?>images/ajaxProgress.gif" alt="..." /><br />
-            <span style="font-size: xx-small">(Pokud zpracování trvá příliš dlouho, zkuste klávesou F5 obnovit stránku.)</span>
-         </p>
+         <div id="preview">
+            <div class="image-wrap"><span class="helper"></span><img src="" alt="" /><span class="icon icon-ban"></span></div>
+         </div>
+         <hr />
+         <div id="file-operations">
+            <div>
+               <label for="file-operations-selector"><?php ps($this->tr('Označené soubory'))?></label>
+               <select name="" id="file-operations-selector">
+                  <option value=""><?php ps($this->tr('Vyberte operaci ...'))?></option>
+                  <option value="resize" data-target="#image-resize" class="image-operation" ><?php ps($this->tr('Změna velikosti'))?></option>
+                  <option value="rotate" data-target="#image-rotate" class="image-operation" ><?php ps($this->tr('Otočení'))?></option>
+                  <option value="rotate" data-target="#image-flip" class="image-operation" ><?php ps($this->tr('Zrcadlení'))?></option>
+                  <option value="rotate" data-target="#image-filter" class="image-operation" ><?php ps($this->tr('Filtry'))?></option>
+                  <option value="rotate" data-target="#image-watermark" class="image-operation" ><?php ps($this->tr('Vodoznak'))?></option>
+               </select>
+            </div>
+            <div id="image-resize" class="file-operations-box image-operation disabled">
+               <form method="post" action="" class="form-file-action" onsubmit="CubeBrowserFileActionsWidget.resizeImages(); return false;">
+                  <div class="form-row">
+                     <input type="text" value="" name="image_size_x" class="imgsize" /> <span class="icon icon-times"></span>
+                     <input type="text" value="" name="image_size_y" class="imgsize" /> px
+                  </div>
+                  <div class="form-row">
+                     <label><input type="checkbox" name="mantain_ratio" checked="checked" /> <?php ps($this->tr('Zachovat poměr stran'))?></label>
+                  </div>
+                  <div class="form-row">
+                     <label><input type="checkbox" name="image_crop" /> <?php ps($this->tr('Ožezat'))?></label>
+                  </div>
+                  <div class="form-row">
+                     <label><input type="checkbox" name="create_new" checked="checked" /> <?php ps($this->tr('Vytvořit nový obrázek'))?></label>
+                  </div>
+                  <div class="form-row submit-row">
+                     <input type="hidden" name="action" value="resize" />
+                     <button type="submit" name="process_images"><span class="icon icon-check"></span><?php ps($this->tr('Provést'))?></button>
+                  </div>
+               </form>
+            </div>
+            <div id="image-rotate" class="file-operations-box image-operation disabled">
+               <form method="post" action="" onsubmit="CubeBrowserFileActionsWidget.rotateImages(); return false;">
+                  <div class="form-row">
+                     <?php ps($this->tr('Otočit o'))?>
+                     <select name="degree">
+                        <option value="90">90°</option>
+                        <option value="180">180°</option>
+                        <option value="270">270°</option>
+                     </select>
+                  </div>
+                  <div class="form-row">
+                     <label><input type="checkbox" name="create_new" checked="checked" /> <?php ps($this->tr('Vytvořit nový obrázek'))?></label>
+                  </div>
+                  <div class="form-row submit-row">
+                     <input type="hidden" name="action" value="rotate" />
+                     <button type="submit" name="processFile"><span class="icon icon-check"></span><?php ps($this->tr('Provést'))?></button>
+                  </div>
+               </form>
+            </div>
+            <div id="image-flip" class="file-operations-box image-operation disabled">
+               <form method="post" action="" onsubmit="CubeBrowserFileActionsWidget.flipImages(); return false;">
+                  <div class="form-row">
+                     <?php ps($this->tr('Zrcadlit'))?>
+                     <select name="flip">
+                        <option value="<?=IMG_FLIP_HORIZONTAL?>">Horizontálně</option>
+                        <option value="<?=IMG_FLIP_VERTICAL?>">Vertikálně</option>
+                     </select>
+                  </div>
+                  <div class="form-row">
+                     <label><input type="checkbox" name="create_new" checked="checked" /> <?php ps($this->tr('Vytvořit nový obrázek'))?></label>
+                  </div>
+                  <div class="form-row submit-row">
+                     <input type="hidden" name="action" value="rotate" />
+                     <button type="submit" name="processFile"><span class="icon icon-check"></span><?php ps($this->tr('Provést'))?></button>
+                  </div>
+               </form>
+            </div>
+            <div id="image-watermark" class="file-operations-box image-operation disabled">
+               <form method="post" action="" onsubmit="CubeBrowserFileActionsWidget.watermarkImages(); return false;">
+                  <div class="form-row">
+                     <label for="input-watemark-text"><?php ps($this->tr('Text'))?></label>:<br />
+                     <input name="text" type="text" value="<?=CUBE_CMS_WEB_NAME?>" id="input-watemark-text" />
+                  </div>
+                  <div class="form-row">
+                     <label><?php ps($this->tr('Kódy barev'))?> (000000)</label>:<br />
+                     <label for="input-watemark-color"><?php ps($this->tr('Text'))?></label>:
+                     <input name="color" type="text" value="000000"  id="input-watemark-color" class="input-color"/>
+                     <label for="input-watemark-colorbg"><?php ps($this->tr('BG'))?></label>:
+                     <input name="colorBg" type="text" value="ffffff"  id="input-watemark-colorbg" class="input-color"/>
+                  </div>
+                  <div class="form-row">
+                     <?php ps($this->tr('Pozice'))?><br />
+                     <select name="posX">
+                        <option value="left"><?ps($this->tr('Vlevo'))?></option>
+                        <option value="center"><?ps($this->tr('Uprostřed'))?></option>
+                        <option value="right" selected=""><?ps($this->tr('Vpravo'))?></option>
+                     </select>
+                     <select name="posY">
+                        <option value="top"><?ps($this->tr('Nahoře'))?></option>
+                        <option value="center"><?ps($this->tr('Uprostřed'))?></option>
+                        <option value="bottom" selected=""><?ps($this->tr('Dole'))?></option>
+                     </select>
+                  </div>
+                  
+                  <div class="form-row">
+                     <label><input type="checkbox" name="create_new" checked="checked" /> <?php ps($this->tr('Vytvořit nový obrázek'))?></label>
+                  </div>
+                  <div class="form-row submit-row">
+                     <input type="hidden" name="action" value="rotate" />
+                     <button type="submit" name="processFile"><span class="icon icon-check"></span><?php ps($this->tr('Provést'))?></button>
+                  </div>
+               </form>
+            </div>
+            <div id="image-filter" class="file-operations-box image-operation disabled">
+               <form method="post" action="" onsubmit="CubeBrowserFileActionsWidget.filterImages(); return false;">
+                  <div class="form-row">
+                     <label for="image-filter-select"><?php ps($this->tr('Filtr'))?></label>
+                     <select name="filter" id="image-filter-select">
+                        <option value="<?=IMG_FILTER_GRAYSCALE?>" data-adv="0"><?ps($this->tr('Odstíny šedi'))?></option>
+                        <option value="<?=IMG_FILTER_NEGATE?>" data-adv="0"><?ps($this->tr('Negativ'))?></option>
+                        <!--<option value="<?=IMG_FILTER_NEGATE?>"><? ps($this->tr('Zaostřit'))?></option>-->
+                        
+                        <option value="<?=IMG_FILTER_SELECTIVE_BLUR?>"data-adv="0"><?ps($this->tr('Rozostřit (selektivní)'))?></option>
+                        
+                        <option value="<?=IMG_FILTER_GAUSSIAN_BLUR?>" data-adv="0"><?ps($this->tr('Rozostřit (gausian)'))?></option>
+                        
+                        <option value="<?=IMG_FILTER_PIXELATE?>" 
+                                data-adv="1"
+                                data-advtitle="0 až 255"
+                                data-advmin=""
+                                data-advmax="255"
+                                data-advdefault="10"
+                                ><?ps($this->tr('Pixelizovat'))?></option>
+                        
+                        <option value="<?=IMG_FILTER_BRIGHTNESS?>" 
+                                data-adv="1"
+                                data-advtitle="-255 až 255"
+                                data-advmin="-255"
+                                data-advmax="255"
+                                data-advdefault="40"
+                                ><?ps($this->tr('Světlost'))?></option>
+                        
+                        <option value="<?=IMG_FILTER_CONTRAST?>"
+                                data-adv="1"
+                                data-advtitle="-255 až 255"
+                                data-advmin="-255"
+                                data-advmax="255"
+                                data-advdefault="-40"
+                                ><?ps($this->tr('Kontrast'))?></option>
+                        
+                        <option value="<?=IMG_FILTER_EDGEDETECT?>" data-adv="0"><?ps($this->tr('Detekce hran'))?></option>
+                        
+                        <option value="sepia" 
+                                data-adv="1"
+                                data-advtitle="Odstín červené a modré, -255 až 255"
+                                data-advmin="-255"
+                                data-advmax="255"
+                                data-advdefault="60"
+                                ><?ps($this->tr('Sépie'))?></option>
+                     </select>
+                  </div>
+                  <div class="form-row" id="fitler-settings">
+                     <label for="image-filter-arg">Parametry</label><br />
+                     <input type="text" value="0" name="filter_arg" id="image-filter-arg" /><br/>
+                     <span></span>
+                  </div>
+                  <div class="form-row">
+                     <label><input type="checkbox" name="create_new" checked="checked" /> <?php ps($this->tr('Vytvořit nový obrázek'))?></label>
+                  </div>
+                  <div class="form-row submit-row">
+                     <input type="hidden" name="action" value="rotate" />
+                     <button type="submit" name="processFile"><span class="icon icon-check"></span><?php ps($this->tr('Provést'))?></button>
+                  </div>
+               </form>
+            </div>
+         </div>
+         <hr />
+         <div id="tips">
+            <div class="header"><a href="#showtips" id="button-show-tips"><span id="base-icon" class="icon icon-lightbulb-o"></span> <?php ps($this->tr('Nápověda'))?></a></div>
+            <div id="tip-content">
+               <p><?php ps($this->tr('Pomocí klávesy CTRL a SHIFT lze označit více položek najednou.'))?>'</p>
+               <p><?php ps($this->tr('Soubor lze také nahrát přetažením do otevřené složky.'))?>'</p>
+               <p><?php ps($this->tr('Při označení více obrázků jsou akce aplikovány na všechny.'))?>'</p>
+               <p><?php ps($this->tr('Přesun a kopírování položek lze pomocí chránky.'))?>'</p>
+               <p><?php ps($this->tr('Při nahrávání obrázků z fotoaparátu je nutné obrázek zmenšit.'))?></p>
+               <a href="" onclick="CubeBrowserTipsWidget.showRandomTip(); return false;" id="button-new-tip"><span class="icon icon-refresh"></span></a>
+            </div>
+         </div>
       </div>
+      <div id="col-right">
+         <div id="toolbox-panel">
+            <div id="toolbox">
+               <div class="col-tools">
+                  <button id="toolbox-button-home" 
+                          class="button-icon" 
+                          onclick="CubeBrowserListWidget.loadPath('/home/<?=Auth::getUserName()?>/'); return false;"
+                          title="<?php ps($this->tr('Domů'))?>"><span class="icon icon-home"></span></button>
+                  <button id="toolbox-button-public" 
+                          class="button-icon" 
+                          onclick="CubeBrowserListWidget.loadPath('/public/'); return false;"
+                          title="<?php ps($this->tr('Veřejná složka'))?>"><span class="icon icon-globe"></span></button>
+                  <button id="toolbox-button-folder-up" 
+                          onclick="CubeBrowserListWidget.getFolderUp(); return false;" 
+                          class="button-icon" 
+                          title="<?php ps($this->tr('O složku výše'))?>"><span class="icon icon-chevron-circle-up"></span></button>
+                  <button id="toolbox-button-refersh" 
+                          class="button-icon" 
+                          onclick="CubeBrowserListWidget.refreshPath();" 
+                          title="<?php ps($this->tr('Obnovit seznam souborů'))?>"><span class="icon icon-refresh"></span></button>
+                  <span class="separator"></span>
+                  <button id="toolbox-button-clipboard-copy" 
+                          class="button-icon"
+                          onclick="CubeBrowserClipBoardWidget.copySelected(); return false;"
+                          title="<?php ps($this->tr('Kopírovat do schránky'))?>"><span class="icon icon-copy"></span></button>
+                  <button id="toolbox-button-clipboard-cut" 
+                          class="button-icon" 
+                          onclick="CubeBrowserClipBoardWidget.cutSelected(); return false;"
+                          title="<?php ps($this->tr('Vyjmout do schránky'))?>"><span class="icon icon-cut"></span></button>
+                  <button id="toolbox-button-clipboard-paste" 
+                          class="button-icon" 
+                          onclick="CubeBrowserClipBoardWidget.paste(); return false;"
+                          title="<?php ps($this->tr('Vložit ze schránky'))?>"><span class="icon icon-paste"></span></button>
+                  <span class="separator"></span>
+                  <button id="toolbox-button-rename" 
+                          class="button-icon"
+                          onclick="CubeBrowser.openRenameDialog();"
+                          title="<?php ps($this->tr('Přejmenovat'))?>"><span class="icon icon-pencil"></span></button>
+                  <button id="toolbox-button-copy" 
+                          class="button-icon" 
+                          onclick="CubeBrowser.openCopyDialog();"
+                          title="<?php ps($this->tr('Kopírovat'))?>"><span class="icon icon-copy"></span></button>
+                  <button id="toolbox-button-move" 
+                          class="button-icon" 
+                          onclick="CubeBrowser.openMoveDialog();"
+                          title="<?php ps($this->tr('Přesunout'))?>"><span class="icon icon-arrows"></span></button>
+                  <button id="toolbox-button-delete" 
+                          class="button-icon button-remove" 
+                          onclick="CubeBrowser.openDeleteDialog(); return false;"
+                          title="<?php ps($this->tr('Odstranit'))?>"><span class="icon icon-times"></span></button>
+               </div>
+               <div class="col-buttons">
+                  <button id="button-create-folder" onclick="CubeBrowser.openNewDirDialog()"><span class="icon icon-plus"></span> <?php ps($this->tr('Nová složka'))?></button>
+                  <?
+                  $this->uploadForm->setDecorator(new Form_Decorator_Clear());
+                  $this->uploadForm->html()->setAttrib('target', 'fb_u_target')->setAttrib('id', 'upload-form');
+                  echo $this->uploadForm->renderStart();
+                  echo $this->uploadForm->type->control();
+                  echo $this->uploadForm->path->control();
+                  echo $this->uploadForm->iframe->control();
+                  echo $this->uploadForm->file->control();
+                  ?>
+                  <button id="toolbox-button-upload" type="button"><span class="icon icon-upload"></span> <?php ps($this->tr('Nahrát'))?></button>
+                  <?
+                  echo $this->uploadForm->renderEnd();
+                  ?>
+               </div>
+            </div>
+            <div id="current-path">
+               <label for="current_path"><?php ps($this->tr('Cesta:'))?></label>
+               <form action="" id="form-change-path">
+                  <input type="text" id="input-current-path" />
+                  <button class="button" type="submit"><span class="icon icon-check"></span></button>
+               </form>
+            </div>
+         </div>
+         <div id="browser">
+            <div class="header">
+               <span class="selector"><input type="checkbox" /></span>
+               <span class="name"><?php ps($this->tr('Název'))?>:</span>
+               <span class="size"><?php ps($this->tr('Velikost'))?>:</span>
+               <span class="actions"><?php ps($this->tr('Akce'))?>:</span>
+            </div>
+            <ul class="list">
+            </ul>
+            <ul id="item-tpl" style="display: none;">
+               <li>
+                  <span class="selector"><input type="checkbox" /><label></label></span>
+                  <span class="name"><a href="#"><span class="icon"></span><span class="filename"></span></a></span>
+                  <span class="size"></span>
+                  <span class="actions">
+                     <a href="#" onclick="CubeBrowser.openRenameDialog(this); return false;"><span class="icon icon-pencil"></span></a>
+                     <a href="#" onclick="CubeBrowser.openDeleteDialog(this); return false;" class="button-remove"><span class="icon icon-times"></span></a>
+                     <a href="" class="button-open-external" title="<?ps($this->tr('Otevřít v novém okně'))?>"><span class="icon icon-share"></span></a>
+                  </span>
+                  <span class="preview"><img src="" alt="" /></span>
+               </li>
+            </ul>
+            <div id="drop-area"><span>Upusťte zde pro nahrání do aktuální složky</span></div>
+            <div class="filter">
+               <label for="browser-filter-input"><span class="icon icon-filter"></span> <?php ps($this->tr('Filtr'))?>:</label>
+               <input type="text" class="list-filter" id="browser-filter-input" />
+            </div>
+         </div>
+         <div class="clearfix" id="messages-box">
+            <div id="logs">
+               <div class="title"><?php ps($this->tr('Výpisy'))?></div>
+               <ul class="list">
+                  <?php /*
+                  $rand = rand(1, 20);
+                  for ($i = 1; $i <= $rand; $i++) {
+                     $rStr = rand(0, 2);
+                     $types = array('info', "warning", 'error');
+                     ?>
+                  <li class="msg msg-<?=$types[$rStr]?>">položka <?=$i?></li>
+                  <?php }*/?>
+               </ul>
+               <a href="" class="button-clear-list" onclick="CubeBrowserLogsWidget.clear(); return false;"><span class="icon icon-times"></span></a>
+            </div>
+            <div id="clipboard">
+               <div class="title"><?php ps($this->tr('Schránka'))?></div>
+               <ul class="list">
+                  <?php 
+                  /*$rand = rand(1, 20);
+                  for ($i = 1; $i <= $rand; $i++) {?>
+                  <li>
+                     <a href="">položka <?=$i?></a><a class="button-remove" href=""><span class="icon icon-times"></span></a>
+                  </li>
+                  <?php }
+                   */?>
+               </ul>
+               <a href="#clipboard-clr" onclick="CubeBrowserClipBoardWidget.clear(); return false;" class="button-clear-list"><span class="icon icon-times"></span></a>
+            </div>
+         </div>
+         <div class="clearfix" id="dialog-buttons-box">
+            <div id="progress-bar">
+               <button class="button-cancel"><span class="icon icon-times"></span></button>
+               <div class="meter">
+                  <span class="progress" style="width: 25%"></span>
+                  <span class="percent">0%</span>
+               </div>   
+            </div>
+            <div id="filebrowser-buttons">
+               <button id="button-close"><span class="icon icon-times"></span> <?php ps($this->tr('Zavřít')) ?></button>
+               <button id="button-insert" disabled="" onclick="CubeBrowser.submitSelectedFile();"><span class="icon icon-check"></span> <?php ps($this->tr('Vložit')) ?></button>
+            </div>
+         </div>
+      </div>
+   </div>
+
+   <div id="working" style="display: none;">
+      <p>
+         Zpracovávám...
+         <img src="<?=Url_Request::getBaseWebDir()?>images/ajaxProgress.gif" alt="..." /><br />
+         <span style="font-size: xx-small">(Pokud zpracování trvá příliš dlouho, zkuste klávesou F5 obnovit stránku.)</span>
+      </p>
+   </div>
+   <iframe id="upload_target" name="fb_u_target" src="<?=$this->uploadLink?>&method=iframe" style="width:0;height:0;border:0px solid #fff;" onload="CubeBrowserListWidget.refreshPath();"></iframe>
+   <div id="dialog-copy" class="dialog">
+      <div class="dialog-content">
+         <div class="title"><?php ps($this->tr('Kopírovat vybrané'))?></div>
+         <div class="content">
+            <form action="" id="form-select-target-copy-dir" onsubmit="CubeBrowser.copySelectedItems(this.target.value); CubeBrowser.closeDialog(this); return false;">
+               <div class="form-row">
+                  <label for="select-copy-dir-target"><?php ps($this->tr('Vyberte cílový adresář'));?></label>
+                  <select name="target" id="select-copy-dir-target" class="directory-select"></select>
+               </div>
+               <div class="form-row submit-row">
+                  <button type="submit"><?php ps($this->tr('Kopírovat'))?></button>
+                  <button type="button" onclick="CubeBrowser.closeDialog(this);"><?php ps($this->tr('Zavřít'))?></button>
+               </div>
+            </form>
+         </div>
+      </div>
+   </div>
+   <div id="dialog-move" class="dialog">
+      <div class="dialog-content">
+         <div class="title"><?php ps($this->tr('Přesunout vybrané'))?></div>
+         <div class="content">
+            <form action="" id="form-move-dir" onsubmit="CubeBrowser.moveSelectedItems(this.target.value); CubeBrowser.closeDialog(this); return false;">
+               <div class="form-row">
+                  <label for="select-move-dir-target"><?php ps($this->tr('Vyberte cílový adresář'));?></label>
+                  <select name="target" id="select-move-dir-target" class="directory-select"></select>
+               </div>
+               <div class="form-row submit-row">
+                  <button type="submit"><?php ps($this->tr('Přesunout'))?></button>
+                  <button type="button" onclick="CubeBrowser.closeDialog(this);"><?php ps($this->tr('Zavřít'))?></button>
+               </div>
+            </form>
+         </div>
+      </div>
+   </div>
+   <div id="dialog-rename" class="dialog">
+      <div class="dialog-content">
+         <div class="title"><?php ps($this->tr('Přejmenovat soubor/adresář'))?></div>
+         <div class="content">
+            <form action="" id="form-move-dir" onsubmit="CubeBrowser.renameItems(this.newname.value); CubeBrowser.closeDialog(this); return false;">
+               <div class="form-row">
+                  <label for="input-rename"><?php ps($this->tr('Nové jméno'));?></label>
+                  <input type="text" name="newname" value="" id="input-rename" />
+               </div>
+               <div class="form-row submit-row">
+                  <button type="submit"><?php ps($this->tr('Přejmenovat'))?></button>
+                  <button type="button" onclick="CubeBrowser.closeDialog(this);"><?php ps($this->tr('Zavřít'))?></button>
+               </div>
+            </form>
+         </div>
+      </div>
+   </div>
+   <div id="dialog-delete" class="dialog">
+      <div class="dialog-content">
+         <div class="title"><?php ps($this->tr('Smazat'))?></div>
+         <div class="content">
+            <form action="" id="form-move-dir" onsubmit="CubeBrowser.deleteSelectedItems(); CubeBrowser.closeDialog(this); return false;">
+               <div class="form-row">
+                  <?php ps($this->tr('Opravdu smazat:'))?><strong class="files-list"></strong>?
+               </div>
+               <div class="form-row submit-row">
+                  <button type="submit"><?php ps($this->tr('Smazat'))?></button>
+                  <button type="button" onclick="CubeBrowser.closeDialog(this);"><?php ps($this->tr('Zavřít'))?></button>
+               </div>
+            </form>
+         </div>
+      </div>
+   </div>
+   <div id="dialog-new-dir" class="dialog">
+      <div class="dialog-content">
+         <div class="title"><?php ps($this->tr('Nová složka'))?></div>
+         <div class="content">
+            <form action="" id="form-new-dir" onsubmit="CubeBrowser.createDir(this.newname.value); CubeBrowser.closeDialog(this); return false;">
+               <div class="form-row">
+                  <label for="select-move-dir-target"><?php ps($this->tr('nové jméno'));?></label>
+                  <input type="text" name="newname" value="" />
+               </div>
+               <div class="form-row submit-row">
+                  <button type="submit"><?php ps($this->tr('Vytvořit'))?></button>
+                  <button type="button" onclick="CubeBrowser.closeDialog(this);"><?php ps($this->tr('Zavřít'))?></button>
+               </div>
+            </form>
+         </div>
+      </div>
+   </div>
 </body>
 </html>
