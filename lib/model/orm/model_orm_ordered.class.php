@@ -146,9 +146,9 @@ class Model_ORM_Ordered_Record extends Model_ORM_Record {
       
       $whereString = array();
       $whereBinds = array();
-
-      if(!empty($this->model->getLimitedColumns())){
-         foreach ($this->model->getLimitedColumns() as $index => $column) {
+      $lColumns = $this->model->getLimitedColumns();
+      if(!empty($lColumns)){
+         foreach ($lColumns as $index => $column) {
             $whereString[] = $column.' = :col_'.$index;
             $whereBinds[':col_'.$index] = $this->{$column};
          }
