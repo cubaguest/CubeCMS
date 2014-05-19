@@ -166,6 +166,12 @@ class Template_Core extends Template {
       unset ($js);
 
       // doplníme titulek stránky
+      if(Face::getParamStatic('category_new_line_separators', null, false)){
+         $separators = Face::getParamStatic('category_new_line_separators');
+         foreach (self::$pageTitle as &$value) {
+            $value = str_replace($separators, array_fill(0, count($separators), ""), $value);
+         }
+      }
       $title = implode(' '.VVE_PAGE_TITLE_SEPARATOR.' ', array_reverse (self::$pageTitle));
 
       // dovypsání CoreErrors

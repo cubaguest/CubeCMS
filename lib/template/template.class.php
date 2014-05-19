@@ -134,6 +134,12 @@ class Template extends TrObject {
    public function __construct(Url_Link $link) {
       $this->link = $link;
       self::$browser = new Browser();
+//      $existed = in_array("tpl", stream_get_wrappers());
+//      if (!$existed) {
+//         stream_wrapper_register('tpl', 'Template_Stream_Tpl');
+//         stream_wrapper_register('css', 'Template_Stream_Css');
+//         stream_wrapper_register('js', 'Template_Stream_Js');
+//      }
    }
 
    /**
@@ -566,7 +572,12 @@ class Template extends TrObject {
     * @return bool -- true pokud se jedná o titulní stránku
     */
    final public static function isTitlePage() {
-      return AppCore::getUrlRequest()->getCategory() == null ? true : false;
+      if(AppCore::getUrlRequest()->getCategory() == null || 
+          (Category_Structure::getDefaultCategory() != null &&
+          Category::getSelectedCategory()->getId() == Category_Structure::getDefaultCategory()->getId())){
+         return true;
+      }
+      return false;
    }
 
    /**
@@ -876,7 +887,9 @@ class Template extends TrObject {
          } else {
             $cache = $path . $rpFile;
          }
-
+         if(!is_dir(dirname($cacheFile))){
+            mkdir(dirname($cacheFile), 0777, true);
+         }
          $newCache = $less->cachedCompile($cache);
 
          if (!is_array($cache) || $newCache["updated"] > $cache["updated"]) {
@@ -1057,19 +1070,30 @@ class Template extends TrObject {
    public function filter($text, $filters){
       if(is_string($filters)) $filters = array($filters);
       foreach ($filters as $filter) {
-         if(function_exists('vve_filter_'.$filter)){
+         if(strpos($filter, '::') !== false){
+            $class = explode('::', $filter);
+            if(!method_exists($class[0], $class[1])){
+               throw new BadFunctionCallException($this->tr('Volán nedefinovaný výstupní filtr.'));
+            }
+            $text = call_user_func($filter, $text, $this->link, $this);
+         } else if(function_exists('vve_filter_'.$filter)){
             $filter = 'vve_filter_'.$filter;
+            if(is_array($filter)){
+               $text = $filter[0]($text, $this->link, $this, $filter[1]);
+            } else {
+               $text = $filter($text, $this->link, $this);
+            }
+            
          } else if(function_exists($filter)){
+            if(is_array($filter)){
+               $text = $filter[0]($text, $this->link, $this, $filter[1]);
+            } else {
+               $text = $filter($text, $this->link, $this);
+            }
          } else {
             throw new BadFunctionCallException($this->tr('Volán nedefinovaný výstupní filtr.'));
          }
-         if(is_array($filter)){
-            $text = $filter[0]($text, $this->link, $this, $filter[1]);
-         } else {
-            $text = $filter($text, $this->link, $this);
-         }
       }
-
       return $text;
    }
 
