@@ -116,13 +116,19 @@ class File_Image_Imagick extends File_Image_Base {
       }
       
       // calculate the position
-//       $x = ($this->getWidth() - $wWidth) / 2;
-//       $y = ($this->getHeight() - $wHeight) / 2;
+       $x = ($this->getWidth() - $wWidth) / 2;
+       $y = ($this->getHeight() - $wHeight) / 2;
       
       $this->imageData->compositeImage($watermark, Imagick::COMPOSITE_OVER, $x, $y);
       
       return $this;
    }
+   
+   public function textWatermark($text, $params = array())
+   {
+      
+   }
+       
    
    /**
     * Metoda pro uložení obrázku (automaticky upraví příponu) nebo ho vypíše

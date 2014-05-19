@@ -176,7 +176,7 @@ abstract class File_Image_Base extends TrObject {
     * @param int $filter -- konstanta IMG_FILTER_XXX
     * @return File_Image_Base 
     */
-   public function filter($filter, $arg1 = null, $arg2 = null, $arg3 = null)
+   public function filter($filter)
    {
       return $this;
    }
@@ -189,6 +189,16 @@ abstract class File_Image_Base extends TrObject {
    public function watermark(File_Image $img, $params = array())
    {
       
+      return $this;
+   }
+   
+   /**
+    * Metoda vloží textový vodoznak do obrázku
+    * @param string $text - text vodoznaku
+    * @param array $params - parametry: 'color', 'fontSize', 'fontFile', 'bgColor', 'alpha', 'horizontal', 'vertical',
+    */
+   public function textWatermark($text, $params = array())
+   {
       return $this;
    }
    

@@ -144,6 +144,7 @@ class File_Image_Gd extends File_Image_Base {
       {
         case IMAGETYPE_JPEG:
             if (imagetypes() & IMG_JPG) {
+               imageinterlace($this->imageData, true);
                imagejpeg($this->imageData, $file, $this->quality);
             }
             break;
@@ -167,10 +168,12 @@ class File_Image_Gd extends File_Image_Base {
       }
    }
 
-   public function filter($filter, $arg1 = null, $arg2 = null, $arg3 = null)
+   public function filter($filter)
    {
+      $args = func_get_args();
       $this->loadImageData();
-      imagefilter($this->imageData, $filter, $arg1, $arg2, $arg3);
+      call_user_func_array('imagefilter', array_merge(array($this->imageData), $args));
+//      imagefilter($this->imageData, $args[0]);
       return $this;
    }
 
@@ -221,6 +224,92 @@ class File_Image_Gd extends File_Image_Base {
       return $this;
    }
 
+   /**
+    * Metoda vloží textový vodoznak do obrázku
+    * @param string $text - text vodoznaku
+    * @param array $params - parametry: 'color', 'fontSize', 'fontFile', 'bgColor', 'alpha', 'horizontal', 'vertical',
+    */
+   public function textWatermark($text, $params = array())
+   {
+      $this->loadImageData();
+      $params += array(
+          'color' => '000000',
+          'fontSize' => 14,
+          'fontFile' => AppCore::getAppLibDir().'fonts'.DIRECTORY_SEPARATOR.'FreeSans.ttf',
+          'bgColor' => 'ffffff',
+          'alpha' => 0.5,
+          'horizontal' => 'right',
+          'vertical' => 'bottom',
+      );
+      
+      $typeSpace = imagettfbbox($params['fontSize'], 0, $params['fontFile'], $text);
+      
+      // výpočet velikosti
+      $stamp_width = abs($typeSpace[4] - $typeSpace[0]) + 10;
+      $stamp_height = abs($typeSpace[5] - $typeSpace[1]) + 10;
+
+      // známka
+      $stamp = imagecreatetruecolor($stamp_width, $stamp_height);
+
+      // Nastavení barev
+      $color = $this->hexrgb($params['color']);
+      $colorBg = $this->hexrgb($params['bgColor']);
+      $text_color = imagecolorallocate($stamp, $color[0], $color[1], $color[2]);
+      $bg_color = imagecolorallocate($stamp, $colorBg[0], $colorBg[1], $colorBg[2]);
+
+      // Fill image:
+      imagefill($stamp, 0, 0, $bg_color);
+      
+      // oprava x a y souřadnic pro text
+      $x = 5; // Padding 5 pixels.
+      $y = $stamp_height - 10; // vertikálně centrovaný text, má být sice 5, ale to pak není uprostřed
+
+      // Přidání textu
+      imagettftext($stamp, $params['fontSize'], 0, $x, $y, $text_color, $params['fontFile'], $text);
+      
+      // dopočet pozice z parametrů
+      switch ($params['horizontal']) {
+         case 'left':
+            $dest_x = 10;
+            break;
+         case 'center':
+            $dest_x = $this->getWidth()/2 - $stamp_width/2;
+            break;
+         case 'right':
+            $dest_y = $this->getWidth() - $stamp_width - 10;
+            break;
+         default:
+            $dest_x = (int)$params['horizontal'];
+            break;
+      }
+      switch ($params['vertical']) {
+         case 'top':
+            $dest_y = 10;
+            break;
+         case 'center':
+            $dest_y = $this->getHeight()/2 - $stamp_height/2;
+            break;
+         case 'bottom':
+            $dest_y = $this->getHeight() - $stamp_height - 10;
+            break;
+         default:
+            $dest_y = (int)$params['vertical'];
+            break;
+      }
+      
+      //přidání do obrázku
+      imagecopymerge($this->imageData, $stamp, $dest_x, $dest_y, 0, 0, $stamp_width, $stamp_height, $params['alpha'] * 100);
+      
+      // Destroy image in memory to free-up resources:
+      imagedestroy($stamp);
+      return $this;
+   }
+   
+   private function hexrgb($hexstr) {
+      $int = hexdec($hexstr);
+      return array(0xFF & ($int >> 0x10), 0xFF & ($int >> 0x8), 0xFF & $int);
+   }
+   
 
    /*** PRIVATE METHODS  ***/
 
