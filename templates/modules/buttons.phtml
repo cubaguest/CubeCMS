@@ -18,6 +18,7 @@ if( !empty($this->moduleButtons) ){
              'icon' => null,
              'type' => 'button',
              'state' => null, // warning, error, ok
+             'options' => array(), // hodnoty pro rozbalovací seznam a podobně
              'attributes' => array(
                  'id' => isset($button['id']) ? $button['id'] : ( !is_int($id) ? $id : null ),
                  'onclick' => isset($button['confirm']) ? 'return confirm(\''.htmlspecialchars($button['confirm']).'\')' : null
@@ -35,6 +36,20 @@ if( !empty($this->moduleButtons) ){
                   $cnt .= $name.'="'.$value.'" ';
                }
                $cnt .= '/>';
+               $cnt .= '</div>';
+               break;
+            case 'select':
+               $cnt .= '<div class="ui-button">';
+               $cnt .= '<label>'.  htmlspecialchars($button['name']).'</label> ';
+               $cnt .= '<select ';
+               foreach($button['attributes'] as $name => $value){
+                  $cnt .= $name.'="'.$value.'" ';
+               }
+               $cnt .= '>';
+               foreach($button['options'] as $label => $value){
+                  $cnt .= '<option value="'.$value.'">'.  htmlspecialchars( is_int($label) ? $value : $label ).'</option>';
+               }
+               $cnt .= '</select>';
                $cnt .= '</div>';
                break;
             case 'button':
@@ -80,4 +95,4 @@ if( !empty($this->moduleButtons) ){
    <?
       Template::setPVar('_module-tool-buttons', true);
    }?>
-<?}?>
+<?}
