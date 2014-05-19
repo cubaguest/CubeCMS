@@ -237,34 +237,37 @@ class File_Image_Gd extends File_Image_Base {
           'fontSize' => 14,
           'fontFile' => AppCore::getAppLibDir().'fonts'.DIRECTORY_SEPARATOR.'FreeSans.ttf',
           'bgColor' => 'ffffff',
-          'alpha' => 0.5,
+          'alpha' => 0.5, // 0 - průhledný, 1 - neprůhledný 
           'horizontal' => 'right',
           'vertical' => 'bottom',
       );
       
       $typeSpace = imagettfbbox($params['fontSize'], 0, $params['fontFile'], $text);
-      
+      $alpha = round((1 - $params['alpha']) * 127);
       // výpočet velikosti
       $stamp_width = abs($typeSpace[4] - $typeSpace[0]) + 10;
       $stamp_height = abs($typeSpace[5] - $typeSpace[1]) + 10;
 
       // známka
       $stamp = imagecreatetruecolor($stamp_width, $stamp_height);
-
+      imagesavealpha($stamp, true);
+      $white = imagecolorallocatealpha($stamp, 0, 0, 0, 127);
+      imagefill($stamp, 0, 0, $white);
       // Nastavení barev
-      $color = $this->hexrgb($params['color']);
-      $colorBg = $this->hexrgb($params['bgColor']);
-      $text_color = imagecolorallocate($stamp, $color[0], $color[1], $color[2]);
-      $bg_color = imagecolorallocate($stamp, $colorBg[0], $colorBg[1], $colorBg[2]);
-
-      // Fill image:
-      imagefill($stamp, 0, 0, $bg_color);
+      if($params['bgColor'] != null){
+         $colorBg = $this->hexrgb($params['bgColor']);
+         $bg_color = imagecolorallocatealpha($stamp, $colorBg[0], $colorBg[1], $colorBg[2], $alpha);
+         // Fill image:
+         imagefill($stamp, 0, 0, $bg_color);
+      }
       
       // oprava x a y souřadnic pro text
       $x = 5; // Padding 5 pixels.
       $y = $stamp_height - 10; // vertikálně centrovaný text, má být sice 5, ale to pak není uprostřed
 
       // Přidání textu
+      $color = $this->hexrgb($params['color']);
+      $text_color = imagecolorallocatealpha($stamp, $color[0], $color[1], $color[2], $alpha);
       imagettftext($stamp, $params['fontSize'], 0, $x, $y, $text_color, $params['fontFile'], $text);
       
       // dopočet pozice z parametrů
@@ -276,7 +279,7 @@ class File_Image_Gd extends File_Image_Base {
             $dest_x = $this->getWidth()/2 - $stamp_width/2;
             break;
          case 'right':
-            $dest_y = $this->getWidth() - $stamp_width - 10;
+            $dest_x = $this->getWidth() - $stamp_width - 10;
             break;
          default:
             $dest_x = (int)$params['horizontal'];
@@ -296,9 +299,8 @@ class File_Image_Gd extends File_Image_Base {
             $dest_y = (int)$params['vertical'];
             break;
       }
-      
       //přidání do obrázku
-      imagecopymerge($this->imageData, $stamp, $dest_x, $dest_y, 0, 0, $stamp_width, $stamp_height, $params['alpha'] * 100);
+      imagecopyresampled($this->imageData, $stamp, $dest_x, $dest_y, 0, 0, $stamp_width, $stamp_height, $stamp_width, $stamp_height);
       
       // Destroy image in memory to free-up resources:
       imagedestroy($stamp);
