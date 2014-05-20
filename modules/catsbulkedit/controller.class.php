@@ -151,13 +151,16 @@ class CatsBulkEdit_Controller extends Controller {
             if(file_exists(Category::getImageDir(Category::DIR_ICON, true))){
                $dirIterator = new DirectoryIterator(Category::getImageDir(Category::DIR_ICON, true));
                $elem->setOptions(array($this->tr('Žádný') => ''), true);
+               $files = array();
                foreach ($dirIterator as $item) {
                   if($item->isDir() OR $item->isDot()) {
                      continue;
                   }
-                  $elem->setOptions(array($item->getFilename() => $item->getFilename()), true);
+                  $files[$item->getFilename()] = $item->getFilename();
                }
             }
+            sort($files);
+            $elem->setOptions($files, true);
             $elem->setDimensional();
             break;
          case 'def_rights':
