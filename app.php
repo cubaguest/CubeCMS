@@ -704,6 +704,13 @@ class AppCore extends TrObject {
          $routes->checkRoutes();
          if(!$routes->getActionName() 
             OR ($routes->getRouteName() == 'normal' AND !self::$category->getRights()->isReadable()) ) {
+            // redirect to login page
+            $linkLogin = Url_Link::getCategoryLinkByModule('login');
+            if(!Auth::isLogin() && $linkLogin && is_array($linkLogin)){
+               $linkLogin = reset($linkLogin);
+               $linkLogin->param('redirect', Url_Request::getCurrentUrl())->redirect();
+               flush();die;
+            }
             AppCore::setErrorPage();
             return false;
          }
