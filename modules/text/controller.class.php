@@ -309,6 +309,8 @@ class Text_Controller extends Controller {
 
       if ($textRec == false) {
          $textRec = $this->textModel->newRecord();
+      }
+      if($textRec->isNew()){
          $textRec->{Text_Model::COLUMN_ID_CATEGORY} = $this->category()->getId();
          $textRec->{Text_Model::COLUMN_SUBKEY} = $subkey;
       }
