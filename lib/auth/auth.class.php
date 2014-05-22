@@ -68,7 +68,7 @@ class Auth extends TrObject {
             self::saveUserDetailToSession();
             self::checkEnablePermanentLogin();
             // redirect to link
-            $link = new Url(isset($_GET['redirect']) ? urlencode($_GET['redirect']) : null);
+            $link = new Url(isset($_GET['redirect']) ? urldecode($_GET['redirect']) : null);
             $link->rmParam()->redirect();
          }
       } else {
