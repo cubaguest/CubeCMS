@@ -114,7 +114,7 @@ class Routes {
       if($replacement == null){
          $replacement = $regexp;
       }
-      if(strpos($regexp, '{') !== false && strpos($regexp, '}') !== false){
+      if(preg_match('/\{[a-z]{2,}\}/i', $regexp)){
          $regexp = preg_replace("/\{([a-z0-9-_]+)?\}/i", '::\1::', $regexp);
       }
       $rege = addcslashes($regexp, '/');
