@@ -4,6 +4,7 @@ class Articles_Routes extends Routes {
 
    function initRoutes() {
       $this->addRoute('top', "top", 'top', 'top/');
+      $this->addRoute('archiveDate', "archive/::year::/::month::/", 'archiveDate', 'archive/{year}/{month}/');
       $this->addRoute('archive', "archive", 'archive', 'archive/');
 
       $this->addRoute('content', "content.html", 'content', 'content.html');
@@ -30,5 +31,3 @@ class Articles_Routes extends Routes {
       
 	}
 }
-
-?>

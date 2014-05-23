@@ -53,7 +53,6 @@ class Articles_Controller extends Controller {
    public function mainController() {
       //        Kontrola práv
       $this->checkReadableRights();
-//      self::AutoRunHourly();
       // načtení článků
       $artModel = new Articles_Model();
       
@@ -222,6 +221,8 @@ class Articles_Controller extends Controller {
          $this->view()->articlesTags = $articlesTags ;
       }
       
+      $this->checkDateFirstArticle();
+      
       // odkaz zpět
       $this->link()->backInit();
       
@@ -229,7 +230,78 @@ class Articles_Controller extends Controller {
       $this->view()->text = $this->loadText();
    }
 
-   /**
+   public function archiveDateController($year, $month)
+   {
+      $this->checkReadableRights();
+      $artModel = new Articles_Model();
+      $dateStart = new DateTime($year.'-'.$month.'-1 00:00:00');
+      $this->view()->currentDate = $dateStart;
+      $dateEnd = new DateTime($year.'-'.$month.'-'.$dateStart->format('t').' 23:59:59');
+      
+      $mWhereString = Articles_Model::COLUMN_ID_CATEGORY.' = :idc '
+          . 'AND '.Articles_Model::COLUMN_ADD_TIME.' >= :dateStart '
+          . 'AND '.Articles_Model::COLUMN_ADD_TIME.' <= :dateEnd';
+      $mWhereBinds = array(
+          'idc' => $this->category()->getId(),
+          'dateStart' => $dateStart->format(DATE_ISO8601),
+          'dateEnd' => $dateEnd->format(DATE_ISO8601),
+          );
+      
+       if($this->category()->getRights()->isControll()){
+         $artModel->setSelectAllLangs(true);
+         $mWhereString .= ' AND '.Articles_Model::COLUMN_URLKEY.' IS NOT NULL ';
+         
+      } else if($this->category()->getRights()->isWritable()){
+         $mWhereString .= 
+            // články který nejsou koncepty nebo je napsal uživatel
+            " AND ("
+            .'('.Articles_Model::COLUMN_CONCEPT.' = 0 OR '.Articles_Model::COLUMN_ID_USER.' = :idusr) '
+            // články jsoupřidány po aktuálním času nebo je napsal uživatel
+            .'AND ('.Articles_Model::COLUMN_ADD_TIME.' <= NOW() OR  '.Articles_Model::COLUMN_ID_USER.' = :idusr2)'
+            // kategorie a vyplněný urlkey
+            .'AND '.Articles_Model::COLUMN_URLKEY.' IS NOT NULL '
+            .")";
+         $mWhereBinds['idusr'] = Auth::getUserId();
+         $mWhereBinds['idusr2'] = Auth::getUserId();
+      } else {
+         $mWhereString .= 
+            " AND ("
+            .Articles_Model::COLUMN_CONCEPT.' = 0 '
+            .'AND '.Articles_Model::COLUMN_ADD_TIME.' < NOW() '
+            .'AND '.Articles_Model::COLUMN_URLKEY.' IS NOT NULL '
+            .")";
+      }
+      $artModel->order(array(Articles_Model::COLUMN_ADD_TIME => $this->getRequestParam('order','desc')));
+      $artModel->where($mWhereString, $mWhereBinds);
+      $artModel->joinFK(Articles_Model::COLUMN_ID_USER, array(
+            Model_Users::COLUMN_USERNAME, 'usernameName' => Model_Users::COLUMN_NAME, 'usernameSurName' => Model_Users::COLUMN_SURNAME));
+      $articles = $artModel->records();
+      
+      $cache = new Cache();
+      $cacheKey = md5($mWhereString.serialize($mWhereBinds).Locales::getLang());
+      if( ($articles = $cache->get($cacheKey)) == false ){
+         $articles = $artModel->records();
+         $cache->set($cacheKey, $articles);
+      }
+      $this->view()->articles = $articles;
+      
+      $this->checkDateFirstArticle();
+      
+      $this->link()->backInit();
+   }
+   
+   protected function checkDateFirstArticle()
+   {
+      // rok prvního článku
+      $modelArt = new Articles_Model();
+      $firstRec = $modelArt
+          ->where(Articles_Model::COLUMN_CONCEPT." = 0", array())
+          ->order(array(Articles_Model::COLUMN_ADD_TIME => Model_ORM::ORDER_ASC))
+          ->record();
+      $this->view()->firstArticleDate = new DateTime($firstRec ? $firstRec->{Articles_Model::COLUMN_ADD_TIME} : null);
+   }
+
+      /**
     * @deprecated - není potřeba
     */
    public function contentController(){
@@ -264,6 +336,8 @@ class Articles_Controller extends Controller {
       $this->view()->articles = $articles;
       // odkaz zpět
       $this->view()->linkBack = $this->link()->back($this->link()->route(), 0);
+      
+      $this->checkDateFirstArticle();
    }
 
    public function showController($urlkey) {
@@ -468,6 +542,8 @@ class Articles_Controller extends Controller {
       } else {
          $this->view()->editor = $modelUsers->record($article->{Articles_Model::COLUMN_ID_USER_LAST_EDIT});
       }
+      
+      $this->checkDateFirstArticle();
    }
 
    /**
