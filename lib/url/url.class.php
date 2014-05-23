@@ -352,7 +352,11 @@ class Url
       }
    }
 
-   protected function getBaseUrl()
+   /**
+    * Metoda vrací aktuální základní url (např http://www.seznam.cz)
+    * @return string
+    */
+   public function getBaseUrl()
    {
       $l = '';
       $l .= $this->transferProtocol."://";
