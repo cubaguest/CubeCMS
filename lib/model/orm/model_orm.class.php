@@ -775,7 +775,7 @@ class Model_ORM extends Model implements ArrayAccess {
     * Varcí SQL dotaz pro výběr
     * @return string
     */
-   public function getSQLQuery()
+   public function getSQLQuery($assignVars = true)
    {
       if($this->currentSql == null){
          $sql = 'SELECT ' . $this->createSQLSelectColumns()."\n" . ' FROM `' . $this->getDbName() . '`.`' . $this->getTableName() . '` AS ' . $this->getTableShortName()."\n";
@@ -788,6 +788,18 @@ class Model_ORM extends Model implements ArrayAccess {
       $this->createSQLHaving($sql); // group by
       $this->createSQLOrder($sql); // order
       $this->createSQLLimi($sql); // limit
+      if($assignVars){
+         $replacements = array();
+         foreach (array_merge($this->bindValues, $this->whereBindValues, $this->havingBindValues) as $key => $value) {
+            $k = $key;
+            if(strpos(':', $key) === false){
+               $k = ':'.$key;
+            }
+            $replacements[$k] = is_int($value) ? $value : '\''.$value.'\'';
+            
+         }
+         $sql = str_replace(array_keys($replacements), $replacements, $sql);
+      }
       return array(
          'sql' => $sql,
          'values' => array_merge($this->bindValues, $this->whereBindValues, $this->havingBindValues)
