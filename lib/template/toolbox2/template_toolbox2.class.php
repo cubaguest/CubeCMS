@@ -25,7 +25,7 @@ class Template_Toolbox2 extends Template {
    const ICON_IMAGE_WRENCH = 'picture-o';
    const ICON_ADD = 'plus-circle';
    const ICON_DELETE = 'times-circle';
-   const ICON_MOVE = 'move';
+   const ICON_MOVE = 'arrows';
    const ICON_MOVE_UP_DOWN = 'resize-vertical';
    const ICON_USER = 'user';
    const ICON_GROUP = 'group';
@@ -209,6 +209,7 @@ class Template_Toolbox2 extends Template {
          'flag_green' => "tags",
          'lang_sel' => "flag-checkered",
          'image_edit' => self::ICON_PEN,
+         'move' => self::ICON_MOVE,
          'image_delete' => self::ICON_DELETE,
          'images' => self::ICON_PEN,
          'image' => self::ICON_IMAGE,
