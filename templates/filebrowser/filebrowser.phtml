@@ -21,9 +21,9 @@ if(Auth::isLogin() == false){
       <script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/tinymce/tiny_mce_popup.js"></script>
       <script type="text/javascript">/* <![CDATA[ */<?$this->renderHeaderScripts()?>/* ]]> */</script>
       <?if(VVE_DEBUG_LEVEL > 1){?>
-         <script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/filebrowser/filebrowser_v2.js"></script>
+         <script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/filebrowser/filebrowser.js"></script>
       <?} else {?>
-         <script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/filebrowser/filebrowser_v2.js"></script>
+         <script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/filebrowser/filebrowser.js"></script>
       <?}?>
    </head>
    <body id="cubecms-filebrowser">
