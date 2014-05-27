@@ -1,5 +1,5 @@
 <?
-$this->addCssFile("style.css");
+$this->addCssFile("style.less");
 $jq = new JsPlugin_JQuery();
 $jq->addUIDialog();
 $this->addJsPlugin($jq);
@@ -40,17 +40,17 @@ echo $this->toolbox;
    ?>
    <hr />
    <div id="category-buttons">
-      <form name="form-add" method="post" action="<?=$this->link()->route('add')?>" style="display:inline;">
+      <form name="form-add" method="post" action="<?=$this->link()->route('add')?>">
          <input type="submit" value="<?=$this->tr('Přidat')?>" name="category_add" />
       </form>
-      <form name="form-edit" method="post" action="<?=$this->link()->route('edit',array('categoryid' => '{ID}'))?>" style="display:inline;">
+      <form name="form-edit" method="post" action="<?=$this->link()->route('edit',array('categoryid' => '-ID-'))?>">
          <input type="submit" value="<?=$this->tr('Upravit')?>" name="category_edit" />
       </form>
-      <form name="form-settings" method="post" action="<?=$this->link()->route('settings',array('categoryid' => '{ID}'))?>" style="display:inline;">
+      <form name="form-settings" method="post" action="<?=$this->link()->route('settings',array('categoryid' => '-ID-'))?>">
          <input type="submit" value="<?=$this->tr('Nastavit')?>" name="category_settings"  />
       </form>
       <button id="button-copy-cat"><?=$this->tr('Kopírovat')?></button>
-      <form name="form-delete" method="post" action="<?=$this->link()?>" style="display:inline;">
+      <form name="form-delete" method="post" action="<?=$this->link()?>">
          <input class="button-cancel" type="submit" value="<?=$this->tr('Smazat')?>" name="category_delete"  />
          <input type="hidden" value="" name="category_id" />
       </form>
@@ -135,7 +135,7 @@ echo $this->toolbox;
          var idstr = $('#category-structure').jstree("get_selected").attr('id');
          if(typeof(idstr) != "undefined"){
             var id = getIdCat(idstr);
-            this.action = decodeURI(this.action).replace('{ID}', id);
+            this.action = decodeURI(this.action).replace('-ID-', id);
             return true;
          }
          return false;
