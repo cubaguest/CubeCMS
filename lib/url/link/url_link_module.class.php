@@ -45,8 +45,16 @@ class Url_Link_Module extends Url_Link {
             }
             // odstranění nepovinných parametrů, které nebyly zadány
             $routeReplacement = preg_replace(
-                  array("/\([^{]*\{+[^{]*\}+[^{]*\)/i", "/[()]+/i"),
-                  array("", ""),
+                  array(
+                      "/\([^{]*\{+[^{]*\}+[^{]*\)/i", 
+                      "/[()]+/i",
+                      "/({[^}]+}\/?)/" // "{variable}"
+                      ),
+                  array(
+                      "", 
+                      "",
+                      null,
+                      ),
                   $routeReplacement);
             $this->route = $routeReplacement;
          } else {
