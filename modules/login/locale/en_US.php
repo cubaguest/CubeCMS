@@ -46,6 +46,11 @@ array (
   'Vazeny uzivateli,\nzasilame Vam vyzadanou zmenu hesla.\nPokud jste tento email nevygeneroval Vy, jedna se nejspise\no omyl jineho uzivatele a muzete tento email ignorovat.\\\\n' => 'Dear users, \nwe send you recover the password change. \nIf You Did not you this email, one is likely to mislead another user, and you can ignore this email. \n',
   'S pozdravem\nTým' => 'Sincerely, \n Team',
   'Nově vygenerované heslo bylo zasláno na Váš e-mail' => 'The newly generated password has been sent to your e-mail',
+  'Preferovaný jazyk' => 'Prefered language',
+  'Poznámka / popis' => 'Note / description',
+  'Poslední přihlášení proběhlo %1$s z IP adresy %2$s.' => 'Last login: %1$s from IP %2$s',
+  'Výchozí jazyk' => 'Default language',
+  'Jméno / e-mail' => 'Username / e-mail',
 );
 $plural = 
 array (
