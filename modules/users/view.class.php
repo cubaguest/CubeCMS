@@ -21,6 +21,13 @@ class Users_View extends View {
       Template_Module::setEdit(true);
       Template_Navigation::addItem($this->tr('Skupiny'), $this->link(), null, null, null, true);
    }
+	
+   public function changeUserGroupView()
+   {
+      $this->template()->addTplFile('change_user_group.phtml');
+      Template_Module::setEdit(true);
+      Template_Navigation::addItem($this->tr('Změna skupiny'), $this->link(), null, null, null, true);
+   }
    
    public function usersListView(){
       echo json_encode($this->respond);

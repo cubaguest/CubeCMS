@@ -21,7 +21,6 @@ class Users_Routes extends Routes {
       $this->addRoute('groups', "groups", 'groups','groups/');
       $this->addRoute('users', "users", 'users','users/');
       $this->addRoute('createUser', "create-user", 'createUser','create-user/');
+      $this->addRoute('changeUserGroup');
 	}
 }
-
-?>

@@ -1,0 +1,17 @@
+<?
+// do titulku
+$h = $this->tr('Změna skupiny uživatele');
+$this->addPageTitle($h);
+$this->addJsPlugin(New JsPlugin_JQuery());
+// donastavení formuláře
+?>
+<h1><?ps($h)?></h1>
+<?$this->includeTpl('navigation.phtml');?>
+<div class="main-content-form-edit">
+   <p> </p>
+   <?
+   echo($this->form);
+   ?>
+   <script type="text/javascript">
+   </script>
+</div>

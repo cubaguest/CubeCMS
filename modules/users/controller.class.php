@@ -429,6 +429,85 @@ GROUP BY `t_grp`.`id_group`*/
       }
    }
    
+   public function changeUserGroupController()
+   {
+      $this->checkControllRights();
+      
+      $form = new Form('change_group_');
+      $fGrp = $form->addGroup('changeGrp', $this->tr('Změna skupiny uživatele'));
+      
+      // načtení uživatelů
+      $elemUser = new Form_Element_Select('id', $this->tr('Uživatel'));
+      $m = new Model_Users();
+      $users = $m
+          ->joinFK(Model_Users::COLUMN_GROUP_ID)
+          ->order(array(Model_Groups::COLUMN_NAME, Model_Users::COLUMN_USERNAME))
+          ->records();
+      $arrayUsers = array();
+      foreach ($users as $user) {
+         if(!isset($arrayUsers[$user->{Model_Groups::COLUMN_NAME}])){
+            $arrayUsers[$user->{Model_Groups::COLUMN_NAME}] = array();
+         }
+         $name = $user->{Model_Users::COLUMN_NAME}.' '.$user->{Model_Users::COLUMN_SURNAME}.' - '.$user->{Model_Users::COLUMN_USERNAME}.' ('.$user->{Model_Users::COLUMN_MAIL}.')';
+         $arrayUsers[$user->{Model_Groups::COLUMN_NAME}][$name] = $user->getPK();
+      }
+      $elemUser->setCheckOptions(false); // zatím nefunguje detekce z mltipolí
+      $elemUser->setOptions($arrayUsers, $user->getPK());
+      $form->addElement($elemUser, $fGrp);
+      
+      // načtení skupiny
+      $elemGroup = new Form_Element_Select('groupId', $this->tr('Nová skupina'));
+      $groups = Model_Groups::getAllRecords();    
+      foreach ($groups as $grp) {
+         $elemGroup->addOption($grp->{Model_Groups::COLUMN_NAME}." - ".$grp->{Model_Groups::COLUMN_LABEL}, $grp->getPK());
+      }
+      $form->addElement($elemGroup, $fGrp);
+      
+      $elemSendMail = new Form_Element_Checkbox('sendmail', $this->tr('Odeslat zprávu o změně'));
+      $form->addElement($elemSendMail, $fGrp);
+      
+      $elemMessageSubject = new Form_Element_Text('subject', $this->tr('předmět zprávy'));
+      $form->addElement($elemMessageSubject);
+      
+      $elemMessage = new Form_Element_TextArea('message', $this->tr('Zpráva'));
+      $form->addElement($elemMessage);
+      
+      $elemSave = new Form_Element_Submit('change', $this->tr('Změnit'));
+      $form->addElement($elemSave);
+      
+      if($form->isValid()){
+         $user = Model_Users::getRecord($form->id->getValues());
+         $oldGroup = Model_Groups::getRecord($user->{Model_Users::COLUMN_GROUP_ID});
+         $user->{Model_Users::COLUMN_GROUP_ID} = $form->groupId->getValues();
+         $newGroup = Model_Groups::getRecord($form->groupId->getValues());
+         $user->save();
+         
+         if($form->sendmail->getValues()){
+            $link = new Url_Link();
+            $mail = new Email(true);
+            $tr = new Translator_Module('forms');
+
+            $mail->setSubject( 
+                $form->subject->getValues() != null ? $form->subject->getValues() :
+                sprintf( $this->tr('Změna skupiny Vašeho uživatelského účtu na %s'), VVE_WEB_NAME ) 
+                );
+
+            $msg = $form->message->getValues() != null ? $form->message->getValues() :
+               '<h1>'.$tr->tr('Změna Vaší uživatelské skupiny na stránkách <a href="'.$link->clear(true).'">'.htmlspecialchars(VVE_WEB_NAME).'</a>').'</h1>'
+               . '<p>'
+               . sprintf($this->tr('Vašemu útu byla změněna skupina z %s na %s.'), $oldGroup->{Model_Groups::COLUMN_NAME}, $newGroup->{Model_Groups::COLUMN_NAME})
+               . '</p>';
+            $mail->setContent( Email::getBaseHtmlMail($msg) );
+            $mail->addAddress($user->{Model_Users::COLUMN_MAIL});
+            $mail->send();
+         }
+         $this->infoMsg()->addMessage($this->tr('Změna byla provedena'));
+         $this->link()->redirect();
+      }
+      
+      $this->view()->form = $form;
+   }
+   
    private function generateUserName($surname) 
    {
       $username = vve_to_ascii($surname);

@@ -3,5 +3,6 @@ $this->items = array(
    'Nový uživatel' => array('link' => (string)$this->link()->route(''), 'icon' => Template_Toolbox2::ICON_ADD),
    'Uživatelé' => array('link' => (string)$this->link()->route('users'), 'icon' => Template_Toolbox2::ICON_USER),
    'Skupiny' => array('link' => (string)$this->link()->route('groups'), 'icon' => Template_Toolbox2::ICON_GROUP),
+   'Změna Skupiny' => array('link' => (string)$this->link()->route('changeUserGroup'), 'icon' => Template_Toolbox2::ICON_GROUP),
    );
-$this->includeTpl('module_navigation.phtml', true);?>
+$this->includeTpl('module_navigation.phtml', true);
