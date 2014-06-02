@@ -66,8 +66,8 @@ class UserReg_Controller extends Controller {
       $formReg->addElement($elemMail, $formGrpContact);
       
       $elemNote = new Form_Element_TextArea('note', $this->tr('Váš popis'));
-      $elemNote->setSubLabel($this->tr('Charakteristika Vaší osoby, čím se zabýváte, kde pracujete, co je pro vás důležité, politická příslušnost atd.'
-            .' <em>Text je zobrazen u Vašeho uživatelského účtu a můžete jej kdykoliv změnit.</em>'));
+//      $elemNote->setSubLabel($this->tr('Charakteristika Vaší osoby, čím se zabýváte, kde pracujete, co je pro vás důležité, politická příslušnost atd.'
+//            .' <em>Text je zobrazen u Vašeho uživatelského účtu a můžete jej kdykoliv změnit.</em>'));
       $elemNote->addFilter(new Form_Filter_StripTags());
       $formReg->addElement($elemNote, $formGrpContact);
 

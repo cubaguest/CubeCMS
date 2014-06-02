@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}userreg_queue` (
   `phone` VARCHAR(45) NULL ,
   `timeadd` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ,
   `ipaddress` VARCHAR(15) NULL ,
+  `note` VARCHAR(500) NULL ,
   PRIMARY KEY (`id_request`) ,
   UNIQUE INDEX `hash_UNIQUE` (`hash` ASC) )
 DEFAULT CHARACTER SET = utf8
