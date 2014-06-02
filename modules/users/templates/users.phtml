@@ -100,7 +100,8 @@ $grpsArr = array();
          usersGrid.jqGrid('navGrid','#table-users-pager',
             {edit:true,add:true,del:true},
             // edit options
-            {reloadAfterSubmit:true, jqModal:true, closeOnEscape:true,viewPagerButtons:false, 
+            {reloadAfterSubmit:true, jqModal:true, closeOnEscape:true,viewPagerButtons:false,
+               width:400,
                bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné')?>",closeAfterEdit:true,
                afterSubmit : function(respond){
                   var res = eval("("+respond.responseText+")");
@@ -114,6 +115,7 @@ $grpsArr = array();
             },
             // add options
             {reloadAfterSubmit:true,jqModal:true, closeOnEscape:true, 
+               width:400,
                bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné')?>", closeAfterAdd: true,
                afterSubmit : function(respond){
                   var res = eval("("+respond.responseText+")");
