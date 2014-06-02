@@ -466,7 +466,7 @@ GROUP BY `t_grp`.`id_group`*/
       $elemSendMail = new Form_Element_Checkbox('sendmail', $this->tr('Odeslat zprávu o změně'));
       $form->addElement($elemSendMail, $fGrp);
       
-      $elemMessageSubject = new Form_Element_Text('subject', $this->tr('předmět zprávy'));
+      $elemMessageSubject = new Form_Element_Text('subject', $this->tr('Předmět zprávy'));
       $form->addElement($elemMessageSubject);
       
       $elemMessage = new Form_Element_TextArea('message', $this->tr('Zpráva'));
