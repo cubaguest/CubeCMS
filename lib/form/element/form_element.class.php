@@ -713,6 +713,7 @@ class Form_Element extends TrObject implements Form_Element_Interface {
          $cnt = null;
          foreach ($this->getLangs() as $langKey => $langLabel) {
             $container = clone $this->containerElement;
+            $container->addClass('input-group');
             if($this->isMultiple()) {
                $this->html()->setAttrib('name', $this->getName().'['.$this->dimensional.']['.$langKey.']');
                $this->html()->setAttrib('id', $this->getName().'_'.$rKey."_".$this->dimensional.'_'.$langKey);
@@ -739,10 +740,6 @@ class Form_Element extends TrObject implements Form_Element_Interface {
          if($this->isMultiple()) {
             if(is_array($values) && $this->dimensional === true){
                $container = clone $this->containerElement;
-               $container
-                   ->addClass($this->cssClasses['multipleClass'])
-                   ->addClass('input-group')
-                   ;
                /**
                 * @todo - tohle vyřešit nějak jinak, protože se vkládá index 0 do pole s hodnotami
                 */
@@ -755,6 +752,10 @@ class Form_Element extends TrObject implements Form_Element_Interface {
                $numVals = count($values);
                foreach ($values as $key => $val) {
                   $container->clearContent();
+                  $container
+                   ->addClass($this->cssClasses['multipleClass'])
+                   ->addClass('input-group')
+                   ;
                   $this->html()->setAttrib('name', $this->getName()."[".$key."]");
                   $this->html()->setAttrib('id', $this->getName().'_'.$rKey."_".$key);
                   $this->html()->setAttrib('value', htmlspecialchars((string)$val));
@@ -769,7 +770,10 @@ class Form_Element extends TrObject implements Form_Element_Interface {
                }
             } else if($values == null && $this->dimensional === true){
                $container = clone $this->containerElement;
-               $container->addClass('form-input-multiple');
+               $container
+                  ->addClass($this->cssClasses['multipleClass'])
+                  ->addClass('form-input-multiple')
+                  ->addClass('input-group');
                $this->html()->setAttrib('name', $this->getName()."[]");
                $this->html()->setAttrib('id', $this->getName().'_'.$rKey);
                $container->setContent($this->html());
