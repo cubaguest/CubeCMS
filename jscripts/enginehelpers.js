@@ -408,7 +408,9 @@ function initToolboxEvents(){
          var top = $(this).scrollTop();
          toolboxButtons.each(function(){
             var $container = $(this).parent();
-            if($container.offset().top < top+document.toolboxTop && top < $container.offset().top+$container.height()-document.toolboxTop){
+            if($(this).parent().is(':visible') 
+               && $container.offset().top < top+document.toolboxTop 
+               && top < $container.offset().top+$container.height()-document.toolboxTop){
                $(this).css({
                   position : "fixed",
                   top: document.toolboxTop,
@@ -492,12 +494,12 @@ $(document).ready(function(){
    // toolbox events
    initToolboxEvents();
    // open external link in new window
-   $(".link-external").live('click',function(){
+   $("body").on('click', '.link-external',function(){
       window.open(this.href);
       return false;
    });
    // načítání jazykových mutací
-   $('a.toolbox-changelang-button').live('click', function(e){
+   $('body').on('click', 'a.toolbox-changelang-button', function(e){
       e.preventDefault();
       loadPageLang(this.href);
 
