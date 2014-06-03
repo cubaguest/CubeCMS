@@ -317,9 +317,9 @@ class Category_Core extends TrObject {
    }
    
    /**
-    * Metoda vrac� obr�zek kategorie
-    * @param string $type - typ obr�zku
-    * @param bool $returnUrl -- vracet URL nebo absolutn� cestu
+    * Metoda vrací obrázek kategorie
+    * @param string $type - typ obrázku
+    * @param bool $returnUrl -- vracet URL nebo absolutní cestu
     * @return string
     */
    public function getImage($type = 'title', $returnUrl = true)
