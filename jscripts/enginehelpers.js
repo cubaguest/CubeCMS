@@ -352,22 +352,23 @@ function initToolboxEvents(){
    $('div.toolbox-temp').remove();
 
    $("div.toolbox").parent('div').css({position: 'relative'});
-   $(".toolbox-tool").hover(function(){
+   $(".toolbox-tool").on('mouseenter', function(){
       $(this).addClass('ui-state-highlight');
       $(this).find('input').addClass('ui-state-highlight');
-   }, function(){
+   });
+   $(".toolbox-tool").on('mouseleave', function(){
       $(this).removeClass('ui-state-highlight');
       $(this).find('input').removeClass('ui-state-highlight');
    });
 
    /* events */
-   toolboxButtons.hover(function(){
-         $(this).css({'z-index': 3});
-         $(this).next('div.toolbox').trigger('showToolbox', [$(this)]);
-      },
-      function(){
-         $(this).css({'z-index': 10000});
-      });
+   toolboxButtons.on('mouseenter', function(){
+      $(this).css({'z-index': 3});
+      $(this).next('div.toolbox').trigger('showToolbox', [$(this)]);
+   });
+   toolboxButtons.on('mouseleave', function(){
+      $(this).css({'z-index': 10000});
+   });
 
    $("div.toolbox").bind('showToolbox', function(event, $button){
       // podklad pro editaci
