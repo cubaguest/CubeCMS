@@ -43,7 +43,7 @@ class Contact_Controller extends Controller {
 
       $subs = array();
       if($this->category()->getParam(self::PARAM_FORM_SUBJECTS, null) != null){
-         $elemSubjectDef = new Form_Element_Select('subjectDef', $this->tr('Téma'));
+         $elemSubjectDef = new Form_Element_Select('subjectDef', $this->tr('Předmět'));
          $subs = explode(';', $this->category()->getParam(self::PARAM_FORM_SUBJECTS));
          $elemSubjectDef->setOptions(array($this->tr('< Vlastní předmět >') => 0), true);
          foreach ($subs as $key => $sub) {
@@ -53,14 +53,14 @@ class Contact_Controller extends Controller {
          $formQuestion->addElement($elemSubjectDef);
       }
 
-      $elemSubject = new Form_Element_Text('subject', $this->tr('Předmět'));
+      $elemSubject = new Form_Element_Text('subject', $formQuestion->haveElement('subjectDef') ? $this->tr('Vlastní předmět') : $this->tr('Předmět'));
       if($this->category()->getParam(self::PARAM_FORM_SUBJECTS, null) == null){
          $elemSubject->addValidation(new Form_Validator_NotEmpty());
       }
       $formQuestion->addElement($elemSubject);
 
 
-      $elemText = new Form_Element_TextArea('text', $this->tr('Text'));
+      $elemText = new Form_Element_TextArea('text', $this->tr('Zpráva'));
       $elemText->addValidation(new Form_Validator_NotEmpty());
       $formQuestion->addElement($elemText);
       
