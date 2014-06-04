@@ -93,6 +93,12 @@ class Url_Request {
     * @var string
     */
    private $category = null;
+   
+   /**
+    * jestli má být u kategorie použito id místo url klíče
+    * @var bool
+    */
+   private $categoryUseUrlKey = true;
 
    /**
     * Název modulu, epluginu nebo jspluginu požadavku
@@ -145,6 +151,10 @@ class Url_Request {
       $this->checkUrlType();
    }
 
+   /**
+    * Vrací instanci
+    * @return Url_Request
+    */
    public static function getInstance()
    {
       if(!self::$instance){
@@ -270,7 +280,16 @@ class Url_Request {
          $cache = new Cache();
          $cacheKey = md5(self::$serverName.'_cats_'.Auth::getGroupId().Locales::getLang()."_".$urlPart);
          
-         if( ($cat = $cache->get($cacheKey)) == false){
+         $catMatches = array();
+         $modelCat = new Model_Category();
+         $isDirectCategory = false;
+         if(preg_match('/^category-([0-9]+)\//', $urlPart, $catMatches)){ // kategorie má předáno ID
+            $cat = $modelCat->columns(array(
+                '*',
+                'urlpart' => '\''.  str_replace('category-'.$catMatches[1], '', $urlPart).'\''
+            ))->record($catMatches[1]);
+            $isDirectCategory = true;
+         } else if( ($cat = $cache->get($cacheKey)) == false){ // kategorie podle url klíče
             $modelCat = new Model_Category();
             $cat = $modelCat
                ->columns(
@@ -311,7 +330,8 @@ class Url_Request {
                   $this->pageFull = false;
                }
                // jinak se jednná o kategorii
-               $this->category = (string)$cat->{Model_Category::COLUMN_URLKEY};
+               $this->categoryUseUrlKey = !$isDirectCategory;
+               $this->category = $isDirectCategory ? (int)$cat->getPK() : (string)$cat->{Model_Category::COLUMN_URLKEY};
                $this->moduleUrlPart = $matches[1];
                $this->params = $matches[2];
                $return = true;
@@ -455,6 +475,14 @@ class Url_Request {
     */
    public function getCategory() {
       return $this->category;
+   }
+   
+   /**
+    * Metody vrací klíč kategorie (buď vlastní nebo univerzální)
+    * @return string
+    */
+   public function getCategoryUrlKey($urlkey, $id) {
+      return $this->categoryUseUrlKey ? $urlkey : 'category-'.$id;
    }
 
    /**

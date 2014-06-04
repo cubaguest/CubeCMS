@@ -120,7 +120,7 @@ abstract class Controller extends TrObject {
       if($link == null){
          $link = new Url_Link_Module();
          $link->setModuleRoutes($routes);
-         $link->category($this->category()->getUrlKey());
+         $link->category(Url_Request::getInstance()->getCategoryUrlKey($this->category()->getUrlKey(), $this->category()->getId()));
       }
       $this->link = $link;
       

@@ -696,10 +696,6 @@ class AppCore extends TrObject {
          }
          //             Vytvoření objektu kontroleru
          $routes = new $routesClassName(self::getCategory());
-         /**
-          * @param Routes
-          */
-//         $routes = new Routes($urlRequest);
          // kontola cest
          $routes->checkRoutes();
          if(!$routes->getActionName() 
@@ -1151,7 +1147,7 @@ class AppCore extends TrObject {
          } else {
             self::$category = new Category_Admin(Url_Request::getInstance()->getCategory(),true);
          }
-         Url_Link::setCategory(self::$category->getUrlKey());
+         Url_Link::setCategory(Url_Request::getInstance()->getCategoryUrlKey(self::$category->getUrlKey(), self::$category->getId()));
       } 
       if( ((self::$category instanceof Category_Core == false) OR !self::$category->isValid()) 
             AND Url_Request::getInstance()->getUrlType() != Url_Request::URL_TYPE_MODULE_STATIC_REQUEST
