@@ -51,7 +51,12 @@ class Template_Toolbox2_Tool implements Template_Toolbox2_Tool_Interface {
     * @var string
     */
    protected $confirmMessage = null;
-
+   
+   /**
+    * označení důležitých položek
+    * @var bool
+    */
+   protected $important = false;
 
    /**
     * Konstruktor nástroje
@@ -146,6 +151,24 @@ class Template_Toolbox2_Tool implements Template_Toolbox2_Tool_Interface {
    public function getIcon() {
       // remove translate icon in 8.2
       return Template_Toolbox2::translateIcon($this->icon);
+   }
+   
+   /**
+    * Metoda nastaví důležitou položku
+    * @param bool $important -- true pro důležitou položku
+    * @return Template_Toolbox2_Tool
+    */
+   public function setImportant($important) {
+      $this->important = $important;
+      return $this;
+   }
+
+   /**
+    * Metoda vrací jestli je nástroj důležitý
+    * @return bool
+    */
+   public function getImportant() {
+      return $this->important;
    }
 
    /**
