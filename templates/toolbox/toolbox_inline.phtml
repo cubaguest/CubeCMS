@@ -1,9 +1,16 @@
+<?
+$this->addFile('css://engine:style-admin.less');// need for buttons style
+?>
 <div class="toolbox-inline" id="toolbox-<?=rand(1, time());?>-box">
    <? foreach ($this->getTools() as $name => $tool) {
       $class = get_class($tool);
       if($class == "Template_Toolbox2_Tool_LangLoader" AND !Locales::isMultilang()) continue;
+
+      $toolClasses = array();
+      $tool->getImportant() ? $toolClasses[] = 'important' : '';
+      $class == "Template_Toolbox2_Tool_LangLoader" ? $toolClasses[] = 'multitool' : '';
       ?>
-      <div class="toolbox-tool-inline">
+      <div class="toolbox-tool-inline <?=implode(' ', $toolClasses)?>">
       <?
          $formOnSubmit = null;
          if($tool->getConfirmMessage() != null){

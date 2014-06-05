@@ -1,6 +1,6 @@
 /* jen pro pořádek */
 @import "fontawesome/font-awesome.less";
-body.with-admin-menu {padding: 0; margin: 0; margin-top: 25px}
+body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
 /* fonty */
 .admin-font, .toolbox, #adminMenuWrapper ul.dropdown li a {
    font-family: "Tahoma", "Arial", sans-serif !important;
@@ -88,112 +88,440 @@ body.with-admin-menu {padding: 0; margin: 0; margin-top: 25px}
 }
 
 /* SOF ToolBox Panel s editací */
-.toolbox {
-   form {
-      input[type="hidden"] { display:none; }
-      input[type="image"] { vertical-align:bottom; }
-      input[type="submit"]:hover, a:hover { color: black; }
-   }
-   .toolbox-tool {
-      > div {
-         padding-left: 5px;
-      }
-      button, input[type="submit"], a {
-         &:hover {
-            color: black;
-         }
-         span.icon {
-            display: inline-block;
-            margin-right: 7px;
-            width: 15px;
-            text-align: center;
-         }
-         background:none;
-         border:none !important;
-         cursor: pointer;
-         text-align:left;
-         background-repeat: no-repeat;
-         display: inline-block;
-         width: 100%;
-         margin: 0;
-         padding: 3px 5px;
-         text-decoration: none;
-      }
-      .toolbox-changelang-button {
-         width: auto;
-      }
-      font-size: 16px;
-   }
-   
-   background: orange;
-   border: olive 1px solid;
-   position: absolute;
-   top: 0px;
-   right: 0px;
-   height: auto;
-   background-repeat: no-repeat;
-   display: none;
-   z-index: 3;
-   -moz-border-radius: 4px;
-   -webkit-border-radius: 4px;
-   border-radius: 4px;
-   text-align: left;
+/* new TOOLBOX */
+.rounded-corners(@radius: 5px) {
+   border-radius: @radius;
+   -webkit-border-radius: @radius;
+   -moz-border-radius: @radius;
 }
-a.toolbox-button {
-   span {
-      display: inline-block;
-      margin: 3px;
-   }
-   display: block;
-   position: absolute;
-   top: 1px;
-   right: 1px;
-   width: 24px;
-   border-width: 1px;
-   overflow: hidden;
-   line-height: 5px;
-   padding: 0;
-   z-index: 8000;
-   text-decoration: none;
-   text-align: center;
+.tools-box-sahadow() {
+   -webkit-box-shadow: 0 0 3px 0px @color-bg-hover;
+   -mox-box-shadow: 0 0 3px 0px @color-bg-hover;
+   box-shadow: 0 0 3px 0px @color-bg-hover;
 }
+@color-border: #aaa;
+@color-border-hover: #999;
+@color-border-important: #fc4949;
+@color-text: #666;
+@color-text-hover: #fff;
+@color-text-hover-alt: darken(@color-text, 50);
+@color-text-gray: #333;
+@color-bg: #fff;
+@color-bg-hover: #39F;
+@color-bg-important: #FF3323;
 
-.toolbox-active-content {
-   background-color: #e3e3e3;
+@font-size: 16px;
+@font-family: Candara, Calibri, Segoe, "Segoe UI", Optima, Arial, sans-serif;
+
+@border-radius: 5px;
+
+.toolbox,.toolbox-tools {
+   button::-moz-focus-inner, input[type="button"]::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="reset"]::-moz-focus-inner {
+      padding: 0 !important;
+      border: 0 none !important;
+   }
+   &, input, button, a, a:visited, select {
+      font-size: @font-size;
+      font-family: @font-family;
+   }
+   input, button, a, a:visited {
+      &:hover {
+         color: @color-text-hover;
+         background-color: transparent;
+      }
+      color: @color-text;
+      background-color: transparent;
+      background-image: none;
+      border: 0px none transparent;
+      text-decoration: none;
+      padding: 0;
+      margin: 0;
+      text-align: left;
+      outline: 0;
+   }
+   input[type="text"] {
+      &:hover {
+         color: @color-text-gray;
+         background-color: @color-text-hover;
+      }
+      color: @color-text;
+      background-color: transparent;
+      border: 1px solid @color-border;
+      padding: 3px;
+      width: 100px;
+      display: inline-block;
+   }
+   a.toolbox-button {
+      &, &:visited {
+      }
+      &:hover {
+         border-color: @color-border-hover;
+         background-color: @color-bg-hover;
+      }
+      span {
+         margin-left: 1px; /* center bug */
+      }
+      .rounded-corners(@border-radius);
+      background-color: @color-bg;
+      display: inline-block;
+      border: 1px solid @color-border;
+      width: 28px;
+      height: 28px;
+      line-height: 26px;
+      text-align: center;
+      font-size: 16px;
+      z-index: 1000;
+      .tools-box-sahadow();
+   }
+   a.toolbox-button:hover + .toolbox-tools {
+      display: block;
+   }
+   position: absolute;
+   top: 3px;
+   right: 3px;
+   color: @color-text;
 }
 /* Toolbox pro editaci poloĹľek */
 .toolbox-inline {
    float: right;
-   a, a:visited, button {
+   form {
+      margin: 0;
+      padding: 0;
+   }
+   a, a:visited, button, input {
       &:hover {
          background-image: none;
          background-color: transparent;
-         color: #333 !important;
+         color: @color-bg-hover !important;
       }
       background: none transparent;
-      color: #777 !important;
+      color: @color-text !important;
       display: inline-block;
       line-height: 1;
-/*      float: left;
-      width: 16px;
-      height: 16px;*/
       margin: 0;
       padding: 0;
       border: 0px none;
    }
    .toolbox-tool-inline {
+      &.important {
+         a, a:visited, button, input {
+            &:hover {
+               color: @color-bg-important !important;
+            }
+         }
+      }
       span.icon {
-         /*width: 18px;*/
          text-align: center;
          display: inline-block;
       }
       margin-left: 5px;
-      /*display: inline-block;*/
       float: left;
    }
    a, a:hover {
       text-decoration: none;
    }
+}
+.toolbox-tools {
+   &:hover {
+      display: block;
+   }
+   .toolbox-tool {
+      &:hover, &:active {
+         &,a,input[type="submit"],button {
+            color: @color-text-hover;
+         }
+         input[type="text"] { 
+            background-color: @color-text-hover;
+         }
+         .toolbox-tools {
+            display: block;
+         }
+         background-color: @color-bg-hover;
+      }
+      &:first-child:hover {
+      }
+      &:last-child:hover {
+      }
+      &.important {
+         &:hover {
+            background-color: @color-bg-important;
+            &,a,input[type="submit"],button {
+               color: @color-text-hover;
+            }
+         }
+      }
+      &.multitool {
+         a,input,button,select {
+            display: inline-block;
+            min-width: 0;
+         }
+         label {
+            display: inline-block;
+            margin-right: 5px;
+         }
+      }
+      form {
+         margin: 0;
+         padding: 0;
+      }
+      div {
+      }
+      span.icon {
+         width: 18px;
+         margin-left: 7px;
+         margin-right: 5px;
+         text-align: left;
+      }
+      a,input[type="submit"],button {
+         min-width: 100%;
+         padding: 5px 0px 5px 0;
+         display: block;
+         cursor: pointer;
+         margin-right: 5px;
+      }
+      select {
+         padding: 3px 0px 2px 0;
+         margin: 1px 0px 1px 0;
+         display: inline-block;
+         border: 1px solid @color-border;
+         background-color: @color-bg;
+      }
+      /* sub tools*/
+      .toolbox-tools {
+         &,a,input[type="submit"],button {
+            color: @color-text;
+         }
+         .toolbox-tool {
+            &:hover {
+               background-color: @color-bg-hover;
+               &,a,input[type="submit"],button {
+                  color: @color-text-hover;
+               }
+            }
+            &.important {
+               &:hover {
+                  background-color: @color-bg-important;
+               }
+            }
+         }
+         position: absolute;
+         top: 0;
+         right: 100%;
+         display: none;
+      }
+
+      display: block;
+      width: 100%;
+      position: relative;
+   }
+   .toolbox-separator {
+      height: 1px;
+      border-top: 1px solid #aaa;
+      width: 100%;
+      padding: 0;
+      margin: 2px 0;
+   }
+
+   display: none;
+   z-index: 1001;
+   position: absolute;
+   top: -2px;
+   right: -2px;
+   background-color: @color-bg;
+   border: 1px solid @color-border;
+   white-space: nowrap;
+   /*overflow: hidden;*/
+   padding: 3px;
+
+   -moz-box-shadow: 5px 5px 10px 0 rgba(0,0,0,0.75);
+   -webkit-box-shadow: 5px 5px 10px 0 rgba(0,0,0,0.75);
+   box-shadow: 5px 5px 10px 0 rgba(0,0,0,0.75);
+}
+.toolbox-active-content {
+   background-color: lighten(@color-bg-hover, 37);
+}
+
+
+/* Module navigation */
+.module-navigation-container {
+   a {
+      &:hover {
+         background-color: @color-bg-hover;
+         color: @color-text-hover;
+      }
+      color: @color-text;
+      text-decoration: none;
+      font-size: @font-size;
+      font-family: @font-family;
+      white-space:nowrap;
+      background-color: @color-bg;
+   }
+   &:after {
+      clear: both;
+      content: ".";
+      display: block;
+      height: 0;
+      line-height: 0;
+      visibility: hidden;
+   }
+   .module-navigation {
+      &, li {
+         list-style: none;
+         margin: 0;
+         padding: 0;
+      }
+      li {
+         &.active {
+            a {
+               &:hover {
+                  background-color: @color-bg-hover;
+                  color: @color-text-hover;
+               }
+               background-color: lighten(@color-bg-hover, 37);
+               /*padding: 2px 7px 5px 7px;*/
+               /*margin: 3px 3px 0px 3px;*/
+               .rounded-corners(@border-radius @border-radius 0 0);
+            }
+            .name {
+               display: inline-block;
+               /*font-weight: bold;*/
+            }
+         }
+         &.collapsible {
+            &.active {
+               .name {
+                  display: inline-block;
+                  width:auto;
+                  max-width: 300px;
+               }
+            }
+            a:hover {
+               .name {
+                  display: inline-block;
+               }
+            }
+            .name {
+               display: none;
+            }
+         }
+         &.important {
+            &:hover {
+               a, a:visited { 
+                  color: @color-text-hover;
+                  background-color: @color-bg-important;
+               }
+            }
+            a, a:visited { 
+               color: @color-bg-important;
+            }
+            border-color: @color-bg-important;
+         }
+         a {
+            display: block;
+            padding: 5px 10px;
+         }
+         .name {
+         }
+         .icon {
+            display: inline-block;
+         }
+         .icon + .name {
+            margin-left: 5px;
+         }
+         float: left;
+         border: 1px solid @color-border;
+         border-bottom-width: 0;
+         margin-right: 5px;
+         overflow: hidden;
+         .rounded-corners(@border-radius @border-radius 0 0);
+         .tools-box-sahadow();
+      }
+   }
+   border-bottom: 1px solid @color-border;
+   padding-left: 10px;
+   margin-bottom: 10px;
+}
+/*  tlačítka*/
+.module-tool-buttons {
+   button::-moz-focus-inner, input[type="button"]::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="reset"]::-moz-focus-inner {
+      padding: 0 !important;
+      border: 0 none !important;
+   }
+   a,button, input[type="button"], input[type="submit"], input[type="reset"] {
+      cursor: pointer;
+   }
+   label, a, a:visited, input[type="button"], input[type="submit"], input[type="reset"], button, select {
+      padding: 0;
+      margin: 0;
+      border: 0px none transparent;
+   }
+   &, label, a, a:visited, input[type="button"], input[type="submit"], input[type="reset"], button, select {
+      color: @color-text;
+      text-decoration: none;
+      background-color: transparent;
+      font-size: @font-size;
+      font-family: @font-family;
+   }
+   select, input {
+      border: 1px solid @color-border;
+      font-size: @font-size - 2;
+      margin: 0;
+   }
+   &:after {
+      clear: both;
+      content: ".";
+      display: block;
+      height: 0;
+      line-height: 0;
+      visibility: hidden;
+   }
+   
+   li {
+      &:hover {
+         &, label, a, a:visited, input[type="button"], input[type="submit"], input[type="reset"], button, select {
+            color: @color-text-hover;
+         }
+         select, input {
+            color: @color-text;
+            background-color: @color-bg;
+         }
+         background-color: @color-bg-hover;
+      }
+      &.important {
+         &:hover {
+            background-color: @color-bg-important;
+         }
+         /*&, label, a, a:visited, input[type="button"], input[type="submit"], input[type="reset"], button, select {*/
+            /*color: @color-bg-important;*/
+         /*}*/
+         border-color: @color-bg-important;
+      }
+      
+      /* inner */
+      a {
+         display: block;
+      }
+      .icon {
+         display: inline-block;
+         margin-right: 5px;
+         margin-top: 1px;
+      }
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      border: 1px solid @color-border;
+      background-color: @color-bg;
+      padding: 6px 5px 4px 5px;
+      margin-right: 5px;
+      float: left;
+      .rounded-corners(@border-radius);
+      .tools-box-sahadow();
+   }
+   
+   background-color: @color-bg;
+   margin: 0;
+   padding: 0;
+   margin-bottom: 10px; 
 }
 
 /* EOF ToolBox Panel s editací */
@@ -269,25 +597,7 @@ form {
 .main-content-text, .main-content-images, .main-content-list {
    border-width: 0;
 } /* text v hlavním obsahu */
-.module-navigation-container {
-   margin-bottom: 5px;
-}
-.module-navigation {
-   margin-bottom: 5px;
-   li.module-navigation-tab {
-      a {
-         img {
-            top: 5px;
-            vertical-align: -2px;
-            padding-right: 4px;
-         }
-         span.icon {
-            display: inline-block;
-            margin-right: 5px;
-         }
-      }
-   }
-}
+
 .lang-image {padding-right: 2px; width: 18px; height: 12px;}
 
 /* Oprava inputu v JqGrid */
@@ -388,37 +698,6 @@ form {
    }
 }
 
-ul.module-tool-buttons {
-   li {
-      a, div { 
-         float: left; 
-         margin-right: 5px; 
-         margin-bottom: 5px; 
-      }
-      a img { 
-         vertical-align: -2px; 
-         margin-right: 5px; 
-      }
-      label  {
-         font-weight: normal;
-      }
-      select {
-         font-size: 75%;
-      }
-      .text-button {
-         .icon {
-            margin-right: 5px;
-         }
-      }
-      .ui-button-text { 
-         padding: 3px 5px; 
-      }
-   }
-   margin: 0; 
-   padding: 0 0 10px 0;
-}
-.module-row-tool-buttons { float: right; }
-.module-row-tool-buttons *, .module-tool-buttons * { display: inline; }
 /* stránky se závažnou chybou v šabloně */
 #core-error-page {
    background-color: white;

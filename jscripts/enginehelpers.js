@@ -1,4 +1,3 @@
-/** NEW USE THIS!!! */
 /**
  * Vytvoření pomocných funkcí pro Cube CMS systém
  *
@@ -18,6 +17,7 @@ CubeCMS = {
    lang : null,
    primaryLang : null,
    domain : null,
+   toolboxTopOffset : 30,
 
    baseOpt : {},
    // caled in index header
@@ -27,11 +27,13 @@ CubeCMS = {
       document.domain = this.domain;
       document.lang = this.lang;
       document.primaryLang = this.primaryLang ;
+      CubeCMS.ToolBox.toolboxTop = this.toolboxTopOffset ;
    },
    setup : function(){
       // init messages
       this.Msg.init();
       this.Loader.init();
+      this.ToolBox.init();
    }
 };
 
@@ -179,18 +181,157 @@ CubeCMS.Tools = {
       } else{
          return "#ffffff"; // dark colors - white font
       }
+   },
+   /**
+    * Načítání obsahu stránky v daném jazyce
+    * @param string url
+    * @param string lang
+    */
+   loadPageLang : function(url, lang) {
+      showLoadBox(CubeCMS.contentSelector);
+      $(CubeCMS.contentSelector).load(url, function(cnt){
+         var lang = url.match(/(l=[a-z]{2})/g);
+         if(lang !== null){
+            $(CubeCMS.contentSelector).html(cnt.replace(lang[0], "") );
+         }
+         hideLoadBox();
+         $(document).scroll();
+      });
+   },
+   uniqID : {
+      counter:0,
+      get:function(prefix) {
+         if(!prefix) {
+            prefix = "uniqid";
+         }
+         var id =  prefix+"-"+CubeCMS.Tools.uniqID.counter++;
+         if($("#"+id).length === 0){
+            return id;
+         } else {
+            return CubeCMS.Tools.get(prefix);
+         }
+      }
    }
 };
 
 CubeCMS.ToolBox = {
    enablePageTracking : true,
+   toolboxTop : 30,
    init : function() {
+      // rodiče musí mít relativní pozici kvůli posunu
+      $("div.toolbox").parent('div').css({position: 'relative'});
 
+      // přesun toolboxu přímo do body kvůli overflow
+      $('.toolbox').each(function(){
+         var id = CubeCMS.Tools.uniqID.get('toolbox');
+         // move to body
+         $(this).prop('id', id);
+         $('.toolbox-button', this).prop('id', id+'-button');
+         $(this).children('.toolbox-tools').prop('id', id+'-tools');
+      });
+      $('.toolbox>.toolbox-tools').appendTo('body');
+      
+      this.initEvents();
+      this.initLangLoader();
+   },
+   initEvents : function() {
+      var _this = this;
+      /* default events*/
+      $("body").on('mouseenter', 'div.toolbox', function(event){
+         // show toolbox
+         var idbase = '#'+$(this).prop('id');
+         $(idbase).parent().addClass('toolbox-active-content');
+         console.log(idbase);
+         var $toolbox = $(idbase+'-tools');
+         $toolbox.css({
+            top : $(this).offset().top - 2,
+            left : $(this).offset().left - $toolbox.outerWidth() + $(idbase+'-button').outerWidth() + 2,
+            right : 'auto'
+         }).fadeIn(100);
+         // add hide touch
+         $('body').on('touchstart', function(){
+            $toolbox.trigger('mouseleave');
+            // $('body').off('touchstart');
+         });
+         
+      });
+      $("body").on('mouseleave', 'div.toolbox-tools', function(e){
+         if($(this).parent('.toolbox-tool').length === 0){
+            if ((typeof e.fromElement !== 'undefined' && !e.fromElement.length) ||
+               (typeof e.fromElement === 'undefined' && e.target.tagName !== 'SELECT')) {
+               $(this).fadeOut(100);
+            }
+         }
+         $('#'+$(this).prop('id').toString().replace('-tools',"")).parent().removeClass('toolbox-active-content');
+      });
+      /* mobile event */
+      $("body").on('touchstart', '.toolbox-button', function(event){
+         $(this).parent().trigger('mouseenter');
+         return false;
+      });
+      $("body").on('touchstart', '.toolbox-tools *', function(event){
+         event.stopPropagation();
+      });
+
+   //   $('.toolbox').parent().mousedown(function(e){ 
+   //      if( e.button === 2 ) { 
+   //         console.log('show toolbox'); 
+   //         return false; 
+   //      } 
+   //      return true; 
+   //   });
+
+      $(document).on('scroll',function(){
+         var top = $(this).scrollTop();
+         var toolbox = $('.toolbox');
+         toolbox.each(function(){
+            var $container = $(this).parent();
+
+            if($container.is(':visible') // musí být viditelný
+               && $container.offset().top < (top + _this.toolboxTop) // box musí začínat výše než je minimální odsazení (většinou admin menu)
+               && top < ($container.offset().top + $container.height() - _this.toolboxTop - $('.toolbox-button',this).outerHeight() )) // ještě není odscrolováno
+            {
+               $(this).css({
+                  position : "fixed",
+                  top: _this.toolboxTop,
+                  left: $(this).offset().left,
+                  right: 'auto'
+               });
+            } else {
+               $(this).css({
+                  position : "absolute",
+                  top: 3,
+                  right: 3, left : "auto"
+               });
+            }
+         });
+      });
+   },
+   initLangLoader : function(){
+      $('body').on('click', 'a.toolbox-changelang-button', function(e){
+         e.preventDefault();
+         loadPageLang(this.href);
+
+         showLoadBox('.main-content');
+         var cntUrl = this.href;
+         $('.main-content').load(cntUrl, function(cnt){
+            var lang = cntUrl.match(/(l=[a-z]{2})/g);
+            if(lang != null){
+               $('.main-content').html(cnt.replace(lang[0], "") );
+            }
+            hideLoadBox();
+            initToolboxEvents();
+            $(document).scroll();
+         });
+         return false;
+      });
    }
 };
 
 CubeCMS.ToolBox.Tool = {
-
+   init : function(){
+      
+   }
 };
 
 CubeCMS.Images = {
@@ -325,13 +466,34 @@ CubeCMS.Form = {
          $button.html(options.text);
       }
       $element.parent().append($button);
+   },
+   initLangSelector : function(){
+      $('body').on('click', 'form .lang-container a.link-lang',function(event, focus){
+         if(typeof focus === 'undefined') focus = true;
+         var lang = this.lang;
+         $(this).parent().find('a').removeClass('link-lang-sel');
+         $(this).addClass('link-lang-sel');
+         // vybereme prvek, který obsahuje inputy
+         var $container = $(this).closest('*:has(div[lang])');
+         $('div[lang]', $container).hide();
+         var p = $('div[lang="'+lang+'"]', $container).show();
+         if(focus) {
+            p.find('input,textarea,select').focus();
+         }
+         // zobrazení popisku k elementu
+         $container = $(this).closest('*:has(label[lang])')[0];
+         $('label[lang]', $container).hide();
+         $('label[lang="'+lang+'"]', $container).show();
+         return false;
+      });
+      
+      if(typeof CubeCMS.primaryLang !== "undefined"){
+         $('.lang-container a[lang="'+CubeCMS.primaryLang+'"]').trigger('click', [false]);
+      } else {
+         $('.lang-container a[lang="'+CubeCMS.lang+'"]').trigger('click', [false]);
+      }
    }
 };
-
-//base vars
-if(typeof(contentSelector) === "undefined"){
-   var contentSelector = CubeCMS.contentSelector;
-}
 
 /* DEPRECATED */
 function vveShowMessages(dataObj){ CubeCMS.Msg.show(dataObj);}
@@ -342,93 +504,6 @@ function errMsg(msg, clear){ CubeCMS.Msg.err(msg, clear); }
 function showLoadBox(box, timeout){ CubeCMS.Loader.showLoadBox(box); }
 function hideLoadBox(){ CubeCMS.Loader.hideLoadBox(); }
 function vveLoadImage(src, callback){ CubeCMS.Images.loadImage(src, callback); }
-
-function initToolboxEvents(){
-   /**
-    * Initializa all button only once
-    */
-   var toolboxButtons = $('a.toolbox-button');
-   // remove all previous toolboxes
-   $('div.toolbox-temp').remove();
-
-   $("div.toolbox").parent('div').css({position: 'relative'});
-   $(".toolbox-tool").on('mouseenter', function(){
-      $(this).addClass('ui-state-highlight');
-      $(this).find('input').addClass('ui-state-highlight');
-   });
-   $(".toolbox-tool").on('mouseleave', function(){
-      $(this).removeClass('ui-state-highlight');
-      $(this).find('input').removeClass('ui-state-highlight');
-   });
-
-   /* events */
-   toolboxButtons.on('mouseenter', function(){
-      $(this).css({'z-index': 3});
-      $(this).next('div.toolbox').trigger('showToolbox', [$(this)]);
-   });
-   toolboxButtons.on('mouseleave', function(){
-      $(this).css({'z-index': 10000});
-   });
-
-   $("div.toolbox").bind('showToolbox', function(event, $button){
-      // podklad pro editaci
-      $button.parent().addClass('toolbox-active-content');
-      // kontrola jestli není už vytvořen
-      var toolId = $(this).attr('id')+'-copy';
-      var $toolbox;
-      if($('#'+toolId).length == 0){
-         $toolbox = $(this).clone(true).attr('id', toolId).addClass('toolbox-temp');
-         $('body').append($toolbox);
-         $toolbox.bind('mouseleave', function(){
-            $('.toolbox-active-content').removeClass('toolbox-active-content');
-            $(this).animate({opacity:0}, 0, function(){
-               $(this).css({'z-index':-10000}).hide();
-            });
-         });
-      } else {
-         $toolbox = $('#'+toolId);
-      }
-
-      $toolbox.css({
-         opacity     : 1,
-         top         : $button.offset().top-2,
-         left        : $button.offset().left-$toolbox.width()+22,
-         width       : $toolbox.width()+5,
-         'z-index'   : 10000
-      }).show();
-   });
-
-   // move toolbox with document when scrolling
-   if(CubeCMS.ToolBox.enablePageTracking){
-      $(document).unbind('scroll');
-
-      if(typeof document.toolboxTop === "undefined"){
-         document.toolboxTop = 30;
-      }
-      $(document).scroll(function(){
-         var top = $(this).scrollTop();
-         toolboxButtons.each(function(){
-            var $container = $(this).parent();
-            if($(this).parent().is(':visible') 
-               && $container.offset().top < top+document.toolboxTop 
-               && top < $container.offset().top+$container.height()-document.toolboxTop){
-               $(this).css({
-                  position : "fixed",
-                  top: document.toolboxTop,
-                  left: $(this).offset().left
-               });
-            } else {
-               $(this).css({
-                  position : "absolute",
-                  top: 1,
-                  right: 1, left : "auto"
-               });
-            }
-         });
-      });
-   }
-}
-
 function str2url(str,encoding,ucfirst){ return CubeCMS.Tools.str2url(str, ucfirst); }
 
 function vveCheckUrlKey(checkerUrl, element, callback, params){
@@ -451,96 +526,11 @@ function vveCheckUrlKey(checkerUrl, element, callback, params){
    });
 }
 
-function loadPageLang(url, lang) {
-   showLoadBox(contentSelector);
-   $(contentSelector).load(url, function(cnt){
-      var lang = url.match(/(l=[a-z]{2})/g);
-      if(lang != null){
-         $(contentSelector).html(cnt.replace(lang[0], "") );
-      }
-      hideLoadBox();
-      initToolboxEvents();
-      $(document).scroll();
-   });
-};
-
 $(document).ready(function(){
    CubeCMS.setup(); // init base class when document ready
-
-   // when language is changed
-   $('body').on('click', 'form .lang-container a.link-lang',function(event, focus){
-      if(typeof focus == 'undefined') focus = true;
-      var lang = this.lang;
-      $(this).parent().find('a').removeClass('link-lang-sel');
-      $(this).addClass('link-lang-sel');
-      // vybereme prvek, který obsahuje inputy
-      var $container = $(this).closest('*:has(div[lang])');
-      $('div[lang]', $container).hide();
-      var p = $('div[lang="'+lang+'"]', $container).show();
-      if(focus) {
-         p.find('input,textarea,select').focus();
-      }
-      // zobrazení popisku k elementu
-      $container = $(this).closest('*:has(label[lang])')[0];
-      $('label[lang]', $container).hide();
-      $('label[lang="'+lang+'"]', $container).show();
-      return false;
-   });
-   // select default language
-   if(typeof document.primaryLang !== "undefined"){
-      $('.lang-container a[lang="'+document.primaryLang+'"]').trigger('click', [false]);
-   } else {
-      $('.lang-container a[lang="'+document.lang+'"]').trigger('click', [false]);
-   }
-   // toolbox events
-   initToolboxEvents();
    // open external link in new window
    $("body").on('click', '.link-external',function(){
       window.open(this.href);
       return false;
    });
-   // načítání jazykových mutací
-   $('body').on('click', 'a.toolbox-changelang-button', function(e){
-      e.preventDefault();
-      loadPageLang(this.href);
-
-      showLoadBox('.main-content');
-      var cntUrl = this.href;
-      $('.main-content').load(cntUrl, function(cnt){
-         var lang = cntUrl.match(/(l=[a-z]{2})/g);
-         if(lang != null){
-            $('.main-content').html(cnt.replace(lang[0], "") );
-         }
-         hideLoadBox();
-         initToolboxEvents();
-         $(document).scroll();
-      });
-      return false;
-   });
-   // placeholder html5 ie
-   if ( $.browser.msie ) {
-      $('[placeholder]').focus(function() {
-         var input = $(this);
-         if (input.val() == input.attr('placeholder')) {
-            input.val('');
-            input.removeClass('placeholder');
-         }
-      }).blur(function() {
-            var input = $(this);
-            if (input.val() == '' || input.val() == input.attr('placeholder')) {
-               input.addClass('placeholder');
-               input.val(input.attr('placeholder'));
-            }
-         }).blur();
-      $('[placeholder]').parents('form').submit(function() {
-         $(this).find('[placeholder]').each(function() {
-            var input = $(this);
-            if (input.val() == input.attr('placeholder')) {
-               input.val('');
-            }
-         });
-      });
-   }
 });
-
-

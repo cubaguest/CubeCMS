@@ -1,8 +1,5 @@
 <?
 if( !empty($this->moduleButtons) ){
-   $jq = new JsPlugin_JQuery();
-   $jq->addUIButton();
-   $this->addJsPlugin($jq);
    $this->addFile('css://engine:style-admin.less');// need for buttons style
    ?>
    <ul class="module-tool-buttons clearfix">
@@ -11,6 +8,7 @@ if( !empty($this->moduleButtons) ){
          
          $button += array(
              'id' => null,
+             'important' => false,
              'name' => null,
              'title' => null,
              'link' => null,
@@ -24,13 +22,14 @@ if( !empty($this->moduleButtons) ){
                  'onclick' => isset($button['confirm']) ? 'return confirm(\''.htmlspecialchars($button['confirm']).'\')' : null
              ),
          );
+         strpos('.', $button['icon']) === false ? $button['faicon'] = $button['icon'] : '';
 
          $iconSrc = (strpos($button['icon'], 'http') !== false ? $button['icon'] : '/images/icons/'.$button['icon']);
 
          $cnt = null;
          switch ($button['type']){
             case 'text':
-               $cnt .= '<div class="ui-button">';
+               $cnt .= '<div class="">';
                $cnt .= '<input type="text" ';
                foreach($button['attributes'] as $name => $value){
                   $cnt .= $name.'="'.$value.'" ';
@@ -39,7 +38,7 @@ if( !empty($this->moduleButtons) ){
                $cnt .= '</div>';
                break;
             case 'select':
-               $cnt .= '<div class="ui-button">';
+               $cnt .= '<div class="">';
                $cnt .= '<label>'.  htmlspecialchars($button['name']).'</label> ';
                $cnt .= '<select ';
                foreach($button['attributes'] as $name => $value){
@@ -58,7 +57,7 @@ if( !empty($this->moduleButtons) ){
                $button['attributes']['href'] = $button['link'];
                $button['attributes']['title'] = $button['title'];
 
-               $cnt = '<a class="ui-button '.($button['name'] != null ? 'text-button' : '').'" ';
+               $cnt = '<a class=" '.($button['name'] != null ? '' : '').'" ';
                foreach($button['attributes'] as $name => $value){
                   $cnt .= $value != null ? $name.'="'.$value.'" ' : null;
                }
@@ -67,15 +66,14 @@ if( !empty($this->moduleButtons) ){
                if(isset($button['faicon'])){
                   $cnt .= '<span class="icon icon-'.$button['faicon'].'"></span>';
                } else if($button['icon']){
-                  $cnt .= '<img src="'.$iconSrc.'" alt="back" />';
+                  $cnt .= '<img src="'.$iconSrc.'" alt="'.$button['icon'].'" />';
                }
                $cnt .= htmlspecialchars($button['name']).'</a>';
 
                break;
          }
-
          ?>
-         <li><?echo $cnt;?></li>
+         <li class="<?echo $button['important'] ? 'important' : ''?>"><?echo $cnt;?></li>
          <?
       } else if(is_string($button)) {
          ?>
@@ -85,14 +83,4 @@ if( !empty($this->moduleButtons) ){
    }?>
    </ul>
    <?
-   if(Template::pVar('_module-tool-buttons') == null){
-   ?>
-   <script type="text/javascript">
-      $(document).ready(function(){
-         $(".module-tool-buttons a, .module-tool-buttons div" ).button();
-      });
-   </script>
-   <?
-      Template::setPVar('_module-tool-buttons', true);
-   }?>
-<?}
+}
