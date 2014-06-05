@@ -17,6 +17,7 @@ TPL_MODULE='module_template';
 TPL_MODULE_EXTEND='module_template_extend';
 
 module=$1;
+module_lower=${module,,};
 
 echo "Vytvářím modul ${module^}";
 
@@ -31,20 +32,20 @@ else
 fi
 
 # kopie z šablony
-cp -r ./$tpl_path ./${module};
+cp -r ./$tpl_path ./${module_lower};
 
 # pokud se rozšiřuje
 if [ -n "$module_ext" ]; then
    # nahrazení názvu rozšiřujícího modulu
-   find ./${module}/ -type f -exec sed -i "s/MODULEEXTEND_L/${module_ext}/g" '{}' \;
-   find ./${module}/ -type f -exec sed -i "s/MODULEEXTEND/${module_ext^}/g" '{}' \;
+   find ./${module_lower}/ -type f -exec sed -i "s/MODULEEXTEND_L/${module_ext}/g" '{}' \;
+   find ./${module_lower}/ -type f -exec sed -i "s/MODULEEXTEND/${module_ext^}/g" '{}' \;
 fi
 
 # nahrazení názvu modulu
-find ./${module}/ -type f -exec sed -i "s/MODULE/${module^}/g" '{}' \;
+find ./${module_lower}/ -type f -exec sed -i "s/MODULE/${module}/g" '{}' \;
 
 # nastavení na uživatelský modul
-rm ./${module}/docs/admin;
+rm ./${module_lower}/docs/admin;
 
-echo "Modul $1 vytvořen;";
+echo "Modul ${module} vytvořen;";
 exit 0;
