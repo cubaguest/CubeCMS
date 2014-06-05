@@ -9,7 +9,7 @@ echo $this->toolbox;
       array(
          'link' => $this->link()->route('createForm'),
          'title' => $this->tr('Vytvořit nový formulář'),
-         'icon' => 'application_form_add.png',
+         'icon' => Template_Toolbox2::ICON_ADD,
          'name' => $this->tr('Vytvořit formulář'),
       ),
    );
@@ -25,7 +25,7 @@ echo $this->toolbox;
             
             $toolbox = clone $this->toolboxItem;
             $toolbox->form_status_->setIcon(
-                     $form->{Forms_Model::COLUMN_ACTIVE} == true ? 'enable.png' : 'disable.png');
+                     $form->{Forms_Model::COLUMN_ACTIVE} == true ? Template_Toolbox2::ICON_ENABLE : Template_Toolbox2::ICON_DISABLE);
             $toolbox->form_status_->getForm()->id->setValues($form->{Forms_Model::COLUMN_ID});
             $toolbox->editForm->setAction($this->link()->route('editForm', array('id' => $form->{Forms_Model::COLUMN_ID})));
             $toolbox->previewForm->setAction($this->link()->route('previewForm', array('id' => $form->{Forms_Model::COLUMN_ID})));

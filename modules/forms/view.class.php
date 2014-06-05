@@ -13,19 +13,22 @@ class Forms_View extends View {
       $toolbox = new Template_Toolbox2();
 
       $toolChangeStatus = new Template_Toolbox2_Tool_Form($this->formChangeStatus);
-      $toolChangeStatus->setIcon('enable.png');
+      $toolChangeStatus->setIcon(Template_Toolbox2::ICON_ENABLE);
       $toolbox->addTool($toolChangeStatus);
       
       $toolAddEv = new Template_Toolbox2_Tool_Redirect('previewForm', $this->tr('Náhled formuláře'));
-      $toolAddEv->setIcon('application_form_preview.png')->setAction($this->link()->route('previewForm'));
+      $toolAddEv->setIcon(Template_Toolbox2::ICON_PREVIEW)->setAction($this->link()->route('previewForm'));
       $toolbox->addTool($toolAddEv);
       
       $toolHome = new Template_Toolbox2_Tool_Redirect('editForm', $this->tr('Upravit formulář'));
-      $toolHome->setIcon('application_form_edit.png')->setAction($this->link()->route("editForm"));
+      $toolHome->setIcon(Template_Toolbox2::ICON_PAGE_EDIT)->setAction($this->link()->route("editForm"));
       $toolbox->addTool($toolHome);
 
       $toolRemove = new Template_Toolbox2_Tool_Form($this->formDelete);
-      $toolRemove->setIcon('application_form_delete.png')->setConfirmMeassage($this->tr('Opravdu smazat formulář?'));
+      $toolRemove
+          ->setIcon(Template_Toolbox2::ICON_DELETE)
+          ->setConfirmMeassage($this->tr('Opravdu smazat formulář?'))
+          ->setImportant(true);
       $toolbox->addTool($toolRemove);
 
       $this->toolboxItem = $toolbox;
