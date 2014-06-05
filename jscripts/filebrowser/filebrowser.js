@@ -828,7 +828,7 @@ var CubeBrowserClipBoardWidget = {
    isEmpty : function()
    {
       var items = localStorage.getObj('clipboard');
-      return items.length > 0 ? false : true;
+      return (items !== null && items.length > 0) ? false : true;
    },
    clear : function()
    {
