@@ -386,7 +386,7 @@ if(Auth::isLogin() == false){
                </div>   
             </div>
             <div id="filebrowser-buttons">
-               <button id="button-close"><span class="icon icon-times"></span> <?php ps($this->tr('Zavřít')) ?></button>
+               <button id="button-close" onclick="tinyMCEPopup.close();"><span class="icon icon-times"></span> <?php ps($this->tr('Zavřít')) ?></button>
                <button id="button-insert" disabled="" onclick="CubeBrowser.submitSelectedFile();"><span class="icon icon-check"></span> <?php ps($this->tr('Vložit')) ?></button>
             </div>
          </div>
