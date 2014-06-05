@@ -34,6 +34,7 @@ CubeCMS = {
       this.Msg.init();
       this.Loader.init();
       this.ToolBox.init();
+      this.Form.initLangSelector();
    }
 };
 
