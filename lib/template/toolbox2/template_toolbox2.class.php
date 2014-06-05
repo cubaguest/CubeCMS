@@ -26,17 +26,20 @@ class Template_Toolbox2 extends Template {
    const ICON_ADD = 'plus-circle';
    const ICON_DELETE = 'times-circle';
    const ICON_MOVE = 'arrows';
-   const ICON_MOVE_UP_DOWN = 'resize-vertical';
+   const ICON_MOVE_UP_DOWN = 'arrows-v';
    const ICON_USER = 'user';
    const ICON_GROUP = 'group';
-   const ICON_DISABLE = 'eye-slash';
-   const ICON_ENABLE = 'eye';
+//   const ICON_DISABLE = 'circle-o';
+   const ICON_DISABLE = 'square-o';
+//   const ICON_ENABLE = 'circle';
+   const ICON_ENABLE = 'check-square-o';
    const ICON_COPY = 'copy';
    const ICON_STATS = 'bar-chart-o';
    const ICON_HOME = 'home';
    const ICON_EXPORT = 'share-square-o';
    const ICON_SHARE = 'share';
    const ICON_CLOSE = 'times-circle';
+   const ICON_PREVIEW = 'eye';
    
    const TEMPLATE_NORMAL = "toolbox.phtml";
    const TEMPLATE_INLINE = "toolbox_inline.phtml";
