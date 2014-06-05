@@ -160,7 +160,7 @@ $expire->modify('+1 year');
                            </form>
                            <?}?>
                            <span class="vote-counter">
-                        <?if(!$message->voteEnabled){ ps($this->tr('Hlasů').": ");}?>
+                        <?if(!$message->voteEnabled){ ps($tr->tr('Hlasů').": ");}?>
                               <?ps($message->{Forum_Model_Messages::COLUMN_VOTE})?>
                            </span>
                            <?if($message->voteEnabled){?>
