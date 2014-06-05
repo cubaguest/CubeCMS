@@ -28,10 +28,10 @@ class ArticlesWGal_Controller extends Articles_Controller {
       parent::mainController();
    }
 
-   public function showController() 
+   public function showController($urlkey) 
    {
       $this->checkReadableRights();
-      if(parent::showController() === false) return false;
+      if(parent::showController($urlkey) === false) return false;
 
       // fotogalerie
       $this->view()->pCtrl = new Photogalery_Controller($this);
@@ -93,9 +93,9 @@ class ArticlesWGal_Controller extends Articles_Controller {
       return $id;
    }
 
-   public function exportArticleController()
+   public function exportArticleController($urlkey, $output)
    {
-      parent::exportArticleController();
+      parent::exportArticleController($urlkey, $output);
       // načtení fotek z článku, první bude zobrazena
       $photosM = new PhotoGalery_Model_Images();
       $images = $photosM->getImages($this->category()->getId(), $this->view()->article->{Articles_Model_Detail::COLUMN_ID});

@@ -29,7 +29,7 @@ class PhotogaleryMed_Controller extends ArticlesWGal_Controller {
       // tady by mělo být načtení fotek
    }
 
-   public function showController() {
+   public function showController($urlkey) {
       $this->checkReadableRights();
       $this->setOption('deleteMsg', $this->tr('Galerie byla smazána'));
       $this->setOption('publicMsg', $this->tr('Galerie byla zveřejněna'));
