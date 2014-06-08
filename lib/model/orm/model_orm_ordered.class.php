@@ -25,6 +25,9 @@ class Model_ORM_Ordered extends Model_ORM {
    public function __construct()
    {
       parent::__construct();
+      if($this->rowClass == 'Model_ORM_Record'){
+         $this->rowClass = 'Model_ORM_Ordered_Record';
+      }
       // nastavíme výchozí řazení
       $this->order(array($this->orderColumn => Model_ORM::ORDER_ASC));
    }
