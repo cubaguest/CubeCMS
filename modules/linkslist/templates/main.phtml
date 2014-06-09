@@ -1,0 +1,49 @@
+<?
+   $h1 = $this->category()->getName();
+   $this->addPageTitle($h1);
+?>
+<h1><?ps($h1);?></h1>
+<div class="main-content-detail">
+   <?
+   echo $this->text;
+   ?>
+   <ul id="links-list" class="">
+      <?
+      if(!empty($this->links)){
+         foreach($this->links as $link) {
+            $href = $link->{LinksList_Model_Links::COLUMN_TARGET};
+            $name = $link->{LinksList_Model_Links::COLUMN_TITLE};
+            if($link->{LinksList_Model_Links::COLUMN_CATEGORY} != 0){
+               $ulr = new Url_Link(true);
+               $href = $ulr->category($link->{Model_Category::COLUMN_URLKEY});
+               $name = $link->{Model_Category::COLUMN_NAME};
+            } else if(strpos($href, 'http') === false){
+               $href = Url_Link::getMainWebDir().$href;
+            }
+            ?>
+            <li id="link-<?=$link->getPK()?>" class="clearfix" data-id="<?=$link->getPK()?>">
+               <span class="move"><span class="icon icon-arrows-v"></span></span>
+               <?if($link->imageSrc){?>
+               <span class="image"><img src="<?=  vve_image_cacher($link->imageSrc, 100, 40)?>" alt="" />
+               </span>
+               <?}?>
+               <span class="info">
+                  <span class="title"><?=$name?></span>
+                  <a class="link" href="<?=$href?>"><?ps($href)?></a>
+               </span>
+            </li>
+            <?
+         }
+      } else {
+         ?>
+         <li>
+            <?  ps($this->tr('Není vložen žádný odkaz'))?>
+         </li>
+         <?
+      }
+      ?>
+   </ul>
+   <?
+   echo $this->toolbox;
+   ?>
+</div>

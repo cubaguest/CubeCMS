@@ -1,0 +1,98 @@
+<?
+$jq = new JsPlugin_JQuery();
+$jq->addUISortable();
+$this->addJsPlugin($jq);
+$this->addFile('css://style.less');
+$h = $this->tr('Úprava odkazů');
+Template::addPageTitle($h);
+?>
+<h1><?ps($h);?></h1>
+<div class="content-admin">
+   <?php
+   $this->moduleButtons = array(
+      array(
+         'link' => $this->link()->route(),
+         'title' => $this->tr('Zavřít'),
+         'icon' => Template_Toolbox2::ICON_HOME,
+         'name' => $this->tr('Zavřít úpravu'),
+      ),
+      array(
+         'link' => $this->link()->route('add'),
+         'title' => $this->tr('Nový odkaz'),
+         'icon' => Template_Toolbox2::ICON_ADD,
+         'name' => $this->tr('Vytvořit nový odkaz'),
+      ),
+   );
+   $this->includeTpl('modules/buttons.phtml', true);
+   ?>
+   
+   <ul id="links-admin-list" class="ui-cube ui-cube-widget ui-list-widget">
+      <?
+      if(!empty($this->links)){
+         foreach($this->links as $link) {
+            $href = $link->{LinksList_Model_Links::COLUMN_TARGET};
+            $name = $link->{LinksList_Model_Links::COLUMN_TITLE};
+            if($link->{LinksList_Model_Links::COLUMN_CATEGORY} != 0){
+               $ulr = new Url_Link(true);
+               $href = $ulr->category($link->{Model_Category::COLUMN_URLKEY});
+               $name = $link->{Model_Category::COLUMN_NAME};
+            } else if(strpos($href, 'http') === false){
+               $href = Url_Link::getMainWebDir().$href;
+            }
+            ?>
+            <li id="link-<?=$link->getPK()?>" class="ui-state-default clearfix" data-id="<?=$link->getPK()?>">
+               <span class="move"><span class="icon icon-arrows-v"></span></span>
+               <?if($link->imageSrc){?>
+               <span class="image"><img src="<?=  vve_image_cacher($link->imageSrc, 100, 40)?>" alt="" />
+               </span>
+               <?}?>
+               <span class="info">
+                  <span class="title"><?=$link->{LinksList_Model_Links::COLUMN_TITLE}?></span>
+                  <a class="link" href="<?=$href?>"><?ps($href)?></a>
+               </span>
+               <span class="tools"></span>
+               <?
+               if($this->toolboxLink){
+                  $this->toolboxLink->setTemplate(Template_Toolbox2::TEMPLATE_INLINE);
+                  $this->toolboxLink->linkDelete->getForm()->id->setValues($link->getPK());
+                  $this->toolboxLink->editLink->setAction($this->link()->route('edit', array('id' => $link->getPK())));
+                  echo $this->toolboxLink;
+               }
+               ?>
+            </li>
+            <?
+         }
+      } else {
+         ?>
+         <li>
+            <?  ps($this->tr('Není vložen žádný odkaz'))?>
+         </li>
+         <?
+      }
+      ?>
+   </ul>
+   <?if(!empty($this->links)){?>
+   <script type="text/javascript">
+      $(document).ready(function(){
+         $('#links-admin-list').sortable({
+            placeholder: "ui-state-highlight",
+               axis: "y",
+               forceHelperSize: true,
+               forcePlaceholderSize: true,
+               handle : ".move",
+               update : function( event, ui ){
+                  $.ajax({
+                     type : 'POST', url : "<?=$this->link()->route('changePositon')?>",
+                     data : {id : ui.item.data('id'), pos : ui.item.index()+1},
+                     success : function(result){
+                        if(result.errmsg.length != 0){
+                           alert('Chyba při přesunu: '+result.errmsg.join(", "));
+                        }
+                     }
+                  });
+               }
+         });
+      });
+   </script>
+   <?}?>
+</div>

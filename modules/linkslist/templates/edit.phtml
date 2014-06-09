@@ -1,0 +1,23 @@
+<?
+if($this->linkRecord){
+   $h1 = sprintf($this->tr('Úprava odkazu %s'), $this->linkRecord->{LinksList_Model_Links::COLUMN_TITLE});
+} else {
+   $h1 = $this->tr('Přidání nového odkazu');
+}
+Template_Core::setPageTitle($h1);
+$this->addJsPlugin(new JsPlugin_JQuery());
+?>
+<h1><?ps($h1)?></h1>
+<div class="main-content-form-edit" id="text-edit-form">
+   <?
+   echo ($this->form);
+   ?>
+   <script type="text/javascript">
+      $(document).ready(function(){
+      });
+      $('#editLinkcategory_1').change(function(){
+         var title = $(this).val() == 0 ? null : $('option:selected', this). text();
+         $('input[name="editLinktitle"]').val(title);
+      });
+   </script>
+</div>
