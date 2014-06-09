@@ -1,7 +1,7 @@
 <?php
 class DisplayForm_View extends View {
    public function mainView() {
-      $this->template()->addFile("tpl://form.phtml");
+      $this->template()->addFile($this->getTemplate());
       
       if($this->rights()->isWritable()){
          $this->toolbox = new Template_Toolbox2();
@@ -20,5 +20,3 @@ class DisplayForm_View extends View {
       Template_Navigation::addItem($this->tr('Úprava úvodního textu'), $this->link());
    }
 }
-
-?>
