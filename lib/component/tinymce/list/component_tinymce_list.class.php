@@ -41,7 +41,7 @@ class Component_TinyMCE_List extends TrObject {
    public static function tinyMceString($items, $type = self::LIST_TYPE_LINK) {
       $itemsArr = array();
       foreach ($items as $item) {
-         $str = '"'.$item['name'].'","'.$item['link'].'"';
+         $str = '"'.addslashes($item['name']).'","'.$item['link'].'"';
          if($item['label'] != null){
             $str .= ',"'.$item['label'].'"';
          }
