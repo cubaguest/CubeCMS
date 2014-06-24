@@ -11,96 +11,61 @@
  * @abstract 		Třída pro vytvoření modelu pro práci s kategoriemi
  * @todo          nutný refaktoring
  */
-class Model_CategoryAdm extends Model_File {
-   const STRUCTURE_FILE = 'admmenu.xml';
-   const STRUCTURE_SHOP_FILE = 'admshopmenu.xml';
+class Model_CategoryAdm extends Model {
+
    /**
     * Objekt s admin menu
-    * @var SimpleXMLElement
+    * @var Menu_Admin_Item[]
     */
-   private static $structure = null;
-   protected static $lang = null;
+   private static $items = false;
 
    public function __construct()
    {
-      if(self::$structure === null){
-         self::$structure = new SimpleXMLElement(AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR.DIRECTORY_SEPARATOR
-            .'menu'.DIRECTORY_SEPARATOR.self::STRUCTURE_FILE, NULL, TRUE);
-         // shop struct
-         if(defined('VVE_SHOP') && VVE_SHOP == true){
-            $shopStructure = new SimpleXMLElement(AppCore::getAppLibDir().AppCore::ENGINE_LIB_DIR.DIRECTORY_SEPARATOR
-               .'menu'.DIRECTORY_SEPARATOR.self::STRUCTURE_SHOP_FILE, NULL, TRUE);
-            $this->appendSimplexml(self::$structure, $shopStructure);
-         }
-         // user struct
-         if(is_file(AppCore::getAppWebDir().AppCore::ENGINE_CONFIG_DIR.DIRECTORY_SEPARATOR.self::STRUCTURE_FILE)){
-            $userStructure = new SimpleXMLElement(AppCore::getAppLibDir().AppCore::ENGINE_CONFIG_DIR.DIRECTORY_SEPARATOR.self::STRUCTURE_FILE, NULL, TRUE);
-            $this->appendSimplexml(self::$structure, $userStructure);
-         }
-      }
-      self::$lang = Locales::getUserLang();
+      
    }
 
-   private function appendSimplexml(&$simplexml_to, &$simplexml_from)
+   public function getCategory($urlkey)
    {
-      foreach ($simplexml_from->children() as $simplexml_child)
-      {
-         $simplexml_temp = $simplexml_to->addChild($simplexml_child->getName(), (string) $simplexml_child);
-         foreach ($simplexml_child->attributes() as $attr_key => $attr_value)
-         {
-            $simplexml_temp->addAttribute($attr_key, $attr_value);
+      return self::findItemByUrl($urlkey);
+   }
+
+   public static function getCategoryByID($id)
+   {
+      return isset(self::$items[$id]) ? isset(self::$items[$id]) : false;
+   }
+
+   public static function getCategoryByModule($module)
+   {
+      
+   }
+
+   /**
+    * 
+    * @param Menu_Admin_Item $url
+    */
+   public static function findItemByUrl($url)
+   {
+      if(self::$items === false){
+         Menu_Admin::getInstance();
+      }
+      foreach (self::$items as $item) {
+         if(strpos($url, $item->{Model_Category::COLUMN_URLKEY}) !== false){
+            return $item;
          }
-         $this->appendSimplexml($simplexml_temp, $simplexml_child);
       }
+      return false;
    }
-
-   public function getCategory($urlkey){
-      $child = self::$structure->xpath("//item[child::urlkey=\"".$urlkey."\" and child::urlkey[@lang=\"".self::$lang."\"]]");
-      // try cs
-      if(empty($child)){
-         $child = self::$structure->xpath("//item[child::urlkey=\"".$urlkey."\" and child::urlkey[@lang=\"cs\"]]");
-      }
-      return empty($child) ? false : self::createCatObject($child[0]);
-   }
-
-   public static function getCategoryByID($id){
-      $child = self::$structure->xpath("//item[@id=\"".$id."\" and child::urlkey[@lang=\"".self::$lang."\"]]");
-      // try cs
-      if(empty($child)){
-         $child = self::$structure->xpath("//item[@id=\"".$id."\" and child::urlkey[@lang=\"cs\"]]");
-      }
-      return empty($child) ? false : self::createCatObject($child[0]);
-   }
-
-   public static function getCategoryByModule($module){
-      $child = self::$structure->xpath("//item[child::module=\"".$module."\" and child::urlkey[@lang=\"".self::$lang."\"]]");
-      // try cs
-      if(empty($child)){
-         $child = self::$structure->xpath("//item[child::module=\"".$module."\" and child::urlkey[@lang=\"cs\"]]");
-      }
-      return empty($child) ? false : self::createCatObject($child[0]);
-   }
-
-   private static function createCatObject($child){
+   
+   public static function addRecord(Menu_Admin_Item $item)
+   {
       $obj = new Object();
-      $urlkey = $child->xpath('urlkey[@lang="'.self::$lang.'"]');
-      if(empty($urlkey)){
-         $urlkey = $child->xpath('urlkey[@lang="cs"]');
-      }
-      $obj->{Model_Category::COLUMN_URLKEY} = (string)$urlkey[0];
-      $name = $child->xpath('name[@lang="'.self::$lang.'"]');
-      if(empty($name)){
-         $name = $child->xpath('name[@lang="cs"]');
-      }
-      $obj->{Model_Category::COLUMN_NAME} = (string)$name[0];
-      $obj->{Model_Category::COLUMN_MODULE} = (string)$child->module;
-      $obj->{Model_Category::COLUMN_PARAMS} = (string)$child->params;
-      $obj->{Model_Category::COLUMN_ID} = (int)$child['id'];
-      $obj->{Model_Category::COLUMN_DATADIR} = null;
-      if(isset($child->datadir)){
-         $obj->{Model_Category::COLUMN_DATADIR} = (string)$child->datadir;
-      }
-      return $obj;
+      $obj->{Model_Category::COLUMN_URLKEY} = $item->getUrlKey();
+      $obj->{Model_Category::COLUMN_NAME} = $item->getName();
+      $obj->{Model_Category::COLUMN_MODULE} = $item->getModule();
+      $obj->{Model_Category::COLUMN_PARAMS} = $item->getParams();
+      $obj->{Model_Category::COLUMN_ID} = $item->getId();
+      $obj->{Model_Category::COLUMN_DATADIR} = $item->getDataDir();
+      self::$items[$item->getId()] = $obj;
    }
 
    /**
@@ -109,11 +74,7 @@ class Model_CategoryAdm extends Model_File {
     */
    public function getCategoryList()
    {
-      $retArray = array();
-      foreach(self::$structure->xpath("//item") as $child) {
-         array_push($retArray, self::createCatObject($child));
-      }
-      return $retArray;
+      return self::$items;
    }
 
    /**
@@ -122,13 +83,12 @@ class Model_CategoryAdm extends Model_File {
     */
    public function getStructure()
    {
-      return self::$structure;
+      return self::$items;
    }
 
    public static function getCategoryListByModule($module, $onlyWithRights = true)
    {
-
+      
    }
 
 }
-?>
