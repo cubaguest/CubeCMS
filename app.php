@@ -609,16 +609,6 @@ class AppCore extends TrObject {
          new CoreErrors($e);
       }
       // inicializace admin menu
-      if(Auth::isLogin() && Auth::isAdmin()){
-         try {
-            $menu = new Menu_Admin();
-            $menu->controller();
-            $menu->view();
-            $this->getCoreTpl()->menuAdminObj = $menu->template();
-         } catch (Exception $e) {
-            new CoreErrors($e);
-         }
-      }
    }
 
    /**
@@ -1108,6 +1098,7 @@ class AppCore extends TrObject {
          Locales::factory();
          // provedení autorizace
          Auth::authenticate();
+         $adm = Menu_Admin::getInstance();
          // parsování requestu
          Url_Request::getInstance();
          // výběr jazyka a locales

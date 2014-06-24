@@ -644,8 +644,8 @@ class Template_Core extends Template {
     */
    public function renderBodyBegin()
    {
-      if(Auth::isAdmin() AND $this->menuAdminObj != null AND !empty($this->menuAdminObj->menu)) {
-         $this->includeTplObj($this->menuAdminObj);
+      if(Auth::isAdmin()) {
+         $this->includeFile('tpl://menu_admin.phtml');
       }
    }
 
