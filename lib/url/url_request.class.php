@@ -340,32 +340,26 @@ class Url_Request {
       }
       // kontrola admin kategorie
       if(!$return && Auth::isAdmin()){
-         $model = new Model_CategoryAdm();
-         $cats = $model->getCategoryList();
-         unset($model);
-         foreach ($cats as $cat) {
-            if (strpos($urlPart, (string)$cat->{Model_Category::COLUMN_URLKEY}) !== false) {
-               $matches = array();
-               $regexp = "/".str_replace('/', '\/', (string)$cat->{Model_Category::COLUMN_URLKEY})."\/([^?]*)\/?\??(.*)/i";
-               if(preg_match($regexp, $urlPart, $matches)) {
-                  // pokud obsahuje soubor
-                  $fileMatchs = array();
-                  if(preg_match('/([a-z0-9]+)\.([a-z0-9]+)/i', $matches[1], $fileMatchs)){
-                     $this->urlType = self::URL_TYPE_MODULE_REQUEST;
-                     $this->outputType = $fileMatchs[2];
-                     $this->pageFull = false;
-                  } else if(self::isXHRRequest()){ // při XHR není nutné zpracovávat celou stránku :-)
-                     $this->urlType = self::URL_TYPE_MODULE_REQUEST;
-                     $this->pageFull = false;
-                  }
-                  // jinak se jednná o kategorii
-                  $this->category = (string)$cat->{Model_Category::COLUMN_URLKEY};
-                  $this->moduleUrlPart = $matches[1];
-                  $this->params = $matches[2];
-                  $this->isAdminCat = true;
-                  $return = true;
-                  break;
+         $item = Model_CategoryAdm::findItemByUrl($urlPart);
+         if($item){
+            $regexp = "/".str_replace('/', '\/', (string)$item->{Model_Category::COLUMN_URLKEY})."\/([^?]*)\/?\??(.*)/i";
+            if(preg_match($regexp, $urlPart, $matches)) {
+               // pokud obsahuje soubor
+               $fileMatchs = array();
+               if(preg_match('/([a-z0-9]+)\.([a-z0-9]+)/i', $matches[1], $fileMatchs)){
+                  $this->urlType = self::URL_TYPE_MODULE_REQUEST;
+                  $this->outputType = $fileMatchs[2];
+                  $this->pageFull = false;
+               } else if(self::isXHRRequest()){ // při XHR není nutné zpracovávat celou stránku :-)
+                  $this->urlType = self::URL_TYPE_MODULE_REQUEST;
+                  $this->pageFull = false;
                }
+               // jinak se jednná o kategorii
+               $this->category = (string)$item->{Model_Category::COLUMN_URLKEY};
+               $this->moduleUrlPart = $matches[1];
+               $this->params = $matches[2];
+               $this->isAdminCat = true;
+               $return = true;
             }
          }
       }
