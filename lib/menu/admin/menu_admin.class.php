@@ -53,7 +53,7 @@ class Menu_Admin {
       // load base items
       include_once $baseDir."base.php";
       // load shop items
-      if(defind('CUBE_CMS_SHOP') && CUBE_CMS_SHOP){
+      if(defined('CUBE_CMS_SHOP') && CUBE_CMS_SHOP){
          include_once $baseDir."shop.php";
       }
       // load custom items
