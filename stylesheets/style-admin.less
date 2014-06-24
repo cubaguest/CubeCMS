@@ -1,5 +1,39 @@
 /* jen pro pořádek */
 @import "fontawesome/font-awesome.less";
+
+@color-border: #aaa;
+@color-border-hover: #999;
+@color-border-important: #fc4949;
+@color-text: #666;
+@color-text-hover: #fff;
+@color-text-hover-alt: darken(@color-text, 50);
+@color-text-gray: #333;
+@color-bg: #fff;
+@color-bg-hover: #39F;
+@color-bg-important: #FF3323;
+
+@font-size: 16px;
+@font-family: Candara, Calibri, Segoe, "Segoe UI", Optima, Arial, sans-serif;
+
+@border-radius: 5px;
+@padding-content: 3px;
+
+.rounded-corners(@radius: 5px) {
+   border-radius: @radius;
+   -webkit-border-radius: @radius;
+   -moz-border-radius: @radius;
+}
+.tools-box-sahadow() {
+   -webkit-box-shadow: 0 0 3px 0px @color-bg-hover;
+   -mox-box-shadow: 0 0 3px 0px @color-bg-hover;
+   box-shadow: 0 0 3px 0px @color-bg-hover;
+}
+.widget-sahadow() {
+   -moz-box-shadow: 5px 5px 10px 0 rgba(0,0,0,0.75);
+   -webkit-box-shadow: 5px 5px 10px 0 rgba(0,0,0,0.75);
+   box-shadow: 5px 5px 10px 0 rgba(0,0,0,0.75);
+}
+
 body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
 /* fonty */
 .admin-font, .toolbox, #adminMenuWrapper ul.dropdown li a {
@@ -16,68 +50,108 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
       margin: 0;
       z-index: 1000;
    }
+   ul {
+      background-color: @color-bg;
+   }
    
    ul.dropdown {
-      li {
+      >li {
+         >ul {
+            >li {
+               a { 
+                  border-right: none; 
+                  width: 90%; 
+                  display: inline-block;
+                  /*-moz-border-radius: 5px;*/
+                  /*border-radius: 5px;*/
+               }
+               font-weight: normal;
+               /*background: #666666;*/
+               /*color: #000;*/
+               float: none;
+               opacity: 0.9;
+            /* IE 7 */
+            }
+            width: 220px; 
+            visibility: hidden; 
+            position: absolute; 
+            top: 100%; 
+            left: 0;
+            /*box-shadow:0px 3px 3px #000;*/
+            /*-webkit-box-shadow:0px 3px 3px #000;*/
+            /*-moz-box-shadow: 0px 3px 3px #000;*/
+            /*-moz-border-radius: 0 10px 10px 10px;*/
+            /*border-radius: 0 10px 10px 10px;*/
+            padding: @padding-content;
+            overflow: hidden;
+            .widget-sahadow();
+            border: 1px solid @color-border;
+            z-index: 4;
+         }
+         
          &.hover, &:hover { 
-            a { color: white; }
+            >a {
+               color: @color-bg; 
+            }
+            background-color: @color-bg-hover;
          }
          a {
-            &:hover {background: #333333 !important;}
-            &:active { color: #ffa500; }
-            img { vertical-align: text-bottom; margin-right: 2px;}
-            display: block; padding: 0 8px; color: white; line-height: 24px;
-            -moz-border-radius: 10px 10px 0 0;
-            border-radius: 10px 10px 0 0;
+            img {
+               float: left;
+               margin-right: 4px;
+               margin-top: 4px;
+            }
+            &:hover {
+               background: @color-bg-hover !important; 
+               text-decoration: none;
+               color: @color-bg; 
+            }
+            &:active { 
+               /*color: #ffa500;*/ 
+            }
+            display: block; 
+            padding: 0 5px; 
+            line-height: 24px;
             overflow: hidden;
+            text-decoration: none;
+            color: @color-text;
          }
-         font-weight: bold; float: left; zoom: 1; background-color: #666666;
+         font-weight: bold; 
+         float: left; 
+         zoom: 1; 
+         background-color: @color-bg;
+         color: @color-text;
          padding: 0;
          margin: 0;
          font-size: small;
          text-decoration: none;
          list-style: none;
          position: relative;
+         z-index: 5;
+         /*padding: 0 5px;*/
       }
-      li.adminmenu-user-item, li.adminmenu-user-item ul li {background-color: #006666;}
-      li.adminmenu-shop-item, li.adminmenu-shop-item ul li {background-color: #660000;}
+      li.adminmenu-user-item, li.adminmenu-user-item ul li {
+         /*background-color: #006666;*/
+      }
+      li.adminmenu-shop-item, li.adminmenu-shop-item ul li {
+         /*background-color: #660000;*/
+      }
    }
-   background-color: #666666;
+   background-color: @color-bg;
    position: fixed;
    top: 0;
    left: 0;
    width: 100%;
    z-index: 10002;
    text-align: left;
-   border-bottom: 1px solid #666666;
+   border-bottom: 1px solid @color-border;
    box-shadow:0px 0px 5px #000;
    -webkit-box-shadow:0px 0px 3px #000;
    -moz-box-shadow: 0px 0px 3px #000;
 }
 
 /* ADMIN MENU LEVEL TWO */
-#adminMenuWrapper ul.dropdown ul {
-   width: 220px; visibility: hidden; position: absolute; top: 100%; left: 0;
-   box-shadow:0px 0px 3px #000;
-   -webkit-box-shadow:0px 0px 3px #000;
-   -moz-box-shadow: 0px 1px 3px #000;
-   -moz-border-radius: 0 10px 10px 10px;
-   border-radius: 0 10px 10px 10px;
-   overflow: hidden;
-}
-#adminMenuWrapper ul.dropdown ul li {
-   font-weight: normal;
-   background: #666666;
-   color: #000;
-   float: none;
-   opacity: 0.9;
-/* IE 7 */
-}
 /* IE 6 & 7 Needs Inline Block */
-#adminMenuWrapper ul.dropdown ul li a { border-right: none; width: 90%; display: inline-block;
-   -moz-border-radius: 5px;
-   border-radius: 5px;
-}
 /* LEVEL THREE */
 #adminMenuWrapper ul.dropdown ul ul { left: 100%; top: 0; }
 #adminMenuWrapper ul.dropdown li:hover > ul { visibility: visible; }
@@ -89,32 +163,6 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
 
 /* SOF ToolBox Panel s editací */
 /* new TOOLBOX */
-.rounded-corners(@radius: 5px) {
-   border-radius: @radius;
-   -webkit-border-radius: @radius;
-   -moz-border-radius: @radius;
-}
-.tools-box-sahadow() {
-   -webkit-box-shadow: 0 0 3px 0px @color-bg-hover;
-   -mox-box-shadow: 0 0 3px 0px @color-bg-hover;
-   box-shadow: 0 0 3px 0px @color-bg-hover;
-}
-@color-border: #aaa;
-@color-border-hover: #999;
-@color-border-important: #fc4949;
-@color-text: #666;
-@color-text-hover: #fff;
-@color-text-hover-alt: darken(@color-text, 50);
-@color-text-gray: #333;
-@color-bg: #fff;
-@color-bg-hover: #39F;
-@color-bg-important: #FF3323;
-
-@font-size: 16px;
-@font-family: Candara, Calibri, Segoe, "Segoe UI", Optima, Arial, sans-serif;
-
-@border-radius: 5px;
-
 .toolbox,.toolbox-tools {
    button::-moz-focus-inner, input[type="button"]::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="reset"]::-moz-focus-inner {
       padding: 0 !important;
@@ -332,10 +380,7 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
    white-space: nowrap;
    /*overflow: hidden;*/
    padding: 3px;
-
-   -moz-box-shadow: 5px 5px 10px 0 rgba(0,0,0,0.75);
-   -webkit-box-shadow: 5px 5px 10px 0 rgba(0,0,0,0.75);
-   box-shadow: 5px 5px 10px 0 rgba(0,0,0,0.75);
+   .widget-sahadow();
 }
 .toolbox-active-content {
    background-color: lighten(@color-bg-hover, 37);
