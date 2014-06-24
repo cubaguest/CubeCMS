@@ -28,38 +28,16 @@ class Url_Link_Module extends Url_Link {
     * Metoda nastavuje název a id routy
     * @param string -- název cesty
     * @param array -- pole s parametry pojmenovanými podle cesty
+    * @param bool -- připojit existující parametry v URL
     *
     * @return Url_Link_Module -- objket Links
     */
-   public function route($name = null, $params = array())
+   public function route($name = null, $params = array(), $mergeParams = true)
    {
       if ($name == null) {
          $this->route = null;
       } else {
-         $route = $this->routes->getRoute($name);
-         $routeReplacement = $route['replacement'];
-         if ($routeReplacement != null | '') {
-            $params = array_merge($this->routes->getRouteParams(), $params);
-            foreach ($params as $pname => $pvalue) {
-               $routeReplacement = str_replace("{" . $pname . "}", $pvalue, $routeReplacement);
-            }
-            // odstranění nepovinných parametrů, které nebyly zadány
-            $routeReplacement = preg_replace(
-                  array(
-                      "/\([^{]*\{+[^{]*\}+[^{]*\)/i", 
-                      "/[()]+/i",
-                      "/({[^}]+}\/?)/" // "{variable}"
-                      ),
-                  array(
-                      "", 
-                      "",
-                      null,
-                      ),
-                  $routeReplacement);
-            $this->route = $routeReplacement;
-         } else {
-            $this->route = $route['regexp'];
-         }
+         $this->route = $this->routes->applyRouteParams($name, $params, $mergeParams);
       }
       return $this;
    }
