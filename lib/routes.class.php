@@ -75,6 +75,7 @@ class Routes {
 
    /**
     * Metoda kontroluje cesty a vybírá správnou cestu
+    * @todo Implementovat volání vlastní metody v cestě modulu
     */
    public function checkRoutes() {
       foreach ($this->routes as $routeName => $route) {
@@ -113,6 +114,7 @@ class Routes {
       }
       if($replacement == null){
          $replacement = $regexp;
+         $replacement = preg_replace('/::([a-z]+)::/i', '{\1}', $replacement); // přepíše ::ID:: na {ID}
       }
       if(preg_match('/\{[a-z]{2,}\}/i', $regexp)){
          $regexp = preg_replace("/\{([a-z0-9-_]+)?\}/i", '::\1::', $regexp);
@@ -130,8 +132,55 @@ class Routes {
           'actionCtrl' => $act['method'],
           'actionClass' => $act['class'],
           'replacement' => $replacement,
+          'replacementMethod' => method_exists($this, $replacement) ? $replacement : false,
           'respondClass' =>  $respondClass
          );
+   }
+   
+   /**
+    * Metoda aplikuje zadané parametry do cesty a vrátí ji
+    * @param string $name -- název cesty
+    * @param array $params -- pole s parametry
+    * @param bool $mergeParams -- jeslti se mají přidat i již exitující parametry v url
+    * @return string
+    */
+   final public function applyRouteParams($name, $params, $mergeParams = true)
+   {
+      if(!isset($this->routes[$name])){
+         return null;
+      }
+      $routeReplacement = $this->routes[$name]['replacement'];
+//      var_dump($this->routes[$name]);
+      if ($routeReplacement != null | '') {
+         if($mergeParams){
+            $params = array_merge($this->getRouteParams(), $params);
+         }
+         $method = $name.'RouteParams';
+         if(method_exists($this, $method)){
+            $routeReplacement = $this->$method($params);
+         } else {
+            foreach ($params as $pname => $pvalue) {
+               $routeReplacement = str_replace("{" . $pname . "}", $pvalue, $routeReplacement);
+            }
+         }
+         // odstranění nepovinných parametrů, které nebyly zadány
+         $routeReplacement = preg_replace(
+               array(
+                   "/\([^{]*\{+[^{]*\}+[^{]*\)/i", 
+                   "/[()]+/i",
+                   "/({[^}]+}\/?)/" // "{variable}"
+                   ),
+               array(
+                   "", 
+                   "",
+                   null,
+                   ),
+               $routeReplacement);
+         return $routeReplacement;
+      } else {
+         // tohle by hctělo odstranit, je to zbytečné, ale není jisté kde všude se využívá
+         return $this->routes[$name]['regexp'];
+      }
    }
 
    /**
