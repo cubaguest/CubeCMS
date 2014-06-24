@@ -99,7 +99,8 @@ class Articles_View extends View {
 
          $tooldel = new Template_Toolbox2_Tool_Form($this->formDelete);
          $tooldel->setIcon('page_delete.png')->setTitle($this->tr('Smazat položku'))
-            ->setConfirmMeassage($this->tr('Opravdu smazat položku?'));
+            ->setConfirmMeassage($this->tr('Opravdu smazat položku?'))
+            ->setImportant(true);
          $this->toolbox->addTool($tooldel);
          
          if($this->category()->getRights()->isControll()){
