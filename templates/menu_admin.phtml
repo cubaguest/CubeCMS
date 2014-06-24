@@ -1,58 +1,101 @@
 <?
-// funkce pro render menu
-function vveAdminMenuRenderFunc(SimpleXMLElement $menuArr, $link, $ulParam) {
-   $l = Locales::getUserLang();
-   echo ("<ul ".$ulParam.">\n");
-   foreach ($menuArr as $key => $item) {
-      if(isset($item['type']) && $item['type'] == 'user'){
-         echo ("<li class=\"adminmenu-user-item\">");
-      } else if(isset($item['type']) && $item['type'] == 'shop'){
-         echo ("<li class=\"adminmenu-shop-item\">");
-      } else {
-         echo ("<li>");
-      }
-      $name = $item->xpath('name[@lang="'.$l.'"]');
-      if(empty($name)){
-         $name = $item->xpath('name[@lang="cs"]');
-      }
-      $name = $name[0];
-      $urlkey = $item->xpath('urlkey[@lang="'.$l.'"]');
-      if(empty($urlkey)){
-         $urlkey = $item->xpath('urlkey[@lang="cs"]');
-      }
-      if(!empty($urlkey)){
-         $urlkey = $urlkey[0];
-      }
-      $t = $item->xpath('title[@lang="'.$l.'"]');
-      if(empty($t)){
-         $t = $item->xpath('title[@lang="cs"]');
-      }
-      $title = null;
-      if(isset ($t[0])){
-         $title = $t[0];
-      }
 
-      if($key == 'section') {
-         echo '<a href="#" title="'.$title.'">';
-         if((string)$item['icon'] != null){
-            echo '<img src="'.(strpos($item['icon'], "/") !== false ? $item['icon'] : '/images/icons/'.$item['icon']).'" alt="'.htmlspecialchars($name).'" />';
+// funkce pro render menu
+function CubeCMSAdminMenuRenderFunc($menuArr, $link, $ulParam)
+{
+//   $l = Locales::getUserLang();
+   echo ("<ul " . $ulParam . ">\n");
+   foreach ($menuArr as $key => $item) {
+//      if(isset($item['type']) && $item['type'] == 'user'){
+//         echo ("<li class=\"adminmenu-user-item\">");
+//      } else if(isset($item['type']) && $item['type'] == 'shop'){
+//         echo ("<li class=\"adminmenu-shop-item\">");
+//      } else {
+//         echo ("<li>");
+//      }
+//      $name = $item->xpath('name[@lang="'.$l.'"]');
+//      if(empty($name)){
+//         $name = $item->xpath('name[@lang="cs"]');
+//      }
+//      $name = $name[0];
+//      $urlkey = $item->xpath('urlkey[@lang="'.$l.'"]');
+//      if(empty($urlkey)){
+//         $urlkey = $item->xpath('urlkey[@lang="cs"]');
+//      }
+//      if(!empty($urlkey)){
+//         $urlkey = $urlkey[0];
+//      }
+//      $t = $item->xpath('title[@lang="'.$l.'"]');
+//      if(empty($t)){
+//         $t = $item->xpath('title[@lang="cs"]');
+//      }
+//      $title = null;
+//      if(isset ($t[0])){
+//         $title = $t[0];
+//      }
+//      if($key == 'section') {
+//         echo '<a href="#" title="'.$title.'">';
+//         if((string)$item['icon'] != null){
+//            echo '<img src="'.(strpos($item['icon'], "/") !== false ? $item['icon'] : '/images/icons/'.$item['icon']).'" alt="'.htmlspecialchars($name).'" />';
+//         }
+//         echo $name.'</a>';
+//         vveAdminMenuRenderFunc($item->item, $link, null);
+//      } else {
+//         echo '<a href="'.$link->clear()->category($urlkey).'" title="'.$title.'">';
+//         if((string)$item['icon'] != null){
+//            echo '<img src="'.(strpos($item['icon'], "/") !== false ? $item['icon'] : '/images/icons/'.$item['icon']).'" alt="'.htmlspecialchars($name).'" />';
+//         }
+//         echo $name.'</a>';
+//      }
+      $class = 'menu_' . $key;
+      if (sizeof($item['items']) > 1) {
+         echo ('<li class="' . $class . '">');
+         $label = $item['labels']['cs'];
+         if (isset($item['labels'][Locales::getLang()])) {
+            $label = $item['labels'][Locales::getLang()];
          }
-         echo $name.'</a>';
-         vveAdminMenuRenderFunc($item->item, $link, null);
+         if (isset($item['labels'][Locales::getUserLang()])) {
+            $label = $item['labels'][Locales::getUserLang()];
+         }
+         echo '<a href="#">';
+         if ($item['icon'] != null) {
+            echo '<img src="' . (strpos($item['icon'], "/") !== false ? $item['icon'] : '/images/icons/' . $item['icon']) . '" alt="' . htmlspecialchars($label) . '" />';
+         }
+
+         echo $label . '</a>';
+         echo '<ul>';
+         foreach ($item['items'] as $menuItem) {
+            echo '<a href="' . $menuItem->getUrl() . '">';
+            if ((string) $menuItem->getIcon() != null) {
+               echo '<img src="' . (strpos($menuItem->getIcon(), "/") !== false ? $menuItem->getIcon() : '/images/icons/' . $menuItem->getIcon()) . '" alt="' . htmlspecialchars($menuItem->getName()) . '" />';
+            }
+            echo $menuItem->getName() . '</a>';
+         }
+         echo '</ul>';
+//         echo $name.'</a>';
+         echo ("</li>\n");
+      } else if (sizeof($item['items']) == 1) {
+         echo ('<li class="' . $class . '">');
+         $menuItem = reset($item['items']);
+         echo '<a href="' . $menuItem->getUrl() . '">';
+         if ((string) $menuItem->getIcon() != null) {
+            echo '<img src="' . (strpos($menuItem->getIcon(), "/") !== false ? $menuItem->getIcon() : '/images/icons/' . $menuItem->getIcon()) . '" alt="' . htmlspecialchars($menuItem->getName()) . '" />';
+         }
+         echo $menuItem->getName() . '</a>';
+         echo ("</li>\n");
       } else {
-         echo '<a href="'.$link->clear()->category($urlkey).'" title="'.$title.'">';
-         if((string)$item['icon'] != null){
-            echo '<img src="'.(strpos($item['icon'], "/") !== false ? $item['icon'] : '/images/icons/'.$item['icon']).'" alt="'.htmlspecialchars($name).'" />';
-         }
-         echo $name.'</a>';
+         
       }
-      echo ("</li>\n");
    }
    echo ("</ul>\n");
 }
 ?>
 <!-- Halvni menu sekce v menu  -->
 <div id="adminMenuWrapper">
-   <?=vveAdminMenuRenderFunc($this->menu, $this->link(), 'class="dropdown"')?>
-   <?if(class_exists("QuickTools_View")){ QuickTools_View::renderTools();}?>
+<?
+CubeCMSAdminMenuRenderFunc(Menu_Admin::getInstance()->getItems(), $this->link(), 'class="dropdown"');
+if (class_exists("QuickTools_View")) {
+   QuickTools_View::renderTools();
+}
+?>
 </div>
