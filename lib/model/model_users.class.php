@@ -145,6 +145,15 @@ class Model_Users extends Model_ORM {
              ->joinFK(Model_Users::COLUMN_ID_GROUP, array('group_name' => Model_Groups::COLUMN_NAME, '*'))
              ->record();
    }
+   
+   public static function getUserByID($id) 
+   {
+      $model = new Model_Users();
+      return $model
+             ->where(Model_Users::COLUMN_ID.' = :id', array('id' => $id))
+             ->joinFK(Model_Users::COLUMN_ID_GROUP, array('group_name' => Model_Groups::COLUMN_NAME, '*'))
+             ->record();
+   }
 
 
    /* DEPRECATED */
@@ -173,25 +182,6 @@ class Model_Users extends Model_ORM {
          $dbst->bindValue(':blocked', $blockedUsers, PDO::PARAM_BOOL);
       }
 
-      $dbst->execute();
-
-      $dbst->setFetchMode(PDO::FETCH_OBJ);
-      return $dbst->fetch();
-   }
-
-   /**
-    * Metoda načte uživatele podle id uživatele
-    * @param int $id -- id uživatele
-    * @return Object
-    * @deprecated
-    */
-   public function getUserById($id) {
-      $mgrp = new Model_Groups();
-      $dbc = Db_PDO::getInstance();
-      $dbst = $dbc->query("SELECT user.*, grp.".self::COLUMN_ID_GROUP.", grp.name AS ".self::COLUMN_GROUP_NAME
-          ." FROM ".$this->getTableName()." AS user"
-          ." JOIN ".$mgrp->getTableName()." AS grp ON user.".self::COLUMN_ID_GROUP." = grp.".self::COLUMN_ID_GROUP
-          ." WHERE (user.".self::COLUMN_ID." = ".$dbc->quote((int)$id).")");
       $dbst->execute();
 
       $dbst->setFetchMode(PDO::FETCH_OBJ);
