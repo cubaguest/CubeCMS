@@ -94,6 +94,9 @@ class Form_Decorator implements Form_Decorator_Interface {
    {
       $row = new Html_Element('div');
       $row->addClass('form-group');
+      if($formElements[$name] instanceof Form_Element_Hidden){
+         $row->addClass('form-group-hidden');
+      }
       if( $formElements[$name]->isPopulated() && !$formElements[$name]->isValid() ){
          $row->addClass('has-error');
       }
