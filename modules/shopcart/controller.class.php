@@ -785,6 +785,8 @@ class ShopCart_Controller extends Controller {
       $addressPayment .= $order->{Shop_Model_Orders::COLUMN_CUSTOMER_STREET}."<br />";
       $addressPayment .= $order->{Shop_Model_Orders::COLUMN_CUSTOMER_CITY}.' '.$order->{Shop_Model_Orders::COLUMN_CUSTOMER_POST_CODE}."<br />";
       $addressPayment .= $order->{Shop_Model_Orders::COLUMN_CUSTOMER_COUNTRY}."<br />";
+      $addressPayment .= $order->{Shop_Model_Orders::COLUMN_CUSTOMER_EMAIL}."<br />";
+      $addressPayment .= $order->{Shop_Model_Orders::COLUMN_CUSTOMER_PHONE}."<br />";
 
       $addressPayment .= $order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY_DIC} != null ?
          'DIČ: '.$order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY_DIC}."<br />" : null;
