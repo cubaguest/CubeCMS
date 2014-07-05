@@ -1,5 +1,5 @@
 <?php
-
+$lastID = 32794;
 /* 
  * Základní sekce menu
  */
@@ -57,7 +57,7 @@ $this->addItem(Menu_Admin::SECTION_STRUCT, new Menu_Admin_Item(
    'structure/categories', 'categories', 'tree.png'
 ));
 $this->addItem(Menu_Admin::SECTION_STRUCT, new Menu_Admin_Item(
-    33002, array( 'cs' => 'Hromadná úprava kategorií', 'en' => 'Bulk Edit of categories'),
+    32791, array( 'cs' => 'Hromadná úprava kategorií', 'en' => 'Bulk Edit of categories'),
    'structure/categories-bulk-edit', 'catsbulkedit', 'table_edit.png'
 ));
 $this->addItem(Menu_Admin::SECTION_STRUCT, new Menu_Admin_Item(
@@ -77,7 +77,7 @@ $this->addItem(Menu_Admin::SECTION_USER, new Menu_Admin_Item(
  * Obsah
  */
 $this->addItem(Menu_Admin::SECTION_CONTENT, new Menu_Admin_Item(
-    32777, array( 'cs' => 'Šablony', 'en' => 'Templates'),
+    32792, array( 'cs' => 'Šablony', 'en' => 'Templates'),
    'content/templates', 'templates', 'page_code.png'
 ));
 //$this->addItem(Menu_Admin::SECTION_CONTENT, new Menu_Admin_Item(
@@ -110,7 +110,7 @@ $this->addItem(Menu_Admin::SECTION_CONTENT, new Menu_Admin_Item(
  * Emaily
  */
 $this->addItem(Menu_Admin::SECTION_EMAIL, new Menu_Admin_Item(
-    32771, array( 'cs' => 'Poslat e-mail', 'en' => 'Send e-mail'),
+    32790, array( 'cs' => 'Poslat e-mail', 'en' => 'Send e-mail'),
    'e-mails/send-email', 'mails', 'email_edit.png'
 ));
 $this->addItem(Menu_Admin::SECTION_EMAIL, new Menu_Admin_Item(
