@@ -1,4 +1,4 @@
-@CHARSET "UTF-8";
+@charset "UTF-8";
 @import "@{dirCoreCss}normalize.css";
 @import "fontawesome/font-awesome.less";
 @import "@{dirFaceCss}style-layout.css";
@@ -400,7 +400,7 @@ form {
          .rounded-corners(0);
       }
       position: relative;
-      display: table !important;
+      display: table; // nemůže být important, jinak nefunguje přepínání jazyků!!
       border-collapse: separate;
    }
    .input-group-addon, .input-group-btn, .input-group .form-control {
