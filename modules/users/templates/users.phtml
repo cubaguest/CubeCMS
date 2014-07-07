@@ -37,36 +37,46 @@ $grpsArr = array();
             ajaxGridOptions : {type:"POST"},
             url: '<?=$this->link()->route('usersList');?>?idgrp='+$('#select-group-id').val().toString(),
             datatype: "json",
-            colNames:['ID', '<?=$this->tr('Jméno')?>', '<?=$this->tr('Přijmení')?>', '<?=$this->tr('Už.jméno')?>',
-               '<?=$this->tr('heslo')?>', '<?=$this->tr('E-mail')?>', '<?=$this->tr('Blokace')?>', '<?=$this->tr('Poznámka')?>', '<?=$this->tr('Skupina')?>'],
+            colNames:['ID', '<?=$this->tr('Už.jméno')?>', '<?=$this->tr('Jméno')?>', '<?=$this->tr('Přijmení')?>',
+               '<?=$this->tr('Heslo')?>', '<?=$this->tr('E-mail')?>', '<?=$this->tr('Tel.')?>', '<?=$this->tr('Adresa')?>', 
+               '<?=$this->tr('Blokace')?>', '<?=$this->tr('Poznámka')?>', '<?=$this->tr('Skupina')?>'],
             colModel:[
                {name:'<?=Model_Users::COLUMN_ID?>',index:'<?=Model_Users::COLUMN_ID?>',
                   width:33,fixed: true,editable:false},
-               {name:'<?=Model_Users::COLUMN_NAME?>',index:'<?=Model_Users::COLUMN_NAME?>', 
-                  width:100,fixed: true,editable:true,editoptions:{size:20},
-                  formoptions:{ rowpos:2, label: "<?=$this->tr('Jméno')?>",elmprefix:"(*)"}},
-               {name:'<?=Model_Users::COLUMN_SURNAME?>',index:'<?=Model_Users::COLUMN_SURNAME?>', 
-                  width:100,fixed: true,editable:true,editoptions:{size:20},
-                  formoptions:{ rowpos:3, label: "<?=$this->tr('Přijmení')?>",elmprefix:"(*)"}},
                {name:'<?=Model_Users::COLUMN_USERNAME?>',index:'<?=Model_Users::COLUMN_USERNAME?>', 
-                  width:100,fixed: true,editable:true,editoptions:{size:20},
-                  formoptions:{ rowpos:4, label: "<?=$this->tr('Uživ. jméno')?>",elmprefix:"(*)"}},
+                  width:150,fixed: true,editable:true,editoptions:{size:20},
+                  formoptions:{ rowpos:2, label: "<?=$this->tr('Uživ. jméno')?>",elmprefix:"(*)"}},
+               {name:'<?=Model_Users::COLUMN_NAME?>',index:'<?=Model_Users::COLUMN_NAME?>', 
+                  width:80,fixed: true,editable:true,editoptions:{size:20},
+                  formoptions:{ rowpos:3, label: "<?=$this->tr('Jméno')?>",elmprefix:"(*)"}},
+               {name:'<?=Model_Users::COLUMN_SURNAME?>',index:'<?=Model_Users::COLUMN_SURNAME?>', 
+                  width:80,fixed: true,editable:true,editoptions:{size:20},
+                  formoptions:{ rowpos:4, label: "<?=$this->tr('Přijmení')?>",elmprefix:"(*)"}},
                {name:'<?=Model_Users::COLUMN_PASSWORD?>',index:'<?=Model_Users::COLUMN_PASSWORD?>',
                   width:1,fixed:true,hidedlg:false, hidden:true, editable:true,edittype:'password',editoptions:{size:20},
                   formoptions:{ rowpos:5, label: "<?=$this->tr('Heslo')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
                {name:'<?=Model_Users::COLUMN_MAIL?>',index:'<?=Model_Users::COLUMN_MAIL?>', 
-                  width:260,fixed: true,editable:true,editoptions:{size:20},
+                  width:150,fixed: true,editable:true,editoptions:{size:20},
                   formoptions:{ rowpos:6, label: "<?=$this->tr('E-mail')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
+               
+               {name:'<?=Model_Users::COLUMN_PHONE?>',index:'<?=Model_Users::COLUMN_PHONE?>', 
+                  width:100, fixed : true, editable: true,editoptions:{size:20},
+                  formoptions:{ rowpos:7, label: "<?=$this->tr('Tel.')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
+                  
+               {name:'<?=Model_Users::COLUMN_ADDRESS?>',index:'<?=Model_Users::COLUMN_ADDRESS?>', 
+                  width:1,fixed:true,hidedlg:false, hidden:true, editable:true, edittype:"textarea", editoptions:{rows:"2",cols:"20"},
+                  formoptions:{ rowpos:8, label: "<?=$this->tr('Adresa')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
+               
                {name:'<?=Model_Users::COLUMN_BLOCKED?>',index:'<?=Model_Users::COLUMN_BLOCKED?>', formatter: 'checkbox', 
                   formatoptions:{disabled: false, 'class' : 'blockUser'}, 
                   width:50,fixed: true,editable:true,edittype:'checkbox', editoptions:{size:20, value:"true:false"},
-                  formoptions:{ rowpos:7, label: "<?=$this->tr('Blokace')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
+                  formoptions:{ rowpos:9, label: "<?=$this->tr('Blokace')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
                {name:'<?=Model_Users::COLUMN_NOTE?>',index:'<?=Model_Users::COLUMN_NOTE?>', 
                   editable: true,edittype:"textarea", editoptions:{rows:"2",cols:"20"},
-                  formoptions:{ rowpos:8, label: "<?=$this->tr('Poznámka')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
+                  formoptions:{ rowpos:10, label: "<?=$this->tr('Poznámka')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
                {name:'<?=Model_Users::COLUMN_GROUP_ID?>',index:'<?=Model_Users::COLUMN_GROUP_ID?>', 
                   width:90,fixed: true, editable: true,edittype:"select",
-                  editoptions:{value: <?=json_encode($grpsArr)?>},formoptions:{ rowpos:9, 
+                  editoptions:{value: <?=json_encode($grpsArr)?>},formoptions:{ rowpos:11, 
                      label: "<?=$this->tr('Skupina')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}}
             ],
             rowNum:20,
@@ -111,7 +121,7 @@ $grpsArr = array();
                   }
                   return [res.allOk,msg];
                },
-               beforeShowForm: function(form) { $("tr#tr_password",form[0]).show(); }
+               beforeShowForm: function(form) { $("tr#tr_password",form[0]).show();$("tr#tr_user_address",form[0]).show(); }
             },
             // add options
             {reloadAfterSubmit:true,jqModal:true, closeOnEscape:true, 
@@ -128,7 +138,7 @@ $grpsArr = array();
                afterShowForm : function(){
                   $('#id_group').val($('#select-group-id').val());
                },
-               beforeShowForm: function(form) { $("tr#tr_password",form[0]).show(); }
+               beforeShowForm: function(form) { $("tr#tr_password",form[0]).show();$("tr#tr_user_address",form[0]).show(); }
             },  
             // del options
             {reloadAfterSubmit:true,jqModal:true, closeOnEscape:true,

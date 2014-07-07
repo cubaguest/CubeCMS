@@ -33,14 +33,37 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
          <th class="ui-widget-header"><?=$this->tr('E-maily')?></th>
          <td class="ui-widget-content"><?=$this->user->{Model_Users::COLUMN_MAIL}?></td>
       </tr>
+      <?if($this->user->{Model_Users::COLUMN_PHONE}){?>
+      <tr>
+         <th class="ui-widget-header"><?=$this->tr('Telefon')?></th>
+         <td class="ui-widget-content"><?=$this->user->{Model_Users::COLUMN_PHONE}?></td>
+      </tr>
+      <?}?>
+      <?if($this->user->{Model_Users::COLUMN_ADDRESS}){?>
+      <tr>
+         <th class="ui-widget-header"><?=$this->tr('Adresa')?></th>
+         <td class="ui-widget-content"><?=$this->user->{Model_Users::COLUMN_ADDRESS}?></td>
+      </tr>
+      <?}?>
+      <tr>
+         <th class="ui-widget-header"><?=$this->tr('Informace jsou veřejné')?></th>
+         <td class="ui-widget-content"><?=($this->user->{Model_Users::COLUMN_INFO_IS_PRIVATE} ? $this->tr('Ne') : $this->tr('Ano'))?></td>
+      </tr>
       <tr>
          <th class="ui-widget-header"><?=$this->tr('Poznámka / popis')?></th>
          <td class="ui-widget-content"><?=$this->user->{Model_Users::COLUMN_NOTE}?></td>
       </tr>
+      <?if(count(Locales::getAppLangs()) > 1 && Auth::isAdmin()){?>
       <tr>
          <th class="ui-widget-header"><?=$this->tr('Preferovaný jazyk')?></th>
-         <td class="ui-widget-content"><?=Locales::getUserLang()?></td>
+         <td class="ui-widget-content">
+            <?
+            $arr = Locales::getLangLabel(Locales::getUserLang());
+            echo reset($arr);
+            ?>
+         </td>
       </tr>
+      <?}?>
    </table>
    <br />
    <?=$this->includeTpl('buttons.phtml')?>

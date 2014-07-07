@@ -40,10 +40,9 @@ class Model_Users extends Model_ORM {
    const COLUMN_LAST_LOGIN = 'last_login';
    const COLUMN_EXTERNAL_AUTH_ID    = 'external_auth_id';
    const COLUMN_AUTHENTICATOR  = 'authenticator';
-   const COLUMN_PHONE  = 'user_address';
-   const COLUMN_ADDRESS  = 'user_phone';
-
-
+   const COLUMN_ADDRESS  = 'user_address';
+   const COLUMN_PHONE  = 'user_phone';
+   const COLUMN_INFO_IS_PRIVATE  = 'user_info_is_private';
 
    const COLUMN_GROUP_ID    = 'id_group';
    const COLUMN_GROUP_NAME    = 'gname';
@@ -56,8 +55,8 @@ class Model_Users extends Model_ORM {
          $this->setTableName(self::DB_TABLE, 't_us');
       }
 
-      $this->addColumn(self::COLUMN_ID, array('datatype' => 'smallint', 'ai' => true, 'nn' => true, 'pk' => true));
-      $this->addColumn(self::COLUMN_ID_GROUP, array('datatype' => 'smallint', 'nn' => true, 'pdoparam' => PDO::PARAM_INT));
+      $this->addColumn(self::COLUMN_ID, array('datatype' => 'int', 'ai' => true, 'nn' => true, 'pk' => true));
+      $this->addColumn(self::COLUMN_ID_GROUP, array('datatype' => 'int', 'nn' => true, 'pdoparam' => PDO::PARAM_INT));
       $this->addColumn(self::COLUMN_USERNAME, array('datatype' => 'varchar(50)', 'nn' => true, 'uq' => true, 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_PASSWORD, array('datatype' => 'varchar(50)', 'nn' => true, 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_PASSWORD_RESTORE, array('datatype' => 'varchar(50)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
@@ -74,6 +73,7 @@ class Model_Users extends Model_ORM {
       $this->addColumn(self::COLUMN_AUTHENTICATOR, array('datatype' => 'varchar(20)', 'pdoparam' => PDO::PARAM_STR, 'default' => 'internal'));
       $this->addColumn(self::COLUMN_ADDRESS, array('datatype' => 'varchar(500)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
       $this->addColumn(self::COLUMN_PHONE, array('datatype' => 'varchar(15)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
+      $this->addColumn(self::COLUMN_INFO_IS_PRIVATE, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => false));
 
       $this->setPk(self::COLUMN_ID);
       $this->addForeignKey(self::COLUMN_ID_GROUP, 'Model_Groups');

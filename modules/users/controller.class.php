@@ -74,11 +74,13 @@ class Users_Controller extends Controller {
          array_push($jqGrid->respond()->rows, array('id' => $user->{Model_Users::COLUMN_ID},
              'cell' => array(
                  $user->{Model_Users::COLUMN_ID},
+                 $user->{Model_Users::COLUMN_USERNAME},
                  $user->{Model_Users::COLUMN_NAME},
                  $user->{Model_Users::COLUMN_SURNAME},
-                 $user->{Model_Users::COLUMN_USERNAME},
                  null, // pass
                  $user->{Model_Users::COLUMN_MAIL},
+                 $user->{Model_Users::COLUMN_PHONE},
+                 $user->{Model_Users::COLUMN_ADDRESS},
                  $blstr,
                  $user->{Model_Users::COLUMN_NOTE},
                  $user->{Model_Groups::COLUMN_NAME}

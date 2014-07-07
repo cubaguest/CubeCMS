@@ -140,7 +140,18 @@ class Login_Controller extends Controller {
       $elemEmails->addValidation(new Form_Validator_NotEmpty());
       $elemEmails->addValidation(new Form_Validator_Email());
       $form->addElement($elemEmails, $fGrpBase);
+      
+      $elemPhone = new Form_Element_Text('phone', $this->tr('Telefon'));
+      $elemPhone->addValidation(new Form_Validator_Regexp(Form_Validator_Regexp::REGEXP_PHONE_CZSK));
+      $form->addElement($elemPhone, $fGrpBase);
+      
+      $elemAddress = new Form_Element_TextArea('address', $this->tr('Adresa'));
+      $form->addElement($elemAddress, $fGrpBase);
 
+      $elemPrivate = new Form_Element_Checkbox('private', $this->tr('Kontaktní informace jsou veřejné'));
+      $elemPrivate->setValues(true);
+      $form->addElement($elemPrivate, $fGrpBase);
+      
       $fGrpOther = $form->addGroup('other', $this->tr('Ostatní'));
       $elemNote = new Form_Element_TextArea('note', $this->tr('Poznámky'));
       $form->addElement($elemNote, $fGrpOther);
@@ -159,6 +170,9 @@ class Login_Controller extends Controller {
       $form->surname->setValues($user->{Model_Users::COLUMN_SURNAME});
       $form->email->setValues($user->{Model_Users::COLUMN_MAIL});
       $form->note->setValues($user->{Model_Users::COLUMN_NOTE});
+      $form->phone->setValues($user->{Model_Users::COLUMN_PHONE});
+      $form->address->setValues($user->{Model_Users::COLUMN_ADDRESS});
+      $form->private->setValues(!$user->{Model_Users::COLUMN_INFO_IS_PRIVATE});
       if(isset($form->lang)){
          $form->lang->setValues(Model_UsersSettings::getSettings('userlang', Locales::getDefaultLang()));
       }
@@ -174,6 +188,9 @@ class Login_Controller extends Controller {
       $user->{Model_Users::COLUMN_SURNAME} = $form->surname->getValues();
       $user->{Model_Users::COLUMN_MAIL} = $form->email->getValues();
       $user->{Model_Users::COLUMN_NOTE} = $form->note->getValues();
+      $user->{Model_Users::COLUMN_ADDRESS} = $form->address->getValues();
+      $user->{Model_Users::COLUMN_PHONE} = $form->phone->getValues();
+      $user->{Model_Users::COLUMN_INFO_IS_PRIVATE} = !$form->private->getValues();
       if(isset($form->lang)){
          Model_UsersSettings::setSettings('userlang', $form->lang->getValues());
       }
