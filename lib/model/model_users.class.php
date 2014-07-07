@@ -40,6 +40,8 @@ class Model_Users extends Model_ORM {
    const COLUMN_LAST_LOGIN = 'last_login';
    const COLUMN_EXTERNAL_AUTH_ID    = 'external_auth_id';
    const COLUMN_AUTHENTICATOR  = 'authenticator';
+   const COLUMN_PHONE  = 'user_address';
+   const COLUMN_ADDRESS  = 'user_phone';
 
 
 
@@ -70,6 +72,8 @@ class Model_Users extends Model_ORM {
       $this->addColumn(self::COLUMN_LAST_LOGIN, array('datatype' => 'datetime', 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_EXTERNAL_AUTH_ID, array('datatype' => 'varchar(200)', 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_AUTHENTICATOR, array('datatype' => 'varchar(20)', 'pdoparam' => PDO::PARAM_STR, 'default' => 'internal'));
+      $this->addColumn(self::COLUMN_ADDRESS, array('datatype' => 'varchar(500)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
+      $this->addColumn(self::COLUMN_PHONE, array('datatype' => 'varchar(15)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
 
       $this->setPk(self::COLUMN_ID);
       $this->addForeignKey(self::COLUMN_ID_GROUP, 'Model_Groups');

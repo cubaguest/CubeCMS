@@ -1,0 +1,14 @@
+NEW:
+- Přidána podpora telefon a adresu u uživatele
+- Implementace nové verze admin menu
+- Přidání emailu a telefonu do fakturační adrey v emailu.
+
+FIXED:
+- Oprava admin stylů pro toolboxy
+- přidání speciální třídy pro form. řádky se zkrytými elementy
+- Odstranění starých souborů
+- Úprava parsoání a vytváření cest modulů
+
+CHANGES:
+- Přidání konstant pro obr. kategorie. Oprava vracení obrázku kategorie pokud neexistuje
+- Změna LESS kompileru na  oyejorge/less.php
