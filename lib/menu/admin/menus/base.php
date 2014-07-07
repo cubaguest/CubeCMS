@@ -93,7 +93,7 @@ $this->addItem(Menu_Admin::SECTION_CONTENT, new Menu_Admin_Item(
    'content/forms', 'templates', 'application_form.png'
 ));
 $this->addItem(Menu_Admin::SECTION_CONTENT, new Menu_Admin_Item(
-    32777, array( 'cs' => 'SlideShow', 'en' => 'SlideShow'),
+    32794, array( 'cs' => 'SlideShow', 'en' => 'SlideShow'),
    'content/slideshow', 'hpslideshow', 'images.png'
 ));
 $this->addItem(Menu_Admin::SECTION_CONTENT, new Menu_Admin_Item(
