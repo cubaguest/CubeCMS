@@ -31,6 +31,8 @@ class Form_Decorator implements Form_Decorator_Interface {
    private $content = null;
    private $groupText = null;
    private $groupName = null;
+   
+   const CHECKBOX_LABEL_AFTER_CHARS = 25;
 
    /**
     * Konstruktor vytvoří obal
@@ -118,7 +120,11 @@ class Form_Decorator implements Form_Decorator_Interface {
           !$element instanceof Form_Element_Button 
           && !$element instanceof Form_Element_Submit 
           && !$element instanceof Form_Element_SaveCancel 
+          && !$element instanceof Form_Element_Checkbox 
           ){
+         $cell->addContent($element->label());
+      }
+      if($element instanceof Form_Element_Checkbox && mb_strlen($element->getLabel()) <= self::CHECKBOX_LABEL_AFTER_CHARS){
          $cell->addContent($element->label());
       }
       return $cell;
@@ -158,6 +164,9 @@ class Form_Decorator implements Form_Decorator_Interface {
             $wrap->addContent($wrapControl);
          }
          $cell->addContent($wrap);
+      } else if($element instanceof Form_Element_Checkbox && mb_strlen($element->getLabel()) > self::CHECKBOX_LABEL_AFTER_CHARS) {
+         $cell->addContent($element->control());
+         $cell->addContent($element->label(null, true));
       } else {
          $this->addControlClass($element);
          $cell->addContent($element->control());
