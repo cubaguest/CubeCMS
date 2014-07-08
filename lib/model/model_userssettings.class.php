@@ -24,6 +24,7 @@ class Model_UsersSettings extends Model_ORM {
    const COLUMN_NAME       = 'setting_name';
    const COLUMN_VALUE      = 'setting_value';
 
+   protected static $settingsCache = array();
 
    protected function  _initTable() {
       if(VVE_USE_GLOBAL_ACCOUNTS === true) {
@@ -43,13 +44,26 @@ class Model_UsersSettings extends Model_ORM {
 
    public static function getSettings($name, $defaultValue = null, $idUser = null)
    {
-      $m = new self();
       $idUser = $idUser == null ? Auth::getUserId() : $idUser;
-      $set = $m
-         ->where(self::COLUMN_ID_USER.' = :idu AND '.self::COLUMN_NAME.' = :name', array('idu' => $idUser, 'name' => $name))
-         ->record(null, null, PDO::FETCH_OBJ);
-
-      return $set != false ? $set->{self::COLUMN_VALUE} : $defaultValue ;
+      
+      self::checkSettingsLoaded($idUser);
+      if(isset(self::$settingsCache[$idUser]) && isset(self::$settingsCache[$idUser][$name])){
+         return self::$settingsCache[$idUser][$name];
+      }
+   }
+   
+   protected static function checkSettingsLoaded($idUser)
+   {
+      if(!isset(self::$settingsCache[$idUser])){
+         self::$settingsCache[$idUser] = array();
+         $m = new self();
+         $all = $m
+            ->where(self::COLUMN_ID_USER.' = :idu', array('idu' => $idUser))
+            ->records(PDO::FETCH_OBJ);
+         foreach ($all as $value) {
+            self::$settingsCache[$idUser][$value->{self::COLUMN_NAME}] = $value->{self::COLUMN_VALUE};
+         }
+      }
    }
 
    public static function setSettings($name, $value = null, $idUser = null)
@@ -71,10 +85,9 @@ class Model_UsersSettings extends Model_ORM {
          }
          $setting->{self::COLUMN_VALUE} = $value;
          $setting->save();
-         
-//         $m
-//            ->where(self::COLUMN_ID_USER.' = :idu AND '.self::COLUMN_NAME.' = :name', array('idu' => $idUser, 'name' => $name))
-//            ->update(array(self::COLUMN_VALUE => $value));
+      }
+      if(isset(self::$settingsCache[$idUser])){
+         unset(self::$settingsCache[$idUser]);
       }
    }
 }
