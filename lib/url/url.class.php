@@ -91,6 +91,12 @@ class Url
       $this->parseUrl($url != null ? $url : $this->getCurrentUrl());
    }
    
+   public static function getInstance()
+   {
+      $ref = new ReflectionClass(get_called_class());
+      return $ref->newInstanceArgs(func_get_args());
+   }
+   
    protected function getCurrentUrl()
    {
       $ssl = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? true:false;
