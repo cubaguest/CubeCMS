@@ -21,7 +21,14 @@ class Auth_User {
    protected $userNote = null;
    protected $userPhone = null;
    protected $userAddress = null;
+   protected $userHasPrivateInfo = true;
    
+   /**
+    *
+    * @var Model_ORM_Record
+    */
+   protected $lastLogin = false;
+
    protected $groupName = VVE_DEFAULT_GROUP_NAME;
    protected $groupId = VVE_DEFAULT_ID_GROUP;
    
@@ -44,9 +51,11 @@ class Auth_User {
          $this->userUserName = $user->{Model_Users::COLUMN_USERNAME};
          $this->userName = $user->{Model_Users::COLUMN_NAME};
          $this->userSurname = $user->{Model_Users::COLUMN_SURNAME};
-         $this->userNote = $user->{Model_Users::COLUMN_MAIL};
+         $this->userMail = $user->{Model_Users::COLUMN_MAIL};
+         $this->userNote = $user->{Model_Users::COLUMN_NOTE};
          $this->userPhone = $user->{Model_Users::COLUMN_PHONE};
          $this->userAddress = $user->{Model_Users::COLUMN_ADDRESS};
+         $this->userHasPrivateInfo = $user->{Model_Users::COLUMN_INFO_IS_PRIVATE};
 
          $this->groupId = $user->{Model_Groups::COLUMN_ID};
          $this->groupName = $user->group_name;
@@ -109,7 +118,7 @@ class Auth_User {
     * @return string -- název uživatele
     */
    public function getFullName() {
-      return $this->userName.' '.$this->userSurname;
+      return $this->getFirstName().' '.$this->getLastName();
    }
    
    /**
@@ -132,24 +141,71 @@ class Auth_User {
     * Metoda vrací mail uživatele
     * @return string -- mail uživatele
     */
-   public function getUserMail() {
+   public function getMail() {
       return $this->userMail;
+   }
+   /**
+    * 
+    * @return type
+    * @deprecated since version number
+    */
+   public function getUserMail() {
+      return $this->getMail();
    }
    
    /**
     * Metoda vrací telefon uživatele
     * @return string -- telefon uživatele
     */
-   public function getUserPhone() {
+   public function getPhone() {
       return $this->userPhone;
    }
-   
+      
    /**
     * Metoda vrací adresu uživatele
     * @return string -- adresa uživatele
     */
-   public function getUserAddress() {
+   public function getAddress() {
       return $this->userAddress;
+   }
+   
+   /**
+    * Metoda vrací poznámku uživatele
+    * @return string -- poznámka uživatele
+    */
+   public function getNote() {
+      return $this->userNote;
+   }
+   
+   /**
+    * Metoda vrací datum posledního přihlášení uživatele
+    * @return string -- poznámka uživatele
+    */
+   public function getLastLoginDate() {
+      if(!$this->lastLogin){
+         $this->lastLogin = Model_UsersLogins::getLastLogin($this->getUserId());
+      }
+      return $this->lastLogin ? new DateTime($this->lastLogin->{Model_UsersLogins::COLUMN_TIME}) : false;
+   }
+   
+   /**
+    * Metoda vrací IP posledního přihlášení uživatele
+    * @return string -- poznámka uživatele
+    */
+   public function getLastLoginIP() {
+      if(!$this->lastLogin){
+         $this->lastLogin = Model_UsersLogins::getLastLogin($this->getUserId());
+      }
+      return $this->lastLogin ? $this->lastLogin->{Model_UsersLogins::COLUMN_IP_ADDRESS} : false;
+   }
+   
+   
+   /**
+    * Metoda vrací jestli informace o uživateli jsou privátní
+    * @return bool -- true pokud jsou data privátní
+    */
+   public function hasPrivateInfo() {
+      return (bool)$this->userHasPrivateInfo;
    }
 
    
@@ -194,19 +250,22 @@ class Auth_User {
    public function __sleep()
    {
       return array(
-          'userId', 
-          'userUserName', 
-          'userMail',
-          'userName',
-          'userSurname',
-          'userNote',
-          'groupName',
-          'groupId',
-          'isAdmin',
-          'isSiteAdmin',
-          'userSites',
-          'authenticatorName',
-          );
+         'userId', 
+         'userUserName', 
+         'userMail',
+         'userName',
+         'userSurname',
+         'userNote',
+         'userPhone',
+         'userAddress',
+         'userHasPrivateInfo',
+         'groupName',
+         'groupId',
+         'isAdmin',
+         'isSiteAdmin',
+         'userSites',
+         'authenticatorName',
+      );
    }
     
    public function __wakeup()
