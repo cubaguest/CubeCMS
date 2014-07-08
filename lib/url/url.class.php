@@ -91,6 +91,10 @@ class Url
       $this->parseUrl($url != null ? $url : $this->getCurrentUrl());
    }
    
+   /**
+    * Metoda vytvoří nový objekt
+    * @return static
+    */
    public static function getInstance()
    {
       $ref = new ReflectionClass(get_called_class());
