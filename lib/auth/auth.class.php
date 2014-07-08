@@ -79,6 +79,18 @@ class Auth extends TrObject {
       
    }
    
+   /**
+    * Metoda provede přihlášení interního uživatele
+    * @param Model_ORM_Record $user -- záznam uživatele z db
+    */
+   public static function loginUser(Model_ORM_Record $user)
+   {
+      $baseAuth = self::getAuthenticator('internal');
+      self::$user = new Auth_User($baseAuth, $user);
+      self::$login = true;
+      self::saveUserDetailToSession();
+   }
+   
    public static function addAuthenticator(Auth_Provider_Interface $auth)
    {
       self::$authenticators[strtolower(str_replace('Auth_Provider_', '', get_class($auth)))] = $auth;
