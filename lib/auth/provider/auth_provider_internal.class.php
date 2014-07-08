@@ -55,7 +55,7 @@ class Auth_Provider_Internal extends Auth_Provider implements Auth_Provider_Inte
                   $model->save($user);
                   unset ($model);
                   AppCore::getInfoMessages()->addMessage($tr->tr("Nové heslo bylo nastaveno."));
-                  Log::msg($tr->tr('Uživateli bylo obnoveno nové heslo'), null, self::$userName);
+                  Log::msg($tr->tr('Uživateli bylo obnoveno nové heslo'), null, $user->{Model_Users::COLUMN_SURNAME});
                }
                // uložení přihlášení
 
