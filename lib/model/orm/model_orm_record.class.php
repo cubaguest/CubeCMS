@@ -45,6 +45,20 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
       }
       $this->model = $model;
    }
+   
+   protected function getColsFunc($funcname)
+   {
+      return false;
+   }
+   
+   public function __call($name, $args)
+   {
+      $funcName = strtolower(str_replace('get', '', $name));
+      $colname = $this->getColsFunc($funcName);
+      if($colname){
+         return $this->$colname;
+      }
+   }
 
    /**
     * Magic pro nastavení slupce
