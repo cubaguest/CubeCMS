@@ -19,6 +19,8 @@ class Auth_User {
    protected $userName = null;
    protected $userSurname = null;
    protected $userNote = null;
+   protected $userPhone = null;
+   protected $userAddress = null;
    
    protected $groupName = VVE_DEFAULT_GROUP_NAME;
    protected $groupId = VVE_DEFAULT_ID_GROUP;
@@ -43,6 +45,8 @@ class Auth_User {
          $this->userName = $user->{Model_Users::COLUMN_NAME};
          $this->userSurname = $user->{Model_Users::COLUMN_SURNAME};
          $this->userNote = $user->{Model_Users::COLUMN_MAIL};
+         $this->userPhone = $user->{Model_Users::COLUMN_PHONE};
+         $this->userAddress = $user->{Model_Users::COLUMN_ADDRESS};
 
          $this->groupId = $user->{Model_Groups::COLUMN_ID};
          $this->groupName = $user->group_name;
@@ -131,7 +135,24 @@ class Auth_User {
    public function getUserMail() {
       return $this->userMail;
    }
+   
+   /**
+    * Metoda vrací telefon uživatele
+    * @return string -- telefon uživatele
+    */
+   public function getUserPhone() {
+      return $this->userPhone;
+   }
+   
+   /**
+    * Metoda vrací adresu uživatele
+    * @return string -- adresa uživatele
+    */
+   public function getUserAddress() {
+      return $this->userAddress;
+   }
 
+   
    /**
     * Metoda vrací jestli je uživatele administrátor pro dané stránky
     * @return bool -- true pokud je administrator
