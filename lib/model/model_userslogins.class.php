@@ -41,5 +41,10 @@ class Model_UsersLogins extends Model_ORM {
       $this->setPk(self::COLUMN_ID);
       $this->addForeignKey(self::COLUMN_ID_USER, 'Model_Users');
    }
+   
+   public static function getLastLogin($iduser)
+   {
+      $m = new self();
+      return $m->where(self::COLUMN_ID_USER." = :idu", array('idu' => $iduser))->record();
+   }
 }
-?>
