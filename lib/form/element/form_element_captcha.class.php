@@ -43,7 +43,7 @@ class Form_Element_Captcha extends Form_Element_Text {
       $this->createValidationLabels();
       $this->html()->clearContent();
       if(!$this->isValid AND $this->isPopulated) {
-         $this->html()->addClass(self::$cssClasses['error']);
+         $this->html()->addClass($this->cssClasses['error']);
          if(!self::$elementFocused){ $this->html()->setAttrib('autofocus','autofocus'); self::$elementFocused = true;}
       }
       $this->html()->addClass($this->getName()."_class")->addClass('captcha');
