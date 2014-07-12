@@ -216,14 +216,6 @@ class AppCore extends TrObject {
       // inicializace parametrů jádra a php
       $this->_initCore();
 
-      // přidání adresáře pro načítání knihoven
-      set_include_path(AppCore::getAppLibDir().self::ENGINE_LIB_DIR.DIRECTORY_SEPARATOR . PATH_SEPARATOR . get_include_path());
-
-      // Autoloaders
-      spl_autoload_extensions('.class.php,.php');
-      // spl_autoload_register(); PHP 5.3.10 make warnings here
-      spl_autoload_register(array('AppCore', 'libLoader'));
-      spl_autoload_register(array('AppCore', 'moduleLoader'));
       // bootstrap
       if(is_file(AppCore::getAppWebDir().'config'.DIRECTORY_SEPARATOR.'bootstrap.php')){
          include_once AppCore::getAppWebDir().'config'.DIRECTORY_SEPARATOR.'bootstrap.php';
@@ -371,6 +363,14 @@ class AppCore extends TrObject {
     */
    private function _initCore()
    {
+      // přidání adresáře pro načítání knihoven
+      set_include_path(AppCore::getAppLibDir().self::ENGINE_LIB_DIR.DIRECTORY_SEPARATOR . PATH_SEPARATOR . get_include_path());
+
+      // Autoloaders
+      spl_autoload_extensions('.class.php,.php');
+      // spl_autoload_register(); PHP 5.3.10 make warnings here
+      spl_autoload_register(array('AppCore', 'libLoader'));
+      spl_autoload_register(array('AppCore', 'moduleLoader'));
       // base classes
       $this->_initBaseClasses();
 

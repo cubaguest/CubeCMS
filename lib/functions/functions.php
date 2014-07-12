@@ -2,7 +2,8 @@
 
 /**
  * Soubor s globálními funkcemi, použitelnými v celém frameworku. každá funkce
- * začíná prefixem vve_ např. vve_názevfunkce
+ * začíná prefixem cube_cms_ např. cube_cms_názevfunkce
+ * @todo převést na objekty typu Utils
  */
 
 /**
@@ -12,13 +13,9 @@
  */
 function vve_to_ascii(&$string)
 {
-   if(defined('VVE_USE_ICONV') && VVE_USE_ICONV == false){
-      $string =  strtr($string, array("\xc3\xa1"=>"a","\xc3\xa4"=>"a","\xc4\x8d"=>"c","\xc4\x8f"=>"d","\xc3\xa9"=>"e","\xc4\x9b"=>"e","\xc3\xad"=>"i","\xc4\xbe"=>"l","\xc4\xba"=>"l","\xc5\x88"=>"n","\xc3\xb3"=>"o","\xc3\xb6"=>"o","\xc5\x91"=>"o","\xc3\xb4"=>"o","\xc5\x99"=>"r","\xc5\x95"=>"r","\xc5\xa1"=>"s","\xc5\xa5"=>"t","\xc3\xba"=>"u","\xc5\xaf"=>"u","\xc3\xbc"=>"u","\xc5\xb1"=>"u","\xc3\xbd"=>"y","\xc5\xbe"=>"z","\xc3\x81"=>"A","\xc3\x84"=>"A","\xc4\x8c"=>"C","\xc4\x8e"=>"D","\xc3\x89"=>"E","\xc4\x9a"=>"E","\xc3\x8d"=>"I","\xc4\xbd"=>"L","\xc4\xb9"=>"L","\xc5\x87"=>"N","\xc3\x93"=>"O","\xc3\x96"=>"O","\xc5\x90"=>"O","\xc3\x94"=>"O","\xc5\x98"=>"R","\xc5\x94"=>"R","\xc5\xa0"=>"S","\xc5\xa4"=>"T","\xc3\x9a"=>"U","\xc5\xae"=>"U","\xc3\x9c"=>"U","\xc5\xb0"=>"U","\xc3\x9d"=>"Y","\xc5\xbd"=>"Z")); 
-   } else {
-      $string = iconv('UTF-8', 'ASCII//TRANSLIT', $string);
-   }
-   return $string;
+   return Utils_String::toAscii($string);
 }
+
 
 /**
  * Funkce odstrani nepovolené znaky a diakritiku pro vložení jako klíč do db
@@ -27,24 +24,7 @@ function vve_to_ascii(&$string)
  */
 function vve_cr_url_key($string, $removeSlashes = true)
 {
-   if (is_null($string)) {
-      return $string;
-   } else if (is_array($string)) {
-      foreach ($string as $key => $variable) {
-         $string[$key] = vve_cr_url_key($variable, $removeSlashes);
-      }
-   } else {
-      $string = strip_tags($string);
-      $string = vve_to_ascii($string);
-      $slashes = null;
-      if ($removeSlashes) {
-         $slashes = '\/';
-      }
-      $regexp = array('/[^a-z0-9\/ _-]+/i', '/[ ' . $slashes . '-]+/', '/[\/]+/');
-      $replacements = array('', '-', URL_SEPARATOR);
-      $string = strtolower(preg_replace($regexp, $replacements, $string) );
-   }
-   return $string;
+   return Utils_Url::toUrlKey($string, $removeSlashes);
 }
 
 /**
@@ -54,16 +34,7 @@ function vve_cr_url_key($string, $removeSlashes = true)
  */
 function vve_cr_safe_file_name($string)
 {
-   if (is_array($string)) {
-      foreach ($string as $key => $variable) {
-         $string[$key] = vve_cr_safe_file_name($variable);
-      }
-   } else {
-      $string = vve_to_ascii($string);
-      $string = preg_replace("/[ +]{1,}/", "-", $string);
-      $string = preg_replace("/[\/()\"\'!?,]?/", "", $string);
-   }
-   return $string;
+   return Utils_String::toSafeFileName($string);
 }
 
 /**
@@ -92,8 +63,7 @@ function vve_parse_cfg_value($value, $delimiter = ';')
  */
 function vve_create_full_url_path(&$string, $atrNames = 'src|href')
 {
-   $string = preg_replace('/(src|href)="(?!http)([^"]+)"/i', '\\1="' . Url_Link::getMainWebDir() . '\\2"', $string);
-   return $string;
+   return Utils_Url::createFullUrlPaths($string, $atrNames);
 }
 
 /**
@@ -103,14 +73,7 @@ function vve_create_full_url_path(&$string, $atrNames = 'src|href')
  */
 function vve_strip_tags($value, $allowedtags = null)
 {
-   if (is_array($value)) {
-      foreach ($value as $key => $val) {
-         $value[$key] = vve_strip_tags($val, $allowedtags);
-      }
-   } else {
-      $value = strip_tags($value, $allowedtags);
-   }
-   return $value;
+   return Utils_Html::stripTags($value, $allowedtags);
 }
 
 /**
@@ -140,70 +103,10 @@ function vve_strip_tags($value, $allowedtags = null)
  */
 function vve_date($format, $timestamp = null)
 {
-   if ($timestamp instanceof DateTime) {
-      $timestamp = $timestamp->format("U");
-   } else if ($timestamp === null) {
-      $timestamp = time();
-   } else if(is_string($timestamp)){
-      $timestamp = new DateTime($timestamp);
-      $timestamp = $timestamp->format("U");
-   }
-
-   $replacementArray = array(
-      '%d' => array('func' => 'date', 'param' => 'j'),
-      '%D' => array('func' => 'date', 'param' => 'd'),
-      '%l' => array('func' => 'strftime', 'param' => '%a'),
-      '%L' => array('func' => 'strftime', 'param' => '%A'),
-      '%m' => array('func' => 'date', 'param' => 'n'),
-      '%M' => array('func' => 'date', 'param' => 'm'),
-      '%f' => array('func' => 'strftime', 'param' => '%b'),
-      '%b' => array('func' => 'strftime', 'param' => '%b'),
-      '%F' => array('func' => 'strftime', 'param' => '%B'),
-      '%B' => array('func' => 'strftime', 'param' => '%B'),
-      '%x' => array('func' => 'strftime', 'param' => '%x'),
-      '%X' => array('func' => 'strftime', 'param' => '%X'),
-      '%Y' => array('func' => 'date', 'param' => 'Y'),
-      '%y' => array('func' => 'date', 'param' => 'y'),
-      '%G' => array('func' => 'date', 'param' => 'G'),
-      '%H' => array('func' => 'date', 'param' => 'H'),
-      '%g' => array('func' => 'date', 'param' => 'g'),
-      '%h' => array('func' => 'date', 'param' => 'h'),
-      '%i' => array('func' => 'date', 'param' => 'i'),
-      '%s' => array('func' => 'date', 'param' => 's'),
-      '%J' => array('func' => '_vve_date_mtr', 'param' => '')
-   );
-
-   foreach ($replacementArray as $str => $func) {
-      $format = str_replace($str, call_user_func_array($func['func'], array($func['param'], (int) $timestamp)), $format);
-   }
-   return $format;
+   return Utils_DateTime::fdate($format, $timestamp);
 }
 
-/**              
- * Interní funkce pro překlad názvu měsíce po řadové čísloce
- * @param $param
- * @param $timestam
- * @return string
- */
-function _vve_date_mtr($param, $timestam){
-   $monthTR = array(
-      'cs' => array(
-         1 => 'ledna',
-         'února',
-         'března',
-         'dubna',
-         'května',
-         'června',
-         'července',
-         'srpna',
-         'září',
-         'října',
-         'listopadu',
-         'prosince',
-      )
-   );
-   return isset($monthTR[Locales::getLang()]) ? $monthTR[Locales::getLang()][date('n', $timestam)] : strftime('%B', $timestam);
-}
+///  TODO HERE !!!
 
 /**
  * Metoda kontroluje jestli zadaná URL adresa existuje
@@ -212,8 +115,7 @@ function _vve_date_mtr($param, $timestam){
  */
 function vve_url_exists($url)
 {
-   $headers = @get_headers($url);
-   return (bool) preg_match('/^HTTP\/\d\.\d\s+(200|301|302)/', $headers[0]);
+   return Utils_Url::exist($url);
 }
 
 /**
@@ -227,15 +129,7 @@ function vve_url_exists($url)
  */
 function vve_array_insert($array, $pos, $val, $valkey = null)
 {
-   $array2 = array_splice($array, $pos);
-   if ($valkey == null) {
-      $array[] = $val;
-   } else {
-      $array[$valkey] = $val;
-   }
-   $array = array_merge($array, $array2);
-
-   return $array;
+   return Utils_Array::insert($array, $pos, $val, $valkey);
 }
 
 /**
@@ -250,18 +144,7 @@ function vve_array_insert($array, $pos, $val, $valkey = null)
  */
 function vve_array_insert_by_key($array, $key, $val, $valkey = null, $sort = 'after')
 {
-   $pos = 0;
-   foreach ($array as $lkey => $lval) {
-      if ($lkey == $key)
-         break;
-      $pos++;
-   }
-   if ($sort == 'after') {
-      $array = vve_array_insert($array, $pos + 1, $val, $valkey);
-   } else {
-      $array = vve_array_insert($array, $pos, $val, $valkey);
-   }
-   return $array;
+   return Utils_Array::insertByKey($array, $key, $val, $valkey, $sort);
 }
 
 /**
@@ -270,30 +153,16 @@ function vve_array_insert_by_key($array, $key, $val, $valkey = null, $sort = 'af
  */
 function vve_strip_html_comment($str)
 {
-   if (is_array($str)) {
-      foreach ($str as $key => $s) {
-         $str[$key] = vve_strip_html_comment($s);
-      }
-   } else {
-      $str = preg_replace('/<!--(.|\s)*?-->/', '', $str);
-   }
-   return $str;
+   return Utils_Html::stripHtmlComment($str);
 }
 
 /**
  * Funkce rozparsuje a převede hodnotu velikosti na bajty
  * @param string $param -- řetězec s velikostí (např.: 5M => 5*1024*1024, 2k => 2*1024, ...)
  */
-function vve_parse_size($str)
+function vve_parse_size($str) 
 {
-   $val = trim($str);
-   $last = strtolower($str[strlen($str) - 1]);
-   switch ($last) {
-      case 'g': $val *= 1024;
-      case 'm': $val *= 1024;
-      case 'k': $val *= 1024;
-   }
-   return $val;
+   return Utils_String::parseSize($str);
 }
 
 /**
@@ -304,15 +173,7 @@ function vve_parse_size($str)
  */
 function vve_create_size_str($size, $round = 1)
 {
-   if($size > 1073741824){
-      return round($size/1073741824,$round)." GB";
-   } else if($size > 1048576){
-      return round($size/1048576,$round)." MB";
-   } else if($size > 1024) {
-      return round($size/1024,$round)." KB";
-   } else {
-      return $size." B";
-   }
+   return Utils_String::createSizeString($size, $round);
 }
 
 /**
@@ -321,9 +182,9 @@ function vve_create_size_str($size, $round = 1)
  * @param string - řetězec, který se má převést
  * @return string - převedený řetězec
  */
-function vve_br2nl($string)
+function vve_br2nl($string) 
 {
-    return preg_replace('/\<br(\s*)?\/?\>/i', "\n", $string);
+   return Utils_String::br2nl($string);
 }
 
 /**
@@ -334,96 +195,12 @@ function vve_br2nl($string)
  * @author Andrew Johnson, Jun 15, 2009 (modified Sep 13, 2009) 
  * @see http://www.itnewb.com/tutorial/Generating-Session-IDs-and-Random-Passwords-with-PHP
  */
-function vve_generate_token($len = 32, $md5 = true)
-{
-
-   # Seed random number generator
-   # Only needed for PHP versions prior to 4.2
-   mt_srand((double) microtime() * 1000000);
-
-   # Array of characters, adjust as desired
-   $chars = array(
-      'Q', '@', '8', 'y', '%', '^', '5', 'Z', '(', 'G', '_', 'O', '`',
-      'S', '-', 'N', '<', 'D', '{', '}', '[', ']', 'h', ';', 'W', '.',
-      '/', '|', ':', '1', 'E', 'L', '4', '&', '6', '7', '#', '9', 'a',
-      'A', 'b', 'B', '~', 'C', 'd', '>', 'e', '2', 'f', 'P', 'g', ')',
-      '?', 'H', 'i', 'X', 'U', 'J', 'k', 'r', 'l', '3', 't', 'M', 'n',
-      '=', 'o', '+', 'p', 'F', 'q', '!', 'K', 'R', 's', 'c', 'm', 'T',
-      'v', 'j', 'u', 'V', 'w', ',', 'x', 'I', '$', 'Y', 'z', '*'
-   );
-
-   # Array indice friendly number of chars; empty token string
-   $numChars = count($chars) - 1;
-   $token = '';
-
-   # Create random token at the specified length
-   for ($i = 0; $i < $len; $i++)
-      $token .= $chars[mt_rand(0, $numChars)];
-
-   # Should token be run through md5?
-   if ($md5) {
-
-      # Number of 32 char chunks
-      $chunks = ceil(strlen($token) / 32);
-      $md5token = '';
-
-      # Run each chunk through md5
-      for ($i = 1; $i <= $chunks; $i++)
-         $md5token .= md5(substr($token, $i * 32 - 32, 32));
-
-      # Trim the token
-      $token = substr($md5token, 0, $len);
-   } 
-   return $token;
+function vve_generate_token($len = 32, $md5 = true){
+   return cube_cms_generate_token($len, $md5);
 }
 
 function vve_image_cacher($path, $width = null, $height = null, $crop = false){
-   if(strpos($path, AppCore::getAppWebDir()) !== false){ // absolutní cesta
-      $path = str_replace(array(
-         AppCore::getAppWebDir(), DIRECTORY_SEPARATOR,
-      ),array(
-         Url_Request::getBaseWebDir(), "/",
-      ), $path);
-   }
-
-   // check if http
-   if(substr($path, 0, 4) != "http"){
-      $path = Url_Request::getBaseWebDir().$path;
-   }
-   
-   // explode by parts
-   $parts = explode('?', $path);
-   $getParasms = null;
-   $path = $parts[0];
-   if(isset($parts[1])){
-      $getParasms = $parts[1];
-   }
-   
-   
-   $sizes = $width.'x'.$height.($crop == false ? '' : 'c');
-   $origPath = str_replace(Url_Request::getBaseWebDir(), '', $path);
-   $cachePath = 'cache/imgc/'.Template::face().'/'.$sizes.'/'.$origPath;
-   $hash = sha1($sizes.VVE_DB_PASSWD);
-   // pokud má obrázek url adresu ze současného webu
-   if(strpos($path, Url_Request::getBaseWebDir()) !== false){
-      $path = str_replace(Url_Request::getBaseWebDir(),
-         Url_Request::getBaseWebDir().'cache/imgc/'.Template::face().'/'.$sizes.'/', $path);
-      $path .= "?hash=". urlencode($hash);
-   }
-   // pokud je obrázek přímo z data
-   else if(strpos($path, VVE_DATA_DIR."/") === 0){
-      $path = Url_Request::getBaseWebDir().'cache/imgc/'.Template::face().'/'.$sizes.'/'.$path
-          ."?hash=". urlencode($hash);
-   }
-   // create abs paths
-   $realOrigPath = realpath($origPath);
-   $realCachedPath = realpath($cachePath);
-   // check change time if cached is oldest then original remove
-   if(is_file($realCachedPath) && filemtime($realCachedPath) < filemtime($realOrigPath)){
-      @unlink($realCachedPath);
-      $path .= '&t='.time();
-   }
-   return $path.($getParasms != null ? '&'.$getParasms : null);
+   return Utils_Image::cache($path, $width, $height, $crop);
 }
 
 /**
@@ -432,11 +209,7 @@ function vve_image_cacher($path, $width = null, $height = null, $crop = false){
  */
 function vve_get_lang_string($string)
 {
-   if(isset($string[Locales::getLang()]) && $string[Locales::getLang()] != null){
-      return $string[Locales::getLang()];
-   } else if(isset($string[Locales::getDefaultLang()]) && $string[Locales::getDefaultLang()] != null){
-      return $string[Locales::getDefaultLang()];
-   }
-   return $string;
+   return Utils_String::getLangString($string);
 }
-?>
+
+
