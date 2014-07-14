@@ -36,7 +36,7 @@ class Form_Element_File extends Form_Element {
     */
    public function  __construct($name, $label = null, $prefix = null) {
       parent::__construct($name, $label,$prefix);
-      $this->setUploadDir(AppCore::getAppCacheDir());
+      $this->setUploadDir(AppCore::getAppCacheDir().uniqid('upload-'));
       $this->addValidation(new Form_Validator_FileSize(VVE_MAX_UPLOAD_SIZE));
       $this->cssClasses['containerClass'] = 'input-file-multiple';
    }
@@ -80,7 +80,7 @@ class Form_Element_File extends Form_Element {
       $this->isPopulated = true;
    }
     
-   private function uploadFile($name, $tmpName, $error, $mime, $size, $key = null)
+   protected function uploadFile($name, $tmpName, $error, $mime, $size, $key = null)
    {
       if($error == UPLOAD_ERR_OK) {
          $saveFileName = vve_cr_safe_file_name($name);
@@ -90,7 +90,7 @@ class Form_Element_File extends Form_Element {
             $this->isValid(false);
          } else {
             // kontrola adresáře
-            $dir = new Filesystem_Dir($this->uploadDir);
+            $dir = new Filesystem_Dir($this->getUploadDir());
             $dir->checkDir();
             if(!$this->overWrite){
                $saveFileName = File::creatUniqueName($saveFileName, $dir);
@@ -114,7 +114,7 @@ class Form_Element_File extends Form_Element {
       };
    }
 
-   private function _setFileValue($data, $key = null) 
+   protected function _setFileValue($data, $key = null) 
    {
       if($this->isDimensional() || $this->isMultiLang()){
          if(!is_array($this->values)){
@@ -130,7 +130,7 @@ class Form_Element_File extends Form_Element {
     * Metoda vytvoří chybovou hlášku podle zadaného kódu
     * @param int $errNumber -- id chybové hlášky
     */
-   private function creteUploadError($errNumber, $fileName) {
+   protected function creteUploadError($errNumber, $fileName) {
       switch($errNumber) {
          case 0: //no error; possible file attack!
             $this->errMsg()->addMessage(sprintf($this->tr('Nahrávání spustitelných souborů je zakázáno ("%s")'),$fileName));
@@ -162,7 +162,7 @@ class Form_Element_File extends Form_Element {
     * @param string $file -- cesta k souboru
     * @return string -- mime typ
     */
-   private function getMimeType($file) {
+   protected function getMimeType($file) {
       // for php 5.3 or finfo extension
       if(function_exists('finfo_open')) {
          // todo doladit pod win platformu (není validní cesta)
@@ -193,7 +193,7 @@ class Form_Element_File extends Form_Element {
     * @param string $file -- název souboru
     * @return string -- přípona
     */
-   private function getExtension($file) {
+   protected function getExtension($file) {
       //najdeme první tečku.
       $dotPos = strpos($file, '.');
       $extension = strtolower(substr($file, $dotPos+1, strlen($file)));
@@ -259,8 +259,17 @@ class Form_Element_File extends Form_Element {
     * @return Form_Element_File
     */
    public function setUploadDir($dir) {
-      $this->uploadDir = $dir;
+      $this->uploadDir = (string)$dir;
       return $this;
+   }
+   
+   /**
+    * Vrací aktuální adresář pro nahrání
+    * @return string
+    */
+   public function getUploadDir()
+   {
+      return $this->uploadDir;
    }
 
    /**
@@ -299,11 +308,11 @@ class Form_Element_File extends Form_Element {
       }
 
       if(isset($this->values['name'])){// pokud je jeden soubor
-         $fileObj = new $className($this->values['name'], $this->uploadDir);
+         $fileObj = new $className($this->values['name'], $this->getUploadDir());
       } else {
          $fileObj = array();
          foreach ($this->values as $file) {
-            $fileObj[] = new $className($file['name'], $this->uploadDir);
+            $fileObj[] = new $className($file['name'], $this->getUploadDir());
          }
       }
       return $fileObj;
