@@ -1040,7 +1040,10 @@ class AppCore extends TrObject {
          $jsPlugin->runAction(Url_Request::getInstance()->getAction(), Url_Request::getInstance()->getUrlParams(),
             Url_Request::getInstance()->getOutputType());
       } catch (Exception $exc) {
-         echo $exc->getMessage();
+         echo $exc->getMessage()."\n";
+         if(CUBE_CMS_DEBUG_LEVEL > 0){
+            echo $exc->getTraceAsString();
+         }
       }
       exit();
    }
