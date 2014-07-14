@@ -78,7 +78,7 @@ class Utils_Array {
             $replace_keys[] = '"' . $value . '"';
          }
       }
-      $json = json_encode($params);
+      $json = json_encode($array);
       return str_replace($replace_keys, $value_arr, $json);
    }
 
