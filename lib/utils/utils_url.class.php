@@ -15,17 +15,17 @@ class Utils_Url {
     * @param string/array $string -- řetězec nebo pole pro převedení
     * @return string/array -- řetězec nebo pole s převedenými znaky
     */
-   public static function toUrlKey($string, $removeSlashes = true)
+   public static function toUrlKey($string, $removeSlashes = true, $lang = false)
    {
       if (is_null($string)) {
          return $string;
       } else if (is_array($string)) {
          foreach ($string as $key => $variable) {
-            $string[$key] = vve_cr_url_key($variable, $removeSlashes);
+            $string[$key] = self::toUrlKey($variable, $removeSlashes, $lang);
          }
       } else {
          $string = strip_tags($string);
-         $string = Utils_String::toAscii($string);
+         $string = Utils_String::toAscii($string, $lang);
          $slashes = null;
          if ($removeSlashes) {
             $slashes = '\/';
@@ -53,5 +53,21 @@ class Utils_Url {
    {
       $headers = @get_headers($url);
       return (bool) preg_match('/^HTTP\/\d\.\d\s+(200|301|302)/', $headers[0]);
+   }
+   
+   /**
+    * Převede systémovou cestu na url adresu
+    * @param string $path
+    * @return string
+    */
+   public static function pathToSystemUrl($path)
+   {
+      return str_replace(array(
+         AppCore::getAppWebDir(), 
+         DIRECTORY_SEPARATOR, 
+      ), array(
+         Url_Link::getWebURL(),
+         '/'
+      ), $path);
    }
 }
