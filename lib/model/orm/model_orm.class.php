@@ -114,6 +114,16 @@ class Model_ORM extends Model implements ArrayAccess {
          $this->rowClass = get_class($this).'_Record';
       }
    }
+   
+   /**
+    * Metoda vytvoří nový objekt
+    * @return static
+    */
+   public static function getInstance()
+   {
+      $ref = new ReflectionClass(get_called_class());
+      return $ref->newInstanceArgs(func_get_args());
+   }
 
    /**
     * Metody pro nasatvení modelu
