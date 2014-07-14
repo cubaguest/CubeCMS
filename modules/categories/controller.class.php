@@ -203,9 +203,9 @@ class Categories_Controller extends Controller {
             if ($variable == null AND $names[$lang] == null) {
                $urlkey[$lang] = null;
             } else if ($variable == null AND $names[$lang] != null) {
-               $urlkey[$lang] = $urlPath . vve_cr_url_key(strtolower($names[$lang]));
+               $urlkey[$lang] = $urlPath . Utils_Url::toUrlKey(strtolower($names[$lang]), true, $lang);
             } else {
-               $urlkey[$lang] = vve_cr_url_key(strtolower($variable), false);
+               $urlkey[$lang] = Utils_Url::toUrlKey(strtolower($variable), false, $lang);
             }
             $urlkey[$lang] = self::createUniqueUrlKey($urlkey[$lang], $lang, $record->{Model_Category::COLUMN_ID});
          }
@@ -237,7 +237,7 @@ class Categories_Controller extends Controller {
                $datadir = substr($datadir, $last + 1);
             }
          } else {
-            $datadir = vve_cr_safe_file_name($form->datadir->getValues());
+            $datadir = Utils_String::toSafeFileName($form->datadir->getValues());
             // pokud byl předtím definován dojde k přesunu
             if ($record->{Model_Category::COLUMN_DATADIR} != $datadir) {
                $dir = new Filesystem_Dir(AppCore::getAppWebDir() . VVE_DATA_DIR . DIRECTORY_SEPARATOR . $record->{Model_Category::COLUMN_DATADIR});
@@ -348,9 +348,9 @@ class Categories_Controller extends Controller {
             if ($variable == null AND $names[$lang] == null) {
                $urlkey[$lang] = null;
             } else if ($variable == null) {
-               $urlkey[$lang] = $urlPath . vve_cr_url_key(strtolower($names[$lang]));
+               $urlkey[$lang] = $urlPath . Utils_Url::toUrlKey(strtolower($names[$lang]), true, $lang);
             } else {
-               $urlkey[$lang] = $urlPath . vve_cr_url_key(strtolower($variable), false);
+               $urlkey[$lang] = $urlPath . Utils_Url::toUrlKey(strtolower($variable), false, $lang);
             }
             $urlkey[$lang] = self::createUniqueUrlKey($urlkey[$lang], $lang);
          }
@@ -371,7 +371,7 @@ class Categories_Controller extends Controller {
                $dataDir = substr($dataDir, $last + 1);
             }
          } else {
-            $dataDir = vve_cr_safe_file_name($form->datadir->getValues());
+            $dataDir = Utils_String::toSafeFileName($form->datadir->getValues());
          }
 
          $record = $categoryModel->newRecord();
@@ -968,7 +968,7 @@ class Categories_Controller extends Controller {
 //         echo 'urlpart '.$lang.' '.$urlpart.'<br />';
          // pokud nemá definovaný url klíč
          if($urlpart == null && $record[Model_Category::COLUMN_URLKEY][$lang] != null){
-            $urlpart = vve_cr_url_key($record[Model_Category::COLUMN_URLKEY][$lang]);
+            $urlpart = Utils_Url::toUrlKey($record[Model_Category::COLUMN_URLKEY][$lang], true, $lang);
          }
          // ????
          if($urlpart == null){ continue; }
@@ -1039,11 +1039,11 @@ class Categories_Controller extends Controller {
          if ($name == null) {
             $urlkey[$lang] = null;
          } else {
-            $urlkey[$lang] = $urlPath . vve_cr_url_key(strtolower($name), true);
+            $urlkey[$lang] = $urlPath . Utils_Url::toUrlKey(strtolower($name), true, $lang);
          }
          $urlkey[$lang] = self::createUniqueUrlKey($urlkey[$lang], $lang);
       }
-      $cat->{Model_Category::COLUMN_DATADIR} = vve_cr_safe_file_name($names[Locales::getDefaultLang()]);
+      $cat->{Model_Category::COLUMN_DATADIR} = Utils_String::toSafeFileName($names[Locales::getDefaultLang()]);
       $cat->{Model_Category::COLUMN_URLKEY} = $urlkey;
    
       // uložení kategorie a zažazení do stromu
