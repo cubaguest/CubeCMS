@@ -7,7 +7,7 @@
 class Text_View extends View {
    public function mainView() {
 //      $this->template()->addFile('tpl://'.$this->category()->getParam(Text_Controller::PARAM_TPL_MAIN, 'text.phtml'));
-      $this->template()->addFile($this->getTemplate());
+      $this->template()->addFile($this->getTemplate('main'));
 
       if($this->category()->getRights()->isWritable()) {
          $toolbox = new Template_Toolbox2();
