@@ -29,6 +29,7 @@ class Utils_String {
       } else {
          $string = iconv('UTF-8', 'ASCII//TRANSLIT', $string);
       }
+      return $string;
    }
 
    /**
