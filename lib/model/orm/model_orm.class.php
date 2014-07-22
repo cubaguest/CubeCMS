@@ -498,7 +498,7 @@ class Model_ORM extends Model implements ArrayAccess {
     * Funkce pro na čtení dat pomocí jednoho záznamu
     * @param type $fetchParams
     * @return boolean
-    * @internal nen� stabiln� API!!!
+    * @internal není stabilní API!!!
     */
    public function fetchRow($fetchParams = self::FETCH_LANG_CLASS)
    {
