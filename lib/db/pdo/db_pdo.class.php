@@ -58,7 +58,10 @@ class Db_PDO extends PDO {
             self::$instance = $this;
          } else {
             $args = func_get_args();
-            call_user_func_array(array($this, "__construct"), $args);
+            $reflector = new ReflectionClass(get_class($this));
+            $parent = $reflector->getParentClass();
+            $method = $parent->getMethod('__construct');
+            $method->invokeArgs($this, $args);
          }
          $this->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
          $this->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
