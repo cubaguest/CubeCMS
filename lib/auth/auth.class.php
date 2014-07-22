@@ -52,9 +52,9 @@ class Auth extends TrObject {
       self::checkUserIslogIn();
       
       if(!self::isLogin()){
-         foreach (self::$authenticators as $auth) {
-            if($auth->isCalled()){
-               $authenticatedUser = $auth->authenticate();
+         foreach (self::$authenticators as $authenticator) {
+            if($authenticator->isCalled()){
+               $authenticatedUser = $authenticator->authenticate();
                if($authenticatedUser){
                   self::$user = $authenticatedUser;
                   self::$login = true;
@@ -79,10 +79,6 @@ class Auth extends TrObject {
       
    }
    
-   /**
-    * Metoda provede přihlášení interního uživatele
-    * @param Model_ORM_Record $user -- záznam uživatele z db
-    */
    public static function loginUser(Model_ORM_Record $user)
    {
       $baseAuth = self::getAuthenticator('internal');
@@ -90,7 +86,7 @@ class Auth extends TrObject {
       self::$login = true;
       self::saveUserDetailToSession();
    }
-   
+
    public static function addAuthenticator(Auth_Provider_Interface $auth)
    {
       self::$authenticators[strtolower(str_replace('Auth_Provider_', '', get_class($auth)))] = $auth;
@@ -109,7 +105,7 @@ class Auth extends TrObject {
    /**
     * 
     * @param type $name
-    * @return Auth_Provider_Interface, boolean
+    * @return Auth_Provider_Interface|boolean
     */
    public static function getAuthenticator($name = null)
    {
@@ -145,7 +141,7 @@ class Auth extends TrObject {
    
    private static function checkEnablePermanentLogin()
    {
-      if(isset ($_POST[self::FORM_PERMANENT_LOGIN]) AND $_POST[self::FORM_PERMANENT_LOGIN] == 'on'){
+      if(self::getUser()->getAuthenticator()->isPermanentLogin()){
          self::createPermanentLogin();
       }
    }
@@ -330,7 +326,9 @@ class Auth extends TrObject {
    {
       $tr = new Translator();
       
-      
+      /**
+       * @todo přepsat do Auth_Provider včetně generování emailu
+       */
       $modelUsr = new Model_Users();
       $user = $modelUsr->where(Model_Users::COLUMN_USERNAME.' = :uname OR '.Model_Users::COLUMN_MAIL." = :mail",
          array('uname' => $userName, 'mail' => $userName))->record();

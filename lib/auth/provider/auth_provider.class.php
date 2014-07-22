@@ -46,6 +46,11 @@ abstract class Auth_Provider extends TrObject implements Auth_Provider_Interface
       return false;
    }
    
+   public function isPermanentLogin()
+   {
+      return false;
+   }
+   
    /**
     * Metoda pro generování nového hesla
     * @param $userName
@@ -58,5 +63,15 @@ abstract class Auth_Provider extends TrObject implements Auth_Provider_Interface
    protected function getName()
    {
       return strtolower(str_replace('Auth_Provider_', '', get_class($this)));
+   }
+   
+   public function getLoginContent()
+   {
+      return null;
+   }
+   
+   public function getLoginForm()
+   {
+      return null;
    }
 }

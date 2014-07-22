@@ -40,9 +40,22 @@ interface Auth_Provider_Interface {
    
    public function isCalled();
  
+   public function isPermanentLogin();
+   
    /**
     * vrací, které operace jsou povoleny
     */
    public function operationIsAllowed($operation);
    
+   /**
+    * Metoda vrací obsah pro přihlášení
+    * @return string html obsah pro přihlášení
+    */
+   public function getLoginContent();
+   
+   /**
+    * Metoda vrací formulář pro přihlášení
+    * @return Form|null formulář pro přihlášení
+    */
+   public function getLoginForm();
 }

@@ -13,12 +13,18 @@
  */
 
 class Auth_Provider_Internal extends Auth_Provider implements Auth_Provider_Interface {
-   const FORM_USERNAME = 'login_username';
-   const FORM_PASSWORD = 'login_password';
-   const FORM_SUBMIT = 'login_submit';
+   const FORM_USERNAME = 'username';
+   const FORM_PASSWORD = 'password';
+   const FORM_SUBMIT = 'login';
+   const FORM_PERMANENT = 'permanent';
    
+   /**
+    *
+    * @var Form
+    */
+   protected $form = false;
+
    public function __construct($defaultIdGroup = 1, $params = array()){
-      
    }
    
    /**
@@ -26,54 +32,49 @@ class Auth_Provider_Internal extends Auth_Provider implements Auth_Provider_Inte
     * @return boolean -- true pokud se uživatele podařilo přihlásit
     */
    public function authenticate() {
-      $tr = new Translator();
-      if (($_POST[self::FORM_USERNAME] == "") and ($_POST[self::FORM_PASSWORD] == "")){
-         AppCore::getUserErrors()->addMessage($tr->tr("Byly zadány prázdné údaje"));
-         
-      } else {
-         $user = Model_Users::getUsersByUsername($_POST[self::FORM_USERNAME]);
+      $form = $this->getLoginForm();
+
+      if($form->isSend() && $form->isValid()){
+         $user = Model_Users::getUsersByUsername($form->{self::FORM_USERNAME}->getValues());
          if (!$user){
-            AppCore::getUserErrors()->addMessage($tr->tr("Nepodařilo se přihlásit. Zřejmě váš účet neexistuje."));
+            $form->{self::FORM_USERNAME}->setError($this->tr('Nepodařilo se přihlásit. Zřejmě váš účet neexistuje.'));
             return false;
-            
          } else if($user->{Model_Users::COLUMN_BLOCKED} == 1) {
-            AppCore::getUserErrors()->addMessage($tr->tr("Nepodařilo se přihlásit. Zřejmě váš účet neexistuje."));
+            $form->{self::FORM_USERNAME}->setError($this->tr('Nepodařilo se přihlásit. Váš účet je bloková.'));
             return false;
-            
-         } else {
-            if (Auth::cryptPassword(htmlentities($_POST[self::FORM_PASSWORD],ENT_QUOTES)) == $user->{Model_Users::COLUMN_PASSWORD}
-               OR (
-                   $user->{Model_Users::COLUMN_PASSWORD_RESTORE} != null
-                     AND Auth::cryptPassword(htmlentities($_POST[self::FORM_PASSWORD],ENT_QUOTES)) == $user->{Model_Users::COLUMN_PASSWORD_RESTORE})
-                     ){
-                     
-               // pokud je použito obnovné heslo uožíme jej
-               if(Auth::cryptPassword(htmlentities($_POST[self::FORM_PASSWORD],ENT_QUOTES)) == $user->{Model_Users::COLUMN_PASSWORD_RESTORE}){
-                  $user->{Model_Users::COLUMN_PASSWORD} = $user->{Model_Users::COLUMN_PASSWORD_RESTORE};
-                  $user->{Model_Users::COLUMN_PASSWORD_RESTORE} = null;
-                  $model = new Model_Users();
-                  $model->save($user);
-                  unset ($model);
-                  AppCore::getInfoMessages()->addMessage($tr->tr("Nové heslo bylo nastaveno."));
-                  Log::msg($tr->tr('Uživateli bylo obnoveno nové heslo'), null, $user->{Model_Users::COLUMN_SURNAME});
-               }
-               // uložení přihlášení
-
-               $modelUserLogins = new Model_UsersLogins();
-               $newLogin = $modelUserLogins->newRecord();
-               $newLogin->{Model_UsersLogins::COLUMN_ID_USER} = $user->getPK();
-               $newLogin->{Model_UsersLogins::COLUMN_IP_ADDRESS} = $_SERVER['REMOTE_ADDR'];
-               $newLogin->{Model_UsersLogins::COLUMN_BROWSER} = $_SERVER['HTTP_USER_AGENT'];
-               $modelUserLogins->save($newLogin);
-
-               $userObj = new Auth_User($this, $user);
-               Log::msg($tr->tr('Uživatel byl přihlášen'), null, $userObj->getUserName());
-               return $userObj;
-            } else {
-               AppCore::getUserErrors()->addMessage($tr->tr("Bylo zadáno špatné heslo."));
-               return false;
-            }
          }
+         $cryptedPassord = Auth::cryptPassword(htmlentities($form->{self::FORM_PASSWORD}->getValues(),ENT_QUOTES));
+         if ( $cryptedPassord != $user->{Model_Users::COLUMN_PASSWORD}
+            AND $cryptedPassord != $user->{Model_Users::COLUMN_PASSWORD_RESTORE}
+            ){
+            $form->{self::FORM_PASSWORD}->setError($this->tr('Bylo zadáno špatné heslo.'));
+            return false;
+         }
+      }
+         
+      if($form->isValid()){
+         // pokud je použito obnovné heslo uožíme jej
+         if(Auth::cryptPassword(htmlentities($form->{self::FORM_PASSWORD}->getValues(),ENT_QUOTES)) == $user->{Model_Users::COLUMN_PASSWORD_RESTORE}){
+            $user->{Model_Users::COLUMN_PASSWORD} = $user->{Model_Users::COLUMN_PASSWORD_RESTORE};
+            $user->{Model_Users::COLUMN_PASSWORD_RESTORE} = null;
+            $model = new Model_Users();
+            $model->save($user);
+            unset ($model);
+            AppCore::getInfoMessages()->addMessage($tr->tr("Nové heslo bylo nastaveno."));
+            Log::msg($tr->tr('Uživateli bylo obnoveno nové heslo'), null, $user->{Model_Users::COLUMN_SURNAME});
+         }
+         // uložení přihlášení
+
+         $modelUserLogins = new Model_UsersLogins();
+         $newLogin = $modelUserLogins->newRecord();
+         $newLogin->{Model_UsersLogins::COLUMN_ID_USER} = $user->getPK();
+         $newLogin->{Model_UsersLogins::COLUMN_IP_ADDRESS} = $_SERVER['REMOTE_ADDR'];
+         $newLogin->{Model_UsersLogins::COLUMN_BROWSER} = $_SERVER['HTTP_USER_AGENT'];
+         $modelUserLogins->save($newLogin);
+
+         $userObj = new Auth_User($this, $user);
+         Log::msg($this->tr('Uživatel byl přihlášen'), null, $userObj->getUserName());
+         return $userObj;
       }
       return false;
    }
@@ -95,7 +96,12 @@ class Auth_Provider_Internal extends Auth_Provider implements Auth_Provider_Inte
    public function isCalled() 
    {
       // kontrola odhlášení
-      return (isset($_POST[self::FORM_SUBMIT]) OR isset ($_POST[self::FORM_SUBMIT.'_x']));
+      return $this->getLoginForm()->isSend();
+   }
+   
+   public function isPermanentLogin()
+   {
+      return $this->getLoginForm()->{self::FORM_PERMANENT}->getValues();
    }
    
    /**
@@ -104,5 +110,44 @@ class Auth_Provider_Internal extends Auth_Provider implements Auth_Provider_Inte
     */
    public function restorePassword()
    {
+   }
+   
+   /**
+    * Vrátí obsah pro přihlášení
+    * @return string
+    */
+   public function getLoginContent()
+   {
+      return (string)$this->getLoginForm();
+   }
+   
+   /**
+    * Metoda vytvoří formulář přihlášení
+    * @return \Form
+    */
+   public function getLoginForm()
+   {
+      if(!$this->form){
+         $this->form = new Form('login_');
+         $this->form->setAction(new Url());
+
+         $eUserName = new Form_Element_Text(self::FORM_USERNAME, $this->tr('Jméno / e-mail'));
+         $eUserName->addValidation(new Form_Validator_NotEmpty($this->tr('Nebylo vyplěnno uživatelksé jméno')));
+         $this->form->addElement($eUserName);
+
+         $ePassword = new Form_Element_Password(self::FORM_PASSWORD, $this->tr('Heslo'));
+         $ePassword->addValidation(new Form_Validator_NotEmpty($this->tr('Nebylo vyplěnno heslo')));
+         $this->form->addElement($ePassword);
+
+         $ePermanent = new Form_Element_Checkbox(self::FORM_PERMANENT, $this->tr('aktivovat trvalé přihlášení'));
+         $this->form->addElement($ePermanent);
+
+         $eSubmit = new Form_Element_Submit(self::FORM_SUBMIT, $this->tr('Přihlásit'));
+         $this->form->addElement($eSubmit);
+
+         $this->form->isSend();
+      
+      }
+      return $this->form;
    }
 }
