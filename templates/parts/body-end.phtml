@@ -1,5 +1,5 @@
 <?php
-if(VVE_DEBUG_LEVEL > 1 && !Template::browser()->isMobile() ) {
+if(VVE_DEBUG_LEVEL > 1 && !Template::browser()->isMobile() || isset($_GET['debug'])) {
    $this->addFile('css://debug.less');
    ?>
    <div id="debug">
