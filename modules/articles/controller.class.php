@@ -1751,7 +1751,7 @@ class Articles_Controller extends Controller {
       $article->{Articles_Model::COLUMN_NAME} = $msg['subject'];
       $article->{Articles_Model::COLUMN_TEXT} = $msg['plain'];
       if($msg['html'] != null){
-         Loader::loadLib('htmlpurifier');
+         Loader::loadExternalLib('htmlpurifier');
 
          $purifierConfig = HTMLPurifier_Config::createDefault();
          $purifierConfig->set('HTML.TidyLevel', 'heavy' );
