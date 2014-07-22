@@ -2,8 +2,8 @@
 /**
  * Třída pro výpisy a debug časového zpracování
  *
- * @copyright  	Copyright (c) 2010 Jakub Matas
- * @version    	$Id: $ VVE 7.4 $Revision: $
+ * @copyright     Copyright (c) 2010 Jakub Matas
+ * @version       $Id: $ VVE 7.4 $Revision: $
  * @author        $Author: $ $Date: $
  *                $LastChangedBy: $ $LastChangedDate: $
  * @abstract      Třída pro obsluhu časových razítek
@@ -50,26 +50,26 @@ class Debug_Timer {
     */
    public function timerStart($point = null)
    {
-      self::$timers[$point == null ? $this->point : $point]['start'] = microtime();
+      self::$timers[$point == null ? $this->point : $point]['start'] = microtime(true);
       return $this;
    }
 
    public static function timerStop($point, $msg = null)
    {
-      $t = microtime() - self::$timers[$point]['start'];
+      $t = microtime(true) - self::$timers[$point]['start'];
       self::$timers[$point]['times'][] = array('time' => $t, 'msg' => $msg);
    }
    
    public function start()
    {
-      self::$timers[$this->point]['start'] = microtime();
+      self::$timers[$this->point]['start'] = microtime(true);
       self::$timers[$this->point]['times'][] = array('time' => 0, 'msg' => 'TIMER START');
       return $this;
    }
    
    public function stop($msg = null)
    {
-      $t = microtime() - self::$timers[$this->point]['start'];
+      $t = microtime(true) - self::$timers[$this->point]['start'];
       self::$timers[$this->point]['times'][] = array('time' => $t, 'msg' => $msg);
       return $this;
    }
