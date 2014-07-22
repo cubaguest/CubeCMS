@@ -12,6 +12,7 @@
  * @license    GNU General Public License v. 2 viz. Docs/license.txt
  * @internal   Last ErrorCode 22
  */
+include_once dirname(__FILE__).DIRECTORY_SEPARATOR.'lib'.DIRECTORY_SEPARATOR.'loader.class.php';
 include_once dirname(__FILE__).DIRECTORY_SEPARATOR.'lib'.DIRECTORY_SEPARATOR.'trobject.class.php';
 include_once dirname(__FILE__).DIRECTORY_SEPARATOR.'lib'.DIRECTORY_SEPARATOR.'debug'.DIRECTORY_SEPARATOR.'debug.class.php';
 class AppCore extends TrObject {
@@ -369,8 +370,10 @@ class AppCore extends TrObject {
       // Autoloaders
       spl_autoload_extensions('.class.php,.php');
       // spl_autoload_register(); PHP 5.3.10 make warnings here
-      spl_autoload_register(array('AppCore', 'libLoader'));
-      spl_autoload_register(array('AppCore', 'moduleLoader'));
+      Loader::loadCache();
+      spl_autoload_register(array('Loader', 'cacheAutoLoader'));
+      spl_autoload_register(array('Loader', 'libAutoLoader'));
+      spl_autoload_register(array('Loader', 'moduleAutoLoader'));
       // base classes
       $this->_initBaseClasses();
 
@@ -466,88 +469,9 @@ class AppCore extends TrObject {
       }
    }
 
-   /**
-    * Metoda pro automatické načtení knihoven
-    * @todo refaktoring nutný
-    */
-   public static function libLoader($classOrigName)
-   {
-      $file = strtolower($classOrigName) . '.class.php';
-      $classL = strtolower($classOrigName);
-      $pathDirs = explode('_', $classL);
-      $pathFull = implode('/', $pathDirs);
-      array_pop($pathDirs); // remove last path item
-      $pathShort = implode('/', $pathDirs);
-
-//      Debug::log(array(
-//         'loader' => 'LIB',
-//         '$classOrigName' => $classOrigName,
-//         '$file' => $file,
-//         '$pathDirs' => $pathDirs,
-//         '$pathFull' => $pathFull,
-//         '$pathShort' => $pathShort,
-//      ));
-      // short path
-      if (is_file(AppCore::getAppLibDir() . AppCore::ENGINE_LIB_DIR
-            . DIRECTORY_SEPARATOR . $pathShort . DIRECTORY_SEPARATOR . $file)) {
-         require AppCore::getAppLibDir() . AppCore::ENGINE_LIB_DIR
-            . DIRECTORY_SEPARATOR . $pathShort . DIRECTORY_SEPARATOR . $file;
-//         Debug::log('used short');
-         return true;
-      }
-      // full path
-      if (is_file(AppCore::getAppLibDir() . AppCore::ENGINE_LIB_DIR
-      . DIRECTORY_SEPARATOR . $pathFull . DIRECTORY_SEPARATOR . $file)) {
-         require AppCore::getAppLibDir() . AppCore::ENGINE_LIB_DIR
-            . DIRECTORY_SEPARATOR . $pathFull . DIRECTORY_SEPARATOR . $file;
-//         Debug::log('used long');
-         return true;
-      }
-      return false;
-   }
-   
-   /**
-    * Metoda pro automatické načtení knihoven
-    * @todo refaktoring nutný
-    */
-   public static function moduleLoader($classOrigName)
-   {
-      $file = strtolower($classOrigName) . '.class.php';
-      $classL = strtolower($classOrigName);
-      $pathDirs = explode('_', $classL);
-      $moduleFile = end($pathDirs) . '.class.php';
-      $pathFull = implode('/', $pathDirs);
-      array_pop($pathDirs);
-      $pathShort = implode('/', $pathDirs);
-//      Debug::log(array(
-//         'loader' => 'MODULE',
-//         '$classOrigName' => $classOrigName,
-//         '$file' => $file,
-//         '$pathDirs' => $pathDirs,
-//         '$pathFull' => $pathFull,
-//         '$pathShort' => $pathShort,
-//      ));
-      // short path
-      if (is_file(AppCore::getAppLibDir() . AppCore::MODULES_DIR
-            . DIRECTORY_SEPARATOR . $pathShort . DIRECTORY_SEPARATOR . $moduleFile)) {
-         require AppCore::getAppLibDir() . AppCore::MODULES_DIR
-            . DIRECTORY_SEPARATOR . $pathShort . DIRECTORY_SEPARATOR . $moduleFile;
-//         Debug::log('used module short');
-         return true;
-      }
-      // full path
-      if (is_file(AppCore::getAppLibDir() . AppCore::MODULES_DIR
-      . DIRECTORY_SEPARATOR . $pathFull . DIRECTORY_SEPARATOR . $moduleFile)) {
-         require AppCore::getAppLibDir() . AppCore::MODULES_DIR
-            . DIRECTORY_SEPARATOR . $pathFull . DIRECTORY_SEPARATOR . $moduleFile;
-//         Debug::log('used module long');
-         return true;
-      }
-      return false;
-   }
-
    public static function shutDownHandler() 
    {
+      Loader::storeCache();
       // @todo dodělat vypisování chyb při špatném ukončení skriptu
    }
    /**
