@@ -491,6 +491,66 @@ class Model_ORM extends Model implements ArrayAccess {
       }
       return $r;
    }
+   
+   protected $stmt = false;
+   protected $stmtSQL = false;
+   /**
+    * Funkce pro na čtení dat pomocí jednoho záznamu
+    * @param type $fetchParams
+    * @return boolean
+    * @internal nen� stabiln� API!!!
+    */
+   public function fetchRow($fetchParams = self::FETCH_LANG_CLASS)
+   {
+      $r = false;
+      if(!$this->stmt){
+         $sql = null;
+         if($this->currentSql == null){
+            $sql = 'SELECT ' . $this->createSQLSelectColumns() . ' FROM `' 
+                . $this->getDbName() . '`.`' . $this->getTableName() . '` AS ' . $this->getTableShortName();
+            $this->createSQLJoins($sql);
+            $this->createSQLWhere($sql, $this->getTableShortName());
+            $this->createSQLGroupBy($sql); // group by
+            $this->createSQLHaving($sql);
+            $this->createSQLOrder($sql);
+            $this->createSQLLimi($sql);
+            $this->stmt = $this->getDb()->prepare($sql);
+            $this->bindSQLWhere($this->stmt);
+            $this->bindSQLHaving($this->stmt);
+            $this->bindSQLLimit($this->stmt);
+            $this->bindValues($this->stmt);
+         } else if($this->currentSql instanceof PDOStatement) {
+            $this->stmt = $this->currentSql;
+            $this->currentSql = null;
+         } else {
+            $this->stmt = $this->getDb()->prepare($this->currentSql);
+            $this->stmt = $this->bindValues($this->stmt);
+            $this->currentSql = null;
+         }
+         try {
+            $r = false;
+            if ($fetchParams == self::FETCH_LANG_CLASS OR $fetchParams == self::FETCH_PKEY_AS_ARR_KEY) {
+               $this->stmt->setFetchMode(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, $this->rowClass, array($this->tableStructure, true, $this));
+               $this->stmt->execute();
+            } else {
+               $this->stmt->setFetchMode($fetchParams);
+               $this->stmt->execute();
+            }
+         } catch (PDOException $exc) {
+            $this->unLock();
+            CoreErrors::addException($exc);
+            if (AppCore::getUserErrors() instanceof Messages AND VVE_DEBUG_LEVEL > 0) {
+               AppCore::getUserErrors()->addMessage('ERROR SQL: ' . $sql);
+            }
+         }
+      }
+      if ($fetchParams == self::FETCH_LANG_CLASS OR $fetchParams == self::FETCH_PKEY_AS_ARR_KEY) {
+         return $this->stmt->fetch(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE);
+      } else {
+         return $this->stmt->fetch($fetchParams);
+      }
+      return false;
+   }
 
    /**
     * Metoda vrací záznamy z db
