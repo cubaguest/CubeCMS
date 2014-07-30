@@ -1,14 +1,10 @@
 <?
-if($maintenanceTitle == null){
-   $maintenanceTitle =
-   'Aktualizace systému';
-}
-if($maintenanceMessage == null){
-   $maintenanceMessage =
+$url = "http://" . $_SERVER['SERVER_NAME'];
+$maintenanceTitle = 'Aktualizace systému';
+$maintenanceMessage =
    'Systém usilovně aktualizujeme na novější verzi.<br />
    Zkuste prosím přijít později.<br /><br />
-   Tým Cube-Studio';
-}
+';
 setlocale(LC_ALL, 'cs_CZ.UTF-8');
 echo '<?xml version="1.0" encoding="UTF-8"?>'; ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -61,13 +57,15 @@ echo '<?xml version="1.0" encoding="UTF-8"?>'; ?>
       <div id="mainBoxWrap">
       <div id="mainBox">
          <h1><?= $maintenanceTitle; ?></h1>
-         <img class="mainImage" alt="maintance" src="images/maintenance.gif" />
+         <img class="mainImage" alt="maintance" src="<?=$url?>/images/maintenance.gif" />
          <p class="mainBoxText"><?= $maintenanceMessage ?></p>
-         <?if($maintenanceDeadTime != null){?>
-         <p class="mainBoxText"><strong>Předpokládaný čas opětovného spuštění:</strong>&nbsp;<?=$maintenanceDeadTime;?></p>
+         <?if(defined('MAINTENANCE_DATE') && MAINTENANCE_DATE != null){?>
+         <p class="mainBoxText"><strong>Předpokládaný čas opětovného spuštění:</strong>&nbsp;<?=MAINTENANCE_DATE;?></p>
          <?}?>
-         <p class="mainBoxContact"><strong>Kontakt:</strong><br /><?= $maintenanceContact ?><br />
+         <?if(defined('MAINTENANCE_EMAIL')){?>
+         <p class="mainBoxContact"><strong>Kontakt:</strong><br /><?=MAINTENANCE_EMAIL?><br />
             <span class="small">Kontaktujte nás pouze v nutných případech.</span> </p>
+         <?}?>
       </div>
       </div>
    </body>

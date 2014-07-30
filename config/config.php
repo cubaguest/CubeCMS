@@ -16,5 +16,8 @@ define('VVE_DB_PASSWD', 'cube_cms');
 if(!defined('VVE_DB_PREFIX')){
    define('VVE_DB_PREFIX', 'cube_cms_');
 }
+// define('VVE_MEMCACHE_SERVER', '127.0.0.1');
+// define('VVE_MEMCACHE_PORT', 11211);
 
-?>
+define('MAINTENANCE_EMAIL', 'pepa2@cube-studio.cz');
+define('MAINTENANCE_KEY', 'key2014');
