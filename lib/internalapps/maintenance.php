@@ -15,7 +15,7 @@ if(!isset($_GET['action']) || !isset($_GET['key'])){
    die;
 }
 if(!defined("MAINTENANCE_KEY") || MAINTENANCE_KEY != $_GET['key']){
-   echo 'App error';
+   echo 'App error. Config need update!';
    die;
 }
 define("FILE_MAINTENANCE", 'maintenance.lock');
