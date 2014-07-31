@@ -24,12 +24,12 @@ define("FILE_IP", 'maintenance.ip');
 define("DIR", realpath(dirname(__FILE__).DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."data".DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR);
 $action = $_GET['action'];
 if($action == 'activate'){
-   file_put_contents(DIR.FILE_MAINTENANCE, isset($_GET['date']) ? $_GET['date'] : null);
-   echo 'Systém byl aktivován';
-} else if($action == 'deactivate'){
    if(is_file(DIR.FILE_MAINTENANCE)){
       unlink(DIR.FILE_MAINTENANCE);
    }
+   echo 'Systém byl aktivován';
+} else if($action == 'deactivate'){
+   file_put_contents(DIR.FILE_MAINTENANCE, isset($_GET['date']) ? $_GET['date'] : null);
    echo 'Systém byl deaktivován. Povoleny jsou pouze určené IP adresy.';
 } else if($action == 'add'){
    $ips = array($_SERVER['REMOTE_ADDR']);
