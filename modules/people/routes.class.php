@@ -6,5 +6,3 @@ class People_Routes extends Routes {
       $this->addRoute('editOrder', "edit-order/", 'editOrder', 'edit-order/');
 	}
 }
-
-?>

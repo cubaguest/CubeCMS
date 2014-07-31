@@ -1,6 +1,5 @@
 <?php
 
 class People_Module extends Module {
-   protected $version = '1.0.0';
-   protected $depModules = array('articles', 'photogalery');
+   protected $version = '1.1.0';
 }

@@ -1,9 +1,9 @@
 <?
 // do titulku
-if($this->edit) {
-   $h = sprintf($this->_('úprava osoby "%s"'),$this->person->{People_Model::COLUMN_NAME}.' '.$this->person->{People_Model::COLUMN_SURNAME});
+if($this->person) {
+   $h = sprintf($this->tr('úprava osoby "%s"'),$this->person->{People_Model::COLUMN_NAME}.' '.$this->person->{People_Model::COLUMN_SURNAME});
 } else {
-   $h = $this->_('přidání osoby');
+   $h = $this->tr('přidání osoby');
 }
 $this->addPageTitle($h);
 // donastavení formuláře
@@ -11,13 +11,12 @@ $this->form->text->html()->setAttrib('cols', 80)->setAttrib('rows', 30);
 $this->form->degree->html()->setAttrib('size', 5);
 
 if(isset ($this->form->imgdel)){
-   $this->form->imgdel->setSubLabel($this->_('Uložen portrét:').'<br /><img src="'.$this->category()->getModule()->getDataDir(true).$this->person->{People_Model::COLUMN_IMAGE}
+   $this->form->imgdel->setSubLabel($this->tr('Uložen portrét:').'<br /><img src="'.$this->category()->getModule()->getDataDir(true).$this->person->{People_Model::COLUMN_IMAGE}
    .'" alt="'.$this->person->{People_Model::COLUMN_IMAGE}.'" width="100" />');
 }
-
 ?>
 <h1><?=$h?></h1>
-<div class="main-content-form-edit">
+<div class="content-edit-form">
    <?
    echo($this->form);
    ?>

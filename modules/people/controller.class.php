@@ -1,9 +1,6 @@
 <?php
 
 class People_Controller extends Controller {
-   const DEFAULT_IMAGE_WIDTH = 90;
-   const DEFAULT_IMAGE_HEIGHT = 120;
-   const DEFAULT_IMAGE_CROP = false;
    const DEFAULT_RECORDS_ON_PAGE = 10;
 
    const DATA_DIR = 'people';
@@ -16,7 +13,7 @@ class People_Controller extends Controller {
       //		Kontrola práv
       $this->checkReadableRights();
       $model = new People_Model();
-      $model->where(People_Model::COLUMN_DELETED.' = 0 AND '.People_Model::COLUMN_ID_CATEGORY.' = :idc', array('idc' => $this->category()->getId()))
+      $model->where(People_Model::COLUMN_ID_CATEGORY.' = :idc', array('idc' => $this->category()->getId()))
          ->order(array(
             People_Model::COLUMN_ORDER => Model_ORM::ORDER_ASC,
             People_Model::COLUMN_SURNAME => Model_ORM::ORDER_ASC,
@@ -33,7 +30,7 @@ class People_Controller extends Controller {
                $page++;
             }
             if($person->{People_Model::COLUMN_ID} == $this->getRequestParam('sid')){
-               $this->link()->param(Component_Scroll::GET_PARAM, $page)->anchor('lecturer-'.$person->{People_Model::COLUMN_ID})
+               $this->link()->param(Component_Scroll::GET_PARAM, $page)->anchor('person-'.$person->{People_Model::COLUMN_ID})
                ->rmParam('sid')->reload();
             }
             $counter++;
@@ -48,13 +45,13 @@ class People_Controller extends Controller {
          $elemId = new Form_Element_Hidden('id');
          $formDel->addElement($elemId);
 
-         $elemSubmit = new Form_Element_Submit('delete', $this->_('Smazat'));
+         $elemSubmit = new Form_Element_Submit('delete', $this->tr('Smazat'));
          $formDel->addElement($elemSubmit);
 
          if($formDel->isValid()){
             $model->delete($formDel->id->getValues());
 
-            $this->infoMsg()->addMessage($this->_('Osoba byla smazána'));
+            $this->infoMsg()->addMessage($this->tr('Osoba byla smazána'));
             $this->link()->rmParam()->reload();
          }
          $this->view()->formDelete = $formDel;
@@ -88,12 +85,8 @@ class People_Controller extends Controller {
          $record->{People_Model::COLUMN_ID_CATEGORY} = $this->category()->getId();
          
          if ($addForm->image->getValues() != null) {
-            $image = $addForm->image->createFileObject('Filesystem_File_Image');
-            $image->resampleImage($this->category()->getParam('imgw', self::DEFAULT_IMAGE_WIDTH),
-                    $this->category()->getParam('imgh', self::DEFAULT_IMAGE_HEIGHT),
-                    $this->category()->getParam('cropimg', self::DEFAULT_IMAGE_CROP));
-            $image->save();
-            $record->{People_Model::COLUMN_IMAGE} = $image->getName();
+            $file = $addForm->image->createFileObject();
+            $record->{People_Model::COLUMN_IMAGE} = $file->getName();
          }
          
          $record->{People_Model::COLUMN_NAME} = $addForm->name->getValues();
@@ -102,21 +95,12 @@ class People_Controller extends Controller {
          $record->{People_Model::COLUMN_DEGREE_AFTER} = $addForm->degreeAfter->getValues();
          $record->{People_Model::COLUMN_TEXT} = $addForm->text->getValues();
          $record->{People_Model::COLUMN_TEXT_CLEAR} = strip_tags($addForm->text->getValues());
-         
-         // pokud byla zadáno pořadí, zařadíme na pořadí. Jinak dáme na konec
-         if($addForm->order->getValues() != null){ 
-            $record->{People_Model::COLUMN_ORDER} = $addForm->order->getValues();
-         } else {
-            $c = $model->columns(array('m' => 'MAX(`'.People_Model::COLUMN_ORDER.'`)'))
-               ->where(People_Model::COLUMN_DELETED.' = 0 AND ' . People_Model::COLUMN_ID_CATEGORY.' = :idc', 
-                  array('idc' => $this->category()->getId()))->record()->m;
-            
-            $record->{People_Model::COLUMN_ORDER} = $c + 1;
-         }
+         $record->{People_Model::COLUMN_AGE} = $addForm->age->getValues();
+         $record->{People_Model::COLUMN_LABEL} = $addForm->label->getValues();
          
          $model->save($record);
          
-         $this->infoMsg()->addMessage($this->_('Osoba byla uložena'));
+         $this->infoMsg()->addMessage($this->tr('Osoba byla uložena'));
          $this->link()->route()->reload();
       }
       $this->view()->form = $addForm;
@@ -131,15 +115,17 @@ class People_Controller extends Controller {
       // načtení dat
       $model = new People_Model();
       $person = $model->record($this->getRequest('id'));
-      if($person == false) return false;
+      if($person == false) {
+         throw new UnexpectedPageException();
+      }
 
       $editForm = $this->createForm();
 
       // element pro odstranění obrázku
       if($person->{People_Model::COLUMN_IMAGE} != null){
-         $elemRemImg = new Form_Element_Checkbox('imgdel', $this->_('Odstranit uložený portrét'));
-         $elemRemImg->setSubLabel($this->_('Uložen portrét').': '.$person->{People_Model::COLUMN_IMAGE});
-         $editForm->addElement($elemRemImg, 'others');
+         $elemRemImg = new Form_Element_Checkbox('imgdel', $this->tr('Odstranit uložený portrét'));
+         $elemRemImg->setSubLabel($this->tr('Uložen portrét').': '.$person->{People_Model::COLUMN_IMAGE});
+         $editForm->addElement($elemRemImg, 'basic');
       }
 
 
@@ -148,7 +134,8 @@ class People_Controller extends Controller {
       $editForm->degree->setValues($person->{People_Model::COLUMN_DEGREE});
       $editForm->degreeAfter->setValues($person->{People_Model::COLUMN_DEGREE_AFTER});
       $editForm->text->setValues($person->{People_Model::COLUMN_TEXT});
-      $editForm->order->setValues($person->{People_Model::COLUMN_ORDER});
+      $editForm->age->setValues($person->{People_Model::COLUMN_AGE});
+      $editForm->label->setValues($person->{People_Model::COLUMN_LABEL});
 
       if ($editForm->isValid()) {
          if ($editForm->image->getValues() != null OR ($editForm->haveElement('imgdel') AND $editForm->imgdel->getValues() == true)) {
@@ -161,13 +148,9 @@ class People_Controller extends Controller {
          }
 
          if ($editForm->image->getValues() != null) {
-            $image = $editForm->image->createFileObject('Filesystem_File_Image');
-            $image->resampleImage($this->category()->getParam('imgw', self::DEFAULT_IMAGE_WIDTH),
-                    $this->category()->getParam('imgh', self::DEFAULT_IMAGE_HEIGHT),
-                    $this->category()->getParam('cropimg', self::DEFAULT_IMAGE_CROP));
-            $image->save();
-            $person->{People_Model::COLUMN_IMAGE} = $image->getName();
-            unset ($image);
+            $file = $editForm->image->createFileObject();
+            $person->{People_Model::COLUMN_IMAGE} = $file->getName();
+            unset ($file);
          }
 
          $person->{People_Model::COLUMN_NAME} = $editForm->name->getValues();
@@ -176,17 +159,10 @@ class People_Controller extends Controller {
          $person->{People_Model::COLUMN_DEGREE_AFTER} = $editForm->degreeAfter->getValues();
          $person->{People_Model::COLUMN_TEXT} = $editForm->text->getValues();
          $person->{People_Model::COLUMN_TEXT_CLEAR} = strip_tags($editForm->text->getValues());
+         $person->{People_Model::COLUMN_AGE} = $editForm->age->getValues();
+         $person->{People_Model::COLUMN_LABEL} = $editForm->label->getValues();
          
          // pokud byla zadáno pořadí, zařadíme na pořadí. Jinak dáme na konec
-         if($editForm->order->getValues() != null){ 
-            $person->{People_Model::COLUMN_ORDER} = $editForm->order->getValues();
-         } else {
-            $c = $model->columns(array('m' => 'MAX(`'.People_Model::COLUMN_ORDER.'`)'))
-               ->where(People_Model::COLUMN_DELETED.' = 0 AND ' . People_Model::COLUMN_ID_CATEGORY.' = :idc', 
-                  array('idc' => $this->category()->getId()))->record()->m;
-            
-            $person->{People_Model::COLUMN_ORDER} = $c + 1;
-         }
          $model->save($person);
 
          $this->infoMsg()->addMessage($this->tr('Osoba byla uložena'));
@@ -203,39 +179,49 @@ class People_Controller extends Controller {
    protected function createForm() {
       $form = new Form('person_');
 
-      $gbase = $form->addGroup('basic', $this->_('Základní informace o osobě'));
-      $gothr = $form->addGroup('others', $this->_('ostatní'));
+      $gbase = $form->addGroup('basic', $this->tr('Informace o osobě'));
 
-      $iName = new Form_Element_Text('name', $this->_('Jméno'));
+      $iName = new Form_Element_Text('name', $this->tr('Jméno'));
       $iName->addValidation(New Form_Validator_NotEmpty());
       $form->addElement($iName, $gbase);
 
-      $iSurName = new Form_Element_Text('surname', $this->_('Přijmení'));
+      $iSurName = new Form_Element_Text('surname', $this->tr('Přijmení'));
       $iSurName->addValidation(New Form_Validator_NotEmpty());
       $form->addElement($iSurName, $gbase);
 
-      $iDegree = new Form_Element_Text('degree', $this->_('Titul'));
+      $iDegree = new Form_Element_Text('degree', $this->tr('Titul'));
       $form->addElement($iDegree, $gbase);
 
-      $iDegreeA = new Form_Element_Text('degreeAfter', $this->_('Titul za jménem'));
+      $iDegreeA = new Form_Element_Text('degreeAfter', $this->tr('Titul za jménem'));
       $form->addElement($iDegreeA, $gbase);
+      
+      $iAge = new Form_Element_Text('age', $this->tr('Věk'));
+      $iAge->addValidation(new Form_Validator_IsNumber(null, Form_Validator_IsNumber::TYPE_INT));
+      $form->addElement($iAge, $gbase);
+      
+      $iLabel = new Form_Element_Text('label', $this->tr('Funkce'));
+      $iLabel->setSubLabel($this->tr('Zařazení, přezdívka, krátký popis a podobně'));
+      $iLabel->addFilter(new Form_Filter_StripTags());
+      $form->addElement($iLabel, $gbase);
 
-      $iText = new Form_Element_TextArea('text', $this->_('Popis'));
+      $iText = new Form_Element_TextArea('text', $this->tr('Popis'));
       $iText->addValidation(New Form_Validator_NotEmpty());
       $form->addElement($iText, $gbase);
 
-      $iOrder = new Form_Element_Text('order', $this->_('Pořadí'));
-      $iOrder->setSubLabel($this->tr('Určuje pořadí osoby v seznamu'));
-      $iOrder->addValidation(new Form_Validator_IsNumber());
-      $form->addElement($iOrder, $gothr);
       
-      $iImage = new Form_Element_File('image', $this->_('Portrét'));
+//      $iOrder = new Form_Element_Text('order', $this->tr('Pořadí'));
+//      $iOrder->setSubLabel($this->tr('Určuje pořadí osoby v seznamu'));
+//      $iOrder->addValidation(new Form_Validator_IsNumber());
+//      $form->addElement($iOrder, $gothr);
+//      
+      $iImage = new Form_Element_File('image', $this->tr('Portrét'));
       $iImage->addValidation(new Form_Validator_FileExtension('jpg;png'));
       $iImage->setUploadDir($this->module()->getDataDir());
-      $form->addElement($iImage, $gothr);
+      $iImage->setOverWrite(false);
+      $form->addElement($iImage, $gbase);
 
       $iSubmit = new Form_Element_SaveCancel('save');
-      $form->addElement($iSubmit);
+      $form->addElement($iSubmit, $gbase);
 
       if($form->isSend() && $form->save->getValues() == false){
          $this->link()->route()->reload();
@@ -249,7 +235,7 @@ class People_Controller extends Controller {
       $this->checkWritebleRights();
       
       $model = new People_Model();
-      $people = $model->where(People_Model::COLUMN_DELETED.' = 0 AND '.People_Model::COLUMN_ID_CATEGORY.' = :idc', array('idc' => $this->category()->getId()))
+      $people = $model->where(People_Model::COLUMN_ID_CATEGORY.' = :idc', array('idc' => $this->category()->getId()))
          ->order(array(
             People_Model::COLUMN_ORDER => Model_ORM::ORDER_ASC,
             People_Model::COLUMN_SURNAME => Model_ORM::ORDER_ASC,
@@ -294,7 +280,8 @@ class People_Controller extends Controller {
     * @param Category $category
     */
    public static function clearOnRemove(Category $category) {
-
+      $model = new People_Model();
+      $model->where(People_Model::COLUMN_ID_CATEGORY. " = :idc", array('idc' => $category->getId()))->delete();
    }
 
    /**
@@ -347,4 +334,3 @@ class People_Controller extends Controller {
    }
 
 }
-?>

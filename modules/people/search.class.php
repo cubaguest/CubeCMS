@@ -18,4 +18,3 @@ class People_Search extends Search {
       }
    }
 }
-?>
