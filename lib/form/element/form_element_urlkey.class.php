@@ -52,15 +52,20 @@ class Form_Element_UrlKey extends Form_Element_Text {
       $updateButton = null;
       
       $jsondata = str_replace('"',"'",json_encode($this->checkParams));
-      if(!$this->autoUpdate && $this->checkUrl != null){
+      if($this->checkUrl != null){
          $updateButton = new Html_Element('a', '<span class="icon icon-refresh"></span>');
          $updateButton
              ->setAttrib('title', $this->tr('Aktualizovat'))
              ->addClass('input-group-btn')
              ->addClass('button_update_urlkey_for_'.$this->getName())
-             ->setAttrib('href', new Url_Link())
-             ->setAttrib('onclick', 'CubeCMS.Form.checkUrlKey($(this).prev(), \''.$this->checkUrl.'\', '
-                 . $jsondata .');return false;');
+             ->addClass('button_update_urlkey')
+             ->setAttrib('href', (new Url_Link()).'#update-urlkey')
+          ;
+      }
+      $this->html()->setAttrib('data-checkurl', $this->checkUrl);
+      $this->html()->setAttrib('data-additional', $jsondata);
+      if($this->autoUpdate){
+         $this->html()->addClass('input-urlkey-autoupdate');
       }
       
       if($this->isMultiLang()) {
@@ -71,17 +76,17 @@ class Form_Element_UrlKey extends Form_Element_Text {
             $this->html()->setAttrib('name', $this->getName().'['.$langKey.']');
             $this->html()->setAttrib('id', $this->getName().'_'.$rKey.'_'.$langKey);
             $this->html()->setAttrib('value', htmlspecialchars($values[$langKey]));
-            if($this->autoUpdate){
-               $this->html()->setAttrib('onchange', 'CubeCMS.Form.checkUrlKey($(this), \''.$this->checkUrl.'\', '
-                   . $jsondata.');');
-            }
             $container->setAttrib('id', $this->getName().'_container_'.$langKey);
             $this->html()->setAttrib('lang', $langKey);
+            $this->html()->setAttrib('data-lang', $langKey);
             $container
                 ->addClass($this->cssClasses['elemContainer'])
                 ->addClass('input-group')
                 ;
             $container->setAttrib('lang', $langKey);
+            if($updateButton instanceof Html_Element){
+               $updateButton->setAttrib('data-element', '#'.$this->getName().'_'.$rKey.'_'.$langKey);
+            }
             $cnt .= $container->setContent($this->html().$updateButton);
          }
       } else {
@@ -89,7 +94,9 @@ class Form_Element_UrlKey extends Form_Element_Text {
          $this->html()->setAttrib('id', $this->getName().'_'.$rKey);
          $this->html()->setAttrib('lang', Locales::getDefaultLang());
          $this->html()->setAttrib('value', htmlspecialchars((string)$values));
-         
+         if($updateButton instanceof Html_Element){
+            $updateButton->setAttrib('data-element', '#'.$this->getName().'_'.$rKey);
+         }
          $cnt = $this->html().$updateButton;
       }
       if($renderKey == null){

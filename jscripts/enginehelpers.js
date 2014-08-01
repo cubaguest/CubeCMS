@@ -34,7 +34,7 @@ CubeCMS = {
       this.Msg.init();
       this.Loader.init();
       this.ToolBox.init();
-      this.Form.initLangSelector();
+      this.Form.init();
    }
 };
 
@@ -405,6 +405,10 @@ CubeCMS.Loader = {
 };
 
 CubeCMS.Form = {
+   init : function(){
+      this.initLangSelector();
+      this.initUrlCheckers();
+   },
    addRow : function(button){
       var $original = $(button).closest('.form-input-multiple');
       var $new = $original.clone(true);
@@ -494,12 +498,23 @@ CubeCMS.Form = {
          $('.lang-container a[lang="'+CubeCMS.lang+'"]').trigger('click', [false]);
       }
    },
+   initUrlCheckers : function(){
+      var _that = this;
+      $('.input-urlkey-autoupdate').on('change', function(){
+         _that.checkUrlKey($(this), $(this).data('checkurl'), $(this).data('additional'));
+      });
+      $('.button_update_urlkey').on('click', function(e){
+         e.preventDefault();
+         $($(this).data('element')).change();
+         return false;
+      }); 
+   },
    checkUrlKey : function($elem, url, params) {
       var postParams = {
          key : $elem.val(), 
          lang : $elem.attr("lang")
       };
-      if(typeof params !== "undefined"){ $.extend(postParams, params); }
+      if(typeof params !== "undefined"){ $.extend(postParams, params, $elem.data()); }
       $.ajax({
          type: "POST",
          url: url,
