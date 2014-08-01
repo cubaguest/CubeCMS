@@ -1118,10 +1118,10 @@ class Forum_Controller extends Controller {
          $form->scrollT->setValues($settings['scrollT']);
       }
       
-      $elemOrder = new Form_Element_Select('order', $this->tr('PoYad� koYenov�ch pY�spvko'));
+      $elemOrder = new Form_Element_Select('order', $this->tr('Pořadí kořenových příspěvků'));
       $elemOrder->setOptions(array(
-          $this->tr('Od nejstara�ho pY�spvku') => 'asc',
-          $this->tr('Od nejnovja�ho pY�spvku') => 'desc'
+          $this->tr('Od nejstaršího příspěvku') => 'asc',
+          $this->tr('Od nejnovějašho příspěvku') => 'desc'
       ), false, false);
       $form->addElement($elemOrder, 'basic');
       if(isset($settings[self::PARAM_ORDER_BY_DATE])) {
