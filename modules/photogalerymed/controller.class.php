@@ -34,7 +34,7 @@ class PhotogaleryMed_Controller extends ArticlesWGal_Controller {
       $this->setOption('deleteMsg', $this->tr('Galerie byla smazána'));
       $this->setOption('publicMsg', $this->tr('Galerie byla zveřejněna'));
       
-      if(parent::showController() === false) return false;
+      if(parent::showController($urlkey) === false) return false;
       
       if($this->view()->formDelete instanceof Form){
          $this->view()->formDelete->delete->setLabel($this->tr('Smazat galerii'));
