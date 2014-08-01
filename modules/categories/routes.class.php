@@ -13,14 +13,11 @@ class Categories_Routes extends Routes {
       $this->addRoute('changeVisibility', "changevisibility.php", 'changeVisibility', 'changevisibility.php', 'XHR_Respond_VVEAPI');
       $this->addRoute('moveCat', "movecat.php", 'moveCat', 'movecat.php', 'XHR_Respond_VVEAPI');
       $this->addRoute('getCatInfo', "info.html", 'getCatInfo', 'info.html'); // info o kategorii
+      // kontrola url klíče
+      $this->addRoute('checkUrlkey', 'c-url.php', 'checkUrlkey', 'c-url.php', 'XHR_Respond_VVEAPI');
 
       $this->addRoute('edit', "category-::categoryid::/edit/", 'edit','category-{categoryid}/edit/');
       $this->addRoute('settings', "category-::categoryid::/settings/", 'catSettings','category-{categoryid}/settings/');
       $this->addRoute('detail', "category-::categoryid::/", 'show','category-{categoryid}/');
-      $this->addRoute('adminMenu', "adminmenu/", 'adminMenu','adminmenu/');
-
-      $this->addRoute('normal', null, 'main', null);
 	}
 }
-
-?>

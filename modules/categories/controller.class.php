@@ -114,6 +114,7 @@ class Categories_Controller extends Controller {
       if($record == false){
          return false;
       }
+      $form->urlkey->setCheckParam('catid', (int)$record->getPK());
       
       $form->name->setValues($record->{Model_Category::COLUMN_CAT_LABEL});
       $form->alt->setValues($record->{Model_Category::COLUMN_CAT_ALT});
@@ -582,9 +583,11 @@ class Categories_Controller extends Controller {
       $form->addElement($catDataDir, 'labels');
 
       // url klíč kategorie
-      $catUrlKey = new Form_Element_Text('urlkey', $this->tr('Url klíč'));
+      $catUrlKey = new Form_Element_UrlKey('urlkey', $this->tr('Url klíč'));
       $catUrlKey->setLangs();
       $catUrlKey->setSubLabel($this->tr('Pokud není zadán, je url klíč generován automaticky'));
+      $catUrlKey->setAutoUpdate(true)
+          ->setCheckingUrl($this->link()->route('checkUrlkey'));
       $form->addElement($catUrlKey, 'settings');
 
       // priorita
@@ -712,6 +715,43 @@ class Categories_Controller extends Controller {
       }
    }
 
+   public function checkUrlkeyController()
+   {
+      $name = $this->getRequestParam('name');
+      $urlkey = $this->getRequestParam('forcename') ? $name : $this->getRequestParam('key');
+      $lang = $this->getRequestParam('lang', Locales::getDefaultLang());
+      $catId = $this->getRequestParam('catid');
+      if($urlkey == null && $name == null){
+         $this->view()->urlkey = null;
+      }
+      $structure = Category_Structure::getStructure(Category_Structure::ALL);
+      if($catId){
+         $cat = $structure->getCategory($catId);
+         $path = $structure->getPath($cat->getParentId());
+      } else {
+         $path = $structure->getPath($this->getRequestParam('idparent', 0));
+      }
+      
+      $parentUrlKey = null;
+      
+      if(is_array($path)){
+         $p = end($path);
+         if ($p instanceof Category_Structure && $p->getCatObj() !== null) {
+            $parentUrlKey = $p->getCatObj()->getUrlKey()."/";
+         }
+      }
+      
+      if(strpos($urlkey, $parentUrlKey) === 0){ // url klíč začíná celou cestou
+         $urlkey = substr($urlkey, strlen($parentUrlKey));
+      }
+      $newurlkey = Utils_Url::toUrlKey($urlkey != null ? $urlkey : $name);
+      
+      $this->view()->urlkey = $parentUrlKey.self::createUniqueUrlKey(
+          $newurlkey, 
+          $lang
+          );
+   }
+   
    public function moduleDocController()
    {
       if (file_exists(AppCore::getAppLibDir() . AppCore::MODULES_DIR . DIRECTORY_SEPARATOR

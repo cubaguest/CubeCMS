@@ -23,6 +23,8 @@ $this->addCssFile("style.less");
 <div class="main-content-detail main-content-form-edit">
    <?
 // donastavení formuláře
+   $this->form->urlkey->html()->setAttrib('data-idparent', $this->get('id'));
+   
    $this->form->priority->html()->setAttrib('size', 4);
    $this->form->module->htmlSubLabel()->addContent('<span style="font-weight:bold;">'.$this->tr('Popis').':</span><div id="moduleNameDoc"></div>', true);
    $this->addJsPlugin(new JsPlugin_JQuery());
@@ -34,12 +36,54 @@ $this->addCssFile("style.less");
          $('select[name=categorymodule]').after('<span style="font-weight:bold;"><?=$this->tr('Popis')?>:</span><div id="moduleNameDoc"></div>');
          loadDoc();
          $('select[name=categoryparent_cat]').change(function(){
-            if($('#categoryurlkey_1_<?=Locales::getDefaultLang()?>').val() != '' && confirm('<?=$this->tr('Upravit také URL adresu?')?>')){
+            if($('#categoryurlkey_1_<?=Locales::getDefaultLang()?>').val() !== '' && confirm('<?=$this->tr('Upravit také URL adresu?')?>')){
                $('.categoryurlkey_class').val(null);
             }
          });
+         $('select[name=categorymodule]').change(function(){loadDoc();$('input[name=categorygotoSettings]').attr('checked',true);});
+         
+         $('.button_update_urlkey_for_categoryurlkey').after(
+            $('<a></a>')
+            .addClass('input-group-btn').addClass('button_update_urlkey_from_name')
+            .prop('href', '<?=$this->link()?>#update-urlkey-by-name')
+            .prop('title', '<?=$this->tr('Aktualizovat podle jména')?>')
+            .html('<span class="icon icon-retweet"></span>')
+            .on('click', function(e){
+               e.preventDefault();
+               // update by name
+               var $eUrlKey = $(this).closest('div').find('.categoryurlkey_class');
+               $eUrlKey.val($('.categoryname_class[lang="'+$eUrlKey.prop('lang')+'"]').val()).change();
+               return false;
+            })
+         );
+         <?
+         // EDITACE
+         if($this->edit) {?>
+         <?} else {
+            // PŘIDÁNÍ
+            ?>
+            $('.categoryname_class').change(function(){
+               var $eUrlKey = $('.categoryurlkey_class[lang="'+$(this).prop('lang')+'"]');
+               if(!$eUrlKey.data('userchanged')){
+                  $('.categoryurlkey_class[lang="'+$(this).prop('lang')+'"]').val($(this).val()).change();
+               }
+            });
+         <?}?>
+         
+         // pokud url klíž změnil uživatel
+         $('.categoryurlkey_class').change(function(){
+            $(this).data('userchanged', true);
+         })
+         .on('beforeCheck', function(event, data){
+            var $eName = $('.categoryname_class[lang="'+$(this).prop('lang')+'"]');
+            data.name = $eName.val();
+            data.idparent = $('select[name="categoryparent_cat"]').val();
+            if(data.key === ""){
+               data.key = data.name;
+            }
+         });
+            
       });
-      $('select[name=categorymodule]').change(function(){loadDoc();$('input[name=categorygotoSettings]').attr('checked',true);});
       
       function loadDoc(){
          var url = '<?=$this->link()->route('moduleDoc')?>';
