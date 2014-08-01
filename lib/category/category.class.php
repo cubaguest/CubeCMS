@@ -57,9 +57,15 @@ class Category extends Category_Core {
          } else {
             $catModel
                ->withRights()
-               ->withModule()
-               ->where(Model_Category::COLUMN_URLKEY.' IS NOT NULL', array())
-               ->order(array(Model_Category::COLUMN_PRIORITY => Model_ORM::ORDER_DESC));
+               ->withModule();
+            
+            if(defined('CUBE_CMS_DEFAULT_CATEGORY_ID') && CUBE_CMS_DEFAULT_CATEGORY_ID != null){
+               $catModel->where(Model_Category::COLUMN_ID.' = :idc', array('idc' => CUBE_CMS_DEFAULT_CATEGORY_ID))
+                  ->order(array(Model_Category::COLUMN_PRIORITY => Model_ORM::ORDER_DESC));
+            } else {
+               $catModel->where(Model_Category::COLUMN_URLKEY.' IS NOT NULL', array())
+                  ->order(array(Model_Category::COLUMN_PRIORITY => Model_ORM::ORDER_DESC));
+            }
          }
          $this->category = $catModel->record();
       } else {
