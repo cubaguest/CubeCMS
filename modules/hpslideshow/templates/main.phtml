@@ -4,6 +4,7 @@ $this->addFile("css://style.less");
 $jq = new JsPlugin_JQuery();
 $jq->addUITabs();
 $jq->addUISortable();
+$jq->addJQPlugin('cookie');
 $this->addJsPlugin($jq);
 $this->addJsPlugin(new JsPlugin_JQueryCSS());
 
@@ -45,6 +46,7 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
             </div>
             <div class="tab" id="edit-<?=$img->getPK()?>">
                <?
+               $this->formEdit->setAction($this->link()->anchor('image-'.$img->getPK()));
                $this->formEdit->html()->addClass('form-edit-image');
                $this->formEdit->id->setValues($img->{HPSlideShow_Model::COLUMN_ID});
                $this->formEdit->catId->setValues($img->{HPSlideShow_Model::COLUMN_ID_CAT});
@@ -64,7 +66,15 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
       </ul>
       <script type="text/javascript">
          $(document).ready(function(){
-            $( "#images-list>li" ).tabs();
+            $( "#images-list>li" ).each(function(){
+               var id = $(this).prop('id');
+               $(this).tabs({
+                  active   : $.cookie('hpslideshowactivetab'+id),
+                  activate : function( event, ui ){
+                      $.cookie( 'hpslideshowactivetab'+id, ui.newTab.index(),{expires : 10});
+                  }
+               });
+            });
             $( "#images-list" ).sortable({
                placeholder: "ui-state-highlight",
                axis: "y",
@@ -124,29 +134,6 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
             });
 
             $('input[name="img_edit_save"]').after($('<img src="images/progress_small.gif" />').addClass('loader').hide());
-
-            $('form.form-edit-image').submit(function(){
-               var $form = $(this);
-               $('.loader', $form).show();
-               $('input[name="img_edit_save"]', $form).attr('disabled', 'disabled');
-               $.ajax({
-                  type: "POST",
-                  url: "<?=$this->link()?>",
-                  data: $form.serialize(),
-                  success : function(html){
-
-                     $('.tab-preview', html).each(function(){
-                        $('#'+$(this).attr('id')).html($(this).html());
-                     });
-
-                     $('.loader', $form).hide();
-                     $('input[name="img_edit_save"]', $form).removeAttr('disabled');
-                  }
-               });
-
-               return false;
-            });
-
          });
       </script>
    <?} else { ?>

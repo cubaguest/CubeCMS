@@ -88,6 +88,10 @@ class HPSlideShow_Controller extends Controller {
       $elemLabel = new Form_Element_TextArea('label', $this->tr('Text'));
       $elemLabel->setLangs();
       $formEdit->addElement($elemLabel);
+      
+      $elemImage = new Form_Element_File('image', $this->tr('Obrázek'));
+      $elemImage->addValidation(new Form_Validator_FileExtension('jpg;png'));
+      $formEdit->addElement($elemImage);
 
       $formEdit->addElement(new Form_Element_Submit('save', $this->tr('Uložit')));
 
@@ -100,9 +104,17 @@ class HPSlideShow_Controller extends Controller {
          $img->{HPSlideShow_Model::COLUMN_LINK} = $formEdit->link->getValues();
          $img->{HPSlideShow_Model::COLUMN_LABEL} = $formEdit->label->getValues();
 
+         if($formEdit->image->getValues() != null){
+            $image = new File_Image($formEdit->image->getValues());
+            $image->move($this->module()->getDataDir())->rename($img->getPK().'.'.$image->getExtension(), false);
+            $image->getData()
+               ->resize($dimensions['width'], $dimensions['height'], File_Image_Base::RESIZE_CROP)
+               ->save();
+         }
+         
          $img->save();
 
-//         $this->infoMsg()->addMessage($this->tr('Uloženo'));
+         $this->infoMsg()->addMessage($this->tr('Uloženo'));
          $this->link()->redirect();
       }
 

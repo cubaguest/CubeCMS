@@ -3,6 +3,9 @@ class HPSlideShow_View extends View {
    public function mainView() {
       $this->template()->addFile('tpl://main.phtml');
       Template_Module::setEdit(true);
+      if($this->formEdit && $this->category()->getParam('wysiwyg', false)){
+         $this->setTinyMCE($this->formEdit->label);
+      }
    }
 
    /**
