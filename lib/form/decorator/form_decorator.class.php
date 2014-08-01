@@ -12,7 +12,7 @@
  */
 class Form_Decorator implements Form_Decorator_Interface {
 
-   private $decoration = array('wrap' => 'table',
+   protected $decoration = array('wrap' => 'table',
       'wrapclass' => 'form-table',
       'wrapgroupclass' => 'form-table form-table-group',
       'grouplabelclass' => 'form-group-text',
@@ -28,9 +28,9 @@ class Form_Decorator implements Form_Decorator_Interface {
       'labelwrapwidth' => 100,
       'ctrlwrapwidth' => 400,
       'hiddenClass' => 'hidden');
-   private $content = null;
-   private $groupText = null;
-   private $groupName = null;
+   protected $content = null;
+   protected $groupText = null;
+   protected $groupName = null;
    
    const CHECKBOX_LABEL_AFTER_CHARS = 25;
 
