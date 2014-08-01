@@ -7,32 +7,30 @@ $backImg = null;
 if($this->panelObj()->getBackImage() != null){
    $backImg = 'background-image: url(\''.Panel_Obj::getBackImgDir().$this->panelObj()->getBackImage().'\');';
 }
+$form = Auth::getAuthenticator('internal')->getLoginForm();
 ?>
 <div class="name"><?=$icon?><a href="<?=$this->l();?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=$this->panelObj()->getName()?></a></div>
 <div class="content" style="<?=$backImg?>">
-<form method="post" action="<?=$this->currentLink;?>">
-   <p>
+<?
+$form->setAction($this->currentLink);
+echo $form->renderStart();
+?>
+   <div>
       <? if(!Auth::isLogin()){?>
-      <label for="panel_login_username"><?=$this->tr('Jméno')?></label><br />
-      <input id="panel_login_username" class="login_input" type="text" 
-             name="<?=Auth_Provider_Internal::FORM_USERNAME?>" maxlength="20" size="15" value="" placeholder="<?=$this->tr('login') ?>" /><br />
-      <label for="panel_login__passwd"><?=$this->tr('Heslo')?></label><br />
-      <input id="panel_login__passwd" type="password" name="<?=Auth_Provider_Internal::FORM_PASSWORD?>" maxlength="20" 
-             size="15" value="" placeholder="<?=$this->tr('heslo') ?>" /><br />
-      <label><?=$this->tr('Trvalé přihlášení')?></label>&nbsp;<input type="checkbox" name="<?=Auth::FORM_PERMANENT_LOGIN?>" />&nbsp;<br />
-      <input id="login_submit" type="submit" name="<?=Auth_Provider_Internal::FORM_SUBMIT?>" value="<?=$this->tr('přihlásit')?>" />
+      <?=$form->{Auth_Provider_Internal::FORM_USERNAME}->label();?><br />
+      <?=$form->{Auth_Provider_Internal::FORM_USERNAME}->control();?><br />
       
-      <?php if(Auth::isAuthenticator('google')){?>
-      <div>
-         <a href="<?=Auth::getAuthenticator('google')->getAuthUrl()?>"
-            ><img style="width: 100%" src="https://developers.google.com/accounts/images/sign-in-with-google.png" alt="" /></a>
-      </div>
-      <?php }?>
-         
-         <? } else { ?>
+      <?=$form->{Auth_Provider_Internal::FORM_PASSWORD}->label();?><br />
+      <?=$form->{Auth_Provider_Internal::FORM_PASSWORD}->control();?><br />
+      
+      <?=$form->{Auth_Provider_Internal::FORM_PERMANENT}->label();?>
+      <?=$form->{Auth_Provider_Internal::FORM_PERMANENT}->control();?><br />
+      
+      <?=$form->{Auth_Provider_Internal::FORM_SUBMIT}->control();?>
+      <? } else { ?>
       <?=$this->tr('Přihlášen')?>: <a href="<?=$this->l();?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=Auth::getUserName()?></a><br />
       <input id="login_submit" type="submit" name="<?=Auth::FORM_LOGOUT?>" value="<?=$this->tr('odhlásit')?>" />
       <? } ?>
-   </p>
-</form>
+   </div>
+<?=$form->renderEnd()?>
 </div>
