@@ -51,7 +51,6 @@ class Form_Element_UrlKey extends Form_Element_Text {
       
       $updateButton = null;
       
-      $jsondata = str_replace('"',"'",json_encode($this->checkParams));
       if($this->checkUrl != null){
          $updateButton = new Html_Element('a', '<span class="icon icon-refresh"></span>');
          $updateButton
@@ -63,7 +62,11 @@ class Form_Element_UrlKey extends Form_Element_Text {
           ;
       }
       $this->html()->setAttrib('data-checkurl', $this->checkUrl);
-      $this->html()->setAttrib('data-additional', $jsondata);
+      if(!empty($this->checkParams)){
+         foreach ($this->checkParams as $key => $value) {
+            $this->html()->setAttrib('data-'.$key, $value);
+         }
+      }
       if($this->autoUpdate){
          $this->html()->addClass('input-urlkey-autoupdate');
       }

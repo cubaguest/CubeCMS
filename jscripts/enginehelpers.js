@@ -501,20 +501,25 @@ CubeCMS.Form = {
    initUrlCheckers : function(){
       var _that = this;
       $('.input-urlkey-autoupdate').on('change', function(){
-         _that.checkUrlKey($(this), $(this).data('checkurl'), $(this).data('additional'));
+         _that.checkUrlKey($(this), $(this).data('checkurl'));
       });
       $('.button_update_urlkey').on('click', function(e){
          e.preventDefault();
-         $($(this).data('element')).change();
+         var $elem = $($(this).data('element'));
+         _that.checkUrlKey($elem, $elem.data('checkurl'));
          return false;
-      }); 
+      });
+//      $('.input-urlkey').on('change');
+      
    },
    checkUrlKey : function($elem, url, params) {
       var postParams = {
          key : $elem.val(), 
          lang : $elem.attr("lang")
       };
-      if(typeof params !== "undefined"){ $.extend(postParams, params, $elem.data()); }
+      $.extend(postParams, $elem.data());
+      if(typeof params !== "undefined"){ $.extend(postParams, params); }
+      $elem.trigger( "beforeCheck", [ postParams, url ] );
       $.ajax({
          type: "POST",
          url: url,
@@ -524,6 +529,7 @@ CubeCMS.Form = {
             if(typeof data.urlkey !== "undefined" ){
                $elem.val(data.urlkey);
             }
+            $elem.trigger( "checkComplete");
          }
       });
    }
