@@ -62,6 +62,9 @@ class Login_Controller extends Controller {
       //        Pokud byl odeslán formulář
       if($form->isSend()){
          if($form->change->getValues() == false){
+            if($this->getRequestParam('back')){
+               Url::getInstance($this->getRequestParam('back'))->redirect();
+            }
             $this->link()->route()->reload();
          }
 
@@ -81,6 +84,9 @@ class Login_Controller extends Controller {
          $user->{Model_Users::COLUMN_PASSWORD} = Auth::cryptPassword($form->new1->getValues());
          $model->save($user);
          $this->infoMsg()->addMessage($this->tr("Heslo bylo úspěšně změněno"));
+         if($this->getRequestParam('back')){
+            Url::getInstance($this->getRequestParam('back'))->redirect();
+         }
    		$this->link()->route()->reload();
       }
 
@@ -96,21 +102,19 @@ class Login_Controller extends Controller {
 
       if($form->isSend() ){
          if(!$form->save->getValues()){
+            if($this->getRequestParam('back')){
+               Url::getInstance($this->getRequestParam('back'))->redirect();
+            }
             $this->link()->route()->redirect();
          }
-         
-//         $reserver = $model->where(Model_Users::COLUMN_USERNAME." = :uname AND ".Model_Users::COLUMN_ID." != :uid",
-//               array('uname' => $form->username->getValues(), 'uid' => Auth::getUserId()))
-//            ->count();
-//
-//         if((bool)$reserver){
-//            $form->username->setError($this->tr('Vybrané uživatelské jméno je obsazeno'));
-//         }
       }
 
       if($form->isValid()){
          $this->saveUser($form);
          $this->infoMsg()->addMessage($this->tr('Změny byly uloženy'));
+         if($this->getRequestParam('back')){
+            Url::getInstance($this->getRequestParam('back'))->redirect();
+         }
          $this->link()->route()->redirect();
       }
       $this->view()->form = $form;

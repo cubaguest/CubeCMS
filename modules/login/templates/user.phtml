@@ -1,5 +1,5 @@
 <?
-$this->addCssFile("style.css");
+$this->addFile("css://login:style.css");
 $this->addJsPlugin(new JsPlugin_JQueryCSS());
 ?>
 <h1><?=$this->tr('Informace o účtu')?></h1>
@@ -66,5 +66,5 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
       <?}?>
    </table>
    <br />
-   <?=$this->includeTpl('buttons.phtml')?>
+   <?=$this->includeFile('tpl://login:buttons.phtml')?>
 </div>
