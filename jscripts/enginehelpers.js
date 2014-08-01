@@ -493,6 +493,24 @@ CubeCMS.Form = {
       } else {
          $('.lang-container a[lang="'+CubeCMS.lang+'"]').trigger('click', [false]);
       }
+   },
+   checkUrlKey : function($elem, url, params) {
+      var postParams = {
+         key : $elem.val(), 
+         lang : $elem.attr("lang")
+      };
+      if(typeof params !== "undefined"){ $.extend(postParams, params); }
+      $.ajax({
+         type: "POST",
+         url: url,
+         data: postParams,
+         cache: false,
+         success: function(data){
+            if(typeof data.urlkey !== "undefined" ){
+               $elem.val(data.urlkey);
+            }
+         }
+      });
    }
 };
 
