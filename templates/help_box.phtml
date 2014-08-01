@@ -1,6 +1,5 @@
 <? 
 $thin = (isset($_COOKIE['cube_cms_helpbox']) && $_COOKIE['cube_cms_helpbox'] == 0) ? true : false;
-
 ?>
 <div id="module-help-box" class="<?echo $thin ? "thin" : null ?>">
 <div class="label"><?=$this->tr('Nápověda')?></div>
@@ -22,6 +21,11 @@ $this->addJsPlugin($jq);
     		   $(this).width(baseW);
          }); 
 	   
+      if($hbox.hasClass('thin')){
+         document.cookie="cube_cms_helpbox=0"; 
+      } else {
+         document.cookie="cube_cms_helpbox=-1"; 
+      }
 	   
 	   $('#button-toggle-helpbox').click(function(e){
 		   e.preventDefault();
