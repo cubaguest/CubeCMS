@@ -524,7 +524,7 @@ class Categories_Controller extends Controller {
       // description
       $catDescription = new Form_Element_TextArea('description', $this->tr('Popis kategorie'));
       $catDescription->setLangs();
-      $catDescription->setSubLabel($this->tr('Pro vyhledávače'));
+      $catDescription->setSubLabel($this->tr('Používá se jako krátký popis obsahu kategorie a pro vyhledávače'));
       $form->addElement($catDescription, 'labels');
 
       // SETTINGS
@@ -575,16 +575,19 @@ class Categories_Controller extends Controller {
       $catFeedExp = new Form_Element_Checkbox('feedexp', $this->tr('Povolit export zdrojů'));
       $catFeedExp->setSubLabel($this->tr('Pokud modul podporuje export RSS/ATOM zdrojů'));
       $catFeedExp->setValues(true);
+      $catFeedExp->setAdvanced(true);
       $form->addElement($catFeedExp, 'settings');
 
       $catDataDir = new Form_Element_Text('datadir', $this->tr('Adresář s daty'));
       $catDataDir->setSubLabel($this->tr('Název datového adresář (ne cestu). Do něj budou ukládány všechyn soubory modulu.
          Pokud zůstane prázdný, použije se název modulu. POZOR! změna tohoto parametru může zapříčinit ztrátu dat!'));
+      $catDataDir->setAdvanced(true);
       $form->addElement($catDataDir, 'labels');
 
       // url klíč kategorie
       $catUrlKey = new Form_Element_UrlKey('urlkey', $this->tr('Url klíč'));
       $catUrlKey->setLangs();
+      $catUrlKey->setAdvanced(true);
       $catUrlKey->setSubLabel($this->tr('Pokud není zadán, je url klíč generován automaticky'));
       $catUrlKey->setAutoUpdate(true)
           ->setCheckingUrl($this->link()->route('checkUrlkey'));
@@ -596,11 +599,13 @@ class Categories_Controller extends Controller {
       $catPriority->addValidation(New Form_Validator_IsNumber());
       $catPriority->addValidation(New Form_Validator_Length(1, 4));
       $catPriority->setValues(0);
+      $catPriority->setAdvanced(true);
       $form->addElement($catPriority, 'settings');
 
       // panely
       $catLeftPanel = new Form_Element_Checkbox('individual_panels', $this->tr('Panely'));
       $catLeftPanel->setSubLabel($this->tr('Zapnutí individuálního nastavení panelů'));
+      $catLeftPanel->setAdvanced(true);
       $form->addElement($catLeftPanel, 'settings');
 
 //      $catShowInMenu = new Form_Element_Checkbox('show_in_menu', $this->tr('Zobrazit v menu'));
@@ -610,6 +615,7 @@ class Categories_Controller extends Controller {
 //      $form->addElement($catShowOnlyWhenLogin, 'settings');
       $catVisibility = new Form_Element_Select('visibility', $this->tr('Viditelnost'));
       $catVisibility->setOptions(array_flip($this->getVisibilityTypes()));
+      $catVisibility->setSubLabel($this->tr('Položka určuje, která skupina návštěvníků resp. uživatelů danou stránku uvidí v menu, mapě stránek a podobě. Nicméně i když je stránka neviditelná, vždy ji lze zobrazit pomocí odkazu. Pro omezení přístupu využijte nastavení práv v pokročilých možnostech'));
       $form->addElement($catVisibility, 'settings');
 
 
@@ -630,6 +636,7 @@ class Categories_Controller extends Controller {
       // výchozí práva kategorie
       $catGrpRigths = new Form_Element_Select('rights_default', $this->tr('Výchozí práva'));
       $catGrpRigths->setOptions($rightsTypes);
+      $catGrpRigths->setAdvanced(true);
       $catGrpRigths->setSubLabel($this->tr('Výchozí práva pro nově přidané skupiny a všechny ostatní uživatele'));
       $form->addElement($catGrpRigths, $fGrpRights);
 
@@ -646,6 +653,7 @@ class Categories_Controller extends Controller {
                sprintf($this->tr("Skupina\n \"%s\""), $group->{Model_Groups::COLUMN_NAME}));
          $catGrpRigths->setSubLabel(sprintf($this->tr("Skupina\n \"%s\""), $group->{Model_Groups::COLUMN_LABEL}));
          $catGrpRigths->setOptions($rightsTypes);
+         $catGrpRigths->setAdvanced(true);
          $catGrpRigths->setValues(reset($rightsTypes));
          $form->addElement($catGrpRigths, $fGrpRights);
       }
@@ -654,6 +662,7 @@ class Categories_Controller extends Controller {
       $elemOwner->setSubLabel($this->tr('Vlastník kategorie má všechny práva k úpravě a nemusí být zařazen ve skupině'));
       $elemOwner->setOptions(array($this->tr('Žádný') => 0));
       $elemOwner->setValues(0);
+      $elemOwner->setAdvanced(true);
       
       $modelUsers = new Model_Users();
       $users = $modelUsers->order(array(Model_Users::COLUMN_SURNAME => Model_ORM::ORDER_ASC))->records();
@@ -669,7 +678,7 @@ class Categories_Controller extends Controller {
       // nastvaení SITEMAPS
       // priorita
       $catSitemapPriority = new Form_Element_Text('sitemap_priority', $this->tr('Priorita kategorie v sitemap'));
-      $catSitemapPriority->setSubLabel('0 - 1, čím větší, tím výše kategorie bude');
+      $catSitemapPriority->setSubLabel('0 - 1. Číslo určuje důležitost stránky pro vyhledávače a určuje důležitost samotného obsahu. Je dobré využít čísla v celém rozmezí.');
       $catSitemapPriority->setValues(0);
       $catSitemapPriority->addValidation(New Form_Validator_IsNumber(null, Form_Validator_IsNumber::TYPE_FLOAT));
       $form->addElement($catSitemapPriority, 'sitemap');
@@ -681,6 +690,7 @@ class Categories_Controller extends Controller {
       $catSitemapChangeFrequency = new Form_Element_Select('sitemap_frequency', $this->tr('Frekvence změn'));
       $catSitemapChangeFrequency->setOptions($freqOptions);
       $catSitemapChangeFrequency->setValues('yearly');
+      $catSitemapChangeFrequency->setSubLabel($this->tr('Jak často se bude obsah stránek aktualizovat. Pomůžete tak vyhledávači správně indexovat obsah.'));;
       $form->addElement($catSitemapChangeFrequency, 'sitemap');
 
 

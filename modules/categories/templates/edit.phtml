@@ -26,14 +26,14 @@ $this->addCssFile("style.less");
    $this->form->urlkey->html()->setAttrib('data-idparent', $this->get('id'));
    
    $this->form->priority->html()->setAttrib('size', 4);
-   $this->form->module->htmlSubLabel()->addContent('<span style="font-weight:bold;">'.$this->tr('Popis').':</span><div id="moduleNameDoc"></div>', true);
+   $this->form->module->htmlSubLabel()->addContent('<div id="module-desc"><span class="desc">'.$this->tr('Popis').':</span><div class="content"></div></div>', true);
    $this->addJsPlugin(new JsPlugin_JQuery());
    echo $this->form;
    ?>
    <script type="text/javascript">
       /* <![CDATA[ */
       $(document).ready(function(){
-         $('select[name=categorymodule]').after('<span style="font-weight:bold;"><?=$this->tr('Popis')?>:</span><div id="moduleNameDoc"></div>');
+         $('select[name=categorymodule]').after('<div id="module-desc"><strong><?=$this->tr('Popis')?>:</strong><div class="content"></div></div>');
          loadDoc();
          $('select[name=categoryparent_cat]').change(function(){
             if($('#categoryurlkey_1_<?=Locales::getDefaultLang()?>').val() !== '' && confirm('<?=$this->tr('Upravit také URL adresu?')?>')){
@@ -89,7 +89,7 @@ $this->addCssFile("style.less");
          var url = '<?=$this->link()->route('moduleDoc')?>';
          url.indexOf("?") >= 0 ? url += '&' : url += '?';
          url += 'module='+$('select[name=categorymodule]').val();
-         $('#moduleNameDoc').load(url+' .moduleLabel');
+         $('#module-desc .content').load(url+' .moduleLabel');
       }
       /* ]]> */
    </script>

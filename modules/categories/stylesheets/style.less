@@ -27,15 +27,24 @@
 #category-info label { font-weight: bold;}
 #category-info p { margin-left: 10px;}
 
-div.moduleLabel { 
-   border: 1px solid silver;
-   padding: 3px;
-   background-color: white;
-   color: black;
-}
-
-div.moduleLabel table { margin-top: 10px; border: 1px solid silver; }
-div.moduleLabel table tr td, div.moduleLabel table tr th {
-   padding: 3px;
-   vertical-align: top;
+#module-desc {
+   strong {
+      display: block;
+      margin: 5px;
+   }
+   table { 
+      td, th {
+         padding: 3px;
+         vertical-align: top;
+      }
+      margin-top: 10px; 
+      border: 1px solid silver; 
+   }
+   .content {
+      border: 1px solid silver;
+      padding: 3px;
+      background-color: white;
+      color: black;
+      border-radius: 3px;
+   }
 }
