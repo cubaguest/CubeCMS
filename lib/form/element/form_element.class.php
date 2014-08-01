@@ -141,6 +141,13 @@ class Form_Element extends TrObject implements Form_Element_Interface {
    protected static $elementFocused = false;
 
    /**
+    * Jestli je prvek pro pokročilé uživatele
+    * @var bool
+    */
+   protected $isAdvanced = false;
+
+
+   /**
     * Id renderované část -- použito při vytváření id
     * @var integer
     */
@@ -920,5 +927,25 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     */
    public function htmlSubLabel() {
       return $this->htmlElementSubLabel;
+   }
+   
+   /**
+    * Metoda nastaví prvek pro pokročilé uživatele
+    * @param bool $adv
+    * @return \Form_Element
+    */
+   public function setAdvanced($adv)
+   {
+      $this->isAdvanced = $adv;
+      return $this;
+   }
+   
+   /**
+    * Metoda vrací jestli je prvek pro pokročílé uživatele
+    * @return bool
+    */
+   public function isAdvanced()
+   {
+      return $this->isAdvanced;
    }
 }

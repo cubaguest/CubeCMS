@@ -32,6 +32,9 @@ class Form_Decorator implements Form_Decorator_Interface {
    protected $groupText = null;
    protected $groupName = null;
    
+   protected $hasAdvFields = false;
+
+
    const CHECKBOX_LABEL_AFTER_CHARS = 25;
 
    /**
@@ -101,6 +104,10 @@ class Form_Decorator implements Form_Decorator_Interface {
       }
       if( $formElements[$name]->isPopulated() && !$formElements[$name]->isValid() ){
          $row->addClass('has-error');
+      }
+      if( $formElements[$name]->isAdvanced()){
+         $row->addClass('form-group-advanced');
+         $this->hasAdvFields = true;
       }
       $row->addContent( $this->createLabel($formElements[$name]) );
       $row->addContent( $this->createControl($formElements[$name]) );

@@ -408,6 +408,7 @@ CubeCMS.Form = {
    init : function(){
       this.initLangSelector();
       this.initUrlCheckers();
+      this.initAdvancedFormElements();
    },
    addRow : function(button){
       var $original = $(button).closest('.form-input-multiple');
@@ -532,6 +533,47 @@ CubeCMS.Form = {
             $elem.trigger( "checkComplete");
          }
       });
+   },
+   initAdvancedFormElements : function(){
+      // první všechny adv schovat
+      $('form').each(function(){
+         var $advGrgoups = $('.form-group-advanced', this).hide();
+         var _$form = $(this);
+         if($advGrgoups.length > 0){
+            $(this).addClass('form-advanced');
+            
+            // create expand button
+//            var $buttonExpand = $('<a href="#"><span class="icon icon-eye"></span> pokročilé možnosti</a>');
+            var $buttonExpand = $('<button></button>').prop('type', 'button')
+               .html('<span class="icon icon-eye"></span> pokročilé možnosti')
+               .data('expanded', false)
+               .on('click', function(){
+                  if($(this).data('expanded')){
+                     // otevřené
+                     $('.icon', this).removeClass('icon-eye-slash').addClass('icon-eye');
+                     $(this).data('expanded', false);
+                     $('.form-group-advanced,.form-fieldset-advanced', _$form).slideUp(300);
+                  } else {
+                     // zavřené
+                     $('.icon', this).removeClass('icon-eye').addClass('icon-eye-slash');
+                     $(this).data('expanded', true);
+                     $('.form-fieldset-advanced .form-group-advanced', _$form).show();
+                     $('.form-group-advanced,.form-fieldset-advanced', _$form).slideDown(300);
+                  }
+               });
+            $(this).prepend($('<div class="form-advance-buttons"></div>').append($buttonExpand));
+         }
+         // pokud fildsed nemá žádný viditelný prvek typu div.form-group, tak jej označ a schovej
+         $('form fieldset').each(function(){
+            if($(this).find('div.form-group:visible').length === 0){
+               $(this).addClass('form-fieldset-advanced').hide();
+            }
+         });
+         
+         
+      });
+      
+      
    }
 };
 
