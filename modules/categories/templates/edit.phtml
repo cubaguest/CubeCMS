@@ -31,6 +31,7 @@ $this->addCssFile("style.less");
    <script type="text/javascript">
       /* <![CDATA[ */
       $(document).ready(function(){
+         $('select[name=categorymodule]').after('<span style="font-weight:bold;"><?=$this->tr('Popis')?>:</span><div id="moduleNameDoc"></div>');
          loadDoc();
          $('select[name=categoryparent_cat]').change(function(){
             if($('#categoryurlkey_1_<?=Locales::getDefaultLang()?>').val() != '' && confirm('<?=$this->tr('Upravit také URL adresu?')?>')){
