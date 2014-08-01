@@ -50,9 +50,17 @@ class Form_Element_UrlKey extends Form_Element_Text {
       $this->html()->addClass($this->getName()."_class");
       
       $updateButton = null;
+      
+      $jsondata = str_replace('"',"'",json_encode($this->checkParams));
       if(!$this->autoUpdate && $this->checkUrl != null){
-         $updateButton = new Html_Element('a', $this->tr('Aktualizovat'));
-         $updateButton->addClass('button_update_urlkey_for_'.$this->getName())->setAttrib('href', 'javascript:void(0)');
+         $updateButton = new Html_Element('a', '<span class="icon icon-refresh"></span>');
+         $updateButton
+             ->setAttrib('title', $this->tr('Aktualizovat'))
+             ->addClass('input-group-btn')
+             ->addClass('button_update_urlkey_for_'.$this->getName())
+             ->setAttrib('href', new Url_Link())
+             ->setAttrib('onclick', 'CubeCMS.Form.checkUrlKey($(this).prev(), \''.$this->checkUrl.'\', '
+                 . $jsondata .');return false;');
       }
       
       if($this->isMultiLang()) {
@@ -63,9 +71,16 @@ class Form_Element_UrlKey extends Form_Element_Text {
             $this->html()->setAttrib('name', $this->getName().'['.$langKey.']');
             $this->html()->setAttrib('id', $this->getName().'_'.$rKey.'_'.$langKey);
             $this->html()->setAttrib('value', htmlspecialchars($values[$langKey]));
+            if($this->autoUpdate){
+               $this->html()->setAttrib('onchange', 'CubeCMS.Form.checkUrlKey($(this), \''.$this->checkUrl.'\', '
+                   . $jsondata.');');
+            }
             $container->setAttrib('id', $this->getName().'_container_'.$langKey);
             $this->html()->setAttrib('lang', $langKey);
-            $container->addClass($this->cssClasses['elemContainer']);
+            $container
+                ->addClass($this->cssClasses['elemContainer'])
+                ->addClass('input-group')
+                ;
             $container->setAttrib('lang', $langKey);
             $cnt .= $container->setContent($this->html().$updateButton);
          }
