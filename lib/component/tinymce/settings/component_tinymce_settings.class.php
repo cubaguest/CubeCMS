@@ -265,42 +265,14 @@ abstract class Component_TinyMCE_Settings extends TrObject implements ArrayAcces
 
    protected function getContentCssFile()
    {
-      $contentCss = null;
-      $file = 'style.less';
-      $faceRealPath = Face::getCurrent()->getDir().Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR;
-      $parentFaceRealPath = AppCore::getAppLibDir()."faces".DIRECTORY_SEPARATOR.Face::getCurrent()->getName().DIRECTORY_SEPARATOR.Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR;
-      $faceFile = 'style.less.'.md5(Url_Request::getDomain().$faceRealPath.$file).'.css';
-      $parentFaceFile = 'style.less.'.md5(Url_Request::getDomain().$parentFaceRealPath.$file).'.css';
-
-      $libRealPath = AppCore::getAppLibDir().Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR;
-      $libFile = 'style.less.'.md5(Url_Request::getDomain().$libRealPath.$file).'.css';
-
-      if(is_file(AppCore::getAppCacheDir().Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.$faceFile) ){
-         // check less css file form face
-         $contentCss = Url_Request::getBaseWebDir(false).AppCore::ENGINE_CACHE_DIR."/".Template::STYLESHEETS_DIR."/"
-            .$faceFile;
-      } else if(is_file(AppCore::getAppLibDir().AppCore::ENGINE_CACHE_DIR.DIRECTORY_SEPARATOR.Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.$parentFaceFile) ){
-         // check less css file form face
-         $contentCss = Url_Request::getBaseWebDir(true).AppCore::ENGINE_CACHE_DIR."/".Template::STYLESHEETS_DIR."/"
-            .$parentFaceFile;
-      } else if(is_file(AppCore::getAppCacheDir().Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.$libFile ) ){
-         // check less css file form parent face
-         $contentCss = Url_Request::getBaseWebDir(true).AppCore::ENGINE_CACHE_DIR."/".Template::STYLESHEETS_DIR."/"
-            .$libFile;
-      }
-      // old for normal content css file
-      else if(is_file(Template::faceDir().Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.'style-content.css')) {
-         // from face
-         $contentCss = Template::faceUrl().Template::STYLESHEETS_DIR.'/style-content.css';
-      } else if(VVE_SUB_SITE_DIR != null AND
-            is_file(Template::faceDir(true) .Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.'style-content.css')) {
-         // from parent face
-         $contentCss = Template::faceUrl(true).Template::STYLESHEETS_DIR.'/style-content.css';
+      $tpl = new Template(new Url_Link());
+      $tpl->addFile('css://style.less');
+      $styles = $tpl->getStylesheets();
+      if(isset($styles[0])){
+         return $styles[0];
       } else {
-         // from core
-         $contentCss = Url_Request::getBaseWebDir().Template::STYLESHEETS_DIR.'/style-content.css';
+         throw new Exception('Doplnit content.css');
       }
-      return $contentCss;
    }
 
    /* ArrayAccess */

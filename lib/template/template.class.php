@@ -870,33 +870,24 @@ class Template extends TrObject {
          @mkdir($targetPath);
          @mkdir($targetPath.DIRECTORY_SEPARATOR.'shop'); // for shop styles
       }
-      $hash = md5(Url_Request::getDomain().$path.$file);
-      $compiledFileUrl = $url.$file.".".$hash.".css";
-
       try {
-         $less = new lessc();
-         $less->setVariables($this->getLessVariables());
-         $less->setImportDir(array($rpFaceDir, AppCore::getAppWebDir().self::STYLESHEETS_DIR."/", ));
-         if(VVE_DEBUG_LEVEL == 0){
-            $less->setFormatter("compressed");
-         }
-
-         $cacheFile = AppCore::getAppCacheDir().self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR.$rpFile."-".$hash.".cache";
-         if (file_exists($cacheFile)) {
-            $cache = unserialize(file_get_contents($cacheFile));
-         } else {
-            $cache = $path . $rpFile;
-         }
-         if(!is_dir(dirname($cacheFile))){
-            mkdir(dirname($cacheFile), 0777, true);
-         }
-         $newCache = $less->cachedCompile($cache);
-
-         if (!is_array($cache) || $newCache["updated"] > $cache["updated"]) {
-            file_put_contents($cacheFile, serialize($newCache));
-            file_put_contents($targetPath . $rpFile . ".".$hash.".css", $newCache['compiled']);
-         }
-
+        $options = array( 
+            'relativeUrls' => false,
+            'sourceMap' => (VVE_DEBUG_LEVEL != 0),
+            'sourceMapWriteTo'  => AppCore::getAppCacheDir().Template::STYLESHEETS_DIR.'/'.$rpFile.'.map',
+            'sourceMapURL'      => Url_Link::getWebURL().'cache/'.Template::STYLESHEETS_DIR.'/'.$rpFile.'.map',
+            'import_dirs' => array( 
+               Face::getCurrent()->getDir().'stylesheets/' => '/face/'.Face::getCurrent()->getName()."/stylesheets/", // face styles 
+               AppCore::getAppWebDir().'stylesheets/' => '/stylesheets/', // base styles 
+            ),
+            'compress' => (VVE_DEBUG_LEVEL == 0),
+            'cache_dir'=> AppCore::getAppCacheDir().Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR,
+         );
+         
+         $css_file_name = Less_Cache::Get( 
+             array( $path.$rpFile => '/cache/'.Template::STYLESHEETS_DIR.'/' ), 
+             $options, $this->getLessVariables() );
+         $compiledFileUrl = $url.$css_file_name;
       } catch (Exception $exc) {
          new CoreErrors($exc);
       }
@@ -931,35 +922,25 @@ class Template extends TrObject {
          @mkdir($cachePath);
          @mkdir($cachePath.DIRECTORY_SEPARATOR.'shop'); // for shop styles
       }
-
-      $hash = md5(Url_Request::getDomain().$path.$file);
       $url = Url_Request::getBaseWebDir(false).AppCore::ENGINE_CACHE_DIR."/".self::STYLESHEETS_DIR."/";
-      $compiledFileUrl = $url.$file.'-'.$module."-".$hash.".css";
-
       try {
-         $less = new lessc();
-         $less->setVariables($this->getLessVariables());
-         if(VVE_DEBUG_LEVEL == 0){
-            $less->setFormatter("compressed");
-         }
-
-         $cacheFile = $cachePath.$rpFile.'-'.$module."-".$hash.".cache";
-         if (file_exists($cacheFile)) {
-            $cache = unserialize(file_get_contents($cacheFile));
-         } else {
-            $cache = $path.$rpFile;
-         }
-
-         $newCache = $less->cachedCompile($cache);
-
-         if (!is_array($cache) || $newCache["updated"] > $cache["updated"]) {
-            file_put_contents($cacheFile, serialize($newCache));
-            file_put_contents($cachePath.$rpFile.'-'.$module."-".$hash.".css", $newCache['compiled']);
-         }
-
-         $less = new lessc();
-         $less->checkedCompile($path.$rpFile, $cachePath.$rpFile.'-'.$module.".css");
-
+         $options = array( 
+            'relativeUrls' => false,
+            'sourceMap' => (VVE_DEBUG_LEVEL != 0),
+            'sourceMapWriteTo'  => AppCore::getAppCacheDir().$rpFile.'.map',
+            'sourceMapURL'      => Url_Link::getWebURL().'cache/'.Template::STYLESHEETS_DIR.'/'.$rpFile.'.map',
+            'import_dirs' => array( 
+               Face::getCurrent()->getDir().'stylesheets/' => '/face/'.Face::getCurrent()->getName()."/stylesheets/", // face styles 
+               AppCore::getAppWebDir().'stylesheets/' => '/stylesheets/', // base styles 
+            ),
+            'compress' => (VVE_DEBUG_LEVEL == 0),
+            'cache_dir'=> AppCore::getAppCacheDir().Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR,
+         );
+         
+         $css_file_name = Less_Cache::Get( 
+             array( $path.$rpFile => '/cache/'.Template::STYLESHEETS_DIR.'/' ), 
+             $options, $this->getLessVariables() );
+         $compiledFileUrl = $url.$css_file_name;
       } catch (Exception $exc) {
          new CoreErrors($exc);
       }
@@ -974,10 +955,11 @@ class Template extends TrObject {
    {
       return array(
          'dirFace' => "'".Template::faceUrl(false)."'",
+         'dirFaceImages' => "'".Template::faceUrl(false)."images/'",
          'dirFaceParent' => "'".Template::faceUrl(true)."'",
+         'dirFaceCss' => "'".Template::faceUrl(true).self::STYLESHEETS_DIR."/'",
          'dirCore' => "'".Url_Request::getBaseWebDir()."'",
          'dirCoreImages' => "'".Url_Request::getBaseWebDir()."images/'",
-         'dirFaceCss' => "'".Template::faceUrl(true).self::STYLESHEETS_DIR."/'",
          'dirCoreCss' => "'".Url_Request::getBaseWebDir().self::STYLESHEETS_DIR."/'",
       );
    }
