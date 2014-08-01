@@ -16,6 +16,15 @@
 /* COLORS */
 @color-text: #A0A0A0;
 @color-text-light: #A0A0A0;
+@color-warning: #fcf8e3;
+@color-success: #dff0d8;
+@color-error: #f2dede;
+@color-info: #d9edf7;
+
+/* fonts */
+@font-size-base: 14px;
+@font-size-small: 11px;
+@font-size-large: 18px;
 
 /* PATHS */
 @imgdir: @dirCoreImages;
@@ -25,7 +34,7 @@ html,body {
    border: 0px none;
    margin: 0px;
    padding: 0px;
-   font-size: 100%;
+   font-size: @font-size-base;
    text-align: left;
    background: url('@{imgdir}backshadow.png') fixed top center white repeat-y;
 }
@@ -155,10 +164,10 @@ a.image + p, a.image + h3, a.image + h2, a.image + h3, a.image + h4, a.image + d
    p { margin-bottom:3px; border-top: 1px solid gray;}
    p:first-child { border: none;}
 }
-#infoMessages, .message-info { border-color: #b7dcff; background-color: #cce6ff; background-image: url('@{dirCore}images/icons/accept.png');}
-#errMessages, .message-err { border-color: #ffc7c0; background-color: #ffe3e0; background-image: url('@{dirCore}images/icons/error.png');}
-.message-warning { border-color: #AFAB23; background-color: #f0ea30; background-image: url('@{dirCore}images/icons/error.png');}
-#coreErrMessage { border-color: #ffa095; background-color: #ffb2a9; background-image: url('@{dirCore}images/icons/error.png');}
+#infoMessages, .message-info { border-color: darken(@color-success, 20%); background-color: @color-success; background-image: url('@{dirCore}images/icons/accept.png');}
+#errMessages, .message-err { border-color: darken(@color-error, 20); background-color: @color-error; background-image: url('@{dirCore}images/icons/error.png');}
+.message-warning { border-color: darken(@color-warning, 20); background-color: @color-warning; background-image: url('@{dirCore}images/icons/error.png');}
+#coreErrMessage { border-color: darken(@color-error, 40); background-color: darken(@color-error, 20); background-image: url('@{dirCore}images/icons/error.png');}
 
 
 
@@ -213,8 +222,8 @@ input[type="submit"], input[type="reset"], input[type="button"], button, a.form-
          border-color: @form-color-bg-red;
       }
    }
-   .rounded-corners(5px);
-   padding: 1px 3px;
+   .rounded-corners(4px);
+   padding: 1px 5px;
    color: @form-color-text;
    cursor: pointer;
 }
@@ -265,7 +274,7 @@ form {
          display: block;
          width: 100%;
          border-bottom: 1px solid #ccc;
-         margin: 10px 0;
+         margin: 0 0 10px 0px;
          padding-bottom: 5px;
          font-size: 18px;
          font-weight: bold;
@@ -359,6 +368,8 @@ form {
       &.form-group-hidden {
          margin-bottom: 0;
       }
+      &.form-group-advanced {
+      }
       input, textarea {
          padding: 5px;
          height: auto;
@@ -382,6 +393,16 @@ form {
       margin-left: -15px;
       /*margin-right: -15px;*/
    }
+   .form-advance-buttons {
+      button {
+         font-size: @font-size-small;
+         position: absolute;
+         top: 0;
+         right: 15px;
+      }
+      position: relative;
+      /*text-align: right;*/
+   }
    .help-block {
       font-size: 12px;
       color: #777;
@@ -399,6 +420,7 @@ form {
          }
          .rounded-corners(0);
       }
+      width: 100%;
       position: relative;
       display: table; // nemůže být important, jinak nefunguje přepínání jazyků!!
       border-collapse: separate;
