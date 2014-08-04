@@ -134,6 +134,15 @@ class Model_ORM_LangCell implements ArrayAccess, Countable, Iterator {
          return (string)null;
       }
    }
+   
+   /**
+    * Metoda vrací obsah jako pole
+    * @return array
+    */
+   public function toArray()
+   {
+      return $this->values;
+   }
 
    /**
     * Přesun ukazettele na tačátek pole
