@@ -870,6 +870,10 @@ class Template extends TrObject {
          @mkdir($targetPath);
          @mkdir($targetPath.DIRECTORY_SEPARATOR.'shop'); // for shop styles
       }
+      $dir = dirname($targetPath.$rpFile);
+      if(!is_dir($dir)){
+         @mkdir($dir, 0777, true);
+      }
       try {
         $options = array( 
             'relativeUrls' => false,
@@ -921,6 +925,10 @@ class Template extends TrObject {
       if(!is_dir($cachePath) || !is_writable($cachePath)){
          @mkdir($cachePath);
          @mkdir($cachePath.DIRECTORY_SEPARATOR.'shop'); // for shop styles
+      }
+      $dir = dirname($cachePath.$rpFile);
+      if(!is_dir($dir)){
+         @mkdir($dir, 0777, true);
       }
       $url = Url_Request::getBaseWebDir(false).AppCore::ENGINE_CACHE_DIR."/".self::STYLESHEETS_DIR."/";
       try {
