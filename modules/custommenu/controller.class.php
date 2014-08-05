@@ -82,7 +82,7 @@ class CustomMenu_Controller extends Controller {
       $f->addElement($eName);
 
       $eLink = new Form_Element_Text('link', $this->tr('Odkaz'));
-      $eLink->addValidation(new Form_Validator_Url());
+//      $eLink->addValidation(new Form_Validator_Url());
       $eLink->setSubLabel($this->tr('Místo odkazu můžete vybrat kategorii stránek níže'));
       $f->addElement($eLink);
 
