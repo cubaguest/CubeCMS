@@ -877,7 +877,7 @@ class Template extends TrObject {
             'sourceMapWriteTo'  => AppCore::getAppCacheDir().Template::STYLESHEETS_DIR.'/'.$rpFile.'.map',
             'sourceMapURL'      => Url_Link::getWebURL().'cache/'.Template::STYLESHEETS_DIR.'/'.$rpFile.'.map',
             'import_dirs' => array( 
-               Face::getCurrent()->getDir().'stylesheets/' => '/face/'.Face::getCurrent()->getName()."/stylesheets/", // face styles 
+               Face::getCurrent()->getDir().'stylesheets/' => '/faces/'.Face::getCurrent()->getName()."/stylesheets/", // face styles 
                AppCore::getAppWebDir().'stylesheets/' => '/stylesheets/', // base styles 
             ),
             'compress' => (VVE_DEBUG_LEVEL == 0),
@@ -930,7 +930,7 @@ class Template extends TrObject {
             'sourceMapWriteTo'  => AppCore::getAppCacheDir().$rpFile.'.map',
             'sourceMapURL'      => Url_Link::getWebURL().'cache/'.Template::STYLESHEETS_DIR.'/'.$rpFile.'.map',
             'import_dirs' => array( 
-               Face::getCurrent()->getDir().'stylesheets/' => '/face/'.Face::getCurrent()->getName()."/stylesheets/", // face styles 
+               Face::getCurrent()->getDir().'stylesheets/' => '/faces/'.Face::getCurrent()->getName()."/stylesheets/", // face styles 
                AppCore::getAppWebDir().'stylesheets/' => '/stylesheets/', // base styles 
             ),
             'compress' => (VVE_DEBUG_LEVEL == 0),
