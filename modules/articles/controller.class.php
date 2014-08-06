@@ -946,6 +946,7 @@ class Articles_Controller extends Controller {
 
       // $iUrlKey = new Form_Element_Text('urlkey', $this->tr('Url klíč'));
       $iUrlKey = new Form_Element_UrlKey('urlkey', $this->tr('Url klíč'));
+      $iUrlKey->setAdvanced(true);
       $iUrlKey->setUpdateFromElement($iName)->setCheckingUrl($this->link()->route('checkUrlkey'));
       if($article != null){
          $iUrlKey->setCheckParam('id', (int)$article->{Articles_Model::COLUMN_ID})->setAutoUpdate(false);
@@ -960,6 +961,7 @@ class Articles_Controller extends Controller {
       $form->addElement($iKeywords, $fGrpParams);
 
       $iDesc = new Form_Element_TextArea('metaDesc', $this->tr('Popisek'));
+      $iDesc->setAdvanced(true);
       $iDesc->setLangs();
       $iDesc->setSubLabel($this->tr('Pokud není zadán pokusí se použít anotaci, jinak zůstne prázdný.'));
       $form->addElement($iDesc, $fGrpParams);
@@ -994,12 +996,14 @@ class Articles_Controller extends Controller {
                $this->tr('Okamžitá (3)') => 3,
                ));
          $ePriority->setValues(0);
+         $ePriority->setAdvanced(true);
          $form->addElement($ePriority, $fGrpPublic);
       
          $ePriorityEndDate = new Form_Element_Text('priorityEndDate', $this->tr('Konec priority'));
          $ePriorityEndDate->addValidation(new Form_Validator_Date());
          $ePriorityEndDate->addFilter(new Form_Filter_DateTimeObj());
          $ePriorityEndDate->setSubLabel($this->tr('Do kdy bude položka označena prioritou'));
+         $ePriorityEndDate->setAdvanced(true);
          $form->addElement($ePriorityEndDate, $fGrpPublic);
       }
       
@@ -1015,11 +1019,13 @@ class Articles_Controller extends Controller {
          if($article == null){
             $eCreator->setValues(Auth::getUserId());
          }
+         $eCreator->setAdvanced(true);
          $form->addElement($eCreator, $fGrpPublic);
       }
          
       $eCreatorOther = new Form_Element_Text('creatorOther', $this->tr('Autor'));
       $eCreatorOther->setSubLabel($this->tr('Autor položky, pokud není zařazen v systému.'));
+      $eCreatorOther->setAdvanced(true);
       $form->addElement($eCreatorOther, $fGrpPublic);
 
       $iConcept = new Form_Element_Checkbox('concept', $this->tr('Koncept'));
@@ -1033,12 +1039,14 @@ class Articles_Controller extends Controller {
          $eCreatedDate->setSubLabel($this->tr('Pokud bude datum v budoucnosti, dojde k zveřejnění až v toto datum.'));
          $eCreatedDate->addValidation(new Form_Validator_NotEmpty());
          $eCreatedDate->addValidation(new Form_Validator_Date());
+         $eCreatedDate->setAdvanced(true);
          $form->addElement($eCreatedDate, $fGrpPublic);
 
          $eCreatedTime = new Form_Element_Text('created_time', $this->tr('Čas vytvoření'));
          $eCreatedTime->setValues(vve_date("%H:%i"));
          $eCreatedTime->addValidation(new Form_Validator_NotEmpty());
          $eCreatedTime->addValidation(new Form_Validator_Time());
+         $eCreatedTime->setAdvanced(true);
          $form->addElement($eCreatedTime, $fGrpPublic);
       }
       
