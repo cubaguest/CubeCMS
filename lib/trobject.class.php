@@ -25,7 +25,7 @@ class TrObject {
     * Metoda vrací objekt překladatele
     * @return Translator
     */
-   protected function translator() {
+   public function translator() {
       if(!$this->translator instanceof Translator) $this->setTranslator();
       return $this->translator;
    }
@@ -35,8 +35,7 @@ class TrObject {
     * @param mixed $str -- řetězec nebo pole pro překlady
     * @param int $count -- (nepovinné) počet, podle kterého se volí překlad
     */
-   protected function tr($str, $count = 0) {
+   public function tr($str, $count = 0) {
       return $this->translator()->tr($str, $count);
    }
 }
-?>
