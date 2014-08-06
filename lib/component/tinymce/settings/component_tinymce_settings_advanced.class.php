@@ -22,7 +22,7 @@ class Component_TinyMCE_Settings_Advanced extends Component_TinyMCE_Settings {
       'content_css' => null,
       'PHPSESSID' => null,
       'cid' => null,
-      'extended_valid_elements' => 'td[*],div[*],code[class],iframe[src|width|height|align|frameborder|scrolling]', // tady se musí upravit, protože tohle je nepřípustné kvůli atributům a XSS
+      'extended_valid_elements' => 'td[*],div[*],code[class],iframe[src|width|height|align|frameborder|scrolling],article[class|id],aside[class|id],figure[class|id]', // tady se musí upravit, protože tohle je nepřípustné kvůli atributům a XSS
       'forced_root_block' => 'p',
       'theme_advanced_toolbar_location' => 'top',
       'theme_advanced_toolbar_align' => 'left',
