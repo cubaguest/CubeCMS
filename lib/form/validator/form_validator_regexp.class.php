@@ -32,7 +32,7 @@ class Form_Validator_Regexp extends Form_Validator implements Form_Validator_Int
    public function addHtmlElementParams(Form_Element $element) {
       if($this->regexp == self::REGEXP_PHONE_CZSK) {
          $element->addValidationConditionLabel($this->tr('např: +420 123 456 789'));
-         if($element->getUnfilteredValues() == null){
+         if($element->hasValidator("Form_Validator_NotEmpty") && $element->getUnfilteredValues() == null){
             $element->setValues('+420');
          }
       }
