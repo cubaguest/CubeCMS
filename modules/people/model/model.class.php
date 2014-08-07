@@ -20,6 +20,9 @@ class People_Model extends Model_ORM_Ordered {
    const COLUMN_ORDER = 'person_order';
    const COLUMN_AGE = 'person_age';
    const COLUMN_LABEL = 'person_label';
+   const COLUMN_EMAIL = 'person_email';
+   const COLUMN_PHONE = 'person_phone';
+   const COLUMN_SOCIAL_URL = 'person_social_url';
 
    protected function  _initTable() {
       $this->setTableName(self::DB_TABLE, 't_persons');
@@ -36,6 +39,9 @@ class People_Model extends Model_ORM_Ordered {
       $this->addColumn(self::COLUMN_ORDER, array('datatype' => 'smallint', 'default' => 0, 'pdoparam' => PDO::PARAM_INT));
       $this->addColumn(self::COLUMN_AGE, array('datatype' => 'int', 'pdoparam' => PDO::PARAM_INT, 'default' => null));
       $this->addColumn(self::COLUMN_LABEL, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
+      $this->addColumn(self::COLUMN_EMAIL, array('datatype' => 'varchar(50)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
+      $this->addColumn(self::COLUMN_PHONE, array('datatype' => 'varchar(20)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
+      $this->addColumn(self::COLUMN_SOCIAL_URL, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
       
       $this->setPk(self::COLUMN_ID);
       $this->setOrderColumn(self::COLUMN_ORDER);

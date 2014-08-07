@@ -82,24 +82,7 @@ class People_Controller extends Controller {
       if ($addForm->isValid()) {
          $model = new People_Model();
          $record = $model->newRecord();
-         $record->{People_Model::COLUMN_ID_CATEGORY} = $this->category()->getId();
-         
-         if ($addForm->image->getValues() != null) {
-            $file = $addForm->image->createFileObject();
-            $record->{People_Model::COLUMN_IMAGE} = $file->getName();
-         }
-         
-         $record->{People_Model::COLUMN_NAME} = $addForm->name->getValues();
-         $record->{People_Model::COLUMN_SURNAME} = $addForm->surname->getValues();
-         $record->{People_Model::COLUMN_DEGREE} = $addForm->degree->getValues();
-         $record->{People_Model::COLUMN_DEGREE_AFTER} = $addForm->degreeAfter->getValues();
-         $record->{People_Model::COLUMN_TEXT} = $addForm->text->getValues();
-         $record->{People_Model::COLUMN_TEXT_CLEAR} = strip_tags($addForm->text->getValues());
-         $record->{People_Model::COLUMN_AGE} = $addForm->age->getValues();
-         $record->{People_Model::COLUMN_LABEL} = $addForm->label->getValues();
-         
-         $model->save($record);
-         
+         $this->processEditForm($addForm, $record);
          $this->infoMsg()->addMessage($this->tr('Osoba byla uložena'));
          $this->link()->route()->reload();
       }
@@ -119,52 +102,12 @@ class People_Controller extends Controller {
          throw new UnexpectedPageException();
       }
 
-      $editForm = $this->createForm();
+      $editForm = $this->createForm($person);
 
-      // element pro odstranění obrázku
-      if($person->{People_Model::COLUMN_IMAGE} != null){
-         $elemRemImg = new Form_Element_Checkbox('imgdel', $this->tr('Odstranit uložený portrét'));
-         $elemRemImg->setSubLabel($this->tr('Uložen portrét').': '.$person->{People_Model::COLUMN_IMAGE});
-         $editForm->addElement($elemRemImg, 'basic');
-      }
-
-
-      $editForm->name->setValues($person->{People_Model::COLUMN_NAME});
-      $editForm->surname->setValues($person->{People_Model::COLUMN_SURNAME});
-      $editForm->degree->setValues($person->{People_Model::COLUMN_DEGREE});
-      $editForm->degreeAfter->setValues($person->{People_Model::COLUMN_DEGREE_AFTER});
-      $editForm->text->setValues($person->{People_Model::COLUMN_TEXT});
-      $editForm->age->setValues($person->{People_Model::COLUMN_AGE});
-      $editForm->label->setValues($person->{People_Model::COLUMN_LABEL});
+      
 
       if ($editForm->isValid()) {
-         if ($editForm->image->getValues() != null OR ($editForm->haveElement('imgdel') AND $editForm->imgdel->getValues() == true)) {
-            // smaže se původní
-            if(is_file($this->category()->getModule()->getDataDir().$person->{People_Model::COLUMN_IMAGE})){
-               /* if upload file with same name it's overwrited and then deleted. This make error!!! */
-//               @unlink($this->category()->getModule()->getDataDir().$person->{People_Model::COLUMN_IMAGE});
-            }
-            $person->{People_Model::COLUMN_IMAGE} = null;
-         }
-
-         if ($editForm->image->getValues() != null) {
-            $file = $editForm->image->createFileObject();
-            $person->{People_Model::COLUMN_IMAGE} = $file->getName();
-            unset ($file);
-         }
-
-         $person->{People_Model::COLUMN_NAME} = $editForm->name->getValues();
-         $person->{People_Model::COLUMN_SURNAME} = $editForm->surname->getValues();
-         $person->{People_Model::COLUMN_DEGREE} = $editForm->degree->getValues();
-         $person->{People_Model::COLUMN_DEGREE_AFTER} = $editForm->degreeAfter->getValues();
-         $person->{People_Model::COLUMN_TEXT} = $editForm->text->getValues();
-         $person->{People_Model::COLUMN_TEXT_CLEAR} = strip_tags($editForm->text->getValues());
-         $person->{People_Model::COLUMN_AGE} = $editForm->age->getValues();
-         $person->{People_Model::COLUMN_LABEL} = $editForm->label->getValues();
-         
-         // pokud byla zadáno pořadí, zařadíme na pořadí. Jinak dáme na konec
-         $model->save($person);
-
+         $this->processEditForm($editForm, $person);
          $this->infoMsg()->addMessage($this->tr('Osoba byla uložena'));
          $this->link()->route()->reload();
       }
@@ -172,11 +115,51 @@ class People_Controller extends Controller {
       $this->view()->person = $person;
    }
 
+   protected function processEditForm(Form $form, Model_ORM_Record $person = null)
+   {
+      
+      if ($form->image->getValues() != null OR ($form->haveElement('imgdel') AND $form->imgdel->getValues() == true)) {
+         // smaže se původní
+         if(is_file($this->category()->getModule()->getDataDir().$person->{People_Model::COLUMN_IMAGE})){
+            /* if upload file with same name it's overwrited and then deleted. This make error!!! */
+//               @unlink($this->category()->getModule()->getDataDir().$person->{People_Model::COLUMN_IMAGE});
+         }
+         $person->{People_Model::COLUMN_IMAGE} = null;
+      }
+
+      if ($form->image->getValues() != null) {
+         $file = $form->image->createFileObject();
+         $person->{People_Model::COLUMN_IMAGE} = $file->getName();
+         unset ($file);
+      }
+      
+      $person->{People_Model::COLUMN_ID_CATEGORY} = $this->category()->getId();
+      $person->{People_Model::COLUMN_NAME} = $form->name->getValues();
+      $person->{People_Model::COLUMN_SURNAME} = $form->surname->getValues();
+      $person->{People_Model::COLUMN_DEGREE} = $form->degree->getValues();
+      $person->{People_Model::COLUMN_DEGREE_AFTER} = $form->degreeAfter->getValues();
+      $person->{People_Model::COLUMN_TEXT} = $form->text->getValues();
+      $person->{People_Model::COLUMN_TEXT_CLEAR} = strip_tags($form->text->getValues());
+      $person->{People_Model::COLUMN_AGE} = $form->age->getValues();
+      $person->{People_Model::COLUMN_LABEL} = $form->label->getValues();
+      $person->{People_Model::COLUMN_EMAIL} = $form->email->getValues();
+      $person->{People_Model::COLUMN_PHONE} = $form->phone->getValues();
+      $person->{People_Model::COLUMN_SOCIAL_URL} = $form->socialUrl->getValues();
+
+      
+      
+      // pokud byla zadáno pořadí, zařadíme na pořadí. Jinak dáme na konec
+      $person->save($person);
+      
+      return $person;
+   }
+
+
    /**
     * Metoda  vytvoří element formuláře
     * @return Form
     */
-   protected function createForm() {
+   protected function createForm(Model_ORM_Record $person = null) {
       $form = new Form('person_');
 
       $gbase = $form->addGroup('basic', $this->tr('Informace o osobě'));
@@ -198,6 +181,19 @@ class People_Controller extends Controller {
       $iAge = new Form_Element_Text('age', $this->tr('Věk'));
       $iAge->addValidation(new Form_Validator_IsNumber(null, Form_Validator_IsNumber::TYPE_INT));
       $form->addElement($iAge, $gbase);
+      
+      $iEmail = new Form_Element_Text('email', $this->tr('Kontaktní e-mail'));
+      $iEmail->addValidation(new Form_Validator_Email());
+      $form->addElement($iEmail, $gbase);
+      
+      $iPhone = new Form_Element_Text('phone', $this->tr('Kontaktní telefon'));
+      $iPhone->addValidation(new Form_Validator_Regexp(Form_Validator_Regexp::REGEXP_PHONE_CZSK));
+      $form->addElement($iPhone, $gbase);
+      
+      $iSocilaUrl = new Form_Element_Text('socialUrl', $this->tr('Adresa sociálního profilu'));
+      $iSocilaUrl->setSubLabel($this->tr('Url adresa profilu na sociální síti (Facebook, Google+) nebo osobní stránky'));
+      $iSocilaUrl->addValidation(new Form_Validator_Url());
+      $form->addElement($iSocilaUrl, $gbase);
       
       $iLabel = new Form_Element_Text('label', $this->tr('Funkce'));
       $iLabel->setSubLabel($this->tr('Zařazení, přezdívka, krátký popis a podobně'));
@@ -223,6 +219,25 @@ class People_Controller extends Controller {
       $iSubmit = new Form_Element_SaveCancel('save');
       $form->addElement($iSubmit, $gbase);
 
+      if($person){
+         // element pro odstranění obrázku
+         if($person->{People_Model::COLUMN_IMAGE} != null){
+            $elemRemImg = new Form_Element_Checkbox('imgdel', $this->tr('Odstranit uložený portrét'));
+            $elemRemImg->setSubLabel($this->tr('Uložen portrét').': '.$person->{People_Model::COLUMN_IMAGE});
+            $form->addElement($elemRemImg, 'basic');
+         }
+         $form->name->setValues($person->{People_Model::COLUMN_NAME});
+         $form->surname->setValues($person->{People_Model::COLUMN_SURNAME});
+         $form->degree->setValues($person->{People_Model::COLUMN_DEGREE});
+         $form->degreeAfter->setValues($person->{People_Model::COLUMN_DEGREE_AFTER});
+         $form->text->setValues($person->{People_Model::COLUMN_TEXT});
+         $form->age->setValues($person->{People_Model::COLUMN_AGE});
+         $form->label->setValues($person->{People_Model::COLUMN_LABEL});
+         $form->email->setValues($person->{People_Model::COLUMN_EMAIL});
+         $form->phone->setValues($person->{People_Model::COLUMN_PHONE});
+         $form->socialUrl->setValues($person->{People_Model::COLUMN_SOCIAL_URL});
+      }
+      
       if($form->isSend() && $form->save->getValues() == false){
          $this->link()->route()->reload();
       }

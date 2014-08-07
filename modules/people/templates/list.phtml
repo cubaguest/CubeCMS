@@ -1,9 +1,73 @@
-<h1><?=$this->category()->getName()?></h1>
-<div class="main-content-list module-people-list">
 <?
-$this->includeTpl('onlylist.phtml', false, array('people' => $this->people,'hE' => 'h2', 'hEClass' => 'person-name'));?>
+function getDegree($degree) {
+   $str = null;
+   if ($degree != null) {
+      $str .= $degree;
+      if ($degree[strlen($degree) - 1] != '.') {
+         $str .=  '.';
+      }
+      $str .= ' ';
+   }
+   return $str;
+}
+echo $this->toolbox;// TOOLBOXY
+$this->addFile('css://style.less');
+?>
+<h1 class=""><?=$this->category()->getName()?></h1>
+<div class="posts-list persons-list">
+<?
+   if(!empty ($this->people)) {
+      foreach ($this->people as $person) {
+         
+         $name = getDegree($person->{People_Model::COLUMN_DEGREE})
+               .$person->{People_Model::COLUMN_NAME}.' '
+               .$person->{People_Model::COLUMN_SURNAME}.' '
+               .getDegree($person->{People_Model::COLUMN_DEGREE_AFTER});
+         ?>
+         <div class="person clearfix" id="preson-<?=$person->{People_Model::COLUMN_ID}?>">
+            <h2><?ps($name);?></h2>
+            <div class="person-image">
+               <?
+               $src = Utils_Image::cache($this->category()->getModule()->getDataDir().$person->{People_Model::COLUMN_IMAGE},
+                   300, 275, true);
+               ?>
+               <img src="<?=$src?>" alt="<?ps($name)?>" />
+            </div>
+         
+            <div class="person-content text">
+               <?
+               if($person->{People_Model::COLUMN_PHONE}){
+                  ?>
+                  <div class=""><?php ps($this->tr('Tel.:')); ?><span class="phone"><?ps($person->{People_Model::COLUMN_PHONE})?></span></div>
+                  <?
+               }
+               if($person->{People_Model::COLUMN_EMAIL}){
+                  ?>
+                  <div class=""><?php ps($this->tr('E-mail:')); ?><span class="email"><?ps($person->{People_Model::COLUMN_EMAIL})?></span></div>
+                  <?
+               }
+               if($person->{People_Model::COLUMN_SOCIAL_URL}){
+                  ?>
+                  <div class=""><a href="<?=$person->{People_Model::COLUMN_SOCIAL_URL}?>" class="profile link-external"><?ps($this->tr('Profil'))?></a></div>
+                  <?
+               }
+               
+               echo $person->{People_Model::COLUMN_TEXT};
+               ?>
+            </div>
+            <?
+            if($this->toolboxEdit != null){
+               $this->toolboxEdit->person_edit->setAction($this->link()->route('edit', array('id' => $person->{People_Model::COLUMN_ID})));
+               $this->toolboxEdit->person_del_->getForm()->id->setValues($person->{People_Model::COLUMN_ID});
+               echo $this->toolboxEdit;
+            }
+            ?>
+         </div>
+      <?}
+   } else {
+      echo ($this->tr('Není vložena žádná osoba'));
+   }?>
 </div>
 <?
-   echo $this->compScroll;
-   echo $this->toolbox;// TOOLBOXY
+echo $this->compScroll;
 ?>
