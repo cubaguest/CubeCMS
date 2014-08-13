@@ -21,6 +21,7 @@ class Text_Controller extends Controller {
    protected $textModel = null;
 
    protected $customFields = array();
+   protected $customFieldsTypes = array();
 
    protected function init()
    {
@@ -28,9 +29,17 @@ class Text_Controller extends Controller {
       $this->textModel = new Text_Model();
 
       $fields = $this->view()->getCurrentTemplateParam('customFields', false);
+      $fieldsTypes = $this->view()->getCurrentTemplateParam('customFieldsType', false);
       if($fields){
          foreach($fields as $tpl => $labels){
             $this->customFields[$tpl] = $labels[Locales::getLang()];
+            $this->customFields[$tpl] = $labels[Locales::getLang()];
+         }
+      }
+      if($fieldsTypes){
+         foreach($fieldsTypes as $tpl => $type){
+            $this->customFieldsTypes[$tpl] = $type;
+            $this->customFieldsTypes[$tpl] = $type;
          }
       }
       
@@ -269,7 +278,11 @@ class Text_Controller extends Controller {
       // custom fileds
       if($fields = $this->customFields){
          foreach($fields as $field => $label){
-            $elem = new Form_Element_TextArea('filed_'.$field, $label);
+            if(isset($this->customFieldsTypes[$field]) && $this->customFieldsTypes[$field] == 'text'){
+               $elem = new Form_Element_Text('filed_'.$field, $label);
+            } else {
+               $elem = new Form_Element_TextArea('filed_'.$field, $label);
+            }
             $elem->setLangs();
             if(isset($customFields[$field])){
                $elem->setValues($customFields[$field]->{Text_Model::COLUMN_TEXT});
