@@ -22,14 +22,12 @@ class Debug {
 
    public static function log() {
       $args = func_get_args();
-//      if(!class_exists('FirePHP')){
-         self::$vars = array_merge(self::$vars, $args);
-//      } else {
-//         $firephp = FirePHP::getInstance(true);
-//         foreach ($args as $arg) {
-//            $firephp->log($arg);
-//         }
-//      }
+      foreach ($args as $key => $arg) {
+         if(is_object($arg)){
+            $args[$key] = clone $arg;
+         }
+      }
+      self::$vars = array_merge(self::$vars, $args);
    }
 
    private static function prepareJsStringLiteral( $stringLiteral, $mode = 2 )
