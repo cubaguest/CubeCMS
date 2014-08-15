@@ -924,10 +924,12 @@ class Model_ORM extends Model implements ArrayAccess {
          $dbst->bindValue(':pkey', $record->getPK(), $this->tableStructure[$this->pKey]['pdoparam']); // bind pk
          // bind values
          foreach ($record->getColumns() as $colname => $params) {
-            if ($params['extern'] == true OR $params['changed'] < 1)
+            if ($params['extern'] == true OR $params['changed'] < 1){
                continue;
-            if (!isset($params['lang']))
+            }
+            if (!isset($params['lang'])){
                $params['lang'] = false;
+            }
             $value = $params['value'];
             if ($params['lang'] == true) {
                foreach (Locales::getAppLangs() as $lang) {
@@ -964,10 +966,12 @@ class Model_ORM extends Model implements ArrayAccess {
          $bindParamStr = array();
          // create query
          foreach ($record->getColumns() as $colname => $params) {
-            if (!isset($params['lang']))
+            if (!isset($params['lang'])){
                $params['lang'] = false;
-            if ($params['extern'] == true OR $params['changed'] != 1)
+            }
+            if ($params['extern'] == true OR $params['changed'] != 1){
                continue;
+            }
             if ($params['lang'] === true) {
                foreach (Locales::getAppLangs() as $lang) {
                   if ($params['aliasFor'] === null) {

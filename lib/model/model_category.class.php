@@ -82,12 +82,12 @@ class Model_Category extends Model_ORM {
    {
       $this->setTableName($this->tableName, 't_cats');
 
-      $this->addColumn(self::COLUMN_ID, array('datatype' => 'smallint', 'ai' => true, 'nn' => true, 'pk' => true));
-      $this->addColumn(self::COLUMN_ID_USER_OWNER, array('datatype' => 'smallint', 'nn' => true, 'default' => 0));
+      $this->addColumn(self::COLUMN_ID, array('datatype' => 'int', 'ai' => true, 'nn' => true, 'pk' => true));
+      $this->addColumn(self::COLUMN_ID_USER_OWNER, array('datatype' => 'int', 'nn' => true, 'default' => 0));
       $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(200)', 'lang' => true, 'pdoparam' => PDO::PARAM_STR, 'fulltext' => true, 'fulltextRel' => VVE_SEARCH_ARTICLE_REL_MULTIPLIER+1));
       $this->addColumn(self::COLUMN_ALT, array('datatype' => 'varchar(200)', 'lang' => true, 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_URLKEY, array('datatype' => 'varchar(100)', 'lang' => true, 'pdoparam' => PDO::PARAM_STR));
-      $this->addColumn(self::COLUMN_DISABLE, array('datatype' => 'tinyint(1)', 'lang' => true, 'pdoparam' => PDO::PARAM_BOOL, 'nn' => true, 'default' => 0));
+      $this->addColumn(self::COLUMN_DISABLE, array('datatype' => 'tinyint(1)', 'lang' => true, 'pdoparam' => PDO::PARAM_BOOL, 'nn' => true, 'default' => false));
       $this->addColumn(self::COLUMN_MODULE, array('datatype' => 'varchar(30)', 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_DATADIR, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR));
 
@@ -123,9 +123,6 @@ class Model_Category extends Model_ORM {
    {
       Cache::delete('cats_list_'.Auth::getUserId().'_1'); // allLangs true
       Cache::delete('cats_list_'.Auth::getUserId().'_'); // allLangs false
-      foreach ($record->{self::COLUMN_URLKEY} as $url) {
-         $record->{self::COLUMN_DISABLE} = $record->{self::COLUMN_URLKEY} == null ? true : false;
-      }
    } 
    
    /**

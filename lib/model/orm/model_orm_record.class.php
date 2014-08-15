@@ -90,7 +90,7 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
             }
          }
 
-         if(isset($this->columns[$collName]['pdoparam'])){
+         if(isset($this->columns[$collName]['pdoparam']) && $this->columns[$collName]['lang'] == false){
             if ($this->columns[$collName]['pdoparam'] == PDO::PARAM_BOOL) {
                $value = (bool) $value;
             } else if ($this->columns[$collName]['pdoparam'] == PDO::PARAM_INT) {
@@ -292,7 +292,7 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
     * @param string $offset -- název proměnné
     * @return mixed -- hodnota prvku
     */
-   public function offsetGet($offset)
+   public function &offsetGet($offset)
    {
       return $this->__get($offset);
    }

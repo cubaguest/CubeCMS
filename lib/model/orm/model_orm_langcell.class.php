@@ -22,11 +22,10 @@ class Model_ORM_LangCell implements ArrayAccess, Countable, Iterator {
     * Konstruktor
     */
    function  __construct($values = false) {
+      $this->values = array_fill_keys(Locales::getAppLangs(), null);
       if(is_array($values) && !empty ($values)){
-         $this->values = $values;
-      } else {
-         $this->values = array_fill_keys(Locales::getAppLangs(), null);
-      }
+         $this->values = array_merge($this->values, $values);
+      } 
    }
 
    /**
@@ -34,8 +33,8 @@ class Model_ORM_LangCell implements ArrayAccess, Countable, Iterator {
     * @param string $name -- název prvku
     * @param mixed $value -- hodnota prvku
     */
-   public function  __set($name,  $value) {
-      $this->values[$name] = $value;
+   public function  __set($lang,  $value) {
+      $this->values[$lang] = $value;
    }
 
    /**
@@ -43,8 +42,8 @@ class Model_ORM_LangCell implements ArrayAccess, Countable, Iterator {
     * @param string $name -- název proměnné
     * @return mixed
     */
-   public function  &__get($name) {
-      return $this->values[$name];
+   public function  &__get($lang) {
+      return $this->values[$lang];
    }
 
    /**
@@ -52,16 +51,16 @@ class Model_ORM_LangCell implements ArrayAccess, Countable, Iterator {
     * @param string $name -- název prvku
     * @return boolena
     */
-   public function  __isset($name) {
-      return isset ($this->values[$name]);
+   public function  __isset($lang) {
+      return isset ($this->values[$lang]);
    }
 
    /**
     * Metoda odstraní zadaný prvek
     * @param string $name -- název prvku
     */
-   public function  __unset($name) {
-      unset ($this->values[$name]);
+   public function  __unset($lang) {
+      unset ($this->values[$lang]);
    }
 
    /**
@@ -69,8 +68,8 @@ class Model_ORM_LangCell implements ArrayAccess, Countable, Iterator {
     * @param string $offset -- název proměnné
     * @param mixed $value -- hodnota prvku
     */
-   public function offsetSet($offset, $value) {
-      $this->__set($offset, $value);
+   public function offsetSet($lang, $value) {
+      $this->__set($lang, $value);
    }
 
    /**
@@ -78,16 +77,16 @@ class Model_ORM_LangCell implements ArrayAccess, Countable, Iterator {
     * @param string $offset -- název proměnné
     * @return boolean
     */
-   public function offsetExists($offset) {
-      return isset($this->values[$offset]);
+   public function offsetExists($lang) {
+      return isset($this->values[$lang]);
    }
 
    /**
     * Metoda odstranění prvku při přístupu přes pole
     * @param string $offset -- název prvku
     */
-   public function offsetUnset($offset) {
-      unset($this->container[$offset]);
+   public function offsetUnset($lang) {
+      unset($this->container[$lang]);
    }
 
    /**
@@ -95,8 +94,9 @@ class Model_ORM_LangCell implements ArrayAccess, Countable, Iterator {
     * @param string $offset -- název proměnné
     * @return mixed -- hodnota prvku
     */
-   public function offsetGet($offset) {
-      return isset($this->values[$offset]) ? $this->values[$offset] : null;
+   public function &offsetGet($lang) {
+      $str = null;
+      return isset($this->values[$lang]) ? $this->values[$lang] : $str;
    }
 
    /**
