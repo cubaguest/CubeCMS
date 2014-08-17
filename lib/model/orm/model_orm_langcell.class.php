@@ -95,8 +95,7 @@ class Model_ORM_LangCell implements ArrayAccess, Countable, Iterator {
     * @return mixed -- hodnota prvku
     */
    public function &offsetGet($lang) {
-      $str = null;
-      return isset($this->values[$lang]) ? $this->values[$lang] : $str;
+      return $this->__get($lang);
    }
 
    /**
