@@ -279,7 +279,7 @@ class Url_Request {
          // načtení kategorií
          $cache = new Cache();
          $cacheKey = md5(self::$serverName.'_cats_'.Auth::getGroupId().Locales::getLang()."_".$urlPart);
-         
+
          $catMatches = array();
          $modelCat = new Model_Category();
          $isDirectCategory = false;
@@ -302,6 +302,11 @@ class Url_Request {
                ->record();
             $cache->set($cacheKey, $cat);
          } 
+         if (!Auth::isAdmin()) {
+            $modelCat->where(' AND '.Model_Category::COLUMN_DISABLE." = 0", array(), true);
+         }
+         
+         $cat = $modelCat->record();
          if($cat != false && !$cat->isNew()){
             $matches = array();
             $regexp = "/\/([^?]*)\/?\??(.*)/i";
@@ -343,26 +348,26 @@ class Url_Request {
          $item = Model_CategoryAdm::findItemByUrl($urlPart);
          if($item){
             $regexp = "/".str_replace('/', '\/', (string)$item->{Model_Category::COLUMN_URLKEY})."\/([^?]*)\/?\??(.*)/i";
-            if(preg_match($regexp, $urlPart, $matches)) {
-               // pokud obsahuje soubor
-               $fileMatchs = array();
-               if(preg_match('/([a-z0-9]+)\.([a-z0-9]+)/i', $matches[1], $fileMatchs)){
-                  $this->urlType = self::URL_TYPE_MODULE_REQUEST;
-                  $this->outputType = $fileMatchs[2];
-                  $this->pageFull = false;
-               } else if(self::isXHRRequest()){ // při XHR není nutné zpracovávat celou stránku :-)
-                  $this->urlType = self::URL_TYPE_MODULE_REQUEST;
-                  $this->pageFull = false;
+               if(preg_match($regexp, $urlPart, $matches)) {
+                  // pokud obsahuje soubor
+                  $fileMatchs = array();
+                  if(preg_match('/([a-z0-9]+)\.([a-z0-9]+)/i', $matches[1], $fileMatchs)){
+                     $this->urlType = self::URL_TYPE_MODULE_REQUEST;
+                     $this->outputType = $fileMatchs[2];
+                     $this->pageFull = false;
+                  } else if(self::isXHRRequest()){ // při XHR není nutné zpracovávat celou stránku :-)
+                     $this->urlType = self::URL_TYPE_MODULE_REQUEST;
+                     $this->pageFull = false;
+                  }
+                  // jinak se jednná o kategorii
+                  $this->category = (string)$item->{Model_Category::COLUMN_URLKEY};
+                  $this->moduleUrlPart = $matches[1];
+                  $this->params = $matches[2];
+                  $this->isAdminCat = true;
+                  $return = true;
                }
-               // jinak se jednná o kategorii
-               $this->category = (string)$item->{Model_Category::COLUMN_URLKEY};
-               $this->moduleUrlPart = $matches[1];
-               $this->params = $matches[2];
-               $this->isAdminCat = true;
-               $return = true;
             }
          }
-      }
       return $return;
    }
 

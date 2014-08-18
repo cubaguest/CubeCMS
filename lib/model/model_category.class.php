@@ -163,14 +163,16 @@ class Model_Category extends Model_ORM {
                Model_Category::COLUMN_DEF_RIGHT, Model_Category::COLUMN_ID_USER_OWNER, Model_Category::COLUMN_FEEDS,
                Model_Category::COLUMN_INDIVIDUAL_PANELS, Model_Category::COLUMN_MODULE, Model_Category::COLUMN_URLKEY,
                Model_Category::COLUMN_VISIBILITY, Model_Category::COLUMN_ICON,  Model_Category::COLUMN_BACKGROUND,
-               Model_Category::COLUMN_PRIORITY,
+               Model_Category::COLUMN_PRIORITY, Model_Category::COLUMN_DISABLE,
                Model_Category::COLUMN_PARAMS
    //            , 'uk_l' => 'LENGTH( '.self::COLUMN_URLKEY.'_'.Locales::getLang().' )'
             ));
             $this->setSelectAllLangs($allLangs)
                ->withRights()
-               ->withModule()
-               ->where(Model_Category::COLUMN_DISABLE.' = 0', array());
+               ->withModule();
+            if(!Auth::isAdmin()){
+               $this->where(Model_Category::COLUMN_DISABLE.' = 0', array());
+            }
 //             ->order(array('LENGTH('.Model_Category::COLUMN_URLKEY.')' => 'DESC')); // filesort
             $cats = $this->records(Model_ORM::FETCH_PKEY_AS_ARR_KEY);
             Cache::set($key, $cats);
@@ -259,17 +261,21 @@ class Model_Category extends Model_ORM {
    {
       $model = new self();
 
-      $whereStr = null;
+      $whereStr = '1 = 1';
       $whereBind = array();
+      if(!Auth::isAdmin()){
+         $whereStr .= ' AND '.Model_Category::COLUMN_DISABLE.' = 0';
+      }
+      
       if(is_array($module)){
          $modBinds = array();
          foreach($module as $key => $mod){
             $modBinds[':mod_'.$key] = $mod;
          }
-         $whereStr = self::COLUMN_MODULE." IN (".implode(',', array_keys($modBinds)).")";
+         $whereStr .= ' AND '.self::COLUMN_MODULE." IN (".implode(',', array_keys($modBinds)).")";
          $whereBind = $modBinds;
       } else {
-         $whereStr = self::COLUMN_MODULE." = :module";
+         $whereStr .= ' AND '.self::COLUMN_MODULE." = :module";
          $whereBind['module'] = $module;
       }
       if($onlyWithRights){

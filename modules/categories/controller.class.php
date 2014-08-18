@@ -20,11 +20,6 @@ class Categories_Controller extends Controller {
    {
       $this->checkWritebleRights();
 
-      $this->setMainStruct();
-//       if ($this->routes()->getActionName() != 'main') {
-//          $this->setMainStruct(false);
-//       }
-
       $formDelete = new Form('category_', true);
 
       $elemId = new Form_Element_Hidden('id');
@@ -137,6 +132,13 @@ class Categories_Controller extends Controller {
       $form->priority->setValues($record->{Model_Category::COLUMN_PRIORITY});
       $form->individual_panels->setValues($record->{Model_Category::COLUMN_INDIVIDUAL_PANELS});
       $form->visibility->setValues($record->{Model_Category::COLUMN_VISIBILITY});
+      if(isset($form->disabledLangs)){
+         $disbaledLangs = array();
+         foreach ($record[Model_Category::COLUMN_DISABLE] as $lang => $value) {
+            $disbaledLangs[$lang] = $value;
+         }
+         $form->disabledLangs->setValues($disbaledLangs);
+      }
       $form->sitemap_priority->setValues($record->{Model_Category::COLUMN_CAT_SITEMAP_CHANGE_PRIORITY});
       $form->sitemap_frequency->setValues($record->{Model_Category::COLUMN_CAT_SITEMAP_CHANGE_FREQ});
 
@@ -166,6 +168,7 @@ class Categories_Controller extends Controller {
 //    Checkbox pro regeneraci url klíčů při přesunu  settings
       $elemRegenUrls = new Form_Element_Checkbox('regenerateUrls', $this->tr('Opravit URL'));
       $elemRegenUrls->setSubLabel($this->tr('Opravit URL adresu kategorie a všech potomků podle struktury'));
+      $elemRegenUrls->setAdvanced(true);
       $form->addElement($elemRegenUrls, 'settings', 4);
 
 
@@ -265,6 +268,15 @@ class Categories_Controller extends Controller {
          $record->{Model_Category::COLUMN_DATADIR} = $datadir;
          $record->{Model_Category::COLUMN_ID_USER_OWNER} = $form->owner->getValues();
 
+         if(isset($form->disabledLangs)){
+            foreach (Locales::getAppLangs() as $lang) {
+               $record[Model_Category::COLUMN_DISABLE][$lang] = false;
+            }
+            foreach ($form->disabledLangs->getValues() as $lang) {
+               $record[Model_Category::COLUMN_DISABLE][$lang] = true;
+            }
+         }
+         
          $categoryModel->save($record);
 
          // práva
@@ -392,12 +404,14 @@ class Categories_Controller extends Controller {
          $record->{Model_Category::COLUMN_FEEDS} = $feeds;
          $record->{Model_Category::COLUMN_DATADIR} = $dataDir;
          $record->{Model_Category::COLUMN_ID_USER_OWNER} = $form->owner->getValues();
-
-         // instalace
-//         $mInsClass = ucfirst($form->module->getValues()) . '_Install';
-//         if(!class_exists($mInsClass, true)){
-//            throw new UnexpectedValueException($this->tr('Neexistuje třída pro instalaci tohoto modulu'));
-//         }
+         if(isset($form->disabledLangs)){
+            foreach (Locales::getAppLangs() as $lang) {
+               $record[Model_Category::COLUMN_DISABLE][$lang] = false;
+            }
+            foreach ($form->disabledLangs->getValues() as $lang) {
+               $record[Model_Category::COLUMN_DISABLE][$lang] = true;
+            }
+         }
 
          $mClass = ucfirst($form->module->getValues()) . '_Module';
          if(!class_exists($mClass)){
@@ -618,6 +632,16 @@ class Categories_Controller extends Controller {
       $catVisibility->setSubLabel($this->tr('Položka určuje, která skupina návštěvníků resp. uživatelů danou stránku uvidí v menu, mapě stránek a podobě. Nicméně i když je stránka neviditelná, vždy ji lze zobrazit pomocí odkazu. Pro omezení přístupu využijte nastavení práv v pokročilých možnostech'));
       $form->addElement($catVisibility, 'settings');
 
+      if(Locales::isMultilang()){
+         $catDisLangs = new Form_Element_Select('disabledLangs', $this->tr('Vypnuté jazykové mutace'));
+         $catDisLangs->setMultiple(true);
+         $catDisLangs->setAdvanced(true);
+         $catDisLangs->setSubLabel($this->tr('Adminsitrátor vždy uvidí vše'));
+         foreach (Locales::getAppLangsNames() as $key => $name) {
+            $catDisLangs->addOption($name, $key);
+         }
+         $form->addElement($catDisLangs, 'settings');
+      }
 
       // práva
       $fGrpRights = $form->addGroup('rights', $this->tr('Práva'), $this->tr('Nastavení práv ke kategorii (r - čtení, w - zápis, c - úplná kontrola)'));
@@ -799,18 +823,6 @@ class Categories_Controller extends Controller {
 //          return false;
 //       }
       return true;
-   }
-
-   private function setMainStruct()
-   {
-//       if ($main === true) {
-//          $_SESSION['structAdmin'] = false;
-//          $this->isMainStruct = true;
-//          unset($_SESSION['structAdmin']);
-//       } else {
-//          $this->isMainStruct = false;
-//          $_SESSION['structAdmin'] = true;
-//       }
    }
 
    private function gotoBack()
@@ -1132,4 +1144,3 @@ class Categories_Controller extends Controller {
       return $urlkey;
    }
 }
-?>

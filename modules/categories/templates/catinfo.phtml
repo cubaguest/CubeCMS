@@ -18,21 +18,48 @@ function tplCatTrRights(Translator $translator, $right)
    return $out.'('.$right.')';
 }
 
+$disabled = array();
+foreach ($this->catInfo->{Model_Category::COLUMN_DISABLE} as $lang => $dis) {
+   if((bool)$dis){
+      $disabled[] = $lang;
+   }
+}
+
 ?>
 <input type="hidden" name="id_cat" value="<?=$this->catInfo->{Model_Category::COLUMN_CAT_ID};?>" />
 <table class="full-width">
-   <tr><th class="ui-widget-header" colspan="2"><?=$this->tr('Názvy (s jazyky)');?>:</th></tr>
+   <tr>
+      <th colspan="3" class="ui-widget-header"><?=$this->tr('Názvy (s jazyky)');?>:</th>
+   </tr>
    <?foreach ($this->catInfo[Model_Category::COLUMN_NAME] as $lang => $name) {
-      if($name != null){?><tr class="ui-widget-content ui-state-default"><td><?=  htmlspecialchars($name);?></td><td class="cell-lang"><?=vve_tpl_lang_image($lang)?></td></tr><?}
+      if($name != null){?>
+      <tr class="ui-widget-content ui-state-default">
+         <td colspan="2"><?=  htmlspecialchars($name);?></td><td class="cell-lang"><?=vve_tpl_lang_image($lang)?></td>
+      </tr><?}
    }?>
-   <tr><th class="ui-widget-header" colspan="2"><?=$this->tr('Adresy URL (s jazyky)');?>:</th></tr>
+   <tr><th class="ui-widget-header" colspan="3"><?=$this->tr('Adresy URL (s jazyky)');?>:</th></tr>
    <?
    $link = new Url_Link(true);
    foreach ($this->catInfo[Model_Category::COLUMN_URLKEY] as $lang => $key) {
-      if($key != null){?><tr class="ui-widget-content ui-state-default"><td class="editable">
+      if($key != null){?>
+      <tr class="ui-widget-content ui-state-default">
+         <td class="editable" colspan="2" >
             <a href="<?=$link->lang($lang)->category($key);?>" title="<?=$this->tr('Otevřít v novém okně')?>"
-               class="link-external"><?=$key?></a></td><td class="cell-lang"><?='&nbsp;'.vve_tpl_lang_image($lang)?></td></tr><?}
-   }?>
+               class="link-external"><?=$key?></a>
+         </td>
+         <td class="cell-lang"><?='&nbsp;'.vve_tpl_lang_image($lang)?></td>
+      </tr><?}
+   }
+   if(!empty($disabled)){?>
+   <tr class="ui-widget-content ui-state-default">
+      <th>Vypnuté jazyky</th>
+      <td colspan="2"><?
+         foreach ($disabled as $lang) {
+            echo vve_tpl_lang_image($lang).'&nbsp;';
+         }
+      ?></td>
+   </tr>
+   <?}?>
 </table>
 <br />
 <table class="full-width">
