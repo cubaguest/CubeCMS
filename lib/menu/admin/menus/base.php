@@ -86,7 +86,7 @@ $this->addItem(Menu_Admin::SECTION_CONTENT, new Menu_Admin_Item(
 //));
 $this->addItem(Menu_Admin::SECTION_CONTENT, new Menu_Admin_Item(
     32785, array( 'cs' => 'Bannery', 'en' => 'Banners'),
-   'content/banners', 'templates', 'image.png'
+   'content/banners', 'banners', 'image.png'
 ));
 $this->addItem(Menu_Admin::SECTION_CONTENT, new Menu_Admin_Item(
     32784, array( 'cs' => 'Formuláře', 'en' => 'Forms'),
