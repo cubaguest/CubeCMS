@@ -1,0 +1,13 @@
+<?
+if($this->itemName){
+   $h = $this->category()->getName().' - '.sprintf($this->tr('úprava položky %s'), $this->itemName);
+} else {
+   $h = $this->category()->getName().' - '.$this->tr('přidání položky');
+}
+?>
+<h1><?php ps($h)?></h1>
+<div class="admin-content">
+   <?php
+   echo $this->form;
+   ?>
+</div>

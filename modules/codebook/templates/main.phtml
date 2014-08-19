@@ -1,0 +1,76 @@
+<h1><?ps($this->category()->getName())?></h1>
+<div class="admin-content">
+<?php
+   $this->moduleButtons = array(
+      array(
+         'link' => $this->link()->route('add'),
+         'title' => $this->tr('nová položka'),
+         'icon' => Template_Toolbox2::ICON_ADD,
+         'name' => $this->tr('Přidat položku'),
+      ),
+   );
+   $this->includeTpl('modules/buttons.phtml', true);
+   ?>
+   <?if(!empty($this->items)){?>
+   <div id="codebook-list" class="cubecms-widget cubecms-list <?=$this->sorting ? 'cubecms-list-sortable' : ''?>">
+      <?foreach ($this->items as $item) {?>
+      <div class="item cubecms-list-row" id="codebook-item-<?=$item->getPK()?>" data-id="<?=$item->getPK()?>">
+         <div class="header">
+            <?if($this->sorting){?>
+            <span class="sort"><span class="icon icon-arrows-v"></span></span>
+            <?}?>
+            <span class="name">
+               <?ps($item->{$this->columnName})?>
+            </span>
+            <span class="tools">
+               <?
+               $this->toolboxItem->setTemplate(Template_Toolbox2::TEMPLATE_INLINE);
+               $this->toolboxItem->editItem->setAction($this->link()->route('edit', array('id' => $item->getPK())));
+               $this->toolboxItem->item_delete_->getForm()->id->setValues($item->getPK());
+               echo $this->toolboxItem;
+               ?>
+            </span>
+         </div>
+      </div>
+      <?}?>
+   </div>
+   <?if($this->sorting){
+      $jq = new JsPlugin_JQuery();
+      $jq->addUISortable();
+      $this->addJsPlugin($jq);
+      ?>
+      <script type="text/javascript">
+         $(document).ready(function(){
+            $( "#codebook-list" ).sortable({
+               placeholder: "cubecms-list-row cubecms-state-highlight",
+               forceHelperSize: true, forcePlaceholderSize: true,
+               cursor: 'move',
+               "axis": 'y',
+               handle: '.header',
+               update: function(event, ui) { 
+                  if (this === ui.item.parent()[0]) {
+                     var id = ui.item.data('id');
+                     var index = ui.item.index()+1;
+                     $.ajax({
+                        url : '<?=$this->link()->route('sort')?>',
+                        data : {id : id, position : index},
+                        type : 'POST',
+                        success : function(data){
+                           if(data.errmsg.lenght > 0){
+                              $( "#codebook-list" ).sortable('cancel');
+                              vveShowMessages(data);
+                           }
+                        }
+                     });
+                  }
+               }
+            });
+         });
+      </script>
+   <?}?>
+   <?} else {?>
+   <div class="alert alert-warning">
+         <?php ps($this->tr('Není vložena žádná položka')); ?>
+   </div>
+   <?}?>
+</div>
