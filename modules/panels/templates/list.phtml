@@ -15,7 +15,7 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
          array(
                'link' => $this->link()->route('add'),
                'title' => $this->tr('Přidat nový panel'),
-               'icon' => 'add.png',
+               'icon' => Template_Toolbox2::ICON_ADD,
                'name' => $this->tr('Přidat nový panel'),
          ),
    );
@@ -46,7 +46,7 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
          array(
                'link' => $this->link()->route('add')->rmParam(),
                'title' => $this->tr('Přidat nový individuální panel'),
-               'icon' => 'add.png',
+               'icon' => Template_Toolbox2::ICON_ADD,
                'name' => $this->tr('Přidat nový individuální panel'),
                'id' => 'button-add-individual',
          ),
