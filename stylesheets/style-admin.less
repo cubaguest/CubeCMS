@@ -9,8 +9,14 @@
 @color-text-hover-alt: darken(@color-text, 50);
 @color-text-gray: #333;
 @color-bg: #fff;
+@color-bg-header: #fff;
+@color-bg-content: #fff;
 @color-bg-hover: #39F;
+@color-bg-hover-light: lighten(@color-bg-hover, 35%);
 @color-bg-important: #FF3323;
+
+@color-bg-hightlight: #FFF7B4;
+@color-border-hightlight: darken(@color-bg-hightlight, 30%);
 
 @font-size: 16px;
 @font-family: Candara, Calibri, Segoe, "Segoe UI", Optima, Arial, sans-serif;
@@ -232,6 +238,7 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
    top: 3px;
    right: 3px;
    color: @color-text;
+   z-index: 1000;
 }
 /* Toolbox pro editaci poloĹľek */
 .toolbox-inline {
@@ -821,6 +828,57 @@ form {
          display: inline-block;
       }
    }
+}
+
+/* UI widget adminstrace */
+.cubecms-widget {
+   &.cubecms-table {
+      th, td {
+         padding: @padding-widget;
+      }
+      th {
+         font-weight: bold;
+      }
+   }
+   &.cubecms-list {
+      .cubecms-list-row {
+         .header {
+            .sort {
+               float: left;
+               margin: 0 @padding-widget;
+               cursor: move;
+            }
+            .name {
+               font-weight: bold;
+            }
+            .tools {
+
+            }
+            padding: 0;
+            margin: 0;
+            width: 100% !important;
+            /*background-color: @color-bg-header;*/
+         }
+         .content {
+            
+         }
+         &:hover {
+            border-color: @color-border-hover;
+            background-color: @color-bg-hover-light;
+            /*color: @color-text-hover;*/
+         }
+         background-color: @color-bg;
+         border: 1px solid @color-border;
+         padding: @padding-widget;
+         margin-bottom: @padding-widget;
+         .rounded-corners();
+         
+      }
+   }
+}
+.cubecms-state-highlight {
+   border-color: @color-border-hightlight !important;
+   background-color: @color-bg-hightlight !important;
 }
 
 
