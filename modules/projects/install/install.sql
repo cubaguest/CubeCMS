@@ -22,9 +22,11 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}projects` (
   `project_tpl_params` varchar(500) DEFAULT NULL,
   `project_keywords` varchar(300) DEFAULT NULL,
   `project_desc` varchar(500) DEFAULT NULL,
+  `project_order` int(11) DEFAULT '0',
   PRIMARY KEY (`id_project`),
   KEY `id_user` (`id_user`,`project_urlkey`),
   KEY `id_user_last_edit` (`id_user_last_edit`),
+  KEY `base` (`id_project_section`,`project_order`,`id_project`),
   FULLTEXT KEY `name` (`project_name`,`project_text_clear`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
@@ -42,6 +44,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}projects_sections` (
   `section_time_add` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `section_weight` smallint(6) DEFAULT '0',
   PRIMARY KEY (`id_project_section`),
-  KEY `id_category` (`id_category`,`section_urlkey`)
+  KEY `base` (`id_category`,`section_urlkey`),
+  KEY `id_category` (`id_category`,`id_project_section`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 

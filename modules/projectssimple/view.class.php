@@ -55,6 +55,8 @@ class ProjectsSimple_View extends Projects_View {
       $toolAdd->setIcon('page_add.png')->setTitle($this->tr('Přidat nový projekt'));
       $toolbox->addTool($toolAdd);
       
+      $toolbox->addTool($this->getSortToolbox());
+      
       $toolEditText = new Template_Toolbox2_Tool_PostRedirect('edit_text', $this->tr("Upravit úvodní text"),
             $this->link()->route('editText'));
       $toolEditText->setIcon('page_edit.png')->setTitle($this->tr('Upravit úvodní text seznamu'));
@@ -63,5 +65,3 @@ class ProjectsSimple_View extends Projects_View {
       return $toolbox;
    }
 }
-
-?>

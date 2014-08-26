@@ -9,6 +9,7 @@ class Projects_Routes extends Routes {
       $this->addRoute('editSection', "::seckey::/edit", 'editSection','{seckey}/edit/');
       $this->addRoute('editText', "edit-text/", 'editText','edit-text/');
       $this->addRoute('editProject', "::seckey::/::prkey::/edit/", 'editProject','{seckey}/{prkey}/edit/');
+      $this->addRoute('sortProjects', "::seckey::/sort/", 'sortProjects', '{seckey}/sort/');
       
       $this->addRoute('project', "::seckey::/::prkey::/", 'project', '{seckey}/{prkey}/');
       
@@ -17,5 +18,3 @@ class Projects_Routes extends Routes {
       $this->registerModule('photogalery', array('itemKey' => array('seckey', 'prkey')));
 	}
 }
-
-?>

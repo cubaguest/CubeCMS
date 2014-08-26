@@ -69,58 +69,6 @@ class Projects_View extends View {
       $this->template()->addFile('tpl://projects:edittext.phtml');
    }
 
-   /**
-    * Vytvoření toolboxů v detailu
-    */
-   protected function createDetailToolbox() 
-   {
-      if($this->category()->getRights()->isControll() OR
-              ($this->category()->getRights()->isWritable() AND
-                      $this->article->{Articles_Model::COLUMN_ID_USER} == Auth::getUserId())) {
-         if(($this->toolbox instanceof Template_Toolbox2) == false){
-            $this->toolbox = new Template_Toolbox2();
-         }
-
-         $this->toolbox->setIcon(Template_Toolbox2::ICON_WRENCH);
-         $toolEdit = new Template_Toolbox2_Tool_PostRedirect('edit_article', $this->tr("Upravit položku"), $this->link()->route('edit'));
-         $toolEdit->setIcon('page_edit.png')->setTitle($this->tr('Upravit položku'));
-         $this->toolbox->addTool($toolEdit);
-
-         if($this->formPublic instanceof Form){
-            $tooldel = new Template_Toolbox2_Tool_Form($this->formPublic);
-            $tooldel->setIcon('page_preview.png')->setTitle($this->tr('Zveřejnit položku'));
-            $this->toolbox->addTool($tooldel);
-         }
-
-         $tooldel = new Template_Toolbox2_Tool_Form($this->formDelete);
-         $tooldel->setIcon('page_delete.png')->setTitle($this->tr('Smazat položku'))
-            ->setConfirmMeassage($this->tr('Opravdu smazat položku?'));
-         $this->toolbox->addTool($tooldel);
-         
-         if($this->article != false){
-            $toolLangLoader = new Template_Toolbox2_Tool_LangLoader($this->article->{Articles_Model::COLUMN_TEXT});
-            $this->toolbox->addTool($toolLangLoader);
-         }
-
-         if($this->category()->getParam(Articles_Controller::PARAM_PRIVATE_ZONE, false) == true){
-            $toolboxP = new Template_Toolbox2();
-            $toolboxP->setIcon(Template_Toolbox2::ICON_PEN);
-            $toolEdit = new Template_Toolbox2_Tool_PostRedirect('edit_articlepr', $this->tr("Upravit privátní text"),
-            $this->link()->route('editPrivate'));
-            $toolEdit->setIcon('page_edit.png')->setTitle($this->tr('Upravit privátní text'));
-            $toolboxP->addTool($toolEdit);
-            $this->toolboxPrivate = $toolboxP;
-         }
-         
-         if(isset ($_GET['l']) AND isset ($this->article[Articles_Model::COLUMN_TEXT][$_GET['l']])){
-            $l = $_GET['l'];
-            $this->article->{Articles_Model::COLUMN_TEXT} = $this->article[Articles_Model::COLUMN_TEXT][$l];
-            $this->article->{Articles_Model::COLUMN_NAME} = $this->article[Articles_Model::COLUMN_NAME][$l];
-         }
-         $this->article->{Articles_Model::COLUMN_TEXT} = $this->template()->filter((string)$this->article->{Articles_Model::COLUMN_TEXT}, array('anchors'));
-      }
-   }
-
    protected function createSectionsToolbox()
    {
       if ($this->rights()->isControll()) {
@@ -169,6 +117,8 @@ class Projects_View extends View {
       $toolAdd->setIcon('page_add.png')->setTitle($this->tr('Přidat nový projekt'));
       $toolbox->addTool($toolAdd);
 
+      $toolbox->addTool($this->getSortToolbox($section));
+      
       if ($this->rights()->isControll()) {
          // edit
          $toolEdit = new Template_Toolbox2_Tool_PostRedirect('edit_section', $this->tr("Upravit sekci"),
@@ -186,6 +136,18 @@ class Projects_View extends View {
       }
       return $toolbox;
    }
+   
+   protected function getSortToolbox(Model_ORM_Record $section = null)
+   {
+      $toolSort = new Template_Toolbox2_Tool_PostRedirect('sort_projects', $this->tr("Řadit projekty"),
+               $this->link()->route('sortProjects', array('seckey' => $section ? $section->{Projects_Model_Sections::COLUMN_URLKEY} : null )));
+      $toolSort->setIcon(Template_Toolbox2::ICON_MOVE_UP_DOWN)->setTitle($this->tr('Řadit projekty'));
+      return $toolSort;
+   }
+   
+   public function sortProjectsView()
+   {
+      Template_Module::setEdit(true);
+      $this->template()->addFile('tpl://projects:edit_order.phtml');
+   }
 }
-
-?>

@@ -8,9 +8,8 @@ class ProjectsSimple_Routes extends Projects_Routes {
       $this->addRoute('addProject', "add-project/", 'addProject', "add-project/");
       $this->addRoute('editProject', "::prkey::/edit/", 'editProject','{prkey}/edit/');
       $this->addRoute('project', "::prkey::/", 'project', '{prkey}/');
+      $this->addRoute('sortProjects', "sort/", 'sortProjects', 'sort/');
       // cesty z fotogalerie
       $this->registerModule('photogalery', array('itemKey' => array('prkey')));
 	}
 }
-
-?>

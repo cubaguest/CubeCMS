@@ -1,5 +1,5 @@
 <?
-$this->addCssFile("style.css");
+$this->addFile("css://projects:style.less");
 // do titulku
 if($this->project != false) {
    $h = sprintf($this->tr('Úprava projektu "%s"'), $this->project->{Projects_Model_Projects::COLUMN_NAME});

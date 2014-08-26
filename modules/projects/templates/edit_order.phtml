@@ -1,0 +1,50 @@
+<?
+// do titulku
+$h = $this->tr('úprava pořadí projektů');
+$this->addPageTitle($h);
+
+$jq = new JsPlugin_JQuery();
+$jq->addUISortable();
+$this->addJsPlugin($jq);
+$this->addFile('css://projects:style.less');
+?>
+<h1><?ps($h)?></h1>
+<div class="content-form-edit">
+   <? echo $this->form->renderStart(); ?>
+      <table class="form-table">
+         <tr>
+            <th class="form-labels"><label class="">Projekty:</label></th>
+            <td class="form-controlls">
+            <ul id="projects-sort-list">
+               <?
+               foreach ($this->projects as $pr) {?>
+                  <li class="ui-state-default"><?
+                  echo $pr->{Projects_Model_Projects::COLUMN_NAME};
+                  $this->form->id->setValues($pr->getPK());
+                  echo $this->form->id;
+                  ?></li>
+               <?}?>
+            </ul>
+            </td>
+         </tr>
+         <tr>
+            <td class="form-labels"></td>
+            <td class="form-controlls font-small"><?=$this->tr('Pro změnu pořadí stačí uchopit a přesunout.')?></td>
+         </tr>
+         <tr>
+            <th class="form-labels"><?=$this->form->save->label()?></th>
+            <td class="form-controlls"><?=$this->form->save->controllAll()?></td>
+         </tr>
+      </table>
+   </fieldset>   
+   <? echo $this->form->renderEnd(); ?>
+   <script>
+	$(function() {
+		$( "#projects-sort-list" ).sortable({
+			placeholder: "ui-state-highlight",
+         cursor: 'move'
+		});
+		$( "#projects-sort-list" ).disableSelection();
+	});
+	</script>
+</div>

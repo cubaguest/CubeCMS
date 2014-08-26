@@ -46,9 +46,8 @@ class Projects_Controller extends Controller {
          ->where(Projects_Model_Sections::COLUMN_ID_CATEGORY.' = :idc', array('idc' => $this->category()->getId()))
             // ordery atd
          ->order(array(Projects_Model_Sections::COLUMN_WEIGHT => Model_ORM::ORDER_DESC,
-            Projects_Model_Projects::COLUMN_WEIGHT => Model_ORM::ORDER_DESC,
             Projects_Model_Sections::COLUMN_NAME => Model_ORM::ORDER_ASC,
-            Projects_Model_Projects::COLUMN_NAME => Model_ORM::ORDER_ASC,
+            Projects_Model_Projects::COLUMN_ORDER => Model_ORM::ORDER_ASC
             ))
          ->records();
       
@@ -113,7 +112,6 @@ class Projects_Controller extends Controller {
             $sqlIn[] = ':id'.$id;
             $sqlVals['id'.$id] = $id;
          }
-         
          $relProjects = $model
             ->joinFK(Projects_Model_Projects::COLUMN_ID_SECTION)
             ->where(Projects_Model_Projects::COLUMN_ID.' IN ('.implode(',', $sqlIn).')', $sqlVals )
@@ -312,8 +310,6 @@ class Projects_Controller extends Controller {
             $rec->{Projects_Model_Projects::COLUMN_RELATED} = implode(';', $form->related->getValues());
          }
          
-         $rec->{Projects_Model_Projects::COLUMN_WEIGHT} = $form->weight->getValues();
-         
          if($form->url->getValues() == null){
             $rec->{Projects_Model_Projects::COLUMN_URLKEY} = $this->createUniqueProjectUrlKey( $rec->{Projects_Model_Projects::COLUMN_NAME} );
          } else {
@@ -423,8 +419,6 @@ class Projects_Controller extends Controller {
             $rec->{Projects_Model_Projects::COLUMN_RELATED} = null;
          }
          
-         $rec->{Projects_Model_Projects::COLUMN_WEIGHT} = $form->weight->getValues();
-         
          $oldDirName = $rec->{Projects_Model_Projects::COLUMN_URLKEY};
          
          if($form->url->getValues() == null){
@@ -511,6 +505,58 @@ class Projects_Controller extends Controller {
       $this->view()->form = $form;
       $this->view()->dataDir = $this->module()->getDataDir(true).$rec->{Projects_Model_Projects::COLUMN_URLKEY}.'/';
       
+   }
+   
+   public function sortProjectsController($seckey = null)
+   {
+      $this->checkWritebleRights();
+      
+      $model = new Projects_Model_Projects();
+      $modelS = new Projects_Model_Sections();
+      if($seckey){
+         $section = $modelS
+             ->where(Projects_Model_Sections::COLUMN_URLKEY." = :ukey", array('ukey' => $seckey))
+             ->record();
+      } else {
+         $section = $modelS
+             ->where(Projects_Model_Sections::COLUMN_ID_CATEGORY." = :idc", array('idc' => $this->category()->getId()))
+             ->record();
+      }
+      if(!$section){
+         throw new UnexpectedPageException();
+      }
+      
+      $projects = $model
+          ->where(Projects_Model_Projects::COLUMN_ID_SECTION." = :ids", array('ids' => $section->getPK()))
+          ->records();
+
+      $form = new Form('person_order_');
+      
+      $eId = new Form_Element_Hidden('id');
+      $eId->setDimensional();
+      
+      $form->addElement($eId);
+      
+      $eSave = new Form_Element_SaveCancel('save');
+      $form->addElement($eSave);
+
+      if($form->isSend() && $form->save->getValues() == false){
+         $this->link()->route()->reload();
+      }
+      
+      if($form->isValid()){
+         $ids = $form->id->getValues();
+         foreach ($ids as $index => $id) {
+            /* @var $project Model_ORM_Ordered_Record */
+            $project = Projects_Model_Projects::getRecord($id);
+            $project->setRecordPosition($index + 1);
+         }
+         $this->infoMsg()->addMessage($this->tr('Pořadí bylo uloženo'));
+         $this->link()->route()->reload();
+      }
+      
+      $this->view()->projects = $projects;
+      $this->view()->form = $form;
    }
    
    public function editTextController() {
@@ -605,13 +651,6 @@ class Projects_Controller extends Controller {
       }
       $form->addElement($elemSec, $fGrpInclusion);
       
-      $elemWeight = new Form_Element_Text('weight', $this->tr('Váha'));
-      $elemWeight->setSubLabel($this->tr("Větší váha umístí projekt výše."));
-      $elemWeight->addValidation(new Form_Validator_NotEmpty());
-      $elemWeight->addValidation(new Form_Validator_IsNumber(null, Form_Validator_IsNumber::TYPE_INT));
-      $elemWeight->setValues(0);
-      $form->addElement($elemWeight, $fGrpInclusion);
-      
       $mProjects = new Projects_Model_Projects();
       $prs = $mProjects
             ->joinFK(Projects_Model_Projects::COLUMN_ID_SECTION)
@@ -655,7 +694,6 @@ class Projects_Controller extends Controller {
          $form->keywords->setValues($prRecord->{Projects_Model_Projects::COLUMN_KEYWORDS});
          $form->desc->setValues($prRecord->{Projects_Model_Projects::COLUMN_DESCRIPTION});
          $form->section->setValues($prRecord->{Projects_Model_Projects::COLUMN_ID_SECTION});
-         $form->weight->setValues($prRecord->{Projects_Model_Projects::COLUMN_WEIGHT});
          $form->tplParams->setValues($prRecord->{Projects_Model_Projects::COLUMN_TPL_PARAMS});
          
          if($prRecord->{Projects_Model_Projects::COLUMN_IMAGE} != null){
@@ -835,4 +873,3 @@ class Projects_Controller extends Controller {
       }
    }
 }
-?>
