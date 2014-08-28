@@ -170,7 +170,7 @@ class File_Image_Gd extends File_Image_Base {
 
    public function filter($filter)
    {
-      $args = func_get_args();
+      $args = is_array($filter) ? $filter : func_get_args();
       $this->loadImageData();
       call_user_func_array('imagefilter', array_merge(array($this->imageData), $args));
 //      imagefilter($this->imageData, $args[0]);
@@ -240,6 +240,7 @@ class File_Image_Gd extends File_Image_Base {
           'alpha' => 0.5, // 0 - průhledný, 1 - neprůhledný 
           'horizontal' => 'right',
           'vertical' => 'bottom',
+          'bgFill' => true,
       );
       
       $typeSpace = imagettfbbox($params['fontSize'], 0, $params['fontFile'], $text);
@@ -251,8 +252,10 @@ class File_Image_Gd extends File_Image_Base {
       // známka
       $stamp = imagecreatetruecolor($stamp_width, $stamp_height);
       imagesavealpha($stamp, true);
-      $white = imagecolorallocatealpha($stamp, 0, 0, 0, 127);
-      imagefill($stamp, 0, 0, $white);
+      if($params['bgFill']){
+         $white = imagecolorallocatealpha($stamp, 0, 0, 0, 64);
+         imagefill($stamp, 0, 0, $white);
+      }
       // Nastavení barev
       if($params['bgColor'] != null){
          $colorBg = $this->hexrgb($params['bgColor']);
@@ -304,6 +307,72 @@ class File_Image_Gd extends File_Image_Base {
       
       // Destroy image in memory to free-up resources:
       imagedestroy($stamp);
+      return $this;
+   }
+   
+    /**
+    * Meota pro psaní textu do obrázku
+    * @param string $text
+    * @param array $params
+    * @return \File_Image_Gd
+    */
+   public function writeText($text, $params = array())
+   {
+      $this->loadImageData();
+      $params += array(
+          'color' => '000000',
+          'fontSize' => 14,
+          'fontFile' => AppCore::getAppLibDir().'fonts'.DIRECTORY_SEPARATOR.'FreeSans.ttf',
+          'bgColor' => 'ffffff',
+          'alpha' => 0.5, // 0 - prohledné, 1 - neprohledné 
+          'horizontal' => 'right',
+          'vertical' => 'bottom',
+          'bgFill' => true,
+      );
+      $typeSpace = imagettfbbox($params['fontSize'], 0, $params['fontFile'], $text);
+      $alpha = round((1 - $params['alpha']) * 127);
+      var_dump($typeSpace);
+      // výpočet velikosti
+      $text_width = abs($typeSpace[4] - $typeSpace[0]) + 10;
+      $text_height = abs($typeSpace[5] - $typeSpace[1]) + 10;
+
+      // PYidání textu
+      $color = $this->hexrgb($params['color']);
+      $text_color = imagecolorallocatealpha($this->imageData, $color[0], $color[1], $color[2], $alpha);
+      
+      // dopočet pozice z parametrů
+      switch ($params['horizontal']) {
+         case 'left':
+            $dest_x = 0;
+            break;
+         case 'center':
+            $dest_x = ($this->getWidth()/2) - ($text_width/2);
+            break;
+         case 'right':
+            $dest_x = $this->getWidth() - $text_width;
+            break;
+         default:
+            $dest_x = (int)$params['horizontal'];
+            break;
+      }
+      switch ($params['vertical']) {
+         case 'top':
+            $dest_y = 0;
+            break;
+         case 'center':
+            $dest_y = ($this->getHeight()/2) - ($text_height/2);
+            break;
+         case 'bottom':
+            $dest_y = $this->getHeight() - $text_height;
+            break;
+         default:
+            $dest_y = (int)$params['vertical'];
+            break;
+      }
+      var_dump($text_height, $this->getHeight(), $dest_y);
+      var_dump($text_width, $this->getWidth(), $dest_x);die;
+      //přidání do obrázku
+      imagettftext($this->imageData, $params['fontSize'], 0, $dest_x, $dest_y, $text_color, $params['fontFile'], $text);
       return $this;
    }
    
