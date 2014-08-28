@@ -1,15 +1,45 @@
 /* ONLY FOR TINYMCE */
-body.mceContentBody { padding: 5px; background-color: #FFFFFF; background-image: none; }
-body.mceContentBody .photogalery,
-body.mceContentBody .tpl
-{
-   border: 1px dotted #c00;
-}
-body.mceContentBody td, body.mceContentBody th { // repair tinymce table
-   font-size: 100%;
+@color-border-outline: #c00;
+body.mceContentBody { 
+   td, th { // repair tinymce table
+      font-size: 100%;
+   }
+   .photogalery, .tpl
+   {
+      border: 1px dotted @color-border-outline;
+   }
+   .photogalery {
+      background-color: #ffc;
+
+   }
+   .tpl {
+      &.expand-content {
+         &:after {
+            content: "Expander";
+            position: absolute;
+            top: 0;
+            right: 0;
+            font-size: 10px;
+            background-color: @color-border-outline;
+            padding: 3px 5px;
+            color: white;
+         }
+         .header {
+            a {
+               cursor: s-resize;
+            }
+         }
+         .content {
+            padding: 5px;
+            border-top: 1px dotted @color-border-outline;
+         }
+         position: relative;
+         margin-bottom: 5px;
+      }
+   }
+   
+   margin: 5px; 
 }
 
-body.mceContentBody .photogalery {
-   background-color: #ffc;
-}
+
 
