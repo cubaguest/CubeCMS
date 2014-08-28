@@ -652,4 +652,46 @@ class Form extends TrObject implements ArrayAccess, Iterator {
          $container->{$key} = new Form_Data_Item(get_class($e), $e->getLabel(), $f['name'], $e->getSubLabel());
       }
    }
+   
+   /**
+    * Metoda vytvoří formulář z prvků v uložených v poli
+    * @param array $data -- pole s prvky
+    * @param string $group -- skupina
+    */
+   public function createItems($data, $group = null)
+   {
+      foreach ($data as $name => $params) {
+         if($params instanceof Form_Element){
+            $this->addElement($params, $group);
+            continue;
+         }
+         
+         $par = array_merge(array(
+            'label' => $this->tr('Název'), 
+            'class' => "Form_Element_Text", 
+            'validators' => array(), 
+            'filters' => array(), 
+            'options' => array(), 
+            'multiple' => false, 
+            'advanced' => false, 
+            'value' => null, 
+         ), $params);
+         /* @var $e Form_Element */
+         $e = new $par['class']($name, $par['label']);
+         $e->setMultiple($par['multiple']);
+         $e->setAdvanced($par['advanced']);
+         $e->setValues($par['value']);
+         foreach ($par['validators'] as $validator) {
+            $e->addValidation($validator);
+         }
+         foreach ($par['filters'] as $filter) {
+            $e->addFilter($filter);
+         }
+         
+         if($e instanceof Form_Element_Select){
+            $e->setOptions($par['options']);
+         }
+         $this->addElement($e, $group);
+      }
+   }
 }
