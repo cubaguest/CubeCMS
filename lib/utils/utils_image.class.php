@@ -10,7 +10,7 @@
  */
 class Utils_Image {
 
-   public static function cache($path, $width = null, $height = null, $crop = false)
+   public static function cache($path, $width = null, $height = null, $crop = false, $filter = array())
    {
       if (strpos($path, AppCore::getAppWebDir()) !== false) { // absolutní cesta
          $path = str_replace(array(
@@ -35,6 +35,9 @@ class Utils_Image {
 
 
       $sizes = $width . 'x' . $height . ($crop == false ? '' : 'c');
+      if(!empty($filter)){
+         $sizes .= '-f_'.implode('_', $filter);
+      }
       $origPath = str_replace(Url_Request::getBaseWebDir(), '', $path);
       $cachePath = 'cache/imgc/' . Template::face() . '/' . $sizes . '/' . $origPath;
       $hash = sha1($sizes . VVE_DB_PASSWD);
@@ -54,7 +57,7 @@ class Utils_Image {
       // check change time if cached is oldest then original remove
       if (is_file($realCachedPath) && filemtime($realCachedPath) < filemtime($realOrigPath)) {
          @unlink($realCachedPath);
-         $path .= '&t=' . time();
+         $path .= '&t=' .(string)microtime(true);
       }
       return $path . ($getParasms != null ? '&' . $getParasms : null);
    }

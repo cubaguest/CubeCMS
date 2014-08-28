@@ -49,12 +49,20 @@ $allowSizes = array(/* base ratio 4:3 */
 $expectedHash = sha1($strSize.VVE_DB_PASSWD);
 // parse sizes
 $m = array();
-if(preg_match('/^([0-9]+)?x([0-9]+)?(c?)$/', $sizesTMP, $m) === false){
+if(preg_match('/^([0-9]+)?x([0-9]+)?(c?)(?:-f_([0-9]+)?(?:_([0-9]+)?)?(?:_([0-9]+)?)?(?:_([0-9]+)?)?(?:_([0-9]+)?)?)?$/', $sizesTMP, $m) == false){
    sendError('Vylikost nebyla zadána');
 }
 $SIZES['w'] = (int)$m[1];
 $SIZES['h'] = (int)$m[2];
 $SIZES['c'] = $m[3] == "c" ? true : false;
+
+// 4 - typ filtru
+// první parametr filtru
+// druhý parametr filtru
+$filterParams = array();
+if(isset($m[4])){
+   $filterParams = array_slice($m, 4);
+}
 
 if( ( $HASH != null && $expectedHash != $HASH )
     || ( $HASH == null && ( ($SIZES['w'] != null && !in_array($SIZES['w'], $allowSizes['w']) )
@@ -92,6 +100,10 @@ try {
    // create thum in cache
    $image->getData()->resize($SIZES['w'], $SIZES['h'], $resizeType );
 
+   if(!empty($filterParams)){
+      $image->getData()->filter($filterParams);
+   }
+   
    $dir = new FS_Dir(dirname($CACHED_FILE));
    $dir->check();
 
