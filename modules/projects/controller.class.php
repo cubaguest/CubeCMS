@@ -628,17 +628,21 @@ class Projects_Controller extends Controller {
       
       $elemImage = new Form_Element_File('image', $this->tr('Titulní obrázek'));
       $elemImage->addValidation(new Form_Validator_FileExtension(array('jpg', 'jpeg', 'png', 'gif')));
+      $elemImage->setSubLabel($this->tr('Další obrázky je možné přidat po uložení'));
       $form->addElement($elemImage, $fGrpAppearance);
       
       $elemImageThumb = new Form_Element_File('imageThumb', $this->tr('Titulní obrázek - miniatura'));
       $elemImageThumb->addValidation(new Form_Validator_FileExtension(array('jpg', 'jpeg', 'png', 'gif')));
       $elemImageThumb->setSubLabel($this->tr('Pokud není zadán, je vytvořena miniatura z titulního.'));
+      $elemImageThumb->setAdvanced(true);
       $form->addElement($elemImageThumb, $fGrpAppearance);
       
       $modelSec = new Projects_Model_Sections();
       $secs = $modelSec->where(Projects_Model_Sections::COLUMN_ID_CATEGORY.' = :idc', array('idc' => $this->category()->getId()))->records();
       
       $elemSec = new Form_Element_Select('section', $this->tr('Sekce'));
+      $elemSec->setAdvanced(get_class($this) == 'Projects_Controller' ? false : true);
+          
       foreach ($secs as $s) {
          $elemSec->setOptions(array($s->{Projects_Model_Sections::COLUMN_ID} => $s->{Projects_Model_Sections::COLUMN_NAME}), true);
       }
@@ -668,6 +672,7 @@ class Projects_Controller extends Controller {
       
       
       $elemUrl = new Form_Element_UrlKey('url', $this->tr('URL klíč'));
+      $elemUrl->setAdvanced(true);
       $elemUrl->setCheckingUrl($this->link()->route('checkProjectUrlkey'))
          ->setUpdateFromElement($elemName);
       if($prRecord != null){
@@ -676,13 +681,16 @@ class Projects_Controller extends Controller {
       $form->addElement($elemUrl, $fGrpSEO);
       
       $elemKeywords = new Form_Element_Text('keywords', $this->tr('Klíčová slova'));
+      $elemKeywords->setAdvanced(true);
       $form->addElement($elemKeywords, $fGrpSEO);
       
       $elemDesc = new Form_Element_TextArea('desc', $this->tr('Popis pro vyhledávače'));
+      $elemDesc->setAdvanced(true);
       $form->addElement($elemDesc, $fGrpSEO);
       
       $elemTplParams = new Form_Element_Text('tplParams', $this->tr('Parametry šablony'));
       $elemTplParams->setSubLabel($this->tr('Parametry projektu pro šablonu (např barva, ...). Formát: "název:hodnota;název:hodnota". Parametry určuje kodér šablony.'));
+      $elemTplParams->setAdvanced(true);
       $form->addElement($elemTplParams, $fGrpAppearance);
       
       if($prRecord != null){
