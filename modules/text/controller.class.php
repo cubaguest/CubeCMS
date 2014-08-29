@@ -293,9 +293,14 @@ class Text_Controller extends Controller {
       }
 
       $submits = new Form_Element_Multi_Submit('send');
-      $submits->addElement(new Form_Element_Submit('cancel', $this->tr('Zrušit')));
-      $submits->addElement(new Form_Element_Submit('save', $this->tr('Uložit')));
-      $submits->addElement(new Form_Element_Submit('preview', $this->tr('Náhled')));
+      $eCancel = new Form_Element_Submit('cancel', $this->tr('Zrušit'));
+      $eCancel->html()->addClass('btn-danger');
+      $submits->addElement($eCancel);
+      $eSave = new Form_Element_Submit('save', $this->tr('Uložit'));
+      $eSave->html()->addClass('btn-success');
+      $submits->addElement($eSave);
+      $ePreview = new Form_Element_Submit('preview', $this->tr('Náhled'));
+      $submits->addElement($ePreview);
       $form->addElement($submits);
       
       return $form;
