@@ -2,7 +2,7 @@
 /*
  * Třída modelu s detailem galerie
 */
-class PhotoGalery_Model_Images extends Model_ORM {
+class PhotoGalery_Model_Images extends Model_ORM_Ordered {
    const DB_TABLE = 'photogalery_images';
    /**
     * Názvy sloupců v databázi pro tabulku s obrázky
@@ -33,6 +33,8 @@ class PhotoGalery_Model_Images extends Model_ORM {
       $this->addColumn(self::COLUMN_ORDER, array('datatype' => 'smallint', 'pdoparam' => PDO::PARAM_INT, 'default' => 0));
 
       $this->setPk(self::COLUMN_ID);
+      $this->setOrderColumn(self::COLUMN_ORDER);
+      $this->setLimitedColumns(array(self::COLUMN_ID_CAT, self::COLUMN_ID_ART));
       
       $this->addForeignKey(self::COLUMN_ID_CAT, 'Model_Categories', Model_Category::COLUMN_CAT_ID);
    }
@@ -90,6 +92,18 @@ class PhotoGalery_Model_Images extends Model_ORM {
       return $dbst->fetch();
    }
 
+   /**
+    * 
+    * @param type $idCat
+    * @param type $idArticle
+    * @param type $file
+    * @param type $name
+    * @param type $desc
+    * @param type $ord
+    * @param type $idImage
+    * @return type
+    * @deprecated since version 1.3.0
+    */
    public function saveImage($idCat, $idArticle, $file = null, $name = null, $desc = null, $ord = '0', $idImage = null) {
       // globalní prvky
       $this->setIUValues(array(self::COLUMN_ID_CAT => $idCat,
@@ -240,4 +254,7 @@ class PhotoGalery_Model_Images extends Model_ORM {
    }
 }
 
-?>
+
+//class PhotoGalery_Model_Images_Record extends Model_ORM_Ordered_Record {
+//   
+//}

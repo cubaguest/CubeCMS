@@ -42,10 +42,10 @@ class Photogalery_View extends View {
          $toolEditImages->setIcon('image_edit.png')->setTitle($this->tr('Upravit obrázky'));
          $toolbox->addTool($toolEditImages);
          
-         $toolSortImages = new Template_Toolbox2_Tool_PostRedirect('sort_images', $this->tr("Řadit obrázky"),
-         $this->link()->route('sortphotos'));
-         $toolSortImages->setIcon(Template_Toolbox2::ICON_MOVE)->setTitle($this->tr('Řadit obrázky'));
-         $toolbox->addTool($toolSortImages);
+//         $toolSortImages = new Template_Toolbox2_Tool_PostRedirect('sort_images', $this->tr("Řadit obrázky"),
+//         $this->link()->route('sortphotos'));
+//         $toolSortImages->setIcon(Template_Toolbox2::ICON_MOVE)->setTitle($this->tr('Řadit obrázky'));
+//         $toolbox->addTool($toolSortImages);
          $this->template()->toolboxImages = $toolbox;
       }
    }
@@ -56,9 +56,39 @@ class Photogalery_View extends View {
          Template_Navigation::addItem($this->name, $this->link()->route('detail'));
          $this->template()->addPageTitle($this->name);
       }
+      
       $this->template()->addPageTitle($this->tr('úprava obrázků'));
       $this->template()->addFile("tpl://photogalery:editphotos.phtml");
       Template_Navigation::addItem($this->tr('Úprava obrázků'), $this->link());
+      
+      $toolbox = new Template_Toolbox2();
+      $toolbox->setIcon(Template_Toolbox2::ICON_IMAGE_WRENCH);
+      
+      $toolShow = new Template_Toolbox2_Tool_Button('preview', $this->tr("Náhled"));
+      $toolShow->setIcon('search')->setTitle($this->tr('Náhled'));
+      $toolbox->addTool($toolShow);
+      
+      $toolEditLabels = new Template_Toolbox2_Tool_Button('edit_texts', $this->tr("Upravit text"));
+      $toolEditLabels->setIcon(Template_Toolbox2::ICON_PEN)->setTitle($this->tr('Upravit texty'));
+      $toolbox->addTool($toolEditLabels);
+      
+      $toolRotateLeft = new Template_Toolbox2_Tool_Button('rotate_left', $this->tr("Otočit doleva"));
+      $toolRotateLeft->setIcon('rotate-left')->setTitle($this->tr('Otočit doleva'));
+      $toolbox->addTool($toolRotateLeft);
+      
+      $toolRotateRight = new Template_Toolbox2_Tool_Button('rotate_right', $this->tr("Otočit doleva"));
+      $toolRotateRight->setIcon('rotate-right')->setTitle($this->tr('Otočit doleva'));
+      $toolbox->addTool($toolRotateRight);
+      
+      
+      $toolDelete = new Template_Toolbox2_Tool_Button('delete', $this->tr("Smazat"));
+      $toolDelete->setIcon('delete')->setTitle($this->tr('Smazat'));
+//      $toolDelete->setConfirmMeassage($this->tr('Opravdu smazat?'));
+      $toolDelete->setImportant(true);
+      $toolDelete->setIcon(Template_Toolbox2::ICON_DELETE);
+      $toolbox->addTool($toolDelete);
+      
+      $this->imageToolbox = $toolbox;
    }
 
    public function sortphotosView() {
@@ -72,7 +102,9 @@ class Photogalery_View extends View {
       Template_Navigation::addItem($this->tr('Řazení obrázků'), $this->link());
    }
 
-   public function uploadFileView() {}
+   public function imageUploadView() {
+      $this->template()->addFile("tpl://photogalery:upload-complete.phtml");
+   }
    
    public function checkFileView() {}
 

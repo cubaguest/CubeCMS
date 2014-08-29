@@ -3,273 +3,176 @@ $jq = new JsPlugin_JQuery();
 $jq->addUISortable();
 $jq->addUIDialog();
 $this->addJsPlugin($jq);
-$this->addJsPlugin(new JsPlugin_SWFUpload());
-$this->addJsPlugin(new JsPlugin_PiroBox());
-$this->addJsPlugin(new JsPlugin_JCrop());
+$this->addJsPlugin(new JsPlugin_PrettyPhoto());
 $this->addFile("css://photogalery:style.less");
+$this->addFile("js://photogalery:editphotos.js");
 ?>
 <h1><?
    printf($this->tr('Úprava obrázků přiřazených ke "%s"'), $this->name == null ? $this->category()->getName() : $this->name);
 ?></h1>
-<?$this->includeFile('tpl://photogalery:addimage.phtml')?>
-<div class="ui-widget ui-widget-imageslist">
-   <h2 class="ui-widget-header"><?=$this->tr('Seznam uložených obrázků')?></h2>
-   <div class="">
-      <form method="post" action="<?=$this->link()?>">
-         <fieldset class="fieldset-alt">
-         <div class="list-controlls ui-widget-header clearfix">
-            <p class="images-counter-wrap">
-               <?=$this->tr('Celkem obrázků:')?>
-               <span class="images-counter"><?=count($this->images)?></span>
-            </p>
-            <input id="button-sort-images" type="button" value="<?=$this->tr('Řadit obrázky')?>"
-                   title="<?=$this->tr('upravit řazení obrázků')?>" onclick="window.location.href = '<?=$this->link()->route('sortphotos')->param('b','e')?>'" />
-            <input id="button-check-all-images" type="button" value="<?=$this->tr('Změnit označení')?>" title="<?=$this->tr('Změnit označení pro smazání')?>" />
+<div>
+   <h2><?=$this->tr('Nahrání obrázků')?></h2>
+   <div id="image-uplaod-component" class="drop-area clearfix">
+      <?
+      $this->uploadForm->html()
+          ->setAttrib('id', 'images-upload-form')
+//          ->setAttrib('target', 'upload-target')
+          ;
+      echo $this->uploadForm->renderStart();
+      ?>
+      <div class="form-group">
+         <div class="coll-input">
+            <div class="form-controls">
             <?
-            echo $this->editForm->save->control();
+            echo $this->uploadForm->image->control();
             ?>
+            <div class="drop-area-label"><?  ps($this->tr('Nebo zde přetáhněte obrázky'))?></div>
+            </div>
          </div>
-         <div id="edit-photos-list" class="ui-widget-content edit-photos-list-short">
-            <table class="full-width">
-            <?$step = 0;
-            foreach ($this->images as $image) {
-               $step++;?>
-               <tr id="file-<?=$image->{PhotoGalery_Model_Images::COLUMN_ID}?>"
-                   data-id="<?=$image->{PhotoGalery_Model_Images::COLUMN_ID}?>"
-                   data-file="<?=str_replace('.', '_', $image->{PhotoGalery_Model_Images::COLUMN_FILE})?>"
-                   class="ui-state-default">
-               <td class="photo-select">
-                  <?
-                  $this->editForm->delete->setDimensional($image->{PhotoGalery_Model_Images::COLUMN_ID});
-                  $this->editForm->delete->setValues(false);
-                  //echo ($this->editForm->delete->label());
-                  echo ($this->editForm->delete->control()->addClass('button-check-delete-image'));//->setAttrib('onclick', "if(this.checked == true)return confirm('Smazat?')"));
-                  echo ($this->editForm->delete->scripts());
-                  ?>
-               </td>
-               <td class="photo-preview">
-                  <div>
-                  <a href="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir.Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR
-                     .$image->{PhotoGalery_Model_Images::COLUMN_FILE}?>" class="pirobox_gall full-image-preview" title="<?=$this->tr('Zobrazit náhled')?>"><img
-                        src="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir.Photogalery_Controller::DIR_SMALL.URL_SEPARATOR
-               .$image->{PhotoGalery_Model_Images::COLUMN_FILE}.'?time='.time()?>" alt="<?=$image->{PhotoGalery_Model_Images::COLUMN_FILE}?>" width="70"
-                  /></a>
-                  </div>
-                  <div>
-                     <a href="<?=$this->link()?>#image-<?=$image->{PhotoGalery_Model_Images::COLUMN_ID}?>"
-                        class="button-edit-thumbnail form-button"
-                        title="<?=$this->tr('Upravit miniaturu')?>"><?=$this->tr('Miniatura')?></a>
-                  </div>
-               </td>
-               <td valign="top" style="padding-right:10px;">
-                  <div class="photo-name-controll">
-                     <?
-                     $this->editForm->name->setMultiple($image->{PhotoGalery_Model_Images::COLUMN_ID});
-                     $this->editForm->name->setValues($image->{PhotoGalery_Model_Images::COLUMN_NAME});
-                     echo ($this->editForm->name->label()."<br />");
-                     echo ($this->editForm->name->labelLangs());
-                     echo ($this->editForm->name->control());
-                     echo ($this->editForm->name->scripts());
-                     ?>
-                  </div>
-                  <div class="photo-edit-controll">
-                     <?
-                     $this->editForm->ord->setDimensional($image->{PhotoGalery_Model_Images::COLUMN_ID});
-                     $this->editForm->ord->setValues($image->{PhotoGalery_Model_Images::COLUMN_ORDER});
-                     echo ($this->editForm->ord->label());
-                     $this->editForm->ord->html()->setAttrib('size', 5);
-                     echo ($this->editForm->ord->control());
-                     echo ($this->editForm->ord->scripts());
-                     ?>
-                     <?
-//                     $this->editForm->rotate->setLabel('<img src="images/icons/arrow_rotate_anticlockwise.png" />');
-                     $this->editForm->rotate->setDimensional($image->{PhotoGalery_Model_Images::COLUMN_ID});
-                     $this->editForm->rotate->html()->addClass('image-rotate-controll');
-                     echo ($this->editForm->rotate->label());
-                     echo ($this->editForm->rotate->control());?>   
-                  </div>
-               </td>
-               <td valign="top">
-                  <div class="photo-desc">
-                     <?
-                     $this->editForm->desc->setDimensional($image->{PhotoGalery_Model_Images::COLUMN_ID});
-                     $this->editForm->desc->setValues(array($image->{PhotoGalery_Model_Images::COLUMN_ID} =>
-                     $image->{PhotoGalery_Model_Images::COLUMN_DESC}));
-                     echo ($this->editForm->desc->label()."<br />");
-                     echo ($this->editForm->desc->labelLangs());
-                     echo ($this->editForm->desc->control());
-                     echo ($this->editForm->desc->scripts());
-                     ?>
-                     <?
-                     $this->editForm->id->setDimensional($image->{PhotoGalery_Model_Images::COLUMN_ID});
-                     $this->editForm->id->setValues($image->{PhotoGalery_Model_Images::COLUMN_ID});
-                     echo ($this->editForm->id->control());?>
-                     <a href="<?=$this->link()?>#delete-image" title="<?=$this->tr('Smazat obrázek')?>"
-                        class="button-delete-image" data-id="<?=$image->{PhotoGalery_Model_Images::COLUMN_ID}?>"
-                             ><span class="ui-icon ui-icon-closethick"> </span></a>
-                  </div>
-               </td>
-            </tr>
-            <?}?>
-         </table>
+         <div class="coll-buttons">
+            <div class="form-controls">
+               <?
+               echo $this->uploadForm->idItem->control();
+               echo $this->uploadForm->send->control();
+               ?>
+               <a class="btn btn-danger" href="<?=$this->linkBack?>">Zavřít</a>
+            </div>
          </div>
-         <div class="list-controlls ui-widget-header">
-            <button class="button-toggle-all"><?=$this->tr('Rozbalit')?></button>
+      </div>
+      <? 
+      echo $this->uploadForm->renderEnd();
+      ?>
+      <iframe src="<?=$this->link()->route('imageUploadIframe')?>" id="upload-target" frameborder="0" width="0" height="0"></iframe>
+      <ul id="upload-queue" class="unstyled">
+         
+      </ul>
+      <ul id="upload-queue-tpl" class="hidden">
+         <li class="clearfix">
+            <span class="col-left">
+               <span class="thumbnail"><img src="" /></span>
+            </span>
+            <span class="col-right">
+               <span class="name"></span>
+               <span class="progress">
+                  <span class="progress-bar" role="progressbar" style="width: 0%;">0%</span>
+               </span>
+            </span>
+            <a class="button-cancel-upload" href="<?=$this->link()?>#cancel"><span class="icon icon-times"></span></a>
+         </li>
+      </ul>
+   </div>
+   
+   <h2><?=$this->tr('Seznam uložených obrázků')?></h2>
+   <ul id="images-list" class="unstyled drop-area clearfix">
+      <?
+      foreach ($this->images as $image) {
+         $src = $this->category()->module()->getDataDir(true).$this->imagesPath.Photogalery_Controller::DIR_ORIGINAL."/".$image->{PhotoGalery_Model_Images::COLUMN_FILE};
+         $srcThumb = Utils_Image::cache($src, Photogalery_Controller::EDIT_THUMB_WIDTH, Photogalery_Controller::EDIT_THUMB_HEIGHT);
+         ?>
+      <li 
+         id="image-<?=$image->getPK()?>"
+         data-id="<?=$image->getPK()?>"
+         data-name='<?=json_encode($image->{PhotoGalery_Model_Images::COLUMN_NAME}->toArray())?>'
+         data-desc='<?=json_encode($image->{PhotoGalery_Model_Images::COLUMN_DESC}->toArray())?>'
+         data-src="<?=$src?>"
+         class="image-box"
+         >
+         <span class="image-title" title="<?  ps($image->{PhotoGalery_Model_Images::COLUMN_NAME})?>"><?  ps($image->{PhotoGalery_Model_Images::COLUMN_NAME})?></span>
+         <input type="checkbox" name="imagesSelect" class="image-checkbox" />
+         <span class="image-thumb">
+            <img src="<?=$srcThumb?>" alt="" />
+         </span>
+         <span class="image-tools clearfix">
             <?
-            echo ($this->editForm->goBack->label());
-            echo ($this->editForm->goBack->control());
-            echo $this->editForm->save->control();
+            /* @var $this->imageToolbox Template_Toolbox2 */
+            $this->imageToolbox->setTemplate(Template_Toolbox2::TEMPLATE_INLINE);
+            echo $this->imageToolbox;
             ?>
+         </span>
+      </li>
+      <?}?>
+   </ul>
+   <ul class="hidden" id="image-tpl">
+      <li data-id="" data-name="" data-desc="" data-src="" class="image-box" >
+         <span class="image-title" title=""></span>
+         <input type="checkbox" name="imagesSelect" class="image-checkbox" />
+         <span class="image-thumb">
+            <img src="" alt="" />
+         </span>
+         <span class="image-tools clearfix">
+            <?
+            /* @var $this->imageToolbox Template_Toolbox2 */
+            $this->imageToolbox->setTemplate(Template_Toolbox2::TEMPLATE_INLINE);
+            echo $this->imageToolbox;
+            ?>
+         </span>
+      </li>
+   </ul>
+   <?/*
+   <div class="form-group">
+      <div class="form-controls">
+         <div class="input-group">
+            <label for="images-oprtation"><?php ps($this->tr('Označené')); ?></label>
+            <select name="images-oprtation" class="form-control" id="select-images-oprtation">
+               <option value="delte"><?ps($this->tr('Smazat'))?></option>
+            </select>
+            <button type="button" class="input-group-btn"><span class="icon icon-check"></span></button>
          </div>
-         <?=$this->editForm->scripts()?>
-         </fieldset>
-      </form>
+      </div>
    </div>
-   <div id="dialog-edit-thumbnail" title="<?=$this->tr('Úprava miniatury')?>">
-      <div id="image-crop"><img src="" /></div>
-      <div id="image-crop-preview"></div>
+    */?>
+   <div id="dialog-image-labels">
+      <?
+      $this->editLabelsForm->text->html()->setAttrib('rows', 7);
+      echo $this->editLabelsForm;
+      ?>
    </div>
+ <?/*  
+<div class="modal fade">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <?=$this->editLabelsForm->renderStart();?>
+         <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            <h4 class="modal-title">Modal title</h4>
+         </div>
+         <div class="modal-body">
+            <div class="form-group">
+               <div class="form-labels">
+                  <?=$this->editLabelsForm->name->label()?>
+               </div>
+               <div class="form-controls">
+                  <?=$this->editLabelsForm->name->controlAll()?>
+               </div>
+            </div>
+            <div class="form-group">
+               <div class="form-labels">
+                  <?=$this->editLabelsForm->text->label()?>
+               </div>
+               <div class="form-controls">
+                  <?=$this->editLabelsForm->text->controlAll()?>
+               </div>
+            </div>
+         </div>
+         <div class="modal-footer">
+            <?=$this->editLabelsForm->id->controlAll()?>
+            <?=$this->editLabelsForm->buttons->controlAll()?>
+         </div>
+         <?=$this->editLabelsForm->renderEnd();?>
+      </div><!-- /.modal-content -->
+   </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+   */?>
    <script type="text/javascript">
       $(document).ready(function(){
-         // $('#edit-photos-list table').sortable();
-         var $jcrop;
-         var $thumbDialog = $( "#dialog-edit-thumbnail" ).dialog({
-            autoOpen: false,
-            width : 800, height: 600,
-            modal: true,
-            buttons: {
-               "<?=$this->tr('Uložit')?>": function() {
-                  var $dialog = $(this);
-                  var selectedArea = $jcrop.tellSelect();
-                  // show loadbox
-                  CubeCMS.Loader.showLoadBox(this, '<?=$this->tr('Ukládám')?>');
-                  // ajax request
-                  $.ajax({
-                     type: "POST",
-                     data : {
-                        x: Math.round(selectedArea.x), y: Math.round(selectedArea.y),
-                        w: Math.round(selectedArea.w), h: Math.round(selectedArea.h),
-                        id : $dialog.data('imageid')
-                     },
-                     url: '<?=$this->link()->route('cropThumb')?>',
-                     success: function(data) {
-                        CubeCMS.Loader.hideLoadBox($dialog);
-                        if(data.errmsg && data.errmsg.length > 0){
-                           CubeCMS.Msg.show(data);
-                        }
-                        // reload image
-                        var $imgPrev = $('#edit-photos-list #file-'+$dialog.data('imageid')+' .full-image-preview img');
-                        var src = $imgPrev.attr('src').split('?');
-                        $imgPrev.attr('src', src[0]+"?time="+(new Date().getTime()));
-                        $dialog.dialog( "close" );
-                     }
-                  });
-               },
-               "<?=$this->tr('Zrušit')?>": function() {
-                  $( this ).dialog( "close" );
-               }
-            },
-            close : function(){
-               $jcrop.destroy();
-            },
-            open: function(event, ui ) {
-               var $dialog = $(this);
-               var src = $(this).data("imagesrc");
-                  var $img = $dialog.find('#image-crop img').css({width : "auto", height : "auto"}).attr('src', src );
-                  var imgW = $img.width();
-                  var imgH = $img.height();
-
-                  // resize pokud je větší než okno dialogu
-                  var scale = 1;
-                  var newImagW, newImagH;
-
-                  if(imgH > $dialog.height()){
-                     scale = $dialog.height()/imgH;
-                  }
-                  if(imgW > $dialog.width()){
-                     scale = scale*($dialog.width()/imgW);
-                  }
-
-                  $img.width(imgW*scale);
-                  $img.height(imgH*scale);
-
-                  $jcrop = $.Jcrop('#image-crop img');
-                  $jcrop.setOptions({
-                    trueSize: [ imgW, imgH ],
-                     minSize: [ <?= $this->category()->getParam('small_width', VVE_IMAGE_THUMB_W); ?>,
-                     <?= $this->category()->getParam('small_height', VVE_IMAGE_THUMB_H); ?> ],
-                     setSelect: [ 0, 0, <?= $this->category()->getParam('small_width', VVE_IMAGE_THUMB_W); ?>,
-                     <?= $this->category()->getParam('small_height', VVE_IMAGE_THUMB_H); ?> ],
-                     aspectRatio: <?= str_replace(',', '.', round($this->category()->getParam('small_width', VVE_IMAGE_THUMB_W)
-                     / $this->category()->getParam('small_height', VVE_IMAGE_THUMB_H), 2)) ?>
-                  });
-            }
-         });
-         $('a.button-edit-thumbnail').live("click", function(e){
-            e.preventDefault();
-            var $this = $(this);
-            var src = $this.parents('tr').find('.full-image-preview').attr('href');
-            CubeCMS.Images.loadImage(src, function(){
-               $thumbDialog.data('imagesrc',  src).data('imageid', $this.parents('tr').data('id') ).dialog( "open" );
-            });
-         });
-         $('select.image-rotate-controll').change(function(){
-            var $this = $(this);
-            var $tr = $this.parents('tr');
-            $this.after('<img style="margin-left: 5px" src="<?=Url_Request::getBaseWebDir(true)?>/images/progress_small.gif" />');
-            $this.attr("disabled","disabled");
-            $.ajax({
-               type: "POST",
-               data : { id : $tr.data("id"), degree : $this.val() },
-               url: '<?=$this->link()->route('imageRotate')?>',
-               success: function(data) {
-                  // set to 0 degree
-                  $this.val(0);
-                  $this.removeAttr("disabled");
-                  $this.next('img').remove();
-                  if(data.errmsg && data.errmsg.length > 0){
-                     CubeCMS.Msg.show(data);
-                     return;
-                  }
-                  // reload image
-                  var src = $tr.find('.full-image-preview img').attr('src').split('?');
-                  $tr.find('.full-image-preview img').attr('src', src[0]+"?newtime="+(new Date().getTime()));
-                  var href = $tr.find('.full-image-preview').attr('href').split('?');
-                  $tr.find('.full-image-preview').attr('href', href[0]+"?newtime="+(new Date().getTime()));
-               }
-            });
-         });
-         $('a.button-delete-image').live("click",function(e){
-            var $link = $(this);
-            e.preventDefault();
-            if(confirm('<?=$this->tr('Smazat obrázek?')?>')){
-               $.ajax({
-                  type: "POST",
-                  data : {id : $link.data("id")},
-                  url: '<?=$this->link()->route('deletephoto')?>',
-                  success: function(data) {
-                     if(data.errmsg && data.errmsg.length > 0){
-                        CubeCMS.Msg.show(data);
-                     } else if(data.infomsg && data.infomsg.length > 0){
-                        $link.parents('tr').animate({opacity : 0}, 600, function(){
-                           $(this).remove();
-                        });
-                     }
-                  }
-               });
-            }
-         });
-         var baseListHeight = parseInt($('#edit-photos-list').css('height'));
-         $('.button-toggle-all').click(function(){
-            var $list = $('#edit-photos-list');
-            if($list.hasClass('edit-photos-list-short')){
-               $list.css({height : "auto"}).removeClass("edit-photos-list-short");
-               $(this).text('<?=$this->tr('Sbalit')?>');
-            } else {
-               $list.css({height : baseListHeight}).addClass("edit-photos-list-short");
-               $(this).text('<?=$this->tr('Rozbalit')?>');
-            }
-            return false;
+         CubeImagesEditor.init({
+            uploadImageUrl : '<?=$this->link()->route('imageUploadAjax')?>',
+            imageDeleteUrl : '<?=$this->link()->route('imageDelete')?>',
+            imageMoveUrl : '<?=$this->link()->route('imageMove')?>',
+            imageRotateUrl : '<?=$this->link()->route('imageRotate')?>',
+            editLabelsUrl : '<?=$this->link()->route('imageEditLabels')?>',
+            
+            getImagesUrl : '<?=$this->link()->route('getImages')?>'
          });
       });
    </script>

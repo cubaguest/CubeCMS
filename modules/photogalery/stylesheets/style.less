@@ -1,3 +1,168 @@
+@color-border: #eee;
+// tpl edit photos
+#image-uplaod-component {
+   .form-group {
+      margin-bottom: 0;
+   }
+   .coll-input {
+      input {
+         width: 100%;
+      }
+      float: left;
+      width: 70%;
+   }
+   .coll-buttons {
+      input {
+      }
+      float: left;
+      width: 30%;
+   }
+   .form-controls {
+      width: 100%;
+   }
+   #upload-target {
+      position: absolute;
+      top: -1000px;
+      left: -1000px;
+   }
+   .drop-area-label {
+      clear: both;
+      margin: 10px 10px 0;
+      font-style: italic;
+   }
+   padding: 10px;
+   border: 1px solid @color-border;
+   margin-bottom: 20px;
+}
+
+/* drop area */
+.drop-area {
+   &.draging {
+      background-color: #b2ffad;
+   }
+}
+
+/* uplaod queue */
+#upload-queue {
+   li {
+      .col-left {
+         .thumbnail {
+            text-align: center;
+            display: block;
+         }
+         img {
+            max-width: 50px;
+            max-height: 50px;
+            margin: 5px;
+         }
+         float: left;
+         width: 70px;
+      }
+      .col-right {
+         span {
+            &.name {
+               font-weight: bold;
+               margin: 10px 0 3px 0;
+            }
+            display: block;
+         }
+         padding-top: 10px;
+         /*margin-left: 70px;*/
+         /*float: left;*/
+         
+      }
+      .button-cancel-upload {
+         &,&:visited,&:hover {
+            color: #fa4d4d;
+         }
+         position: absolute;
+         top: 5px;
+         right: 5px;
+      }
+      position: relative;
+      border: 1px solid @color-border;
+      padding: 5px;
+      margin-top: 10px;
+   }
+   max-height: 200px;
+   overflow: hidden;
+   overflow-y: auto;
+}
+.progress {
+   .progress-bar {
+      height: 100%;
+      float: left;
+      width: 0%;
+      background-color: #428bca;
+      color: black;
+      text-align: center;
+   }
+   background-color: #eee;
+   height: 20px;
+   overflow: hidden;
+   border-radius: 4px;
+}
+
+/* images list */
+#images-list {
+   li {
+      &.selected {
+         background-color: #ffffcc;
+      }
+      &.active-edit {
+         background-color: #91c8ff;
+      }
+      .image-title {
+         display: block;
+         text-align: center;
+         margin: 3px 3px 0;
+         white-space: nowrap;
+         overflow: hidden;
+         text-overflow: ellipsis;
+         border: 0px none transparent;
+      }
+      .image-thumb {
+         img {
+            text-align: center;
+            vertical-align: middle;
+            cursor: move;
+         }
+         margin: 5px;
+         display: block;
+         text-align: center;
+         border: 0px none transparent;
+         height: 150px;
+         line-height: 150px;
+      }
+      .image-tools {
+         div {
+            display: inline-block;
+            float: none;
+            margin: 0 3px;
+         }
+         text-align: center;
+         display: block;
+         margin: 10px;
+      }
+      .image-checkbox {
+         position: absolute;
+         bottom: 7px;
+         left: 3px;
+      }
+      position: relative;
+      width: 23%;
+      height: 210px;
+      float: left;
+      border: 1px solid @color-border;
+      margin: 0 10px 10px 0;
+      background-color: #efefef;
+      box-shadow: 0 0 3px 1px #aaa;
+      overflow: hidden;
+   }
+}
+
+
+/* OLD !!! */
 /* seznam fotek mazani */
 input.editimage_ord_class { width: 40px;}
 .swfupload-control p { }
@@ -45,6 +210,7 @@ input.editimage_ord_class { width: 40px;}
 
    &.edit-photos-list-short {
       height: 500px;
+      clear: both;
    }
 
    table {

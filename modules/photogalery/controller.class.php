@@ -26,6 +26,9 @@ class Photogalery_Controller extends Controller {
 
    const SMALL_WIDTH = 140;
    const SMALL_HEIGHT = 140;
+   
+   const EDIT_THUMB_WIDTH = 150;
+   const EDIT_THUMB_HEIGHT = 150;
 
    const MEDIUM_WIDTH = VVE_DEFAULT_PHOTO_W;
    const MEDIUM_HEIGHT = VVE_DEFAULT_PHOTO_H;
@@ -131,120 +134,127 @@ class Photogalery_Controller extends Controller {
    {
       $this->checkWritebleRights();
 
-      $imagesM = new PhotoGalery_Model_Images();
+//      $imagesM = new PhotoGalery_Model_Images();
 
-      $addForm = $this->savePhotoForm();
+      $addForm = $this->createUplaodPhotoForm();
+      
       if($addForm->isValid()) {
+         $this->processSavePhotoForm($addForm);
          $this->infoMsg()->addMessage($this->tr('Obrázek byl uložen'));
          $this->link()->reload();
       }
 
-      $editForm = new Form('editimage_');
-      $imgName = new Form_Element_Text('name', $this->tr('Název'));
-      $imgName->setLangs();
-      $editForm->addElement($imgName);
-      $imgOrd = new Form_Element_Text('ord', $this->tr('Pořadí'));
-      $editForm->addElement($imgOrd);
-      $imgRotation = new Form_Element_Select('rotate', $this->tr('Otočit'));
-      $imgRotation->setOptions(array('0°' => 0, '90°' => 90, '180°' => 180, '270°' => 270));
-      $imgRotation->setValues(0);
-      $editForm->addElement($imgRotation);
+//      $editForm = new Form('editimage_');
+//      $imgName = new Form_Element_Text('name', $this->tr('Název'));
+//      $imgName->setLangs();
+//      $editForm->addElement($imgName);
+//      $imgOrd = new Form_Element_Text('ord', $this->tr('Pořadí'));
+//      $editForm->addElement($imgOrd);
+//      $imgRotation = new Form_Element_Select('rotate', $this->tr('Otočit'));
+//      $imgRotation->setOptions(array('0°' => 0, '90°' => 90, '180°' => 180, '270°' => 270));
+//      $imgRotation->setValues(0);
+//      $editForm->addElement($imgRotation);
+//
+//      $imgDesc = new Form_Element_TextArea('desc', $this->tr('Popis'));
+//      $imgDesc->setLangs();
+//      $editForm->addElement($imgDesc);
+//      $imgDel = new Form_Element_Checkbox('delete', $this->tr('Smazat'));
+//      $editForm->addElement($imgDel);
+//      $imgId = new Form_Element_Hidden('id');
+//      $editForm->addElement($imgId);
+//
+//      $eGoBack = new Form_Element_Checkbox('goBack', $this->tr('Zavřít po uložení'));
+//      $eGoBack->setValues(false);
+//      $editForm->addElement($eGoBack);
+//
+//      $submit = new Form_Element_SaveCancel('save', array($this->tr('Uložit'), $this->tr('Zavřít')));
+//      $submit->setCancelConfirm(false);
+//      $editForm->addElement($submit);
+//
+//      if($editForm->isSend() AND $editForm->save->getValues() == false){
+//         if($this->linkBack instanceof Url_Link){
+//            $this->linkBack->reload();
+//         } else if($backLink === null){
+//            $this->link()->route()->reload();
+//         } else {
+//            $backLink->reload();
+//         }
+//      }
+//
+//      if($editForm->isValid()) {
+//         $names = $editForm->name->getValues();
+//         $descs = $editForm->desc->getValues();
+//         $orders = $editForm->ord->getValues();
+//         $ids = $editForm->id->getValues();
+//
+//         foreach ($ids as $id) {
+//            try {
+//               if ($editForm->delete->getValues($id) === true) {
+//                  $this->deleteImage($id);
+//               } else {
+//                  // ukládají změny
+//                  $imagesM->saveImage($this->category()->getId(), $this->idItem, null,
+//                     $names[$id], $descs[$id], $orders[$id], $id);
+//                  // rotace pokud je
+//                  if ($editForm->rotate->getValues($id) != 0) {
+//                     $file = $imagesM->getImage($id)->{PhotoGalery_Model_Images::COLUMN_FILE};
+//                     /**
+//                      * Otočí se original a znovu se vytvoří miniatury
+//                   */
+//                     $image = new Filesystem_File_Image($file, $this->module()->getDataDir(false)
+//                           . $this->subDir . Photogalery_Controller::DIR_ORIGINAL);
+//                     $image->rotateImage($editForm->rotate->getValues($id));
+//                     $image->save();
+//
+//                     $image = new Filesystem_File_Image($file, $this->module()->getDataDir() .
+//                           $this->subDir . self::DIR_ORIGINAL);
+//                     $image->saveAs($this->module()->getDataDir() . $this->subDir . self::DIR_SMALL,
+//                        $this->category()->getParam('small_width', VVE_IMAGE_THUMB_W),
+//                        $this->category()->getParam('small_height', VVE_IMAGE_THUMB_H),
+//                        $this->category()->getParam('small_crop', true));
+//                     $image->saveAs($this->module()->getDataDir() . $this->subDir . self::DIR_MEDIUM,
+//                        $this->category()->getParam('medium_width', self::MEDIUM_WIDTH),
+//                        $this->category()->getParam('medium_height', self::MEDIUM_HEIGHT),
+//                        $this->category()->getParam('medium_crop', false));
+//
+//                     unset($image);
+//                  }
+//               }
+//            } catch (Exception $exc) {
+//               new CoreErrors($exc);
+//            }
+//         }
+//
+//         $this->infoMsg()->addMessage($this->tr('Obrázky byly uloženy'));
+//         if($editForm->goBack->getValues() == true){
+//            if($this->linkBack instanceof Url_Link){
+//               $this->linkBack->reload();
+//            } else if($backLink === null){
+//               $this->link()->route()->reload();
+//            } else {
+//               $backLink->reload();
+//            }
+//         } else {
+//            $this->link()->reload();
+//         }
+//      }
+//
+//      // odkaz na editaci obrázku
+//      $this->view()->template()->linkImageCrop = $this->link()->route('editphoto',
+//              array('id' => '%s'));
 
-      $imgDesc = new Form_Element_TextArea('desc', $this->tr('Popis'));
-      $imgDesc->setLangs();
-      $editForm->addElement($imgDesc);
-      $imgDel = new Form_Element_Checkbox('delete', $this->tr('Smazat'));
-      $editForm->addElement($imgDel);
-      $imgId = new Form_Element_Hidden('id');
-      $editForm->addElement($imgId);
-
-      $eGoBack = new Form_Element_Checkbox('goBack', $this->tr('Zavřít po uložení'));
-      $eGoBack->setValues(false);
-      $editForm->addElement($eGoBack);
-
-      $submit = new Form_Element_SaveCancel('save', array($this->tr('Uložit'), $this->tr('Zavřít')));
-      $submit->setCancelConfirm(false);
-      $editForm->addElement($submit);
-
-      if($editForm->isSend() AND $editForm->save->getValues() == false){
-         if($this->linkBack instanceof Url_Link){
-            $this->linkBack->reload();
-         } else if($backLink === null){
-            $this->link()->route()->reload();
-         } else {
-            $backLink->reload();
-         }
+      $this->view()->images = PhotoGalery_Model_Images::getImages($this->category()->getId(), $this->idItem);
+      if(($this->linkBack instanceof Url_Link) == false){
+         $this->linkBack = $this->link()->route();
       }
-
-      if($editForm->isValid()) {
-         $names = $editForm->name->getValues();
-         $descs = $editForm->desc->getValues();
-         $orders = $editForm->ord->getValues();
-         $ids = $editForm->id->getValues();
-
-         foreach ($ids as $id) {
-            try {
-               if ($editForm->delete->getValues($id) === true) {
-                  $this->deleteImage($id);
-               } else {
-                  // ukládají změny
-                  $imagesM->saveImage($this->category()->getId(), $this->idItem, null,
-                     $names[$id], $descs[$id], $orders[$id], $id);
-                  // rotace pokud je
-                  if ($editForm->rotate->getValues($id) != 0) {
-                     $file = $imagesM->getImage($id)->{PhotoGalery_Model_Images::COLUMN_FILE};
-                     /**
-                      * Otočí se original a znovu se vytvoří miniatury
-                   */
-                     $image = new Filesystem_File_Image($file, $this->module()->getDataDir(false)
-                           . $this->subDir . Photogalery_Controller::DIR_ORIGINAL);
-                     $image->rotateImage($editForm->rotate->getValues($id));
-                     $image->save();
-
-                     $image = new Filesystem_File_Image($file, $this->module()->getDataDir() .
-                           $this->subDir . self::DIR_ORIGINAL);
-                     $image->saveAs($this->module()->getDataDir() . $this->subDir . self::DIR_SMALL,
-                        $this->category()->getParam('small_width', VVE_IMAGE_THUMB_W),
-                        $this->category()->getParam('small_height', VVE_IMAGE_THUMB_H),
-                        $this->category()->getParam('small_crop', true));
-                     $image->saveAs($this->module()->getDataDir() . $this->subDir . self::DIR_MEDIUM,
-                        $this->category()->getParam('medium_width', self::MEDIUM_WIDTH),
-                        $this->category()->getParam('medium_height', self::MEDIUM_HEIGHT),
-                        $this->category()->getParam('medium_crop', false));
-
-                     unset($image);
-                  }
-               }
-            } catch (Exception $exc) {
-               new CoreErrors($exc);
-            }
-         }
-
-         $this->infoMsg()->addMessage($this->tr('Obrázky byly uloženy'));
-         if($editForm->goBack->getValues() == true){
-            if($this->linkBack instanceof Url_Link){
-               $this->linkBack->reload();
-            } else if($backLink === null){
-               $this->link()->route()->reload();
-            } else {
-               $backLink->reload();
-            }
-         } else {
-            $this->link()->reload();
-         }
-      }
-
-      // odkaz na editaci obrázku
-      $this->view()->template()->linkImageCrop = $this->link()->route('editphoto',
-              array('id' => '%s'));
-
-      $this->view()->template()->images = PhotoGalery_Model_Images::getImages($this->category()->getId(), $this->idItem);
-      $this->view()->template()->addForm = $addForm;
-      $this->view()->template()->editForm = $editForm;
-      $this->view()->template()->idItem = $this->idItem;
+      $this->view()->linkBack = $this->linkBack;
+      $this->view()->uploadForm = $addForm;
+      $this->view()->editLabelsForm = $this->createEditLabelsForm();
+//      $this->view()->template()->editForm = $editForm;
+      $this->view()->idItem = $this->idItem;
       // adresáře k fotkám
       $this->view()->subdir = $this->subDir;
-      $this->view()->websubdir = str_replace(DIRECTORY_SEPARATOR, URL_SEPARATOR, $this->subDir);
+      $this->view()->imagesPath = str_replace(DIRECTORY_SEPARATOR, URL_SEPARATOR, $this->subDir);
    }
 
    public function sortphotosController(Url_Link $backLink = null)
@@ -355,13 +365,13 @@ class Photogalery_Controller extends Controller {
       }
    }
 
-   private function savePhotoForm()
+   private function createUplaodPhotoForm()
    {
       $addForm = new Form('addimage_');
       $addFile = new Form_Element_File('image', $this->tr('Obrázek'));
-      $addFile->addValidation(new Form_Validator_FileExtension(array('jpg', 'jpeg', 'png', 'gif')));
-      $addFile->setUploadDir($this->module()->getDataDir()
-              .$this->subDir.self::DIR_ORIGINAL.DIRECTORY_SEPARATOR);
+//      $addFile->addValidation(new Form_Validator_FileExtension(array('jpg', 'jpeg', 'png', 'gif')));
+      $addFile->setMultiple(true);
+      $addFile->setUploadDir($this->module()->getDataDir().$this->subDir.self::DIR_ORIGINAL.DIRECTORY_SEPARATOR);
       $addFile->setOverWrite(false);
       $addForm->addElement($addFile);
 
@@ -369,45 +379,95 @@ class Photogalery_Controller extends Controller {
       $idItem->setValues($this->idItem);
       $addForm->addElement($idItem);
 
-      $addSubmit = new Form_Element_Submit('send',$this->tr('Odeslat'));
+      $addSubmit = new Form_Element_Submit('send',$this->tr('Nahrát'));
       $addForm->addElement($addSubmit);
-
-      if($addForm->isValid()) {
-         $image = new File_Image($addFile);
-         $imgSmall = $image->copy($this->module()->getDataDir().$this->subDir.self::DIR_SMALL, true);
-         $crop = $this->category()->getParam('small_crop', VVE_IMAGE_THUMB_CROP) == true ? File_Image_Base::RESIZE_CROP : File_Image_Base::RESIZE_AUTO;
-         $imgSmall->getData()
-            ->resize($this->category()->getParam('small_width', VVE_IMAGE_THUMB_W),
-                     $this->category()->getParam('small_height', VVE_IMAGE_THUMB_H), $crop)
-            ->save();
-
-         $crop = $this->category()->getParam('medium_crop', false) == true ? File_Image_Base::RESIZE_CROP : File_Image_Base::RESIZE_AUTO;
-         $imgMedium = $image->copy($this->module()->getDataDir().$this->subDir.self::DIR_MEDIUM, true);
-         $imgMedium->getData()
-            ->resize($this->category()->getParam('medium_width', VVE_DEFAULT_PHOTO_W),
-                     $this->category()->getParam('medium_height', VVE_DEFAULT_PHOTO_H), $crop)
-            ->save();
-         // zjistíme pořadí
-         $imagesM = new PhotoGalery_Model_Images();
-
-         $count = (int)$imagesM->getCountImages($this->category()->getId(), $addForm->idItem->getValues());
-
-         // uloženhí do db
-         $imagesM->saveImage($this->category()->getId(), $addForm->idItem->getValues(),
-                 $image->getName(), $image->getName(), null, $count+1);
-
-      }
       return $addForm;
+   }
+   
+   protected function createEditLabelsForm()
+   {
+      $f = new Form('imglabels_');
+      
+      $eId = new Form_Element_Hidden('id');
+      $f->addElement($eId);
+      
+      $eName = new Form_Element_Text('name', $this->tr('Název'));
+      $eName->setLangs();
+      $eName->addFilter(new Form_Filter_StripTags());
+      $f->addElement($eName);
+      
+      $eText = new Form_Element_TextArea('text', $this->tr('Popisek'));
+      $eText->setLangs();
+      $eText->addFilter(new Form_Filter_StripTags());
+      $f->addElement($eText);
+      
+      $eButtons = new Form_Element_Multi('buttons');
+      $eButtons->addElement(new Form_Element_Button('close', $this->tr('Zavřít')));
+      $eButtons->addElement(new Form_Element_Submit('saveandclose', $this->tr('Uložit a zavřít')));
+      $eButtons->addElement(new Form_Element_Submit('saveandnext', $this->tr('Uložit a další')));
+      
+      $f->addElement($eButtons);
+      
+      return $f;
+   }
+   
+   protected function processSavePhotoForm(Form $form)
+   {
+      $procesedImages = array();
+      foreach ($form->image->getValues() as $file) {
+         $image = new File_Image($file);
+         if($image->isImage()){
+            // odstranit - není potřeba, resizing se provádí za chodu
+            $imgSmall = $image->copy($this->module()->getDataDir().$this->subDir.self::DIR_SMALL, true);
+            $crop = $this->category()->getParam('small_crop', VVE_IMAGE_THUMB_CROP) == true ? File_Image_Base::RESIZE_CROP : File_Image_Base::RESIZE_AUTO;
+            $imgSmall->getData()
+               ->resize($this->category()->getParam('small_width', VVE_IMAGE_THUMB_W),
+                        $this->category()->getParam('small_height', VVE_IMAGE_THUMB_H), $crop)
+               ->save();
+
+            $crop = $this->category()->getParam('medium_crop', false) == true ? File_Image_Base::RESIZE_CROP : File_Image_Base::RESIZE_AUTO;
+            $imgMedium = $image->copy($this->module()->getDataDir().$this->subDir.self::DIR_MEDIUM, true);
+            $imgMedium->getData()
+               ->resize($this->category()->getParam('medium_width', VVE_DEFAULT_PHOTO_W),
+                        $this->category()->getParam('medium_height', VVE_DEFAULT_PHOTO_H), $crop)
+               ->save();
+            // zjistíme pořadí
+            $imagesM = new PhotoGalery_Model_Images();
+
+            // uloženhí do db
+            $imageRec = $imagesM->newRecord();
+            $imageRec->{PhotoGalery_Model_Images::COLUMN_FILE} = $image->getName();
+            $imageRec->{PhotoGalery_Model_Images::COLUMN_ID_ART} = $form->idItem->getValues();
+            $imageRec->{PhotoGalery_Model_Images::COLUMN_ID_CAT} = $this->category()->getId();
+            $imageRec->{PhotoGalery_Model_Images::COLUMN_NAME} = $image->getName();
+            $imageRec->save();
+            
+            $img = new Object();
+            $img->id = (int)$imageRec->getPK();
+            $img->file = $imageRec->{PhotoGalery_Model_Images::COLUMN_FILE};
+            $img->name = $imageRec->{PhotoGalery_Model_Images::COLUMN_NAME}->toArray();
+            $img->desc = $imageRec->{PhotoGalery_Model_Images::COLUMN_DESC}->toArray();
+            $img->url = $this->module()->getDataDir(true).$this->subDir.self::DIR_ORIGINAL."/".$imageRec->{PhotoGalery_Model_Images::COLUMN_FILE};
+            $img->urlSmall = Utils_Image::cache($this->module()->getDataDir(true).$this->subDir.self::DIR_ORIGINAL."/"
+                .$imageRec->{PhotoGalery_Model_Images::COLUMN_FILE}, self::EDIT_THUMB_WIDTH, self::EDIT_THUMB_HEIGHT);
+            $procesedImages[] = $img;
+         } else {
+            $this->errMsg()->addMessage(sprintf($this->tr('Soubor %s není platný obrázek a nebyl uložen'), $image->getName()));
+         }
+      }
+      return $procesedImages;
    }
 
    /**
     * Metoda pro upload fotek pomocí Ajax requestu
     */
-   public function uploadFileController()
+   public function imageUploadController()
    {
       $this->checkWritebleRights();
       $this->view()->allOk = false;
-      if($this->savePhotoForm()->isValid()) {
+      $form = $this->createUplaodPhotoForm();
+      if($form->isValid()) {
+         $this->processSavePhotoForm($form);
          $this->infoMsg()->addMessage($this->tr('Obrázek byl uložen'));
       } else {
          $this->errMsg()->addMessage($this->tr('Chyba při nahrávání, asy nebyl vybrán obrázek, nebo byl poškozen.'));
@@ -416,7 +476,128 @@ class Photogalery_Controller extends Controller {
          $this->view()->allOk = true;
       }
    }
+   
+   /**
+    * Metoda pro upload fotek pomocí Ajax requestu
+    */
+   public function imageUploadAjaxController()
+   {
+      $this->checkWritebleRights();
+      $this->view()->allOk = false;
+      $form = $this->createUplaodPhotoForm();
+      if($form->isValid()) {
+         $images = $this->processSavePhotoForm($form);
+         $this->view()->images = $images;
+         $this->infoMsg()->addMessage($this->tr('Obrázek byl uložen'));
+      } else {
+         $this->errMsg()->addMessage($this->tr('Chyba při nahrávání, asy nebyl vybrán obrázek, nebo byl poškozen.'));
+      }
+      if ($this->errMsg()->isEmpty()) {
+         $this->view()->allOk = true;
+      }
+   }
+   
+   /**
+    * Mazání přes AJAX
+    * @throws InvalidArgumentException
+    * @throws Exception
+    */
+   public function imageDeleteController()
+   {
+      $this->checkWritebleRights();
+      if(!$this->getRequestParam('id')){
+         throw new InvalidArgumentException();
+      }
+      
+      $model = new PhotoGalery_Model_Images();
+      $img = $model->record($this->getRequestParam('id'));
+      if(!$img){
+         throw new Exception($this->tr('Obrázek se nepodařilo smazat'));
+      }
+      $file = new File($img->{PhotoGalery_Model_Images::COLUMN_FILE}, $this->module()->getDataDir().$this->subDir.self::DIR_ORIGINAL.DIRECTORY_SEPARATOR);
+      if($file->exist()){
+         $file->delete();
+      }
+      
+      $model->delete($img);
+      $this->infoMsg()->addMessage($this->tr('Obrázek byl smazán'));
+   }
+   
+   public function imageEditLabelsController()
+   {
+      $this->checkControllRights();
+      
+      $form = $this->createEditLabelsForm();
+      
+      if($form->isValid()){
+         $model = new PhotoGalery_Model_Images();
+         $img = $model->record($form->id->getValues());
+         
+         if(!$img){
+            throw new Exception('Neexistující obrázek');
+         }
+         
+         $img->{PhotoGalery_Model_Images::COLUMN_NAME} = $form->name->getValues();
+         $img->{PhotoGalery_Model_Images::COLUMN_DESC} = $form->text->getValues();
+         $img->save();
+         
+         $this->view()->image = array(
+             'id' => (int)$img->getPK(),
+             'name' => $img->{PhotoGalery_Model_Images::COLUMN_NAME}->toArray(),
+             'desc' => $img->{PhotoGalery_Model_Images::COLUMN_DESC}->toArray(),
+         );
+         $this->infoMsg()->addMessage($this->tr('Popisky byly uloženy'));
+      }
+   }
+   
+   public function imageMoveController()
+   {
+      $this->checkControllRights();
+      $id = $this->getRequestParam('id');
+      $pos = $this->getRequestParam('pos');
+      if(!$id || !$pos){
+         throw new InvalidArgumentException('Nebyly předány všechny parametry');
+      }
+      $model = new PhotoGalery_Model_Images();
+      
+      $image = $model->record($id);
+      if(!$image){
+         throw new InvalidArgumentException('Neplatný obrázek');
+      }
+      /* @var $image Model_ORM_Ordered_Record */
+      $image->setRecordPosition($pos);
+      $this->infoMsg()->addMessage($this->tr('Obrázek byl přesunut'));
+   }
+   
+   public function imageRotateController()
+   {
+      $this->checkControllRights();
+      $id = $this->getRequestParam('id');
+      $to = $this->getRequestParam('to');
+      if(!$id || !$to){
+         throw new InvalidArgumentException('Nebyly předány všechny parametry');
+      }
+      $model = new PhotoGalery_Model_Images();
+      
+      $image = $model->record($id);
+      if(!$image){
+         throw new InvalidArgumentException('Neplatný obrázek');
+      }
+      /* @var $image Model_ORM_Ordered_Record */
+      $file= new File_Image($image->{PhotoGalery_Model_Images::COLUMN_FILE}, $this->module()->getDataDir().$this->subDir.self::DIR_ORIGINAL.DIRECTORY_SEPARATOR);
+      
+      if($to == 'left'){
+         $file->getData()->rotate(90)->save();
+      } else {
+         $file->getData()->rotate(-90)->save();
+      }
+      $this->infoMsg()->addMessage($this->tr('Obrázek byl otočen'));
+      $this->view()->url = $this->module()->getDataDir(true).$this->subDir.self::DIR_ORIGINAL."/".$image->{PhotoGalery_Model_Images::COLUMN_FILE};
+      $this->view()->urlThumb = Utils_Image::cache($this->module()->getDataDir(true).$this->subDir.self::DIR_ORIGINAL."/"
+                .$image->{PhotoGalery_Model_Images::COLUMN_FILE}, self::EDIT_THUMB_WIDTH, self::EDIT_THUMB_HEIGHT);
+   }
 
+      
    public function checkFileController()
    {
       $fileArray = array();
@@ -520,49 +701,49 @@ class Photogalery_Controller extends Controller {
       $this->infoMsg()->addMessage($this->tr('Miniatura byla vytvořena'));
    }
 
-   public function imageRotateController()
-   {
-      $this->checkWritebleRights();
-
-      if(!isset($_POST['id']) || !isset($_POST['degree']) ){
-         throw new BadRequestException($this->tr('Nebyly předány všechny potřebné parametry'));
-      }
-
-
-      $id = (int)$this->getRequestParam('id');
-      $degree = (int)$this->getRequestParam('degree');
-
-      if($degree == 0){
-         throw new BadRequestException($this->tr('Nelze otáčet o 0 stupňů'));
-         return;
-      }
-      $m = new PhotoGalery_Model_Images();
-      $imageRec = $m->record( $id );
-
-      if(!$imageRec){
-         throw new BadRequestException($this->tr('Zadaný obrázek neexistuje'));
-      }
-      // rotate original
-      $image = new File_Image( $imageRec->{PhotoGalery_Model_Images::COLUMN_FILE},
-         $this->module()->getDataDir().$this->subDir.self::DIR_ORIGINAL.DIRECTORY_SEPARATOR );
-
-      // rotate medium
-      $image = new File_Image( $imageRec->{PhotoGalery_Model_Images::COLUMN_FILE},
-         $this->module()->getDataDir().$this->subDir.self::DIR_MEDIUM.DIRECTORY_SEPARATOR );
-      $image->getData()->rotate($degree)->save();
-
-      // create thumbnail
-      $thumb = $image->copy($this->module()->getDataDir().$this->subDir.self::DIR_SMALL.DIRECTORY_SEPARATOR, true, null, false);
-      $crop = $this->category()->getParam('small_crop', VVE_IMAGE_THUMB_CROP) == true ? File_Image_Base::RESIZE_CROP : File_Image_Base::RESIZE_AUTO;
-
-      $thumb->getData()->resize(
-         $this->category()->getParam('small_width',VVE_IMAGE_THUMB_W),
-         $this->category()->getParam('small_height',VVE_IMAGE_THUMB_H),
-         $crop
-      )->save();
-
-      $this->infoMsg()->addMessage($this->tr('Obrázek byl otočen'));
-   }
+//   public function imageRotateController()
+//   {
+//      $this->checkWritebleRights();
+//
+//      if(!isset($_POST['id']) || !isset($_POST['degree']) ){
+//         throw new BadRequestException($this->tr('Nebyly předány všechny potřebné parametry'));
+//      }
+//
+//
+//      $id = (int)$this->getRequestParam('id');
+//      $degree = (int)$this->getRequestParam('degree');
+//
+//      if($degree == 0){
+//         throw new BadRequestException($this->tr('Nelze otáčet o 0 stupňů'));
+//         return;
+//      }
+//      $m = new PhotoGalery_Model_Images();
+//      $imageRec = $m->record( $id );
+//
+//      if(!$imageRec){
+//         throw new BadRequestException($this->tr('Zadaný obrázek neexistuje'));
+//      }
+//      // rotate original
+//      $image = new File_Image( $imageRec->{PhotoGalery_Model_Images::COLUMN_FILE},
+//         $this->module()->getDataDir().$this->subDir.self::DIR_ORIGINAL.DIRECTORY_SEPARATOR );
+//
+//      // rotate medium
+//      $image = new File_Image( $imageRec->{PhotoGalery_Model_Images::COLUMN_FILE},
+//         $this->module()->getDataDir().$this->subDir.self::DIR_MEDIUM.DIRECTORY_SEPARATOR );
+//      $image->getData()->rotate($degree)->save();
+//
+//      // create thumbnail
+//      $thumb = $image->copy($this->module()->getDataDir().$this->subDir.self::DIR_SMALL.DIRECTORY_SEPARATOR, true, null, false);
+//      $crop = $this->category()->getParam('small_crop', VVE_IMAGE_THUMB_CROP) == true ? File_Image_Base::RESIZE_CROP : File_Image_Base::RESIZE_AUTO;
+//
+//      $thumb->getData()->resize(
+//         $this->category()->getParam('small_width',VVE_IMAGE_THUMB_W),
+//         $this->category()->getParam('small_height',VVE_IMAGE_THUMB_H),
+//         $crop
+//      )->save();
+//
+//      $this->infoMsg()->addMessage($this->tr('Obrázek byl otočen'));
+//   }
 
    public static function getImagesURL(Category $category, Model_ORM_Record $article = null, $sizeDir = Photogalery_Controller::DIR_SMALL)
    {
@@ -626,97 +807,97 @@ class Photogalery_Controller extends Controller {
 
       $form->addElement($elemEditorType, $fGrpEditSet);
 
-      $form->addGroup('images', 'Nastavení obrázků');
+//      $form->addGroup('images', 'Nastavení obrázků');
+//
+//      $elemSW = new Form_Element_Text('small_width', 'Šířka miniatury (px)');
+//      $elemSW->addValidation(new Form_Validator_IsNumber());
+//      $elemSW->setSubLabel('Výchozí: <span class="param_small">'.VVE_IMAGE_THUMB_W.'</span>px');
+//      $form->addElement($elemSW, 'images');
+//      if(isset($settings[self::PARAM_SMALL_W])) {
+//         $form->small_width->setValues($settings[self::PARAM_SMALL_W]);
+//      }
+//
+//      $elemSH = new Form_Element_Text('small_height', 'Výška miniatury (px)');
+//      $elemSH->addValidation(new Form_Validator_IsNumber());
+//      $elemSH->setSubLabel('Výchozí: <span class="param_small">'.VVE_IMAGE_THUMB_H.'</span>px');
+//      $form->addElement($elemSH, 'images');
+//      if(isset($settings[self::PARAM_SMALL_H])) {
+//         $form->small_height->setValues($settings[self::PARAM_SMALL_H]);
+//      }
+//
+//      $elemSC = new Form_Element_Checkbox('small_crop', 'Ořezávat miniatury');
+//      $elemSC->setValues(true);
+//      if(isset($settings[self::PARAM_SMALL_C])) {
+//         $elemSC->setValues($settings[self::PARAM_SMALL_C]);
+//      }
+//      $form->addElement($elemSC, 'images');
+//
+//      $elemW = new Form_Element_Text('medium_width', 'Šířka obrázku (px)');
+//      $elemW->addValidation(new Form_Validator_IsNumber());
+//      $elemW->setSubLabel('Výchozí: <span class="param_small">'.VVE_DEFAULT_PHOTO_W.'</span>px');
+//      $form->addElement($elemW, 'images');
+//      if(isset($settings[self::PARAM_MEDIUM_W])) {
+//         $form->medium_width->setValues($settings[self::PARAM_MEDIUM_W]);
+//      }
+//
+//      $elemH = new Form_Element_Text('medium_height', 'Výška obrázku (px)');
+//      $elemH->addValidation(new Form_Validator_IsNumber());
+//      $elemH->setSubLabel('Výchozí: <span class="param_small">'.VVE_DEFAULT_PHOTO_H.'</span>px');
+//      $form->addElement($elemH, 'images');
+//      if(isset($settings[self::PARAM_MEDIUM_H])) {
+//         $form->medium_height->setValues($settings[self::PARAM_MEDIUM_H]);
+//      }
+//
+//      $elemC = new Form_Element_Checkbox('medium_crop', 'Ořezávat obrázky');
+//      $elemC->setValues(false);
+//      if(isset($settings[self::PARAM_MEDIUM_C])) {
+//         $elemC->setValues($settings[self::PARAM_MEDIUM_C]);
+//      }
+//      $form->addElement($elemC, 'images');
+//
+//      $elemResize = new Form_Element_Checkbox('resizeImages', 'Změnit velikosti');
+//      $elemResize->setSubLabel($this->tr('Změnit velikosti již uložených obrázků pokud se liší od původních. POZOR! Tato změna může trvat déle!'));
+//      if(isset($settings[self::PARAM_SMALL_W]) || isset($settings[self::PARAM_SMALL_H]) || isset($settings[self::PARAM_SMALL_C])
+//         || isset($settings[self::PARAM_MEDIUM_W]) || isset($settings[self::PARAM_MEDIUM_H]) || isset($settings[self::PARAM_MEDIUM_C]) ){
+//         $elemResize->setValues(true);
+//      }
 
-      $elemSW = new Form_Element_Text('small_width', 'Šířka miniatury (px)');
-      $elemSW->addValidation(new Form_Validator_IsNumber());
-      $elemSW->setSubLabel('Výchozí: <span class="param_small">'.VVE_IMAGE_THUMB_W.'</span>px');
-      $form->addElement($elemSW, 'images');
-      if(isset($settings[self::PARAM_SMALL_W])) {
-         $form->small_width->setValues($settings[self::PARAM_SMALL_W]);
-      }
-
-      $elemSH = new Form_Element_Text('small_height', 'Výška miniatury (px)');
-      $elemSH->addValidation(new Form_Validator_IsNumber());
-      $elemSH->setSubLabel('Výchozí: <span class="param_small">'.VVE_IMAGE_THUMB_H.'</span>px');
-      $form->addElement($elemSH, 'images');
-      if(isset($settings[self::PARAM_SMALL_H])) {
-         $form->small_height->setValues($settings[self::PARAM_SMALL_H]);
-      }
-
-      $elemSC = new Form_Element_Checkbox('small_crop', 'Ořezávat miniatury');
-      $elemSC->setValues(true);
-      if(isset($settings[self::PARAM_SMALL_C])) {
-         $elemSC->setValues($settings[self::PARAM_SMALL_C]);
-      }
-      $form->addElement($elemSC, 'images');
-
-      $elemW = new Form_Element_Text('medium_width', 'Šířka obrázku (px)');
-      $elemW->addValidation(new Form_Validator_IsNumber());
-      $elemW->setSubLabel('Výchozí: <span class="param_small">'.VVE_DEFAULT_PHOTO_W.'</span>px');
-      $form->addElement($elemW, 'images');
-      if(isset($settings[self::PARAM_MEDIUM_W])) {
-         $form->medium_width->setValues($settings[self::PARAM_MEDIUM_W]);
-      }
-
-      $elemH = new Form_Element_Text('medium_height', 'Výška obrázku (px)');
-      $elemH->addValidation(new Form_Validator_IsNumber());
-      $elemH->setSubLabel('Výchozí: <span class="param_small">'.VVE_DEFAULT_PHOTO_H.'</span>px');
-      $form->addElement($elemH, 'images');
-      if(isset($settings[self::PARAM_MEDIUM_H])) {
-         $form->medium_height->setValues($settings[self::PARAM_MEDIUM_H]);
-      }
-
-      $elemC = new Form_Element_Checkbox('medium_crop', 'Ořezávat obrázky');
-      $elemC->setValues(false);
-      if(isset($settings[self::PARAM_MEDIUM_C])) {
-         $elemC->setValues($settings[self::PARAM_MEDIUM_C]);
-      }
-      $form->addElement($elemC, 'images');
-
-      $elemResize = new Form_Element_Checkbox('resizeImages', 'Změnit velikosti');
-      $elemResize->setSubLabel($this->tr('Změnit velikosti již uložených obrázků pokud se liší od původních. POZOR! Tato změna může trvat déle!'));
-      if(isset($settings[self::PARAM_SMALL_W]) || isset($settings[self::PARAM_SMALL_H]) || isset($settings[self::PARAM_SMALL_C])
-         || isset($settings[self::PARAM_MEDIUM_W]) || isset($settings[self::PARAM_MEDIUM_H]) || isset($settings[self::PARAM_MEDIUM_C]) ){
-         $elemResize->setValues(true);
-      }
-
-      $form->addElement($elemResize, 'images');
+//      $form->addElement($elemResize, 'images');
       if($form->isValid()){
          // resize images if need
-         if($form->resizeImages->getValues() == true){
-            // zjištění původsních a nových velikostí
-            $origSmallW = isset($settings[self::PARAM_SMALL_W]) ? $settings[self::PARAM_SMALL_W] : VVE_IMAGE_THUMB_W;
-            $origSmallH = isset($settings[self::PARAM_SMALL_H]) ? $settings[self::PARAM_SMALL_H] : VVE_IMAGE_THUMB_H;
-            $origSmallC = isset($settings[self::PARAM_SMALL_C]) ? $settings[self::PARAM_SMALL_C] : VVE_IMAGE_THUMB_CROP;
-            $origMedW = isset($settings[self::PARAM_MEDIUM_W]) ? $settings[self::PARAM_MEDIUM_W] : VVE_DEFAULT_PHOTO_W;
-            $origMedH = isset($settings[self::PARAM_MEDIUM_H]) ? $settings[self::PARAM_MEDIUM_H] : VVE_DEFAULT_PHOTO_H;
-            $origMedC = isset($settings[self::PARAM_MEDIUM_C]) ? $settings[self::PARAM_MEDIUM_C] : false;
-
-            $newSmallW = $form->small_width->getValues() != null ? $form->small_width->getValues() : VVE_IMAGE_THUMB_W;
-            $newSmallH = $form->small_height->getValues() != null ? $form->small_height->getValues() : VVE_IMAGE_THUMB_H;
-            $newSmallC = $form->small_crop->getValues() != null ? $form->small_crop->getValues() : VVE_IMAGE_THUMB_CROP;
-            $newMedW = $form->medium_width->getValues() != null ? $form->medium_width->getValues() : VVE_DEFAULT_PHOTO_W;
-            $newMedH = $form->medium_height->getValues() != null ? $form->medium_height->getValues() : VVE_DEFAULT_PHOTO_H;
-            $newMedC = $form->medium_crop->getValues() != null ? $form->medium_crop->getValues() : false;
-
-            // small
-            if( $origSmallW != $newSmallW || $origSmallH != $newSmallH || $origSmallC != $newSmallC ){
-               $this->resizeImages($newSmallW, $newSmallH, $newSmallC, self::DIR_SMALL);
-            }
-
-            if( $origMedW != $newMedW || $origMedH != $newMedH || $origMedC != $newMedC ){
-               $this->resizeImages($newMedW, $newMedH, $newMedC, self::DIR_MEDIUM);
-            }
-         }
+//         if($form->resizeImages->getValues() == true){
+//            // zjištění původsních a nových velikostí
+//            $origSmallW = isset($settings[self::PARAM_SMALL_W]) ? $settings[self::PARAM_SMALL_W] : VVE_IMAGE_THUMB_W;
+//            $origSmallH = isset($settings[self::PARAM_SMALL_H]) ? $settings[self::PARAM_SMALL_H] : VVE_IMAGE_THUMB_H;
+//            $origSmallC = isset($settings[self::PARAM_SMALL_C]) ? $settings[self::PARAM_SMALL_C] : VVE_IMAGE_THUMB_CROP;
+//            $origMedW = isset($settings[self::PARAM_MEDIUM_W]) ? $settings[self::PARAM_MEDIUM_W] : VVE_DEFAULT_PHOTO_W;
+//            $origMedH = isset($settings[self::PARAM_MEDIUM_H]) ? $settings[self::PARAM_MEDIUM_H] : VVE_DEFAULT_PHOTO_H;
+//            $origMedC = isset($settings[self::PARAM_MEDIUM_C]) ? $settings[self::PARAM_MEDIUM_C] : false;
+//
+//            $newSmallW = $form->small_width->getValues() != null ? $form->small_width->getValues() : VVE_IMAGE_THUMB_W;
+//            $newSmallH = $form->small_height->getValues() != null ? $form->small_height->getValues() : VVE_IMAGE_THUMB_H;
+//            $newSmallC = $form->small_crop->getValues() != null ? $form->small_crop->getValues() : VVE_IMAGE_THUMB_CROP;
+//            $newMedW = $form->medium_width->getValues() != null ? $form->medium_width->getValues() : VVE_DEFAULT_PHOTO_W;
+//            $newMedH = $form->medium_height->getValues() != null ? $form->medium_height->getValues() : VVE_DEFAULT_PHOTO_H;
+//            $newMedC = $form->medium_crop->getValues() != null ? $form->medium_crop->getValues() : false;
+//
+//            // small
+//            if( $origSmallW != $newSmallW || $origSmallH != $newSmallH || $origSmallC != $newSmallC ){
+//               $this->resizeImages($newSmallW, $newSmallH, $newSmallC, self::DIR_SMALL);
+//            }
+//
+//            if( $origMedW != $newMedW || $origMedH != $newMedH || $origMedC != $newMedC ){
+//               $this->resizeImages($newMedW, $newMedH, $newMedC, self::DIR_MEDIUM);
+//            }
+//         }
 
          // save options
-         $settings[self::PARAM_SMALL_W] = $form->small_width->getValues();
-         $settings[self::PARAM_SMALL_H] = $form->small_height->getValues();
-         $settings[self::PARAM_SMALL_C] = $form->small_crop->getValues();
-         $settings[self::PARAM_MEDIUM_W] = $form->medium_width->getValues();
-         $settings[self::PARAM_MEDIUM_H] = $form->medium_height->getValues();
-         $settings[self::PARAM_MEDIUM_C] = $form->medium_crop->getValues();
+//         $settings[self::PARAM_SMALL_W] = $form->small_width->getValues();
+//         $settings[self::PARAM_SMALL_H] = $form->small_height->getValues();
+//         $settings[self::PARAM_SMALL_C] = $form->small_crop->getValues();
+//         $settings[self::PARAM_MEDIUM_W] = $form->medium_width->getValues();
+//         $settings[self::PARAM_MEDIUM_H] = $form->medium_height->getValues();
+//         $settings[self::PARAM_MEDIUM_C] = $form->medium_crop->getValues();
          $settings[self::PARAM_EDITOR_TYPE] = $form->editor_type->getValues();
       }
    }
