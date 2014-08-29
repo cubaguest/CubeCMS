@@ -751,7 +751,7 @@ class MailsNewsletters_Controller extends Controller {
       $curIdN = 0;
       $sended = 0;
       foreach ($mails as $mail) {
-         if($sended >= 500){ // sen donly 500 mail per hour
+         if($sended >= 200){ // sen donly 500 mail per hour
             return;
          }
          if($curIdN != $mail->{MailsNewsletters_Model_Queue::COLUMN_ID_NEWSLETTER}){
