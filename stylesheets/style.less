@@ -1,7 +1,7 @@
 @charset "UTF-8";
 @import "@{dirCoreCss}normalize.css";
 @import "fontawesome/font-awesome.less";
-@import "@{dirFaceCss}style-layout.css";
+@import "@{dirCoreCss}style-layout.css";
 
 /**
  * Základní cesty - NEPOUŽÍVAT RELATIVNÍ CESTY!!! PO KOMPRESI NEBUDOU RELATIVNÍ!!!
@@ -147,13 +147,22 @@ a.image {
    margin-right: 10px;
    line-height: 0;
 }
+ul.unstyled {
+   >li {
+      margin: 0;
+      padding: 0;
+   }
+   margin: 0;
+   padding: 0;
+   list-style: none;
+}
 
 .photogalery + p, .photogalery + div, .photogalery + hr,
 a.image + p, a.image + h3, a.image + h2, a.image + h3, a.image + h4, a.image + div
 {clear: both;}
 
 /* Hlášky */
-.message {
+.message, .alert {
    .font-small;
    padding: 5px 5px 5px 40px;
    background-repeat: no-repeat;
@@ -164,9 +173,9 @@ a.image + p, a.image + h3, a.image + h2, a.image + h3, a.image + h4, a.image + d
    p { margin-bottom:3px; border-top: 1px solid gray;}
    p:first-child { border: none;}
 }
-#infoMessages, .message-info { border-color: darken(@color-success, 20%); background-color: @color-success; background-image: url('@{dirCore}images/icons/accept.png');}
-#errMessages, .message-err { border-color: darken(@color-error, 20); background-color: @color-error; background-image: url('@{dirCore}images/icons/error.png');}
-.message-warning { border-color: darken(@color-warning, 20); background-color: @color-warning; background-image: url('@{dirCore}images/icons/error.png');}
+#infoMessages, .message-info, .alert-info { border-color: darken(@color-success, 20%); background-color: @color-success; background-image: url('@{dirCore}images/icons/accept.png');}
+#errMessages, .message-err, .alert-error { border-color: darken(@color-error, 20); background-color: @color-error; background-image: url('@{dirCore}images/icons/error.png');}
+.message-warning, .alert-warning { border-color: darken(@color-warning, 20); background-color: @color-warning; background-image: url('@{dirCore}images/icons/error.png');}
 #coreErrMessage { border-color: darken(@color-error, 40); background-color: darken(@color-error, 20); background-image: url('@{dirCore}images/icons/error.png');}
 
 
@@ -185,7 +194,7 @@ a.image + p, a.image + h3, a.image + h2, a.image + h3, a.image + h4, a.image + d
 @form-color-bg-green: #5cb85c;
 @form-color-bg-disabled: #aaa;
 @form-color-bg-warning: #FFABAB;
-input, button, textarea, select, a.form-button, .button {
+input, button, textarea, select, a.form-button, .button, .btn {
    border: 1px solid @form-color-border;
    background-color: @form-color-bg;
    color: @form-color-text;
@@ -203,7 +212,7 @@ input[type="image"],input[type="checkbox"],input[type="radio"] {
    border: 0;
    background-color:transparent;
 }
-input[type="submit"], input[type="reset"], input[type="button"], button, a.form-button, .button, .btn {
+input[type="submit"], input[type="reset"], input[type="button"], button, a.form-button, .button, .btn, .btn:visited {
    &:hover {
       color: @form-color-text-hover;
       border-color: @form-color-bg-hover;
@@ -226,6 +235,10 @@ input[type="submit"], input[type="reset"], input[type="button"], button, a.form-
    padding: 1px 5px;
    color: @form-color-text;
    cursor: pointer;
+   text-decoration: none;
+   text-align: center;
+   margin: 0;
+   display: inline-block;
 }
 input.form-required, textarea.form-required {
    &:after {
@@ -353,6 +366,18 @@ form {
       content: " ";
       display: table;
    }
+   &.form-vertical {
+      .form-group {
+         .form-labels {
+            width: 100%;
+            float: none;
+         }
+         .form-controls {
+            width: 100%;
+            float: none;
+         }
+      }
+   }
    .form-group {
       *, *:before, *:after {
          box-sizing:border-box;
@@ -370,9 +395,10 @@ form {
       }
       &.form-group-advanced {
       }
-      input, textarea {
+      input, textarea, button, select, .btn {
          padding: 5px;
          height: auto;
+         line-height: 1.4;
       }
       .form-labels {
          label {
