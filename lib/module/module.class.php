@@ -150,6 +150,7 @@ class Module
       } else if(version_compare($this->version, $currentVersion) == 1){
          $this->update($currentVersion);
       }
+      $this->updateDependModules();
    }
 
    public function install()
@@ -267,6 +268,22 @@ class Module
       }
    }
    
+   protected function updateDependModules()
+   {
+      if(empty($this->depModules)){
+         return;
+      }
+      foreach ($this->depModules as $moduleName) {
+         $class = $moduleName.'_Module';
+         $module = new $class($moduleName, array(), self::getModuleVersion($moduleName));
+      }
+   }
+   
+   protected static function getModuleVersion($moduleName)
+   {
+      return Model_Module::getVersion($moduleName);
+   }
+   
    /**
     * metoda pro instalaci požadovaného jazyka
     * @param type $lang
@@ -306,7 +323,7 @@ class Module
       return $models;
    }
 
-protected function replaceDBPrefix($cnt)
+   protected function replaceDBPrefix($cnt)
    {
       return str_replace(Install_Core::SQL_TABLE_PREFIX_REPLACEMENT, VVE_DB_PREFIX, $cnt);
    }
