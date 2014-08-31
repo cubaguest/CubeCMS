@@ -117,6 +117,7 @@ class Model_Category extends Model_ORM {
       $this->setPk(self::COLUMN_ID);
       $this->addRelatioOneToMany(self::COLUMN_ID, 'Model_Rights', Model_Rights::COLUMN_ID_CATEGORY);
       $this->addRelatioOneToMany(self::COLUMN_ID, 'Model_Panel', Model_Panel::COLUMN_ID_CAT);
+      $this->addForeignKey(self::COLUMN_MODULE, 'Model_Module', Model_Module::COLUMN_NAME);
    }
 
    protected function beforeSave(Model_ORM_Record $record, $type = 'I')
@@ -143,8 +144,7 @@ class Model_Category extends Model_ORM {
     */
    public function withModule()
    {
-      $this->join(Model_Category::COLUMN_MODULE, array('t_mod' => 'Model_Module'), Model_Module::COLUMN_NAME,
-                  array(Model_Module::COLUMN_VERSION), self::JOIN_LEFT);
+      $this->joinFK(Model_Category::COLUMN_MODULE);
       return $this;
    }
 
