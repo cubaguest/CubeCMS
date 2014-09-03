@@ -59,7 +59,7 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
          <td class="ui-widget-content">
             <?
             $arr = Locales::getLangLabel(Locales::getUserLang());
-            echo reset($arr);
+            echo is_array($arr) ? reset($arr) : null; 
             ?>
          </td>
       </tr>
