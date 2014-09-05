@@ -272,8 +272,10 @@ class Categories_Controller extends Controller {
             foreach (Locales::getAppLangs() as $lang) {
                $record[Model_Category::COLUMN_DISABLE][$lang] = false;
             }
-            foreach ($form->disabledLangs->getValues() as $lang) {
-               $record[Model_Category::COLUMN_DISABLE][$lang] = true;
+            if(is_array($form->disabledLangs->getValues())){
+               foreach ($form->disabledLangs->getValues() as $lang) {
+                  $record[Model_Category::COLUMN_DISABLE][$lang] = true;
+               }
             }
          }
          
@@ -408,8 +410,10 @@ class Categories_Controller extends Controller {
             foreach (Locales::getAppLangs() as $lang) {
                $record[Model_Category::COLUMN_DISABLE][$lang] = false;
             }
-            foreach ($form->disabledLangs->getValues() as $lang) {
-               $record[Model_Category::COLUMN_DISABLE][$lang] = true;
+            if(is_array($form->disabledLangs->getValues())){
+               foreach ($form->disabledLangs->getValues() as $lang) {
+                  $record[Model_Category::COLUMN_DISABLE][$lang] = true;
+               }
             }
          }
 
