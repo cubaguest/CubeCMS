@@ -861,8 +861,9 @@ class Form_Element extends TrObject implements Form_Element_Interface {
    public function labelLangs($renderKey = null) {
       if($this->isMultilang() AND count($this->langs) > 1) {
          $langButtons = null;
+         $shortCode = count($this->getLangs()) > 5 ? true : false;
          foreach ($this->getLangs() as $langKey => $langLabel) {
-            $a = new Html_Element('a', $langLabel);
+            $a = new Html_Element('a', $shortCode ? $langKey : $langLabel);
             $a->setAttrib('href', "#");
             $a->addClass($this->cssClasses['langLink']);
             if($this->isDimensional()) {
