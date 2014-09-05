@@ -875,6 +875,10 @@ class Form_Element extends TrObject implements Form_Element_Interface {
             $a->setAttrib('lang', $langKey);
             $langButtons .= $a;
          }
+         $a = new Html_Element('a', $this->tr('Do všech'));
+         $a->setAttrib('href', "#duplicate");
+         $a->addClass($this->cssClasses['langLink'].'-duplicator');
+         $langButtons .= $a;   
          $container = clone $this->containerElement;
          $container->addContent($langButtons);
          return $container->addClass($this->cssClasses['langLinkContainer']);

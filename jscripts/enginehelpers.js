@@ -212,6 +212,16 @@ CubeCMS.Tools = {
             return CubeCMS.Tools.get(prefix);
          }
       }
+   },
+   formatFileSize : function(fileSizeInBytes) {
+      var i = -1;
+      var byteUnits = [' kB', ' MB', ' GB', ' TB', 'PB', 'EB', 'ZB', 'YB'];
+      do {
+         fileSizeInBytes = fileSizeInBytes / 1024;
+         i++;
+      } while (fileSizeInBytes > 1024);
+
+      return Math.max(fileSizeInBytes, 0.1).toFixed(1) + byteUnits[i];
    }
 };
 
@@ -420,8 +430,7 @@ CubeCMS.Form = {
       $original.removeClass('form-input-multiple-last').find('a.button-add-multiple-line').hide();
       
       $original.after($new.hide());
-      $new.fadeIn(200, function(){
-      });
+      $new.show().css('display', 'table');
 
       if($original.closest('.form-controls').find('.form-input-multiple').length > 1){
          $original.closest('.form-controls').find('a.button-remove-multiple-line').show();
@@ -491,6 +500,23 @@ CubeCMS.Form = {
          $('label[lang]', $container).hide();
          $('label[lang="'+lang+'"]', $container).show();
          return false;
+      });
+      $('body').on('click', 'form .lang-container a.link-lang-duplicator', function(e){
+         e.preventDefault();
+         var curLang = $(this).parent().find('.link-lang-sel').prop('lang');
+         var $container = $(this).closest('*:has(div[lang])');
+         if($container.find('div[lang="'+curLang+'"] textarea').length > 0){
+            if($container.find('div[lang="'+curLang+'"] textarea + span.mceEditor')){
+               var val = tinyMCE.get($container.find('div[lang="'+curLang+'"] textarea').prop('id')).getContent();
+               $container.find('textarea').each(function(){
+                  tinyMCE.get($(this).prop('id')).setContent(val);
+               });
+            } else {
+               $container.find('div[lang] textarea').val($container.find('div[lang="'+curLang+'"] textarea').val());
+            }
+         } else {
+            $container.find('div[lang] input,select').val($container.find('div[lang="'+curLang+'"] input,select').val());
+         }
       });
       
       if(typeof CubeCMS.primaryLang !== "undefined"){
@@ -565,7 +591,7 @@ CubeCMS.Form = {
          }
          // pokud fildsed nemá žádný viditelný prvek typu div.form-group, tak jej označ a schovej
          $('form fieldset').each(function(){
-            if($(this).find('div.form-group:visible').length === 0){
+            if($(this).find('div.form-group:visible').length === 0 && $(this).find('table.form-table').length === 0){
                $(this).addClass('form-fieldset-advanced').hide();
             }
          });

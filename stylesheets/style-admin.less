@@ -602,6 +602,24 @@ form {
          text-decoration: none;
          border-bottom: 0px none;
          color: #aaa;
+         background-color: #fff;
+      }
+      a.link-lang-duplicator {
+         &:before {
+            font-family: "FontAwesome";
+            content: "\f0e8";
+            display: inline-block;
+            margin-right: 5px;
+         }
+         &:hover {
+            color: @color-bg-important;
+         }
+         color: #aaa;
+         background-color: #fff;
+         text-decoration: none;
+         padding: 3px 6px;
+         display: inline-block;
+         font-size: 12px;
       }
       a.link-lang:hover, a.link-lang-sel:hover, a.link-lang:focus, a.link-lang-sel:focus {
          /*background-position: 0 -20px;*/
