@@ -321,17 +321,14 @@ CubeCMS.ToolBox = {
    initLangLoader : function(){
       $('body').on('click', 'a.toolbox-changelang-button', function(e){
          e.preventDefault();
-         loadPageLang(this.href);
-
-         showLoadBox('.main-content');
+         CubeCMS.Loader.showLoadBox('.main-content');
          var cntUrl = this.href;
          $('.main-content').load(cntUrl, function(cnt){
             var lang = cntUrl.match(/(l=[a-z]{2})/g);
             if(lang != null){
                $('.main-content').html(cnt.replace(lang[0], "") );
             }
-            hideLoadBox();
-            initToolboxEvents();
+            CubeCMS.Loader.hideLoadBox();
             $(document).scroll();
          });
          return false;
