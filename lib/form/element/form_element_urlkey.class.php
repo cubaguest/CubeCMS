@@ -137,6 +137,10 @@ class Form_Element_UrlKey extends Form_Element_Text {
       return $this;
    }
    
+   public function setAllowSlash($allow = false)
+   {
+      $this->addFilter(new Form_Filter_UrlKey(!$allow));
+   }
    
    public function setUpdateFromElement(Form_Element $element)
    {

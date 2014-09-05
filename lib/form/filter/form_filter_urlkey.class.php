@@ -9,8 +9,11 @@
  * @abstract 		Třída fitru pro vytvoření validní url adresy
  */
 class Form_Filter_UrlKey extends Form_Filter {
+   protected $removeSlash;
 
-   public function  __construct() {
+
+   public function  __construct($removeSlash = true) {
+      $this->removeSlash = $removeSlash;
    }
 
    /**
@@ -38,8 +41,7 @@ class Form_Filter_UrlKey extends Form_Filter {
             $this->filterValue($var);
          }
       } else {
-         $variable = vve_cr_url_key($variable);
+         $variable = Utils_Url::toUrlKey($variable, $this->removeSlash);
       }
    }
 }
-?>

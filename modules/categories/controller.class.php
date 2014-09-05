@@ -606,6 +606,7 @@ class Categories_Controller extends Controller {
       $catUrlKey = new Form_Element_UrlKey('urlkey', $this->tr('Url klíč'));
       $catUrlKey->setLangs();
       $catUrlKey->setAdvanced(true);
+      $catUrlKey->setAllowSlash(true);
       $catUrlKey->setSubLabel($this->tr('Pokud není zadán, je url klíč generován automaticky'));
       $catUrlKey->setAutoUpdate(true)
           ->setCheckingUrl($this->link()->route('checkUrlkey'));
