@@ -39,7 +39,17 @@ class PhotoGalery_Model_Images extends Model_ORM_Ordered {
       $this->addForeignKey(self::COLUMN_ID_CAT, 'Model_Categories', Model_Category::COLUMN_CAT_ID);
    }
    
-   /**
+   protected function beforeSave(Model_ORM_Record $record, $type = 'U')
+   {
+      foreach (Locales::getAppLangs() as $lang) {
+         if($record[self::COLUMN_NAME][$lang] == null){
+            $record[self::COLUMN_NAME][$lang] = $record->{self::COLUMN_FILE};
+         }
+      }
+      parent::beforeSave($record, $type);
+   }
+
+      /**
     *
     * @param <type> $idCat
     * @param <type> $idArt

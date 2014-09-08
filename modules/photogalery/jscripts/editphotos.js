@@ -22,8 +22,13 @@ CubeImagesEditor = {
       this.$queueList = $('#upload-queue');
       this.$imagesList = $('#images-list');
       this.$uplaodForm = $('#images-upload-form');
+      this.$imagesActions = $('#images-actions');
       this.$dialogLabels = $('#dialog-image-labels');
       
+      // reset selected
+      this.$imagesList.find('.image-checkbox').removeProp('checked');
+      this.$imagesActions.find('#images-action-select,#buttons-process-images').prop('disabled', 'disabled');
+      that.$imagesActions.removeClass('fixed-box');
       // eventy
       $.fn.prettyPhoto();
       // náhled
@@ -37,6 +42,56 @@ CubeImagesEditor = {
          } else {
             $(this).closest('li').removeClass('selected');
          }
+         if(that.$imagesList.find('.image-checkbox:checked').length > 0 ){
+            that.$imagesActions.find('#images-action-select,#buttons-process-images').removeProp('disabled');
+            that.$imagesActions.addClass('fixed-box');
+         } else {
+            that.$imagesActions.find('#images-action-select,#buttons-process-images').prop('disabled', 'disabled');
+            that.$imagesActions.removeClass('fixed-box');
+         }
+      });
+      this.$imagesActions.on('click', '#button-select-all-images', function(){
+         if(that.$imagesList.find('.image-checkbox:checked').length > 0 ){
+            that.$imagesList.find('.image-checkbox').removeProp('checked').change();
+         } else {
+            that.$imagesList.find('.image-checkbox').prop('checked', 'checked').change();
+         }
+      });
+      this.$imagesActions.on('click', '#buttons-process-images', function(){
+         var val = that.$imagesActions.find('#images-action-select').val();
+         if(val === "rotate-left"){
+            $('li', that.$imagesList).each(function(){
+               if($(this).has('.image-checkbox:checked').length){
+                  $(this).find('.toolbox-button-rotate_left').click();
+               }
+            });
+         } else if(val === "rotate-right"){
+            $('li', that.$imagesList).each(function(){
+               if($(this).has('.image-checkbox:checked').length){
+                  $(this).find('.toolbox-button-rotate_right').click();
+               }
+            });
+         } else if(val === "remove"){
+            if(confirm('Opravdu smazat?')){
+               $('li', that.$imagesList).each(function(){
+                  var $li = $(this);
+                  if($li.has('.image-checkbox:checked').length){
+                     $.ajax({
+                        url: that.options.imageDeleteUrl,
+                        type: "POST",
+                        cache: false,
+                        data: {id : $li.data('id')},
+                        success : function(data){
+                           $li.fadeOut(100, function(){
+                              $li.remove();
+                           });
+                        }
+                     });   
+                  }
+               });
+            }
+         }
+         that.$imagesActions.find('#images-action-select').val(that.$imagesActions.find('#images-action-select option:first').val());
       });
       // mazani
       this.$imagesList.on('click', '.toolbox-button-delete', function(){
@@ -78,7 +133,7 @@ CubeImagesEditor = {
       // editace
       this.$dialogLabels.dialog({
          autoOpen : false,
-         minWidth : 500,
+         minWidth : 650,
          title : 'Úprava popisků obrázku',
          resizable : false,
          close : function(){
