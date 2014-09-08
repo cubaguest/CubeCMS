@@ -673,7 +673,7 @@ abstract class Controller extends TrObject {
       $form->addElement($elemShareTools, $grpView);
       
       if(function_exists('extendCategorySettings')){
-         extendCategorySettings($this->category(), $form, $settings, $this->translator);
+         extendCategorySettings($this->category, $form, $settings, $this->translator);
       }
       
       /* BUTTONS SAVE AND CANCEL */
