@@ -394,7 +394,7 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
    .widget-sahadow();
 }
 .toolbox-active-content {
-   background-color: lighten(@color-bg-hover, 37);
+   background-color: lighten(@color-bg-hover, 30%);
 }
 
 
@@ -674,6 +674,21 @@ form {
 } /* text v hlavním obsahu */
 
 .lang-image {padding-right: 2px; width: 18px; height: 12px;}
+
+/* fixovaný box na stránce, většinou tlačítka k seznamu*/
+.fixed-actions-box {
+   
+}
+.fixed-actions-box-helper {
+   position: fixed;
+   top: 25px;
+   left: 0;
+   z-index: 20;
+   .widget-sahadow();
+}
+.fixed-actions-box-helper + .fixed-actions-box-palceholder {
+   display: block !important;
+}
 
 /* Oprava inputu v JqGrid */
 .ui-jqgrid input,

@@ -244,6 +244,7 @@ CubeCMS.ToolBox = {
       
       this.initEvents();
       this.initLangLoader();
+      this.initFixedBoxs();
    },
    initEvents : function() {
       var _this = this;
@@ -332,6 +333,28 @@ CubeCMS.ToolBox = {
             $(document).scroll();
          });
          return false;
+      });
+   },
+   initFixedBoxs : function(){
+      $('.fixed-actions-box').each(function(){
+         var $element = $(this);
+         if(!$element.data('container')){
+            return;
+         }
+         var $container = $($element.data('container'));
+         var baseOffsetTop = $element.offset().top;
+         var maxVPos = $element.offset().top + $container.outerHeight();
+         $(window).on('scroll', function(){
+            if($(window).scrollTop()+30 > baseOffsetTop && $(window).scrollTop() < maxVPos){
+               if(!$element.hasClass('fixed-actions-box-helper')){
+                  $element.after($('<div class="fixed-actions-box-palceholder hidden"></div>').height($element.height()).width($element.width()));
+                  $element.outerWidth($element.outerWidth()).addClass('fixed-actions-box-helper').css({left : $element.offset().left});
+               }
+            } else {
+               $element.removeClass('fixed-actions-box-helper').css({left : "auto", width : 'auto'});
+               $element.next('.fixed-actions-box-palceholder').remove();
+            }
+         });
       });
    }
 };
