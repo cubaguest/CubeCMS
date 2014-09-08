@@ -194,11 +194,8 @@ a.image + p, a.image + h3, a.image + h2, a.image + h3, a.image + h4, a.image + d
 @form-color-bg-green: #5cb85c;
 @form-color-bg-disabled: #aaa;
 @form-color-bg-warning: #FFABAB;
-input, button, textarea, select, a.form-button, .button, .btn {
-   border: 1px solid @form-color-border;
-   background-color: @form-color-bg;
+input, button, textarea, select, a.form-button, .button, .btn, a.btn {
    color: @form-color-text;
-   padding: 1px;
    &.disabled {
       background-color: @form-color-bg-disabled !important;
       background-image: none;
@@ -206,13 +203,17 @@ input, button, textarea, select, a.form-button, .button, .btn {
       &:hover {
       }
    }
+   vertical-align: middle;
+   border: 1px solid @form-color-border;
+   background-color: @form-color-bg;
+   padding: 1px;
    .rounded-corners(5px);
 }
 input[type="image"],input[type="checkbox"],input[type="radio"] {
    border: 0;
    background-color:transparent;
 }
-input[type="submit"], input[type="reset"], input[type="button"], button, a.form-button, .button, .btn, .btn:visited {
+input[type="submit"], input[type="reset"], input[type="button"], button, a.form-button, .button, .btn, a.btn, a.btn:visited {
    &:hover {
       color: @form-color-text-hover;
       border-color: @form-color-bg-hover;
@@ -235,10 +236,13 @@ input[type="submit"], input[type="reset"], input[type="button"], button, a.form-
    padding: 1px 5px;
    color: @form-color-text;
    cursor: pointer;
-   text-decoration: none;
+   text-decoration: none !important;
    text-align: center;
    margin: 0;
    display: inline-block;
+}
+input[disabled],select[disabled],textarea[disabled] {
+   color: lighten(@form-color-text, 50%);
 }
 input.form-required, textarea.form-required {
    &:after {
