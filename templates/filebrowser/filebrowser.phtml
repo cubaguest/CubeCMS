@@ -400,7 +400,7 @@ if(Auth::isLogin() == false){
          <span style="font-size: xx-small">(Pokud zpracování trvá příliš dlouho, zkuste klávesou F5 obnovit stránku.)</span>
       </p>
    </div>
-   <iframe id="upload_target" name="fb_u_target" src="<?=$this->uploadLink?>&method=iframe" style="width:0;height:0;border:0px solid #fff;" onload="CubeBrowserListWidget.refreshPath();"></iframe>
+   <iframe id="upload_target" name="fb_u_target" src="<?=$this->uploadLink?>&method=iframe" style="width:0;height:0;border:0px solid #fff;"></iframe>
    <div id="dialog-copy" class="dialog">
       <div class="dialog-content">
          <div class="title"><?php ps($this->tr('Kopírovat vybrané'))?></div>

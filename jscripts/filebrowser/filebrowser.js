@@ -325,6 +325,7 @@ var CubeBrowserListWidget = {
    lastSelecteRow : false,
    previewTimer : false,
    currentFolder : false,
+   request : null,
    
    init : function(path)
    {
@@ -564,14 +565,20 @@ var CubeBrowserListWidget = {
             selectedItems.push($(this).data('realpath'));
          });
       }
-      
+     
       var that = this;
       this.clearList();
       CubeBrowserPathWidget.setPath(path);
-      $.ajax({
+      this.request = $.ajax({
          type : 'GET', data : { path : path, type: CubeBrowser.listType }, url : window.location.toString().replace('browser.php', 'getitems.php'),
          cache : false,
          async : false,
+         beforeSend: function(xhr){    
+            if(that.request !== null){
+               that.request.abort();
+            }
+            that.request = xhr;
+         },
          success: function(data){
             if(data.errmsg.length === 0){
                $.each(data.items, function(index, item){
@@ -594,7 +601,6 @@ var CubeBrowserListWidget = {
             }
             CubeBrowserToolboxWidget.updateButtons();
             CubeBrowser.loadDirectories();
-            console.log('path loaded');
          },
          error: function(){
 //            FileBrowser.showResult([], ['Chyba při komunikaci se serverem. Zkuste znovu.']);
