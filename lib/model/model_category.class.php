@@ -249,12 +249,8 @@ class Model_Category extends Model_ORM {
       if (is_array($params)) {
          $params = serialize($params);
       }
-      $dbc = Db_PDO::getInstance();
-      $dbst = $dbc->prepare("UPDATE " . Db_PDO::table(self::DB_TABLE)
-            . " SET " . self::COLUMN_PARAMS . " = :params WHERE " . self::COLUMN_CAT_ID . " = :idcat");
-      $dbst->bindValue(':params', $params, PDO::PARAM_STR);
-      $dbst->bindValue(':idcat', $catId, PDO::PARAM_INT);
-      return $dbst->execute();
+      $model = new self();
+      return $model->where(self::COLUMN_ID." = :idc", array('idc' => $catId))->update(array(self::COLUMN_PARAMS => $params));
    }
 
    public static function getCategoryListByModule($module, $onlyWithRights = true)
