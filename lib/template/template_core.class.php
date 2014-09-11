@@ -151,11 +151,11 @@ class Template_Core extends Template {
       }
 
       // css
-      if(VVE_DEBUG_LEVEL == 0){
-         $css = $this->getCombinedCss();
-      } else {
+//      if(VVE_DEBUG_LEVEL == 0){
+//         $css = $this->getCombinedCss();
+//      } else {
          $css = Template::getStylesheets();
-      }
+//      }
       array_walk($css, create_function('&$i,$k','$i = "<link rel=\"stylesheet\" type=\"text/css\" href=\"$i\" />\n";'));
       $cssfiles = implode('', $css);
       unset ($css);
@@ -296,6 +296,7 @@ class Template_Core extends Template {
          // generate file
          $cnt = null;
          $imports = array();
+         $urlBase = Url_Link::getWebURL();
          foreach($filesForCompress as $file){
             $cssCnt = file_get_contents($file);
             // replace relative paths
@@ -319,7 +320,8 @@ class Template_Core extends Template {
                   '/@charset "?utf-8"?;/i',
                   '/@import (url)\(([^>]*?)\);?/',
                   /* repair relative urls */
-                  '#url\((?!\s*[\'"]?(?:https?:)?//)\s*([\'"])?#',
+                  '/url\(([\'"]\s*\/?faces\/)/',
+                  '/url\((?!\s*[\'"]?(?:https?:)?\/\/)\s*([\'"])?/',
                   /* comments */
                   "`^([\t\s]+)`ism",
                   "`^\/\*(.+?)\*\/`ism",
@@ -332,6 +334,7 @@ class Template_Core extends Template {
                   "",
                   "",
                   /* repair relative urls */
+                  "url($1{$urlBase}faces/",
                   "url($1{$url}",
                   /* comments */
                   '',
@@ -619,7 +622,7 @@ class Template_Core extends Template {
           ."<!--{*-JAVASCRIPTS-*}-->";
 
       if(Category::getSelectedCategory()->getRights()->isWritable()){
-         $this->addFile('css://style-admin.less');
+         $this->addFile('css://admin/admin.less');
          if(Auth::isAdmin()){
             $this->addFile('js://admin/menu.js');
          }
