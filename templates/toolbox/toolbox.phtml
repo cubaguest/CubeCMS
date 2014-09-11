@@ -1,6 +1,6 @@
 <?
 $this->addJsPlugin(new JsPlugin_JQuery());
-$this->addFile('css://engine:style-admin.less');// need for buttons style
+$this->addFile('css://engine:admin/admin.less');// need for buttons style
 $rTime = rand(1, time());
 ?>
 <div class="toolbox">
@@ -112,8 +112,7 @@ $rTime = rand(1, time());
             case 'Template_Toolbox2_Tool_Button':
                ?>
                <button class="toolbox-button toolbox-button-<?ps($name)?>" title="<?ps($tool->getTitle())?>"
-                       style="background-image: url('<?=$image?>')"
-                       onclick="<?=$formOnSubmit?>"></button>
+                       onclick="<?=$formOnSubmit?>"><span class="icon icon-<?=$tool->getIcon()?>"></span><?=$tool->getLabel()?></button>
                <?
                break;
             case 'Template_Toolbox2':
