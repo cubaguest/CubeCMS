@@ -1,0 +1,55 @@
+/**
+ * Admin variables and mixins
+ */
+
+@color-primary: #0080FF;
+@color-border: #aaa;
+@color-border-hover: #999;
+@color-border-important: #fc4949;
+@color-text: #666;
+@color-text-hover: #fff;
+@color-text-hover-alt: darken(@color-text, 50);
+@color-text-gray: #333;
+@color-bg: #fff;
+@color-bg-header: #fff;
+@color-bg-content: #fff;
+@color-bg-hover: lighten(@color-primary, 15%);
+@color-bg-hover-light: lighten(@color-bg-hover, 30%);
+@color-bg-important: #FF3323;
+@color-bg-gray: #efefef;
+
+@color-bg-hightlight: #FFF7B4;
+@color-border-hightlight: darken(@color-bg-hightlight, 30%);
+
+@font-size: 16px;
+@font-family: Candara, Calibri, Segoe, "Segoe UI", Optima, Arial, sans-serif;
+
+@border-radius: 5px;
+@padding-content: 3px;
+@padding-widget: 5px;
+
+@padding-base: 10px;
+@padding-small: 5px;
+@padding-base-vertical: @padding-base;
+
+.rounded-corners(@radius: 5px) {
+   border-radius: @radius;
+   -webkit-border-radius: @radius;
+   -moz-border-radius: @radius;
+}
+.tools-box-sahadow() {
+   -webkit-box-shadow: 0 0 3px 0px @color-bg-hover;
+   -mox-box-shadow: 0 0 3px 0px @color-bg-hover;
+   box-shadow: 0 0 3px 0px @color-bg-hover;
+}
+.widget-sahadow() {
+   -moz-box-shadow: 5px 5px 10px 0 rgba(0,0,0,0.75);
+   -webkit-box-shadow: 5px 5px 10px 0 rgba(0,0,0,0.75);
+   box-shadow: 5px 5px 10px 0 rgba(0,0,0,0.75);
+}
+// zatím nevyužito
+.admin-box-sahadow() { 
+   -webkit-box-shadow: 0px 0px 4px 1px rgba(0,0,0,0.75);
+   -moz-box-shadow: 0px 0px 4px 1px rgba(0,0,0,0.75);
+   box-shadow: 0px 0px 4px 1px rgba(0,0,0,0.75);
+}
