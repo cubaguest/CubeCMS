@@ -51,9 +51,9 @@ class ShopProductGeneral_Controller extends Shop_Product_Controller {
          || !$product->{Shop_Model_Product::COLUMN_STOCK}){
          $this->createAddToCartForm($product->getPK(), true);
       }
-      $this->processDeleteProduct($product);
-      $this->processDuplicateProduct($product);
-      $this->processChangeProductState($product);
+      $this->formDeleteProduct($product);
+      $this->formDupliacateProduct($product);
+      $this->formChangeState($product);
       $this->view()->linkBack = $this->link()->route();
 
       $this->view()->product = $product;

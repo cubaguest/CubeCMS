@@ -20,7 +20,7 @@ class ShopProductGeneral_Panel extends Panel {
          $whereBinds['idc'] = $this->category()->getId();
       }
       if($this->panelObj()->getParam(self::PARAM_SHOW_ONLY_NEW, false)){
-         $whereStr .=' AND '.Shop_Model_Product::COLUMN_IS_NEW_TO_DATE.' > NOW()';
+         $whereStr .=' AND '.Shop_Model_Product::COLUMN_IS_NEW_TO_DATE.' >= CURDATE()';
       }
 
       $modelProducts

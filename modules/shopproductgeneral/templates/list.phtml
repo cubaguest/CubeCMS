@@ -12,11 +12,17 @@ echo $this->category()->getName();
 <div class="main-content-list">
    <?php 
    if(!empty($this->products)){
-      $this->includeFile('tpl://sorting.phtml');
-      foreach ($this->products as $product) {?>
-   <div class="main-content-list-record shop-product <?php if(!$product->{Shop_Model_Product::COLUMN_ACTIVE}) echo "concept";?> clearfix">
-      <h2><a href="<?php echo $this->link()->route('detail', array('urlkey' => $product->{Shop_Model_Product::COLUMN_URLKEY}))?>" 
-             title="<?php echo $this->tr('Přejít na ').$product->{Shop_Model_Product::COLUMN_NAME}?>"><?php 
+      $this->includeFile('tpl://shopproductgeneral:sorting.phtml');
+      foreach ($this->products as $product) {
+         $link = $this->link();
+         if(isset($product->{Model_Category::COLUMN_URLKEY})){
+            $link->category($product->{Model_Category::COLUMN_URLKEY});
+         }
+         $link->route('detail', array('urlkey' => $product->{Shop_Model_Product::COLUMN_URLKEY}))
+
+         ?>
+   <div class="main-content-list-record shop-product <?if(!$product->{Shop_Model_Product::COLUMN_ACTIVE}) echo "concept";?> clearfix">
+      <h2><a href="<?php echo $link?>" title="<?php echo $this->tr('Přejít na ').$product->{Shop_Model_Product::COLUMN_NAME}?>"><?
              echo $product->{Shop_Model_Product::COLUMN_NAME};
              echo strtotime($product->{Shop_Model_Product::COLUMN_IS_NEW_TO_DATE})+(24*60*60) >= time() ? ' - '.$this->tr('Novinka!') : null;
              ?></a>
