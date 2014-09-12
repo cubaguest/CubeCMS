@@ -3,26 +3,44 @@
    <div class="clearfix">
       <?php
       $loginForm = Auth::getAuthenticator('internal')->getLoginForm();
-      $loginForm->html()->addClass('clearfix');
+      $loginForm->html()->addClass('clearfix')->addClass('form-vertical');
       echo $loginForm->renderStart();
       ?>
          <div class="login-form-label">
             <h2><?php echo  $this->tr('Přihlášení'); ?></h2>
          </div>
-         <div>
-            <label for="login-user"><?php echo $this->tr('Jméno / e-mail'); ?>:</label><br />
-            <?php echo $loginForm->{Auth_Provider_Internal::FORM_USERNAME}->control()?>
+         <div class="form-group">
+            <div class="form-labels">
+               <?php echo $loginForm->{Auth_Provider_Internal::FORM_USERNAME}->label();?>
+            </div>
+            <div class="form-controls">
+               <?php 
+               $loginForm->{Auth_Provider_Internal::FORM_USERNAME}->html()->addClass('form-control');
+               echo $loginForm->{Auth_Provider_Internal::FORM_USERNAME}->control();
+               ?>
+            </div>
          </div>
-         <div>
-            <label for="login-password"><?php echo  $this->tr('Heslo'); ?>:</label><br />
-            <?php echo $loginForm->{Auth_Provider_Internal::FORM_PASSWORD}->control()?>
+         <div class="form-group">
+            <div class="form-labels">
+               <?php echo $loginForm->{Auth_Provider_Internal::FORM_PASSWORD}->label();?>
+            </div>
+            <div class="form-controls">
+               <?php 
+               $loginForm->{Auth_Provider_Internal::FORM_PASSWORD}->html()->addClass('form-control');
+               echo $loginForm->{Auth_Provider_Internal::FORM_PASSWORD}->control();
+               ?>
+            </div>
          </div>
-         <div class="left-box login-permanent">
-            <?php echo $loginForm->{Auth_Provider_Internal::FORM_PERMANENT}->control()?>
-            <label for="login-permanent"><?php echo $this->tr('trvale')?></label>
+         <div class="form-group login-permanent">
+            <div class="form-controls">
+               <?php echo $loginForm->{Auth_Provider_Internal::FORM_PERMANENT}->control()?>
+               <label for="login-permanent"><?php echo $loginForm->{Auth_Provider_Internal::FORM_PERMANENT}->label(null, true)?></label>
+            </div>
          </div>
-         <div class="right-box">
-            <?php echo $loginForm->{Auth_Provider_Internal::FORM_SUBMIT}->control()?>
+         <div class="form-group">
+            <div class="form-controls">
+               <?php echo $loginForm->{Auth_Provider_Internal::FORM_SUBMIT}->control()?>
+            </div>
          </div>
       <?php
       echo $loginForm->renderEnd();
