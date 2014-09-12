@@ -87,6 +87,7 @@ class Form extends TrObject implements ArrayAccess, Iterator {
       $this->decorator = $decorator == null ? new Form_Decorator() : $decorator;
       
       $this->htmlElement = new Html_Element('form');
+      $this->htmlElement->setAttrib('role', 'form');
       $this->setAction(new Url_Link_Module());
       $this->setSendMethod();
       $this->elementCheckForm = new Form_Element_Hidden('_'.$prefix.'_check');
