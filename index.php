@@ -5,8 +5,8 @@
 if(!defined('VVE_APP_IS_RUN')){
    define('VVE_APP_IS_RUN', true);
 }
-$libDir = realpath(dirname(__FILE__)).DIRECTORY_SEPARATOR;
-$webDir = realpath(dirname(isset ($siteFile) ? $siteFile : __FILE__)).DIRECTORY_SEPARATOR;
+$libDir = getcwd().DIRECTORY_SEPARATOR;
+$webDir = (isset($siteFile) ? realpath(dirname($siteFile)) : getcwd()).DIRECTORY_SEPARATOR;
 // include site config
 include $libDir.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'config.php';
 $allowedInternalApps = array('imagecacher', 'maintenance');
