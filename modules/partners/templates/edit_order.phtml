@@ -1,4 +1,4 @@
-<?
+<?php 
 // do titulku
 $h = $this->tr('úprava pořadí partnerů');
 $this->addPageTitle($h);
@@ -8,23 +8,23 @@ $jq->addUISortable();
 $this->addJsPlugin($jq);
 $this->addFile('css://style.css');
 ?>
-<h1><?= $h ?></h1>
+<h1><?php echo  $h ?></h1>
 <div class="main-content-form-edit">
-   <? echo $this->form->renderStart(); ?>
-   <fieldset class="fieldset-alt"><legend><span class="form-legend-name"><?=$this->tr('Pořadí partnerů v zobrazení')?></span>
+   <?php  echo $this->form->renderStart(); ?>
+   <fieldset class="fieldset-alt"><legend><span class="form-legend-name"><?php echo $this->tr('Pořadí partnerů v zobrazení')?></span>
          <span class="form-legend-text"></span>
       </legend>
       <table class="form-table">
          <tr>
-            <th class="form-labels"><label for="partner_degreeAfter_1" class="partner_degreeAfter_label_class"><?=$this->tr('Partneři')?>:</label></th>
+            <th class="form-labels"><label for="partner_degreeAfter_1" class="partner_degreeAfter_label_class"><?php echo $this->tr('Partneři')?>:</label></th>
             <td class="form-controlls">
             <ul id="partners-list">
-               <?
+               <?php 
                foreach ($this->partners as $partner) {
                   ?>
                   <li class="ui-state-default">
                      <span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
-                     <?
+                     <?php 
                      echo $partner->{Partners_Model::COLUMN_NAME};
                      $this->form->id->setValues($partner->{Partners_Model::COLUMN_ID});
                      echo $this->form->id;
@@ -34,24 +34,24 @@ $this->addFile('css://style.css');
                      if($partner->{Partners_Model::COLUMN_IMAGE} != null){
                         $imgsrc = vve_image_cacher($this->category()->getModule()->getDataDir(true).$partner->{Partners_Model::COLUMN_IMAGE}, null, 20);
                      ?>
-                     <img src="<?=$imgsrc ?>" alt="<?ps($partner->{Partners_Model::COLUMN_NAME})?>" />
-                     <?}?>
+                     <img src="<?php echo $imgsrc ?>" alt="<?php ps($partner->{Partners_Model::COLUMN_NAME})?>" />
+                     <?php }?>
                   </li>
-               <?}?>
+               <?php }?>
             </ul>
             </td>
          </tr>
          <tr>
             <td class="form-labels"></td>
-            <td class="form-controlls font-small"><?=$this->tr('Pro změnu pořadí stačí partnera uchopit myší a přesunout.')?></td>
+            <td class="form-controlls font-small"><?php echo $this->tr('Pro změnu pořadí stačí partnera uchopit myší a přesunout.')?></td>
          </tr>
          <tr>
-            <th class="form-labels"><?=$this->form->save->label()?></th>
-            <td class="form-controlls"><?=$this->form->save->controllAll()?></td>
+            <th class="form-labels"><?php echo $this->form->save->label()?></th>
+            <td class="form-controlls"><?php echo $this->form->save->controllAll()?></td>
          </tr>
       </table>
    </fieldset>   
-   <? echo $this->form->renderEnd(); ?>
+   <?php  echo $this->form->renderEnd(); ?>
    <script>
 	$(function() {
 		$( "#partners-list" ).sortable({

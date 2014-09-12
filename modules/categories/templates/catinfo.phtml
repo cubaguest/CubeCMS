@@ -1,4 +1,4 @@
-<?
+<?php 
 function tplCatTrRights(Translator $translator, $right)
 {
    $out = null;
@@ -26,73 +26,73 @@ foreach ($this->catInfo->{Model_Category::COLUMN_DISABLE} as $lang => $dis) {
 }
 
 ?>
-<input type="hidden" name="id_cat" value="<?=$this->catInfo->{Model_Category::COLUMN_CAT_ID};?>" />
+<input type="hidden" name="id_cat" value="<?php echo $this->catInfo->{Model_Category::COLUMN_CAT_ID};?>" />
 <table class="full-width">
    <tr>
-      <th colspan="3" class="ui-widget-header"><?=$this->tr('Názvy (s jazyky)');?>:</th>
+      <th colspan="3" class="ui-widget-header"><?php echo $this->tr('Názvy (s jazyky)');?>:</th>
    </tr>
-   <?foreach ($this->catInfo[Model_Category::COLUMN_NAME] as $lang => $name) {
+   <?php foreach ($this->catInfo[Model_Category::COLUMN_NAME] as $lang => $name) {
       if($name != null){?>
       <tr class="ui-widget-content ui-state-default">
-         <td colspan="2"><?=  htmlspecialchars($name);?></td><td class="cell-lang"><?=vve_tpl_lang_image($lang)?></td>
-      </tr><?}
+         <td colspan="2"><?php echo   htmlspecialchars($name);?></td><td class="cell-lang"><?php echo vve_tpl_lang_image($lang)?></td>
+      </tr><?php }
    }?>
-   <tr><th class="ui-widget-header" colspan="3"><?=$this->tr('Adresy URL (s jazyky)');?>:</th></tr>
-   <?
+   <tr><th class="ui-widget-header" colspan="3"><?php echo $this->tr('Adresy URL (s jazyky)');?>:</th></tr>
+   <?php 
    $link = new Url_Link(true);
    foreach ($this->catInfo[Model_Category::COLUMN_URLKEY] as $lang => $key) {
       if($key != null){?>
       <tr class="ui-widget-content ui-state-default">
          <td class="editable" colspan="2" >
-            <a href="<?=$link->lang($lang)->category($key);?>" title="<?=$this->tr('Otevřít v novém okně')?>"
-               class="link-external"><?=$key?></a>
+            <a href="<?php echo $link->lang($lang)->category($key);?>" title="<?php echo $this->tr('Otevřít v novém okně')?>"
+               class="link-external"><?php echo $key?></a>
          </td>
-         <td class="cell-lang"><?='&nbsp;'.vve_tpl_lang_image($lang)?></td>
-      </tr><?}
+         <td class="cell-lang"><?php echo '&nbsp;'.vve_tpl_lang_image($lang)?></td>
+      </tr><?php }
    }
    if(!empty($disabled)){?>
    <tr class="ui-widget-content ui-state-default">
       <th>Vypnuté jazyky</th>
-      <td colspan="2"><?
+      <td colspan="2"><?php 
          foreach ($disabled as $lang) {
             echo vve_tpl_lang_image($lang).'&nbsp;';
          }
       ?></td>
    </tr>
-   <?}?>
+   <?php }?>
 </table>
 <br />
 <table class="full-width">
    <tr class="single-row">
-      <th class="ui-widget-header"><?=$this->tr('Modul');?></th>
-      <td class="ui-widget-content ui-state-default"><?=$this->catInfo->{Model_Category::COLUMN_MODULE};?></td>
+      <th class="ui-widget-header"><?php echo $this->tr('Modul');?></th>
+      <td class="ui-widget-content ui-state-default"><?php echo $this->catInfo->{Model_Category::COLUMN_MODULE};?></td>
    </tr>
    <tr class="single-row">
-      <th class="ui-widget-header"><?=$this->tr('ID');?></th>
-      <td class="ui-widget-content ui-state-default"><?=$this->catInfo->{Model_Category::COLUMN_CAT_ID};?></td>
+      <th class="ui-widget-header"><?php echo $this->tr('ID');?></th>
+      <td class="ui-widget-content ui-state-default"><?php echo $this->catInfo->{Model_Category::COLUMN_CAT_ID};?></td>
    </tr>
    <tr>
-      <th class="ui-widget-header"><?=$this->tr('Viditelné');?></th>
+      <th class="ui-widget-header"><?php echo $this->tr('Viditelné');?></th>
       <td class="ui-widget-content ui-state-default">
          <select name="cat_visibility">
-            <?foreach ($this->visTypes as $type => $label) {?>
-            <option value="<?=$type?>" <?if($this->catInfo->{Model_Category::COLUMN_VISIBILITY} == $type) echo 'selected="selected"'?>><?=$label?></option>
-            <?}?>
+            <?php foreach ($this->visTypes as $type => $label) {?>
+            <option value="<?php echo $type?>" <?php if($this->catInfo->{Model_Category::COLUMN_VISIBILITY} == $type) echo 'selected="selected"'?>><?php echo $label?></option>
+            <?php }?>
          </select>
      </td>
    </tr>
    <tr>
-      <th class="ui-widget-header"><?=$this->tr('Individuální rozložení panelů');?></th>
+      <th class="ui-widget-header"><?php echo $this->tr('Individuální rozložení panelů');?></th>
       <td class="ui-widget-content ui-state-default"><input type="checkbox" name="cat_ind_panels"
-      <?if($this->catInfo->{Model_Category::COLUMN_INDIVIDUAL_PANELS} == true) echo 'checked="checked"';?> /></td>
+      <?php if($this->catInfo->{Model_Category::COLUMN_INDIVIDUAL_PANELS} == true) echo 'checked="checked"';?> /></td>
    </tr>
    <tr>
-      <th class="ui-widget-header"><?=$this->tr('Výchozí práva');?></th>
-      <td class="ui-widget-content ui-state-default"><?=tplCatTrRights($this->translator(), $this->catInfo->{Model_Category::COLUMN_DEF_RIGHT});?></td>
+      <th class="ui-widget-header"><?php echo $this->tr('Výchozí práva');?></th>
+      <td class="ui-widget-content ui-state-default"><?php echo tplCatTrRights($this->translator(), $this->catInfo->{Model_Category::COLUMN_DEF_RIGHT});?></td>
    </tr>
    <tr>
-      <th class="ui-widget-header"><?=$this->tr('Vlastník');?></th>
-      <td class="ui-widget-content ui-state-default"><?
+      <th class="ui-widget-header"><?php echo $this->tr('Vlastník');?></th>
+      <td class="ui-widget-content ui-state-default"><?php 
       if($this->owner->{Model_Users::COLUMN_NAME} != null){
          echo $this->owner->{Model_Users::COLUMN_SURNAME}.' '.$this->owner->{Model_Users::COLUMN_NAME}." (".$this->owner->{Model_Users::COLUMN_USERNAME}.")";
       } else {
@@ -100,51 +100,51 @@ foreach ($this->catInfo->{Model_Category::COLUMN_DISABLE} as $lang => $dis) {
       }?></td>
    </tr>
    <tr>
-      <th class="ui-widget-header"><?=$this->tr('Priorita');?></th>
-      <td class="ui-widget-content ui-state-default"><?=$this->catInfo->{Model_Category::COLUMN_PRIORITY};?></td>
+      <th class="ui-widget-header"><?php echo $this->tr('Priorita');?></th>
+      <td class="ui-widget-content ui-state-default"><?php echo $this->catInfo->{Model_Category::COLUMN_PRIORITY};?></td>
    </tr>
 </table>
 <br />
 <table class="full-width">
-   <tr><th class="ui-widget-header" colspan="2"><?=$this->tr('Datový adresář');?>:</th></tr>
-   <tr class="ui-widget-content ui-state-default"><td colspan="2"><?=VVE_DATA_DIR.'/'.$this->catInfo->{Model_Category::COLUMN_DATADIR}.'/'?></td></tr>
-   <tr><th class="ui-widget-header" colspan="2"><?=$this->tr('Popis');?>:</th></tr>
-   <tr class="ui-widget-content ui-state-default"><td colspan="2"><?
+   <tr><th class="ui-widget-header" colspan="2"><?php echo $this->tr('Datový adresář');?>:</th></tr>
+   <tr class="ui-widget-content ui-state-default"><td colspan="2"><?php echo VVE_DATA_DIR.'/'.$this->catInfo->{Model_Category::COLUMN_DATADIR}.'/'?></td></tr>
+   <tr><th class="ui-widget-header" colspan="2"><?php echo $this->tr('Popis');?>:</th></tr>
+   <tr class="ui-widget-content ui-state-default"><td colspan="2"><?php 
       echo (string)$this->catInfo->{Model_Category::COLUMN_ALT} == null ? $this->tr('Není') : $this->catInfo->{Model_Category::COLUMN_ALT};
    ?></td></tr>
 <!--   Vyhledávač -->
    <tr><th class="ui-widget-header" colspan="2">
-      <?=$this->tr('Popis (vyhledávač)');?>:
- <!--     <?foreach (Locales::getAppLangsNames() as $lang => $desc) {?>
-         <a href="<?=$this->link()->clear()->anchor('desc_'.$lang)?>" title="<?=$this->tr('Zobraz ').$desc?>" class=""><?=vve_tpl_lang_image($lang)?></a>
-      <?}?>-->
+      <?php echo $this->tr('Popis (vyhledávač)');?>:
+ <!--     <?php foreach (Locales::getAppLangsNames() as $lang => $desc) {?>
+         <a href="<?php echo $this->link()->clear()->anchor('desc_'.$lang)?>" title="<?php echo $this->tr('Zobraz ').$desc?>" class=""><?php echo vve_tpl_lang_image($lang)?></a>
+      <?php }?>-->
    </th></tr>
    
-   <tr class="ui-widget-content ui-state-default"><td colspan="2"><?
+   <tr class="ui-widget-content ui-state-default"><td colspan="2"><?php 
    echo (string)$this->catInfo->{Model_Category::COLUMN_DESCRIPTION} == null ? $this->tr('Není') : $this->catInfo->{Model_Category::COLUMN_DESCRIPTION};
    ?></td></tr>
 
-   <tr><th class="ui-widget-header" colspan="2"><?=$this->tr('Klíčová slova (vyhledávač)');?>:</th></tr>
-   <tr class="ui-widget-content ui-state-default"><td colspan="2"><?
+   <tr><th class="ui-widget-header" colspan="2"><?php echo $this->tr('Klíčová slova (vyhledávač)');?>:</th></tr>
+   <tr class="ui-widget-content ui-state-default"><td colspan="2"><?php 
    echo (string)$this->catInfo->{Model_Category::COLUMN_KEYWORDS} == null ? $this->tr('Není') : $this->catInfo->{Model_Category::COLUMN_KEYWORDS};
    ?></td></tr>
 </table>
 <br />
 <table class="full-width">
-   <tr><th class="ui-widget-header" colspan="2"><?=$this->tr('Práva skupin');?>:</th></tr>
-   <?  foreach ($this->catRights as $right) {?>
+   <tr><th class="ui-widget-header" colspan="2"><?php echo $this->tr('Práva skupin');?>:</th></tr>
+   <?php   foreach ($this->catRights as $right) {?>
    <tr class="single-row">
-      <th scope="row" class="ui-widget-header"><?=$right->{Model_Groups::COLUMN_NAME};?></th>
-      <td class="ui-widget-content ui-state-default"><?=tplCatTrRights($this->translator(), $right->{Model_Rights::COLUMN_RIGHT});?> </td>
+      <th scope="row" class="ui-widget-header"><?php echo $right->{Model_Groups::COLUMN_NAME};?></th>
+      <td class="ui-widget-content ui-state-default"><?php echo tplCatTrRights($this->translator(), $right->{Model_Rights::COLUMN_RIGHT});?> </td>
    </tr>
-   <?}?>
+   <?php }?>
    <tr class="single-row">
-      <th scope="row" class="ui-widget-header"><?=$this->tr('Ostatní');?></th>
-      <td class="ui-widget-content ui-state-default"><?=tplCatTrRights($this->translator(), $this->catInfo->{Model_Category::COLUMN_DEF_RIGHT});?></td>
+      <th scope="row" class="ui-widget-header"><?php echo $this->tr('Ostatní');?></th>
+      <td class="ui-widget-content ui-state-default"><?php echo tplCatTrRights($this->translator(), $this->catInfo->{Model_Category::COLUMN_DEF_RIGHT});?></td>
    </tr>
 </table>
 <br />
-<?
+<?php 
 
 ?>
 

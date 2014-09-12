@@ -1,4 +1,4 @@
-<?
+<?php 
 $grid = new Component_JqGrid_JsPlugin();
 $this->addJsPlugin($grid);
 $this->addFile('css://style.css');
@@ -10,22 +10,22 @@ if(isset($_GET['back']) && $_GET['back'] == "detail"){
 }
 ?>
 
-<h1><?ps(sprintf($this->tr('Přístupy ke složce "%s"'), $this->directory->{ShareDocs_Model_Dirs::COLUMN_NAME} ))?></h1>
+<h1><?php ps(sprintf($this->tr('Přístupy ke složce "%s"'), $this->directory->{ShareDocs_Model_Dirs::COLUMN_NAME} ))?></h1>
 
 <div class="main-content-form-edit">
    <div id="sharedocs-edit-buttons" class="module-tool-buttons">
-      <form action="<?=$link?>" method="get">
-         <input type="submit" value="<?=$this->tr('Zavřít úpravu')?>" class="button-cancel" />
+      <form action="<?php echo $link?>" method="get">
+         <input type="submit" value="<?php echo $this->tr('Zavřít úpravu')?>" class="button-cancel" />
       </form>
    </div>
-   <div><?=$this->formPublicAcc;?></div>
+   <div><?php echo $this->formPublicAcc;?></div>
    
-   <h2><?=$this->tr("Oprávnění skupin");?></h2>
+   <h2><?php echo $this->tr("Oprávnění skupin");?></h2>
    <table id="table-groups"></table>
    <div id="table-groups-pager"></div>
    <hr class="reseter" />
    <br />
-   <h2><?=$this->tr("Oprávnění uživatelů");?></h2>
+   <h2><?php echo $this->tr("Oprávnění uživatelů");?></h2>
    <table id="table-users"></table>
    <div id="table-users-pager"></div>
    <hr class="reseter" />
@@ -34,29 +34,29 @@ if(isset($_GET['back']) && $_GET['back'] == "detail"){
 </div>
 <script type="text/javascript">
          /* <![CDATA[ */
-      var groupsList = <?=json_encode($this->groups)?>;
-      var usersList = <?=json_encode($this->users)?>;
+      var groupsList = <?php echo json_encode($this->groups)?>;
+      var usersList = <?php echo json_encode($this->users)?>;
       
       $(document).ready(function() {
          var groupsGrid = $("#table-groups").jqGrid({
             ajaxGridOptions : {type:"POST"},
-            url: '<?=$this->link()->route('groupsList');?>',
+            url: '<?php echo $this->link()->route('groupsList');?>',
             datatype: "json",
-            colNames:['<?=$this->tr('Název')?>', '<?=$this->tr('Pouze čtení')?>'],
+            colNames:['<?php echo $this->tr('Název')?>', '<?php echo $this->tr('Pouze čtení')?>'],
             colModel:[
                {name:'group',index:'group', editable:true, edittype : 'select', editoptions:{ value : groupsList },
-                  formoptions:{ rowpos:2, label: "<?=$this->tr('Název')?>"}},
+                  formoptions:{ rowpos:2, label: "<?php echo $this->tr('Název')?>"}},
                
-               {name:'<?=ShareDocs_Model_GroupsAcc::COLUMN_READ_ONLY?>',index:'<?=ShareDocs_Model_GroupsAcc::COLUMN_READ_ONLY?>', 
+               {name:'<?php echo ShareDocs_Model_GroupsAcc::COLUMN_READ_ONLY?>',index:'<?php echo ShareDocs_Model_GroupsAcc::COLUMN_READ_ONLY?>', 
                   formatter: 'checkbox', formatoptions: {disabled : false, 'class' : 'groupChangeRead'},
                   width:80,fixed:true, editable:true, edittype:'checkbox', editoptions: {value: "true:false" },
-                  formoptions:{ rowpos:4, label: "<?=$this->tr('Pouze čtení')?>"}}
+                  formoptions:{ rowpos:4, label: "<?php echo $this->tr('Pouze čtení')?>"}}
             ],
             rowNum:10, rowList:[10,20,40,100], 
             pager: '#table-groups-pager',
-            caption:"<?=$this->tr('Skupiny s oprávněními')?>",
+            caption:"<?php echo $this->tr('Skupiny s oprávněními')?>",
             autowidth : true, height: '100%',
-            editurl : "<?=$this->link()->route("editGroupAcc")?>",
+            editurl : "<?php echo $this->link()->route("editGroupAcc")?>",
             jsonReader: { repeatitems : false, root:"rows" }
          });
 
@@ -91,23 +91,23 @@ if(isset($_GET['back']) && $_GET['back'] == "detail"){
       
          var usersGrid = $("#table-users").jqGrid({
             ajaxGridOptions : {type:"POST"},
-            url: '<?=$this->link()->route('usersList');?>',
+            url: '<?php echo $this->link()->route('usersList');?>',
             datatype: "json",
-            colNames:['<?=$this->tr('Jméno')?>', '<?=$this->tr('Pouze čtení')?>'],
+            colNames:['<?php echo $this->tr('Jméno')?>', '<?php echo $this->tr('Pouze čtení')?>'],
             colModel:[
                {name:'user',index:'user', editable:true, edittype : 'select', editoptions:{ value : usersList },
-                  formoptions:{ rowpos:2, label: "<?=$this->tr('Název')?>"}},
+                  formoptions:{ rowpos:2, label: "<?php echo $this->tr('Název')?>"}},
                
-               {name:'<?=  ShareDocs_Model_UsersAcc::COLUMN_READ_ONLY?>',index:'<?=ShareDocs_Model_UsersAcc::COLUMN_READ_ONLY?>', 
+               {name:'<?php echo   ShareDocs_Model_UsersAcc::COLUMN_READ_ONLY?>',index:'<?php echo ShareDocs_Model_UsersAcc::COLUMN_READ_ONLY?>', 
                   formatter: 'checkbox', formatoptions: {disabled : false, 'class' : 'userChangeRead'},
                   width:80,fixed:true, editable:true, edittype:'checkbox', editoptions: {value: "true:false" },
-                  formoptions:{ rowpos:4, label: "<?=$this->tr('Pouze čtení')?>"}}
+                  formoptions:{ rowpos:4, label: "<?php echo $this->tr('Pouze čtení')?>"}}
             ],
             rowNum:10, rowList:[10,20,40,100], 
             pager: '#table-users-pager',
-            caption:"<?=$this->tr('Uživatelé s oprávněními')?>",
+            caption:"<?php echo $this->tr('Uživatelé s oprávněními')?>",
             autowidth : true, height: '100%',
-            editurl : "<?=$this->link()->route("editUserAcc")?>",
+            editurl : "<?php echo $this->link()->route("editUserAcc")?>",
             jsonReader: { repeatitems : false, root:"rows" }
          });
          
@@ -144,11 +144,11 @@ if(isset($_GET['back']) && $_GET['back'] == "detail"){
             var val = false;
             if($obj.is(':checked')){ val = true; }
             $.ajax({
-               url: "<?=$this->link()->route("setReadOnly")?>", cache : false,
+               url: "<?php echo $this->link()->route("setReadOnly")?>", cache : false,
                type: "POST", data: {id : rowId, type : 'group', status : val},
                success : function(data){
                   if( (typeof data.result == "undefined") || data.result == false){
-                     alert('<?=$this->tr("Chyba při změně oprávnění. Kontaktujte administrátora.")?>');
+                     alert('<?php echo $this->tr("Chyba při změně oprávnění. Kontaktujte administrátora.")?>');
                   }
                }
             });
@@ -158,11 +158,11 @@ if(isset($_GET['back']) && $_GET['back'] == "detail"){
             var val = false;
             if($obj.is(':checked')){ val = true; }
             $.ajax({
-               url: "<?=$this->link()->route("setReadOnly")?>", cache : false,
+               url: "<?php echo $this->link()->route("setReadOnly")?>", cache : false,
                type: "POST", data: {id : rowId, type : 'user', status : val},
                success : function(data){
                   if( (typeof data.result == "undefined") || data.result == false){
-                     alert('<?=$this->tr("Chyba při změně oprávnění. Kontaktujte administrátora.")?>');
+                     alert('<?php echo $this->tr("Chyba při změně oprávnění. Kontaktujte administrátora.")?>');
                   }
                }
             });

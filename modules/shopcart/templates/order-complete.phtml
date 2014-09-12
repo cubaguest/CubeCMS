@@ -1,23 +1,23 @@
-<?
+<?php 
 $this->addFile('css://style.less');
 $h = $this->tr('Objednávka byla dokončena');
 Template_Core::addPageTitle($h);
 //$this->addJsPlugin(new JsPlugin_JQuery());
 $this->step = 3;
 ?>
-<h1><?=$h?></h1>
-<?//$this->includeFile('tpl://navigation.phtml')?>
+<h1><?php echo $h?></h1>
+<?php //$this->includeFile('tpl://navigation.phtml')?>
 <div class="main-content-detail">
-   <p><?=$this->tr('Děkujeme za vaši objednávku. Na uvedený e-mail byly zaslány informace o obejdnávce.<br />O průběhu vyřizování 
+   <p><?php echo $this->tr('Děkujeme za vaši objednávku. Na uvedený e-mail byly zaslány informace o obejdnávce.<br />O průběhu vyřizování 
       objednávky Vás budeme informovat.<br />V případě jakáchkoliv dotazů nás kontaktujte.')?></p>
    <table class="full-width">
       <tr>
-         <th><h2><?=$this->tr('Fakturační adresa')?></h2></th>
-         <th><h2><?=$this->tr('Dodací adresa')?></h2></th>
+         <th><h2><?php echo $this->tr('Fakturační adresa')?></h2></th>
+         <th><h2><?php echo $this->tr('Dodací adresa')?></h2></th>
       </tr>
       <tr>
          <td>
-            <?
+            <?php 
             echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_NAME}.'<br />';
             echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_STREET}.'<br />';
             echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_CITY}.
@@ -33,7 +33,7 @@ $this->step = 3;
             ?>
          </td>
          <td>
-            <?
+            <?php 
             echo $this->order->{Shop_Model_Orders::COLUMN_DELIVERY_NAME}.'<br />';
             echo $this->order->{Shop_Model_Orders::COLUMN_DELIVERY_STREET}.'<br />';
             echo $this->order->{Shop_Model_Orders::COLUMN_DELIVERY_CITY}.
@@ -44,19 +44,19 @@ $this->step = 3;
       </tr>
    </table>
    <br />
-   <h2><?=$this->tr('Souhrn položek');?></h2>
+   <h2><?php echo $this->tr('Souhrn položek');?></h2>
    <table class="full-width">
       <thead>
          <tr>
-            <th><?=$this->tr('Název')?></th>
-            <th><?=$this->tr('Počet')?></th>
-            <th><?=$this->tr('Cena')?></th>
+            <th><?php echo $this->tr('Název')?></th>
+            <th><?php echo $this->tr('Počet')?></th>
+            <th><?php echo $this->tr('Cena')?></th>
          </tr>
       </thead>
       <tbody>
-      <?foreach ($this->items as $item){?>
+      <?php foreach ($this->items as $item){?>
          <tr>
-            <td><?
+            <td><?php 
                echo $item->{Shop_Model_OrderItems::COLUMN_NAME};
                if($item->{Shop_Model_OrderItems::COLUMN_NOTE} != null){
                   echo '<div class="product-note">'; 
@@ -64,16 +64,16 @@ $this->step = 3;
                   echo '</div>'; 
                }
                ?></td>
-            <td><?
+            <td><?php 
                echo $item->{Shop_Model_OrderItems::COLUMN_QTY}.' '.$item->{Shop_Model_OrderItems::COLUMN_UNIT};
                ?>
             </td>
-            <td><?=Shop_Tools::getFormatedPrice($item->{Shop_Model_OrderItems::COLUMN_PRICE})?></td>
+            <td><?php echo Shop_Tools::getFormatedPrice($item->{Shop_Model_OrderItems::COLUMN_PRICE})?></td>
          </tr>
-      <?}?>
+      <?php }?>
          <tr><td colspan="3" class="spacer">&nbsp;</td></tr>
          <tr>
-            <th><?
+            <th><?php 
                echo $this->order->{Shop_Model_Orders::COLUMN_SHIPPING_METHOD};
                if($this->order->{Shop_Model_Orders::COLUMN_PICKUP_DATE} != null){
                   echo " - <strong>";
@@ -91,7 +91,7 @@ $this->step = 3;
                ?>
             </th>
             <td></td>
-            <td><?
+            <td><?php 
             if($this->order->{Shop_Model_Orders::COLUMN_SHIPPING_PRICE} == 0){
                echo $this->tr('zdarma');
             } else {
@@ -100,7 +100,7 @@ $this->step = 3;
             ?></td>
          </tr>
          <tr>
-            <th><?
+            <th><?php 
                echo $this->order->{Shop_Model_Orders::COLUMN_PAYMENT_METHOD};
                if((string)$this->payment->{Shop_Model_Payments::COLUMN_TEXT} != null){
                   echo '<br />';
@@ -112,7 +112,7 @@ $this->step = 3;
                ?>
             </th>
             <td></td>
-            <td><?
+            <td><?php 
             if($this->order->{Shop_Model_Orders::COLUMN_PAYMENT_PRICE} == 0){
                echo $this->tr('zdarma');
             } else {
@@ -122,8 +122,8 @@ $this->step = 3;
          </tr>
          <tr><td colspan="3" class="spacer">&nbsp;</td></tr>
          <tr class="basket-full-price">
-            <td colspan="2"><?=$this->tr('Cena celkem')?></td>
-            <td><?=Shop_Tools::getFormatedPrice($this->order->{Shop_Model_Orders::COLUMN_TOTAL}) ?></td>
+            <td colspan="2"><?php echo $this->tr('Cena celkem')?></td>
+            <td><?php echo Shop_Tools::getFormatedPrice($this->order->{Shop_Model_Orders::COLUMN_TOTAL}) ?></td>
          </tr>
       </tbody>
    </table>

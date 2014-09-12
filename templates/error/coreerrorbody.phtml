@@ -1,19 +1,19 @@
-<? 
+<?php  
 $this->addFile('css://style-admin.css');
 ?>
 <!DOCTYPE html>
-<html lang="<?=Locales::getLang()?>">
+<html lang="<?php echo Locales::getLang()?>">
 <head>
    <meta charset="utf-8" />
-   <title><?=$this->tr('Chyba ')?></title>
+   <title><?php echo $this->tr('Chyba ')?></title>
    <!-- {*-STYLESHEETS-*} -->
 </head>
  
 <body id="core-error-page">
    <div id="core-error-wrap">
       <div id="core-error-cnt">
-         <h1><?=$this->tr('Chyba aplikace')?></h1>
-         <p><?
+         <h1><?php echo $this->tr('Chyba aplikace')?></h1>
+         <p><?php 
          printf($this->tr('Omlouvám se, ale nastala závažná chyba při vykreslování stránky aplikace %s.'
                .' Zkuste stránku obnovi (klávesa F5). '
                .'Pokud ani obnovní nepomůže, kontaktujte správce stránek na adrese <strong>%s</strong>.'),

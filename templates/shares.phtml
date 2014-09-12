@@ -1,12 +1,12 @@
-<strong><?=_('Sdílej')?>:</strong>
-<?while ($service = $this->shares->fetch()) {?>
-<a href="<?=str_replace($this->search, $this->replacement, $service->{Component_Share_Model::COLUM_LINK})?>"
-   title="<?=$service->{Component_Share_Model::COLUM_NAME}?>">
-         <?
+<strong><?php echo _('Sdílej')?>:</strong>
+<?php while ($service = $this->shares->fetch()) {?>
+<a href="<?php echo str_replace($this->search, $this->replacement, $service->{Component_Share_Model::COLUM_LINK})?>"
+   title="<?php echo $service->{Component_Share_Model::COLUM_NAME}?>">
+         <?php 
          if(stripos($service->{Component_Share_Model::COLUM_ICON}, "http") !== false) {?>
-   <img src="<?=$service->{Component_Share_Model::COLUM_ICON}?>" alt="<?=$service->{Component_Share_Model::COLUM_NAME}?> icon" width="16"/>
-      <?} else {?>
-   <img src="<?=vve_get_tpl_file($service->{Component_Share_Model::COLUM_ICON}, VVE_TPL_FILE_IMAGE)?>" alt="<?=$service->{Component_Share_Model::COLUM_NAME}?> icon" width="16" />
-      <?}?>
+   <img src="<?php echo $service->{Component_Share_Model::COLUM_ICON}?>" alt="<?php echo $service->{Component_Share_Model::COLUM_NAME}?> icon" width="16"/>
+      <?php } else {?>
+   <img src="<?php echo vve_get_tpl_file($service->{Component_Share_Model::COLUM_ICON}, VVE_TPL_FILE_IMAGE)?>" alt="<?php echo $service->{Component_Share_Model::COLUM_NAME}?> icon" width="16" />
+      <?php }?>
 </a>
-<?}?>
+<?php }?>

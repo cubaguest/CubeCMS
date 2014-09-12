@@ -1,4 +1,4 @@
-<?
+<?php 
 if(isset($this->form->color)){
    $this->addJsPlugin(new JsPlugin_JQueryColorPicker());
    $colors = $this->category()->getParam(MessagesBoard_Controller::PARAM_COLORS, 
@@ -10,14 +10,14 @@ if(isset($this->form->color)){
 }
 ?>
 <div class="main-content-form-edit">
-   <?
+   <?php 
    echo($this->form);
    
    if(isset($this->form->color)){?>
    <script type="text/javascript">
       $('input#msg_color_1').colorPicker({ 
-         <?if(!empty ($colors)){ echo 'colors: '.json_encode($colors);}?> 
+         <?php if(!empty ($colors)){ echo 'colors: '.json_encode($colors);}?> 
       });
    </script>
-   <?}?>
+   <?php }?>
 </div>

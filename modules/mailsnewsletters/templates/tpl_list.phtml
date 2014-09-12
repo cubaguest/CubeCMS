@@ -1,4 +1,4 @@
-<?
+<?php 
 $h = $this->tr('Seznam šablon');
 $this->addPageTitle($h);
 $jQuery = new JsPlugin_JQuery();
@@ -6,8 +6,8 @@ $jQuery->addUIAccordion();
 $this->addJsPlugin($jQuery);
 $this->addFile('css://style.less');
 ?>
-<h1><?=$h?></h1>
-<?=$this->includeTpl('navigation.phtml');?>
+<h1><?php echo $h?></h1>
+<?php echo $this->includeTpl('navigation.phtml');?>
 <div class="main-content-list module-templates-list">
    <?php 
    $this->moduleButtons = array(
@@ -26,20 +26,20 @@ $this->addFile('css://style.less');
    );
    $this->includeTpl('modules/buttons.phtml', true);
    ?>
-   <?if(!empty ($this->templates)) {?>
+   <?php if(!empty ($this->templates)) {?>
    <table class="templates-list full-width">
       <thead>
          <tr class="ui-widget-header">
-            <th class="template-tb-name"><?=$this->tr('Název')?></th>
+            <th class="template-tb-name"><?php echo $this->tr('Název')?></th>
             <th class="template-tb-actions"></th>
          </tr>
       </thead>
-   <?
+   <?php 
       foreach ($this->templates as $template) {?>
       <tr class="ui-widget-content">
-         <td class="template-tb-name"><?=$template->{MailsNewsletters_Model_Templates::COLUMN_NAME}?></td>
+         <td class="template-tb-name"><?php echo $template->{MailsNewsletters_Model_Templates::COLUMN_NAME}?></td>
          <td class="template-tb-actions">
-            <?
+            <?php 
             $toolbox = clone $this->toolboxItem;
             $toolbox->editForm->setAction(
                   $this->link()->route('tplEdit', array('id' => $template->{MailsNewsletters_Model_Templates::COLUMN_ID}))->param('ajax', true)
@@ -51,14 +51,14 @@ $this->addFile('css://style.less');
             ?>
          </td>
       </tr>
-     <?}?>
+     <?php }?>
    </table>
-   <?} else {?>
-      <div class="admin-info-text"><? ps($this->tr('Není vložena žádná šablona')); ?> </div>
-   <?}?>
+   <?php } else {?>
+      <div class="admin-info-text"><?php  ps($this->tr('Není vložena žádná šablona')); ?> </div>
+   <?php }?>
 </div>
 <div id="test-prw"></div>
-<? 
+<?php  
 $this->addJsPlugin(new JsPlugin_PrettyPhoto());
 ?>
 <a rel="prettyPhoto"></a>

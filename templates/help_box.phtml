@@ -1,12 +1,12 @@
-<? 
+<?php  
 $thin = (isset($_COOKIE['cube_cms_helpbox']) && $_COOKIE['cube_cms_helpbox'] == 0) ? true : false;
 ?>
-<div id="module-help-box" class="<?echo $thin ? "thin" : null ?>">
-<div class="label"><?=$this->tr('Nápověda')?></div>
-<a href="<?=$this->link()?>#hide-help" title="<? echo $thin ? $this->tr('Otevřít') : $this->tr('Schovat')?>" id="button-toggle-helpbox"
-   ><img src="<? echo $thin ? 'images/icons/help.png' : 'images/icons/collapse.gif'?>" alt="-"/></a>
-<div class="content"><?=$this->content?></div>
-<? 
+<div id="module-help-box" class="<?php echo $thin ? "thin" : null ?>">
+<div class="label"><?php echo $this->tr('Nápověda')?></div>
+<a href="<?php echo $this->link()?>#hide-help" title="<?php  echo $thin ? $this->tr('Otevřít') : $this->tr('Schovat')?>" id="button-toggle-helpbox"
+   ><img src="<?php  echo $thin ? 'images/icons/help.png' : 'images/icons/collapse.gif'?>" alt="-"/></a>
+<div class="content"><?php echo $this->content?></div>
+<?php  
 $jq = new JsPlugin_JQuery();
 $this->addJsPlugin($jq);
 ?>

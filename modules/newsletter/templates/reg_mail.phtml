@@ -1,4 +1,4 @@
-<?
+<?php 
 $h = $this->category()->getName();
 if($this->text != false AND (string)$this->text->{Text_Model_Detail::COLUMN_LABEL} != null){
    $h = ($this->text->{Text_Model_Detail::COLUMN_LABEL});
@@ -8,25 +8,25 @@ $this->addJsPlugin(new JsPlugin_JQuery());
 
 echo $this->toolbox;
 ?>
-<h1><?ps($h)?></h1>
+<h1><?php ps($h)?></h1>
 <div class="content">
-   <?if($this->text != false AND (string)$this->text->{Text_Model_Detail::COLUMN_TEXT} != null){?>
-   <div class=""><?=$this->text->{Text_Model_Detail::COLUMN_TEXT}?></div>
-   <?}?>
-   <?
+   <?php if($this->text != false AND (string)$this->text->{Text_Model_Detail::COLUMN_TEXT} != null){?>
+   <div class=""><?php echo $this->text->{Text_Model_Detail::COLUMN_TEXT}?></div>
+   <?php }?>
+   <?php 
    $this->newMailForm->html()->setAttrib('id', 'registerNewMail');
    echo $this->newMailForm;
    ?>
       <br />
-      <a href="<?=$this->link()->route('unregistration');?>"
-         title="<?=$this->tr('Zrušit registraci e-mailu')?>"
-         ><?=$this->tr('Zrušit registraci e-mailu')?></a>
+      <a href="<?php echo $this->link()->route('unregistration');?>"
+         title="<?php echo $this->tr('Zrušit registraci e-mailu')?>"
+         ><?php echo $this->tr('Zrušit registraci e-mailu')?></a>
 </div>
 <script type="text/javascript">
    /* <![CDATA[ */
    $('form#registerNewMail').submit(function(){
       $.ajax({type: "POST",
-         url: "<?=$this->link()?>",
+         url: "<?php echo $this->link()?>",
          data: $(this).serialize(),
          success: function(data){ vveShowMessages(data); }
       });

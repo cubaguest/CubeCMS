@@ -1,9 +1,9 @@
 <table id="php-status">
-<?foreach ($infoItems as $item) {
+<?php foreach ($infoItems as $item) {
    if($item['status'] != 'group'){?>
    <tr>
-      <td class="check-item-name"><?echo $item['name'];?></td>
-      <td class="check-item-status"><?
+      <td class="check-item-name"><?php echo $item['name'];?></td>
+      <td class="check-item-status"><?php 
       switch ($item['status']) {
          case 'err':
             echo '<span class="status-err">CHYBA</span>';
@@ -18,19 +18,19 @@
       }?>
       </td>
    </tr>
-   <?
+   <?php 
    } else {?>
    <tr>
-      <th colspan="2" class="check-item-groupname"><?echo $item['name'];?></th>
+      <th colspan="2" class="check-item-groupname"><?php echo $item['name'];?></th>
    </tr>
-   <?}?>
+   <?php }?>
 
-   <?if($item['info'] != null){?>
+   <?php if($item['info'] != null){?>
    <tr>
-      <td class="check-item-info" colspan="2"><?echo $item['info'];?></td>
+      <td class="check-item-info" colspan="2"><?php echo $item['info'];?></td>
    </tr>
-   <?}?>
-<?}?>
+   <?php }?>
+<?php }?>
 </table>
 
 

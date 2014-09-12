@@ -1,13 +1,13 @@
-<?
+<?php 
 $this->addFile('css://style.css');
 
 ?>
-<h1><?=$this->category()->getName()?></h1>
+<h1><?php echo $this->category()->getName()?></h1>
 <div class="main-content-list partners-list">
-   <?
+   <?php 
    if(!empty($this->partners)){?>
    
-   <?
+   <?php 
       foreach ($this->partners as $partner) {
          $imgsrc = vve_image_cacher($this->category()->getModule()->getDataDir(true).$partner->{Partners_Model::COLUMN_IMAGE}, 100, 100);
          
@@ -23,30 +23,30 @@ $this->addFile('css://style.css');
          }
          
          ?>
-   <div id="partner-<?=$partner->{Partners_Model::COLUMN_ID}?>" class="partner <?=implode(" ",$classes)?>">
+   <div id="partner-<?php echo $partner->{Partners_Model::COLUMN_ID}?>" class="partner <?php echo implode(" ",$classes)?>">
       <div class="partner-image">
-         <?if($partner->{Partners_Model::COLUMN_IMAGE} != null){?>
-            <img src="<?=$imgsrc ?>" alt="<?ps($partner->{Partners_Model::COLUMN_NAME})?>" />
-         <?}?>
+         <?php if($partner->{Partners_Model::COLUMN_IMAGE} != null){?>
+            <img src="<?php echo $imgsrc ?>" alt="<?php ps($partner->{Partners_Model::COLUMN_NAME})?>" />
+         <?php }?>
       </div>
       <div class="partner-text">
          <div class="text">
-            <h2><?if($partner->{Partners_Model::COLUMN_URL} != null){?>
-               <a href="<?=$partner->{Partners_Model::COLUMN_URL}?>" title="<?ps($partner->{Partners_Model::COLUMN_NAME})?>"
-                  class="link-external" ><?ps($partner->{Partners_Model::COLUMN_NAME})?></a>
-            <?} else {?>
-               <?ps($partner->{Partners_Model::COLUMN_NAME})?>
-            <?}?></h2>
-            <p><?ps($partner->{Partners_Model::COLUMN_TEXT})?></p>
+            <h2><?php if($partner->{Partners_Model::COLUMN_URL} != null){?>
+               <a href="<?php echo $partner->{Partners_Model::COLUMN_URL}?>" title="<?php ps($partner->{Partners_Model::COLUMN_NAME})?>"
+                  class="link-external" ><?php ps($partner->{Partners_Model::COLUMN_NAME})?></a>
+            <?php } else {?>
+               <?php ps($partner->{Partners_Model::COLUMN_NAME})?>
+            <?php }?></h2>
+            <p><?php ps($partner->{Partners_Model::COLUMN_TEXT})?></p>
          </div>
          <hr class="reseter" />
       </div>
-      <?echo $this->toolboxEdit;?>
+      <?php echo $this->toolboxEdit;?>
    </div>
-      <?}?>
-   <?}?>
+      <?php }?>
+   <?php }?>
    
 </div>
-<?
+<?php 
    echo $this->toolbox;// TOOLBOXY
 ?>

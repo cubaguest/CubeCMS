@@ -1,15 +1,15 @@
 <div id="userButtons">
-   <form method="post" action="<?= $this->link(); ?>">
-      <input id="login_submit" type="submit" name="<?=Auth::FORM_LOGOUT?>" value="<?= $this->tr('Odhlásit'); ?>" />
+   <form method="post" action="<?php echo  $this->link(); ?>">
+      <input id="login_submit" type="submit" name="<?php echo Auth::FORM_LOGOUT?>" value="<?php echo  $this->tr('Odhlásit'); ?>" />
    </form>
    <?php if(Auth::getUser()->getAuthenticator()->operationIsAllowed(Auth_Provider::OPERATION_CHANGE_PASSWORD)) {?>
-   <form action="<?= $this->l()->route('changePasswd'); ?>" method="get">
-      <input type="submit" value="<?= $this->tr('Změnit heslo'); ?>" />
+   <form action="<?php echo  $this->l()->route('changePasswd'); ?>" method="get">
+      <input type="submit" value="<?php echo  $this->tr('Změnit heslo'); ?>" />
    </form>
    <?php }?>
    <?php if(Auth::getUser()->getAuthenticator()->operationIsAllowed(Auth_Provider::OPERATION_CHANGE_USER)) {?>
-   <form action="<?= $this->l()->route('changeUser'); ?>" method="get">
-      <input type="submit" value="<?= $this->tr('Změnit údaje'); ?>" />
+   <form action="<?php echo  $this->l()->route('changeUser'); ?>" method="get">
+      <input type="submit" value="<?php echo  $this->tr('Změnit údaje'); ?>" />
    </form>
    <?php }?>
 </div>

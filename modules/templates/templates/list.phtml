@@ -1,8 +1,8 @@
-<?
+<?php 
 $this->addCssFile('style.css');
 $this->addJsPlugin(new JsPlugin_JQueryCSS());
 ?>
-<h1><?=$this->category()->getName();?></h1>
+<h1><?php echo $this->category()->getName();?></h1>
 <div class="main-content-list module-templates-list">
    <?php
    $this->moduleButtons = array(
@@ -15,44 +15,44 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
    );
    $this->includeTpl('modules/buttons.phtml', true);
    ?>
-   <?if(!empty ($this->templates)) {?>
+   <?php if(!empty ($this->templates)) {?>
    <table class="templates-list">
       <thead>
          <tr class="ui-widget-header">
-            <th class="template-tb-name"><?=$this->_('Název')?></th>
-            <th class="template-tb-cnt"><?=$this->_('Obsah')?></th>
-            <th class="template-tb-type"><?=$this->_('Typ')?></th>
+            <th class="template-tb-name"><?php echo $this->_('Název')?></th>
+            <th class="template-tb-cnt"><?php echo $this->_('Obsah')?></th>
+            <th class="template-tb-type"><?php echo $this->_('Typ')?></th>
             <th class="template-tb-actions"></th>
          </tr>
       </thead>
-   <?
+   <?php 
       foreach ($this->templates as $template) {?>
       <tr class="ui-widget-content ui-state-default">
-         <td><?=$template->{Templates_Model::COLUMN_NAME}?></td>
-         <td><span class="templates-tpl-short-cnt" title="<?=htmlspecialchars($template->{Templates_Model::COLUMN_CONTENT})?>"
-                ><?=vve_tpl_truncate(htmlspecialchars($template->{Templates_Model::COLUMN_CONTENT}), 100)?></span></td>
-         <td><?=$template->{Templates_Model::COLUMN_TYPE}?></td>
+         <td><?php echo $template->{Templates_Model::COLUMN_NAME}?></td>
+         <td><span class="templates-tpl-short-cnt" title="<?php echo htmlspecialchars($template->{Templates_Model::COLUMN_CONTENT})?>"
+                ><?php echo vve_tpl_truncate(htmlspecialchars($template->{Templates_Model::COLUMN_CONTENT}), 100)?></span></td>
+         <td><?php echo $template->{Templates_Model::COLUMN_TYPE}?></td>
          <td>
-            <?/*<a href="<?=$this->link()?>#preview" title="<?=$this->_('Náhled v novém okně')?>"
-               ><img src="<?=Template::getFileDir('icons/page_preview.png', Template::IMAGES_DIR, false,true)?>" alt="preview" /></a>*/?>
-            <form action="<?=$this->link()->route('preview', array('id' => $template->{Templates_Model::COLUMN_ID}))?>" method="post" onsubmit="window.open(this.action); return false; //openWindow(this.action)">
-               <input type="image" name="tpl_preview_go" value="" title="<?=$this->_('náhled')?>"
-                      src="<?=Template::getFileDir('icons/page_preview.png', Template::IMAGES_DIR, false,true)?>" />
+            <?php /*<a href="<?php echo $this->link()?>#preview" title="<?php echo $this->_('Náhled v novém okně')?>"
+               ><img src="<?php echo Template::getFileDir('icons/page_preview.png', Template::IMAGES_DIR, false,true)?>" alt="preview" /></a>*/?>
+            <form action="<?php echo $this->link()->route('preview', array('id' => $template->{Templates_Model::COLUMN_ID}))?>" method="post" onsubmit="window.open(this.action); return false; //openWindow(this.action)">
+               <input type="image" name="tpl_preview_go" value="" title="<?php echo $this->_('náhled')?>"
+                      src="<?php echo Template::getFileDir('icons/page_preview.png', Template::IMAGES_DIR, false,true)?>" />
             </form>
-            <form action="<?=$this->link()->route('edit', array('id' => $template->{Templates_Model::COLUMN_ID}))?>" method="post">
-               <input type="image" name="tpl_edit_go" value="" title="<?=$this->_('upravit')?>"
-                      src="<?=Template::getFileDir('icons/page_edit.png', Template::IMAGES_DIR, false,true)?>" />
+            <form action="<?php echo $this->link()->route('edit', array('id' => $template->{Templates_Model::COLUMN_ID}))?>" method="post">
+               <input type="image" name="tpl_edit_go" value="" title="<?php echo $this->_('upravit')?>"
+                      src="<?php echo Template::getFileDir('icons/page_edit.png', Template::IMAGES_DIR, false,true)?>" />
             </form>
-            <form action="<?=$this->link()->route()?>" method="post" onsubmit="return confirm('<?=$this->_('Oprvadu smazat šablonu &quot;'.$template->{Templates_Model::COLUMN_NAME}.'&quot; ?')?>');">
-               <input type="hidden" name="tpl_del_id" value="<?=$template->{Templates_Model::COLUMN_ID}?>" />
-               <input type="image" name="tpl_del_save" value="" title="<?=$this->_('smazat')?>"
-                      src="<?=Template::getFileDir('icons/page_delete.png', Template::IMAGES_DIR, false,true)?>" />
+            <form action="<?php echo $this->link()->route()?>" method="post" onsubmit="return confirm('<?php echo $this->_('Oprvadu smazat šablonu &quot;'.$template->{Templates_Model::COLUMN_NAME}.'&quot; ?')?>');">
+               <input type="hidden" name="tpl_del_id" value="<?php echo $template->{Templates_Model::COLUMN_ID}?>" />
+               <input type="image" name="tpl_del_save" value="" title="<?php echo $this->_('smazat')?>"
+                      src="<?php echo Template::getFileDir('icons/page_delete.png', Template::IMAGES_DIR, false,true)?>" />
             </form>
          </td>
       </tr>
-     <?}?>
+     <?php }?>
    </table>
-   <?
+   <?php 
    } else {
       print ($this->_('Není vložena žádná šablona'));
    }

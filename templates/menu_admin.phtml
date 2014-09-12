@@ -1,4 +1,4 @@
-<?
+<?php 
 
 // funkce pro render menu
 function CubeCMSAdminMenuRenderFunc($menuArr, $link, $ulParam)
@@ -92,7 +92,7 @@ function CubeCMSAdminMenuRenderFunc($menuArr, $link, $ulParam)
 ?>
 <!-- Halvni menu sekce v menu  -->
 <div id="adminMenuWrapper">
-<?
+<?php 
 CubeCMSAdminMenuRenderFunc(Menu_Admin::getInstance()->getItems(), $this->link(), 'class="dropdown"');
 if (class_exists("QuickTools_View")) {
    QuickTools_View::renderTools();

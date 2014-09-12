@@ -1,12 +1,12 @@
-<?
+<?php 
 $this->addJsPlugin(new JsPlugin_JQuery());
 echo $this->toolbox;
 ?>
-<h1><?=$this->category()->getName();?></h1>
+<h1><?php echo $this->category()->getName();?></h1>
 <div class="main-content-detail">
-<a href="#" title="<?=$this->tr('Přidat příspěvek')?>" id="toggleForm"><?=$this->tr('Přidat příspěvek')?></a>
+<a href="#" title="<?php echo $this->tr('Přidat příspěvek')?>" id="toggleForm"><?php echo $this->tr('Přidat příspěvek')?></a>
 <div id="guestbookNewItemForm">
-   <?
+   <?php 
    $this->form->text->html()->setAttrib('cols', 60)->setAttrib('rows', 7);
    echo ($this->form);
    ?>
@@ -19,13 +19,13 @@ echo $this->toolbox;
       $(this).hide();
       return false;
    });
-   <?if($this->showFrom === true){?>
+   <?php if($this->showFrom === true){?>
    $('#toggleForm').click();
-   <?}?>
+   <?php }?>
    /* ]]> */
 </script>
 </div>
 <hr class="reseter" />
 <br />
-<?=$this->includeFile('tpl://list.phtml');?>
+<?php echo $this->includeFile('tpl://list.phtml');?>
 

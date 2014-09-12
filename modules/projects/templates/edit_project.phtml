@@ -1,4 +1,4 @@
-<?
+<?php 
 $this->addFile("css://projects:style.less");
 // do titulku
 if($this->project != false) {
@@ -23,7 +23,7 @@ $this->addPageTitle($h);
 
 
 ?>
-<h1><?=$h;?></h1>
+<h1><?php echo $h;?></h1>
 <div class="main-content-form-edit" id="edit-form-project">
-   <?echo($this->form);?>
+   <?php echo($this->form);?>
 </div>

@@ -1,4 +1,4 @@
-<?
+<?php 
 function printDegree($degree) {
    if ($degree != null) {
       echo $degree;
@@ -9,11 +9,11 @@ function printDegree($degree) {
    }
 }
 ?>
-<?
+<?php 
    if(!empty ($vars['people'])) {
       foreach ($vars['people'] as $preson) {
          ?>
-   <div class="main-content-list-record module-people-preson" id="preson-<?=$preson->{People_Model::COLUMN_ID}?>"><?
+   <div class="main-content-list-record module-people-preson" id="preson-<?php echo $preson->{People_Model::COLUMN_ID}?>"><?php 
       echo '<'.$vars['hE'].' class="'.$vars['hEClass'].'" id="lecturer-'.$preson->{People_Model::COLUMN_ID}.'">';
       printDegree($preson->{People_Model::COLUMN_DEGREE});
       echo $preson->{People_Model::COLUMN_NAME}.'&nbsp;';
@@ -22,13 +22,13 @@ function printDegree($degree) {
       echo '</'.$vars['hE'].'>';
       ?>
       <div class="main-content-list-record-text">
-         <?if($preson->{People_Model::COLUMN_IMAGE} != null){?>
+         <?php if($preson->{People_Model::COLUMN_IMAGE} != null){?>
          <div class="main-content-list-record-image module-people-person-image">
-                  <?=vve_tpl_image_tag($this->category()->getModule()->getDataDir().$preson->{People_Model::COLUMN_IMAGE}, $preson->{People_Model::COLUMN_IMAGE}, 140);?>
+                  <?php echo vve_tpl_image_tag($this->category()->getModule()->getDataDir().$preson->{People_Model::COLUMN_IMAGE}, $preson->{People_Model::COLUMN_IMAGE}, 140);?>
          </div>
-         <?}?>
-         <?echo $preson->{People_Model::COLUMN_TEXT};?>
-         <?
+         <?php }?>
+         <?php echo $preson->{People_Model::COLUMN_TEXT};?>
+         <?php 
          if($this->toolboxEdit != null){
             $this->toolboxEdit->person_edit->setAction($this->link()->route('edit', array('id' => $preson->{People_Model::COLUMN_ID})));
             $this->toolboxEdit->person_del_->getForm()->id->setValues($preson->{People_Model::COLUMN_ID});
@@ -38,7 +38,7 @@ function printDegree($degree) {
       <hr class="reseter" />
       </div>
    </div>
-         <?}
+         <?php }
    } else {
       echo ($this->tr('Není vložena žádná osoba'));
    }?>

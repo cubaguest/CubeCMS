@@ -1,10 +1,10 @@
-<?
+<?php 
 $this->addFile("css://login:style.css");
 $this->addJsPlugin(new JsPlugin_JQueryCSS());
 ?>
-<h1><?=$this->tr('Informace o účtu')?></h1>
+<h1><?php echo $this->tr('Informace o účtu')?></h1>
 <div class="main-content-detail" id="user-dateil">
-   <div class="text"><? 
+   <div class="text"><?php  
    if($this->lastLogin){
       printf('<p>'.$this->tr('Poslední přihlášení proběhlo %1$s z IP adresy %2$s.').'</p>',
          vve_date("%x %X", new DateTime($this->lastLogin->{Model_UsersLogins::COLUMN_TIME})),
@@ -14,57 +14,57 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
    ?></div>
    <table>
       <tr>
-         <th class="ui-widget-header" width="200"><?=$this->tr('Uživatelké jméno')?></th>
-         <td class="ui-widget-content" width="300"><?=$this->user->{Model_Users::COLUMN_USERNAME}?></td>
+         <th class="ui-widget-header" width="200"><?php echo $this->tr('Uživatelké jméno')?></th>
+         <td class="ui-widget-content" width="300"><?php echo $this->user->{Model_Users::COLUMN_USERNAME}?></td>
       </tr>
       <tr>
-         <th class="ui-widget-header"><?=$this->tr('Jméno')?></th>
-         <td class="ui-widget-content"><?=$this->user->{Model_Users::COLUMN_NAME}?></td>
+         <th class="ui-widget-header"><?php echo $this->tr('Jméno')?></th>
+         <td class="ui-widget-content"><?php echo $this->user->{Model_Users::COLUMN_NAME}?></td>
       </tr>
       <tr>
-         <th class="ui-widget-header"><?=$this->tr('Přijmení')?></th>
-         <td class="ui-widget-content"><?=$this->user->{Model_Users::COLUMN_SURNAME}?></td>
+         <th class="ui-widget-header"><?php echo $this->tr('Přijmení')?></th>
+         <td class="ui-widget-content"><?php echo $this->user->{Model_Users::COLUMN_SURNAME}?></td>
       </tr>
       <tr>
-         <th class="ui-widget-header"><?=$this->tr('Skupina')?></th>
-         <td class="ui-widget-content"><?=$this->user->{Model_Users::COLUMN_GROUP_NAME}?></td>
+         <th class="ui-widget-header"><?php echo $this->tr('Skupina')?></th>
+         <td class="ui-widget-content"><?php echo $this->user->{Model_Users::COLUMN_GROUP_NAME}?></td>
       </tr>
       <tr>
-         <th class="ui-widget-header"><?=$this->tr('E-maily')?></th>
-         <td class="ui-widget-content"><?=$this->user->{Model_Users::COLUMN_MAIL}?></td>
+         <th class="ui-widget-header"><?php echo $this->tr('E-maily')?></th>
+         <td class="ui-widget-content"><?php echo $this->user->{Model_Users::COLUMN_MAIL}?></td>
       </tr>
-      <?if($this->user->{Model_Users::COLUMN_PHONE}){?>
+      <?php if($this->user->{Model_Users::COLUMN_PHONE}){?>
       <tr>
-         <th class="ui-widget-header"><?=$this->tr('Telefon')?></th>
-         <td class="ui-widget-content"><?=$this->user->{Model_Users::COLUMN_PHONE}?></td>
+         <th class="ui-widget-header"><?php echo $this->tr('Telefon')?></th>
+         <td class="ui-widget-content"><?php echo $this->user->{Model_Users::COLUMN_PHONE}?></td>
       </tr>
-      <?}?>
-      <?if($this->user->{Model_Users::COLUMN_ADDRESS}){?>
+      <?php }?>
+      <?php if($this->user->{Model_Users::COLUMN_ADDRESS}){?>
       <tr>
-         <th class="ui-widget-header"><?=$this->tr('Adresa')?></th>
-         <td class="ui-widget-content"><?=$this->user->{Model_Users::COLUMN_ADDRESS}?></td>
+         <th class="ui-widget-header"><?php echo $this->tr('Adresa')?></th>
+         <td class="ui-widget-content"><?php echo $this->user->{Model_Users::COLUMN_ADDRESS}?></td>
       </tr>
-      <?}?>
+      <?php }?>
       <tr>
-         <th class="ui-widget-header"><?=$this->tr('Informace jsou veřejné')?></th>
-         <td class="ui-widget-content"><?=($this->user->{Model_Users::COLUMN_INFO_IS_PRIVATE} ? $this->tr('Ne') : $this->tr('Ano'))?></td>
+         <th class="ui-widget-header"><?php echo $this->tr('Informace jsou veřejné')?></th>
+         <td class="ui-widget-content"><?php echo ($this->user->{Model_Users::COLUMN_INFO_IS_PRIVATE} ? $this->tr('Ne') : $this->tr('Ano'))?></td>
       </tr>
       <tr>
-         <th class="ui-widget-header"><?=$this->tr('Poznámka / popis')?></th>
-         <td class="ui-widget-content"><?=$this->user->{Model_Users::COLUMN_NOTE}?></td>
+         <th class="ui-widget-header"><?php echo $this->tr('Poznámka / popis')?></th>
+         <td class="ui-widget-content"><?php echo $this->user->{Model_Users::COLUMN_NOTE}?></td>
       </tr>
-      <?if(count(Locales::getAppLangs()) > 1 && Auth::isAdmin()){?>
+      <?php if(count(Locales::getAppLangs()) > 1 && Auth::isAdmin()){?>
       <tr>
-         <th class="ui-widget-header"><?=$this->tr('Preferovaný jazyk')?></th>
+         <th class="ui-widget-header"><?php echo $this->tr('Preferovaný jazyk')?></th>
          <td class="ui-widget-content">
-            <?
+            <?php 
             $arr = Locales::getLangLabel(Locales::getUserLang());
             echo is_array($arr) ? reset($arr) : null; 
             ?>
          </td>
       </tr>
-      <?}?>
+      <?php }?>
    </table>
    <br />
-   <?=$this->includeFile('tpl://login:buttons.phtml')?>
+   <?php echo $this->includeFile('tpl://login:buttons.phtml')?>
 </div>

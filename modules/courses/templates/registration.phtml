@@ -1,4 +1,4 @@
-<?
+<?php 
 $jQuery = new JsPlugin_JQuery();
 $this->addJsPlugin($jQuery);
 ?>
@@ -39,176 +39,176 @@ $this->addJsPlugin($jQuery);
 </style>
 
 <div class="module-courses-registration">
-   <h2><?=$this->_('Závazná registrace')?></h2>
-   <?// <form>
+   <h2><?php echo $this->_('Závazná registrace')?></h2>
+   <?php // <form>
    echo $this->formReg->renderStart();?>
 
    <fieldset>
-      <legend><?=$this->_('Základní informace')?></legend>
+      <legend><?php echo $this->_('Základní informace')?></legend>
       <div class="course-regform-item">
-         <?
+         <?php 
          $this->formReg->name->htmlLabel()->addClass('course-regform-item-label');
          echo $this->formReg->name->label();
          echo $this->formReg->name->Controll();
          ?>
       </div>
       <div class="course-regform-item">
-         <?
+         <?php 
          $this->formReg->surname->htmlLabel()->addClass('course-regform-item-label');
          echo $this->formReg->surname->label();
          echo $this->formReg->surname->Controll();
          ?>
       </div>
       <div class="course-regform-item">
-         <?
+         <?php 
          $this->formReg->degree->htmlLabel()->addClass('course-regform-item-label');
          echo $this->formReg->degree->label();
          echo $this->formReg->degree->Controll();
          ?>
          <p class="course-regform-item-help">
-            <?=$this->_('Váš titul (např. Mgr., DiS., Bc.)')?>
+            <?php echo $this->_('Váš titul (např. Mgr., DiS., Bc.)')?>
          </p>
       </div>
       <div class="course-regform-item">
-         <?
+         <?php 
          $this->formReg->grade->htmlLabel()->addClass('course-regform-item-label');
          echo $this->formReg->grade->label();
          echo $this->formReg->grade->Controll();
          ?>
          <p class="course-regform-item-help">
-            <?=$this->_('např. sociální pracovník, pedagog, student')?>
+            <?php echo $this->_('např. sociální pracovník, pedagog, student')?>
          </p>
       </div>
       <div class="course-regform-item">
-         <?
+         <?php 
          $this->formReg->practiceLength->htmlLabel()->addClass('course-regform-item-label');
          echo $this->formReg->practiceLength->label();
          echo $this->formReg->practiceLength->Controll();
          ?>
          <p class="course-regform-item-help">
-            <?=$this->_('jak dlouhou máte praxi v souvislosti s Vaším pracovním zařazením (např. 5 let, 7 měsíců...)')?>
+            <?php echo $this->_('jak dlouhou máte praxi v souvislosti s Vaším pracovním zařazením (např. 5 let, 7 měsíců...)')?>
          </p>
       </div>
       <div class="course-regform-item">
-         <?
+         <?php 
          $this->formReg->phone->htmlLabel()->addClass('course-regform-item-label');
          echo $this->formReg->phone->label();
          echo $this->formReg->phone->Controll();
          ?>
          <p class="course-regform-item-help">
-            <?=$this->_('kontaktní telefon na Vás (pro případ sdělení náhlých změn těsně před kurzem, nefunkční email apod.)')?>
+            <?php echo $this->_('kontaktní telefon na Vás (pro případ sdělení náhlých změn těsně před kurzem, nefunkční email apod.)')?>
          </p>
       </div>
       <div class="course-regform-item">
-         <?
+         <?php 
          $this->formReg->mail->htmlLabel()->addClass('course-regform-item-label');
          echo $this->formReg->mail->label();
          echo $this->formReg->mail->Controll();
          ?>
          <p class="course-regform-item-help">
-            <?=$this->_('Vaše emailová adresa, na kterou Vám potvrdíme přijetí přihlášky a budou zaslány bližší informace před konáním kurzu')?>
+            <?php echo $this->_('Vaše emailová adresa, na kterou Vám potvrdíme přijetí přihlášky a budou zaslány bližší informace před konáním kurzu')?>
          </p>
       </div>
       <div class="course-regform-item">
-         <?
+         <?php 
          $this->formReg->regNewsletter->htmlLabel()->addClass('course-regform-item-label');
          echo $this->formReg->regNewsletter->label();
          echo $this->formReg->regNewsletter->Controll();
          ?>
          <p class="course-regform-item-help">
-            <?=$this->_('(pokud chcete na uvedený e-mail získávat novinky o připravovaných kurzech, mimořádných slevách apod., zaškrtněte toto tlačítko)')?>
+            <?php echo $this->_('(pokud chcete na uvedený e-mail získávat novinky o připravovaných kurzech, mimořádných slevách apod., zaškrtněte toto tlačítko)')?>
          </p>
       </div>
       <div class="course-regform-item">
-         <?
+         <?php 
          $this->formReg->note->htmlLabel()->addClass('course-regform-item-label');
          echo $this->formReg->note->label();
          $this->formReg->note->html()->setAttrib('rows', 5)->setAttrib('cols', 60);
          echo $this->formReg->note->Controll();
          ?>
          <p class="course-regform-item-help">
-            <?=$this->_('Vaše poznámky či požadavky vztahující se ke kurzu (např. jako student bych chtěl požádat o studentskou slevu, uvedená praxe se vztahuje k době mého studia, nyní jsem nastoupila nově do zaměstnání, kde pracuji jako terénní pracovnice, fakturu prosím zašlete na tuto adresu: Jarní 5, která je odlišná od fakturační, předem děkuji)')?>
+            <?php echo $this->_('Vaše poznámky či požadavky vztahující se ke kurzu (např. jako student bych chtěl požádat o studentskou slevu, uvedená praxe se vztahuje k době mého studia, nyní jsem nastoupila nově do zaměstnání, kde pracuji jako terénní pracovnice, fakturu prosím zašlete na tuto adresu: Jarní 5, která je odlišná od fakturační, předem děkuji)')?>
          </p>
       </div>
    </fieldset>
 
    <fieldset>
-      <legend><?=$this->_('Fakturační údaje')?></legend>
+      <legend><?php echo $this->_('Fakturační údaje')?></legend>
       <div class="course-regform-item">
-         <?
+         <?php 
          $this->formReg->payType->htmlLabel()->addClass('course-regform-item-label');
          echo $this->formReg->payType->label();
          echo $this->formReg->payType->Controll();
          ?>
          <p class="course-regform-item-help">
-            <?=$this->_('pokud Vás na kurz vysílá Vaše organizace a bude jej za Vás hradit, ponechte zatrženou možnost. V případě, že se kurzu účastníte jako soukromá osoba, zaškrtněte prosím tlačítko Soukromě')?>
+            <?php echo $this->_('pokud Vás na kurz vysílá Vaše organizace a bude jej za Vás hradit, ponechte zatrženou možnost. V případě, že se kurzu účastníte jako soukromá osoba, zaškrtněte prosím tlačítko Soukromě')?>
          </p>
       </div>
       <div class="course-regform-item course-regform-pay-org">
-         <?
+         <?php 
          $this->formReg->orgName->htmlLabel()->addClass('course-regform-item-label');
          echo $this->formReg->orgName->label();
          $this->formReg->orgName->html()->setAttrib('size', 57);
          echo $this->formReg->orgName->Controll();
          ?>
          <p class="course-regform-item-help">
-            <?=$this->_('název Vaší organizace s uvedením její právní formy (a.s., o.s., ...)')?>
+            <?php echo $this->_('název Vaší organizace s uvedením její právní formy (a.s., o.s., ...)')?>
          </p>
       </div>
       <div class="course-regform-item course-regform-pay-org">
-         <?
+         <?php 
          $this->formReg->orgAddress->htmlLabel()->addClass('course-regform-item-label');
          echo $this->formReg->orgAddress->label();
          $this->formReg->orgAddress->html()->setAttrib('rows', 5)->setAttrib('cols', 60);
          echo $this->formReg->orgAddress->Controll();
          ?>
          <p class="course-regform-item-help">
-            <?=$this->_('adresa sídla Vaší organizace, na kterou bude vystavena a zaslána faktura ke kurzu')?>
+            <?php echo $this->_('adresa sídla Vaší organizace, na kterou bude vystavena a zaslána faktura ke kurzu')?>
          </p>
       </div>
       <div class="course-regform-item course-regform-pay-org">
-         <?
+         <?php 
          $this->formReg->orgICO->htmlLabel()->addClass('course-regform-item-label');
          echo $this->formReg->orgICO->label();
          echo $this->formReg->orgICO->Controll();
          ?>
          <p class="course-regform-item-help">
-            <?=$this->_('IČ Vaší organizace')?>
+            <?php echo $this->_('IČ Vaší organizace')?>
          </p>
       </div>
       <div class="course-regform-item course-regform-pay-org">
-         <?
+         <?php 
          $this->formReg->orgPhone->htmlLabel()->addClass('course-regform-item-label');
          echo $this->formReg->orgPhone->label();
          echo $this->formReg->orgPhone->Controll();
          ?>
          <p class="course-regform-item-help">
-            <?=$this->_('kontaktní telefon do Vaší organizace pro případ řešení nesrovnalostí na faktuře apod.')?>
+            <?php echo $this->_('kontaktní telefon do Vaší organizace pro případ řešení nesrovnalostí na faktuře apod.')?>
          </p>
       </div>
       <div class="course-regform-item course-regform-pay-private">
-         <?
+         <?php 
          $this->formReg->privateAddress->htmlLabel()->addClass('course-regform-item-label');
          echo $this->formReg->privateAddress->label();
          $this->formReg->privateAddress->html()->setAttrib('rows', 5)->setAttrib('cols', 60);
          echo $this->formReg->privateAddress->Controll();
          ?>
          <p class="course-regform-item-help">
-            <?=$this->_('Vaše adresa, na kterou bude vystavena a zaslána faktura ke kurzu')?>
+            <?php echo $this->_('Vaše adresa, na kterou bude vystavena a zaslána faktura ke kurzu')?>
          </p>
       </div>
       <div class="course-regform-item">
-         <?
+         <?php 
          echo $this->formReg->send->Controll();
          echo $this->formReg->check->controll();
          echo str_replace(':', null, $this->formReg->check->label());
          ?>
       </div>
       <div class="course-regform-item">
-         <?echo $this->formReg->check->subLabel();?>
+         <?php echo $this->formReg->check->subLabel();?>
       </div>
    </fieldset>
-   <?// </form>
+   <?php // </form>
    echo $this->formReg->renderEnd();
 //   echo $this->formReg;
    ?>

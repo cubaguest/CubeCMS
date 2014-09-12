@@ -1,4 +1,4 @@
-<?
+<?php 
 $jQuery = new JsPlugin_JQuery();
 $jQuery->addUICore();
 $jQuery->addUIDialog();
@@ -9,30 +9,30 @@ $this->addFile('js://shop-variants.js');
 $buttonCancelEdit = '<button name="cancel" class="button-cancel" onclick="clearForm(this); return false;" >'
    .$this->tr('Vyčistit').'</button> ';
 ?>
-<h1><?= $this->category()->getName() ?></h1>
+<h1><?php echo  $this->category()->getName() ?></h1>
 <div class="main-content-admin-form">
    <div id="variants-groups">
-      <h2 class="ui-widget ui-widget-header"><?=$this->tr('Skupiny')?></h2>
+      <h2 class="ui-widget ui-widget-header"><?php echo $this->tr('Skupiny')?></h2>
 
       <ul id="variants-groups-list" class="ui-widget ui-widget-content"></ul>
       <div id="groups-control" class="ui-widget ui-widget-header ui-cube-widget">
-         <button onclick="ShopVariants.addGroup()"><?ps($this->tr('Přidat'))?></button>
-         <button onclick="ShopVariants.loadGroups()"><?ps($this->tr('Obnovit'))?></button>
+         <button onclick="ShopVariants.addGroup()"><?php ps($this->tr('Přidat'))?></button>
+         <button onclick="ShopVariants.loadGroups()"><?php ps($this->tr('Obnovit'))?></button>
       </div>
       <div id="dialog-variant-group-edit">
-         <?echo $this->formEditGroup;?>
+         <?php echo $this->formEditGroup;?>
       </div>
    </div>
    <div id="variants-values">
-      <h2 class="ui-widget ui-widget-header"><?ps($this->tr('Atributy'));?> <span id="group-name"></span></h2>
+      <h2 class="ui-widget ui-widget-header"><?php ps($this->tr('Atributy'));?> <span id="group-name"></span></h2>
 
       <ul id="variants-values-list" class="ui-widget ui-widget-content"></ul>
 
       <div id="values-control" class="ui-widget ui-widget-header ui-cube-widget">
-         <button id="button-add-variant" onclick="ShopVariants.addVariant()"><?ps($this->tr('Přidat'))?></button>
+         <button id="button-add-variant" onclick="ShopVariants.addVariant()"><?php ps($this->tr('Přidat'))?></button>
       </div>
       <div id="dialog-variant-edit">
-         <?echo $this->formEditVariant;?>
+         <?php echo $this->formEditVariant;?>
       </div>
    </div>
    <hr class="reseter" />
@@ -45,14 +45,14 @@ $buttonCancelEdit = '<button name="cancel" class="button-cancel" onclick="clearF
       }
       $(document).ready(function() {
           $('.button-delete-group,.button-delete-value').click(function(){
-             return confirm('<?=$this->tr('Opravdu zmazat tuto skupinu/hodnotu?')?>');
+             return confirm('<?php echo $this->tr('Opravdu zmazat tuto skupinu/hodnotu?')?>');
           });
 
          ShopVariants.init({
-            urlGroups : '<?=$this->link()->route('groupsList')?>',
-            urlEditGroup : '<?=$this->link()->route('editGroup')?>',
-            urlVariants : '<?=$this->link()->route('variantsList')?>',
-            urlEditVariant : '<?=$this->link()->route('editVariant')?>'
+            urlGroups : '<?php echo $this->link()->route('groupsList')?>',
+            urlEditGroup : '<?php echo $this->link()->route('editGroup')?>',
+            urlVariants : '<?php echo $this->link()->route('variantsList')?>',
+            urlEditVariant : '<?php echo $this->link()->route('editVariant')?>'
          }, {
             $dialogGroup : $('#dialog-variant-group-edit'),
             $dialogVariant : $('#dialog-variant-edit'),

@@ -1,15 +1,15 @@
-<?
+<?php 
 echo $this->toolbox;
 $this->addCssFile('style.less');
 $this->addJsPlugin(new JsPlugin_JQuery());
 $this->addJsPlugin(new JsPlugin_JQueryCSS());
 ?>
-<h1><?ps($this->category()->getName());?></h1>
+<h1><?php ps($this->category()->getName());?></h1>
 <div class="content-admin">
-   <?
+   <?php 
    $linkajaxPanelInfo = new Url_Link_ModuleRequest();
    ?>
-   <h2><?=$this->tr('Seznam globálních panelů');?></h2>
+   <h2><?php echo $this->tr('Seznam globálních panelů');?></h2>
    <?php 
    $this->moduleButtons = array(
          array(
@@ -24,23 +24,23 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
    <table class="panels-list">
       <thead>
          <tr class="ui-widget-header">
-            <th scope="col" class="panel-tb-category"><?=$this->tr('kategorie')?></th>
-            <th scope="col" class="panel-tb-box"><?=$this->tr('box')?></th>
-            <th scope="col" class="panel-tb-order"><?=$this->tr('priorita')?></th>
-            <th scope="col" class="panel-tb-actions"><?=$this->tr('akce')?></th>
+            <th scope="col" class="panel-tb-category"><?php echo $this->tr('kategorie')?></th>
+            <th scope="col" class="panel-tb-box"><?php echo $this->tr('box')?></th>
+            <th scope="col" class="panel-tb-order"><?php echo $this->tr('priorita')?></th>
+            <th scope="col" class="panel-tb-actions"><?php echo $this->tr('akce')?></th>
          </tr>
       </thead>
       <tbody>
-      <?$this->panels = $this->gobalpanels;
+      <?php $this->panels = $this->gobalpanels;
       $this->includeTpl('listtpl.phtml', false, array('panels' => $this->gobalpanels));?>
       </tbody>
    </table>
    <br />
    <br />
-   <?
+   <?php 
    // POKUD jsou individuální panely
    if(!empty ($this->individualPanelCats)) {?>
-   <h2><?=$this->tr('Seznam individuálních panelů');?></h2>
+   <h2><?php echo $this->tr('Seznam individuálních panelů');?></h2>
    <?php 
    $this->moduleButtons = array(
          array(
@@ -54,22 +54,22 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
    $this->includeTpl('modules/buttons.phtml', true);
    ?>
    <div class="ui-widget ui-widget-header category-selector" >
-   <strong><?=$this->tr('Kategorie pro zobrazení')?>:</strong>
+   <strong><?php echo $this->tr('Kategorie pro zobrazení')?>:</strong>
    <select id="catsList" name="catsList">
-         <?foreach ($this->individualPanelCats as $cat) {?>
-      <option value="<?=$cat->{Model_Category::COLUMN_CAT_ID}?>"><?=$cat->{Model_Category::COLUMN_CAT_LABEL}." (".$cat->numPanels.")"?></option>
-            <? }?>
+         <?php foreach ($this->individualPanelCats as $cat) {?>
+      <option value="<?php echo $cat->{Model_Category::COLUMN_CAT_ID}?>"><?php echo $cat->{Model_Category::COLUMN_CAT_LABEL}." (".$cat->numPanels.")"?></option>
+            <?php  }?>
    </select>
-   <button name="selectCatPanels"><?=$this->tr('Vybrat')?></button>
+   <button name="selectCatPanels"><?php echo $this->tr('Vybrat')?></button>
    </div>
    <div><!-- kvuli loadboxu-->
       <table class="panels-list" id="indCatPanelsList">
          <thead class="ui-widget-header" id="indCatPanelsListHeader">
             <tr>
-               <th scope="col" class="panel-tb-category"><?=$this->tr('kategorie')?></th>
-               <th scope="col" class="panel-tb-box"><?=$this->tr('box')?></th>
-               <th scope="col" class="panel-tb-order"><?=$this->tr('priorita')?></th>
-               <th scope="col" class="panel-tb-actions"><?=$this->tr('akce')?></th>
+               <th scope="col" class="panel-tb-category"><?php echo $this->tr('kategorie')?></th>
+               <th scope="col" class="panel-tb-box"><?php echo $this->tr('box')?></th>
+               <th scope="col" class="panel-tb-order"><?php echo $this->tr('priorita')?></th>
+               <th scope="col" class="panel-tb-actions"><?php echo $this->tr('akce')?></th>
             </tr>
          </thead>
          <tbody></tbody>
@@ -92,7 +92,7 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
       function loadPanels(){
          showLoadBox($('table#indCatPanelsList'));
          $.ajax({
-        	   url: '<?=$this->link()->route('getListPanels')?>',
+        	   url: '<?php echo $this->link()->route('getListPanels')?>',
             data: { idc : $('select#catsList').val()},
             success: function(data) {
                $('table#indCatPanelsList tbody').html(data);
@@ -102,6 +102,6 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
       }
       /* ]]> */
    </script>
-      <?}?>
+      <?php }?>
 </div>
 

@@ -1,22 +1,22 @@
-<?
+<?php 
 if(!empty($this->variants)){
    foreach( $this->variants as $attr ) {?>
-   <li id="attr-<?=$attr->{Shop_Model_Attributes::COLUMN_ID}?>"
+   <li id="attr-<?php echo $attr->{Shop_Model_Attributes::COLUMN_ID}?>"
        class="ui-state-default clearfix"
-       data-id="<?=$attr->getPK()?>"
-       data-name="<?=$attr->{Shop_Model_Attributes::COLUMN_NAME}?>">
+       data-id="<?php echo $attr->getPK()?>"
+       data-name="<?php echo $attr->{Shop_Model_Attributes::COLUMN_NAME}?>">
       <span class="move ui-icon ui-icon-arrowthick-2-n-s"></span>
-      <span class="name"><?p_lang($attr->{Shop_Model_Attributes::COLUMN_NAME})?></span>
+      <span class="name"><?php p_lang($attr->{Shop_Model_Attributes::COLUMN_NAME})?></span>
             <span class="controls">
-               <a href="<?=$this->link()->param('editv', $attr->{Shop_Model_Attributes::COLUMN_ID})?>"
-                  onclick="ShopVariants.editVariant(<?=$attr->getPK()?>); return false;"
+               <a href="<?php echo $this->link()->param('editv', $attr->{Shop_Model_Attributes::COLUMN_ID})?>"
+                  onclick="ShopVariants.editVariant(<?php echo $attr->getPK()?>); return false;"
                   class="button-edit-value"><img src="/images/icons/pencil.png" /></a>
-               <a href="<?=$this->link()->param('deletev', $attr->{Shop_Model_Attributes::COLUMN_ID})?>"
-                  onclick="ShopVariants.deleteVariant(<?=$attr->getPK()?>); return false;"
+               <a href="<?php echo $this->link()->param('deletev', $attr->{Shop_Model_Attributes::COLUMN_ID})?>"
+                  onclick="ShopVariants.deleteVariant(<?php echo $attr->getPK()?>); return false;"
                   class="button-delete-value"><img src="/images/icons/delete.png" /></a>
             </span>
    </li>
-   <?}
+   <?php }
 } else {?>
-   <li><?ps($this->tr('Není vytvořen žádný atribut'))?></li>
-<?}?>
+   <li><?php ps($this->tr('Není vytvořen žádný atribut'))?></li>
+<?php }?>

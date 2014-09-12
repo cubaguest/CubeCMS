@@ -1,4 +1,4 @@
-<?//<desc>Panel s aktuální akci</desc>
+<?php //<desc>Panel s aktuální akci</desc>
 if($this->action != null) {
 $icon = null;
 if($this->panelObj()->getIcon() != null){
@@ -9,18 +9,18 @@ if($this->panelObj()->getBackImage() != null){
    $backImg = 'background-image: url(\''.Panel_Obj::getBackImgDir().$this->panelObj()->getBackImage().'\');';
 }
 if($this->rssLink != null){?>
-<a style="float: right" href="<?=$this->rssLink?>" title="rss"><img src="<?=vve_get_tpl_file('icons/rss-icon.png', VVE_TPL_FILE_IMAGE)?>" alt="rss" /></a>
-<?}?>
-<p class="panelLabel"><?=$icon?><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=$this->panelObj()->getName()?></a></p>
-<div class="panelActions" style="<?=$backImg?>">
-      <?// podnadpis
+<a style="float: right" href="<?php echo $this->rssLink?>" title="rss"><img src="<?php echo vve_get_tpl_file('icons/rss-icon.png', VVE_TPL_FILE_IMAGE)?>" alt="rss" /></a>
+<?php }?>
+<p class="panelLabel"><?php echo $icon?><a href="<?php echo $this->link()?>" title="<?php echo htmlspecialchars($this->panelObj()->getName())?>"><?php echo $this->panelObj()->getName()?></a></p>
+<div class="panelActions" style="<?php echo $backImg?>">
+      <?php // podnadpis
       if($this->action->{Actions_Model_Detail::COLUMN_SUBANME} != null){
          print(new Html_Element('p', $this->action->{Actions_Model_Detail::COLUMN_SUBANME}));
       }?>
-      <p><a href="<?=$this->link()->route('detail', array('urlkey' => $this->action->{Actions_Model_Detail::COLUMN_URLKEY}))?>"
-      title="<?=$this->action->{Actions_Model_Detail::COLUMN_NAME}?>"
-      ><?=$this->action->{Actions_Model_Detail::COLUMN_NAME}?></a></p>
-      <?// autor
+      <p><a href="<?php echo $this->link()->route('detail', array('urlkey' => $this->action->{Actions_Model_Detail::COLUMN_URLKEY}))?>"
+      title="<?php echo $this->action->{Actions_Model_Detail::COLUMN_NAME}?>"
+      ><?php echo $this->action->{Actions_Model_Detail::COLUMN_NAME}?></a></p>
+      <?php // autor
       if($this->action->{Actions_Model_Detail::COLUMN_AUTHOR} != null){
          print(new Html_Element('p', $this->action->{Actions_Model_Detail::COLUMN_AUTHOR}));
       }
@@ -39,11 +39,11 @@ if($this->rssLink != null){?>
       ?>
       <p class="image" style="width: 100%; overflow: hidden;">
          <img style="width: 100%;"
-            src="<?=$this->datadir.$this->action->{Actions_Model_Detail::COLUMN_IMAGE}?>"
-              alt="<?=$this->tr('titulní obrázek akce').' '
+            src="<?php echo $this->datadir.$this->action->{Actions_Model_Detail::COLUMN_IMAGE}?>"
+              alt="<?php echo $this->tr('titulní obrázek akce').' '
                  .htmlspecialchars($this->action->{Actions_Model_Detail::COLUMN_NAME})?>"/>
       </p>
-      <?}
+      <?php }
       $linkNext = '... <a href="'.$this->link()->route('detail', 
               array('urlkey' => $this->action->{Actions_Model_Detail::COLUMN_URLKEY}))
               .'" title="'.$this->action->{Actions_Model_Detail::COLUMN_NAME}.'">(dále)</a>';
@@ -65,7 +65,7 @@ if($this->rssLink != null){?>
 
 </div>
 <p class="panelLinkMore">
-   <a href="<?=$this->link()?>"
-      title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->tr('Více')?></a>
+   <a href="<?php echo $this->link()?>"
+      title="<?php echo htmlspecialchars($this->category()->getLabel())?>"><?php echo $this->tr('Více')?></a>
 </p>
-<?}?>
+<?php }?>

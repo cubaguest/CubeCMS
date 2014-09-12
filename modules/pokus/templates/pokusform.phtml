@@ -4,7 +4,7 @@
    <input type="submit" name="pokus_send" value="SEND" />
 </form>
 -->
-<?
+<?php 
 //$eleme = new Html_Element('form');
 //$eleme->setAttrib('method', 'post')->setAttrib('action', '');
 //
@@ -25,10 +25,10 @@ $tinyMCE->setCfgParam('theme', 'full');
 $this->addJsPlugin($tinyMCE);
 
 ?>
-<?=$this->form?>
+<?php echo $this->form?>
 
 
-<?
+<?php 
 //print ($this->form->render(new Form_Decorator(array('wrap' => 'ul',
 //                                                    'rowwrap' => 'li',
 //                                                    'labelwrap' => 'span',

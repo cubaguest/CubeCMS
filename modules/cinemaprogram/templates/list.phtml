@@ -1,4 +1,4 @@
-<?
+<?php 
 // titulek
 $range = strftime("%x", $this->curDate->format("U"))." - ".strftime("%x", $this->toDate->format("U"));
 $this->addPageTitle($range);
@@ -30,27 +30,27 @@ while ($time = $this->times->fetch()) {
 </style>
 <div id="prMoviesList">
    <p style="text-align: right">
-      <?=$this->_('Rozbalit')?>:&nbsp;
-      <a href="#" id="showAllMovies" onclick="//return showAll()"><?=$this->_('Vše')?></a>
-      <a href="#" id="hideAllMovies" onclick="//return hideAll()"><?=$this->_('Nic')?></a>
+      <?php echo $this->_('Rozbalit')?>:&nbsp;
+      <a href="#" id="showAllMovies" onclick="//return showAll()"><?php echo $this->_('Vše')?></a>
+      <a href="#" id="hideAllMovies" onclick="//return hideAll()"><?php echo $this->_('Nic')?></a>
    </p>
-   <?
+   <?php 
    $cDay = clone $this->curDate;
    for ($day = 1; $day <= $this->deltaDay; $day++) {?>
    <div style="margin-bottom: 10px">
-      <p style="font-weight: bold;background-color: yellow;"><?=strftime("%x", $cDay->format("U"))
+      <p style="font-weight: bold;background-color: yellow;"><?php echo strftime("%x", $cDay->format("U"))
                     ." - ".strftime("%A", $cDay->format("U"))?></p>
-         <?
+         <?php 
          if(isset ($movies[$cDay->format("Y-m-d")])) {?>
       <table style="width: 100%; border: 1px solid gray;">
-               <?
+               <?php 
                $prevMovieId = null;
                foreach ($movies[$cDay->format("Y-m-d")] as $movie) {
                   $m = $movie['movie'];?>
          <tr>
             <td style="width: 120px; padding: 2px; text-align: center" valign="middle">
                <p style="font-weight: bold;">
-                           <?
+                           <?php 
                            $str = null;
                            foreach ($movie['times'] as $t) {
                               $time = new DateTime($t);
@@ -63,28 +63,28 @@ while ($time = $this->times->fetch()) {
             <td style="padding: 2px">
                <p class="movieName" onclick="showDetail(this)" style="cursor: pointer;">
                   <img class="expcolimg" src="images/buttons/expand.gif" alt="expand" />
-                  <a href="#" title="<?=$this->_('Zobrazit detail')?>"
-                     onclick="return false"><?
+                  <a href="#" title="<?php echo $this->_('Zobrazit detail')?>"
+                     onclick="return false"><?php 
                                  if($m->{CinemaProgram_Model_Detail::COL_FC} == true) {
-                                 ?><span style="color: red">FK</span>&nbsp;<?
+                                 ?><span style="color: red">FK</span>&nbsp;<?php 
                               }
                               print $m->{CinemaProgram_Model_Detail::COL_NAME};
 
                               if($m->{CinemaProgram_Model_Detail::COL_NAME_ORIG} != null) {?>
-                     <span style="font-style: italic">(<?=$m->{CinemaProgram_Model_Detail::COL_NAME_ORIG}?>)</span>
-                                 <?}?>
+                     <span style="font-style: italic">(<?php echo $m->{CinemaProgram_Model_Detail::COL_NAME_ORIG}?>)</span>
+                                 <?php }?>
                   </a>
-                  <span style="float: right;"><?=$m->{CinemaProgram_Model_Detail::COL_LENGTH}?>&nbsp;min/<?=$m->{CinemaProgram_Model_Detail::COL_PRICE}?>&nbsp;Kč</span>
+                  <span style="float: right;"><?php echo $m->{CinemaProgram_Model_Detail::COL_LENGTH}?>&nbsp;min/<?php echo $m->{CinemaProgram_Model_Detail::COL_PRICE}?>&nbsp;Kč</span>
                </p>
                <div class="movieInfo" style="display: none;position: relative;">
-                           <?if($m->{CinemaProgram_Model_Detail::COL_IMAGE} != null) {?>
+                           <?php if($m->{CinemaProgram_Model_Detail::COL_IMAGE} != null) {?>
                   <p style="float: left; margin: 0 1em 0.5em 0">
-                                 <?=vve_tpl_image_tag($this->category()->getModule()->getDataDir()
+                                 <?php echo vve_tpl_image_tag($this->category()->getModule()->getDataDir()
                                          .$m->{CinemaProgram_Model_Detail::COL_IMAGE},null,200);?>
                   </p>
-                              <?}?>
+                              <?php }?>
                   <p>
-                     <?
+                     <?php 
                      echo ($this->_('Typ promítání').":&nbsp;");
                      if($m->{CinemaProgram_Model_Detail::COL_TYPE} != null) {
                         echo ($m->{CinemaProgram_Model_Detail::COL_TYPE});
@@ -92,7 +92,7 @@ while ($time = $this->times->fetch()) {
                         echo ($this->_('Normální'));
                      }?>
                      <br />
-                              <?
+                              <?php 
                               print ($this->_('Mládeži').":&nbsp;");
                               if($m->{CinemaProgram_Model_Detail::COL_ACCESS} != 0) {
                                  print $this->_('přístupno od')."&nbsp;".$m->{CinemaProgram_Model_Detail::COL_ACCESS}."&nbsp;".$this->_('let');
@@ -100,7 +100,7 @@ while ($time = $this->times->fetch()) {
                                  print $this->_('přístupno');
                               }?>
                      <br />
-                              <?
+                              <?php 
                               print ($this->_('Znění').":&nbsp;");
                               switch ($m->{CinemaProgram_Model_Detail::COL_VERSION}) {
                                  case 'origwsubtitles':
@@ -121,33 +121,33 @@ while ($time = $this->times->fetch()) {
                                     break;
                               }?>
                      <br />
-                              <?=$this->_('Stopáž')?>:&nbsp;<?=$m->{CinemaProgram_Model_Detail::COL_LENGTH}?>&nbsp;min<br />
-                              <?=$this->_('Cena')?>:&nbsp;<?=$m->{CinemaProgram_Model_Detail::COL_PRICE}?>&nbsp;Kč<br />
+                              <?php echo $this->_('Stopáž')?>:&nbsp;<?php echo $m->{CinemaProgram_Model_Detail::COL_LENGTH}?>&nbsp;min<br />
+                              <?php echo $this->_('Cena')?>:&nbsp;<?php echo $m->{CinemaProgram_Model_Detail::COL_PRICE}?>&nbsp;Kč<br />
 
                   </p>
                   <hr class="reseter"/>
-                           <?=$m->{CinemaProgram_Model_Detail::COL_LABEL}?>
+                           <?php echo $m->{CinemaProgram_Model_Detail::COL_LABEL}?>
                   <p>
-                              <?if($m->{CinemaProgram_Model_Detail::COL_CSFDID} != 0) {?>
-                     <a href="http://www.csfd.cz/film/<?=$m->{CinemaProgram_Model_Detail::COL_CSFDID}
+                              <?php if($m->{CinemaProgram_Model_Detail::COL_CSFDID} != 0) {?>
+                     <a href="http://www.csfd.cz/film/<?php echo $m->{CinemaProgram_Model_Detail::COL_CSFDID}
                                             ."-".vve_cr_url_key($m->{CinemaProgram_Model_Detail::COL_NAME})?>"
-                        title="ČSFD" target="_blank"><img src="<?=vve_get_tpl_file('icons_logos/logo-csfd.png',
+                        title="ČSFD" target="_blank"><img src="<?php echo vve_get_tpl_file('icons_logos/logo-csfd.png',
                                                                            VVE_TPL_FILE_IMAGE)?>" alt="čsfd logo" /></a>
-                                    <?}?>
-                                 <?if($m->{CinemaProgram_Model_Detail::COL_IMDBID} != 0) {?>
-                     <a href="http://www.imdb.com/title/tt<?=$m->{CinemaProgram_Model_Detail::COL_IMDBID}
+                                    <?php }?>
+                                 <?php if($m->{CinemaProgram_Model_Detail::COL_IMDBID} != 0) {?>
+                     <a href="http://www.imdb.com/title/tt<?php echo $m->{CinemaProgram_Model_Detail::COL_IMDBID}
                                             ."-".vve_cr_url_key($m->{CinemaProgram_Model_Detail::COL_NAME})?>"
-                        title="IMDB" target="_blank"><img src="<?=vve_get_tpl_file('icons_logos/logo-imdb.png',
+                        title="IMDB" target="_blank"><img src="<?php echo vve_get_tpl_file('icons_logos/logo-imdb.png',
                                                                            VVE_TPL_FILE_IMAGE)?>" alt="imdb logo" /></a>
-                                    <?}?>
-                                 <?if($m->{CinemaProgram_Model_Detail::COL_CRITIQUE} != null) {?>
-                     <a href="<?=$m->{CinemaProgram_Model_Detail::COL_CRITIQUE}?>"
-                        title="<?=$this->_('Recenze')?>" target="_blank"><?=$this->_('Recenze')?></a>
-                                    <?}?>
-                     <a href="<?=$this->link()->route('detail', array('id' => $m->{CinemaProgram_Model_Detail::COL_ID}, 'name' => vve_cr_url_key($m->{CinemaProgram_Model_Detail::COL_NAME})))?>"
-                        title="<?=$this->_('detail filmu')?>">detail</a>
+                                    <?php }?>
+                                 <?php if($m->{CinemaProgram_Model_Detail::COL_CRITIQUE} != null) {?>
+                     <a href="<?php echo $m->{CinemaProgram_Model_Detail::COL_CRITIQUE}?>"
+                        title="<?php echo $this->_('Recenze')?>" target="_blank"><?php echo $this->_('Recenze')?></a>
+                                    <?php }?>
+                     <a href="<?php echo $this->link()->route('detail', array('id' => $m->{CinemaProgram_Model_Detail::COL_ID}, 'name' => vve_cr_url_key($m->{CinemaProgram_Model_Detail::COL_NAME})))?>"
+                        title="<?php echo $this->_('detail filmu')?>">detail</a>
                   </p>
-                           <?if($this->category()->getRights()->isWritable()) {
+                           <?php if($this->category()->getRights()->isWritable()) {
                               $toolbox = new Template_Toolbox();
                               $toolbox->addTool('edit_movie', $this->_("Upravit film"),
                                       $this->link()->route('edit',array('id' => (int)$m->{CinemaProgram_Model_Detail::COL_ID})),
@@ -164,21 +164,21 @@ while ($time = $this->times->fetch()) {
          <tr>
             <td colspan="2" style="border-bottom: 1px solid gray"></td>
          </tr>
-                  <?}?>
+                  <?php }?>
       </table>
-            <?} else {
+            <?php } else {
             print ($this->_('Nepromítá se'));
          }?>
    </div>
-      <?
+      <?php 
       $cDay->modify('+1 day');
    }
    ?>
 
-   &laquo;<a href="<?=$this->linkBack?>" title="<?=$this->deltaDay."&nbsp;".$this->_('dní')?>"
-             >-<?=$this->deltaDay."&nbsp;".$this->_('dní')?></a>&nbsp;&brvbar;&nbsp;
-   <a href="<?=$this->linkNext?>" title="<?=$this->deltaDay."&nbsp;".$this->_('dní')?>"
-      >+<?=$this->deltaDay."&nbsp;".$this->_('dní')?></a>&raquo;
+   &laquo;<a href="<?php echo $this->linkBack?>" title="<?php echo $this->deltaDay."&nbsp;".$this->_('dní')?>"
+             >-<?php echo $this->deltaDay."&nbsp;".$this->_('dní')?></a>&nbsp;&brvbar;&nbsp;
+   <a href="<?php echo $this->linkNext?>" title="<?php echo $this->deltaDay."&nbsp;".$this->_('dní')?>"
+      >+<?php echo $this->deltaDay."&nbsp;".$this->_('dní')?></a>&raquo;
 
    <script type="text/javascript">
       /* <![CDATA[ */
@@ -208,7 +208,7 @@ while ($time = $this->times->fetch()) {
 </div>
 
 
-<?
+<?php 
 if($this->category()->getRights()->isWritable()) {
    $toolbox = new Template_Toolbox();
    $toolbox->addTool('add_movie', $this->_("Přidat film"),

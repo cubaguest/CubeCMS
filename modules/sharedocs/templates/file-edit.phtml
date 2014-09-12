@@ -1,9 +1,9 @@
-<?
+<?php 
 $this->addFile('css://style.css');
 $this->addJsPlugin(new JsPlugin_JQueryCSS());
 ?>
 
-<h1><?
+<h1><?php 
 if($this->file instanceof Model_ORM_Record && $this->file->isNew()){
    ps(sprintf($this->tr('Nahrání nového souboru do složky "%s"'),$this->dir->{ShareDocs_Model_Dirs::COLUMN_NAME} ) );
 } else {
@@ -11,13 +11,13 @@ if($this->file instanceof Model_ORM_Record && $this->file->isNew()){
 }
 ?></h1>
 <div class="main-content-form-edit">
-   <?if($this->file->{ShareDocs_Model_Files::COLUMN_LOCKED} && $this->file->{ShareDocs_Model_Files::COLUMN_LOCKED_ID_USER} != Auth::getUserId()){?>
+   <?php if($this->file->{ShareDocs_Model_Files::COLUMN_LOCKED} && $this->file->{ShareDocs_Model_Files::COLUMN_LOCKED_ID_USER} != Auth::getUserId()){?>
    <div class="ui-file-warning ui-state-error">
       <span class="ui-icon ui-icon-alert" style="float: left;"></span>
-      <?=$this->tr('POZOR! Soubor je zamknut jiným uživatelem! Při nahrání již nebude uživatelův soubor aktuální!')?>
+      <?php echo $this->tr('POZOR! Soubor je zamknut jiným uživatelem! Při nahrání již nebude uživatelův soubor aktuální!')?>
    </div>
-   <?}?>
-   <?
+   <?php }?>
+   <?php 
    echo $this->formFile;
    ?>
    

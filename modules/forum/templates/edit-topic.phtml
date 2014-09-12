@@ -1,4 +1,4 @@
-<?
+<?php 
 if($this->topic instanceof Model_ORM_Record){
    $h = sprintf($this->tr('Úprava témata %s'), $this->topic->{Forum_Model_Topics::COLUMN_NAME});
 } else {
@@ -7,10 +7,10 @@ if($this->topic instanceof Model_ORM_Record){
 $this->addPageTitle($h);
 $this->addJsPlugin(new JsPlugin_JQuery());
 ?>
-<h1><?=$h?></h1>
+<h1><?php echo $h?></h1>
 <div class="main-content-detail">
    <div class="main-content-form-edit">
-   <?
+   <?php 
    $this->form->text->html()->setAttrib('rows', 10);
    if(isset($this->form->notificationEMails)){
       $this->form->email->setSubLabel('<a id="buttonAddToNotify" href="#add-mail-notify" title="'.$this->tr('Zasílat nové příspěvky na e-mail').'">'.$this->tr('Přidat').'</a> '.$this->tr(' do upozornění na nové příspěvky'));

@@ -1,4 +1,4 @@
-<?
+<?php 
 // do titulku
 $h = $this->tr('úprava pořadí osob');
 $this->addPageTitle($h);
@@ -8,9 +8,9 @@ $jq->addUISortable();
 $this->addJsPlugin($jq);
 $this->addFile('css://style.css');
 ?>
-<h1><?= $h ?></h1>
+<h1><?php echo  $h ?></h1>
 <div class="content-form-edit">
-   <? echo $this->form->renderStart(); ?>
+   <?php  echo $this->form->renderStart(); ?>
    <fieldset class="fieldset-alt"><legend><span class="form-legend-name">Základní informace o osobě</span>
          <span class="form-legend-text"></span>
       </legend>
@@ -19,28 +19,28 @@ $this->addFile('css://style.css');
             <th class="form-labels"><label for="person_degreeAfter_1" class="person_degreeAfter_label_class">Osoby:</label></th>
             <td class="form-controlls">
             <ul id="people-list">
-               <?
+               <?php 
                foreach ($this->people as $person) {?>
-                  <li class="ui-state-default"><?
+                  <li class="ui-state-default"><?php 
                   echo $person->{People_Model::COLUMN_SURNAME}.' '.$person->{People_Model::COLUMN_NAME};
                   $this->form->id->setValues($person->{People_Model::COLUMN_ID});
                   echo $this->form->id;
                   ?></li>
-               <?}?>
+               <?php }?>
             </ul>
             </td>
          </tr>
          <tr>
             <td class="form-labels"></td>
-            <td class="form-controlls font-small"><?=$this->tr('Pro změnu pořadí stačí osobu uchopit a přesunout.')?></td>
+            <td class="form-controlls font-small"><?php echo $this->tr('Pro změnu pořadí stačí osobu uchopit a přesunout.')?></td>
          </tr>
          <tr>
-            <th class="form-labels"><?=$this->form->save->label()?></th>
-            <td class="form-controlls"><?=$this->form->save->controllAll()?></td>
+            <th class="form-labels"><?php echo $this->form->save->label()?></th>
+            <td class="form-controlls"><?php echo $this->form->save->controllAll()?></td>
          </tr>
       </table>
    </fieldset>   
-   <? echo $this->form->renderEnd(); ?>
+   <?php  echo $this->form->renderEnd(); ?>
    <script>
 	$(function() {
 		$( "#people-list" ).sortable({

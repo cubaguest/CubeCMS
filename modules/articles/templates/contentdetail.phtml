@@ -1,20 +1,20 @@
-<? // detail článku pouze jako html 
+<?php  // detail článku pouze jako html 
 $addDate = new DateTime($this->article->{Articles_Model::COLUMN_ADD_TIME});
 $editDate = new DateTime($this->article->{Articles_Model::COLUMN_EDIT_TIME});
 ?>
-<h1><?=htmlspecialchars($this->article->{Articles_Model::COLUMN_NAME})?></h1>
+<h1><?php echo htmlspecialchars($this->article->{Articles_Model::COLUMN_NAME})?></h1>
 <div class="print-detail">
-   <div class="font-small"><?=$this->tr('Přidáno')." ".strftime("%x %X", $addDate->format("U"))
+   <div class="font-small"><?php echo $this->tr('Přidáno')." ".strftime("%x %X", $addDate->format("U"))
           ."&nbsp;".$this->tr('uživatelem')."&nbsp;".$this->article->{Model_Users::COLUMN_USERNAME}?>.&nbsp;
-      <?=$this->tr('Zobrazeno')?>:&nbsp;<?=$this->article->{Articles_Model::COLUMN_SHOWED}?>&times;
+      <?php echo $this->tr('Zobrazeno')?>:&nbsp;<?php echo $this->article->{Articles_Model::COLUMN_SHOWED}?>&times;
    </div><br />
-   <?if((string)$this->article->{Articles_Model::COLUMN_ANNOTATION} != null){?>
-   <div class="main-content-annotation"><?=$this->article->{Articles_Model::COLUMN_ANNOTATION};?></div><br />
-   <?}?>
-   <?=$this->article->{Articles_Model::COLUMN_TEXT}?>
+   <?php if((string)$this->article->{Articles_Model::COLUMN_ANNOTATION} != null){?>
+   <div class="main-content-annotation"><?php echo $this->article->{Articles_Model::COLUMN_ANNOTATION};?></div><br />
+   <?php }?>
+   <?php echo $this->article->{Articles_Model::COLUMN_TEXT}?>
    <hr class="reseter" />
-   <?if($this->allowPrivate === true){?>
-      <?=$this->article->{Articles_Model::COLUMN_TEXT_PRIVATE}?>
+   <?php if($this->allowPrivate === true){?>
+      <?php echo $this->article->{Articles_Model::COLUMN_TEXT_PRIVATE}?>
       <hr class="reseter" />
-   <?}?>
+   <?php }?>
 </div>

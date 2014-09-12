@@ -1,4 +1,4 @@
-<?
+<?php 
 $this->addFile("css://articles:style.css?original");
 $jq = new JsPlugin_JQuery();
 $jq->addUIDialog();
@@ -38,9 +38,9 @@ if( isset( $this->form->priorityEndDate) ){
 
 $this->addJsPlugin($jq);
 ?>
-<h1><?=$h;?></h1>
+<h1><?php echo $h;?></h1>
 <div class="main-content-form-edit" id="article-edit-form">
-   <?
+   <?php 
    echo($this->form);
    $this->includeFile('tpl://engine:parts/seltitleimage.phtml');
    ?>
@@ -48,18 +48,18 @@ $this->addJsPlugin($jq);
 <script type="text/javascript">
    /* <![CDATA[ */
    $(document).ready(function(){
-	   <?if( isset( $this->form->created_date) || isset($this->form->priorityEndDate)){?>
-      $.datepicker.setDefaults(['<?= Locales::getLang() ?>'] ) ;
+	   <?php if( isset( $this->form->created_date) || isset($this->form->priorityEndDate)){?>
+      $.datepicker.setDefaults(['<?php echo  Locales::getLang() ?>'] ) ;
       $("input.datepicker").datepicker();
-	   <?}?>
+	   <?php }?>
 
       $('.article_tags_class').tagsInput({
-    	  'autocomplete_url': '<?echo $this->link()->route('getTags')?>',
-    	  'defaultText':'<?=$this->tr('přidat štítek') ?>'
+    	  'autocomplete_url': '<?php echo $this->link()->route('getTags')?>',
+    	  'defaultText':'<?php echo $this->tr('přidat štítek') ?>'
       });
       
       $(window).bind('beforeunload', function(){
-    	    return ("<?=$this->tr('Neuložené změny budou ztraceny!')?>");
+    	    return ("<?php echo $this->tr('Neuložené změny budou ztraceny!')?>");
     	});
       $('form[name="form-article"]').submit(function(){
           $(window).unbind('beforeunload');

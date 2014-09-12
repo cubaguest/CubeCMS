@@ -1,16 +1,16 @@
-<?
+<?php 
 $jQ = new JsPlugin_JQuery();
 $this->addJsPlugin($jQ);
 echo $this->toolbox;
 ?>
-<h1><?= $this->category()->getName() ?></h1>
-<div class="main-content-text"><?
+<h1><?php echo  $this->category()->getName() ?></h1>
+<div class="main-content-text"><?php 
    if ($this->text != null) {
       echo $this->text;
    }
 ?></div>
 <div class="main-content-form-edit" id="userreg-reg-form">
-   <?
+   <?php 
    echo $this->formReg;
    ?>
 </div>
@@ -24,7 +24,7 @@ echo $this->toolbox;
 	   $loader.css('display' ,'inline');
 	   $input.removeClass('form-error');
 	   $.ajax({
-		   type: "POST", url: "<?= $this->link()->route('checkUserName') ?>", cache: false,
+		   type: "POST", url: "<?php echo  $this->link()->route('checkUserName') ?>", cache: false,
 		   data: {username: userName},
 		   success: function(data){
             $status.html('&nbsp;');

@@ -1,4 +1,4 @@
-<?
+<?php 
 $this->addCssFile("style.css");
 $this->addJsPlugin(new JsPlugin_JQuery());
 $this->addJsPlugin(new JsPlugin_JQueryCSS());
@@ -42,31 +42,31 @@ function vveSectionsRenderFunc($menuArr, $link) {
       if($item->getParentId() != 0){// pokud není kořen
          $class = 'child-of-node-'.$item->getParentId();
       }
-      ?><tr id="node-<?=$item->getId();?>" class="ui-widget-header list-item <?=$class;?>">
+      ?><tr id="node-<?php echo $item->getId();?>" class="ui-widget-header list-item <?php echo $class;?>">
       <td class="cat-first-coll">
 <!--         <div class="category-header">-->
-            <span class="sec"><?=$item?></span>
-            <?echo langsImages($item->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_URLKEY});
-               if($item->getCatObj()->haveFeed()){?><a href="<?=$link3->clear()->category($item->getCatObj()->getUrlKey())->file(Url_Request::URL_FILE_RSS);?>" title="rss feed"><img src="<?=Url_Request::getBaseWebDir()?>images/icons/rss-icon.png" alt="feed icon" height="12" /></a><?}?>&nbsp;ID:<?=$item->getId()?>
-            <a href="" class="button-show-detail" title="<?=SECTION_SHOW_DETAIL_LABEL?>">detail</a>&nbsp;
-            <a href="<?=$link3->clear()->lang()->category($item->getCatObj()->getUrlKey())?>" title="<?=SECTION_GOTO_CAT_LABEL?>"><?=SECTION_GOTO_CAT_LABEL?></a>
+            <span class="sec"><?php echo $item?></span>
+            <?php echo langsImages($item->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_URLKEY});
+               if($item->getCatObj()->haveFeed()){?><a href="<?php echo $link3->clear()->category($item->getCatObj()->getUrlKey())->file(Url_Request::URL_FILE_RSS);?>" title="rss feed"><img src="<?php echo Url_Request::getBaseWebDir()?>images/icons/rss-icon.png" alt="feed icon" height="12" /></a><?php }?>&nbsp;ID:<?php echo $item->getId()?>
+            <a href="" class="button-show-detail" title="<?php echo SECTION_SHOW_DETAIL_LABEL?>">detail</a>&nbsp;
+            <a href="<?php echo $link3->clear()->lang()->category($item->getCatObj()->getUrlKey())?>" title="<?php echo SECTION_GOTO_CAT_LABEL?>"><?php echo SECTION_GOTO_CAT_LABEL?></a>
 <!--      </div>-->
       <div class="category-params">
-         <input type="hidden" name="id_cat" value="<?=$item->getCatObj()->getId();?>" />
+         <input type="hidden" name="id_cat" value="<?php echo $item->getCatObj()->getId();?>" />
          <table>
             <tr>
-               <th><?=SECTION_MODULE_LABEL?>:</th>
-               <td><?=$item->getCatObj()->getModule()->getName()?></td>
+               <th><?php echo SECTION_MODULE_LABEL?>:</th>
+               <td><?php echo $item->getCatObj()->getModule()->getName()?></td>
             </tr>
             <tr>
-               <th><?=SECTION_IND_PANELS_LABEL?>:</th>
+               <th><?php echo SECTION_IND_PANELS_LABEL?>:</th>
                <td>
-                  <input type="checkbox" name="change_ind_panels" <?if($item->getCatObj()->isIndividualPanels() == true) echo 'checked="checked"';?> />
+                  <input type="checkbox" name="change_ind_panels" <?php if($item->getCatObj()->isIndividualPanels() == true) echo 'checked="checked"';?> />
                </td>
             </tr>
             <tr>
-               <th><?=SECTION_VISIBILITY?>:</th>
-               <td><?
+               <th><?php echo SECTION_VISIBILITY?>:</th>
+               <td><?php 
                switch ($item->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_VISIBILITY}) {
                   case Model_Category::VISIBILITY_HIDDEN:
                      echo SECTION_VISIBILITY_HIDDEN;
@@ -88,24 +88,24 @@ function vveSectionsRenderFunc($menuArr, $link) {
                   ?></td>
             </tr>
             <tr>
-               <th><?=SECTION_MODULE_DATADIR?>:</th>
-               <td><?=$item->getCatObj()->getModule()->getDataDir(true)?></td>
+               <th><?php echo SECTION_MODULE_DATADIR?>:</th>
+               <td><?php echo $item->getCatObj()->getModule()->getDataDir(true)?></td>
             </tr>
             <tr>
-               <th><?=SECTION_RIGHTS?>:</th>
-               <td><?=$item->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_DEF_RIGHT};?></td>
+               <th><?php echo SECTION_RIGHTS?>:</th>
+               <td><?php echo $item->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_DEF_RIGHT};?></td>
             </tr>
             <tr>
-               <th><?=SECTION_TITLE?>:</th>
-               <td><?=$item->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_CAT_ALT};?></td>
+               <th><?php echo SECTION_TITLE?>:</th>
+               <td><?php echo $item->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_CAT_ALT};?></td>
             </tr>
             <tr>
-               <th><?=SECTION_DESC?>:</th>
-               <td><?=$item->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_DESCRIPTION};?></td>
+               <th><?php echo SECTION_DESC?>:</th>
+               <td><?php echo $item->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_DESCRIPTION};?></td>
             </tr>
             <tr>
                <th>Url:</th>
-               <td><?
+               <td><?php 
                   foreach ($item->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_URLKEY} as $lang => $urlkey){
                      if($urlkey == null) continue;
                      if($lang != Locales::getDefaultLang()) $link3->lang($lang); // default language needn't have definition in URL
@@ -121,38 +121,38 @@ function vveSectionsRenderFunc($menuArr, $link) {
          </table>
       </div>
          </td><td width="110" valign="top">
-      <form method="post" action="<?=$link2->route('settings',array('categoryid' => $item->getId()))?>" style="display:inline;">
-         <input type="image" src="<?=vve_get_tpl_file('icons/cog_edit.png', VVE_TPL_FILE_IMAGE)?>"
-                value="edit" name="category_settings" title="<?=SECTION_SETTINGS_LABEL?>" />
+      <form method="post" action="<?php echo $link2->route('settings',array('categoryid' => $item->getId()))?>" style="display:inline;">
+         <input type="image" src="<?php echo vve_get_tpl_file('icons/cog_edit.png', VVE_TPL_FILE_IMAGE)?>"
+                value="edit" name="category_settings" title="<?php echo SECTION_SETTINGS_LABEL?>" />
       </form>
-      <form method="post" action="<?=$link2->route('edit',array('categoryid' => $item->getId()))?>" style="display:inline;">
-         <input type="image" src="<?=vve_get_tpl_file('icons/application_edit.png', VVE_TPL_FILE_IMAGE)?>"
-                value="edit" name="category_edit" title="<?=SECTION_EDTI_LABEL?>" />
+      <form method="post" action="<?php echo $link2->route('edit',array('categoryid' => $item->getId()))?>" style="display:inline;">
+         <input type="image" src="<?php echo vve_get_tpl_file('icons/application_edit.png', VVE_TPL_FILE_IMAGE)?>"
+                value="edit" name="category_edit" title="<?php echo SECTION_EDTI_LABEL?>" />
       </form>
-      <form method="post" action="<?=$link?>" style="display:inline;" onsubmit="return submitRemoveCat('<?=$item;?>')">
-         <input type="hidden" value="<?=$item->getId()?>" name="category_id" />
-         <input type="image" src="<?=vve_get_tpl_file('icons/application_delete.png', VVE_TPL_FILE_IMAGE)?>"
-                value="remove" name="category_remove" title="<?=SECTION_REMOVE_LABEL?>" />
+      <form method="post" action="<?php echo $link?>" style="display:inline;" onsubmit="return submitRemoveCat('<?php echo $item;?>')">
+         <input type="hidden" value="<?php echo $item->getId()?>" name="category_id" />
+         <input type="image" src="<?php echo vve_get_tpl_file('icons/application_delete.png', VVE_TPL_FILE_IMAGE)?>"
+                value="remove" name="category_remove" title="<?php echo SECTION_REMOVE_LABEL?>" />
       </form>
-            <?if(!$first) {?>
-      <form method="post" action="<?=$link?>" style="display:inline;">
-         <input type="hidden" value="<?=$item->getId()?>" name="item_id" />
+            <?php if(!$first) {?>
+      <form method="post" action="<?php echo $link?>" style="display:inline;">
+         <input type="hidden" value="<?php echo $item->getId()?>" name="item_id" />
          <input type="hidden" value="up" name="item_move_to" />
-         <input type="image" src="<?=vve_get_tpl_file('icons/go-up.png', VVE_TPL_FILE_IMAGE)?>"
-                value="edit" name="item_move" title="<?=SECTION_MOVEUP_LABEL?>" />
+         <input type="image" src="<?php echo vve_get_tpl_file('icons/go-up.png', VVE_TPL_FILE_IMAGE)?>"
+                value="edit" name="item_move" title="<?php echo SECTION_MOVEUP_LABEL?>" />
       </form>
-            <?}
+            <?php }
             if($cycle < $count) {?>
-      <form method="post" action="<?=$link?>" style="display:inline;">
-         <input type="hidden" value="<?=$item->getId()?>" name="item_id" />
+      <form method="post" action="<?php echo $link?>" style="display:inline;">
+         <input type="hidden" value="<?php echo $item->getId()?>" name="item_id" />
          <input type="hidden" value="down" name="item_move_to" />
-         <input type="image" src="<?=vve_get_tpl_file('icons/go-down.png', VVE_TPL_FILE_IMAGE)?>"
-                value="edit" name="item_move" title="<?=SECTION_MOVEDOWN_LABEL?>" />
+         <input type="image" src="<?php echo vve_get_tpl_file('icons/go-down.png', VVE_TPL_FILE_IMAGE)?>"
+                value="edit" name="item_move" title="<?php echo SECTION_MOVEDOWN_LABEL?>" />
       </form>
-            <?}?>
+            <?php }?>
    </td>
 </tr>
-      <?
+      <?php 
       if(!$item->isEmpty()) {
          vveSectionsRenderFunc($item, $link);
       }
@@ -162,11 +162,11 @@ function vveSectionsRenderFunc($menuArr, $link) {
 
 echo $this->toolbox;
 ?>
-<h1><?=$this->tr("Struktura stránek")?></h1>
-<?=$this->includeTpl('navigation.phtml');?>
+<h1><?php echo $this->tr("Struktura stránek")?></h1>
+<?php echo $this->includeTpl('navigation.phtml');?>
 <div class="main-content-detail">
-   <p><?=$this->tr('Ve struktuře jsou zobrazeny také zkryté položky.');?></p>
-   <?//sekce
+   <p><?php echo $this->tr('Ve struktuře jsou zobrazeny také zkryté položky.');?></p>
+   <?php //sekce
    $typeClass = 'mainStruct';
    $id = 'categories-table';
    if($this->isMainMenu != true) {
@@ -176,26 +176,26 @@ echo $this->toolbox;
    }
    ?>
    <hr />
-   <div id="sections" class="<?=$typeClass?>">
-      <table id="<?=$id?>" style="width: 98%">
-         <?if($this->structure != null){
+   <div id="sections" class="<?php echo $typeClass?>">
+      <table id="<?php echo $id?>" style="width: 98%">
+         <?php if($this->structure != null){
             echo vveSectionsRenderFunc($this->structure, $this->link());
          }?>
       </table>
    </div>
    <br />
    <br />
-   <?
+   <?php 
    ?>
    <script type="text/javascript">
       /* <![CDATA[ */
-      $('#<?=$id?>').treeTable({
+      $('#<?php echo $id?>').treeTable({
          clickableNodeNames : false,
          indent: 15
       });
 
       function submitRemoveCat(msg){
-         return confirm('<?=$this->tr('Opravdu smazat kategorii: ')?>'+msg+'?');
+         return confirm('<?php echo $this->tr('Opravdu smazat kategorii: ')?>'+msg+'?');
       }
 
       $('a.button-show-detail').click(function(){
@@ -223,7 +223,7 @@ echo $this->toolbox;
             sendData.enabled = true;
          }
          $.ajax({
-            type: "POST", url: "<?=$this->link()->route("changeIndPanels")?>",
+            type: "POST", url: "<?php echo $this->link()->route("changeIndPanels")?>",
             data: sendData,
             success: function(msg){
 //               alert( "Data Saved: " + msg );

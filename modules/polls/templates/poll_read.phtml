@@ -1,4 +1,4 @@
-<?// vypočty
+<?php // vypočty
 $data = unserialize($this->poll->{Polls_Model::COLUMN_DATA});
 $maxVote = 0;
 $allVotes = 0;
@@ -6,14 +6,14 @@ foreach ($data as $key => $vote) {
    if($vote['count'] > $maxVote) $maxVote = $vote['count'];
    $allVotes += $vote['count'];
 }?>
-   <?foreach ($data as $key => $answer) {
+   <?php foreach ($data as $key => $answer) {
       $maxVote == 0 ? $prRender = 0 : $prRender = round(($answer['count']/($maxVote/100)*0.9));
       $percent = $allVotes/100;
       $percent == 0 ? $pr = 0 : $pr = round($answer['count']/$percent);
       ?>
-   <label><?=$answer['answer']?></label>
-   <p class="pollGraph" style="width: <?=$prRender?>%;">
-      <span class="pollNumbers"><?printf('%d %% (%d)',$pr ,$answer['count'])?></span>
+   <label><?php echo $answer['answer']?></label>
+   <p class="pollGraph" style="width: <?php echo $prRender?>%;">
+      <span class="pollNumbers"><?php printf('%d %% (%d)',$pr ,$answer['count'])?></span>
    </p>
-      <?}?>
-   <span class="pollNumVotes"><?printf($this->_('Celkem hlasovalo: %d osob'),$this->poll->{Polls_Model::COLUMN_VOTES});?></span>
+      <?php }?>
+   <span class="pollNumVotes"><?php printf($this->_('Celkem hlasovalo: %d osob'),$this->poll->{Polls_Model::COLUMN_VOTES});?></span>

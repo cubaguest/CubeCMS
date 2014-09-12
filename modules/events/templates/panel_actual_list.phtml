@@ -1,4 +1,4 @@
-<?//<desc>Panel seznam nadcházejících akcí</desc>
+<?php //<desc>Panel seznam nadcházejících akcí</desc>
 if(!empty ($this->events)) {
    $icon = null;
    if($this->panelObj()->getIcon() != null) {
@@ -9,17 +9,17 @@ if(!empty ($this->events)) {
       $backImg = 'background-image: url(\''.Panel_Obj::getBackImgDir().$this->panelObj()->getBackImage().'\');';
    }
    /*if($this->rssLink != null) {?>
-<a style="float: right" href="<?=$this->rssLink?>" title="rss"><img src="<?=vve_get_tpl_file('icons/rss-icon.png', VVE_TPL_FILE_IMAGE)?>" alt="rss" /></a>
-         <?}*/
+<a style="float: right" href="<?php echo $this->rssLink?>" title="rss"><img src="<?php echo vve_get_tpl_file('icons/rss-icon.png', VVE_TPL_FILE_IMAGE)?>" alt="rss" /></a>
+         <?php }*/
          ?>
-<div class="label"><?=$icon?><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=$this->panelObj()->getName()?></a></div>
-<div class="content" style="<?=$backImg?>">
-   <?
+<div class="label"><?php echo $icon?><a href="<?php echo $this->link()?>" title="<?php echo htmlspecialchars($this->panelObj()->getName())?>"><?php echo $this->panelObj()->getName()?></a></div>
+<div class="content" style="<?php echo $backImg?>">
+   <?php 
    foreach ($this->events AS $cat){
       ?>
-      <div class="name name-section"><?=$cat['cat']->{Events_Model_Categories::COL_NAME}?></div>
+      <div class="name name-section"><?php echo $cat['cat']->{Events_Model_Categories::COL_NAME}?></div>
       <div class="item-section">
-      <?
+      <?php 
       foreach ($cat['events'] AS $event){
          // datum a čas
          $dateStr = null;
@@ -40,23 +40,23 @@ if(!empty ($this->events)) {
       
       ?>
       <div class="item post">
-         <div class="name"><?=$event->{Events_Model::COL_NAME}?></div>
+         <div class="name"><?php echo $event->{Events_Model::COL_NAME}?></div>
          <div class="text">
-            <span class="date"><?=$dateStr?></span><span class="time"><?=$timeStr?></span>
-            <?if($event->{Events_Model::COL_PLACE} != null){?>
-               <br/><span class="place"><?ps($event->{Events_Model::COL_PLACE})?></span>
-            <?}?>
-            <?if($event->{Events_Model::COL_NOTE} != null){?>
-               <br/><span class="note"><?ps($event->{Events_Model::COL_NOTE})?></span>
-            <?}?>
+            <span class="date"><?php echo $dateStr?></span><span class="time"><?php echo $timeStr?></span>
+            <?php if($event->{Events_Model::COL_PLACE} != null){?>
+               <br/><span class="place"><?php ps($event->{Events_Model::COL_PLACE})?></span>
+            <?php }?>
+            <?php if($event->{Events_Model::COL_NOTE} != null){?>
+               <br/><span class="note"><?php ps($event->{Events_Model::COL_NOTE})?></span>
+            <?php }?>
          </div>
       </div>
-      <?}?>
+      <?php }?>
       </div>
-   <?}?>
+   <?php }?>
    <div class="link-more">
-      <a href="<?=$this->link()?>"
-         title="<?=$this->tr('Více akcí z ').htmlspecialchars($this->category()->getLabel())?>"><?=$this->tr('Více událostí')?></a>
+      <a href="<?php echo $this->link()?>"
+         title="<?php echo $this->tr('Více akcí z ').htmlspecialchars($this->category()->getLabel())?>"><?php echo $this->tr('Více událostí')?></a>
    </div>
 </div>
-   <?}?>
+   <?php }?>

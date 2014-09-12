@@ -1,11 +1,11 @@
-<?
+<?php 
 $jsJqGrid = new Component_JqGrid_JsPlugin();
 $this->addJsPlugin($jsJqGrid);
 $jQuery = new JsPlugin_JQuery();
 $this->addJsPlugin($jQuery);
 $this->addFile('css://style.css');
 ?>
-<h1><?= $this->category()->getName() ?></h1>
+<h1><?php echo  $this->category()->getName() ?></h1>
 <div class="main-content-admin-form">
    <table id="table-attributes"></table>
    <div id="table-attributes-pager"></div>
@@ -18,14 +18,14 @@ $this->addFile('css://style.css');
          var ordersGrid = $("#table-attributes").jqGrid({
             datatype: 'json',
             ajaxGridOptions : {type:"POST"},
-            url: '<?= $this->link()->route('attrGroupsList'); ?>',
-            colNames:['ID', '<?= $this->tr('Skupina') ?>'],
+            url: '<?php echo  $this->link()->route('attrGroupsList'); ?>',
+            colNames:['ID', '<?php echo  $this->tr('Skupina') ?>'],
             colModel:[
-               {name:'<?=Shop_Model_AttrGroups::COLUMN_ID?>',index:'<?=Shop_Model_AttrGroups::COLUMN_ID?>',
+               {name:'<?php echo Shop_Model_AttrGroups::COLUMN_ID?>',index:'<?php echo Shop_Model_AttrGroups::COLUMN_ID?>',
                   width:33,fixed: true,editable:false},
-               {name:'<?=Shop_Model_AttrGroups::COLUMN_NAME?>',index:'<?=Shop_Model_AttrGroups::COLUMN_NAME?>', 
+               {name:'<?php echo Shop_Model_AttrGroups::COLUMN_NAME?>',index:'<?php echo Shop_Model_AttrGroups::COLUMN_NAME?>', 
                   editable:true, editoptions:{size:20},
-                  formoptions:{ rowpos:2, label: "<?=$this->tr('Název')?>",elmprefix:"(*)"}}
+                  formoptions:{ rowpos:2, label: "<?php echo $this->tr('Název')?>",elmprefix:"(*)"}}
             ],
             rowNum:15,
             autowidth : true,
@@ -39,9 +39,9 @@ $this->addFile('css://style.css');
             jsonReader: {
                repeatitems : false, root:"rows"
             },
-            caption: "<?= $this->tr('Přehled skupin atributů') ?>",
+            caption: "<?php echo  $this->tr('Přehled skupin atributů') ?>",
             height: '100%',
-            editurl : '<?= $this->link()->route('editAttrGroup'); ?>',
+            editurl : '<?php echo  $this->link()->route('editAttrGroup'); ?>',
             // define the icons in subgrid 
             subGridOptions: { 
                "plusicon" : "ui-icon-triangle-1-e", 
@@ -56,20 +56,20 @@ $this->addFile('css://style.css');
                $("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table><div id='"+pager_id+"' class='scroll'></div>"); 
                $("#"+subgrid_table_id).jqGrid({
                   datatype: 'json',
-                  url: "<?=$this->link()->route('attrList');?>?gid="+row_id, 
+                  url: "<?php echo $this->link()->route('attrList');?>?gid="+row_id, 
                   ajaxGridOptions : {type:"POST"},
-                  colNames: ['ID','<?=$this->tr('Název')?>'], 
+                  colNames: ['ID','<?php echo $this->tr('Název')?>'], 
                   colModel: [ 
-                     {name:'<?=Shop_Model_Attributes::COLUMN_ID?>',index:'<?=Shop_Model_Attributes::COLUMN_ID?>',
+                     {name:'<?php echo Shop_Model_Attributes::COLUMN_ID?>',index:'<?php echo Shop_Model_Attributes::COLUMN_ID?>',
                         width:33, fixed: true, editable:false},
-                     {name:'<?=Shop_Model_Attributes::COLUMN_NAME?>',index:'<?=Shop_Model_Attributes::COLUMN_NAME?>', 
+                     {name:'<?php echo Shop_Model_Attributes::COLUMN_NAME?>',index:'<?php echo Shop_Model_Attributes::COLUMN_NAME?>', 
                         editable:true, editoptions: {size:20},
-                        formoptions: { rowpos:2, label: "<?=$this->tr('Název')?>",elmprefix:"(*)"}
+                        formoptions: { rowpos:2, label: "<?php echo $this->tr('Název')?>",elmprefix:"(*)"}
                      }
                   ], 
                   rowNum:10, 
                   pager: pager_id, 
-                  sortname: '<?=Shop_Model_Attributes::COLUMN_NAME?>', 
+                  sortname: '<?php echo Shop_Model_Attributes::COLUMN_NAME?>', 
                   sortorder: "asc",
                   jsonReader: {
                      repeatitems : false, root:"rows"
@@ -78,7 +78,7 @@ $this->addFile('css://style.css');
                   multiselect: false, 
                   height: '100%',
                   autowidth : true,
-                  editurl: "<?=$this->link()->route('editAttr');?>?gid="+row_id
+                  editurl: "<?php echo $this->link()->route('editAttr');?>?gid="+row_id
                }); 
                jQuery("#"+subgrid_table_id).jqGrid('navGrid',"#"+pager_id,
                   {edit:true, add:true, del:true},
@@ -88,7 +88,7 @@ $this->addFile('css://style.css');
                      jqModal:true, 
                      closeOnEscape:true,
                      viewPagerButtons:false, 
-                     bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné')?>",
+                     bottominfo:"<?php echo $this->tr('Položky označené (*) jsou povinné')?>",
                      closeAfterEdit:true
                   },
                   // add options
@@ -96,7 +96,7 @@ $this->addFile('css://style.css');
                      reloadAfterSubmit:true,
                      jqModal:true, 
                      closeOnEscape:true, 
-                     bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné')?>", 
+                     bottominfo:"<?php echo $this->tr('Položky označené (*) jsou povinné')?>", 
                      closeAfterAdd: true
                   },  
                   // del options
@@ -124,7 +124,7 @@ $this->addFile('css://style.css');
                jqModal:true, 
                closeOnEscape:true,
                viewPagerButtons:false, 
-               bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné')?>",
+               bottominfo:"<?php echo $this->tr('Položky označené (*) jsou povinné')?>",
                closeAfterEdit:true
             },
             // add options
@@ -132,7 +132,7 @@ $this->addFile('css://style.css');
                reloadAfterSubmit:true,
                jqModal:true, 
                closeOnEscape:true, 
-               bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné')?>", 
+               bottominfo:"<?php echo $this->tr('Položky označené (*) jsou povinné')?>", 
                closeAfterAdd: true
             },  
             // del options

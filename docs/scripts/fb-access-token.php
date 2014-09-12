@@ -1,4 +1,4 @@
-<?
+<?php 
 session_start();
 ?>
 <!DOCTYPE html>
@@ -11,29 +11,29 @@ session_start();
 <form method="post" action="">
    <p>
       <label>Page ID:</label>
-      <input name="pageid" value="<?
+      <input name="pageid" value="<?php 
          if(isset($_POST['pageid'])){echo $_POST['pageid'];}
          else if(isset($_SESSION['pageId'])){echo $_SESSION['pageId'];}
          ?>" type="text"/><br />
       <label>APP ID:</label>
-      <input name="appid" value="<?
+      <input name="appid" value="<?php 
          if(isset($_POST['appid'])){echo $_POST['appid'];}
          else if(isset($_SESSION['appId'])){echo $_SESSION['appId'];}
          ?>" type="text"/><br />
       <label>APP Secret:</label>
-      <input name="appsecret" value="<?
+      <input name="appsecret" value="<?php 
          if(isset($_POST['appsecret'])){echo $_POST['appsecret'];}
          else if(isset($_SESSION['secret'])){echo $_SESSION['secret'];}
          ?>" type="text"/><br />
       <label>Access token:</label>
-      <input name="accesstoken" value="<?
+      <input name="accesstoken" value="<?php 
          if(isset($_POST['accesstoken'])){echo $_POST['accesstoken'];}
          if(isset($_GET['code'])){echo $_GET['code'];}
          ?>" type="text"/><br />
       <label>Krok:</label>
       <select name="step">
          <option value="1">1</option>
-         <option value="2" <?
+         <option value="2" <?php 
             if( ( isset($_POST['step']) && $_POST['step'] == 1 ) 
                OR (isset($_SESSION['pageId']))){echo 'selected="selected"';}?>>2</option>
       </select>

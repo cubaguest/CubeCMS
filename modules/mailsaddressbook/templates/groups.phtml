@@ -1,4 +1,4 @@
-<?
+<?php 
 $this->addPageTitle($this->tr('Adresář e-mailů'));
 
 $jsJqGrid = new Component_JqGrid_JsPlugin();
@@ -8,8 +8,8 @@ $this->addJsPlugin($jQuery);
 
 $grpsArr = array();
 ?>
-<h1><?=$this->tr('Skupiny adresáře');?></h1>
-<?$this->includeTpl('navigation.phtml');?>
+<h1><?php echo $this->tr('Skupiny adresáře');?></h1>
+<?php $this->includeTpl('navigation.phtml');?>
 
 <div class="main-content-detail">
    <table id="table-addressbook-groups"></table>
@@ -17,45 +17,45 @@ $grpsArr = array();
    <hr class="reseter" />
    <br />
 </div>
-<?
+<?php 
 ?>
 <script type="text/javascript" charset="utf-8">
       /* <![CDATA[ */
       $(document).ready(function() {
          var groupsGrid = $("#table-addressbook-groups").jqGrid({
             ajaxGridOptions : {type:"POST"},
-            url: '<?=$this->link()->route('groupsList');?>',
+            url: '<?php echo $this->link()->route('groupsList');?>',
             datatype: "json",
             colNames:[
                       'ID', 
-                      '<?=$this->tr('Název')?>', 
-                      '<?=$this->tr('Poznámka')?>', 
-                      '<?=$this->tr('E-mailů')?>'],
+                      '<?php echo $this->tr('Název')?>', 
+                      '<?php echo $this->tr('Poznámka')?>', 
+                      '<?php echo $this->tr('E-mailů')?>'],
             colModel:[
                   // id
-               {name:'<?=MailsAddressBook_Model_Groups::COLUMN_ID?>',
-                  index:'<?=MailsAddressBook_Model_Groups::COLUMN_ID?>',
+               {name:'<?php echo MailsAddressBook_Model_Groups::COLUMN_ID?>',
+                  index:'<?php echo MailsAddressBook_Model_Groups::COLUMN_ID?>',
                   width:33,fixed: true,editable:false},
                   // name
-               {name:'<?=MailsAddressBook_Model_Groups::COLUMN_NAME?>',
-                  index:'<?=MailsAddressBook_Model_Addressbook::COLUMN_NAME?>', 
+               {name:'<?php echo MailsAddressBook_Model_Groups::COLUMN_NAME?>',
+                  index:'<?php echo MailsAddressBook_Model_Addressbook::COLUMN_NAME?>', 
                   width:200,fixed: true,editable:true,editoptions:{size:20},
-                  formoptions:{ rowpos:2, label: "<?=$this->tr('Název')?>",elmprefix:"(*)"}},
+                  formoptions:{ rowpos:2, label: "<?php echo $this->tr('Název')?>",elmprefix:"(*)"}},
                   // note
-               {name:'<?=MailsAddressBook_Model_Groups::COLUMN_NOTE?>', 
-                  index:'<?=MailsAddressBook_Model_Addressbook::COLUMN_NOTE?>', 
+               {name:'<?php echo MailsAddressBook_Model_Groups::COLUMN_NOTE?>', 
+                  index:'<?php echo MailsAddressBook_Model_Addressbook::COLUMN_NOTE?>', 
                   editable:true,editoptions:{size:20},
-                  formoptions:{ rowpos:3, label: "<?=$this->tr('Poznámka')?>",elmprefix:"&nbsp;&nbsp;&nbsp;"}},
+                  formoptions:{ rowpos:3, label: "<?php echo $this->tr('Poznámka')?>",elmprefix:"&nbsp;&nbsp;&nbsp;"}},
                {name:'emails_count', index:'emails_count', editable:false, width:70, fixed: true}
             ],
             rowNum:30,
             rowList:[10,30,60,100],
             pager: '#table-addressbook-groups-pager',
-            sortname: '<?=MailsAddressBook_Model_Groups::COLUMN_ID?>',
-            caption:"<?=$this->tr('Skupiny v adresáři')?>",
+            sortname: '<?php echo MailsAddressBook_Model_Groups::COLUMN_ID?>',
+            caption:"<?php echo $this->tr('Skupiny v adresáři')?>",
             autowidth : true,
             height: '100%',
-            editurl:"<?=$this->link()->route('editGroup')?>",
+            editurl:"<?php echo $this->link()->route('editGroup')?>",
             toolbar: [true,"top"],
             jsonReader: { repeatitems : false, root: "rows" }
          });
@@ -73,17 +73,17 @@ $grpsArr = array();
             {edit:true,add:true, del:true },
             // edit options
             {reloadAfterSubmit:true, jqModal:true, closeOnEscape:true,viewPagerButtons:false, 
-               bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné')?>",closeAfterEdit:true,
+               bottominfo:"<?php echo $this->tr('Položky označené (*) jsou povinné')?>",closeAfterEdit:true,
                afterSubmit : afterSubmitFunc
             },
             // add options
             {reloadAfterSubmit:true,jqModal:true, closeOnEscape:true, 
-               bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné')?>", closeAfterAdd: true,
+               bottominfo:"<?php echo $this->tr('Položky označené (*) jsou povinné')?>", closeAfterAdd: true,
                afterSubmit : afterSubmitFunc
             },  
             // del options
             {reloadAfterSubmit:true,jqModal:true, closeOnEscape:true, width : 360,
-            	msg: "<?=$this->tr('Opravdu smazat skupinu i se všemi e-maily?')?>",
+            	msg: "<?php echo $this->tr('Opravdu smazat skupinu i se všemi e-maily?')?>",
             	afterSubmit : afterSubmitFunc
             },
             {multipleSearch:false, closeAfterSearch: true,closeOnEscape:true,sopt : ['eq','ne','cn','nc']},

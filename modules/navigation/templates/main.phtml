@@ -1,4 +1,4 @@
-<?
+<?php 
    $h1 = $this->category()->getName();
    $this->addPageTitle($h1);
 
@@ -25,10 +25,10 @@
    }
 
 ?>
-<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $h1;?></h1>
+<h1><?php $this->includeFile('tpl://engine:headline/icon.phtml'); echo $h1;?></h1>
 <div class="main-content-detail">
    <div class="main-content-text">
-   <?
+   <?php 
    if($this->text != null AND strpos($this->text, '{LIST}') !== false){
       echo str_replace('{LIST}', navRenderStruvcutre($this->structure), $this->text);
    } else if($this->text != null) {

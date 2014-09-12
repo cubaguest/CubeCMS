@@ -1,4 +1,4 @@
-<?
+<?php 
 $this->addPageTitle(sprintf($this->_('Program filmového klubu pro rok %s'),$this->currentYear));
 $this->setPageHeadline(sprintf($this->_('Program filmového klubu pro rok %s'),$this->currentYear));
 
@@ -6,17 +6,17 @@ $cM = vve_date('%F');
 vve_to_ascii($cM);
 ?>
 <div>
-   <?if($this->text != null) {?>
+   <?php if($this->text != null) {?>
    <div>
-         <?=$this->text->{Text_Model_Detail::COLUMN_TEXT}?>
+         <?php echo $this->text->{Text_Model_Detail::COLUMN_TEXT}?>
    </div>
    <br />
-   <?}?>
-   <?if(!empty ($this->movies)) {?>
-   <a href="<?=$this->link().'#'.$cM?>" title="<?=$this->_('přejít na aktuální film')?>"><?=$this->_('přejít na aktuální film')?></a>
+   <?php }?>
+   <?php if(!empty ($this->movies)) {?>
+   <a href="<?php echo $this->link().'#'.$cM?>" title="<?php echo $this->_('přejít na aktuální film')?>"><?php echo $this->_('přejít na aktuální film')?></a>
    <br />
    <br />
-      <?$isNull = true;
+      <?php $isNull = true;
       $curMonth = null;
 //   while ($row = $this->movies->fetch()){
       foreach ($this->movies as $row) {
@@ -30,27 +30,27 @@ vve_to_ascii($cM);
       ?>
    <div class="">
       <p>
-               <?
+               <?php 
                print(vve_date('%L, %d.%m', new DateTime($row->{CinemaProgram_Model_Detail::COL_T_DATE}))
                                .'&nbsp;'.vve_date('%G:%i', new DateTime($row->{CinemaProgram_Model_Detail::COL_T_TIME})));
       ?>
       </p>
       <h2>
-               <?
+               <?php 
                print ($row->{CinemaProgram_Model_Detail::COL_NAME});
       if($row->{CinemaProgram_Model_Detail::COL_NAME_ORIG} != null) {?>
-         <span style="font-style: italic">(<?=$row->{CinemaProgram_Model_Detail::COL_NAME_ORIG}?>)</span>
-         <?}?>
+         <span style="font-style: italic">(<?php echo $row->{CinemaProgram_Model_Detail::COL_NAME_ORIG}?>)</span>
+         <?php }?>
       </h2>
-            <?
+            <?php 
       if($row->{CinemaProgram_Model_Detail::COL_IMAGE} != null) {?>
       <p style="float: left; margin: 0 1em 0.5em 0">
-                  <?=vve_tpl_image_tag(AppCore::getAppWebDir().VVE_DATA_DIR.DIRECTORY_SEPARATOR.$this->datadir
+                  <?php echo vve_tpl_image_tag(AppCore::getAppWebDir().VVE_DATA_DIR.DIRECTORY_SEPARATOR.$this->datadir
                  .DIRECTORY_SEPARATOR.$row->{CinemaProgram_Model_Detail::COL_IMAGE},null,200);?>
       </p>
       <p>
-                  <?}?>
-               <?
+                  <?php }?>
+               <?php 
                print ($this->_('Mládeži').":&nbsp;");
                if($row->{CinemaProgram_Model_Detail::COL_ACCESS} != 0) {
                   print $this->_('přístupno od')."&nbsp;".$row->{CinemaProgram_Model_Detail::COL_ACCESS}."&nbsp;".$this->_('let');
@@ -58,7 +58,7 @@ vve_to_ascii($cM);
                   print $this->_('přístupno');
       }?>
          <br />
-               <?
+               <?php 
                print ($this->_('Znění').":&nbsp;");
                switch ($row->{CinemaProgram_Model_Detail::COL_VERSION}) {
                   case 'origwsubtitles':
@@ -76,37 +76,37 @@ vve_to_ascii($cM);
                      break;
       }?>
          <br />
-               <?=$this->_('Stopáž')?>:&nbsp;<?=$row->{CinemaProgram_Model_Detail::COL_LENGTH}?>&nbsp;min<br />
-      <?=$this->_('Cena')?>:&nbsp;<?=$row->{CinemaProgram_Model_Detail::COL_PRICE}?>&nbsp;Kč<br />
+               <?php echo $this->_('Stopáž')?>:&nbsp;<?php echo $row->{CinemaProgram_Model_Detail::COL_LENGTH}?>&nbsp;min<br />
+      <?php echo $this->_('Cena')?>:&nbsp;<?php echo $row->{CinemaProgram_Model_Detail::COL_PRICE}?>&nbsp;Kč<br />
 
       </p>
       <hr class="reseter"/>
-      <?=$row->{CinemaProgram_Model_Detail::COL_LABEL}?>
+      <?php echo $row->{CinemaProgram_Model_Detail::COL_LABEL}?>
       <p>
-      <?if($row->{CinemaProgram_Model_Detail::COL_CSFDID} != 0) {?>
-         <a href="http://www.csfd.cz/film/<?=$row->{CinemaProgram_Model_Detail::COL_CSFDID}
+      <?php if($row->{CinemaProgram_Model_Detail::COL_CSFDID} != 0) {?>
+         <a href="http://www.csfd.cz/film/<?php echo $row->{CinemaProgram_Model_Detail::COL_CSFDID}
                  ."-".vve_cr_url_key($row->{CinemaProgram_Model_Detail::COL_NAME})?>"
-            title="ČSFD" target="_blank"><img src="<?=vve_get_tpl_file('icons_logos/logo-csfd.png',
+            title="ČSFD" target="_blank"><img src="<?php echo vve_get_tpl_file('icons_logos/logo-csfd.png',
                              VVE_TPL_FILE_IMAGE)?>" alt="čsfd logo" /></a>
-                     <?}?>
-      <?if($row->{CinemaProgram_Model_Detail::COL_IMDBID} != 0) {?>
-         <a href="http://www.imdb.com/title/tt<?=$row->{CinemaProgram_Model_Detail::COL_IMDBID}
+                     <?php }?>
+      <?php if($row->{CinemaProgram_Model_Detail::COL_IMDBID} != 0) {?>
+         <a href="http://www.imdb.com/title/tt<?php echo $row->{CinemaProgram_Model_Detail::COL_IMDBID}
                  ."-".vve_cr_url_key($row->{CinemaProgram_Model_Detail::COL_NAME})?>"
-            title="IMDB" target="_blank"><img src="<?=vve_get_tpl_file('icons_logos/logo-imdb.png',
+            title="IMDB" target="_blank"><img src="<?php echo vve_get_tpl_file('icons_logos/logo-imdb.png',
                              VVE_TPL_FILE_IMAGE)?>" alt="imdb logo" /></a>
-                     <?}?>
-      <?if($row->{CinemaProgram_Model_Detail::COL_CRITIQUE} != null) {?>
-         <a href="<?=$row->{CinemaProgram_Model_Detail::COL_CRITIQUE}?>"
-            title="<?=$this->_('Recenze')?>" target="_blank"><?=$this->_('Recenze')?></a>
-         <?}?>
+                     <?php }?>
+      <?php if($row->{CinemaProgram_Model_Detail::COL_CRITIQUE} != null) {?>
+         <a href="<?php echo $row->{CinemaProgram_Model_Detail::COL_CRITIQUE}?>"
+            title="<?php echo $this->_('Recenze')?>" target="_blank"><?php echo $this->_('Recenze')?></a>
+         <?php }?>
       </p>
    </div>
-         <?}
+         <?php }
 } else {?>
    <br />
-   <p><?=$this->_('Źádný film není promítán ve filmovém klubu');?></p>
-   <?}?>
-   <?
+   <p><?php echo $this->_('Źádný film není promítán ve filmovém klubu');?></p>
+   <?php }?>
+   <?php 
    if($this->toolbox != null){
       $this->includeTplObj($this->toolbox);
    }

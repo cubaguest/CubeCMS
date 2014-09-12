@@ -1,26 +1,26 @@
-<?
+<?php 
 $this->addFile('css://style.css');
 $jsJqGrid = new Component_JqGrid_JsPlugin();
 $this->addJsPlugin($jsJqGrid);
 $jQuery = new JsPlugin_JQuery();
 $this->addJsPlugin($jQuery);
 ?>
-<h1><?=$this->category()->getName()?></h1>
+<h1><?php echo $this->category()->getName()?></h1>
 <div class="main-content-form-edit">
    <div>
       <table class="full-width" id="shop-table-orders">
          <thead class="ui-widget-header ui-state-highlight">
             <tr>
-               <th scope="col"><?=$this->tr('ID')?>
+               <th scope="col"><?php echo $this->tr('ID')?>
                </th>
-               <th scope="col"><?=$this->tr('Jméno a přijmení')?></th>
-               <th scope="col"><?=$this->tr('Stav')?></th>
-               <th scope="col"><?=$this->tr('Cena')?></th>
-               <th scope="col"><?=$this->tr('Akce')?></th>
+               <th scope="col"><?php echo $this->tr('Jméno a přijmení')?></th>
+               <th scope="col"><?php echo $this->tr('Stav')?></th>
+               <th scope="col"><?php echo $this->tr('Cena')?></th>
+               <th scope="col"><?php echo $this->tr('Akce')?></th>
             </tr>
          </thead>
          <tbody class="ui-widget-content">
-            <?
+            <?php 
             if(!empty ($this->orders)){
                foreach ($this->orders as $order) {?>
             <tr>
@@ -29,16 +29,16 @@ $this->addJsPlugin($jQuery);
                <td></td>
                <td></td>
                <td>
-                  <form name="form-delete" method="post" action="<?=$this->link()?>" style="display:inline;">
-                     <input class="button-cancel" type="submit" value="<?=$this->tr('Smazat')?>" name="manufacturer_delete"  />
+                  <form name="form-delete" method="post" action="<?php echo $this->link()?>" style="display:inline;">
+                     <input class="button-cancel" type="submit" value="<?php echo $this->tr('Smazat')?>" name="manufacturer_delete"  />
                      <input type="hidden" value="" name="category_id" />
                   </form>
                </td>
             </tr> 
-               <?}
+               <?php }
             } else {?>
-               <tr><td colspan="5"><?=$this->tr('Nebyla přijata žádná objednávka')?></td></tr>
-            <?}?>
+               <tr><td colspan="5"><?php echo $this->tr('Nebyla přijata žádná objednávka')?></td></tr>
+            <?php }?>
          </tbody>
       </table>
    </div>

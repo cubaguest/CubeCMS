@@ -1,4 +1,4 @@
-<?
+<?php 
 if($this->edit == true){
    if((string)$this->panel->{Model_Panel::COLUMN_NAME} != null){
       $h = sprintf($this->tr('Úprava panelu kategorie "%s"'), $this->panel->{Model_Panel::COLUMN_NAME} );
@@ -9,9 +9,9 @@ if($this->edit == true){
    $h = $this->tr('Nový panel');
 }
 ?>
-<h1><?ps($h);?></h1>
+<h1><?php ps($h);?></h1>
 <div class="content-admin">
-   <?
+   <?php 
 // donastavení formuláře
    $this->form->panel_order->html()->setAttrib('size', 4);
    $this->addJsPlugin(new JsPlugin_JQuery());

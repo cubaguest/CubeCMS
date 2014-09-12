@@ -1,4 +1,4 @@
-<? // načtení detailu
+<?php  // načtení detailu
 $this->addPageTitle($this->action->{Actions_Model::COLUMN_NAME});
 $image = null;
 if ($this->action->{Actions_Model::COLUMN_IMAGE} != null) {
@@ -8,16 +8,16 @@ if ($this->action->{Actions_Model::COLUMN_IMAGE} != null) {
 }
 
 ?>
-<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); ps_lang($this->action->{Actions_Model::COLUMN_NAME})?></h1>
+<h1><?php $this->includeFile('tpl://engine:headline/icon.phtml'); ps_lang($this->action->{Actions_Model::COLUMN_NAME})?></h1>
 <div class="post">
-   <?if($this->action->{Actions_Model::COLUMN_SUBANME} != null) {?>
-   <div class="text subname"><?p_lang($this->action->{Actions_Model::COLUMN_SUBANME})?></div>
-   <?}?>
-   <?if($this->action->{Actions_Model::COLUMN_AUTHOR} != null) {?>
-   <div class="text author"><?p_lang($this->action->{Actions_Model::COLUMN_AUTHOR})?></div>
-      <?}?>
+   <?php if($this->action->{Actions_Model::COLUMN_SUBANME} != null) {?>
+   <div class="text subname"><?php p_lang($this->action->{Actions_Model::COLUMN_SUBANME})?></div>
+   <?php }?>
+   <?php if($this->action->{Actions_Model::COLUMN_AUTHOR} != null) {?>
+   <div class="text author"><?php p_lang($this->action->{Actions_Model::COLUMN_AUTHOR})?></div>
+      <?php }?>
    <div class="text info">
-      <?
+      <?php 
       $startDate = vve_date("%x", new DateTime($this->action->{Actions_Model::COLUMN_DATE_START}));
       $stopDate = vve_date("%x", new DateTime($this->action->{Actions_Model::COLUMN_DATE_STOP}));
       print ($startDate);
@@ -40,29 +40,29 @@ if ($this->action->{Actions_Model::COLUMN_IMAGE} != null) {
       }
       ?>
    </div>
-   <?if($this->action->{Actions_Model::COLUMN_NOTE} != null) {?>
-   <div class="text note"><?p_lang($this->action->{Actions_Model::COLUMN_NOTE})?></div>
-      <?}?>
-   <?if($image != null) {?><div class="title-image"><?echo $image;?></div><?}?>
+   <?php if($this->action->{Actions_Model::COLUMN_NOTE} != null) {?>
+   <div class="text note"><?php p_lang($this->action->{Actions_Model::COLUMN_NOTE})?></div>
+      <?php }?>
+   <?php if($image != null) {?><div class="title-image"><?php echo $image;?></div><?php }?>
    <div class="text">
-   <?p_lang($this->action->{Actions_Model::COLUMN_TEXT})?>
+   <?php p_lang($this->action->{Actions_Model::COLUMN_TEXT})?>
    </div>
    <hr class="reseter" />
-   <?
+   <?php 
    echo $this->dForm;
    
    if(!$this->category()->getParam(Actions_Controller::PARAM_SHOW_EVENT_DIRECTLY, false) && $this->isPreview == null){
       $this->includeTpl("buttonback.phtml", true, array('text' => $this->tr('Zpět na seznam')));
    }
    ?>
-   <?
+   <?php 
    $this->includeTpl('articletools.phtml', true, array(
            'lastEditTime' => $this->action->{Actions_Model::COLUMN_CHANGED},
            'lastEditUser' => $this->action->{Model_Users::COLUMN_USERNAME},
            'linkToPdf' => $this->link()->route('detailExport',array('output' => 'pdf')),
            'shares' => array('url' => $this->link(), 'title' => $this->action->{Actions_Model::COLUMN_NAME})));?>
 
-   <?
+   <?php 
    echo $this->toolbox;
    ?>
 </div>

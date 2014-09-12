@@ -1,5 +1,5 @@
 <p>
-   <? foreach ($this->pVar("appLangs") as $lang) {?>
-      <a href="<?=$lang["link"]?>" title="<?=$lang["label"]?>"><?=$lang["name"]?></a>
-   <?}?>
+   <?php  foreach ($this->pVar("appLangs") as $lang) {?>
+      <a href="<?php echo $lang["link"]?>" title="<?php echo $lang["label"]?>"><?php echo $lang["name"]?></a>
+   <?php }?>
 </p>

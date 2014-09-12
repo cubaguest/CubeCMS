@@ -1,7 +1,7 @@
 <div class="comments-form-add" id="addComment">
-   <strong><?=$this->tr('Přidání komentáře')?></strong>
+   <strong><?php echo $this->tr('Přidání komentáře')?></strong>
    <p id="comment-reaction-label"></p>
-   <?
+   <?php 
    $this->formAdd->comment->html()->setAttrib('rows', 5)->setAttrib('cols', 70);
    $this->formAdd->comment->setSubLabel($this->tr('Povolené značky XHTML').': a, br, em, strong, sub, sup, ul, li, ol');
    $this->formAdd->add->html()->setAttrib('style', 'width: 70px;');
@@ -12,10 +12,10 @@
    /* <![CDATA[ */
    function selectParent(id, nick,text){
       document.getElementById('comment_new_parent_1').value = id;
-      document.getElementById('comment-reaction-label').innerHTML = '<?=$this->tr('Reakce na: ')?>'+nick+' - '+text.toString();
+      document.getElementById('comment-reaction-label').innerHTML = '<?php echo $this->tr('Reakce na: ')?>'+nick+' - '+text.toString();
    }
    // vypnutí submitu
-   var ccTime = <?=$this->ctTime?>;
+   var ccTime = <?php echo $this->ctTime?>;
    document.getElementById('comment_new_add_1').disabled = 'disabled';
    document.getElementById('comment_new_add_1').value = ccTime+'s';
 
@@ -23,7 +23,7 @@
       ccTime--;
       if(ccTime == 0){
          document.getElementById('comment_new_add_1').disabled = '';
-         document.getElementById('comment_new_add_1').value = '<?=$this->tr('Uložit')?>';
+         document.getElementById('comment_new_add_1').value = '<?php echo $this->tr('Uložit')?>';
       } else {
          document.getElementById('comment_new_add_1').value = ccTime+'s';
          t=setTimeout("timedCount()",1000);

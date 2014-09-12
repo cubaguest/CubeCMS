@@ -1,5 +1,5 @@
 <div>
-<?
+<?php 
 // do titulku
 if($this->edit === true){
    $this->addPageTitle($this->_('úprava navigačního odkazu'));
@@ -12,12 +12,12 @@ if($this->edit === true){
 }
 ?>
 
-<?=$this->form?>
+<?php echo $this->form?>
 
 <script type="text/javascript">
    /* <![CDATA[ */
    /* ]]> */
 </script>
 
-<?=$this->includeTpl('buttonback.phtml', true, array('link' => $this->link()->clear()))?>
+<?php echo $this->includeTpl('buttonback.phtml', true, array('link' => $this->link()->clear()))?>
 </div>

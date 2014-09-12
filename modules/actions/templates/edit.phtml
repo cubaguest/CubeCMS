@@ -1,4 +1,4 @@
-<?
+<?php 
 $this->addCssFile("style.css");
 // do titulku
 if($this->edit) {
@@ -26,21 +26,21 @@ $jQuery->addUITimepicker();
 $this->addJsPlugin($jQuery);
 
 ?>
-<h1><?=$h1?></h1>
+<h1><?php echo $h1?></h1>
 <div class="main-content-form-edit" id="editArticleForm">
-   <?if($this->previewLink){?>
-   <div class="message message-info message-warning"><?
+   <?php if($this->previewLink){?>
+   <div class="message message-info message-warning"><?php 
       printf($this->tr('Máte již vytvořenu starší verzi dokumentu. Chcete ji <a href="%s"><strong>otevřít</strong></a> nebo <a href="%s"><strong>zrušit</strong></a>?'),
          $this->previewLink, $this->previewLinkCancel);
       ?></div>
-   <?}
+   <?php }
    echo($this->form);
    $this->includeFile('tpl://engine:parts/seltitleimage.phtml');
    ?>
    <script type="text/javascript">
       /* <![CDATA[ */
       $(document).ready(function(){
-         $.datepicker.setDefaults( $.datepicker.regional[ "<?=Locales::getLang()?>" ] );
+         $.datepicker.setDefaults( $.datepicker.regional[ "<?php echo Locales::getLang()?>" ] );
          var dates = $('input#action_date_start_1, input#action_date_stop_1').datepicker({
             showButtonPanel: true, showOtherMonths: true, selectOtherMonths: true,
             onSelect: function( selectedDate ) {

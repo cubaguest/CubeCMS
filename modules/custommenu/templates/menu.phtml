@@ -1,17 +1,17 @@
-<div class="<?if($this->box == 'left'){echo 'panel ';}?>custom-menu custom-menu-<?=$this->box?> clearfix">
-   <?
+<div class="<?php if($this->box == 'left'){echo 'panel ';}?>custom-menu custom-menu-<?php echo $this->box?> clearfix">
+   <?php 
    if($this->box == 'left'){?>
-      <div class="name"><?ps($this->tr('Kam dále?'))?></div>
-   <?}?>
+      <div class="name"><?php ps($this->tr('Kam dále?'))?></div>
+   <?php }?>
    <ul class="nav">
-   <?foreach ($this->items as $item) {
+   <?php foreach ($this->items as $item) {
       ?>
       <li>
-         <a href="<?=$item->{CustomMenu_Model_Items::COLUMN_LINK}?>"
-            class="<? if($item->{CustomMenu_Model_Items::COLUMN_NEW_WINDOW}){ echo "link-external";}?>"
-            title="<?ps($item->{CustomMenu_Model_Items::COLUMN_NAME})?>"
-                 ><?ps($item->{CustomMenu_Model_Items::COLUMN_NAME})?></a>
+         <a href="<?php echo $item->{CustomMenu_Model_Items::COLUMN_LINK}?>"
+            class="<?php  if($item->{CustomMenu_Model_Items::COLUMN_NEW_WINDOW}){ echo "link-external";}?>"
+            title="<?php ps($item->{CustomMenu_Model_Items::COLUMN_NAME})?>"
+                 ><?php ps($item->{CustomMenu_Model_Items::COLUMN_NAME})?></a>
       </li>
-   <?}?>
+   <?php }?>
    </ul>
 </div>

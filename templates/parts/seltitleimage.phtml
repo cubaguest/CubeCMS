@@ -1,4 +1,4 @@
-<?
+<?php 
 if (isset($this->form->titleImage) && Template::pVar('DIALOG_TITLE_IMAGE') != true) {
    Template::setPVar('DIALOG_TITLE_IMAGE', true);
    $jq = new JsPlugin_JQuery();
@@ -7,8 +7,8 @@ if (isset($this->form->titleImage) && Template::pVar('DIALOG_TITLE_IMAGE') != tr
    $this->addJsPlugin($jq);
    $baseDir = $this->titleImagesURL != null ? $this->titleImagesURL : vve_tpl_art_title_image('');
    ?>
-   <div id="dialog-title-image" title="<?= $this->tr('Výběr titulního obrázku') ?>">
-   <?
+   <div id="dialog-title-image" title="<?php echo  $this->tr('Výběr titulního obrázku') ?>">
+   <?php 
    foreach ($this->form->titleImage->getOptions() as $key => $image) {
       if ($image == null) {
          echo '<a href="' . $this->link() . '#" class="button-select-title-image" data-file="" >' . $key . '</a>';
@@ -49,4 +49,4 @@ if (isset($this->form->titleImage) && Template::pVar('DIALOG_TITLE_IMAGE') != tr
    });
    /* ]]> */
 </script>
-   <? } ?>
+   <?php  } ?>

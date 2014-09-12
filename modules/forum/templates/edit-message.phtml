@@ -1,4 +1,4 @@
-<?
+<?php 
 if($this->message instanceof Model_ORM_Record){
    $h = sprintf($this->tr('Úprava příspěvku %s'), $this->message->{Forum_Model_Messages::COLUMN_NAME});
 } else {
@@ -7,18 +7,18 @@ if($this->message instanceof Model_ORM_Record){
 $this->addPageTitle($h);
 $this->addFile('css://style.less');
 ?>
-<h1><?=$h?></h1>
+<h1><?php echo $h?></h1>
 <div class="main-content-detail forum-message-edit">
-   <?
+   <?php 
    if($this->parentMessage){?>
-   <?if($this->parentMessage->{Forum_Model_Messages::COLUMN_NAME} != null){?>
-   <h2><?=$this->tr('Reakce na')?>: <?ps($this->parentMessage->{Forum_Model_Messages::COLUMN_NAME})?></h2>
-   <?}?>
-   <div class="author"><?=$this->tr('Autor')?>: <?ps($this->parentMessage->{Forum_Model_Messages::COLUMN_CREATED_BY})?></div>   
-   <div class="text"><?=$this->parentMessage->{Forum_Model_Messages::COLUMN_TEXT}?></div>   
-   <?}?>
+   <?php if($this->parentMessage->{Forum_Model_Messages::COLUMN_NAME} != null){?>
+   <h2><?php echo $this->tr('Reakce na')?>: <?php ps($this->parentMessage->{Forum_Model_Messages::COLUMN_NAME})?></h2>
+   <?php }?>
+   <div class="author"><?php echo $this->tr('Autor')?>: <?php ps($this->parentMessage->{Forum_Model_Messages::COLUMN_CREATED_BY})?></div>   
+   <div class="text"><?php echo $this->parentMessage->{Forum_Model_Messages::COLUMN_TEXT}?></div>   
+   <?php }?>
    <div class="main-content-form-edit">
-   <?
+   <?php 
    $this->form->text->html()->setAttrib('rows', 15);
    echo $this->form;
    ?>

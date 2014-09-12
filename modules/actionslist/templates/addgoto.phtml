@@ -1,10 +1,10 @@
-<strong><?=$this->_('Přidat do:')?></strong>
-<?$l = reset($this->categories);$l = $l['url'];?>
-<form action="<?=$l?>" method="post">
+<strong><?php echo $this->_('Přidat do:')?></strong>
+<?php $l = reset($this->categories);$l = $l['url'];?>
+<form action="<?php echo $l?>" method="post">
    <select name="linkAdd">
-      <?foreach ($this->categories as $cat) {?>
-      <option value="<?=$cat['url']?>"><?=$cat['name']?></option>
-         <?}?>
+      <?php foreach ($this->categories as $cat) {?>
+      <option value="<?php echo $cat['url']?>"><?php echo $cat['name']?></option>
+         <?php }?>
    </select>
    <input type="submit" name="go" value="GO" />
 </form>

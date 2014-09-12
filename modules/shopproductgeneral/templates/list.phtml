@@ -1,4 +1,4 @@
-<?
+<?php 
 $this->addFile('css://style.css');
 //$jQuery = new JsPlugin_JQuery();
 //$jQuery->addUISpinner();
@@ -6,39 +6,39 @@ $this->addFile('css://style.css');
 
 echo $this->toolbox;
 ?>
-<h1><?
+<h1><?php 
 echo $this->category()->getName();
 ?></h1>
 <div class="main-content-list">
-   <?
+   <?php 
    if(!empty($this->products)){
       $this->includeFile('tpl://sorting.phtml');
       foreach ($this->products as $product) {?>
-   <div class="main-content-list-record shop-product <?if(!$product->{Shop_Model_Product::COLUMN_ACTIVE}) echo "concept";?> clearfix">
-      <h2><a href="<?=$this->link()->route('detail', array('urlkey' => $product->{Shop_Model_Product::COLUMN_URLKEY}))?>" 
-             title="<?=$this->tr('Přejít na ').$product->{Shop_Model_Product::COLUMN_NAME}?>"><?
+   <div class="main-content-list-record shop-product <?php if(!$product->{Shop_Model_Product::COLUMN_ACTIVE}) echo "concept";?> clearfix">
+      <h2><a href="<?php echo $this->link()->route('detail', array('urlkey' => $product->{Shop_Model_Product::COLUMN_URLKEY}))?>" 
+             title="<?php echo $this->tr('Přejít na ').$product->{Shop_Model_Product::COLUMN_NAME}?>"><?php 
              echo $product->{Shop_Model_Product::COLUMN_NAME};
              echo strtotime($product->{Shop_Model_Product::COLUMN_IS_NEW_TO_DATE})+(24*60*60) >= time() ? ' - '.$this->tr('Novinka!') : null;
              ?></a>
-      <?echo $product->{Shop_Model_Product::COLUMN_ACTIVE} ? null : ' - '.$this->tr('neaktivní')?>
+      <?php echo $product->{Shop_Model_Product::COLUMN_ACTIVE} ? null : ' - '.$this->tr('neaktivní')?>
       </h2>
-      <?if($product->{Shop_Model_Product::COLUMN_IMAGE} != null){?>
+      <?php if($product->{Shop_Model_Product::COLUMN_IMAGE} != null){?>
       <div class="main-content-list-record-image">
-         <img src="<?=Shop_Product_Controller::getImagesDir(true).'small/'.$product->{Shop_Model_Product::COLUMN_IMAGE}?>" 
-              alt="<?=$product->{Shop_Model_Product::COLUMN_NAME}?>" />
+         <img src="<?php echo Shop_Product_Controller::getImagesDir(true).'small/'.$product->{Shop_Model_Product::COLUMN_IMAGE}?>" 
+              alt="<?php echo $product->{Shop_Model_Product::COLUMN_NAME}?>" />
       </div>
-      <?}?>
+      <?php }?>
       <div class="main-content-list-record-text">
-         <?=$product->{Shop_Model_Product::COLUMN_TEXT_SHORT}?>
+         <?php echo $product->{Shop_Model_Product::COLUMN_TEXT_SHORT}?>
       </div>
       <div class="main-content-list-record-text shop-product-attributes">
          <div class="product-price">
-            <?
+            <?php 
             echo $this->tr('Cena').': ';
             echo Shop_Tools::getFormatedPrice($product->{Shop_Model_Product::COLUMN_PRICE}, $product->{Shop_Model_Tax::COLUMN_VALUE});
             ?>
          </div>
-      <?
+      <?php 
       $qty = $product->{Shop_Model_ProductCombinations::COLUMN_QTY} != null ?
          (int)$product->{Shop_Model_ProductCombinations::COLUMN_QTY} : (int)$product->{Shop_Model_Product::COLUMN_QUANTITY};
       if($this->formAddToCart instanceof Form
@@ -69,9 +69,9 @@ echo $this->category()->getName();
    <script type="text/javascript">
    </script>
    <hr class="reseter" />
-      <?}
+      <?php }
       echo $this->scrollComp;
    } else {?>
-   <div class="main-content-text"><?=$this->tr('Žádné zboží nebylo nalezeno')?></div>
-   <?}?>
+   <div class="main-content-text"><?php echo $this->tr('Žádné zboží nebylo nalezeno')?></div>
+   <?php }?>
 </div>

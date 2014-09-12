@@ -1,4 +1,4 @@
-<h1><?= $this->category()->getName(); ?></h1>
+<h1><?php echo  $this->category()->getName(); ?></h1>
 <div class="main-content-form-edit" id="login-form">
    <div class="clearfix">
       <?php
@@ -7,32 +7,32 @@
       echo $loginForm->renderStart();
       ?>
          <div class="login-form-label">
-            <h2><?= $this->tr('Přihlášení'); ?></h2>
+            <h2><?php echo  $this->tr('Přihlášení'); ?></h2>
          </div>
          <div>
-            <label for="login-user"><?=$this->tr('Jméno / e-mail'); ?>:</label><br />
-            <?=$loginForm->{Auth_Provider_Internal::FORM_USERNAME}->control()?>
+            <label for="login-user"><?php echo $this->tr('Jméno / e-mail'); ?>:</label><br />
+            <?php echo $loginForm->{Auth_Provider_Internal::FORM_USERNAME}->control()?>
          </div>
          <div>
-            <label for="login-password"><?= $this->tr('Heslo'); ?>:</label><br />
-            <?=$loginForm->{Auth_Provider_Internal::FORM_PASSWORD}->control()?>
+            <label for="login-password"><?php echo  $this->tr('Heslo'); ?>:</label><br />
+            <?php echo $loginForm->{Auth_Provider_Internal::FORM_PASSWORD}->control()?>
          </div>
          <div class="left-box login-permanent">
-            <?=$loginForm->{Auth_Provider_Internal::FORM_PERMANENT}->control()?>
-            <label for="login-permanent"><?=$this->tr('trvale')?></label>
+            <?php echo $loginForm->{Auth_Provider_Internal::FORM_PERMANENT}->control()?>
+            <label for="login-permanent"><?php echo $this->tr('trvale')?></label>
          </div>
          <div class="right-box">
-            <?=$loginForm->{Auth_Provider_Internal::FORM_SUBMIT}->control()?>
+            <?php echo $loginForm->{Auth_Provider_Internal::FORM_SUBMIT}->control()?>
          </div>
       <?php
       echo $loginForm->renderEnd();
       ?>
       <p class="login-lost-password">
-         <a href="<?= $this->link()->route('newPassword') ?>" title="<?= $this->tr('Obnovit zapomenuté heslo') ?>"><?= $this->tr('Zapomenuté heslo') ?></a>
+         <a href="<?php echo  $this->link()->route('newPassword') ?>" title="<?php echo  $this->tr('Obnovit zapomenuté heslo') ?>"><?php echo  $this->tr('Zapomenuté heslo') ?></a>
       </p>
       <?php if(Auth::isAuthenticator('google')){?>
       <div>
-         <a href="<?=Auth::getAuthenticator('google')->getAuthUrl()?>"
+         <a href="<?php echo Auth::getAuthenticator('google')->getAuthUrl()?>"
             ><img width="200" src="https://developers.google.com/accounts/images/sign-in-with-google.png" alt="" /></a>
       </div>
       <?php }?>
@@ -40,8 +40,8 @@
       <div>
          <form action="" method="post">
             <label for="">OpenID</label>
-            <input type="text" name="<?=Auth_Provider_OpenID::FORM_ID_NAME?>" value="" />
-            <button type="submit" name="<?=Auth_Provider_OpenID::FORM_SUBMIT_NAME?>">Přihlásit</button>
+            <input type="text" name="<?php echo Auth_Provider_OpenID::FORM_ID_NAME?>" value="" />
+            <button type="submit" name="<?php echo Auth_Provider_OpenID::FORM_SUBMIT_NAME?>">Přihlásit</button>
          </form>
       </div>
       <?php }?>

@@ -1,4 +1,4 @@
-<?
+<?php 
 /**
  * Třída pro obsluhu vyjímek pro načítání souborů
  * Třída rozšiřuje třídu Exception

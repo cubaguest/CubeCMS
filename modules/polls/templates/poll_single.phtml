@@ -1,4 +1,4 @@
-<?// vypočty
+<?php // vypočty
 $data = unserialize($this->poll->{Polls_Model::COLUMN_DATA});
 $maxVote = 0;
 $allVotes = 0;
@@ -8,25 +8,25 @@ foreach ($data as $key => $vote) {
 }
 echo($this->formsingle->renderStart());// SOF form?>
 <p>
-   <?foreach ($data as $key => $answer) {
+   <?php foreach ($data as $key => $answer) {
       $maxVote == 0 ? $prRender = 0 : $prRender = round(($answer['count']/($maxVote/100)*0.9));
       $percent = $allVotes/100;
       $percent == 0 ? $pr = 0 : $pr = round($answer['count']/$percent);
       ?>
-   <input name="vote_answer" id="vote_answer_<?=$this->poll->{Polls_Model::COLUMN_ID}."_".$key.$this->subkey?>" value="<?=$key?>"
-          type="radio" <?if($key == 0)echo('checked="checked"')?> />
-   <label for="vote_answer_<?=$this->poll->{Polls_Model::COLUMN_ID}."_".$key.$this->subkey?>"><?=$answer['answer']?></label>
+   <input name="vote_answer" id="vote_answer_<?php echo $this->poll->{Polls_Model::COLUMN_ID}."_".$key.$this->subkey?>" value="<?php echo $key?>"
+          type="radio" <?php if($key == 0)echo('checked="checked"')?> />
+   <label for="vote_answer_<?php echo $this->poll->{Polls_Model::COLUMN_ID}."_".$key.$this->subkey?>"><?php echo $answer['answer']?></label>
    <br />
-   <p class="pollGraph pollAnswer_<?=$key?>" style="width: <?=$prRender?>%;">
-      <span class="pollNumbers"><?printf('%d %% (%d)',$pr ,$answer['count'])?></span>
+   <p class="pollGraph pollAnswer_<?php echo $key?>" style="width: <?php echo $prRender?>%;">
+      <span class="pollNumbers"><?php printf('%d %% (%d)',$pr ,$answer['count'])?></span>
    </p>
-      <?}?>
-   <?
+      <?php }?>
+   <?php 
    $this->formsingle->id_poll->setValues($this->poll->{Polls_Model::COLUMN_ID});
    echo ($this->formsingle->id_poll->controll());
    echo ($this->formsingle->vote->controll());
    ?>
    <br />
-   <span class="pollNumVotes"><?printf($this->_('Celkem hlasovalo: %d osob'),$this->poll->{Polls_Model::COLUMN_VOTES});?></span>
+   <span class="pollNumVotes"><?php printf($this->_('Celkem hlasovalo: %d osob'),$this->poll->{Polls_Model::COLUMN_VOTES});?></span>
 </p>
-<?=$this->formsingle->renderEnd()// EOF form?>
+<?php echo $this->formsingle->renderEnd()// EOF form?>

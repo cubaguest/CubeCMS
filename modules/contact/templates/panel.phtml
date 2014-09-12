@@ -1,4 +1,4 @@
-<?
+<?php 
 $icon = null;
 if($this->panelObj()->getIcon() != null){
    $icon = '<img src="'.Panel_Obj::getIconDir().$this->panelObj()->getIcon().'" alt="'.$this->panelObj()->getIcon().'" />';
@@ -10,9 +10,9 @@ if($this->panelObj()->getBackImage() != null){
 $this->text = vve_remove_empty_tags($this->text);
 if($this->text != null){
 ?>
-<div class="panel-box-label"><?=$icon?><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=$this->panelObj()->getName()?></a></div>
-<div class="panel-box-content" style="<?=$backImg?>">
-   <div class="panel-box-text"><address><?echo vve_remove_empty_tags($this->text);?></address></div>
+<div class="panel-box-label"><?php echo $icon?><a href="<?php echo $this->link()?>" title="<?php echo htmlspecialchars($this->panelObj()->getName())?>"><?php echo $this->panelObj()->getName()?></a></div>
+<div class="panel-box-content" style="<?php echo $backImg?>">
+   <div class="panel-box-text"><address><?php echo vve_remove_empty_tags($this->text);?></address></div>
 </div>
-<div class="panel-box-link-more"><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->tr('Více')?></a></div>
-<?}?>
+<div class="panel-box-link-more"><a href="<?php echo $this->link()?>" title="<?php echo htmlspecialchars($this->category()->getLabel())?>"><?php echo $this->tr('Více')?></a></div>
+<?php }?>

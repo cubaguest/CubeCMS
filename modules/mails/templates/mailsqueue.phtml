@@ -1,13 +1,13 @@
-<?
+<?php 
 $this->addPageTitle($this->tr('Fronta odesílání e-mailů'));
 $this->addCssFile('style.less');
 ?>
-<h1><?=$this->tr('Fronta odesílání e-mailů')?></h1>
-<?=$this->includeTpl('navigation.phtml');?>
+<h1><?php echo $this->tr('Fronta odesílání e-mailů')?></h1>
+<?php echo $this->includeTpl('navigation.phtml');?>
 <div class="form-edit admin-content">
 <br />
 <div class="mails-queue-buttons">
-<?
+<?php 
 if($this->formSend != null){
    $this->formSend->html()->setAttrib('name', 'form-send-queue');
    echo $this->formSend->renderStart();
@@ -30,34 +30,34 @@ if($this->formSend != null){
          <th>status</th>
       </tr>
    </thead>
-   <?
+   <?php 
    if(!empty ($this->queue)){?>
       <tbody class="ui-widget-content">
-      <?foreach ($this->queue as $mail) {?>
+      <?php foreach ($this->queue as $mail) {?>
    <tr class="mail-row">
       <td class="mail-row-data">
-         <?
+         <?php 
          if($mail->{Mails_Model_SendQueue::COLUMN_NAME} != null){
             echo htmlspecialchars($mail->{Mails_Model_SendQueue::COLUMN_NAME}.' <'.$mail->{Mails_Model_SendQueue::COLUMN_MAIL}.'>');
          } else {
             echo htmlspecialchars($mail->{Mails_Model_SendQueue::COLUMN_MAIL});
          }
          ?>
-         <input type="hidden" value="<?=$mail->{Mails_Model_SendQueue::COLUMN_ID};?>" name="mail-id" />
+         <input type="hidden" value="<?php echo $mail->{Mails_Model_SendQueue::COLUMN_ID};?>" name="mail-id" />
       </td>
       <td class="mail-row-status"></td>
    </tr>
-      <?}?>
+      <?php }?>
       </tbody>
-   <?} else {?>
+   <?php } else {?>
    <tr>
-      <td colspan="2"><?=$this->tr('Fronta je prázdná');?></td>
+      <td colspan="2"><?php echo $this->tr('Fronta je prázdná');?></td>
    </tr>
-   <?}?>
+   <?php }?>
 </table>
 <br />
 <div class="mails-queue-buttons">
-<?
+<?php 
 if($this->formSend != null){
    $this->formSend->html()->setAttrib('name', 'form-send-queue');
    echo $this->formSend->renderStart();
@@ -73,7 +73,7 @@ if($this->formSend != null){
 ?>
    <br />
    <br />
-<?
+<?php 
 if($this->formRemUnedlivered != null){
    echo '<label>'.$this->tr('Odstranit z adresáře adresy, které se nepodařilo doručit').'</label>';
    $this->formRemUnedlivered->html()->setAttrib('name', 'form-remove-undelivered');
@@ -102,7 +102,7 @@ if($this->formRemUnedlivered != null){
                type: "POST",
                context: $thisrow,
                cache : false,
-               url:'<?=$this->link()->route('sendMail');?>',
+               url:'<?php echo $this->link()->route('sendMail');?>',
                data : ({
                   id : $('input[name=mail-id]', $thisrow).val()
                }),
@@ -126,7 +126,7 @@ if($this->formRemUnedlivered != null){
       });
 
       $('form[name=form-remove-undelivered]').submit(function(){
-         return confirm('<?=$this->tr('Opravdu smazat ')?>');
+         return confirm('<?php echo $this->tr('Opravdu smazat ')?>');
       });
 
    });

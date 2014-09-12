@@ -1,4 +1,4 @@
-<?
+<?php 
 $jq = new JsPlugin_JQuery();
 $jq->addUISortable();
 $jq->addUIDialog();
@@ -7,13 +7,13 @@ $this->addJsPlugin(new JsPlugin_PrettyPhoto());
 $this->addFile("css://photogalery:style.less");
 $this->addFile("js://photogalery:editphotos.js");
 ?>
-<h1><?
+<h1><?php 
    printf($this->tr('Úprava obrázků přiřazených ke "%s"'), $this->name == null ? $this->category()->getName() : $this->name);
 ?></h1>
 <div>
-   <h2><?=$this->tr('Nahrání obrázků')?></h2>
+   <h2><?php echo $this->tr('Nahrání obrázků')?></h2>
    <div id="image-uplaod-component" class="drop-area clearfix">
-      <?
+      <?php 
       $this->uploadForm->html()
           ->setAttrib('id', 'images-upload-form')
           ->addClass('form-vertical')
@@ -24,28 +24,28 @@ $this->addFile("js://photogalery:editphotos.js");
       <div class="form-group">
          <div class="coll-input">
             <div class="form-controls">
-            <?
+            <?php 
             echo $this->uploadForm->image->control();
             ?>
-            <div class="drop-area-label"><?  ps($this->tr('Nebo zde přetáhněte obrázky'))?></div>
+            <div class="drop-area-label"><?php   ps($this->tr('Nebo zde přetáhněte obrázky'))?></div>
             </div>
          </div>
          <div class="coll-buttons">
             <div class="form-controls">
-               <?
+               <?php 
                echo $this->uploadForm->idItem->control();
                echo $this->uploadForm->send->control();
                ?>
                <div class="right-box">
-                  <a class="btn btn-danger" href="<?=$this->linkBack?>"><span class="icon icon-times"></span> <?php ps($this->tr('Zavřít úpravu')); ?></a>
+                  <a class="btn btn-danger" href="<?php echo $this->linkBack?>"><span class="icon icon-times"></span> <?php ps($this->tr('Zavřít úpravu')); ?></a>
                </div>
             </div>
          </div>
       </div>
-      <? 
+      <?php  
       echo $this->uploadForm->renderEnd();
       ?>
-      <iframe src="<?=$this->link()->route('imageUploadIframe')?>" id="upload-target" frameborder="0" width="0" height="0"></iframe>
+      <iframe src="<?php echo $this->link()->route('imageUploadIframe')?>" id="upload-target" frameborder="0" width="0" height="0"></iframe>
       <ul id="upload-queue" class="unstyled">
          
       </ul>
@@ -60,17 +60,17 @@ $this->addFile("js://photogalery:editphotos.js");
                   <span class="progress-bar" role="progressbar" style="width: 0%;">0%</span>
                </span>
             </span>
-               <a class="button-cancel-upload" href="<?=$this->link()?>#cancel"><span class="icon icon-times"></span></a>
+               <a class="button-cancel-upload" href="<?php echo $this->link()?>#cancel"><span class="icon icon-times"></span></a>
          </li>
       </ul>
    </div>
    
-   <h2><?=$this->tr('Seznam uložených obrázků')?></h2>
+   <h2><?php echo $this->tr('Seznam uložených obrázků')?></h2>
    <div id="images-actions" class="fixed-actions-box" data-container="#images-list">
-      <form action="<?=$this->link()?>" class="form-vertical">
+      <form action="<?php echo $this->link()?>" class="form-vertical">
          <div class="form-group">
             <div class="form-controls">
-               <a class="btn" id="button-select-all-images" href="<?=$this->link()?>#sel">Označit vše</a>&nbsp;&nbsp;
+               <a class="btn" id="button-select-all-images" href="<?php echo $this->link()?>#sel">Označit vše</a>&nbsp;&nbsp;
                <label for="images-action-select"><?php ps($this->tr('Označené')); ?></label>:
                <select name="action" id="images-action-select" disabled="disabled">
                   <option value="" selected="selected"><?php ps($this->tr('Vyberte akci')); ?></option>
@@ -80,40 +80,40 @@ $this->addFile("js://photogalery:editphotos.js");
                </select>
                <button id="buttons-process-images" class="btn btn-success" type="button" disabled="disabled"><span class="icon icon-check"></span> <?php ps($this->tr('Provést')); ?></button>
                <div class="right-box">
-                  <a class="btn btn-danger" href="<?=$this->linkBack?>"><span class="icon icon-times"></span> <?php ps($this->tr('Zavřít úpravu')); ?></a>
+                  <a class="btn btn-danger" href="<?php echo $this->linkBack?>"><span class="icon icon-times"></span> <?php ps($this->tr('Zavřít úpravu')); ?></a>
                </div>
             </div>
          </div>
       </form>
    </div>
    <ul id="images-list" class="unstyled drop-area clearfix">
-      <?
+      <?php 
       foreach ($this->images as $image) {
          $src = $this->category()->module()->getDataDir(true).$this->imagesPath.Photogalery_Controller::DIR_ORIGINAL."/".$image->{PhotoGalery_Model_Images::COLUMN_FILE};
          $srcThumb = Utils_Image::cache($src, Photogalery_Controller::EDIT_THUMB_WIDTH, Photogalery_Controller::EDIT_THUMB_HEIGHT);
          ?>
       <li 
-         id="image-<?=$image->getPK()?>"
-         data-id="<?=$image->getPK()?>"
-         data-name='<?=json_encode($image->{PhotoGalery_Model_Images::COLUMN_NAME}->toArray())?>'
-         data-desc='<?=json_encode($image->{PhotoGalery_Model_Images::COLUMN_DESC}->toArray())?>'
-         data-src="<?=$src?>"
+         id="image-<?php echo $image->getPK()?>"
+         data-id="<?php echo $image->getPK()?>"
+         data-name='<?php echo json_encode($image->{PhotoGalery_Model_Images::COLUMN_NAME}->toArray())?>'
+         data-desc='<?php echo json_encode($image->{PhotoGalery_Model_Images::COLUMN_DESC}->toArray())?>'
+         data-src="<?php echo $src?>"
          class="image-box"
          >
-         <span class="image-title" title="<?  ps($image->{PhotoGalery_Model_Images::COLUMN_NAME})?>"><?  ps($image->{PhotoGalery_Model_Images::COLUMN_NAME})?></span>
+         <span class="image-title" title="<?php   ps($image->{PhotoGalery_Model_Images::COLUMN_NAME})?>"><?php   ps($image->{PhotoGalery_Model_Images::COLUMN_NAME})?></span>
          <input type="checkbox" name="imagesSelect" class="image-checkbox" />
          <span class="image-thumb">
-            <img src="<?=$srcThumb?>" alt="" />
+            <img src="<?php echo $srcThumb?>" alt="" />
          </span>
          <span class="image-tools clearfix">
-            <?
+            <?php 
             /* @var $this->imageToolbox Template_Toolbox2 */
             $this->imageToolbox->setTemplate(Template_Toolbox2::TEMPLATE_INLINE);
             echo $this->imageToolbox;
             ?>
          </span>
       </li>
-      <?}?>
+      <?php }?>
    </ul>
    <ul class="hidden" id="image-tpl">
       <li data-id="" data-name="" data-desc="" data-src="" class="image-box" >
@@ -123,7 +123,7 @@ $this->addFile("js://photogalery:editphotos.js");
             <img src="" alt="" />
          </span>
          <span class="image-tools clearfix">
-            <?
+            <?php 
             /* @var $this->imageToolbox Template_Toolbox2 */
             $this->imageToolbox->setTemplate(Template_Toolbox2::TEMPLATE_INLINE);
             echo $this->imageToolbox;
@@ -131,13 +131,13 @@ $this->addFile("js://photogalery:editphotos.js");
          </span>
       </li>
    </ul>
-   <?/*
+   <?php /*
    <div class="form-group">
       <div class="form-controls">
          <div class="input-group">
             <label for="images-oprtation"><?php ps($this->tr('Označené')); ?></label>
             <select name="images-oprtation" class="form-control" id="select-images-oprtation">
-               <option value="delte"><?ps($this->tr('Smazat'))?></option>
+               <option value="delte"><?php ps($this->tr('Smazat'))?></option>
             </select>
             <button type="button" class="input-group-btn"><span class="icon icon-check"></span></button>
          </div>
@@ -145,16 +145,16 @@ $this->addFile("js://photogalery:editphotos.js");
    </div>
     */?>
    <div id="dialog-image-labels">
-      <?
+      <?php 
       $this->editLabelsForm->text->html()->setAttrib('rows', 7);
       echo $this->editLabelsForm;
       ?>
    </div>
- <?/*  
+ <?php /*  
 <div class="modal fade">
    <div class="modal-dialog">
       <div class="modal-content">
-         <?=$this->editLabelsForm->renderStart();?>
+         <?php echo $this->editLabelsForm->renderStart();?>
          <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
             <h4 class="modal-title">Modal title</h4>
@@ -162,26 +162,26 @@ $this->addFile("js://photogalery:editphotos.js");
          <div class="modal-body">
             <div class="form-group">
                <div class="form-labels">
-                  <?=$this->editLabelsForm->name->label()?>
+                  <?php echo $this->editLabelsForm->name->label()?>
                </div>
                <div class="form-controls">
-                  <?=$this->editLabelsForm->name->controlAll()?>
+                  <?php echo $this->editLabelsForm->name->controlAll()?>
                </div>
             </div>
             <div class="form-group">
                <div class="form-labels">
-                  <?=$this->editLabelsForm->text->label()?>
+                  <?php echo $this->editLabelsForm->text->label()?>
                </div>
                <div class="form-controls">
-                  <?=$this->editLabelsForm->text->controlAll()?>
+                  <?php echo $this->editLabelsForm->text->controlAll()?>
                </div>
             </div>
          </div>
          <div class="modal-footer">
-            <?=$this->editLabelsForm->id->controlAll()?>
-            <?=$this->editLabelsForm->buttons->controlAll()?>
+            <?php echo $this->editLabelsForm->id->controlAll()?>
+            <?php echo $this->editLabelsForm->buttons->controlAll()?>
          </div>
-         <?=$this->editLabelsForm->renderEnd();?>
+         <?php echo $this->editLabelsForm->renderEnd();?>
       </div><!-- /.modal-content -->
    </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
@@ -189,13 +189,13 @@ $this->addFile("js://photogalery:editphotos.js");
    <script type="text/javascript">
       $(document).ready(function(){
          CubeImagesEditor.init({
-            uploadImageUrl : '<?=$this->link()->route('imageUploadAjax')?>',
-            imageDeleteUrl : '<?=$this->link()->route('imageDelete')?>',
-            imageMoveUrl : '<?=$this->link()->route('imageMove')?>',
-            imageRotateUrl : '<?=$this->link()->route('imageRotate')?>',
-            editLabelsUrl : '<?=$this->link()->route('imageEditLabels')?>',
+            uploadImageUrl : '<?php echo $this->link()->route('imageUploadAjax')?>',
+            imageDeleteUrl : '<?php echo $this->link()->route('imageDelete')?>',
+            imageMoveUrl : '<?php echo $this->link()->route('imageMove')?>',
+            imageRotateUrl : '<?php echo $this->link()->route('imageRotate')?>',
+            editLabelsUrl : '<?php echo $this->link()->route('imageEditLabels')?>',
             
-            getImagesUrl : '<?=$this->link()->route('getImages')?>'
+            getImagesUrl : '<?php echo $this->link()->route('getImages')?>'
          });
          
          // fixace elenetu na strnce při posunu

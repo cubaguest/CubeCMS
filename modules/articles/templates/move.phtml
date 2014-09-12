@@ -1,4 +1,4 @@
-<?
+<?php 
 $this->addFile("css://articles:style.css?original");
 // do titulku
 $h = sprintf( $this->tr('přesun položky "%s"'), $this->article->{Articles_Model::COLUMN_NAME});
@@ -6,12 +6,12 @@ $h = sprintf( $this->tr('přesun položky "%s"'), $this->article->{Articles_Mode
 $this->addPageTitle($this->article->{Articles_Model::COLUMN_NAME});
 $this->addPageTitle($this->tr('přesun položky'));
 ?>
-<h1><?=$h;?></h1>
+<h1><?php echo $h;?></h1>
 <div class="main-content-form-edit" id="article-move-form">
    <p class="admin-info-text">
-   <?echo $this->tr('Položka se přesune do níže vybrané kategorie včetně všech přiřazených obrázků.') ?>
+   <?php echo $this->tr('Položka se přesune do níže vybrané kategorie včetně všech přiřazených obrázků.') ?>
    </p>
-   <?
+   <?php 
    echo($this->form);
    ?>
 </div>

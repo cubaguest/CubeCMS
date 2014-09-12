@@ -1,4 +1,4 @@
-<?
+<?php 
 // do titulku
 $h = $this->tr('úprava pořadí osob');
 $this->addPageTitle($h);
@@ -8,17 +8,17 @@ $jq->addUISortable();
 $this->addJsPlugin($jq);
 $this->addFile('css://style.css');
 ?>
-<h1><?= $h ?></h1>
+<h1><?php echo  $h ?></h1>
 <div class="main-content-form-edit" id="orderform">
-   <? echo $this->form->renderStart(); ?>
+   <?php  echo $this->form->renderStart(); ?>
       <div id="teams-list">
-         <?
+         <?php 
          $curGroup = -1;
          foreach ($this->teams as $id => $team) {
             ?>
-            <div id="team-id-<?=$id?>" class="team ui-widget ui-widget-content">
-               <h2 class="ui-widget-header" title="<?ps($team['name'])?>"><?ps( $team['name'])?></h2>
-               <? // form 
+            <div id="team-id-<?php echo $id?>" class="team ui-widget ui-widget-content">
+               <h2 class="ui-widget-header" title="<?php ps($team['name'])?>"><?php ps( $team['name'])?></h2>
+               <?php  // form 
                $this->form->teamId->setDimensional($id);
                $this->form->teamId->setValues($id);
                echo $this->form->teamId;
@@ -29,11 +29,11 @@ $this->addFile('css://style.css');
                ?>
                
                <div class="persons-list">
-            <?  foreach ($team['persons'] as $person){?>
+            <?php   foreach ($team['persons'] as $person){?>
                   <div class="ui-state-default person">
-                     <img src="<?=$this->category()->getModule()->getDataDir(true).$person->{Teams_Model_Persons::COLUMN_IMAGE}?>" 
-                          alt="<?ps($person->{Teams_Model_Persons::COLUMN_NAME}." ".$person->{Teams_Model_Persons::COLUMN_SURNAME})?>" /><br />
-                     <?
+                     <img src="<?php echo $this->category()->getModule()->getDataDir(true).$person->{Teams_Model_Persons::COLUMN_IMAGE}?>" 
+                          alt="<?php ps($person->{Teams_Model_Persons::COLUMN_NAME}." ".$person->{Teams_Model_Persons::COLUMN_SURNAME})?>" /><br />
+                     <?php 
                      ps($person->{Teams_Model_Persons::COLUMN_NAME}." ".$person->{Teams_Model_Persons::COLUMN_SURNAME});
                      
                      $this->form->personTeamId->setDimensional($person->{Teams_Model_Persons::COLUMN_ID});
@@ -44,19 +44,19 @@ $this->addFile('css://style.css');
                      echo $this->form->personOrd;
                      ?>
                   </div>
-            <?}?>
+            <?php }?>
                </div>
                <hr class="reseter" />
             </div>
-         <?}?>
+         <?php }?>
       </div>
-      <p><?=$this->form->removeEmptyTeams->label()?><?=$this->form->removeEmptyTeams->controllAll()?></p>
-      <p><?=$this->form->save->label()?><?=$this->form->save->controllAll()?></p>
-   <? echo $this->form->renderEnd(); ?>
+      <p><?php echo $this->form->removeEmptyTeams->label()?><?php echo $this->form->removeEmptyTeams->controllAll()?></p>
+      <p><?php echo $this->form->save->label()?><?php echo $this->form->save->controllAll()?></p>
+   <?php  echo $this->form->renderEnd(); ?>
       <ul class="text">
-         <li><?=$this->tr("Pro změnu pořadí stačí osobu uchopit a přesunout.")?></li>
-         <li><?=$this->tr("Pro přesun skupiny je nutné skupinu uchopit za její nadpis.")?></li>
-         <li><?=$this->tr("Pokud bude skupina při ukládání prázdná, dojde k jejímu smazání.")?></li>
+         <li><?php echo $this->tr("Pro změnu pořadí stačí osobu uchopit a přesunout.")?></li>
+         <li><?php echo $this->tr("Pro přesun skupiny je nutné skupinu uchopit za její nadpis.")?></li>
+         <li><?php echo $this->tr("Pokud bude skupina při ukládání prázdná, dojde k jejímu smazání.")?></li>
       </ul>
    <script>
 	   $(function() {

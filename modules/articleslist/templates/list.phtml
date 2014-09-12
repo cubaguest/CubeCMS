@@ -1,10 +1,10 @@
-<h1><?=$this->category()->getName();?></h1>
-<?if($this->text != null){?>
-<div class="article-list-text"><?echo (string)$this->text?></div>
+<h1><?php echo $this->category()->getName();?></h1>
+<?php if($this->text != null){?>
+<div class="article-list-text"><?php echo (string)$this->text?></div>
 <br />
-<?}?>
+<?php }?>
 <div class="article-list">
-   <?if(!empty ($this->articles)) {
+   <?php if(!empty ($this->articles)) {
       foreach ($this->articles as $article) {
          $showClass = $public = null;
          if($article->{Articles_Model_Detail::COLUMN_CONCEPT} == 1){
@@ -12,35 +12,35 @@
          }
          $editTime = new DateTime($article->{Articles_Model_Detail::COLUMN_ADD_TIME});
          ?>
-   <div class="article-list-content <?=$showClass?>">
-      <h2><a href="<?=$this->link()->category($article->curlkey)->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
-             title="<?=htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>"><?=htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>&nbsp;
+   <div class="article-list-content <?php echo $showClass?>">
+      <h2><a href="<?php echo $this->link()->category($article->curlkey)->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
+             title="<?php echo htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>"><?php echo htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>&nbsp;
             <span class="smallFont">
-             <?=strftime("%x %X", $editTime->format("U"))?> - <?=$article->{Model_Users::COLUMN_USERNAME}?></span>
+             <?php echo strftime("%x %X", $editTime->format("U"))?> - <?php echo $article->{Model_Users::COLUMN_USERNAME}?></span>
          </a>
       </h2>
-            <? // nalezneme v textu první obrázek, pokud ano vykreslíme jej
+            <?php  // nalezneme v textu první obrázek, pokud ano vykreslíme jej
             $out = array();
             preg_match('/< *[img][^>]*[src] *= *[\"\']{0,1}([^"\'\ >]*)/i', $article->{Articles_Model_Detail::COLUMN_TEXT}, $out);
             if(!empty ($out) AND $out[1] != '0') {?>
       <div class="article-list-box-image">
-                  <?=vve_tpl_image_tag($out[1], "article title image", 80, 80);?>
+                  <?php echo vve_tpl_image_tag($out[1], "article title image", 80, 80);?>
       </div>
-            <?}?>
+            <?php }?>
 
-            <?//print (vve_tpl_xhtml_cut(strip_tags('img', $article->{Articles_Model_Detail::COLUMN_TEXT}), 650));?>
-            <?print vve_tpl_truncate(strip_tags($article->{Articles_Model_Detail::COLUMN_TEXT}), 640);?>
+            <?php //print (vve_tpl_xhtml_cut(strip_tags('img', $article->{Articles_Model_Detail::COLUMN_TEXT}), 650));?>
+            <?php print vve_tpl_truncate(strip_tags($article->{Articles_Model_Detail::COLUMN_TEXT}), 640);?>
       <hr class="reseter" />
-      <p style="float:left;"><?=$this->_('Zobrazeno')?>:&nbsp;<?=$article->{Articles_Model_Detail::COLUMN_SHOWED}?>&times;</p>
+      <p style="float:left;"><?php echo $this->_('Zobrazeno')?>:&nbsp;<?php echo $article->{Articles_Model_Detail::COLUMN_SHOWED}?>&times;</p>
       <p style="text-align:right;">
-         <a href="<?=$this->link()->category($article->curlkey)->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
-            title="<?//=$article['label']?>">[&nbsp;<?=$this->_("více")?>&nbsp;]</a>
+         <a href="<?php echo $this->link()->category($article->curlkey)->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
+            title="<?php //=$article['label']?>">[&nbsp;<?php echo $this->_("více")?>&nbsp;]</a>
       </p>
       <br />
    </div>
-     <?}
+     <?php }
    } else {
       print ($this->_('Není vložen žádný článek'));
    }?>
 </div>
-<?echo $this->toolbox;?>
+<?php echo $this->toolbox;?>

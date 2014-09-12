@@ -1,4 +1,4 @@
-<? // base metatags
+<?php  // base metatags
 Template_Core::setMetaTag('Robots', 'index,follow');
 Template_Core::setMetaTag('generator', AppCore::ENGINE_NAME.' '.AppCore::ENGINE_VERSION.'.'.  AppCore::ENGINE_RELEASE);
 // base styles
@@ -11,12 +11,12 @@ $this->addFile('css://style-handle.css');
       <meta name="viewport" content="width=device-width, initial-scale=1"> 
       <!-- {*-PAGE_META_TAGS-*}-->
       <title>{*-PAGE_TITLE-*}</title>
-      <base href="<?=Url_Link::getMainWebDir()?>" />
-      <link rel="canonical" href="<?=$this->link()->rmParam()?>" />
+      <base href="<?php echo Url_Link::getMainWebDir()?>" />
+      <link rel="canonical" href="<?php echo $this->link()->rmParam()?>" />
       <script type="text/javascript">
          /* <![CDATA[ */
-         document.domain = '<?=Url_Request::getDomain();?>';
-         document.lang = '<?=Locales::getLang()?>';
+         document.domain = '<?php echo Url_Request::getDomain();?>';
+         document.lang = '<?php echo Locales::getLang()?>';
          /* ]]> */
       </script>
       <!-- {*-STYLESHEETS-*}-->
@@ -24,15 +24,15 @@ $this->addFile('css://style-handle.css');
    </head>
    <body id="pageTop">
       <div data-role="page">
-         <div data-role="header" id="header"><?=VVE_WEB_NAME;?></div>
-         <? $this->includeTpl("messages.phtml", true);?>
-         <div data-role="content" id="content" class="module-content module-<?=  Category::getSelectedCategory()->getModule()->getName()?>">
-            <? $this->includeTpl("modules.phtml", true); ?>
+         <div data-role="header" id="header"><?php echo VVE_WEB_NAME;?></div>
+         <?php  $this->includeTpl("messages.phtml", true);?>
+         <div data-role="content" id="content" class="module-content module-<?php echo   Category::getSelectedCategory()->getModule()->getName()?>">
+            <?php  $this->includeTpl("modules.phtml", true); ?>
             <hr class="reseter" />
          </div>
          <div data-role="footer" id="footer">
-         <? $this->includeTplObj($this->menuObj);?>
-         <a id="button-no-mobile" href="<?=$this->link()->clear(true);?>" title="<?=$this->tr("Normální zobrazení")?>"><?=$this->tr("Normální zobrazení")?></a>
+         <?php  $this->includeTplObj($this->menuObj);?>
+         <a id="button-no-mobile" href="<?php echo $this->link()->clear(true);?>" title="<?php echo $this->tr("Normální zobrazení")?>"><?php echo $this->tr("Normální zobrazení")?></a>
       </div><!-- footwrap -->
       </div>
    </body>

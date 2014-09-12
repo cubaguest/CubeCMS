@@ -1,57 +1,57 @@
-<?
+<?php 
 $jsJqGrid = new Component_JqGrid_JsPlugin();
 $this->addJsPlugin($jsJqGrid);
 $this->addJsPlugin(new JsPlugin_JQuery());
 ?>
-<h1><?=$this->category()->getName();?></h1>
+<h1><?php echo $this->category()->getName();?></h1>
 <div class="main-content-list">
    <table id="table-tasks"></table>
    <div id="table-tasks-pager"></div>
    <br />
-   <h2><?=$this->tr('Adresa pro automatické spouštění')?></h2>
+   <h2><?php echo $this->tr('Adresa pro automatické spouštění')?></h2>
    <div>
-      <p><?=$this->tr('Tuto adresu zařaďte do automatického spouštění')?></p>
-      <em>/usr/bin/wget <?=Url_Request::getBaseWebDir(true)?>autorun.php > /dev/null 2>&1</em>
+      <p><?php echo $this->tr('Tuto adresu zařaďte do automatického spouštění')?></p>
+      <em>/usr/bin/wget <?php echo Url_Request::getBaseWebDir(true)?>autorun.php > /dev/null 2>&1</em>
    </div>
    <script type="text/javascript" charset="utf-8">
       /* <![CDATA[ */
       $(document).ready(function() {
          var tasksGrid = $("#table-tasks").jqGrid({
             ajaxGridOptions : {type:"POST"},
-            url: '<?=$this->link()->route('tasksList');?>',
+            url: '<?php echo $this->link()->route('tasksList');?>',
             datatype: "json",
-            colNames:['<?=$this->tr('ID')?>','<?=$this->tr('Modul')?>','<?=$this->tr('URL')?>', '<?=$this->tr('Perioda')?>'],
+            colNames:['<?php echo $this->tr('ID')?>','<?php echo $this->tr('Modul')?>','<?php echo $this->tr('URL')?>', '<?php echo $this->tr('Perioda')?>'],
             colModel:[
-               {name:'<?=Model_AutoRun::COLUMN_ID?>',index:'<?=Model_AutoRun::COLUMN_ID?>',
+               {name:'<?php echo Model_AutoRun::COLUMN_ID?>',index:'<?php echo Model_AutoRun::COLUMN_ID?>',
                   width:33,editable:false},
-               {name:'<?=Model_AutoRun::COLUMN_MODULE_NAME?>',index:'<?=Model_AutoRun::COLUMN_MODULE_NAME?>',
-                  width:130,editable:true, edittype:"select", editoptions:{value: <?=json_encode($this->modules)?>},
-                  formoptions: { rowpos:1, label: "<?=$this->tr('Modul')?>"}},
-               {name:'<?=Model_AutoRun::COLUMN_URL?>',index:'<?=Model_AutoRun::COLUMN_URL?>', width:400,
+               {name:'<?php echo Model_AutoRun::COLUMN_MODULE_NAME?>',index:'<?php echo Model_AutoRun::COLUMN_MODULE_NAME?>',
+                  width:130,editable:true, edittype:"select", editoptions:{value: <?php echo json_encode($this->modules)?>},
+                  formoptions: { rowpos:1, label: "<?php echo $this->tr('Modul')?>"}},
+               {name:'<?php echo Model_AutoRun::COLUMN_URL?>',index:'<?php echo Model_AutoRun::COLUMN_URL?>', width:400,
                    editable:true, editoptions: {size:20},
-                  formoptions:{ rowpos:2, label: "<?=$this->tr('URL adresa')?>"}},
-               {name:'<?=Model_AutoRun::COLUMN_PERIOD?>',index:'<?=Model_AutoRun::COLUMN_PERIOD?>', width:100,
-                   editable:true, edittype:"select", editoptions:{value: <?=json_encode($this->periods)?>},
-                  formoptions:{ rowpos:3, label: "<?=$this->tr('Perioda')?>",elmprefix:"(*)" }}
+                  formoptions:{ rowpos:2, label: "<?php echo $this->tr('URL adresa')?>"}},
+               {name:'<?php echo Model_AutoRun::COLUMN_PERIOD?>',index:'<?php echo Model_AutoRun::COLUMN_PERIOD?>', width:100,
+                   editable:true, edittype:"select", editoptions:{value: <?php echo json_encode($this->periods)?>},
+                  formoptions:{ rowpos:3, label: "<?php echo $this->tr('Perioda')?>",elmprefix:"(*)" }}
             ],
             rowNum:20,
             rowList:[10,20,40,100],
             pager: '#table-tasks-pager',
-            sortname: '<?=Model_AutoRun::COLUMN_ID?>',
+            sortname: '<?php echo Model_AutoRun::COLUMN_ID?>',
             caption:"Plánované úlohy",
             height: '100%',
             autowidth : true,
             jsonReader: { repeatitems : false, root:"rows" },
-            editurl:"<?=$this->link()->route('taskEdit')?>"
+            editurl:"<?php echo $this->link()->route('taskEdit')?>"
          });
          // úpravy
          jQuery("#table-tasks").jqGrid('navGrid','#table-tasks-pager',
             {view:false}, //options
             {height:250,reloadAfterSubmit:true, jqModal:true, closeOnEscape:true,viewPagerButtons:false, // edit options
-               bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné')?>",closeAfterEdit:true,
+               bottominfo:"<?php echo $this->tr('Položky označené (*) jsou povinné')?>",closeAfterEdit:true,
                beforeSubmit : function(postdata, formid){
-                  if(postdata.<?=Model_AutoRun::COLUMN_MODULE_NAME?> == "u" && postdata.<?=Model_AutoRun::COLUMN_URL?> == "" ){
-                     return[false,'<?=$this->tr('Musíte zadat modul nebo URL adresu')?>'];
+                  if(postdata.<?php echo Model_AutoRun::COLUMN_MODULE_NAME?> == "u" && postdata.<?php echo Model_AutoRun::COLUMN_URL?> == "" ){
+                     return[false,'<?php echo $this->tr('Musíte zadat modul nebo URL adresu')?>'];
                   }
                   return [true]
                },
@@ -66,10 +66,10 @@ $this->addJsPlugin(new JsPlugin_JQuery());
                }
             },
             {height:200,reloadAfterSubmit:true,jqModal:true, closeOnEscape:true, // add options
-               bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné')?>", closeAfterAdd: true,
+               bottominfo:"<?php echo $this->tr('Položky označené (*) jsou povinné')?>", closeAfterAdd: true,
                beforeSubmit : function(postdata, formid){
-                  if(postdata.<?=Model_AutoRun::COLUMN_MODULE_NAME?> == "u" && postdata.<?=Model_AutoRun::COLUMN_URL?> == "" ){
-                     return[false,'<?=$this->tr('Musíte zadat modul nebo URL adresu')?>'];
+                  if(postdata.<?php echo Model_AutoRun::COLUMN_MODULE_NAME?> == "u" && postdata.<?php echo Model_AutoRun::COLUMN_URL?> == "" ){
+                     return[false,'<?php echo $this->tr('Musíte zadat modul nebo URL adresu')?>'];
                   }
                   return [true]
                },

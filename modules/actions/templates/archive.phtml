@@ -1,4 +1,4 @@
-<?
+<?php 
 $this->addPageTitle($this->tr('Archiv'));
 
 $jQuery = new JsPlugin_JQuery();
@@ -9,22 +9,22 @@ $model = new Actions_Model_List();
 $actions = $model->getAllActions($this->category()->getId(), !$this->category()->getRights()->isWritable());
 
 ?>
-<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $this->category()->getName().' - '.$this->tr('Archiv');;?></h1>
+<h1><?php $this->includeFile('tpl://engine:headline/icon.phtml'); echo $this->category()->getName().' - '.$this->tr('Archiv');;?></h1>
 <div class="main-content-archive">
    <div class="main-content-tools">
-      <a href="<?=$this->link()->route()?>" title="<?=$this->tr('Seznam')?>"><?=$this->tr('Seznam')?></a>
+      <a href="<?php echo $this->link()->route()?>" title="<?php echo $this->tr('Seznam')?>"><?php echo $this->tr('Seznam')?></a>
    </div>
    <div class="main-content-list" id="actionsArchiveList">
-      <? $prevYear = null;
+      <?php  $prevYear = null;
       while ($row = $actions->fetch()) {
          $date = new DateTime($row->{Actions_Model::COLUMN_DATE_START});
          $year = $date->format("Y");
          if($year == $prevYear) continue;
          $prevYear = $year;?>
-      <h2 class="main-content-archive-year actionYearLabel year<?=$year?>"><a href="#"><?=$year?></a></h2>
+      <h2 class="main-content-archive-year actionYearLabel year<?php echo $year?>"><a href="#"><?php echo $year?></a></h2>
       <div class="main-content-archive-year-content">
          <table cellpadding="0" cellspacing="0">
-               <?$curAct = $model->getActions($this->category()->getId(),
+               <?php $curAct = $model->getActions($this->category()->getId(),
                        new DateTime($year.'-1-1'), new DateTime($year.'-12-31'),
 //                       mktime(0, 0, 0, 1, 1, $year), mktime(23, 59, 59, 12, 31, $year),
                        !$this->category()->getRights()->isWritable());
@@ -46,36 +46,36 @@ $actions = $model->getAllActions($this->category()->getId(), !$this->category()-
                   if($mounth != $prevMounth) {
                      $prevMounth = $mounth;?>
             <tr>
-               <td colspan="3"><a href="#" onclick="return showMonth(this,'.mounth_<?=$mounthNum?>');"
-                                  title="<?=$this->tr('zobraz')." ".$mounth?>">
-                     <img src="<?=vve_get_tpl_file('buttons/expand2.gif',VVE_TPL_FILE_IMAGE)?>"
-                          alt="expand" />&nbsp;<?=$mounth?></a></td>
+               <td colspan="3"><a href="#" onclick="return showMonth(this,'.mounth_<?php echo $mounthNum?>');"
+                                  title="<?php echo $this->tr('zobraz')." ".$mounth?>">
+                     <img src="<?php echo vve_get_tpl_file('buttons/expand2.gif',VVE_TPL_FILE_IMAGE)?>"
+                          alt="expand" />&nbsp;<?php echo $mounth?></a></td>
             </tr>
-                     <?}?>
-            <tr class="mounth_<?=$mounthNum?>" style="display: none;">
-               <td><span style="padding-left: 1em;"><?=$startDate?></span></td>
-               <td><?if($dateStop !== null) {
+                     <?php }?>
+            <tr class="mounth_<?php echo $mounthNum?>" style="display: none;">
+               <td><span style="padding-left: 1em;"><?php echo $startDate?></span></td>
+               <td><?php if($dateStop !== null) {
                            print ("&nbsp;&mdash;&nbsp;".$dateStop);
                 }?>
                </td>
                <td>
                   &nbsp;&nbsp;
-                  <a href="<?=$this->link()->route('detail', array('urlkey' => $rowY->{Actions_Model::COLUMN_URLKEY}))?>"
-                     title="<?=$rowY->{Actions_Model::COLUMN_NAME}?>"
-                     ><?ps($rowY->{Actions_Model::COLUMN_NAME});?></a>
+                  <a href="<?php echo $this->link()->route('detail', array('urlkey' => $rowY->{Actions_Model::COLUMN_URLKEY}))?>"
+                     title="<?php echo $rowY->{Actions_Model::COLUMN_NAME}?>"
+                     ><?php ps($rowY->{Actions_Model::COLUMN_NAME});?></a>
                </td>
             </tr>
-                  <?}?>
+                  <?php }?>
          </table>
       </div>
-         <?}?>
+         <?php }?>
    </div>
    <hr class="reseter" />
 </div>
 <script type="text/javascript">
    /* <![CDATA[ */
    $(function() {
-      $("#actionsArchiveList").accordion({collapsible: true,autoHeight: false,active: '.year<?=date('Y')?>'});
+      $("#actionsArchiveList").accordion({collapsible: true,autoHeight: false,active: '.year<?php echo date('Y')?>'});
    });
    function showMonth(aObj, cls){
       $(cls).toggle(0,function(){

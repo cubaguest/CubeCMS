@@ -1,12 +1,12 @@
-<?
+<?php 
 $this->addJsPlugin(new JsPlugin_JQuery());
 ?>
-<h1><?=$this->tr('Nastavení objednávek')?></h1>
-<?
+<h1><?php echo $this->tr('Nastavení objednávek')?></h1>
+<?php 
 $this->includeFile('tpl://nav.phtml');
 ?>
 <div class="main-content-form-edit">
-   <?
+   <?php 
    $this->form->html()->setAttrib('name', 'orderSetup');
    $this->form->notifyUserMail->html()->setAttrib('rows', 12);
    $this->form->notifyAdminMail->html()->setAttrib('rows', 12);

@@ -1,9 +1,9 @@
-<?
+<?php 
 $jQuery = new JsPlugin_JQuery();
 $this->addJsPlugin($jQuery);
 ?>
-<h1><?=$this->tr('Úprava položky s videem')?></h1>
-<?
+<h1><?php echo $this->tr('Úprava položky s videem')?></h1>
+<?php 
 $this->form->videoObj->html()->setAttrib('rows', 6)->setAttrib('cols', 70);
 echo $this->form;
 ?>
@@ -12,7 +12,7 @@ echo $this->form;
 <script type="text/javascript">
    $(document).ready(function(){
       var container = $('<p></p>').attr('id', 'video-preview');
-      $('textarea[name=text_item_videoObj]').parent().append(container).append('<a href="#" id="test-video"><?=$this->tr('Otestovat')?></a>');
+      $('textarea[name=text_item_videoObj]').parent().append(container).append('<a href="#" id="test-video"><?php echo $this->tr('Otestovat')?></a>');
       // event
       $('#test-video').click(function(){
          var videoTag = $('textarea[name=text_item_videoObj]').val().match(/<(?:iframe|object)[^>]*>.*?<\/(?:iframe|object)>/i);

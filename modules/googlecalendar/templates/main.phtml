@@ -1,26 +1,26 @@
-<?
+<?php 
 $this->addFile("css://style.css");
 echo $this->toolbox;
 ?>
-<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $this->category()->getName();?></h1>
+<h1><?php $this->includeFile('tpl://engine:headline/icon.phtml'); echo $this->category()->getName();?></h1>
 <div class="detail">
    <div class="text">
-      <div><?=$this->tr('Aktuální datum:')?> <span id="current-date"></span></div>
+      <div><?php echo $this->tr('Aktuální datum:')?> <span id="current-date"></span></div>
       <div id="calendar-buttons">
-         <a href="<?=$this->link()?>#prev" id="button-prev-week"><?=$this->tr('Předchozí')?></a>
-         <a href="<?=$this->link()?>#next" id="button-next-week"><?=$this->tr('Další')?></a>
+         <a href="<?php echo $this->link()?>#prev" id="button-prev-week"><?php echo $this->tr('Předchozí')?></a>
+         <a href="<?php echo $this->link()?>#next" id="button-next-week"><?php echo $this->tr('Další')?></a>
       </div>
       <div id="calendar-table">
       <table id="calendar" class="full-width">
          <thead>
             <tr>
-               <th><?=$this->tr('Den')?></th>
-               <th><?=$this->tr('Události')?></th>
+               <th><?php echo $this->tr('Den')?></th>
+               <th><?php echo $this->tr('Události')?></th>
             </tr>
          </thead>
          <tbody>
             <tr id="day-1" class="day">
-               <td class="event-day"><span class="event-day-name"><?=$this->tr('Pondělí')?></span><span class="event-date"></span></td>
+               <td class="event-day"><span class="event-day-name"><?php echo $this->tr('Pondělí')?></span><span class="event-date"></span></td>
                <td class="events">
                   <table>
                      <tr>
@@ -32,7 +32,7 @@ echo $this->toolbox;
                </td>
             </tr>
             <tr id="day-2" class="day">
-               <td class="event-day"><span class="event-day-name"><?=$this->tr('Úterý')?></span><span class="event-date"></span></td>
+               <td class="event-day"><span class="event-day-name"><?php echo $this->tr('Úterý')?></span><span class="event-date"></span></td>
                <td class="events">
                   <table>
                      <tr>
@@ -44,7 +44,7 @@ echo $this->toolbox;
                </td>
             </tr>
             <tr id="day-3" class="day">
-               <td class="event-day"><span class="event-day-name"><?=$this->tr('Středa')?></span><span class="event-date"></span></td>
+               <td class="event-day"><span class="event-day-name"><?php echo $this->tr('Středa')?></span><span class="event-date"></span></td>
                <td class="events">
                   <table>
                      <tr>
@@ -56,7 +56,7 @@ echo $this->toolbox;
                </td>
             </tr>
             <tr id="day-4" class="day">
-               <td class="event-day"><span class="event-day-name"><?=$this->tr('Čtvrtek')?></span><span class="event-date"></span></td>
+               <td class="event-day"><span class="event-day-name"><?php echo $this->tr('Čtvrtek')?></span><span class="event-date"></span></td>
                <td class="events">
                   <table>
                      <tr>
@@ -68,7 +68,7 @@ echo $this->toolbox;
                </td>
             </tr>
             <tr id="day-5" class="day">
-               <td class="event-day"><span class="event-day-name"><?=$this->tr('Pátek')?></span><span class="event-date"></span></td>
+               <td class="event-day"><span class="event-day-name"><?php echo $this->tr('Pátek')?></span><span class="event-date"></span></td>
                <td class="events">
                   <table>
                      <tr>
@@ -80,7 +80,7 @@ echo $this->toolbox;
                </td>
             </tr>
             <tr id="day-6" class="day">
-               <td class="event-day"><span class="event-day-name"><?=$this->tr('Sobota')?></span><span class="event-date"></span></td>
+               <td class="event-day"><span class="event-day-name"><?php echo $this->tr('Sobota')?></span><span class="event-date"></span></td>
                <td class="events">
                   <table>
                      <tr>
@@ -92,7 +92,7 @@ echo $this->toolbox;
                </td>
             </tr>
             <tr id="day-0" class="day">
-               <td class="event-day"><span class="event-day-name"><?=$this->tr('Neděle')?></span><span class="event-date"></span></td>
+               <td class="event-day"><span class="event-day-name"><?php echo $this->tr('Neděle')?></span><span class="event-date"></span></td>
                <td class="events">
                   <table>
                      <tr>
@@ -108,7 +108,7 @@ echo $this->toolbox;
       </div>
    </div>
 </div>
-<?
+<?php 
 $jq = new JsPlugin_JQuery();
 $this->addJsPlugin($jq);
 $baseDate = new DateTime();
@@ -168,8 +168,8 @@ $baseDate->modify((-$dayOfWeek+1)." day");
    }
    
    /* BASE INIT */
-   var dateStart = new Date(<?=$baseDate->format("U")?>*1000);
-   var dateEnd = new Date(<?=$baseDate->format("U")?>*1000);
+   var dateStart = new Date(<?php echo $baseDate->format("U")?>*1000);
+   var dateEnd = new Date(<?php echo $baseDate->format("U")?>*1000);
    dateEnd.setDate(dateStart.getDate()+7);
    
    $(document).ready(function(){
@@ -177,7 +177,7 @@ $baseDate->modify((-$dayOfWeek+1)." day");
       $calendar.bind("loadData", function(){
          var $c = $(this);
          $.ajax({
-            url: '<?=$this->calendarUrl?>',
+            url: '<?php echo $this->calendarUrl?>',
             data : {
                "start-min" : dateStart.getRFC3339(),
                "start-max" : dateEnd.getRFC3339(),
@@ -187,7 +187,7 @@ $baseDate->modify((-$dayOfWeek+1)." day");
                "singleevents" : "true"
             },
             dataType: "json",
-            cache: <?echo VVE_DEBUG_LEVEL == 0 ? "true" : "false"?>,
+            cache: <?php echo VVE_DEBUG_LEVEL == 0 ? "true" : "false"?>,
             success: function(data){
                $c.trigger("updateDateString");
                $c.trigger("updateCalendar", data.feed);
@@ -237,7 +237,7 @@ $baseDate->modify((-$dayOfWeek+1)." day");
          // empty rows
          $(".events table:empty", $c)
             .addClass('no-events')
-            .append( $('<tr></tr>').append( $('<td></td>').text('<?=$this->tr('Žádná událost.')?>') ) );
+            .append( $('<tr></tr>').append( $('<td></td>').text('<?php echo $this->tr('Žádná událost.')?>') ) );
          
       });
    

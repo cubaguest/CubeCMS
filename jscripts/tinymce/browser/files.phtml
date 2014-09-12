@@ -11,7 +11,7 @@ if(!empty ($this->files)) {?>
    <p class="fileActions">úpravy</p>
 </div>
 <ul id="filesSelectable">
-      <?
+      <?php 
       foreach ($this->files as $file) {
          if($file['size'] < 1024) {
             $file['size'] = ($file['size']);
@@ -26,10 +26,10 @@ if(!empty ($this->files)) {?>
             $k = " MB";
          }
          ?>
-   <li class="file<?if($this->editable) print(' dragableFile');?>">
+   <li class="file<?php if($this->editable) print(' dragableFile');?>">
       <p class="filePreview">
-         <span file="<?=$file['path'].$file['name']?>">
-                  <?if($file['type'] == 'image') {
+         <span file="<?php echo $file['path'].$file['name']?>">
+                  <?php if($file['type'] == 'image') {
                       print(vve_tpl_image_tag($file['path'].$file['name']."?".time(), $file['name'], 75, 75));
                      } else {
                      if(file_exists(AppCore::getAppLibDir().'images/mime/'.$file['mime'].'.png')) {
@@ -39,33 +39,33 @@ if(!empty ($this->files)) {?>
                      }
                      print(vve_tpl_image_tag($image, 'mime icon', 75, 75));
                      ?>
-                     <?}?>
+                     <?php }?>
          </span>
       </p>
       <p class="fileName">
-         <span class="name"><?=$file['name']?></span><br/>
-         <span class="fileLabel">Velikost:&nbsp;<?printf("%.2f %s", $file['size'], $k)?></span><br />
-               <?if($file['type'] == 'image') {?>
-         <span class="fileLabel">Rozměry:&nbsp;<?=$file['width'].' x '.$file['height']?>px</span><br />
-                  <?}?>
-         <span class="fileLabel">Mime typ:&nbsp;<?=$file['mime']?></span>
+         <span class="name"><?php echo $file['name']?></span><br/>
+         <span class="fileLabel">Velikost:&nbsp;<?php printf("%.2f %s", $file['size'], $k)?></span><br />
+               <?php if($file['type'] == 'image') {?>
+         <span class="fileLabel">Rozměry:&nbsp;<?php echo $file['width'].' x '.$file['height']?>px</span><br />
+                  <?php }?>
+         <span class="fileLabel">Mime typ:&nbsp;<?php echo $file['mime']?></span>
       </p>
       <p class="fileActions">
-               <?
+               <?php 
                if($this->editable == true) {
                   if($file['type'] == 'image') {?>
          <input type="image" src="../../../images/icons/image_edit.png"
-                title="Upravit obrázek" onclick="FileBrowserFilesFunctions.imageEdit('<?=$file['name']?>', '<?=$file['path']?>')" />
-                            <?}?>
+                title="Upravit obrázek" onclick="FileBrowserFilesFunctions.imageEdit('<?php echo $file['name']?>', '<?php echo $file['path']?>')" />
+                            <?php }?>
          <input type="image" src="../../../images/icons/page_edit.png"
-                title="Přejmenovat soubor" onclick="FileBrowserFilesFunctions.renameFile('<?=$file['name']?>')" />
+                title="Přejmenovat soubor" onclick="FileBrowserFilesFunctions.renameFile('<?php echo $file['name']?>')" />
          <input type="image" src="../../../images/icons/delete.png"
-                title="Smazat soubor" onclick="FileBrowserFilesFunctions.removeFile('<?=$file['name']?>')" />
-                  <?}?>
+                title="Smazat soubor" onclick="FileBrowserFilesFunctions.removeFile('<?php echo $file['name']?>')" />
+                  <?php }?>
       </p>
    </li>
-         <?}?>
+         <?php }?>
 </ul>
-   <?} else {?>
-<div><?=_("Adresář je prázdný")?></div>
-   <?}?>
+   <?php } else {?>
+<div><?php echo _("Adresář je prázdný")?></div>
+   <?php }?>

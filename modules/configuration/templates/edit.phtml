@@ -1,5 +1,5 @@
 <div>
-<?
+<?php 
 // do titulku
 if($this->editGlobalOption == true){
    $h = $this->tr('úprava globální volby').' '.$this->option->{Model_Config::COLUMN_KEY};
@@ -8,9 +8,9 @@ if($this->editGlobalOption == true){
 }
 $this->addPageTitle($h);
 ?>
-<h1><?=$h?></h1>
+<h1><?php echo $h?></h1>
 <div class="main-content-form-edit">
-   <?=$this->form?>
+   <?php echo $this->form?>
 </div>
 
 

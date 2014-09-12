@@ -1,4 +1,4 @@
-<?
+<?php 
 /**
  * Variables
  * $this->project - objekt projektu
@@ -13,42 +13,42 @@ $this->addPageTitle($h);
 echo $this->toolbox;
 ?>
 
-<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo htmlspecialchars($h);?></h1>
+<h1><?php $this->includeFile('tpl://engine:headline/icon.phtml'); echo htmlspecialchars($h);?></h1>
 <div class="main-content-detail">
    <div class="main-content-text">
-      <?if($this->project->{Projects_Model_Projects::COLUMN_IMAGE} != null){?>
+      <?php if($this->project->{Projects_Model_Projects::COLUMN_IMAGE} != null){?>
       <div class="main-content-image">
-         <img src="<?=$this->dataDir.$this->project->{Projects_Model_Projects::COLUMN_IMAGE}?>" />
+         <img src="<?php echo $this->dataDir.$this->project->{Projects_Model_Projects::COLUMN_IMAGE}?>" />
       </div>
-      <?}?>
+      <?php }?>
       
-      <?=$this->filter((string)$this->project->{Projects_Model_Projects::COLUMN_TEXT}, array('emoticons'));?>
+      <?php echo $this->filter((string)$this->project->{Projects_Model_Projects::COLUMN_TEXT}, array('emoticons'));?>
    </div>
    <hr class="reseter" />
-   <?if(count($this->images > 0)){?>
-   <h2><?=$this->tr('Náhledy')?></h2>
-   <?}?>
-   <? // images gallery
+   <?php if(count($this->images > 0)){?>
+   <h2><?php echo $this->tr('Náhledy')?></h2>
+   <?php }?>
+   <?php  // images gallery
    $this->imagesBaseDir = $this->dataDir;
    $this->includeFile('tpl://engine:photogalery.phtml');
    ?>
    
-   <?if($this->projectsRelated != null){?>
-   <h2><?=$this->tr('Související projekty')?></h2>
+   <?php if($this->projectsRelated != null){?>
+   <h2><?php echo $this->tr('Související projekty')?></h2>
    <div class="main-content-text">
       <ul>
-         <?foreach ($this->projectsRelated as $project) {
+         <?php foreach ($this->projectsRelated as $project) {
          $link = $this->link()->route('project', array('prkey' => $project->{Projects_Model_Projects::COLUMN_URLKEY},
                                                                'seckey' => $project->{Projects_Model_Sections::COLUMN_URLKEY}));   
          ?>
-         <li><a href="<?=$link?>" title="<?=$project->{Projects_Model_Projects::COLUMN_NAME}?>"><?=$project->{Projects_Model_Projects::COLUMN_NAME}?></a></li>            
-         <?}?>
+         <li><a href="<?php echo $link?>" title="<?php echo $project->{Projects_Model_Projects::COLUMN_NAME}?>"><?php echo $project->{Projects_Model_Projects::COLUMN_NAME}?></a></li>            
+         <?php }?>
       </ul>
    </div>
-   <?}?>
+   <?php }?>
 <!-- relevantní projekty-->
    <hr class="reseter" />
-   <?$this->includeTpl('articletools.phtml', true, array('shares' => array('url' => $this->link(), 'title' => $h)));?>
+   <?php $this->includeTpl('articletools.phtml', true, array('shares' => array('url' => $this->link(), 'title' => $h)));?>
 </div>
 
 

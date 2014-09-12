@@ -1,4 +1,4 @@
-<?
+<?php 
 $t = $this->tr('Správa kateorií poradny');
 Template::addPageTitle($this->tr('Správa kateorií'));
 $this->addFile('css://style.css');
@@ -13,16 +13,16 @@ if($this->formSortDrugs != null){
 }
 ?>
 
-<h1><?echo $t;?></h1>
+<h1><?php echo $t;?></h1>
 <div class="main-content-detail">
-   <h2><?=$this->tr('Kategorie')?></h2>
-   <?
+   <h2><?php echo $this->tr('Kategorie')?></h2>
+   <?php 
    echo $this->formSortCats->renderStart();?>
    <ul id="cats-sortable" class="cats-sortable">
-   <?foreach ($this->cats as $cat) {?>
+   <?php foreach ($this->cats as $cat) {?>
       <li class="ui-state-default ui-state-active">
          <span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
-         <?
+         <?php 
          $this->formSortCats->name->setDimensional($cat->{Advice_Model_Categories::COLUMN_ID});
          $this->formSortCats->name->setValues($cat->{Advice_Model_Categories::COLUMN_NAME});
          echo $this->formSortCats->name->controll();
@@ -32,21 +32,21 @@ if($this->formSortDrugs != null){
          echo $this->formSortCats->delete->controll();
          ?>
       </li>
-   <?}?>
+   <?php }?>
    </ul>
    <div class="sort-tools ui-state-default">
-         <?=$this->formSortCats->save->controll();?>
-      <input type="button" name="add-cat" value="<?=$this->tr('Přidat kategorii')?>" />
+         <?php echo $this->formSortCats->save->controll();?>
+      <input type="button" name="add-cat" value="<?php echo $this->tr('Přidat kategorii')?>" />
    </div>
-   <?=$this->formSortCats->renderEnd();?>
-   <?if($this->formSortDrugs != null){?>
-   <h2><?=$this->tr('Drogy')?></h2>
-   <?=$this->formSortDrugs->renderStart();?>
+   <?php echo $this->formSortCats->renderEnd();?>
+   <?php if($this->formSortDrugs != null){?>
+   <h2><?php echo $this->tr('Drogy')?></h2>
+   <?php echo $this->formSortDrugs->renderStart();?>
    <ul id="drugs-sortable" class="cats-sortable">
-   <?foreach ($this->drugs as $drug) {?>
+   <?php foreach ($this->drugs as $drug) {?>
       <li class="ui-state-default ui-state-active">
          <span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
-         <?
+         <?php 
          $this->formSortDrugs->name->setDimensional($drug->{Advice_Model_Categories::COLUMN_ID});
          $this->formSortDrugs->name->setValues($drug->{Advice_Model_Categories::COLUMN_NAME});
          echo $this->formSortDrugs->name->controll();
@@ -56,26 +56,26 @@ if($this->formSortDrugs != null){
          echo $this->formSortDrugs->delete->controll();
          ?>
       </li>
-   <?}?>
+   <?php }?>
    </ul>
    <div class="sort-tools ui-state-default">
-         <?=$this->formSortDrugs->save->controll();?>
-      <input type="button" name="add-drug" value="<?=$this->tr('Přidat drogu')?>" />
+         <?php echo $this->formSortDrugs->save->controll();?>
+      <input type="button" name="add-drug" value="<?php echo $this->tr('Přidat drogu')?>" />
    </div>
-   <?=$this->formSortDrugs->renderEnd();?>
-   <?}?>
+   <?php echo $this->formSortDrugs->renderEnd();?>
+   <?php }?>
    
 </div>
 
 <div id="add-cat-dialog" title="">
-   <?
+   <?php 
    $this->formAdd->save->setCancelConfirm(false);
    echo $this->formAdd;
    ?>
 </div>
 
 <div id="test"></div>
-<?
+<?php 
 $jq = new JsPlugin_JQuery();
 $jq->addUISortable();
 $jq->addUIDialog();
@@ -101,13 +101,13 @@ $this->addJsPlugin($jq);
          // button add cat
          $('input[name="add-cat"]').click(function(){
             addDialog.find('input[type="checkbox"]').removeAttr('checked');
-            addDialog.dialog("option", 'title', '<?=$this->tr('Přidání kategorie')?>').dialog( "open" );
+            addDialog.dialog("option", 'title', '<?php echo $this->tr('Přidání kategorie')?>').dialog( "open" );
          });
          
          // button add drug
          $('input[name="add-drug"]').click(function(){
             addDialog.find('input[type="checkbox"]').attr('checked', 'checked');
-            addDialog.dialog("option", "title", '<?=$this->tr('Přidání drogy')?>').dialog( "open" );
+            addDialog.dialog("option", "title", '<?php echo $this->tr('Přidání drogy')?>').dialog( "open" );
          });
          
          // zavření dialogu při zrušení
@@ -128,7 +128,7 @@ $this->addJsPlugin($jq);
          
          $('.button-cancel').click(function(){
             if(someChanges == true){
-               if(!confirm('<?=$this->tr('Zrušit neuložené změny?')?>')){return false;}
+               if(!confirm('<?php echo $this->tr('Zrušit neuložené změny?')?>')){return false;}
             }
          });
          

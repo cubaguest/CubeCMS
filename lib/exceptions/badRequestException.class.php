@@ -1,4 +1,4 @@
-<?
+<?php 
 /**
  * Třída s vyjímkou špatného požadavku na aplikaci
  * Třída rozšiřuje třídu CoreException

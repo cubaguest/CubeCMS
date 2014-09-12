@@ -1,4 +1,4 @@
-<?
+<?php 
 /*
  * php script k vygenerování smajlíků,
  * je součástí pluginu a integruje se přes přidání pluginu

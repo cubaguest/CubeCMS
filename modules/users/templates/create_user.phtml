@@ -1,4 +1,4 @@
-<?
+<?php 
 // do titulku
 $h = $this->tr('Vytvoření nového uživatelského účtu');
 $this->addPageTitle($h);
@@ -6,10 +6,10 @@ $this->addJsPlugin(New JsPlugin_JQuery());
 // donastavení formuláře
 // $this->form->password->html()->addContent('test');
 ?>
-<h1><?=$h?></h1>
-<?$this->includeTpl('navigation.phtml');?>
+<h1><?php echo $h?></h1>
+<?php $this->includeTpl('navigation.phtml');?>
 <div class="main-content-form-edit">
-   <?
+   <?php 
    echo($this->form);
    ?>
    <script type="text/javascript">
@@ -42,7 +42,7 @@ $this->addJsPlugin(New JsPlugin_JQuery());
 	   $('#buttonGeneratePasswd').click(function(e){
 		   e.preventDefault();
 		   var $i = $(this).prev();
-		   $i.val(password(<?=Users_Controller::PASSWORD_MIN_LENGHT?>) );
+		   $i.val(password(<?php echo Users_Controller::PASSWORD_MIN_LENGHT?>) );
 		});
 	   // generate username
 	   if( $('input[name="create_user_username"]').val() == "") {
@@ -59,7 +59,7 @@ $this->addJsPlugin(New JsPlugin_JQuery());
 		$('input[name="create_user_username"]').keyup(function(){
 			var cur = $(this).val();
 			$.ajax({
-				url : '<?=$this->link()->route('checkUserName')?>',
+				url : '<?php echo $this->link()->route('checkUserName')?>',
 				data : { uname : cur},
 				type: "POST",
 				success : function(data){
@@ -72,7 +72,7 @@ $this->addJsPlugin(New JsPlugin_JQuery());
 						$usernameStatus.html(null);
 						$usernameStatus.append(' ');
 						$usernameStatus.append($('<img />').attr('src', 'images/icons/exclamation.png'));
-						$usernameStatus.append(' <?=$this->tr('Obsazeno')?>');
+						$usernameStatus.append(' <?php echo $this->tr('Obsazeno')?>');
 						$('input[name="create_user_username"]').addClass('form-error');
 					} else {
 						vveShowMessages(data);

@@ -1,70 +1,70 @@
 <!--Sipky pro posun stranek-->
-<?
+<?php 
 if($this->countAllPages > 1){?>
 <div class="scroll_main">
 <table>
 <tr>
 <td width="100" align="left">
-<? //Sipka na zacatek
+<?php  //Sipka na zacatek
    if($this->activeButtonBegin){
       ?>
-      <a href="<?=$this->pageLink()->rmParam($this->pageParam)?>" title="<?=$this->textStart?>">|&lt;</a>
-   <?} else {?>
+      <a href="<?php echo $this->pageLink()->rmParam($this->pageParam)?>" title="<?php echo $this->textStart?>">|&lt;</a>
+   <?php } else {?>
       |&lt;
-   <?}?>
+   <?php }?>
    &#032;&#032;
 
-<? //Sipka na předchozí
+<?php  //Sipka na předchozí
    if($this->activeButtonPrevious){?>
-      <a href="<?=$this->pageLink()->param($this->pageParam, $this->selectedPage-1)?>" title="<?=$this->textPrev?>">
-         <span>&lt;&nbsp;<?=$this->textPrev?></span>
+      <a href="<?php echo $this->pageLink()->param($this->pageParam, $this->selectedPage-1)?>" title="<?php echo $this->textPrev?>">
+         <span>&lt;&nbsp;<?php echo $this->textPrev?></span>
       </a>
-   <?} else {?>
-      <span>&lt;&nbsp;<?=$this->textPrev?></span>
-   <?}?>
+   <?php } else {?>
+      <span>&lt;&nbsp;<?php echo $this->textPrev?></span>
+   <?php }?>
 </td>
 <td align="center">
-   <? foreach ($this->pagesLeftSideArray as $number) {
+   <?php  foreach ($this->pagesLeftSideArray as $number) {
       if($number == 1){
          $link = $this->pageLink()->rmParam($this->pageParam);
       } else {
          $link = $this->pageLink()->param($this->pageParam, $number);
       }
       ?>
-      &nbsp;<a href="<?=$link;?>" title="<?=$number;?>"><?=$number;?></a>&nbsp;
-   <?}?>
-   [&nbsp;<?=$this->selectedPage.'/'.$this->countAllPages?>&nbsp;]
-   <? foreach ($this->pagesRightSideArray as $number) {
+      &nbsp;<a href="<?php echo $link;?>" title="<?php echo $number;?>"><?php echo $number;?></a>&nbsp;
+   <?php }?>
+   [&nbsp;<?php echo $this->selectedPage.'/'.$this->countAllPages?>&nbsp;]
+   <?php  foreach ($this->pagesRightSideArray as $number) {
       if($number == 1){
          $link = $this->pageLink()->rmParam($this->pageParam);
       } else {
          $link = $this->pageLink()->param($this->pageParam, (int)$number);
       }
       ?>
-      &nbsp;<a href="<?=$link;?>" title="<?=$number;?>"><?=$number;?></a>&nbsp;
-   <?}?>
+      &nbsp;<a href="<?php echo $link;?>" title="<?php echo $number;?>"><?php echo $number;?></a>&nbsp;
+   <?php }?>
 </td>
 <td width="100" align="right">
-<? //Sipka na další
+<?php  //Sipka na další
    if($this->activeButtonNext){?>
-      <a href="<?=$this->pageLink()->param($this->pageParam, $this->selectedPage+1)?>" title="<?=$this->textNext?>">
-         <span><?=$this->textNext?>&nbsp;&gt;</span>
+      <a href="<?php echo $this->pageLink()->param($this->pageParam, $this->selectedPage+1)?>" title="<?php echo $this->textNext?>">
+         <span><?php echo $this->textNext?>&nbsp;&gt;</span>
       </a>
-   <?} else {?>
+   <?php } else {?>
       
-      <span><?=$this->textNext?>&nbsp;&gt;</span>
-   <?}?>
+      <span><?php echo $this->textNext?>&nbsp;&gt;</span>
+   <?php }?>
    &#032;&#032;
-<? //Sipka na konec
+<?php  //Sipka na konec
    if($this->activeButtonEnd){?>
-      <a href="<?=$this->pageLink()->param($this->pageParam, $this->countAllPages)?>" title="<?=$this->textEnd?>">&gt;|</a>
-   <?} else {?>
+      <a href="<?php echo $this->pageLink()->param($this->pageParam, $this->countAllPages)?>" title="<?php echo $this->textEnd?>">&gt;|</a>
+   <?php } else {?>
       &gt;|
-   <?}?>
+   <?php }?>
 </td>
 </tr>
 </table>
-<?/*
+<?php /*
 //if($this->ajaxBox != null){
 $this->addJsPlugin(new JsPlugin_JQuery());
 ?>
@@ -76,8 +76,8 @@ $('.scroll_main a').click(function(){
    return false;
 });
 </script>
-<?
+<?php 
 //}*/
 ?>
 </div>
-<?}?>
+<?php }?>

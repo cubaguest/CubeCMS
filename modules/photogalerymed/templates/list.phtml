@@ -1,13 +1,13 @@
-<?
+<?php 
 $this->includeTpl('sortLabel.phtml',false,null,'articles');
 $h1 = $this->category()->getName().$this->sortText;
 $modelImages = new PhotoGalery_Model_Images();
 echo $this->toolbox;
 ?>
-<h1><?ps($h1);?></h1>
+<h1><?php ps($h1);?></h1>
 <div class="posts-list">
-   <?=$this->includeTpl('sort.phtml',false,null,'articles')?>
-   <?if(!empty ($this->articles)) {
+   <?php echo $this->includeTpl('sort.phtml',false,null,'articles')?>
+   <?php if(!empty ($this->articles)) {
       foreach ($this->articles as $article) {
          $showClass  = null;
          if($article->{Articles_Model::COLUMN_CONCEPT} == 1){
@@ -39,42 +39,42 @@ echo $this->toolbox;
          }
                
          ?>
-   <div class="post <?=$showClass?>">
-      <h2><a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model::COLUMN_URLKEY}))?>"
-             title="<?=htmlspecialchars($article->{Articles_Model::COLUMN_NAME})?>"><?=htmlspecialchars($article->{Articles_Model::COLUMN_NAME})?></a>
-         <?if($article->{Articles_Model::COLUMN_CONCEPT} == true){?><span class="font-small"><?=$this->tr('Koncept')?></span><?}?>
+   <div class="post <?php echo $showClass?>">
+      <h2><a href="<?php echo $this->link()->route('detail', array('urlkey' => $article->{Articles_Model::COLUMN_URLKEY}))?>"
+             title="<?php echo htmlspecialchars($article->{Articles_Model::COLUMN_NAME})?>"><?php echo htmlspecialchars($article->{Articles_Model::COLUMN_NAME})?></a>
+         <?php if($article->{Articles_Model::COLUMN_CONCEPT} == true){?><span class="font-small"><?php echo $this->tr('Koncept')?></span><?php }?>
       </h2>
       <div class="dateadd">
-         <? 
+         <?php  
          echo vve_date("%x %H:%i", new DateTime($article->{Articles_Model_Detail::COLUMN_ADD_TIME}));
          printf(' '.$this->tr("(%s fotek)"), count($images));
          ?>
       </div>
-      <?
+      <?php 
       if($text != null){?>
-         <?if($titleImageFile != null){ ?>
+         <?php if($titleImageFile != null){ ?>
          <div class="title-image">
-            <img src="<?=$titleImageFile?>" alt="<?ps($titleImageAlt)?>" />
+            <img src="<?php echo $titleImageFile?>" alt="<?php ps($titleImageAlt)?>" />
          </div>
-         <?}?>
+         <?php }?>
          <div class="annotation">
-         <?if((string)$article->{Articles_Model_Detail::COLUMN_ANNOTATION} != null){
+         <?php if((string)$article->{Articles_Model_Detail::COLUMN_ANNOTATION} != null){
             echo strip_tags($article->{Articles_Model_Detail::COLUMN_ANNOTATION}, '<p><a><span><br>');
          } else {
             echo vve_tpl_truncate(strip_tags($article->{Articles_Model_Detail::COLUMN_TEXT}), 640);
          }?>
       </div>
-      <?
+      <?php 
       } else {
          $numImages = $this->category()->getParam('imagesinlist', 5);
          $i = 1;
          foreach ($images as $img) { ?>
-         <div class="title-image image-left <?if($i == $numImages) echo "last";?>">
-            <img src="<?=$this->category()->getModule()->getDataDir(true).$article[Articles_Model::COLUMN_URLKEY][Locales::getDefaultLang()]
+         <div class="title-image image-left <?php if($i == $numImages) echo "last";?>">
+            <img src="<?php echo $this->category()->getModule()->getDataDir(true).$article[Articles_Model::COLUMN_URLKEY][Locales::getDefaultLang()]
               .URL_SEPARATOR.Photogalery_Controller::DIR_SMALL.URL_SEPARATOR.$img->{PhotoGalery_Model_Images::COLUMN_FILE}?>" 
-              alt="<?=$img->{PhotoGalery_Model_Images::COLUMN_NAME}?>" />
+              alt="<?php echo $img->{PhotoGalery_Model_Images::COLUMN_NAME}?>" />
          </div>
-         <?
+         <?php 
          if($i == $numImages){ break; }
          $i++;
          }
@@ -82,12 +82,12 @@ echo $this->toolbox;
       ?>
       <hr class="reseter" />
       <div class="link-more">
-         <a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
-            title="<?=$this->tr("více o").' '.$article->{Articles_Model_Detail::COLUMN_NAME}?>">[&nbsp;<?=$this->tr("Více")?>&nbsp;]</a>
+         <a href="<?php echo $this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
+            title="<?php echo $this->tr("více o").' '.$article->{Articles_Model_Detail::COLUMN_NAME}?>">[&nbsp;<?php echo $this->tr("Více")?>&nbsp;]</a>
       </div>
       </div>
-     <?}?>
-     <?
+     <?php }?>
+     <?php 
       echo $this->scrollComp;
    } else {
       echo ($this->tr('Není vložena žádná galerie'));

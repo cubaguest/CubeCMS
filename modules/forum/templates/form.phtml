@@ -1,12 +1,12 @@
-<?
+<?php 
 $this->addJsPlugin(new JsPlugin_JQuery());
 echo $this->toolbox;
 ?>
-<h1><?=$this->category()->getName();?></h1>
+<h1><?php echo $this->category()->getName();?></h1>
 <div class="main-content-detail">
-<a href="#" title="<?=$this->_('Přidat příspěvek')?>" id="toggleForm"><?=$this->_('Přidat příspěvek')?></a>
+<a href="#" title="<?php echo $this->_('Přidat příspěvek')?>" id="toggleForm"><?php echo $this->_('Přidat příspěvek')?></a>
 <div id="guestbookNewItemForm">
-   <?
+   <?php 
    $this->form->text->html()->setAttrib('cols', 60)->setAttrib('rows', 7);
    echo ($this->form);
    ?>
@@ -15,7 +15,7 @@ echo $this->toolbox;
    /* <![CDATA[ */
    var sendButt = document.getElementById("answer_send_1");
    var sendButtText = sendButt.value;
-   var seconds = <?=$this->capchaTime?>;
+   var seconds = <?php echo $this->capchaTime?>;
    // disable button and set timeout
    sendButt.disabled = true;
    sendButt.value = seconds;
@@ -41,15 +41,15 @@ echo $this->toolbox;
       $(this).hide();
       return false;
    });
-   <?if($this->showFrom === true){?>
+   <?php if($this->showFrom === true){?>
    $('#toggleForm').click();
-   <?} else {?>
+   <?php } else {?>
 
-   <?}?>
+   <?php }?>
    /* ]]> */
 </script>
 </div>
 <hr class="reseter" />
 <br />
-<?=$this->includeFile('tpl://list.phtml');?>
+<?php echo $this->includeFile('tpl://list.phtml');?>
 

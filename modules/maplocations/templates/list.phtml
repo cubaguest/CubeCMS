@@ -1,40 +1,40 @@
-<?
+<?php 
 $this->addJsPlugin(new JsPlugin_JQueryCSS());
 $this->addFile("css://style.css");
 $this->addPageTitle($this->tr('Seznam míst'));
 echo $this->toolbox;
 ?>
-<h1><?=$this->category()->getName().' - '.$this->tr('Seznam míst')?></h1>
+<h1><?php echo $this->category()->getName().' - '.$this->tr('Seznam míst')?></h1>
 <div class="main-content-list">
-   <?if(!empty ($this->locations)) {
+   <?php if(!empty ($this->locations)) {
    foreach ($this->locations as $loc) {?>
    <div class="main-content-list-record ui-widget">
       <div class="ui-widget-header ui-corner-top ui-state-default ui-place-header">
-         <?
+         <?php 
          $this->toolboxItem->setTemplate(Template_Toolbox2::TEMPLATE_INLINE);
          $this->toolboxItem->edit_location->setAction($this->link()->route('edit', array('id' => $loc->{MapLocations_Model::COLUMN_ID})));
          $this->toolboxItem->location_del->getForm()->id->setValues($loc->{MapLocations_Model::COLUMN_ID});
          echo $this->toolboxItem;
          ?>
-         <h2><?=$loc->{MapLocations_Model::COLUMN_NAME}?></h2>
+         <h2><?php echo $loc->{MapLocations_Model::COLUMN_NAME}?></h2>
       </div>
       <div class="main-content-list-record-text ui-widget-content ui-corner-bottom ui-place-content">
-         <?if($loc->{MapLocations_Model::COLUMN_IMAGE} != null){?>
+         <?php if($loc->{MapLocations_Model::COLUMN_IMAGE} != null){?>
             <div class="main-content-list-record-image">
-               <img src="<?=$this->category()->getModule()->getDataDir(true).$loc->{MapLocations_Model::COLUMN_IMAGE}?>"
-                    alt="<?=$loc->{MapLocations_Model::COLUMN_NAME}?>"/>
+               <img src="<?php echo $this->category()->getModule()->getDataDir(true).$loc->{MapLocations_Model::COLUMN_IMAGE}?>"
+                    alt="<?php echo $loc->{MapLocations_Model::COLUMN_NAME}?>"/>
             </div>
-         <?}?>
-         <?
+         <?php }?>
+         <?php 
          echo $loc->{MapLocations_Model::COLUMN_TEXT};
          ?>
       <hr class="reseter" />
       </div>
    </div>
-   <?}} else {?>   
+   <?php }} else {?>   
    <div class="main-content-list-record ui-widget">
-      <div class="ui-widget-content"><?=$this->tr('Źádné místo nebylo přidáno')?></div>
+      <div class="ui-widget-content"><?php echo $this->tr('Źádné místo nebylo přidáno')?></div>
    </div>
-   <?}?>
-   <a href="<?=$this->link()->route()?>" title="<?=$this->tr('Přejít zpět na mapu')?>">&DoubleLeftArrow; <?=$this->tr('Zpět na mapu')?></a>
+   <?php }?>
+   <a href="<?php echo $this->link()->route()?>" title="<?php echo $this->tr('Přejít zpět na mapu')?>">&DoubleLeftArrow; <?php echo $this->tr('Zpět na mapu')?></a>
 </div>

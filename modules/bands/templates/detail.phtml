@@ -1,4 +1,4 @@
-<?
+<?php 
 // načtení detailu
 //$this->addCssFile("style.css");
 $this->addPageTitle($this->band->{Bands_Model::COLUMN_NAME});
@@ -13,18 +13,18 @@ if ($this->band->{Bands_Model::COLUMN_PUBLIC} == 0) {
 }
 ?>
 
-<div class="article-detail band-detail <?=$showClass
+<div class="article-detail band-detail <?php echo $showClass
 ?>">
    <div class="article-detail-box-image bands-detail-box-image">
-      <?=vve_tpl_image_tag($this->category()->getModule()->getDataDir(true)
+      <?php echo vve_tpl_image_tag($this->category()->getModule()->getDataDir(true)
         . $this->band->{Bands_Model::COLUMN_IMAGE}, $this->band->{Bands_Model::COLUMN_IMAGE}, 200, 150); ?>
       </div>
-      <?=$this->band->{Bands_Model::COLUMN_TEXT}
+      <?php echo $this->band->{Bands_Model::COLUMN_TEXT}
 ?>
       <hr class="reseter" />
 
 </div>
-   <?
+   <?php 
    // pokud je v textu třída pirobox načteme plugin
    if (strpos($this->band->{Bands_Model::COLUMN_TEXT}, 'pirobox')) {
       $piroBox = new JsPlugin_PiroBox();
@@ -50,7 +50,7 @@ if ($this->band->{Bands_Model::COLUMN_PUBLIC} == 0) {
 
             /* ]]> */
          </script>
-   <?
+   <?php 
 }
 
 $this->includeTpl('articletools.phtml', true, array(
@@ -62,5 +62,5 @@ $this->includeTpl('articletools.phtml', true, array(
     'shares' => $this->shares));
    ?>
 
-<? echo $this->toolbox; // TOOLBOX ?>
-<? $this->includeTpl("buttonback.phtml", true); ?>
+<?php  echo $this->toolbox; // TOOLBOX ?>
+<?php  $this->includeTpl("buttonback.phtml", true); ?>

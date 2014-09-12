@@ -1,13 +1,13 @@
-<?
+<?php 
 $jqCss = new JsPlugin_JQueryCSS();
 $this->addJsPlugin($jqCss);
 ?>
-<h1><?=$this->tr('Zákazníci')?></h1>
-<?
+<h1><?php echo $this->tr('Zákazníci')?></h1>
+<?php 
 $this->includeFile('tpl://nav.phtml');
 ?>
 <div class="content-admin">
-   <?
+   <?php 
    $this->moduleButtons = array(
       array(
          'link' => $this->link()->route('addCustomer'),
@@ -24,34 +24,34 @@ $this->includeFile('tpl://nav.phtml');
          <tr class="ui-widget-header">
             <td>ID</td>
             <th>
-               <?
+               <?php 
                echo $this->tr('Jméno');
                $this->orderParam = 'nord';
                echo $this->includeFile('tpl://engine:modules/buttons-table-order.phtml');
                ?>
             </th>
             <th>
-               <?
+               <?php 
                echo $this->tr('Přijmení');
                $this->orderParam = 'snord';
                echo $this->includeFile('tpl://engine:modules/buttons-table-order.phtml');
                ?>
             </th>
             <th>
-               <?
+               <?php 
                echo $this->tr('E-mail');
                $this->orderParam = 'emord';
                echo $this->includeFile('tpl://engine:modules/buttons-table-order.phtml');
                ?>
             </th>
             <th>
-               <?
+               <?php 
                echo $this->tr('Skupina');
                $this->orderParam = 'gord';
                echo $this->includeFile('tpl://engine:modules/buttons-table-order.phtml');
                ?>
             </th>
-            <th><?
+            <th><?php 
                ps($this->tr('Utratil'));
                $this->orderParam = 'ptord';
                echo $this->includeFile('tpl://engine:modules/buttons-table-order.phtml');
@@ -60,18 +60,18 @@ $this->includeFile('tpl://nav.phtml');
          </tr>
          </thead>
          <tbody>
-         <?
+         <?php 
          if(!empty($this->customers)){
             foreach ($this->customers as $customer) {?>
             <tr class="ui-widget-content ui-state-default">
-               <td class=""><?ps($customer->{Shop_Model_Customers::COLUMN_ID})?></td>
-               <td class=""><?ps($customer->{Model_Users::COLUMN_NAME})?></td>
-               <td class=""><?ps($customer->{Model_Users::COLUMN_USERNAME})?></td>
-               <td class=""><?ps($customer->{Model_Users::COLUMN_MAIL})?></td>
+               <td class=""><?php ps($customer->{Shop_Model_Customers::COLUMN_ID})?></td>
+               <td class=""><?php ps($customer->{Model_Users::COLUMN_NAME})?></td>
+               <td class=""><?php ps($customer->{Model_Users::COLUMN_USERNAME})?></td>
+               <td class=""><?php ps($customer->{Model_Users::COLUMN_MAIL})?></td>
                <td>
-                  <form name="form-set-group" action="<?=$this->link()?>" method="post">
+                  <form name="form-set-group" action="<?php echo $this->link()?>" method="post">
                      <select name="customer-group-select">
-                     <? foreach($this->customersGroups as $grp) {
+                     <?php  foreach($this->customersGroups as $grp) {
                         $selected = $grp->{Shop_Model_CustomersGroups::COLUMN_ID} == $customer->{Shop_Model_Customers::COLUMN_ID_GROUP}
                            ? 'selected="selected"' : null;
                         $name = $grp->{Shop_Model_CustomersGroups::COLUMN_NAME};
@@ -79,16 +79,16 @@ $this->includeFile('tpl://nav.phtml');
                            $name .= ' - '.$grp->{Shop_Model_CustomersGroups::COLUMN_REDUCTION}.'%';
                         }
                         ?>
-                        <option value="<?echo (int)$grp->{Shop_Model_CustomersGroups::COLUMN_ID}?>"
-                             <?=$selected?> ><?ps($name)?></option>
-                     <?}?>
+                        <option value="<?php echo (int)$grp->{Shop_Model_CustomersGroups::COLUMN_ID}?>"
+                             <?php echo $selected?> ><?php ps($name)?></option>
+                     <?php }?>
                      </select>
-                     <input type="hidden" name="cust-id" value="<?=$customer->{Shop_Model_Customers::COLUMN_ID}?>" />
+                     <input type="hidden" name="cust-id" value="<?php echo $customer->{Shop_Model_Customers::COLUMN_ID}?>" />
                   </form>
                </td>
-               <td><?=Shop_Tools::getFormatedPrice($customer->totalPaid)?></td>
+               <td><?php echo Shop_Tools::getFormatedPrice($customer->totalPaid)?></td>
                <td>
-                  <?
+                  <?php 
                   $toolbox = clone $this->toolboxItem;
                   $toolbox->cust_del_->getForm()->id->setValues( $customer->{Shop_Model_Customers::COLUMN_ID});
 
@@ -97,14 +97,14 @@ $this->includeFile('tpl://nav.phtml');
                   ?>
                </td>
             </tr>
-               <?
+               <?php 
             }
          } else {
             ?>
          <tr class="ui-widget-content ui-state-disabled">
-            <td colspan="2"><?=$this->tr('Není definována žádná značka')?></td>
+            <td colspan="2"><?php echo $this->tr('Není definována žádná značka')?></td>
          </tr>
-            <?}?>
+            <?php }?>
          </tbody>
       </table>
    </div>
@@ -117,7 +117,7 @@ $this->includeFile('tpl://nav.phtml');
          var idc = $(this).parent().find('input[name="cust-id"]').val();
          var idg = $(this).val();
          $.ajax({
-            url: '<?=$this->link()->route('changeCustomer')?>', type : 'POST',
+            url: '<?php echo $this->link()->route('changeCustomer')?>', type : 'POST',
             data : {action : 'changegrp', id : idc, idg : idg},
             success: function(data) {
 

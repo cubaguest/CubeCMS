@@ -1,4 +1,4 @@
-<?
+<?php 
 // do titulku
 if($this->person) {
    $h = sprintf($this->tr('úprava osoby "%s"'),$this->person->{People_Model::COLUMN_NAME}.' '.$this->person->{People_Model::COLUMN_SURNAME});
@@ -15,9 +15,9 @@ if(isset ($this->form->imgdel)){
    .'" alt="'.$this->person->{People_Model::COLUMN_IMAGE}.'" width="100" />');
 }
 ?>
-<h1><?=$h?></h1>
+<h1><?php echo $h?></h1>
 <div class="content-edit-form">
-   <?
+   <?php 
    echo($this->form);
    ?>
 </div>

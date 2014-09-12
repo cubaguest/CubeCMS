@@ -1,4 +1,4 @@
-<? // načtení detailu
+<?php  // načtení detailu
 $this->addPageTitle($this->article->{Articles_Model::COLUMN_NAME});
 $h1 = $this->article->{Articles_Model::COLUMN_NAME};
 $piroBox = new JsPlugin_PiroBox();
@@ -16,32 +16,32 @@ $addTime = new DateTime($this->article->{Articles_Model::COLUMN_ADD_TIME});
 $editTime = new DateTime($this->article->{Articles_Model::COLUMN_EDIT_TIME});
 ?>
 
-<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo htmlspecialchars($h1); if($this->article->{Articles_Model::COLUMN_CONCEPT} == true)echo $this->tr(' - koncept');?></h1>
+<h1><?php $this->includeFile('tpl://engine:headline/icon.phtml'); echo htmlspecialchars($h1); if($this->article->{Articles_Model::COLUMN_CONCEPT} == true)echo $this->tr(' - koncept');?></h1>
 
 <div class="post">
    <div class="info info-top">
-      <?=$this->tr('Přidáno');?>: <span class="date"><?=vve_date("%x %X", $addTime)?></span>,
-      <?=$this->tr('aktualizováno');?>: <span class="date-edit"><?=vve_date("%x %X", $editTime)?></span>,
-      <?=$this->tr('uživatelem');?>: <span class="author"><?=$this->article->{Model_Users::COLUMN_USERNAME}?></span>
+      <?php echo $this->tr('Přidáno');?>: <span class="date"><?php echo vve_date("%x %X", $addTime)?></span>,
+      <?php echo $this->tr('aktualizováno');?>: <span class="date-edit"><?php echo vve_date("%x %X", $editTime)?></span>,
+      <?php echo $this->tr('uživatelem');?>: <span class="author"><?php echo $this->article->{Model_Users::COLUMN_USERNAME}?></span>
    </div>
-   <?if((string)$this->article->{Articles_Model::COLUMN_ANNOTATION} != null){?>
-   <div class="annotation"><?
+   <?php if((string)$this->article->{Articles_Model::COLUMN_ANNOTATION} != null){?>
+   <div class="annotation"><?php 
       echo $image;$image = null;
       echo $this->filter((string)$this->article->{Articles_Model::COLUMN_ANNOTATION}, array('emoticons', 'filesicons'));
       ?>
    <hr class="reseter" />
    </div>
-   <?}?>
-   <div class="text"><?
+   <?php }?>
+   <div class="text"><?php 
       echo $image;
       echo $this->filter((string)$this->article->{Articles_Model::COLUMN_TEXT}, array('emoticons', 'filesicons'));
     ?></div>
    <hr class="reseter" />
-   <?$this->includeTpl('privateText.phtml', false,null,'articles');?>
+   <?php $this->includeTpl('privateText.phtml', false,null,'articles');?>
    
-   <?if( $this->tags ){?>
+   <?php if( $this->tags ){?>
    <div class="tags">
-      <? 
+      <?php  
       echo '<strong>'.$this->tr('Štítky').": </strong>";
       $printArray = array();
       foreach ($this->tags as $tag) {
@@ -51,19 +51,19 @@ $editTime = new DateTime($this->article->{Articles_Model::COLUMN_EDIT_TIME});
       echo implode(', ', $printArray);
       ?>
    </div>
-   <?}?>
+   <?php }?>
 
-   <?if(!empty($this->similar)){?>
-   <h3><?ps('Podobné články')?></h3>
+   <?php if(!empty($this->similar)){?>
+   <h3><?php ps('Podobné články')?></h3>
    <ul class="related-posts">
-      <?foreach($this->similar as $item){?>
+      <?php foreach($this->similar as $item){?>
       <li>
-         <a href="<?=$this->link()->route('detail', array('urlkey' => $item->{Articles_Model::COLUMN_URLKEY}))?>"
-            title="<?ps($item->{Articles_Model::COLUMN_NAME})?>"><?ps(vve_tpl_truncate($item->{Articles_Model::COLUMN_NAME}, 50));?></a>
+         <a href="<?php echo $this->link()->route('detail', array('urlkey' => $item->{Articles_Model::COLUMN_URLKEY}))?>"
+            title="<?php ps($item->{Articles_Model::COLUMN_NAME})?>"><?php ps(vve_tpl_truncate($item->{Articles_Model::COLUMN_NAME}, 50));?></a>
       </li>
-      <?}?>
+      <?php }?>
    </ul>
-   <?}?>
+   <?php }?>
    
    <script type="text/javascript">
       /* <![CDATA[ */
@@ -71,21 +71,21 @@ $editTime = new DateTime($this->article->{Articles_Model::COLUMN_EDIT_TIME});
       /* ]]> */
    </script>
    <hr class="reseter" />
-   <?if($this->articles != null){?>
-   <form name="gotoart" action="<?=$this->link();?>" method="get" onsubmit="document.gotoart.action = document.getElementById('gotoArtLinkSel').value">
+   <?php if($this->articles != null){?>
+   <form name="gotoart" action="<?php echo $this->link();?>" method="get" onsubmit="document.gotoart.action = document.getElementById('gotoArtLinkSel').value">
       <p>
-         <label><?=$this->tr('Přejít na')?></label>
+         <label><?php echo $this->tr('Přejít na')?></label>
          <select id="gotoArtLinkSel">
-            <?foreach ($this->articles as $article) {?>
-            <option value="<?=$this->link()->route('detail', array('urlkey' => (string)$article->{Articles_Model::COLUMN_URLKEY}));?>">
-            <?=vve_tpl_truncate((string)$article->{Articles_Model::COLUMN_NAME}, 100)?>
+            <?php foreach ($this->articles as $article) {?>
+            <option value="<?php echo $this->link()->route('detail', array('urlkey' => (string)$article->{Articles_Model::COLUMN_URLKEY}));?>">
+            <?php echo vve_tpl_truncate((string)$article->{Articles_Model::COLUMN_NAME}, 100)?>
             </option>
-            <?}?>
+            <?php }?>
          </select>
-         <input type="submit" value="<?=$this->tr('Přejít')?>" />
+         <input type="submit" value="<?php echo $this->tr('Přejít')?>" />
       </p>
    </form>
-   <?} else {
+   <?php } else {
       $this->includeTpl("buttonback.phtml", true);
    }
    
@@ -103,7 +103,7 @@ $editTime = new DateTime($this->article->{Articles_Model::COLUMN_EDIT_TIME});
    }
 //   echo $this->toolbox;
    ?>
-   <?
+   <?php 
    if($this->article != null AND ( 
       strpos((string)$this->article->{Articles_Model_Detail::COLUMN_TEXT}, 'pirobox') !== false
       OR strpos((string)$this->article->{Articles_Model::COLUMN_TEXT_PRIVATE}, 'pirobox') !== false)){
@@ -115,8 +115,8 @@ $editTime = new DateTime($this->article->{Articles_Model::COLUMN_EDIT_TIME});
       $(document).ready(function(){$().piroBox({slideShow : true,slideSpeed : 3});});
       /* ]]> */
    </script>
-<?}?>
+<?php }?>
 </div>
-<?echo $this->comments;?>
+<?php echo $this->comments;?>
 
 

@@ -1,4 +1,4 @@
-<?
+<?php 
 $jq = new JsPlugin_JQuery();
 $jq->addUISortable();
 $this->addJsPlugin($jq);
@@ -6,7 +6,7 @@ $this->addFile('css://style.less');
 $h = $this->tr('Úprava odkazů');
 Template::addPageTitle($h);
 ?>
-<h1><?ps($h);?></h1>
+<h1><?php ps($h);?></h1>
 <div class="content-admin">
    <?php
    $this->moduleButtons = array(
@@ -27,7 +27,7 @@ Template::addPageTitle($h);
    ?>
    
    <ul id="links-admin-list" class="ui-cube ui-cube-widget ui-list-widget">
-      <?
+      <?php 
       if(!empty($this->links)){
          foreach($this->links as $link) {
             $href = $link->{LinksList_Model_Links::COLUMN_TARGET};
@@ -40,18 +40,18 @@ Template::addPageTitle($h);
                $href = Url_Link::getMainWebDir().$href;
             }
             ?>
-            <li id="link-<?=$link->getPK()?>" class="ui-state-default clearfix" data-id="<?=$link->getPK()?>">
+            <li id="link-<?php echo $link->getPK()?>" class="ui-state-default clearfix" data-id="<?php echo $link->getPK()?>">
                <span class="move"><span class="icon icon-arrows-v"></span></span>
-               <?if($link->imageSrc){?>
-               <span class="image"><img src="<?=  vve_image_cacher($link->imageSrc, 100, 40)?>" alt="" />
+               <?php if($link->imageSrc){?>
+               <span class="image"><img src="<?php echo   vve_image_cacher($link->imageSrc, 100, 40)?>" alt="" />
                </span>
-               <?}?>
+               <?php }?>
                <span class="info">
-                  <span class="title"><?=$link->{LinksList_Model_Links::COLUMN_TITLE}?></span>
-                  <a class="link" href="<?=$href?>"><?ps($href)?></a>
+                  <span class="title"><?php echo $link->{LinksList_Model_Links::COLUMN_TITLE}?></span>
+                  <a class="link" href="<?php echo $href?>"><?php ps($href)?></a>
                </span>
                <span class="tools"></span>
-               <?
+               <?php 
                if($this->toolboxLink){
                   $this->toolboxLink->setTemplate(Template_Toolbox2::TEMPLATE_INLINE);
                   $this->toolboxLink->linkDelete->getForm()->id->setValues($link->getPK());
@@ -60,18 +60,18 @@ Template::addPageTitle($h);
                }
                ?>
             </li>
-            <?
+            <?php 
          }
       } else {
          ?>
          <li>
-            <?  ps($this->tr('Není vložen žádný odkaz'))?>
+            <?php   ps($this->tr('Není vložen žádný odkaz'))?>
          </li>
-         <?
+         <?php 
       }
       ?>
    </ul>
-   <?if(!empty($this->links)){?>
+   <?php if(!empty($this->links)){?>
    <script type="text/javascript">
       $(document).ready(function(){
          $('#links-admin-list').sortable({
@@ -82,7 +82,7 @@ Template::addPageTitle($h);
                handle : ".move",
                update : function( event, ui ){
                   $.ajax({
-                     type : 'POST', url : "<?=$this->link()->route('changePositon')?>",
+                     type : 'POST', url : "<?php echo $this->link()->route('changePositon')?>",
                      data : {id : ui.item.data('id'), pos : ui.item.index()+1},
                      success : function(result){
                         if(result.errmsg.length != 0){
@@ -94,5 +94,5 @@ Template::addPageTitle($h);
          });
       });
    </script>
-   <?}?>
+   <?php }?>
 </div>

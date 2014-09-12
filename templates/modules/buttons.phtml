@@ -1,9 +1,9 @@
-<?
+<?php 
 if( !empty($this->moduleButtons) ){
    $this->addFile('css://engine:style-admin.less');// need for buttons style
    ?>
    <ul class="module-tool-buttons clearfix">
-   <?foreach ($this->moduleButtons as $id => $button) {
+   <?php foreach ($this->moduleButtons as $id => $button) {
       if(is_array($button)){
          
          $button += array(
@@ -73,14 +73,14 @@ if( !empty($this->moduleButtons) ){
                break;
          }
          ?>
-         <li class="<?echo $button['important'] ? 'important' : ''?>"><?echo $cnt;?></li>
-         <?
+         <li class="<?php echo $button['important'] ? 'important' : ''?>"><?php echo $cnt;?></li>
+         <?php 
       } else if(is_string($button)) {
          ?>
-         <li><div><?echo $button;?></div></li>
-         <?
+         <li><div><?php echo $button;?></div></li>
+         <?php 
       }
    }?>
    </ul>
-   <?
+   <?php 
 }

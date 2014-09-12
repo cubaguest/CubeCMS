@@ -1,4 +1,4 @@
-<?
+<?php 
 // do titulku
 if($this->partner != null) {
    $h = sprintf($this->tr('Úprava partnera "%s"'),$this->partner->{Partners_Model::COLUMN_NAME});
@@ -14,9 +14,9 @@ if(isset ($this->form->imgdel)){
    $this->form->imgdel->setSubLabel($this->tr('Uložen obrázek:').'<br /><img src="'.$src.'" alt="'.$this->partner->{Partners_Model::COLUMN_IMAGE}.'" height="60" />');
 }
 ?>
-<h1><?=$h?></h1>
+<h1><?php echo $h?></h1>
 <div class="main-content-form-edit">
-   <?
+   <?php 
    echo($this->form);
    ?>
 </div>

@@ -1,4 +1,4 @@
-<?
+<?php 
 $allowClientResize = true;
 $w = $this->category()->getParam('medium_width', Photogalery_Controller::MEDIUM_WIDTH);
 $h = $this->category()->getParam('medium_height', Photogalery_Controller::MEDIUM_HEIGHT);
@@ -12,18 +12,18 @@ if( ( $w/$h > $ratio)
 
 ?>
 <div class="ui-widget ui-widget-upload">
-   <h2 class="ui-widget-header"><?=$this->tr('Přidání obrázků')?></h2>
+   <h2 class="ui-widget-header"><?php echo $this->tr('Přidání obrázků')?></h2>
    <div class="swfupload-control ui-widget-content">
-      <form action="<?=$this->link()?>" method="post">
-         <p class="upload-controll"><strong><?=$this->tr('Nahrát')?>:</strong>
+      <form action="<?php echo $this->link()?>" method="post">
+         <p class="upload-controll"><strong><?php echo $this->tr('Nahrát')?>:</strong>
             <span id="spanButtonPlaceholder"></span>
-            <button name="upload-button"><?=$this->tr('Vybrat obrázky')?></button>
-            &nbsp;&nbsp;Optimalizovat nahrání:<input id="optimalise-upload" type="checkbox" value="true" <?if($allowClientResize) echo 'checked="checked"';?> /> (<?=$this->tr('Vypněte, pokud obrázky mají širokoúhlý poměr stran')?>)<br /></p>
-         <p class="note"><?= $this->tr('Pro bezproblémové nahrání obrázků by měl být instalován Flash Player verze 10. Velikost obrázků je měněna přímo v prohížeči, proto nahrání
+            <button name="upload-button"><?php echo $this->tr('Vybrat obrázky')?></button>
+            &nbsp;&nbsp;Optimalizovat nahrání:<input id="optimalise-upload" type="checkbox" value="true" <?php if($allowClientResize) echo 'checked="checked"';?> /> (<?php echo $this->tr('Vypněte, pokud obrázky mají širokoúhlý poměr stran')?>)<br /></p>
+         <p class="note"><?php echo  $this->tr('Pro bezproblémové nahrání obrázků by měl být instalován Flash Player verze 10. Velikost obrázků je měněna přímo v prohížeči, proto nahrání
          může trvat déle. Pokud je obrázek typu "png" a má velké rozlišení, jeho změna velikosti bude trvat také dlouho.<br/>
          Pokud se při nahrávání vyskytnou chyby, zkuste obnovit stránku a nahrát soubory znovu.)'); ?></p>
       </form>
-      <p class="upload-images-selected"><span id="queuestatus" ><?=$this->tr('Vybráno souborů')?>: 0 / <?=$this->tr('Zařazeno souborů')?>: 0</span></p>
+      <p class="upload-images-selected"><span id="queuestatus" ><?php echo $this->tr('Vybráno souborů')?>: 0 / <?php echo $this->tr('Zařazeno souborů')?>: 0</span></p>
       <ol id="upload-files-log"></ol>
    </div>
 </div>
@@ -32,12 +32,12 @@ if( ( $w/$h > $ratio)
    $(document).ready(function() {
       $('.swfupload-control').swfupload({
          // Backend Settings
-         upload_url: "<?= $this->link()->route('uploadFile'); ?>",    // Relative to the SWF file (or you can use absolute paths)
+         upload_url: "<?php echo  $this->link()->route('uploadFile'); ?>",    // Relative to the SWF file (or you can use absolute paths)
          file_post_name: "addimage_image",
-         post_params: {'sessionid': '<?= session_id(); ?>', 'addimage_send' : 'send', 'addimage_idItem' : <?= $this->addForm->idItem->getUnfilteredValues() ?>},
+         post_params: {'sessionid': '<?php echo  session_id(); ?>', 'addimage_send' : 'send', 'addimage_idItem' : <?php echo  $this->addForm->idItem->getUnfilteredValues() ?>},
          file_size_limit : "10048", // 100MB
          file_types : "*.jpg;*.jpeg;*.png;*.JPG;*.JPEG;*.PNG",
-         file_types_description : "<?=$this->tr('Obrázky');?>",
+         file_types_description : "<?php echo $this->tr('Obrázky');?>",
          file_upload_limit : 150,
          file_queue_limit : 0,
          button_placeholder_id : "spanButtonPlaceholder",
@@ -45,13 +45,13 @@ if( ( $w/$h > $ratio)
          button_height: 22,
          button_window_mode: SWFUpload.WINDOW_MODE.TRANSPARENT,
          button_cursor: SWFUpload.CURSOR.HAND,
-         debug: <?if(VVE_DEBUG_LEVEL > 1){echo "true";}else{echo "false";};?>,
+         debug: <?php if(VVE_DEBUG_LEVEL > 1){echo "true";}else{echo "false";};?>,
          // Flash Settings
-         flash_url : "<?=Url_Request::getBaseWebDir()?>/jscripts/swfupload/swfupload.swf",
-         flash9_url : "<?=Url_Request::getBaseWebDir()?>/jscripts/swfupload/swfupload_fp9.swf",
+         flash_url : "<?php echo Url_Request::getBaseWebDir()?>/jscripts/swfupload/swfupload.swf",
+         flash9_url : "<?php echo Url_Request::getBaseWebDir()?>/jscripts/swfupload/swfupload_fp9.swf",
          custom_settings : { // added setting for JQuery SWFUpload plugin
-            r_width: <?=$this->category()->getParam('medium_width',Photogalery_Controller::MEDIUM_WIDTH)+200?>,
-            r_height: <?=$this->category()->getParam('medium_height',Photogalery_Controller::MEDIUM_HEIGHT)+200?>,
+            r_width: <?php echo $this->category()->getParam('medium_width',Photogalery_Controller::MEDIUM_WIDTH)+200?>,
+            r_height: <?php echo $this->category()->getParam('medium_height',Photogalery_Controller::MEDIUM_HEIGHT)+200?>,
             r_quality: 100
          }
       });
@@ -61,7 +61,7 @@ if( ( $w/$h > $ratio)
       .bind('fileQueued', function(event, file){
          var listitem='<li id="'+file.id+'" >'+
          '<em>'+file.name+'</em> ('+Math.round(file.size/1024)+' KB) <span class="progressvalue" >'
-         +'</span><span class="status" > <?=$this->tr('Čekám')?></span>'
+         +'</span><span class="status" > <?php echo $this->tr('Čekám')?></span>'
          +'<p class="progressbar" ><span class="progress" ></span></p><span class="cancel" >&nbsp;</span>'+'</li>';
          $('#upload-files-log').append(listitem);
          $('li#'+file.id+' .cancel').bind('click', function(){ //Remove from queue on cancel click
@@ -83,16 +83,16 @@ if( ( $w/$h > $ratio)
             $(this).swfupload('startUpload');
          }
       })
-      .bind('fileQueueError', function(event, file, errorCode, message){alert('<?=$this->tr('Velikost souboru')?> '+file.name+' <?=$this->tr('je větší než povolený limit')?>');})
+      .bind('fileQueueError', function(event, file, errorCode, message){alert('<?php echo $this->tr('Velikost souboru')?> '+file.name+' <?php echo $this->tr('je větší než povolený limit')?>');})
       .bind('fileDialogComplete', function(event, numFilesSelected, numFilesQueued){
-         $('#queuestatus').text('<?=$this->tr('Vybráno souborů')?>: '+numFilesSelected+' / <?=$this->tr('Zařazeno souborů')?>: '+numFilesQueued);
+         $('#queuestatus').text('<?php echo $this->tr('Vybráno souborů')?>: '+numFilesSelected+' / <?php echo $this->tr('Zařazeno souborů')?>: '+numFilesQueued);
       })
       .bind('uploadResizeStart', function(event, file){
-         $('#upload-files-log li#'+file.id).find('span.status').text(' <?=$this->tr('Měním velikost')?>');
+         $('#upload-files-log li#'+file.id).find('span.status').text(' <?php echo $this->tr('Měním velikost')?>');
          $('#upload-files-log li#'+file.id).find('span.cancel').hide();
       })
       .bind('uploadStart', function(event, file){ // kvůli flash9
-         $('#upload-files-log li#'+file.id).find('span.status').text(' <?=$this->tr('Odesílám')?>...');
+         $('#upload-files-log li#'+file.id).find('span.status').text(' <?php echo $this->tr('Odesílám')?>...');
          $('#upload-files-log li#'+file.id).find('span.progressvalue').text('0%');
          $('#upload-files-log li#'+file.id).find('span.cancel').hide();
       })
@@ -109,7 +109,7 @@ if( ( $w/$h > $ratio)
             $('#edit-photos-list').load(location.href+" #edit-photos-list>*","",function(){
                $('#edit-photos-list p.form-link-lang-container a:first-child').trigger('click', false);
                $().piroBox({slideShow : true,slideSpeed : 3});
-               CubeCMS.Msg.info('<?=$this->tr('Obrázky byly nahrány')?>', true);
+               CubeCMS.Msg.info('<?php echo $this->tr('Obrázky byly nahrány')?>', true);
             });
          }
       });

@@ -1,4 +1,4 @@
-<?
+<?php 
 // načtení detailu
 $this->addJsPlugin(new JsPlugin_JQuery());
 $this->addFile(Url_Request::getBaseWebDir(true).'modules/journals/flexpaper/flexpaper_flash.js');
@@ -7,21 +7,21 @@ $this->addPageTitle($h);
 
 echo $this->toolbox; // TOOLBOX
 ?>
-<h1 class=""><?= $h ?></h1>
+<h1 class=""><?php echo  $h ?></h1>
 <div class="main-content-detail">
-   <?if(count($this->labels) > 0){ ?>
+   <?php if(count($this->labels) > 0){ ?>
       <div id="journal-labels">
-         <label for="journal-labels-select"><?=$this->tr('Články')?>:</label>
+         <label for="journal-labels-select"><?php echo $this->tr('Články')?>:</label>
          <select onchange="getDocViewer().gotoPage(this.value);" id="journal-labels-select">
-      <?foreach ($this->labels as $label) {?>
-            <option value="<?=$label->{Journals_Model_Labels::COLUMN_PAGE}?>"><?=$label->{Journals_Model_Labels::COLUMN_LABEL}?></option>
-      <?}?>
+      <?php foreach ($this->labels as $label) {?>
+            <option value="<?php echo $label->{Journals_Model_Labels::COLUMN_PAGE}?>"><?php echo $label->{Journals_Model_Labels::COLUMN_LABEL}?></option>
+      <?php }?>
          </select>
       </div>
-   <?}?>
+   <?php }?>
    <div id="pdf-viewer" style="height: 600px;"></div>
    <br />
-   <?
+   <?php 
    $this->optionalButtons[] = array(
       'link' => $this->linkBack, 
       'content' => $this->tr('Přejít na seznam čísel'), 
@@ -39,7 +39,7 @@ echo $this->toolbox; // TOOLBOX
    fp = new FlexPaperViewer(
       '/modules/journals/flexpaper/FlexPaperViewer',
 		'pdf-viewer', { config : {
-      SwfFile : escape('<?=$this->dir.$this->journal->{Journals_Model::COLUMN_FILE}.'.swf'.($this->category()->getRights()->isWritable() == true ? "?t=".time() : null ) ?>'),
+      SwfFile : escape('<?php echo $this->dir.$this->journal->{Journals_Model::COLUMN_FILE}.'.swf'.($this->category()->getRights()->isWritable() == true ? "?t=".time() : null ) ?>'),
 		Scale : 0.6, ZoomTransition : 'easeOut', ZoomTime : 0.5,
 		ZoomInterval : 0.2, FitPageOnLoad : false, FitWidthOnLoad : true,
 		PrintEnabled : true, FullScreenAsMaxWindow : false, ProgressiveLoading : false,

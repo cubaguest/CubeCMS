@@ -1,11 +1,11 @@
-<?
+<?php 
 $h = $this->tr('úprava parametrů panelu').' '.$this->catName;
 $this->addPageTitle($h);
 ?>
 
-<h1><?ps($h);?></h1>
+<h1><?php ps($h);?></h1>
 <div class="content-admin">
-<?
+<?php 
 if($this->includeTpl != null){
    $this->includeTplObj($this->includeTpl);
 } else if($this->form instanceof Form) {

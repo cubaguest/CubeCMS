@@ -45,7 +45,7 @@ if(VVE_DEBUG_LEVEL > 1 && !Template::browser()->isMobile() || isset($_GET['debug
                <th><?php ps('ID kategorie:')?></th>
                <td><?php ps(Category::getSelectedCategory()->getId())?></td>
             </tr>
-            <?if(function_exists('xdebug_get_function_count')){?>
+            <?php if(function_exists('xdebug_get_function_count')){?>
             <tr class="section-name">
                <td colspan="4">XDEBUG</td>
             </tr>
@@ -63,7 +63,7 @@ if(VVE_DEBUG_LEVEL > 1 && !Template::browser()->isMobile() || isset($_GET['debug
                <th><?php ps('Index time (s kompilací css/js):')?></th>
                <td><?php ps(xdebug_time_index())?></td>
             </tr>
-            <?}?>
+            <?php }?>
             <tr class="section-name">
                <td colspan="4">Optimalizace</td>
             </tr>
@@ -92,7 +92,7 @@ if($this->disableFooterGA !== true && defined('VVE_GOOGLE_ANALYTICS_CODE') && VV
   m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
   })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-  ga('create', '<?=VVE_GOOGLE_ANALYTICS_CODE?>', 'auto');
+  ga('create', '<?php echo VVE_GOOGLE_ANALYTICS_CODE?>', 'auto');
   ga('send', 'pageview');
 </script>
 <?php

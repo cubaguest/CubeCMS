@@ -1,4 +1,4 @@
-<?
+<?php 
 $margin = 15;
 if(isset ($vars['comment'])){
    $comment = $vars['comment'];
@@ -12,8 +12,8 @@ if(!$comment->viewed){
 }
 
 ?>
-<div id="comment-id-<?=$comment->{Component_Comments_Model::COL_ID}?>" class="comments-comment<?echo $classes?>" style="margin-left: <?echo ($comment->{Component_Comments_Model::COL_LEVEL}*$margin)?>px;">
-      <?if($this->toolboxComment instanceof Template_Toolbox2){
+<div id="comment-id-<?php echo $comment->{Component_Comments_Model::COL_ID}?>" class="comments-comment<?php echo $classes?>" style="margin-left: <?php echo ($comment->{Component_Comments_Model::COL_LEVEL}*$margin)?>px;">
+      <?php if($this->toolboxComment instanceof Template_Toolbox2){
          if((bool)$comment->{Component_Comments_Model::COL_PUBLIC} == false){
             $this->toolboxComment->comment_public_->setIcon('comment_add.png');
          } else {
@@ -24,21 +24,21 @@ if(!$comment->viewed){
          $this->toolboxComment->comment_public_->getForm()->id->setValues($comment->{Component_Comments_Model::COL_ID});
          echo $this->toolboxComment;
       }?>
-   <span><strong><?=$comment->{Component_Comments_Model::COL_NICK}?></strong>
-      &nbsp;<?=vve_date('%X %G:%i', new DateTime($comment->{Component_Comments_Model::COL_TIME_ADD}))?></span>
-   <?if($comment->{Component_Comments_Model::COL_CENSORED} != true) {?>
-      <p><?=nl2br($this->filter($comment->{Component_Comments_Model::COL_COMMENT},array('emoticons')),true)?></p>
-   <?} else {
+   <span><strong><?php echo $comment->{Component_Comments_Model::COL_NICK}?></strong>
+      &nbsp;<?php echo vve_date('%X %G:%i', new DateTime($comment->{Component_Comments_Model::COL_TIME_ADD}))?></span>
+   <?php if($comment->{Component_Comments_Model::COL_CENSORED} != true) {?>
+      <p><?php echo nl2br($this->filter($comment->{Component_Comments_Model::COL_COMMENT},array('emoticons')),true)?></p>
+   <?php } else {
       echo '<p>'.$this->tr('Komentář by cenzurován.').'</p>';
       if($this->admin != null) {
          echo '<p class="comments-censored-text">'.nl2br($comment->{Component_Comments_Model::COL_COMMENT},true).'</p>';
 
       }
    }?>
-   <?if($this->isClosed == false) {?>
+   <?php if($this->isClosed == false) {?>
    <p>
-      <a href="<?=$this->pageLink()?>#addComment" onclick="selectParent(<?=$comment->{Component_Comments_Model::COL_ID}
-                    ?>, '<?=$comment->{Component_Comments_Model::COL_NICK}?>', '<?=vve_tpl_truncate($comment->{Component_Comments_Model::COL_COMMENT},40);?>');"><?=$this->tr('Reagovat')?></a>
+      <a href="<?php echo $this->pageLink()?>#addComment" onclick="selectParent(<?php echo $comment->{Component_Comments_Model::COL_ID}
+                    ?>, '<?php echo $comment->{Component_Comments_Model::COL_NICK}?>', '<?php echo vve_tpl_truncate($comment->{Component_Comments_Model::COL_COMMENT},40);?>');"><?php echo $this->tr('Reagovat')?></a>
    </p>
-      <?}?>
+      <?php }?>
 </div>

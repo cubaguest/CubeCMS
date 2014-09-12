@@ -1,12 +1,12 @@
-<?
+<?php 
 $h = sprintf($this->tr('Náhled formuláře "%s"'), $this->form->{Forms_Model::COLUMN_NAME} );
 Template_Core::setPageTitle($h);
 $this->addFile("css://style.css");
 echo $this->toolbox;
 ?>
-<h1><?ps($h);?></h1>
+<h1><?php ps($h);?></h1>
 <div class="form-edit">
-   <?
+   <?php 
    $this->moduleButtons = array(
       array(
          'link' => $this->link()->route(),
@@ -24,15 +24,15 @@ echo $this->toolbox;
    $this->includeTpl('modules/buttons.phtml', true);
    ?>
    <hr class="reseter" />
-   <?if($this->sendData != null){?>
-   <h2><?ps($this->tr('Odeslaná data'))?></h2>
+   <?php if($this->sendData != null){?>
+   <h2><?php ps($this->tr('Odeslaná data'))?></h2>
    <div>
       <table class="full-width ui-widget">
          <tbody>
-         <?foreach ($this->sendData as $name => $value) {?>
+         <?php foreach ($this->sendData as $name => $value) {?>
             <tr>
-               <th class="ui-widget-header"><?ps($name)?></th>
-               <td class="ui-widget-content"><?
+               <th class="ui-widget-header"><?php ps($name)?></th>
+               <td class="ui-widget-content"><?php 
                if(is_bool($value)){
                   ps( $value == true ? $this->tr('ANO') : $this->tr('NE') );
                } else if($value == null){
@@ -46,18 +46,18 @@ echo $this->toolbox;
                }
                ?></td>
             </tr>
-         <?}?>
+         <?php }?>
          </tbody>
       </table>
       <br />
    </div>
-   <h2><?=$this->tr('Náhled formuláře')?></h2>
-   <?}?>
-   <?
+   <h2><?php echo $this->tr('Náhled formuláře')?></h2>
+   <?php }?>
+   <?php 
    echo $this->formPreview;
    ?>
 </div>
-<?
+<?php 
 $jq = new JsPlugin_JQuery();
 $this->addJsPlugin($jq);
 $this->addJsPlugin(new JsPlugin_JQueryCSS());

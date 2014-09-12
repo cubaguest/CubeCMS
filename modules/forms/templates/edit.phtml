@@ -1,4 +1,4 @@
-<?
+<?php 
 $this->addFile("css://style.css?original");
 $this->addFile("js://engine:json2.js?original");
 $this->addFile("js://form-edit.js?original");
@@ -13,7 +13,7 @@ $jq->addUISortable();
 $jq->addUIAccordion();
 $this->addJsPlugin($jq);
 ?>
-<h1><?=$h;?></h1>
+<h1><?php echo $h;?></h1>
 <div class="form-edit" id="movie-form-edit">
    <div id="form-wrap" class="ui-widget">
       <div class="ui-widget-header">
@@ -30,14 +30,14 @@ $this->addJsPlugin($jq);
          <h2>Nastavení formuláře</h2>
       </div>
       <div id="form-settings" class="ui-widget-content">
-         <?
+         <?php 
          $this->form->html()->setAttrib('id','form-data');
          echo $this->form;
          
          /*echo $this->form->renderStart();
          ?>
          <p class="ui-state-default">
-            <?
+            <?php 
             $this->form->name->html()->setAttrib('onkeyup', "FormEditor.changeFormName(this.value)");
             echo $this->form->name->label();
             echo $this->form->name->controll();
@@ -45,18 +45,18 @@ $this->addJsPlugin($jq);
             <br class="reseter" />
          </p>
          <p class="ui-state-default">
-            <?
+            <?php 
             $this->form->messageSend->html()->setAttrib('onkeyup', "FormEditor.changeFormMessage(this.value)");
             echo $this->form->messageSend->label();
             echo $this->form->messageSend->controll();
             ?>
             <br class="reseter" />
          </p>
-         <?if($this->form->data instanceof Form_Element_Hidden){
+         <?php if($this->form->data instanceof Form_Element_Hidden){
             echo $this->form->data->controll();
          } else {?>
          <p class="ui-state-default">
-            <?
+            <?php 
 //            $this->form->data->html()->setAttrib('rows', 10);
 //            $this->form->data->html()->setAttrib("disabled", "disabled");
             $this->form->data->setSubLabel($this->tr('Data nejsou ručně upravitelná.'));
@@ -65,9 +65,9 @@ $this->addJsPlugin($jq);
             ?>
             <br class="reseter" />
          </p>
-         <?}?>
+         <?php }?>
          <p class="ui-state-default">
-            <?
+            <?php 
             echo $this->form->sysRecipients->label();
             echo $this->form->sysRecipients->controll();
             echo $this->form->sysRecipients->getSubLabel();
@@ -75,25 +75,25 @@ $this->addJsPlugin($jq);
             <br class="reseter" />
          </p>
          <p class="ui-state-default">
-            <?
+            <?php 
             echo $this->form->active->label();
             echo $this->form->active->controll();
             ?>
             <br class="reseter" />
          </p>
-         <?
+         <?php 
          echo $this->form->delete->label();
          echo $this->form->delete->controll();
          ?>
          <p class="ui-state-default">
             <label> </label>
-            <?
+            <?php 
             echo $this->form->save->label();
             echo $this->form->save->controll();
             ?>
             <br class="reseter" />
          </p>
-         <?
+         <?php 
          echo $this->form->renderEnd();*/
          ?>
          <hr class="reseter" />
@@ -101,24 +101,24 @@ $this->addJsPlugin($jq);
       </div>
    </div>
    <div id="form-tools-wrap">
-      <div class="ui-widget-header"><?=$this->tr('Nástroje')?></div>
+      <div class="ui-widget-header"><?php echo $this->tr('Nástroje')?></div>
       <div id="form-tools" class="ui-widget-content" >
          
          <h3 class="accordion ui-widget-header">Přidání elementu</h3>
          <div class="ui-widget-content" id="form-element-create">
             Nový element:
             <select name="create-element" onchange="FormEditor.createFormItem($(this).val());$(this).val('');">
-               <optgroup label="<?=$this->tr('Základní')?>">
-                  <option value=""><?=$this->tr('Vyberte element...')?></option>
-                  <option value="text"><?=$this->tr('Textový řádek')?></option>
-                  <option value="textarea"><?=$this->tr('Textové pole')?></option>
-                  <option value="checkbox"><?=$this->tr('Checkbox')?></option>
-                  <option value="select"><?=$this->tr('Výběr')?></option>
-                  <option value="radio"><?=$this->tr('Výběr (radio)')?></option>
-                  <option value="label"><?=$this->tr('Napis')?></option>
+               <optgroup label="<?php echo $this->tr('Základní')?>">
+                  <option value=""><?php echo $this->tr('Vyberte element...')?></option>
+                  <option value="text"><?php echo $this->tr('Textový řádek')?></option>
+                  <option value="textarea"><?php echo $this->tr('Textové pole')?></option>
+                  <option value="checkbox"><?php echo $this->tr('Checkbox')?></option>
+                  <option value="select"><?php echo $this->tr('Výběr')?></option>
+                  <option value="radio"><?php echo $this->tr('Výběr (radio)')?></option>
+                  <option value="label"><?php echo $this->tr('Napis')?></option>
                </optgroup>
-               <optgroup label="<?=$this->tr('Pokročilé')?>">
-                  <option value="selectcountry"><?=$this->tr('Výběr státu')?></option>
+               <optgroup label="<?php echo $this->tr('Pokročilé')?>">
+                  <option value="selectcountry"><?php echo $this->tr('Výběr státu')?></option>
                </optgroup>
             </select>
          </div>
@@ -140,10 +140,10 @@ $this->addJsPlugin($jq);
                <div class="elem-optional" id="elem-optional-validators-wrap">
                   <label>Validátor:</label><br />
                   <select name="validator" onchange="FormEditor.$selectedItem.trigger('chengeValidator', [this])">
-                     <option value=""><?=$this->tr('Žádný')?></option>
-                     <option value="mail"><?=$this->tr('E-Mail')?></option>
-                     <option value="url"><?=$this->tr('URL adresa')?></option>
-                     <option value="phone"><?=$this->tr('Telefon')?></option>
+                     <option value=""><?php echo $this->tr('Žádný')?></option>
+                     <option value="mail"><?php echo $this->tr('E-Mail')?></option>
+                     <option value="url"><?php echo $this->tr('URL adresa')?></option>
+                     <option value="phone"><?php echo $this->tr('Telefon')?></option>
                   </select>
                </div>
                <div class="elem-optional" id="elem-optional-is-multiple-wrap">
@@ -156,8 +156,8 @@ $this->addJsPlugin($jq);
    </div>
    <div id="form-tpls">
       <div class="element-tools">
-         <a href="<?=$this->link()?>#" onclick="FormEditor.deleteFormItem(this);return false;"
-                     title="<?=$this->tr('Smazat prvek')?>"><span class="ui-icon ui-icon-closethick"></span></a>
+         <a href="<?php echo $this->link()?>#" onclick="FormEditor.deleteFormItem(this);return false;"
+                     title="<?php echo $this->tr('Smazat prvek')?>"><span class="ui-icon ui-icon-closethick"></span></a>
       </div>
    </div>
    <hr class="reseter" />
@@ -165,8 +165,8 @@ $this->addJsPlugin($jq);
 <script type="text/javascript">
    $(document).ready(function(){
       FormEditor.init({
-         selectcountry : {label : '<?=$this->tr('Výběr země')?>', options : <?=json_encode(array_values( Form_Element_CountrySelect::getCountries()) ) ?>},
-         defaultlabel : '<?=$this->tr('Název')?>'
+         selectcountry : {label : '<?php echo $this->tr('Výběr země')?>', options : <?php echo json_encode(array_values( Form_Element_CountrySelect::getCountries()) ) ?>},
+         defaultlabel : '<?php echo $this->tr('Název')?>'
       });
    });
 </script>

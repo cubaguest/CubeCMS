@@ -1,57 +1,57 @@
-<?
+<?php 
 $this->addPageTitle($this->tr('odeslání e-mailu'));
 $this->addPageHeadline($this->tr('odeslání e-mailu'));
 ?>
 <div class="main-content-detail" id="sendMailForm">
-   <?
+   <?php 
    $tinymce = new JsPlugin_TinyMce();
    $tinymce->setCfgParam(JsPlugin_TinyMce::PARAM_THEME, JsPlugin_TinyMce::TINY_THEME_ADVANCED);
    $tinymce->setCfgParam('editor_selector', 'mceEditorSimple');
    $tinymce->setCfgParam(JsPlugin_TinyMce::PARAM_TPL_TYPE, Templates_Model::TEMPLATE_TYPE_MAIL);
    $this->addJsPlugin($tinymce);
    ?>
-<?echo $this->form->renderStart();?>
+<?php echo $this->form->renderStart();?>
    <table>
       <tr>
          <td>
-         <?echo $this->form->recipients->label()?><br />
-         <? $this->form->recipients->html()->setAttrib('cols', 60)->setAttrib('rows', 5);
+         <?php echo $this->form->recipients->label()?><br />
+         <?php  $this->form->recipients->html()->setAttrib('cols', 60)->setAttrib('rows', 5);
          echo $this->form->recipients->controll();?>
-         <?echo $this->form->recipients->sublabel()?>
+         <?php echo $this->form->recipients->sublabel()?>
          <br />
          </td>
       </tr>
       <tr>
          <td>
-         <?echo $this->form->subject->label()?><br />
-         <?$this->form->subject->html()->setAttrib('size', 60);
+         <?php echo $this->form->subject->label()?><br />
+         <?php $this->form->subject->html()->setAttrib('size', 60);
          echo $this->form->subject->controll();?><br />
          <br />
          </td>
       </tr>
       <tr>
          <td>lkabel
-         <?echo $this->form->text->label()?>
-            <strong><?=$this->tr('Edotir')?>:&nbsp;</strong>
-            <a href="<?=$this->link()?>#disableEditor"
+         <?php echo $this->form->text->label()?>
+            <strong><?php echo $this->tr('Edotir')?>:&nbsp;</strong>
+            <a href="<?php echo $this->link()?>#disableEditor"
             onclick="toggleEditor('sendmail_text');"
-            title="<?=$this->tr('vypnout/zapnout editor')?>"><?=$this->tr('OFF/ON')?></a>
+            title="<?php echo $this->tr('vypnout/zapnout editor')?>"><?php echo $this->tr('OFF/ON')?></a>
             <br />
-         <?
+         <?php 
          $this->form->text->html()->setAttrib('cols', 60)->setAttrib('rows', 40)->addClass('mceEditorSimple');
          echo $this->form->text->controll();?>
          <br />
-         <strong><?=$this->tr('Edotir')?>:&nbsp;</strong>
-<!--         <a href="<?=$this->link()?>#disableEditor"
+         <strong><?php echo $this->tr('Edotir')?>:&nbsp;</strong>
+<!--         <a href="<?php echo $this->link()?>#disableEditor"
             onclick="toggleEditor('sendmail_text');"
-            title="<?=$this->tr('vypnout/zapnout editor')?>"><?=$this->tr('OFF/ON')?></a>-->
+            title="<?php echo $this->tr('vypnout/zapnout editor')?>"><?php echo $this->tr('OFF/ON')?></a>-->
          <br />
          <br />
          </td>
       </tr>
       <tr>
          <td>
-         <?
+         <?php 
          echo $this->form->file->label();
          echo $this->form->file->controll();
          ?>
@@ -60,11 +60,11 @@ $this->addPageHeadline($this->tr('odeslání e-mailu'));
       </tr>
       <tr>
          <td align="right">
-            <?echo $this->form->send->controll()?>
+            <?php echo $this->form->send->controll()?>
          </td>
       </tr>
    </table>
-<?echo $this->form->renderEnd();?>
+<?php echo $this->form->renderEnd();?>
 </div>
 <script type="text/javascript">
    function toggleEditor(id) {
@@ -74,4 +74,4 @@ $this->addPageHeadline($this->tr('odeslání e-mailu'));
 }
 </script>
 <br />
-<?$this->includeTpl("buttonback.phtml", true, array('link'=>(string)$this->link()->clear()));?>
+<?php $this->includeTpl("buttonback.phtml", true, array('link'=>(string)$this->link()->clear()));?>

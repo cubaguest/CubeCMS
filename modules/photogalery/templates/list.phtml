@@ -1,22 +1,22 @@
-<?
+<?php 
 $this->addFile("css://style.less");
 ?>
-<h1><?echo $this->category()->getName();?></h1>
+<h1><?php echo $this->category()->getName();?></h1>
 <div class="main-content-detail">
-      <div class="main-content-text"><?
+      <div class="main-content-text"><?php 
    if($this->text != null AND (string)$this->text->{Text_Model_Detail::COLUMN_TEXT} != null) {
       echo $this->text->{Text_Model_Detail::COLUMN_TEXT};
    } else if($this->category()->getRights()->isWritable()) {
-      ?><div class="admin-info-text"><?echo $this->tr('Źádný text galerie nebyl vyplněn.');?></div><?
+      ?><div class="admin-info-text"><?php echo $this->tr('Źádný text galerie nebyl vyplněn.');?></div><?php 
    }
    //echo $this->toolboxText;
    ?></div>
-   <? // images gallery
+   <?php  // images gallery
    $this->imagesBaseDir = $this->category()->getModule()->getDataDir(true).$this->websubdir;
    $this->includeFile('tpl://engine:photogalery.phtml');
    ?>
    <hr class="reseter" />
-   <?
+   <?php 
    echo $this->toolbox;
    ?>
 </div>

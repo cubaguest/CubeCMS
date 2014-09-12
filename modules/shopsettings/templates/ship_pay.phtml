@@ -1,19 +1,19 @@
-<? 
+<?php  
 $this->addFile('css://style.css');
 $jsJqGrid = new Component_JqGrid_JsPlugin();
 $this->addJsPlugin($jsJqGrid);
 ?>
-<h1><?= $this->tr('Měny a daně') ?></h1>
-<?
+<h1><?php echo  $this->tr('Měny a daně') ?></h1>
+<?php 
 $this->includeFile('tpl://nav.phtml');
 ?>
 <div class="main-content-form-edit">
-   <? echo $this->form; ?>
-   <h2><?=$this->tr('Platby')?></h2>
+   <?php  echo $this->form; ?>
+   <h2><?php echo $this->tr('Platby')?></h2>
    <table id="table-payments"></table>
    <div id="table-payments-pager"></div>
    <hr class="reseter" />
-   <h2><?=$this->tr('Dopravy')?></h2>
+   <h2><?php echo $this->tr('Dopravy')?></h2>
    <table id="table-shippings"></table>
    <div id="table-shippings-pager"></div>
    <hr class="reseter" />
@@ -25,49 +25,49 @@ $this->includeFile('tpl://nav.phtml');
       $(document).ready(function() {
          var paymentsGrid = $("#table-payments").jqGrid({
             ajaxGridOptions : {type:"POST"},
-            url: '<?=$this->link()->route('paymentsList');?>',
+            url: '<?php echo $this->link()->route('paymentsList');?>',
             datatype: "json",
-            colNames:['ID','<?=$this->tr('Název')?>', '<?=$this->tr('Cena')?>', '<?=$this->tr('Doplňující text pro uživatele')?>'],
+            colNames:['ID','<?php echo $this->tr('Název')?>', '<?php echo $this->tr('Cena')?>', '<?php echo $this->tr('Doplňující text pro uživatele')?>'],
             colModel:[
-               {name:'<?=Shop_Model_Payments::COLUMN_ID?>',index:'<?=Shop_Model_Payments::COLUMN_ID?>', 
+               {name:'<?php echo Shop_Model_Payments::COLUMN_ID?>',index:'<?php echo Shop_Model_Payments::COLUMN_ID?>', 
                   width:33, fixed : true, editable:false},
                
-               {name:'<?=Shop_Model_Payments::COLUMN_NAME?>',index:'<?=Shop_Model_Payments::COLUMN_NAME?>',
+               {name:'<?php echo Shop_Model_Payments::COLUMN_NAME?>',index:'<?php echo Shop_Model_Payments::COLUMN_NAME?>',
                   formatter: langFmatter, unformat: langUnFmatter,
                   width:160, fixed : true, editable:true, edittype:"textarea", 
                   editoptions:{rows:"5",cols:"18",
-                     defaultValue : "<?foreach (Locales::getAppLangs() as $l){echo "[$l][/$l]\\n";}?>"
+                     defaultValue : "<?php foreach (Locales::getAppLangs() as $l){echo "[$l][/$l]\\n";}?>"
                   },
-                  formoptions:{ rowpos:2, label: "<?=$this->tr('Název')?>",elmprefix:"(*)"}},
+                  formoptions:{ rowpos:2, label: "<?php echo $this->tr('Název')?>",elmprefix:"(*)"}},
                
-               {name:'<?=Shop_Model_Payments::COLUMN_PRICE_ADD?>',index:'<?=Shop_Model_Payments::COLUMN_PRICE_ADD?>', 
+               {name:'<?php echo Shop_Model_Payments::COLUMN_PRICE_ADD?>',index:'<?php echo Shop_Model_Payments::COLUMN_PRICE_ADD?>', 
                   width:50, fixed : true, editable: true,editoptions:{size:20},
-                  formoptions:{ rowpos:3, label: "<?=$this->tr('Cena')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
+                  formoptions:{ rowpos:3, label: "<?php echo $this->tr('Cena')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
                
-               {name:'<?=Shop_Model_Payments::COLUMN_TEXT?>',index:'<?=Shop_Model_Payments::COLUMN_TEXT?>', 
+               {name:'<?php echo Shop_Model_Payments::COLUMN_TEXT?>',index:'<?php echo Shop_Model_Payments::COLUMN_TEXT?>', 
                   formatter: langFmatter, unformat: langUnFmatter,
                   editable:true,edittype:"textarea", editoptions:{rows:"12",cols:"18",
-                     defaultValue : "<?foreach (Locales::getAppLangs() as $l){echo "[$l][/$l]\\n";}?>"
+                     defaultValue : "<?php foreach (Locales::getAppLangs() as $l){echo "[$l][/$l]\\n";}?>"
                   },
-                  formoptions:{ rowpos:4, label: "<?=$this->tr('Text pro uživatele')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}}
+                  formoptions:{ rowpos:4, label: "<?php echo $this->tr('Text pro uživatele')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}}
             ],
             rowNum:5,
             rowList:[5,10,20,50],
             pager: '#table-payments-pager',
-            sortname: '<?=Shop_Model_Tax::COLUMN_NAME?>',
+            sortname: '<?php echo Shop_Model_Tax::COLUMN_NAME?>',
             caption:"Seznam plateb",
             jsonReader: {
                repeatitems : false, root:"rows"
             },
             height: 'auto',
             autowidth : true,
-            editurl:"<?=$this->link()->route('editPayment')?>"
+            editurl:"<?php echo $this->link()->route('editPayment')?>"
          });
          paymentsGrid.jqGrid('navGrid','#table-payments-pager',
             {edit:true,add:true,del:true,search:false},
             // edit options
             {reloadAfterSubmit:true, jqModal:true, closeOnEscape:true,viewPagerButtons:false, width:400, 
-               bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné').'<br />'.$this->tr('Jazykové verze se zadávají mezi značky [cs][/cs] (Anglicky [en][/en]).')?>",closeAfterEdit:true,
+               bottominfo:"<?php echo $this->tr('Položky označené (*) jsou povinné').'<br />'.$this->tr('Jazykové verze se zadávají mezi značky [cs][/cs] (Anglicky [en][/en]).')?>",closeAfterEdit:true,
                afterSubmit : function(respond){
                   var res = eval("("+respond.responseText+")");
                   var msg = res.errmsg.toString();
@@ -79,7 +79,7 @@ $this->includeFile('tpl://nav.phtml');
             },
             // add options
             {reloadAfterSubmit:true,jqModal:true, closeOnEscape:true, 
-               bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné')?>", closeAfterAdd: true, width:400, 
+               bottominfo:"<?php echo $this->tr('Položky označené (*) jsou povinné')?>", closeAfterAdd: true, width:400, 
                afterSubmit : function(respond){
                   var res = eval("("+respond.responseText+")");
                   var msg = res.errmsg.toString();
@@ -104,60 +104,60 @@ $this->includeFile('tpl://nav.phtml');
       
       var shippingsGrid = $("#table-shippings").jqGrid({
             ajaxGridOptions : {type:"POST"},
-            url: '<?=$this->link()->route('shippingsList');?>',
+            url: '<?php echo $this->link()->route('shippingsList');?>',
             datatype: "json",
-            colNames:['ID', '<?=$this->tr('Název')?>', '<?=$this->tr('Cena')?>', 
-               '<?=$this->tr('Doplňující text pro uživatele')?>', '<?=$this->tr('ID zakázaných plateb')?>', '<?=$this->tr('Osobní <br />odběr')?>'],
+            colNames:['ID', '<?php echo $this->tr('Název')?>', '<?php echo $this->tr('Cena')?>', 
+               '<?php echo $this->tr('Doplňující text pro uživatele')?>', '<?php echo $this->tr('ID zakázaných plateb')?>', '<?php echo $this->tr('Osobní <br />odběr')?>'],
             colModel:[
-               {name:'<?=Shop_Model_Shippings::COLUMN_ID?>',index:'<?=Shop_Model_Shippings::COLUMN_ID?>', 
+               {name:'<?php echo Shop_Model_Shippings::COLUMN_ID?>',index:'<?php echo Shop_Model_Shippings::COLUMN_ID?>', 
                   width:33, fixed : true, editable:false},
                
-               {name:'<?=Shop_Model_Shippings::COLUMN_NAME?>',index:'<?=Shop_Model_Shippings::COLUMN_NAME?>',
+               {name:'<?php echo Shop_Model_Shippings::COLUMN_NAME?>',index:'<?php echo Shop_Model_Shippings::COLUMN_NAME?>',
                   formatter: langFmatter, unformat: langUnFmatter,
                   width:160, fixed : true, editable:true, edittype:"textarea", 
                   editoptions:{rows:"5",cols:"18",
-                     defaultValue : "<?foreach (Locales::getAppLangs() as $l){echo "[$l][/$l]\\n";}?>"
+                     defaultValue : "<?php foreach (Locales::getAppLangs() as $l){echo "[$l][/$l]\\n";}?>"
                   },
-                  formoptions:{ rowpos:2, label: "<?=$this->tr('Název')?>",elmprefix:"(*)"}},
+                  formoptions:{ rowpos:2, label: "<?php echo $this->tr('Název')?>",elmprefix:"(*)"}},
                
-               {name:'<?=Shop_Model_Shippings::COLUMN_VALUE?>',index:'<?=Shop_Model_Shippings::COLUMN_VALUE?>', 
+               {name:'<?php echo Shop_Model_Shippings::COLUMN_VALUE?>',index:'<?php echo Shop_Model_Shippings::COLUMN_VALUE?>', 
                   width:50, fixed : true, editable: true,editoptions:{size:20},
-                  formoptions:{ rowpos:3, label: "<?=$this->tr('Cena')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
+                  formoptions:{ rowpos:3, label: "<?php echo $this->tr('Cena')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
                
-               {name:'<?=Shop_Model_Shippings::COLUMN_TEXT?>',index:'<?=Shop_Model_Shippings::COLUMN_TEXT?>',
+               {name:'<?php echo Shop_Model_Shippings::COLUMN_TEXT?>',index:'<?php echo Shop_Model_Shippings::COLUMN_TEXT?>',
                   formatter: langFmatter, unformat: langUnFmatter,
                   editable:true, edittype:"textarea", 
                   editoptions:{rows:"12",cols:"18",
-                     defaultValue : "<?foreach (Locales::getAppLangs() as $l){echo "[$l][/$l]\\n";}?>"
+                     defaultValue : "<?php foreach (Locales::getAppLangs() as $l){echo "[$l][/$l]\\n";}?>"
                   },
-                  formoptions:{ rowpos:4, label: "<?=$this->tr('Text pro uživatele')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
+                  formoptions:{ rowpos:4, label: "<?php echo $this->tr('Text pro uživatele')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
                
-               {name:'<?=Shop_Model_Shippings::COLUMN_DISALLOWED_PAYMENTS?>',index:'<?=Shop_Model_Shippings::COLUMN_DISALLOWED_PAYMENTS?>', 
+               {name:'<?php echo Shop_Model_Shippings::COLUMN_DISALLOWED_PAYMENTS?>',index:'<?php echo Shop_Model_Shippings::COLUMN_DISALLOWED_PAYMENTS?>', 
                   width:100, fixed : true, editable: true,editoptions:{size:20},
-                  formoptions:{ rowpos:5, label: "<?=$this->tr('ID zakázaných plateb <br />oddělených středníky')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
+                  formoptions:{ rowpos:5, label: "<?php echo $this->tr('ID zakázaných plateb <br />oddělených středníky')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
                
-               {name:'<?=Shop_Model_Shippings::COLUMN_PERSONAL_PICKUP?>',index:'<?=Shop_Model_Shippings::COLUMN_PERSONAL_PICKUP?>', formatter: 'checkbox', 
+               {name:'<?php echo Shop_Model_Shippings::COLUMN_PERSONAL_PICKUP?>',index:'<?php echo Shop_Model_Shippings::COLUMN_PERSONAL_PICKUP?>', formatter: 'checkbox', 
                   formatoptions:{disabled: true, 'class' : 'bersonal-pickup'}, 
                   width:50,fixed: true,editable:true,edittype:'checkbox', editoptions:{size:20, value:"true:false"},
-                  formoptions:{ rowpos:7, label: "<?=$this->tr('Osobní odběr')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}}
+                  formoptions:{ rowpos:7, label: "<?php echo $this->tr('Osobní odběr')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}}
             ],
             rowNum:5,
             rowList:[5,10,20,50],
             pager: '#table-shippings-pager',
-            sortname: '<?=Shop_Model_Shippings::COLUMN_NAME?>',
+            sortname: '<?php echo Shop_Model_Shippings::COLUMN_NAME?>',
             caption:"Seznam doprav",
             jsonReader: {
                repeatitems : false, root:"rows"
             },
             height: 'auto',
             autowidth : true,
-            editurl:"<?=$this->link()->route('editShipping')?>"
+            editurl:"<?php echo $this->link()->route('editShipping')?>"
          });
          shippingsGrid.jqGrid('navGrid','#table-shippings-pager',
             {edit:true,add:true,del:true,search:false},
             // edit options
             {reloadAfterSubmit:true, jqModal:true, closeOnEscape:true,viewPagerButtons:false,  width:400, 
-               bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné')?>",closeAfterEdit:true,
+               bottominfo:"<?php echo $this->tr('Položky označené (*) jsou povinné')?>",closeAfterEdit:true,
                afterSubmit : function(respond){
                   var res = eval("("+respond.responseText+")");
                   var msg = res.errmsg.toString();
@@ -169,7 +169,7 @@ $this->includeFile('tpl://nav.phtml');
             },
             // add options
             {reloadAfterSubmit:true,jqModal:true, closeOnEscape:true, 
-               bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné')?>", closeAfterAdd: true, width:400, 
+               bottominfo:"<?php echo $this->tr('Položky označené (*) jsou povinné')?>", closeAfterAdd: true, width:400, 
                afterSubmit : function(respond){
                   var res = eval("("+respond.responseText+")");
                   var msg = res.errmsg.toString();

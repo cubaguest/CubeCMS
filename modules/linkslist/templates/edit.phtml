@@ -1,4 +1,4 @@
-<?
+<?php 
 if($this->linkRecord){
    $h1 = sprintf($this->tr('Úprava odkazu %s'), $this->linkRecord->{LinksList_Model_Links::COLUMN_TITLE});
 } else {
@@ -7,9 +7,9 @@ if($this->linkRecord){
 Template_Core::setPageTitle($h1);
 $this->addJsPlugin(new JsPlugin_JQuery());
 ?>
-<h1><?ps($h1)?></h1>
+<h1><?php ps($h1)?></h1>
 <div class="main-content-form-edit" id="text-edit-form">
-   <?
+   <?php 
    echo ($this->form);
    ?>
    <script type="text/javascript">

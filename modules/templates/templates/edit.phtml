@@ -1,4 +1,4 @@
-<?
+<?php 
 // do titulku
 if($this->edit) {
    $h = $this->_('úprava šablony');
@@ -13,9 +13,9 @@ $linkDisableEdit = '<a href="javascript:toggleEditor(\'template_content_1\');" i
 $this->form->content->setSubLabel($linkDisableEdit);
 
 ?>
-<h1><?=$h?></h1>
+<h1><?php echo $h?></h1>
 <div class="main-content-form-edit">
-   <?
+   <?php 
    print($this->form);
    ?>
 </div>

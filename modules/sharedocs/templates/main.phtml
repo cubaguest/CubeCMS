@@ -1,4 +1,4 @@
-<?
+<?php 
 $h1 = $this->category()->getName();
 $this->addJsPlugin(new JsPlugin_JQuery());
 $this->addJsPlugin(new JsPlugin_JQueryCSS());
@@ -6,30 +6,30 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
 $this->addFile('css://style.css');
 $this->addFile('js://datastore.js');
 ?>
-<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $h1;?></h1>
+<h1><?php $this->includeFile('tpl://engine:headline/icon.phtml'); echo $h1;?></h1>
 <div class="main-content-detail">
    <div class="main-content-text">
-      <?$this->includeFile("tpl://buttons.phtml");?>
+      <?php $this->includeFile("tpl://buttons.phtml");?>
       <br />
-      <div id="datastorage-structure"><?$this->includeFile("tpl://list.phtml");?></div>
+      <div id="datastorage-structure"><?php $this->includeFile("tpl://list.phtml");?></div>
    </div>
 </div>
-<?=$this->addJsPlugin(new Component_Uploader_JsPlugin());?>
+<?php echo $this->addJsPlugin(new Component_Uploader_JsPlugin());?>
 <script type="text/javascript">
    /* <![CDATA[ */
-   var deleteItemsMsg = '<?=$this->tr('Opravdu smazat označené položky?');?>';
-   var enterNameMsg = '<?=$this->tr('Zadejte nové jméno')?>';
-   var newDirNameMsg = '<?=$this->tr('Název nové složky')?>';
-   var uploadMsgs = {upload: '<?=$this->tr('Nahrát')?>', cancel: '<?=$this->tr('Zrušit')?>', failed: '<?=$this->tr('Selhalo')?>', from: '<?=$this->tr('z')?>'};
+   var deleteItemsMsg = '<?php echo $this->tr('Opravdu smazat označené položky?');?>';
+   var enterNameMsg = '<?php echo $this->tr('Zadejte nové jméno')?>';
+   var newDirNameMsg = '<?php echo $this->tr('Název nové složky')?>';
+   var uploadMsgs = {upload: '<?php echo $this->tr('Nahrát')?>', cancel: '<?php echo $this->tr('Zrušit')?>', failed: '<?php echo $this->tr('Selhalo')?>', from: '<?php echo $this->tr('z')?>'};
    
-   var uploadLink = '<?=$this->link()->route('uploadFile');?>';
-   var sessionId = '<?=session_id()?>';
-   var currentUrl = '<?=$this->link();?>';
+   var uploadLink = '<?php echo $this->link()->route('uploadFile');?>';
+   var sessionId = '<?php echo session_id()?>';
+   var currentUrl = '<?php echo $this->link();?>';
 
-   var formDeleteItems_items = '<?=$this->formDeleteItems->items->getName();?>';
-   var formMoveItems_items = '<?=$this->formMoveItems->items->getName();?>';
-   var formRenameItem_oldname = '<?=$this->formRenameItem->oldname->getName();?>';
-   var formRenameItem_newname = '<?=$this->formRenameItem->newname->getName();?>';
+   var formDeleteItems_items = '<?php echo $this->formDeleteItems->items->getName();?>';
+   var formMoveItems_items = '<?php echo $this->formMoveItems->items->getName();?>';
+   var formRenameItem_oldname = '<?php echo $this->formRenameItem->oldname->getName();?>';
+   var formRenameItem_newname = '<?php echo $this->formRenameItem->newname->getName();?>';
 
    initDataStore();
    /* ]]> */

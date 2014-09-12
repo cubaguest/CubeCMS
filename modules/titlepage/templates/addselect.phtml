@@ -1,15 +1,15 @@
-<?
+<?php 
 $this->addCssFile("style.css");
 $this->addJsPlugin(new JsPlugin_JQueryCSS());
 $this->addPageTitle($this->_('přidání položky'));
 ?>
-<h1><?=$this->category()->getLabel().' - '.$this->_('přidání položky')?> </h1>
-<?=$this->_('Výběr typů položek')?>:<br />
+<h1><?php echo $this->category()->getLabel().' - '.$this->_('přidání položky')?> </h1>
+<?php echo $this->_('Výběr typů položek')?>:<br />
 <ul id="title-page-select-additem">
-   <?foreach ($this->addItems as $item) {?>
+   <?php foreach ($this->addItems as $item) {?>
    <li>
-      <a href="<?=$item['link'];?>" title="<?=$item['title'];?>"><?=$item['name'];?></a>&nbsp;-&nbsp;<?=$item['desc'];?>
+      <a href="<?php echo $item['link'];?>" title="<?php echo $item['title'];?>"><?php echo $item['name'];?></a>&nbsp;-&nbsp;<?php echo $item['desc'];?>
    </li>
-   <?}?>
+   <?php }?>
 </ul>
 

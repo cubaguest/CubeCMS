@@ -1,52 +1,52 @@
-<?
+<?php 
 $this->addPageTitle($this->tr('seznam odeslaných emailů'));
 $jQuery = new JsPlugin_JQuery();
 $jQuery->addUIAccordion();
 $this->addJsPlugin($jQuery);
 $this->addCssFile('style.less');
 ?>
-<h1><?=$this->category()->getName().' - '.$this->tr('odeslané e-maily')?></h1>
-<?=$this->includeTpl('navigation.phtml');?>
+<h1><?php echo $this->category()->getName().' - '.$this->tr('odeslané e-maily')?></h1>
+<?php echo $this->includeTpl('navigation.phtml');?>
 <div id="module-mail-list" class="module-mails-list-mails">
-   <?foreach ($this->mails as $mail) {?>
-   <h2><a href="#" title="<?=$this->tr('Dateil mailu')?>"
-          ><?=$mail->{Mails_Model_SendMails::COLUMN_SUBJECT}.'&nbsp;-&nbsp;'
+   <?php foreach ($this->mails as $mail) {?>
+   <h2><a href="#" title="<?php echo $this->tr('Dateil mailu')?>"
+          ><?php echo $mail->{Mails_Model_SendMails::COLUMN_SUBJECT}.'&nbsp;-&nbsp;'
           .vve_date('%x %X', new DateTime($mail->{Mails_Model_SendMails::COLUMN_DATE}))?></a></h2>
    <div class="mail-detail">
-      <div class="mail-tools"><a href="<?=$this->link()->route('composeMail')->param('sendmail',
+      <div class="mail-tools"><a href="<?php echo $this->link()->route('composeMail')->param('sendmail',
                  $mail->{Mails_Model_SendMails::COLUMN_ID})?>"
-            ><img src="<?=vve_get_tpl_file('icons/email_resend.png', VVE_TPL_FILE_IMAGE)?>"
-                alt="icon send mail" />&nbsp;<?=$this->tr('Poslat znovu')?></a>
+            ><img src="<?php echo vve_get_tpl_file('icons/email_resend.png', VVE_TPL_FILE_IMAGE)?>"
+                alt="icon send mail" />&nbsp;<?php echo $this->tr('Poslat znovu')?></a>
       </div>
-      <h3><?=$this->tr('Příjemci')?></h3>
+      <h3><?php echo $this->tr('Příjemci')?></h3>
       <div class="mail-recipients">
-         <?
+         <?php 
          $recs = explode(Mails_Model_SendMails::RECORD_SEPARATOR, $mail->{Mails_Model_SendMails::COLUMN_RECIPIENTS});
          foreach ($recs as $rec) {?>
-            <a href="<?=$this->link()->clear()->param('mail', $rec)?>"
-               title="<?=$this->tr('Odeslat e-mail na adresu').' '.htmlspecialchars($rec);?>"><?=htmlspecialchars($rec)?></a>,
-         <?}
+            <a href="<?php echo $this->link()->clear()->param('mail', $rec)?>"
+               title="<?php echo $this->tr('Odeslat e-mail na adresu').' '.htmlspecialchars($rec);?>"><?php echo htmlspecialchars($rec)?></a>,
+         <?php }
          ?>
       </div><br />
-      <h3><?=$this->tr('Obsah')?></h3>
+      <h3><?php echo $this->tr('Obsah')?></h3>
       <div class="mail-content">
-         <?=$mail->{Mails_Model_SendMails::COLUMN_CONTENT}?>
+         <?php echo $mail->{Mails_Model_SendMails::COLUMN_CONTENT}?>
       </div>
-      <?if($mail->{Mails_Model_SendMails::COLUMN_ATTACHMENTS} != null){?>
+      <?php if($mail->{Mails_Model_SendMails::COLUMN_ATTACHMENTS} != null){?>
       <br />
-      <h3><?=$this->tr('Přílohy')?></h3>
+      <h3><?php echo $this->tr('Přílohy')?></h3>
       <div class="mail-attachments">
-         <?=$mail->{Mails_Model_SendMails::COLUMN_ATTACHMENTS}?>
+         <?php echo $mail->{Mails_Model_SendMails::COLUMN_ATTACHMENTS}?>
       </div>
-      <?}?>
+      <?php }?>
       <br />
-      <div class="mail-tools"><a href="<?=$this->link()->route('composeMail')->param('sendmail',
+      <div class="mail-tools"><a href="<?php echo $this->link()->route('composeMail')->param('sendmail',
                  $mail->{Mails_Model_SendMails::COLUMN_ID})?>"
-            ><img src="<?=vve_get_tpl_file('icons/email_resend.png', VVE_TPL_FILE_IMAGE)?>"
-                alt="icon send mail" />&nbsp;<?=$this->tr('Poslat znovu')?></a>
+            ><img src="<?php echo vve_get_tpl_file('icons/email_resend.png', VVE_TPL_FILE_IMAGE)?>"
+                alt="icon send mail" />&nbsp;<?php echo $this->tr('Poslat znovu')?></a>
       </div>
    </div>
-   <?
+   <?php 
 }
 ?>
 </div>
@@ -60,6 +60,6 @@ $this->addCssFile('style.less');
    });
    /* ]]> */
 </script>
-<?
+<?php 
 echo $this->scrollComp;
 ?>

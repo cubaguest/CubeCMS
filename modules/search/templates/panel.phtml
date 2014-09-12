@@ -1,4 +1,4 @@
-<?
+<?php 
 $icon = null;
 if($this->panelObj()->getIcon() != null){
    $icon = '<img src="'.Panel_Obj::getIconDir().$this->panelObj()->getIcon().'" alt="'.$this->panelObj()->getIcon().'" />';
@@ -8,16 +8,16 @@ if($this->panelObj()->getBackImage() != null){
    $backImg = 'background-image: url(\''.Panel_Obj::getBackImgDir().$this->panelObj()->getBackImage().'\');';
 }
 ?>
-<p class="panelLabel"><?=$icon?><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=$this->panelObj()->getName()?></a></p>
-<div style="<?=$backImg?>">
-   <form method="get" action="<?=$this->link()?>">
+<p class="panelLabel"><?php echo $icon?><a href="<?php echo $this->link()?>" title="<?php echo htmlspecialchars($this->panelObj()->getName())?>"><?php echo $this->panelObj()->getName()?></a></p>
+<div style="<?php echo $backImg?>">
+   <form method="get" action="<?php echo $this->link()?>">
       <p>
-      <input id="search_string_panel" type="text" size="11" name="q" value="<?=$this->searchString?>" />
-      <input type="submit" value="<?=$this->tr('Hledat')?>" />
+      <input id="search_string_panel" type="text" size="11" name="q" value="<?php echo $this->searchString?>" />
+      <input type="submit" value="<?php echo $this->tr('Hledat')?>" />
       </p>
    </form>
 </div>
 <p class="panelLinkMore">
-   <a href="<?=$this->link()?>"
-      title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->tr('Hledání')?></a>
+   <a href="<?php echo $this->link()?>"
+      title="<?php echo htmlspecialchars($this->category()->getLabel())?>"><?php echo $this->tr('Hledání')?></a>
 </p>

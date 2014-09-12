@@ -1,11 +1,11 @@
-<?
+<?php 
 $h = $this->tr('Zrušení registrace e-mailu');
 Template_Core::addPageTitle($h);
 $this->addJsPlugin(new JsPlugin_JQuery());
 ?>
-<h1><?ps($h)?></h1>
+<h1><?php ps($h)?></h1>
 <div class="content content-form-edit">
-   <?
+   <?php 
    $this->unregMailForm->html()->setAttrib('id', 'unregisterMail');
    echo $this->unregMailForm;
    ?>
@@ -14,7 +14,7 @@ $this->addJsPlugin(new JsPlugin_JQuery());
    /* <![CDATA[ */
    $('form#unregisterMail').submit(function(){
       $.ajax({type: "POST",
-         url: "<?=$this->link()?>",
+         url: "<?php echo $this->link()?>",
          data: $(this).serialize(),
          success: function(data){
             vveShowMessages(data);
@@ -24,7 +24,7 @@ $this->addJsPlugin(new JsPlugin_JQuery());
    });
    $('input[name="unregmail_send_cancel"]').click(function(e){
       e.preventDefault();
-      window.location.href = '<?=$this->link()->route()?>';
+      window.location.href = '<?php echo $this->link()->route()?>';
    });
    /* ]]> */
 </script>

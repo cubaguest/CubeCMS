@@ -1,14 +1,14 @@
-<?
+<?php 
    $h1 = $this->category()->getName();
    $this->addPageTitle($h1);
 ?>
-<h1><?ps($h1);?></h1>
+<h1><?php ps($h1);?></h1>
 <div class="main-content-detail">
-   <?
+   <?php 
    echo $this->text;
    ?>
    <ul id="links-list" class="">
-      <?
+      <?php 
       if(!empty($this->links)){
          foreach($this->links as $link) {
             $href = $link->{LinksList_Model_Links::COLUMN_TARGET};
@@ -21,29 +21,29 @@
                $href = Url_Link::getMainWebDir().$href;
             }
             ?>
-            <li id="link-<?=$link->getPK()?>" class="clearfix" data-id="<?=$link->getPK()?>">
+            <li id="link-<?php echo $link->getPK()?>" class="clearfix" data-id="<?php echo $link->getPK()?>">
                <span class="move"><span class="icon icon-arrows-v"></span></span>
-               <?if($link->imageSrc){?>
-               <span class="image"><img src="<?=  vve_image_cacher($link->imageSrc, 100, 40)?>" alt="" />
+               <?php if($link->imageSrc){?>
+               <span class="image"><img src="<?php echo   vve_image_cacher($link->imageSrc, 100, 40)?>" alt="" />
                </span>
-               <?}?>
+               <?php }?>
                <span class="info">
-                  <span class="title"><?=$name?></span>
-                  <a class="link" href="<?=$href?>"><?ps($href)?></a>
+                  <span class="title"><?php echo $name?></span>
+                  <a class="link" href="<?php echo $href?>"><?php ps($href)?></a>
                </span>
             </li>
-            <?
+            <?php 
          }
       } else {
          ?>
          <li>
-            <?  ps($this->tr('Není vložen žádný odkaz'))?>
+            <?php   ps($this->tr('Není vložen žádný odkaz'))?>
          </li>
-         <?
+         <?php 
       }
       ?>
    </ul>
-   <?
+   <?php 
    echo $this->toolbox;
    ?>
 </div>

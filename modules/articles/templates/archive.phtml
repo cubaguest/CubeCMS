@@ -1,4 +1,4 @@
-<?
+<?php 
 // načtení detailu
 $h1 = $this->category()->getName().' - '.$this->tr('Archiv');
 Template_Core::setPageTitle($h1);
@@ -7,16 +7,16 @@ $jQuery = new JsPlugin_JQuery();
 $jQuery->addUIAccordion();
 $this->addJsPlugin($jQuery);
 ?>
-<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $h1; ?></h1>
+<h1><?php $this->includeFile('tpl://engine:headline/icon.phtml'); echo $h1; ?></h1>
 <div class="main-content-tools">
-   <a href="<?=$this->link()->route();?>" title="<?$this->tr('Přejít na seznam článků')?>"><?=$this->tr('Seznam')?></a>
+   <a href="<?php echo $this->link()->route();?>" title="<?php $this->tr('Přejít na seznam článků')?>"><?php echo $this->tr('Seznam')?></a>
 </div>
 <div class="main-content-archive">
-   <? foreach ($this->articles as $year => $rows) {?>
-      <h2 class="main-content-archive-year year<?= $year ?>"><a href="#"><?= $year ?></a></h2>
+   <?php  foreach ($this->articles as $year => $rows) {?>
+      <h2 class="main-content-archive-year year<?php echo  $year ?>"><a href="#"><?php echo  $year ?></a></h2>
       <div class="main-content-archive-year-content">
          <ul>
-         <?foreach ($rows as $row) {
+         <?php foreach ($rows as $row) {
             $title = $row->{Articles_Model::COLUMN_NAME};
             if ((string) $row->{Articles_Model::COLUMN_ANNOTATION} != null) {
                $title = strip_tags($row->{Articles_Model::COLUMN_ANNOTATION});
@@ -24,13 +24,13 @@ $this->addJsPlugin($jQuery);
             $date = new DateTime($row->{Articles_Model::COLUMN_ADD_TIME});
             ?>
             <li class="main-content-archive-item">
-               <a href="<?= $this->link()->route('detail', array('urlkey' => $row->{Articles_Model::COLUMN_URLKEY})) ?>"
-                  title="<?= htmlspecialchars($title)?>"><?=htmlspecialchars($row->{Articles_Model::COLUMN_NAME});?></a>&nbsp;&nbsp;<span class="main-content-archive-dateadd">(<?=vve_date("%x", $date);?>)</span>
+               <a href="<?php echo  $this->link()->route('detail', array('urlkey' => $row->{Articles_Model::COLUMN_URLKEY})) ?>"
+                  title="<?php echo  htmlspecialchars($title)?>"><?php echo htmlspecialchars($row->{Articles_Model::COLUMN_NAME});?></a>&nbsp;&nbsp;<span class="main-content-archive-dateadd">(<?php echo vve_date("%x", $date);?>)</span>
             </li>
-            <? } ?>
+            <?php  } ?>
       </ul>
    </div>
-   <? } ?>
+   <?php  } ?>
    </div>
    <hr class="reseter" />
    <script type="text/javascript">

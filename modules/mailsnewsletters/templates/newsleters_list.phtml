@@ -1,25 +1,25 @@
-<?
+<?php 
 $h = $this->tr('Seznam newsleterů');
 $this->addPageTitle($h);
 $jQuery = new JsPlugin_JQuery();
 $this->addJsPlugin($jQuery);
 $this->addFile('css://style.less');
 ?>
-<h1><?=$h?></h1>
-<?=$this->includeTpl('navigation.phtml');?>
+<h1><?php echo $h?></h1>
+<?php echo $this->includeTpl('navigation.phtml');?>
 <div class="main-content-list module-newsleters-list">
-   <?if(!empty ($this->newsletters)) {?>
+   <?php if(!empty ($this->newsletters)) {?>
    <table class="newsletters-list full-width">
       <thead>
          <tr class="ui-widget-header">
-            <th class="newsletter-tb-name"><?=$this->tr('Název')?></th>
-            <th class="newsletter-tb-num-mails"><?=$this->tr('Mailů')?></th>
-            <th class="newsletter-tb-viewed"><?=$this->tr('Zobrazeno')?></th>
-            <th class="newsletter-tb-date"><?=$this->tr('Datum odeslání')?></th>
+            <th class="newsletter-tb-name"><?php echo $this->tr('Název')?></th>
+            <th class="newsletter-tb-num-mails"><?php echo $this->tr('Mailů')?></th>
+            <th class="newsletter-tb-viewed"><?php echo $this->tr('Zobrazeno')?></th>
+            <th class="newsletter-tb-date"><?php echo $this->tr('Datum odeslání')?></th>
             <th class="newsletter-tb-actions"></th>
          </tr>
       </thead>
-   <?
+   <?php 
       foreach ($this->newsletters as $newsletter) {
          $dateSend = new DateTime($newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_DATE_SEND});
          $curDate = new DateTime();
@@ -27,14 +27,14 @@ $this->addFile('css://style.less');
          $cellClass = null;
          if($dateSend < $curDate) $cellClass = "ui-state-disabled";
       ?>
-      <tr class="ui-widget-content <?if($dateSend < $curDate) echo "newsletter-sended";?>">
-         <td class="newsletter-tb-name <?=$cellClass?>"
-            ><?=$newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_SUBJECT}?></td>
-         <td class="newsletter-tb-num-mails <?=$cellClass?>"><?=$newsletter->mails?></td>
-         <td class="newsletter-tb-viewed <?=$cellClass?>"><?=$newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_VIEWED}."x"?></td>
-         <td class="newsletter-tb-date <?=$cellClass?>"><?=vve_date("%x", $dateSend)?></td>
+      <tr class="ui-widget-content <?php if($dateSend < $curDate) echo "newsletter-sended";?>">
+         <td class="newsletter-tb-name <?php echo $cellClass?>"
+            ><?php echo $newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_SUBJECT}?></td>
+         <td class="newsletter-tb-num-mails <?php echo $cellClass?>"><?php echo $newsletter->mails?></td>
+         <td class="newsletter-tb-viewed <?php echo $cellClass?>"><?php echo $newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_VIEWED}."x"?></td>
+         <td class="newsletter-tb-date <?php echo $cellClass?>"><?php echo vve_date("%x", $dateSend)?></td>
          <td class="newsletter-tb-actions">
-            <?
+            <?php 
             $toolbox = clone $this->toolboxItem;
             $toolbox->newsletter_status_->getForm()->id->setValues( $newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_ID} );
             $newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_ACTIVE} 
@@ -49,19 +49,19 @@ $this->addFile('css://style.less');
             ?>
          </td>
       </tr>
-     <?}?>
+     <?php }?>
      <tfoot>
      	<tr class="ui-widget-header">
-     		<td colspan="5"><? echo $this->scrollComp;?></td>
+     		<td colspan="5"><?php  echo $this->scrollComp;?></td>
      	</tr>
      </tfoot>
    </table>
-   <?} else {?>
-      <div class="admin-info-text"><? ps($this->tr('Není uložen žádný newsletter')); ?> </div>
-   <?}?>
+   <?php } else {?>
+      <div class="admin-info-text"><?php  ps($this->tr('Není uložen žádný newsletter')); ?> </div>
+   <?php }?>
 </div>
 <div id="test-prw"></div>
-<? 
+<?php  
 $this->addJsPlugin(new JsPlugin_PrettyPhoto());
 ?>
 <a rel="prettyPhoto"></a>

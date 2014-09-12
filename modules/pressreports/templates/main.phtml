@@ -1,34 +1,34 @@
-<?
+<?php 
 $h1 = $this->category()->getName();
 $dwLink = new Url_DownloadLink($this->category()->getModule()->getDataDir());
 echo $this->toolbox;
 $this->addFile("css://style.css");
 ?>
-<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $h1;?></h1>
+<h1><?php $this->includeFile('tpl://engine:headline/icon.phtml'); echo $h1;?></h1>
 <div class="posts-list">
-   <?if($this->reports != false && !empty ($this->reports)){?>
+   <?php if($this->reports != false && !empty ($this->reports)){?>
       <ul class="press-messages-list">
-      <?foreach ($this->reports as $report) {?>
-         <li class="press-message" id="press-message-<?=$report->{PressReports_Model::COLUMN_ID}?>">
+      <?php foreach ($this->reports as $report) {?>
+         <li class="press-message" id="press-message-<?php echo $report->{PressReports_Model::COLUMN_ID}?>">
             <div>
-               <span class="date"><?=vve_date("%x", new DateTime($report->{PressReports_Model::COLUMN_TIME_ADD}))?></span> /
-               <a href="<?=$this->dataDir.$report->{PressReports_Model::COLUMN_FILE}?>" title="<?=$this->tr('Zobrazit')?>">
-               <?ps($report->{PressReports_Model::COLUMN_NAME})?>
+               <span class="date"><?php echo vve_date("%x", new DateTime($report->{PressReports_Model::COLUMN_TIME_ADD}))?></span> /
+               <a href="<?php echo $this->dataDir.$report->{PressReports_Model::COLUMN_FILE}?>" title="<?php echo $this->tr('Zobrazit')?>">
+               <?php ps($report->{PressReports_Model::COLUMN_NAME})?>
                </a>
-               <?if($report->{PressReports_Model::COLUMN_AUTHOR} != null){?>
-               <span class="author">(<?ps($report->{PressReports_Model::COLUMN_AUTHOR})?>)</span>   
-               <?}?>
-               <? echo $report->toolbox?>
+               <?php if($report->{PressReports_Model::COLUMN_AUTHOR} != null){?>
+               <span class="author">(<?php ps($report->{PressReports_Model::COLUMN_AUTHOR})?>)</span>   
+               <?php }?>
+               <?php  echo $report->toolbox?>
             </div>
          </li>
-      <?}?>
+      <?php }?>
       </ul>
-   <?} else if($this->category()->getRights()->isWritable()) {?>
-      <div class="admin-info-text"><? echo $this->tr('Žádná tisková zpráva nebyla vložena. Zprávu nahrajete pomocí nástrojů.'); ?></div>
-   <?} else {?>
+   <?php } else if($this->category()->getRights()->isWritable()) {?>
+      <div class="admin-info-text"><?php  echo $this->tr('Žádná tisková zpráva nebyla vložena. Zprávu nahrajete pomocí nástrojů.'); ?></div>
+   <?php } else {?>
       <div class="post text">
-         <?echo $this->tr('Žádná tisková zpráva nebyla vložena.'); ?>
+         <?php echo $this->tr('Žádná tisková zpráva nebyla vložena.'); ?>
       </div>
-   <?}?>
+   <?php }?>
 </div>
 

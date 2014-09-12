@@ -1,4 +1,4 @@
-<?
+<?php 
 if(!Template::browser()->isMobile()){
    // add js
    $js = new JsPlugin_SuperfishMenu();
@@ -21,7 +21,7 @@ if(!Template::browser()->isMobile()){
 ?>
 <!-- Halvni menu sekce v menu  -->
 <ul class="sf-menu clearfix">
-   <?=vveMenuRenderFunc($this->menu, $this->link())?>
+   <?php echo vveMenuRenderFunc($this->menu, $this->link())?>
 </ul>
 <script type="text/javascript">
    $(document).ready(function(){
@@ -36,7 +36,7 @@ if(!Template::browser()->isMobile()){
 
 </script>
 
-<?} else {
+<?php } else {
    // mobile version
    function vveMenuMobileRenderFunc($menuArr, $link) {
       foreach ($menuArr as $key => $item) {
@@ -51,12 +51,12 @@ if(!Template::browser()->isMobile()){
    
    ?>
 <div id="menu-main">
-   <h4><?=$this->tr('Kategorie')?></h4>
+   <h4><?php echo $this->tr('Kategorie')?></h4>
    <ul>
-      <?=vveMenuMobileRenderFunc($this->menu, $this->link()) ?>
+      <?php echo vveMenuMobileRenderFunc($this->menu, $this->link()) ?>
    </ul>
    <hr class="reseter" />
 </div>
-   <?
+   <?php 
 }
 ?>

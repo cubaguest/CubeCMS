@@ -1,8 +1,8 @@
-<?
+<?php 
 Template::addPageTitle($this->tr('metadata'));
 ?>
 
-<h1><?=htmlspecialchars($this->category()->getName()).' - '.$this->tr('metadata')?></h1>
+<h1><?php echo htmlspecialchars($this->category()->getName()).' - '.$this->tr('metadata')?></h1>
 <div class="main-content-form-edit" id="article-edit-form">
-   <?echo($this->form);?>
+   <?php echo($this->form);?>
 </div>

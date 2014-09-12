@@ -1,4 +1,4 @@
-<?
+<?php 
 /**
  * Třída pro automatické nahrávání
  * @todo - přesunout sem autoloadery

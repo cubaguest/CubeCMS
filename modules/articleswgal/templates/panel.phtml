@@ -1,4 +1,4 @@
-<?
+<?php 
 $icon = null;
 if($this->panelObj()->getIcon() != null){
    $icon = '<img src="'.Panel_Obj::getIconDir().$this->panelObj()->getIcon().'" alt="'.$this->panelObj()->getIcon().'" />';
@@ -9,16 +9,16 @@ if($this->panelObj()->getBackImage() != null){
 }
 
 if($this->rssLink != null){?>
-<a style="float: right" href="<?=$this->rssLink?>" title="rss"><img src="<?=vve_get_tpl_file('icons/rss-icon.png', VVE_TPL_FILE_IMAGE)?>" alt="rss" /></a>
-<?}?>
-<p class="panelLabel"><?=$icon?><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=$this->panelObj()->getName()?></a></p>
-<div style="<?=$backImg?>">
-   <?foreach ($this->articles as $article) {?>
-   <a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
-      title="<?=htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>"><?=vve_tpl_truncate($article->{Articles_Model_Detail::COLUMN_NAME},25)?></a><br />
-   <?}?>
+<a style="float: right" href="<?php echo $this->rssLink?>" title="rss"><img src="<?php echo vve_get_tpl_file('icons/rss-icon.png', VVE_TPL_FILE_IMAGE)?>" alt="rss" /></a>
+<?php }?>
+<p class="panelLabel"><?php echo $icon?><a href="<?php echo $this->link()?>" title="<?php echo htmlspecialchars($this->panelObj()->getName())?>"><?php echo $this->panelObj()->getName()?></a></p>
+<div style="<?php echo $backImg?>">
+   <?php foreach ($this->articles as $article) {?>
+   <a href="<?php echo $this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
+      title="<?php echo htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>"><?php echo vve_tpl_truncate($article->{Articles_Model_Detail::COLUMN_NAME},25)?></a><br />
+   <?php }?>
 </div>
 <p class="panelLinkMore">
-   <a href="<?=$this->link()?>"
-      title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->_('Více')?></a>
+   <a href="<?php echo $this->link()?>"
+      title="<?php echo htmlspecialchars($this->category()->getLabel())?>"><?php echo $this->_('Více')?></a>
 </p>

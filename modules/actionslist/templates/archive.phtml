@@ -1,4 +1,4 @@
-<?
+<?php 
 $this->addPageTitle($this->_('Archiv'));
 $this->addPageHeadline($this->_('Archiv'));
 
@@ -12,18 +12,18 @@ $actions = $model->getAllActions($this->category()->getId(), !$this->category()-
 ?>
 <div>
    <p style="text-align: right">
-      <a href="<?=$this->link()->route()?>" title="<?=$this->_('Seznam')?>"><?=$this->_('Seznam')?></a>
+      <a href="<?php echo $this->link()->route()?>" title="<?php echo $this->_('Seznam')?>"><?php echo $this->_('Seznam')?></a>
    </p>
    <div id="actionsArchiveList">
-      <? $prevYear = null;
+      <?php  $prevYear = null;
       while ($row = $actions->fetch()) {
          $year = date("Y", $row->{Actions_Model_Detail::COLUMN_DATE_START});
          if($year == $prevYear) continue;
          $prevYear = $year;?>
-      <h2 class="actionYearLabel year<?=$year?>"><a href="#"><?=$year?></a></h2>
+      <h2 class="actionYearLabel year<?php echo $year?>"><a href="#"><?php echo $year?></a></h2>
       <div>
          <table cellpadding="0" cellspacing="0">
-               <?$curAct = $model->getActions($this->category()->getId(),
+               <?php $curAct = $model->getActions($this->category()->getId(),
                        mktime(0, 0, 0, 1, 1, $year), mktime(23, 59, 59, 12, 31, $year),
                        !$this->category()->getRights()->isWritable());
                $prevMounth = null;
@@ -39,32 +39,32 @@ $actions = $model->getAllActions($this->category()->getId(), !$this->category()-
                   if($mounth != $prevMounth) {
                      $prevMounth = $mounth;?>
             <tr>
-               <td colspan="3"><a href="#" onclick="return showMonth(this,'.mounth_<?=$mounthNum?>');"
-                                  title="<?=$this->_('zobraz')." ".$mounth?>">
-                     <img src="<?=vve_get_tpl_file('buttons/expand2.gif',VVE_TPL_FILE_IMAGE)?>"
-                          alt="expand" />&nbsp;<?=$mounth?></a></td>
+               <td colspan="3"><a href="#" onclick="return showMonth(this,'.mounth_<?php echo $mounthNum?>');"
+                                  title="<?php echo $this->_('zobraz')." ".$mounth?>">
+                     <img src="<?php echo vve_get_tpl_file('buttons/expand2.gif',VVE_TPL_FILE_IMAGE)?>"
+                          alt="expand" />&nbsp;<?php echo $mounth?></a></td>
             </tr>
-                     <?}?>
-            <tr class="mounth_<?=$mounthNum?>" style="display: none;">
-               <td><span style="padding-left: 1em;"><?=$startDate?></span></td>
+                     <?php }?>
+            <tr class="mounth_<?php echo $mounthNum?>" style="display: none;">
+               <td><span style="padding-left: 1em;"><?php echo $startDate?></span></td>
                <td>
-                        <?if($startDate != $stopDate) {
+                        <?php if($startDate != $stopDate) {
                            print ("&nbsp;&mdash;&nbsp;");
                            print ($stopDate);
                         }?>
                </td>
                <td>
                   &nbsp;&nbsp;
-                  <a href="<?=$this->link()->route('detail',
+                  <a href="<?php echo $this->link()->route('detail',
                                    array('urlkey' => $rowY->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
-                     title="<?=$rowY->{Articles_Model_Detail::COLUMN_NAME}?>"
-                     ><?print ($rowY->{Articles_Model_Detail::COLUMN_NAME});?></a>
+                     title="<?php echo $rowY->{Articles_Model_Detail::COLUMN_NAME}?>"
+                     ><?php print ($rowY->{Articles_Model_Detail::COLUMN_NAME});?></a>
                </td>
             </tr>
-                  <?}?>
+                  <?php }?>
          </table>
       </div>
-         <?}?>
+         <?php }?>
    </div>
    <hr class="reseter" />
 </div>
@@ -74,7 +74,7 @@ $actions = $model->getAllActions($this->category()->getId(), !$this->category()-
       $("#actionsArchiveList").accordion({
          collapsible: true,
          autoHeight: false,
-         active: '.year<?=date('Y')?>'
+         active: '.year<?php echo date('Y')?>'
       });
    });
 

@@ -1,4 +1,4 @@
-<?
+<?php 
 $this->addCssFile("style-edit.css");
 $this->addPageTitle($this->_('Program'));
 $this->addPageHeadline($this->_('Program'));
@@ -11,9 +11,9 @@ $this->itemIndex = 0;
 ?>
 
 <div class="article-list">
-   <?=$this->form->renderStart();?>
+   <?php echo $this->form->renderStart();?>
    <ul  class="program-days-list" id="program-days-list">
-      <?// tady vakreslení existujících položek
+      <?php // tady vakreslení existujících položek
       foreach ($this->currentProgram as $day) {
          $this->type = 'day';
          $this->stages = $day->stage;
@@ -26,15 +26,15 @@ $this->itemIndex = 0;
    </ul>
    <br />
    <p>
-      <label for="programAddDay"><?=$this->_("Přidat")?>:</label>&nbsp;
-      <input name="programAddDay" type="button" value="<?=$this->_("Přidat den")?>">
-      <?=$this->form->save->controll();?>
+      <label for="programAddDay"><?php echo $this->_("Přidat")?>:</label>&nbsp;
+      <input name="programAddDay" type="button" value="<?php echo $this->_("Přidat den")?>">
+      <?php echo $this->form->save->controll();?>
    </p>
-   <?echo $this->form->renderEnd();?>
+   <?php echo $this->form->renderEnd();?>
    <hr class="reseter" />
 </div>
 
-<?
+<?php 
 $jQuery = new JsPlugin_JQuery();
 $jQuery->setCfgParam("theme", "ui-lightness");
 $jQuery->addUISortable();
@@ -43,7 +43,7 @@ $this->addJsPlugin($jQuery);
 
 <script type="text/javascript">
    /* <![CDATA[ */
-   var itemIndex = <?=$this->itemIndex?>;
+   var itemIndex = <?php echo $this->itemIndex?>;
    $(document).ready(function(){
       $form = $('form#formProgram');
 
@@ -53,7 +53,7 @@ $this->addJsPlugin($jQuery);
 
       // přidání dne
       $('input[name=programAddDay]', $form).live('click', function(){
-         $.get('<?=$this->link()->route('programItem')?>',
+         $.get('<?php echo $this->link()->route('programItem')?>',
          { type: 'day', index: itemIndex },
          function(data){
             $('ul#program-days-list', $form).append(data);
@@ -68,7 +68,7 @@ $this->addJsPlugin($jQuery);
       $('input[name=programAddStage]', $form).live('click', function(){
          showLoadBox($('#program-days-list'));
          var $list = $(this).parent().children('ul.program-stages-list');
-         $.get('<?=$this->link()->route('programItem')?>',
+         $.get('<?php echo $this->link()->route('programItem')?>',
          { type: 'stage', index: itemIndex },
          function(data){
             $list.append(data);
@@ -88,7 +88,7 @@ $this->addJsPlugin($jQuery);
       $('input[name=programAddBand]', $form).live('click', function(){
          showLoadBox($('#program-days-list'));
          var $list = $(this).parent().children('ul.program-items-list');
-         $.get('<?=$this->link()->route('programItem')?>',
+         $.get('<?php echo $this->link()->route('programItem')?>',
          { type: 'band', index: itemIndex },
          function(data){
             $list.append(data);
@@ -108,7 +108,7 @@ $this->addJsPlugin($jQuery);
       $('input[name=programAddOther]', $form).live('click', function(){
          showLoadBox($('#program-days-list'));
          var $list = $(this).parent().children('ul.program-items-list');
-         $.get('<?=$this->link()->route('programItem')?>',
+         $.get('<?php echo $this->link()->route('programItem')?>',
          { type: 'other', index: itemIndex },
          function(data){
             $list.append(data);
@@ -192,5 +192,5 @@ $this->addJsPlugin($jQuery);
    }
    /* ]]> */
 </script>
-<? echo $this->toolbox; // TOOLBOX ?>
-<?$this->includeTpl("buttonback.phtml", true);?>
+<?php  echo $this->toolbox; // TOOLBOX ?>
+<?php $this->includeTpl("buttonback.phtml", true);?>

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-   <title><?ps($this->title)?></title>
-   <link rel="stylesheet" type="text/css" href="<?=Url_Request::getBaseWebDir(true)?>/stylesheets/normalize.css" />
+   <title><?php ps($this->title)?></title>
+   <link rel="stylesheet" type="text/css" href="<?php echo Url_Request::getBaseWebDir(true)?>/stylesheets/normalize.css" />
    <style type="text/css">
       body { text-align: center;}
       #newsletter { width: 1000px; margin: 10px auto; text-align: left;}
@@ -10,7 +10,7 @@
 </head>
 <body>
    <div id="newsletter">
-      <?echo $this->cnt?>
+      <?php echo $this->cnt?>
    </div>
 </body>
 </html>

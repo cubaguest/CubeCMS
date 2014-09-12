@@ -1,4 +1,4 @@
-<?
+<?php 
 if($this->file != null){
    $h = sprintf($this->tr('Úprava zprávy "%s"'), $this->report->{PressReports_Model::COLUMN_NAME});
 } else {
@@ -7,9 +7,9 @@ if($this->file != null){
 Template_Core::setPageTitle($h);
 
 ?>
-<h1><?=$h?></h1>
+<h1><?php echo $h?></h1>
 <div class="main-content-form-edit">
-   <?
+   <?php 
    // form
    echo $this->form;
    ?>

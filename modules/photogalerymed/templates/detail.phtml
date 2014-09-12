@@ -1,18 +1,18 @@
-<?
+<?php 
 $this->addPageTitle($this->article->{Articles_Model::COLUMN_NAME});
 $h1 = $this->article->{Articles_Model::COLUMN_NAME};
 echo $this->toolbox;
 ?>
-<h1><?=$h1?></h1>
+<h1><?php echo $h1?></h1>
 <div class="main-content-detail">
-   <div class="main-content-text"><?
+   <div class="main-content-text"><?php 
    if((string)$this->article->{Articles_Model::COLUMN_TEXT} != null) {
       echo $this->article->{Articles_Model::COLUMN_TEXT};
    } else if($this->category()->getRights()->isWritable()) {
-      ?><div class="admin-info-text"><?echo $this->tr('Źádný text galerie nebyl vyplněn.');?></div><?
+      ?><div class="admin-info-text"><?php echo $this->tr('Źádný text galerie nebyl vyplněn.');?></div><?php 
    }
    ?></div>
-   <?
+   <?php 
    $this->includeTpl('privateText.phtml', false,null, 'articles');//private text
    
    // images gallery
@@ -28,4 +28,4 @@ echo $this->toolbox;
            'shares' => array('url' => $this->link(), 'title' => $this->article->{Articles_Model::COLUMN_NAME})));
    ?>
 </div>
-<?echo $this->comments;?>
+<?php echo $this->comments;?>

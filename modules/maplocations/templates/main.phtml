@@ -1,26 +1,26 @@
-<?
+<?php 
 Template::addJS('http://maps.google.com/maps/api/js?sensor=false');
 echo $this->toolbox;
 ?>
-<h1><? echo $this->category()->getName(); ?></h1>
+<h1><?php  echo $this->category()->getName(); ?></h1>
 <div class="main-content-detail">
    <div id="map_canvas" style="width:100%; height:400px"></div>   
    <script type="text/javascript">
       var map = null;
       function initMap() {
          var latlng = new google.maps.LatLng(
-<?=$this->category()->getParam(MapLocations_Controller::PARAM_MAP_X, '') /* X */?>, 
-<?=$this->category()->getParam(MapLocations_Controller::PARAM_MAP_Y, '') /* Y */?>);
+<?php echo $this->category()->getParam(MapLocations_Controller::PARAM_MAP_X, '') /* X */?>, 
+<?php echo $this->category()->getParam(MapLocations_Controller::PARAM_MAP_Y, '') /* Y */?>);
          var myOptions = {
-            zoom: <?=$this->category()->getParam(MapLocations_Controller::PARAM_MAP_ZOOM, 8)?>,
+            zoom: <?php echo $this->category()->getParam(MapLocations_Controller::PARAM_MAP_ZOOM, 8)?>,
             center: latlng,
-            mapTypeId: google.maps.MapTypeId.<?=$this->category()->getParam(MapLocations_Controller::PARAM_MAP_TYPE, MapLocations_Controller::MAP_TYPE_NORMAL)?>
+            mapTypeId: google.maps.MapTypeId.<?php echo $this->category()->getParam(MapLocations_Controller::PARAM_MAP_TYPE, MapLocations_Controller::MAP_TYPE_NORMAL)?>
          };
          map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
       }
       initMap();
       // add markers
-      <?if(!empty ($this->locations)) { foreach ($this->locations as $i => $loc) {
+      <?php if(!empty ($this->locations)) { foreach ($this->locations as $i => $loc) {
          // create content string
          $cnt = '<h2>'.$loc->{MapLocations_Model::COLUMN_NAME}."</h2>";
          if($loc->{MapLocations_Model::COLUMN_IMAGE} != null){

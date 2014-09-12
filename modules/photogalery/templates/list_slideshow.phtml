@@ -1,4 +1,4 @@
-<?
+<?php 
 $this->addFile("css://photogalery:style.less");
 
 $model = new Text_Model_Detail();
@@ -11,41 +11,41 @@ $this->addJsPlugin(new JsPlugin_Galleriffic());
 
 ?>
 <div class="imagesList">
-   <?if($text != null) {?>
+   <?php if($text != null) {?>
    <div>
-         <?=$text->{Text_Model_Detail::COLUMN_TEXT}?>
+         <?php echo $text->{Text_Model_Detail::COLUMN_TEXT}?>
    </div>
    <br />
-   <?}?>
+   <?php }?>
 
    <!-- Start Advanced Gallery Html Containers -->
    <div class="navigation-container">
       <div id="thumbs" class="navigation">
          <a class="pageLink prev" style="visibility: hidden;" href="#" title="Previous Page">&lt;</a>
          <ul class="thumbs noscript">
-            <?while ($image = $images->fetch()) {
+            <?php while ($image = $images->fetch()) {
                ?>
             <li>
-               <a class="thumb" name="leaf" href="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir
+               <a class="thumb" name="leaf" href="<?php echo $this->category()->getModule()->getDataDir(true).$this->websubdir
                          .Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR.$image[PhotoGalery_Model_Images::COLUMN_FILE]?>"
-                  title="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>">
-                  <img src="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir.Photogalery_Controller::DIR_SMALL.URL_SEPARATOR
-                              .$image[PhotoGalery_Model_Images::COLUMN_FILE]?>" alt="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>" />
+                  title="<?php echo $image->{PhotoGalery_Model_Images::COLUMN_NAME}?>">
+                  <img src="<?php echo $this->category()->getModule()->getDataDir(true).$this->websubdir.Photogalery_Controller::DIR_SMALL.URL_SEPARATOR
+                              .$image[PhotoGalery_Model_Images::COLUMN_FILE]?>" alt="<?php echo $image->{PhotoGalery_Model_Images::COLUMN_NAME}?>" />
                </a>
                <div class="caption">
-                     <?if((string)$image->{PhotoGalery_Model_Images::COLUMN_NAME} != null) {?>
-                  <div class="image-title"><?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?></div>
-                     <?}?>
-                     <?if((string)$image->{PhotoGalery_Model_Images::COLUMN_DESC} != null) {?>
-                  <div class="image-desc"><?=$image->{PhotoGalery_Model_Images::COLUMN_DESC}?></div>
-                     <?}?>
+                     <?php if((string)$image->{PhotoGalery_Model_Images::COLUMN_NAME} != null) {?>
+                  <div class="image-title"><?php echo $image->{PhotoGalery_Model_Images::COLUMN_NAME}?></div>
+                     <?php }?>
+                     <?php if((string)$image->{PhotoGalery_Model_Images::COLUMN_DESC} != null) {?>
+                  <div class="image-desc"><?php echo $image->{PhotoGalery_Model_Images::COLUMN_DESC}?></div>
+                     <?php }?>
                   <div class="download">
-                     <a href="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir
-                         .Photogalery_Controller::DIR_ORIGINAL.URL_SEPARATOR.$image[PhotoGalery_Model_Images::COLUMN_FILE]?>"><?=$this->_('Originál')?></a>
+                     <a href="<?php echo $this->category()->getModule()->getDataDir(true).$this->websubdir
+                         .Photogalery_Controller::DIR_ORIGINAL.URL_SEPARATOR.$image[PhotoGalery_Model_Images::COLUMN_FILE]?>"><?php echo $this->_('Originál')?></a>
                   </div>
                </div>
             </li>
-            <?}?>
+            <?php }?>
          </ul>
          <a class="pageLink next" style="visibility: hidden;" href="#" title="Next Page">&gt;</a>
 
@@ -93,12 +93,12 @@ $this->addJsPlugin(new JsPlugin_Galleriffic());
             loadingContainerSel:       '#loading',
             renderSSControls:          true,
             renderNavControls:         true,
-            playLinkText:              '<?=$this->_('Přehrát')?>',
-            pauseLinkText:             '<?=$this->_('Pozastavit')?>',
-            prevLinkText:              '&lsaquo; <?=$this->_('Předchozí fotka')?>',
-            nextLinkText:              '<?=$this->_('Další fotka')?> &rsaquo;',
-            nextPageLinkText:          '<?=$this->_('Další')?> &rsaquo;',
-            prevPageLinkText:          '&lsaquo; <?=$this->_('Předchozí')?>',
+            playLinkText:              '<?php echo $this->_('Přehrát')?>',
+            pauseLinkText:             '<?php echo $this->_('Pozastavit')?>',
+            prevLinkText:              '&lsaquo; <?php echo $this->_('Předchozí fotka')?>',
+            nextLinkText:              '<?php echo $this->_('Další fotka')?> &rsaquo;',
+            nextPageLinkText:          '<?php echo $this->_('Další')?> &rsaquo;',
+            prevPageLinkText:          '&lsaquo; <?php echo $this->_('Předchozí')?>',
             enableHistory:             false,
             autoStart:                 false,
             syncTransitions:           true,
@@ -111,7 +111,7 @@ $this->addJsPlugin(new JsPlugin_Galleriffic());
 
                // Update the photo index display
                this.$captionContainer.find('div.photo-index')
-               .html('<?=$this->_('Fotka')?> '+ (nextIndex+1) +' <?=$this->_('z')?> '+ this.data.length);
+               .html('<?php echo $this->_('Fotka')?> '+ (nextIndex+1) +' <?php echo $this->_('z')?> '+ this.data.length);
             },
             onPageTransitionOut:       function(callback) {
                this.fadeTo('fast', 0.0, callback);
@@ -145,7 +145,7 @@ $this->addJsPlugin(new JsPlugin_Galleriffic());
       });
       /* ]]> */
    </script>
-   <?
+   <?php 
    if($this->category()->getRights()->isWritable()) {
       $toolbox = new Template_Toolbox();
       $toolbox->addTool('edit_text', $this->_("Upravit text"),

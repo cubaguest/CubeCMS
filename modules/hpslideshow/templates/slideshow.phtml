@@ -1,5 +1,5 @@
 <div id="hp-slideshow">
-   <?
+   <?php 
    $link = new Url_Link(true);
    foreach ($this->images as $img) {
    // prepare link
@@ -10,18 +10,18 @@
    $label = (string)vve_get_lang_string($img->{HPSlideShow_Model::COLUMN_LABEL});
    ?>
    <div class="slide">
-      <? if($href != null){?>
-      <a href="<?=$href?>">
-      <?}?>
-      <img src="<?echo $this->imagesUrl.$img->{HPSlideShow_Model::COLUMN_FILE};?>" />
-      <? if($href != null){?>
+      <?php  if($href != null){?>
+      <a href="<?php echo $href?>">
+      <?php }?>
+      <img src="<?php echo $this->imagesUrl.$img->{HPSlideShow_Model::COLUMN_FILE};?>" />
+      <?php  if($href != null){?>
       </a>
-      <?}?>
-      <?if($label != null){?>
-      <div class="label"><?ps($label)?></div>
-      <?}?>
+      <?php }?>
+      <?php if($label != null){?>
+      <div class="label"><?php ps($label)?></div>
+      <?php }?>
    </div>
-   <?}?>
+   <?php }?>
 </div>
 <script type="text/javascript">
    $(document).ready(function(){ $('#hp-slideshow').cubeHPSlider(); });

@@ -1,4 +1,4 @@
-<? // načtení detailu
+<?php  // načtení detailu
 $this->addPageTitle($this->action->{Actions_Model::COLUMN_NAME});
 $this->addPageHeadline($this->action->{Actions_Model::COLUMN_NAME});
 
@@ -7,10 +7,10 @@ $this->addJsPlugin(new JsPlugin_PiroBox());
 ?>
 
 <div>
-   <!--<h2><?=htmlspecialchars($this->action->{Actions_Model::COLUMN_NAME})?>&nbsp;-->
+   <!--<h2><?php echo htmlspecialchars($this->action->{Actions_Model::COLUMN_NAME})?>&nbsp;-->
    <!--</h2>-->
    <p>
-      <?
+      <?php 
       $startDate = strftime("%x", $this->action->{Actions_Model::COLUMN_DATE_START});
       $stopDate = strftime("%x", $this->action->{Actions_Model::COLUMN_DATE_STOP});
       print ($startDate);
@@ -19,22 +19,22 @@ $this->addJsPlugin(new JsPlugin_PiroBox());
          print ($stopDate);
       }?>
       <br />
-      <?=$this->_('Naposled upraveno:')?>&nbsp;<?=strftime("%x %X", $this->action->{Actions_Model::COLUMN_EDIT_TIME})?>
+      <?php echo $this->_('Naposled upraveno:')?>&nbsp;<?php echo strftime("%x %X", $this->action->{Actions_Model::COLUMN_EDIT_TIME})?>
    </p>
    <p>
-      <a href="<?=$this->link()->route('detail')?>"><?=$this->_('Text')?></a>
-      <a href="<?=$this->link()->route('detailPhotos')?>"><?=$this->_('Fotky')?></a>
+      <a href="<?php echo $this->link()->route('detail')?>"><?php echo $this->_('Text')?></a>
+      <a href="<?php echo $this->link()->route('detailPhotos')?>"><?php echo $this->_('Fotky')?></a>
    </p>
 
    <div id="Action_Photos"><!-- SOF IMAGES -->
-      <?while ($image = $this->images->fetch()) {?>
-      <a class="pirobox_gall" href="<?=$this->category()->getModule()->getDataDir(true)
+      <?php while ($image = $this->images->fetch()) {?>
+      <a class="pirobox_gall" href="<?php echo $this->category()->getModule()->getDataDir(true)
                     .Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR.$image[PhotoGalery_Model_Images::COLUMN_FILE]?>"
-         title="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>">
-         <img src="<?=$this->category()->getModule()->getDataDir(true).Photogalery_Controller::DIR_SMALL.URL_SEPARATOR
-                         .$image[PhotoGalery_Model_Images::COLUMN_FILE]?>" alt="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>" />
+         title="<?php echo $image->{PhotoGalery_Model_Images::COLUMN_NAME}?>">
+         <img src="<?php echo $this->category()->getModule()->getDataDir(true).Photogalery_Controller::DIR_SMALL.URL_SEPARATOR
+                         .$image[PhotoGalery_Model_Images::COLUMN_FILE]?>" alt="<?php echo $image->{PhotoGalery_Model_Images::COLUMN_NAME}?>" />
       </a>
-         <?}?>
+         <?php }?>
       <script type="text/javascript">
          /* <![CDATA[ */
          $(document).ready(function(){
@@ -56,8 +56,8 @@ $this->addJsPlugin(new JsPlugin_PiroBox());
       </script><!-- EOF IMAGES -->
    </div>
    <hr class="reseter" />
-   <?$this->includeTpl('tools.phtml')?>
+   <?php $this->includeTpl('tools.phtml')?>
    <br />
-   <?=$this->shares?>
+   <?php echo $this->shares?>
 </div>
-<?$this->includeTpl("buttonback.phtml", true);?>
+<?php $this->includeTpl("buttonback.phtml", true);?>

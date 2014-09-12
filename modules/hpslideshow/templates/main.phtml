@@ -1,4 +1,4 @@
-<?
+<?php 
 $this->addFile("css://style.less");
 
 $jq = new JsPlugin_JQuery();
@@ -9,43 +9,43 @@ $this->addJsPlugin($jq);
 $this->addJsPlugin(new JsPlugin_JQueryCSS());
 
 ?>
-<h1><?echo $this->category()->getName();?></h1>
+<h1><?php echo $this->category()->getName();?></h1>
 <div class="content-admin">
    <div id="form-upload">
-      <?
+      <?php 
       echo $this->formUpload;
       ?>
    </div>
-   <h2><?ps($this->tr('Nahrané obrázky'))?></h2>
-   <?if(!empty($this->images)){?>
+   <h2><?php ps($this->tr('Nahrané obrázky'))?></h2>
+   <?php if(!empty($this->images)){?>
       <ul id="images-list" class="ui-widget ui-cube-widget">
-         <?foreach ($this->images as $img) {?>
-         <li class="ui-widget-content ui-state-default slide-image-row" id="image-<?=$img->getPK()?>" data-id="<?=$img->getPK()?>">
+         <?php foreach ($this->images as $img) {?>
+         <li class="ui-widget-content ui-state-default slide-image-row" id="image-<?php echo $img->getPK()?>" data-id="<?php echo $img->getPK()?>">
             <ul class="tabs-links clearfix">
-               <li><a class="tab-link" href="<?=$this->link()?>#preview-<?=$img->getPK()?>"><?ps($this->tr('Náhled'))?></a></li>
-               <li><a class="tab-link" href="<?=$this->link()?>#edit-<?=$img->getPK()?>"><?ps($this->tr('Úprava'))?></a></li>
+               <li><a class="tab-link" href="<?php echo $this->link()?>#preview-<?php echo $img->getPK()?>"><?php ps($this->tr('Náhled'))?></a></li>
+               <li><a class="tab-link" href="<?php echo $this->link()?>#edit-<?php echo $img->getPK()?>"><?php ps($this->tr('Úprava'))?></a></li>
             </ul>
-            <div class="tab tab-preview" id="preview-<?=$img->getPK()?>">
-               <img class="image-slide" src="<?=vve_image_cacher($this->imagesUrl.$img->{HPSlideShow_Model::COLUMN_FILE}, 700, 400)?>" />
-               <?if((string)$img->{HPSlideShow_Model::COLUMN_LABEL} != null){?>
-                  <div class="image-label"><?ps(vve_get_lang_string($img->{HPSlideShow_Model::COLUMN_LABEL}))?></div>
-               <?}?>
+            <div class="tab tab-preview" id="preview-<?php echo $img->getPK()?>">
+               <img class="image-slide" src="<?php echo vve_image_cacher($this->imagesUrl.$img->{HPSlideShow_Model::COLUMN_FILE}, 700, 400)?>" />
+               <?php if((string)$img->{HPSlideShow_Model::COLUMN_LABEL} != null){?>
+                  <div class="image-label"><?php ps(vve_get_lang_string($img->{HPSlideShow_Model::COLUMN_LABEL}))?></div>
+               <?php }?>
                <div class="link-info">
-               <?if((string)$img->{HPSlideShow_Model::COLUMN_LINK} != null){?>
-                  <?ps($this->tr('Odkaz na'))?>:
-                   <a href="<?=$img->{HPSlideShow_Model::COLUMN_LINK}?>" class="link-external"><?ps($img->{HPSlideShow_Model::COLUMN_LINK})?></a>
-               <?} else if($img->{HPSlideShow_Model::COLUMN_ID_CAT} != 0){?>
-                   <?ps($this->tr('Odkaz na kategorie'))?>:
-                  <a href="<?=$this->link()->clear()->category($img->{Model_Category::COLUMN_URLKEY})?>" class="link-external">
-                     <?ps($img->{Model_Category::COLUMN_NAME});?>
+               <?php if((string)$img->{HPSlideShow_Model::COLUMN_LINK} != null){?>
+                  <?php ps($this->tr('Odkaz na'))?>:
+                   <a href="<?php echo $img->{HPSlideShow_Model::COLUMN_LINK}?>" class="link-external"><?php ps($img->{HPSlideShow_Model::COLUMN_LINK})?></a>
+               <?php } else if($img->{HPSlideShow_Model::COLUMN_ID_CAT} != 0){?>
+                   <?php ps($this->tr('Odkaz na kategorie'))?>:
+                  <a href="<?php echo $this->link()->clear()->category($img->{Model_Category::COLUMN_URLKEY})?>" class="link-external">
+                     <?php ps($img->{Model_Category::COLUMN_NAME});?>
                   </a>
-               <?} else {?>
-                  <?ps($this->tr('Nemá proklik'))?>.
-               <?}?>
+               <?php } else {?>
+                  <?php ps($this->tr('Nemá proklik'))?>.
+               <?php }?>
                </div>
             </div>
-            <div class="tab" id="edit-<?=$img->getPK()?>">
-               <?
+            <div class="tab" id="edit-<?php echo $img->getPK()?>">
+               <?php 
                $this->formEdit->setAction($this->link()->anchor('image-'.$img->getPK()));
                $this->formEdit->html()->addClass('form-edit-image');
                $this->formEdit->id->setValues($img->{HPSlideShow_Model::COLUMN_ID});
@@ -57,12 +57,12 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
             </div>
             <div class="slide-buttons">
                <span class="button-move"><img src="images/icons/arrow_up_down.png" /></span>
-               <a class="button-changestate" data-id="<?=$img->getPK()?>" href="<?=$this->link()?>#changestate-<?=$img->getPK()?>"><img
-                       src="images/icons/<?echo $img->{HPSlideShow_Model::COLUMN_ACTIVE} ? 'enable.png' : 'disable.png'?>" /></a>
-               <a class="button-delete" data-id="<?=$img->getPK()?>" href="<?=$this->link()?>#delete-<?=$img->getPK()?>"><img src="images/icons/cancel.png" /></a>
+               <a class="button-changestate" data-id="<?php echo $img->getPK()?>" href="<?php echo $this->link()?>#changestate-<?php echo $img->getPK()?>"><img
+                       src="images/icons/<?php echo $img->{HPSlideShow_Model::COLUMN_ACTIVE} ? 'enable.png' : 'disable.png'?>" /></a>
+               <a class="button-delete" data-id="<?php echo $img->getPK()?>" href="<?php echo $this->link()?>#delete-<?php echo $img->getPK()?>"><img src="images/icons/cancel.png" /></a>
             </div>
          </li>
-         <?}?>
+         <?php }?>
       </ul>
       <script type="text/javascript">
          $(document).ready(function(){
@@ -83,7 +83,7 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
                handle : ".button-move",
                update : function( event, ui ){
                   $.ajax({
-                     type : 'POST', url : "<?=$this->link()->route('editImage')?>",
+                     type : 'POST', url : "<?php echo $this->link()->route('editImage')?>",
                      data : {action : 'changepos', id : ui.item.data('id'), pos : ui.item.index()+1},
                      success : function(data){
                         if(data.errmsg.length != 0){
@@ -95,14 +95,14 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
             });
 
             $('.button-delete').click( function (){
-               if(!confirm('<?ps($this->tr('Opravdu smazat obrázek?'))?>')){
+               if(!confirm('<?php ps($this->tr('Opravdu smazat obrázek?'))?>')){
                    return false;
                }
                var $li = $(this).closest('li.slide-image-row');
                var id = $(this).data("id");
                $.ajax({
                   type: "POST",
-                  url: "<?=$this->link()->route('editImage')?>",
+                  url: "<?php echo $this->link()->route('editImage')?>",
                   data: {action : "delete", id : id},
                   success : function(data){
                      $li.fadeOut(300, function(){
@@ -118,7 +118,7 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
                var $this = $(this);
                $.ajax({
                   type: "POST",
-                  url: "<?=$this->link()->route('editImage')?>",
+                  url: "<?php echo $this->link()->route('editImage')?>",
                   data: {action : "changestate", id : id},
                   success : function(data){
                      var $img = $('img', $this);
@@ -136,9 +136,9 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
             $('input[name="img_edit_save"]').after($('<img src="images/progress_small.gif" />').addClass('loader').hide());
          });
       </script>
-   <?} else { ?>
+   <?php } else { ?>
       <div class="admin-info-text">
-         <?ps($this->tr('Naní nahrán žádný obrázek'))?>
+         <?php ps($this->tr('Naní nahrán žádný obrázek'))?>
       </div>
-   <?}?>
+   <?php }?>
 </div>

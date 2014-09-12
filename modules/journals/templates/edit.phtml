@@ -1,4 +1,4 @@
-<?
+<?php 
 // do titulku
 if ($this->edit) {
    $t = sprintf($this->_('úprava deníku %s/%s'), 1, 2011);
@@ -15,34 +15,34 @@ $this->form->html()->setAttrib('name', 'upload_journal_form');
 ?>
 
 <div class="main-content-form-edit" id="upload_journal_form">
-   <? echo $this->form->renderStart(); ?>
+   <?php  echo $this->form->renderStart(); ?>
    <fieldset class="fieldset-alt">
       <legend><span class="form-legend-name">Základní informace</span></legend>
       <table class="form-table">
          <tbody>
             <tr>
                <th class="form-labels">
-                  <?=$this->form->number->label();?>
+                  <?php echo $this->form->number->label();?>
                </th>
                <td class="form-controlls">
-                  <?=$this->form->number->controllAll()?>
+                  <?php echo $this->form->number->controllAll()?>
                </td>
             </tr>
 
             <tr>
                <th class="form-labels">
-                  <?=$this->form->year->label()?>
+                  <?php echo $this->form->year->label()?>
                </th>
                <td class="form-controlls">
-                  <?=$this->form->year->controllAll()?>
+                  <?php echo $this->form->year->controllAll()?>
                </td>
             </tr>
             <tr>
                <th class="form-labels">
-                  <?=$this->form->file->label()?>
+                  <?php echo $this->form->file->label()?>
                </th>
                <td class="form-controlls">
-                  <?=$this->form->file->controllAll()?>
+                  <?php echo $this->form->file->controllAll()?>
                </td>
             </tr>
          </tbody>
@@ -54,28 +54,28 @@ $this->form->html()->setAttrib('name', 'upload_journal_form');
          <tbody>
             <tr>
                <th class="form-labels" style="width: 10%;">
-                  <?
+                  <?php 
                   echo $this->form->label_page->label();
                   ?>
                </th>
                <th class="form-labels">
-                  <?=$this->form->label->label();?>
+                  <?php echo $this->form->label->label();?>
                </th>
             </tr>
-            <?
+            <?php 
             foreach ($this->labels as $key => $label) {
                $page = $this->labels_pages[$key];
             ?>
             <tr>
                <td class="form-controlls" style="width: 10%;">
-                  <?
+                  <?php 
                   $this->form->label_page->setValues($page);
                   $this->form->label_page->html()->setAttrib('style','width: 30px;');
                   echo $this->form->label_page->controll();
                      ?>
                </td>
                <td class="form-controlls">
-                  <?
+                  <?php 
                   $this->form->label->setValues($label);
                   $this->form->label->html()->setAttrib('style','width: 85%;');
                   echo $this->form->label->controll();
@@ -86,7 +86,7 @@ $this->form->html()->setAttrib('name', 'upload_journal_form');
                   </p>
                </td>
             </tr>
-            <?}?>
+            <?php }?>
          </tbody>
       </table>
    </fieldset>
@@ -96,10 +96,10 @@ $this->form->html()->setAttrib('name', 'upload_journal_form');
          <tbody>
             <tr>
                <th class="form-labels">
-                  <?=$this->form->text->label();?>
+                  <?php echo $this->form->text->label();?>
                </th>
                <td class="form-controlls">
-                  <?
+                  <?php 
                   $this->form->text->html()->setAttrib('style', 'width: 85%; height: 200px;');
                   $this->form->text->htmlSubLabel()->addClass('font-small');
                   echo $this->form->text->controllAll();
@@ -115,12 +115,12 @@ $this->form->html()->setAttrib('name', 'upload_journal_form');
             <tr>
                <th class="form-labels"></th>
                <td class="form-controlls">
-                  <?=$this->form->save?>
+                  <?php echo $this->form->save?>
                </td>
             </tr>
          </tbody></table>
    </fieldset>
-   <? echo $this->form->renderEnd(); ?>
+   <?php  echo $this->form->renderEnd(); ?>
    <script type="text/javascript">
       function rowAdd(linkobj){
          var tr = $(linkobj).parents('tr').clone();

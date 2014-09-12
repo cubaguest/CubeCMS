@@ -1,27 +1,27 @@
-<h1><?=$this->tr('Nastavení hledání');?></h1>
+<h1><?php echo $this->tr('Nastavení hledání');?></h1>
 <div class="main-content-detail">
-   <p><?=$this->tr('Zde lze přidávat další podstránky, ve kterých se má hledat.');?></p>
+   <p><?php echo $this->tr('Zde lze přidávat další podstránky, ve kterých se má hledat.');?></p>
    <br/>
    <div class="main-content-form-edit">
-   <h2><?=$this->tr('Uložené API');?></h2>
+   <h2><?php echo $this->tr('Uložené API');?></h2>
    <table style="width: 95%" cellpadding="0" cellspacing="0">
       <tr>
-         <th style="width: 50%"><?=$this->tr('Url')?></th>
-         <th style="width: 20%"><?=$this->tr('Název')?></th>
-         <th style="width: 20%"><?=$this->tr('API')?></th>
-         <th><?=$this->tr('Akce')?></th>
+         <th style="width: 50%"><?php echo $this->tr('Url')?></th>
+         <th style="width: 20%"><?php echo $this->tr('Název')?></th>
+         <th style="width: 20%"><?php echo $this->tr('API')?></th>
+         <th><?php echo $this->tr('Akce')?></th>
       </tr>
-      <?$someApi = false;
+      <?php $someApi = false;
       foreach ($this->apis as $api) {
          $someApi = true;
          ?>
       <tr>
-         <td><?=$api->{Search_Model_Api::COLUMN_URL}?></td>
-         <td><?=$api->{Search_Model_Api::COLUMN_NAME}?></td>
-         <td><?=array_search($api->{Search_Model_Api::COLUMN_API}, Search_Controller::$apis);?></td>
+         <td><?php echo $api->{Search_Model_Api::COLUMN_URL}?></td>
+         <td><?php echo $api->{Search_Model_Api::COLUMN_NAME}?></td>
+         <td><?php echo array_search($api->{Search_Model_Api::COLUMN_API}, Search_Controller::$apis);?></td>
          <td>
-            <form action="<?=$this->link()?>" method="post">
-                  <?
+            <form action="<?php echo $this->link()?>" method="post">
+                  <?php 
                   $this->formDel->delete->setImage('images/icons/magifier_zoom_out.png');
                   $this->formDel->id->setValues($api->{Search_Model_Api::COLUMN_ID});
                   print($this->formDel->id->controllAll());
@@ -30,19 +30,19 @@
             </form>
          </td>
       </tr>
-         <?}
+         <?php }
          if($someApi === false){?>
       <tr>
-         <td colspan="3"><?=$this->tr('Žádné API není přidáno')?></td>
+         <td colspan="3"><?php echo $this->tr('Žádné API není přidáno')?></td>
       </tr>
-            <?}?>
+            <?php }?>
    </table>
    <br />
-   <h2><?=$this->tr('Přidání API');?></h2>
-   <?print($this->formAdd);?>
-   <h2><?=$this->tr('Popis API');?></h2>
-   <?print($this->apiLabels);?>
+   <h2><?php echo $this->tr('Přidání API');?></h2>
+   <?php print($this->formAdd);?>
+   <h2><?php echo $this->tr('Popis API');?></h2>
+   <?php print($this->apiLabels);?>
    </div>
    <br />
 </div>
-<?$this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->clear()->route()));?>
+<?php $this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->clear()->route()));?>

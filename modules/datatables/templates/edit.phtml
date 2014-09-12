@@ -1,4 +1,4 @@
-<?
+<?php 
 $jq = new JsPlugin_JQuery();
 $jq->addUISortable();
 $this->addJsPlugin($jq);
@@ -12,87 +12,87 @@ echo $this->form->renderStart();
 ?>
    <table id="dataTable">
    <thead class="ui-widget-header">
-      <?//if(Locales::isMultilang()){?>
-      <?if(true){?>
+      <?php //if(Locales::isMultilang()){?>
+      <?php if(true){?>
       <tr>
-         <th colspan="<?=$this->colls+2?>">
-            <?=$this->tr('Jazyk')?>:
+         <th colspan="<?php echo $this->colls+2?>">
+            <?php echo $this->tr('Jazyk')?>:
             <select name="datatable-lang">
-               <?foreach (Locales::getAppLangsNames() as $key => $lang) {?>
-               <option value="<?=$this->link()->param('lang', $key)?>" <?if(isset($_GET['lang']) && $_GET['lang'] == $key) echo 'selected="selected"'?>><?=$lang?></option>
-               <?}?>
+               <?php foreach (Locales::getAppLangsNames() as $key => $lang) {?>
+               <option value="<?php echo $this->link()->param('lang', $key)?>" <?php if(isset($_GET['lang']) && $_GET['lang'] == $key) echo 'selected="selected"'?>><?php echo $lang?></option>
+               <?php }?>
             </select>
          </th>
       </tr>
-      <?}?>
+      <?php }?>
       <tr>
-         <th><span title="<?echo $this->tr('Hlavička');?>"><?echo $this->tr('H');?></span></th>
-      <?for ($i = 1; $i <= $this->colls; $i++) {?>
-         <th><?echo $this->tr('Sloupec').' '.$i;?></th>
-      <?}?>
+         <th><span title="<?php echo $this->tr('Hlavička');?>"><?php echo $this->tr('H');?></span></th>
+      <?php for ($i = 1; $i <= $this->colls; $i++) {?>
+         <th><?php echo $this->tr('Sloupec').' '.$i;?></th>
+      <?php }?>
       <th></th>
       </tr>
    </thead>
    <tbody class="ui-widget-content">
-      <?foreach ($this->rows as $rowkey => $row) {?>
-      <tr class="ui-state-default <?if($row['header'] === true) echo "ui-state-highlight";?>" id="row-<?=$rowkey?>">
+      <?php foreach ($this->rows as $rowkey => $row) {?>
+      <tr class="ui-state-default <?php if($row['header'] === true) echo "ui-state-highlight";?>" id="row-<?php echo $rowkey?>">
             <td>
-               <?
+               <?php 
                $this->form->header->setValues((bool)$row['header']);
                $this->form->header->setDimensional($rowkey);
                $this->form->header->html()->setAttrib('title', $this->tr('Řádek je hlavička'))->addClass('datatable-header-switcher');
                echo $this->form->header;
                ?>
             </td>
-            <?for ($i=1; $i <= $this->colls; $i++) {
+            <?php for ($i=1; $i <= $this->colls; $i++) {
                $this->form->{'coll_'.$i}->setDimensional($rowkey);
                if(isset ($row[$i-1])){
                   $this->form->{'coll_'.$i}->setValues($row[$i-1]);
                }
                $this->form->{'coll_'.$i}->html()->setAttrib('rows', 1);
                ?>
-            <td><?echo $this->form->{'coll_'.$i};?></td>
-            <?}?>
+            <td><?php echo $this->form->{'coll_'.$i};?></td>
+            <?php }?>
             <td class="data-table-actions">
-               <img src="<?=Url_Request::getBaseWebDir(true)?>/images/icons/arrow_up_down.png" alt="move row" />
-               <a href="" onclick="addRow(this); return false;" title="<?=$this->tr('Přidat řádek');?>"><img src="<?=Url_Request::getBaseWebDir(true)?>/images/icons/table_row_insert.png" alt="add row" /></a>
-               <a href="" onclick="delRow(this); return false;" title="<?=$this->tr('Odstranit řádek');?>"><img src="<?=Url_Request::getBaseWebDir(true)?>/images/icons/table_row_delete.png" alt="remove row" /></a>
+               <img src="<?php echo Url_Request::getBaseWebDir(true)?>/images/icons/arrow_up_down.png" alt="move row" />
+               <a href="" onclick="addRow(this); return false;" title="<?php echo $this->tr('Přidat řádek');?>"><img src="<?php echo Url_Request::getBaseWebDir(true)?>/images/icons/table_row_insert.png" alt="add row" /></a>
+               <a href="" onclick="delRow(this); return false;" title="<?php echo $this->tr('Odstranit řádek');?>"><img src="<?php echo Url_Request::getBaseWebDir(true)?>/images/icons/table_row_delete.png" alt="remove row" /></a>
             </td>
          </tr>
-      <?}?>
+      <?php }?>
    </tbody>
    <tfoot class="ui-widget-header">
       <tr>
          <td colspan="2">
-         <?
+         <?php 
          echo $this->form->save;
          echo $this->form->close->label();
          echo $this->form->close;
          ?>
          </td>
-         <td colspan="<?=$this->colls?>" style="text-align: right;">
-            <a href="javascript:addRow()" title="<?=$this->tr('Přidat řádek');?>"><img src="<?=Url_Request::getBaseWebDir(true)?>/images/icons/table_row_insert.png" alt="add row" /><?=$this->tr('Přidat řádek');?></a>
+         <td colspan="<?php echo $this->colls?>" style="text-align: right;">
+            <a href="javascript:addRow()" title="<?php echo $this->tr('Přidat řádek');?>"><img src="<?php echo Url_Request::getBaseWebDir(true)?>/images/icons/table_row_insert.png" alt="add row" /><?php echo $this->tr('Přidat řádek');?></a>
          </td>
       </tr>
       <tr id="dataTableRowTpl" class="ui-state-default">
             <td>
-               <?
+               <?php 
                $this->form->header->setDimensional('{KEY}');
                $this->form->header->setValues(false);
                $this->form->header->html()->setAttrib('title', $this->tr('Řádek je hlavička'))->addClass('datatable-header-switcher');
                echo $this->form->header;
                ?>
             </td>
-            <?for ($i=1 ; $i <= $this->colls; $i++) {
+            <?php for ($i=1 ; $i <= $this->colls; $i++) {
                $this->form->{'coll_'.($i)}->setDimensional('{KEY}');
                $this->form->{'coll_'.($i)}->setValues(null);
                ?>
-               <td><?echo $this->form->{'coll_'.($i)};?></td>
-            <?}?>
+               <td><?php echo $this->form->{'coll_'.($i)};?></td>
+            <?php }?>
             <td class="data-table-actions">
-               <a href="" class="move" onclick="return false;" title="<?=$this->tr('Přidat řádek');?>"><img src="<?=Url_Request::getBaseWebDir(true)?>/images/icons/arrow_up_down.png" alt="move row"  /></a>
-               <a href="" onclick="addRow(this); return false;" title="<?=$this->tr('Přidat řádek');?>"><img src="<?=Url_Request::getBaseWebDir(true)?>/images/icons/table_row_insert.png" alt="add row" /></a>
-               <a href="" onclick="delRow(this); return false;" title="<?=$this->tr('Odstranit řádek');?>"><img src="<?=Url_Request::getBaseWebDir(true)?>/images/icons/table_row_delete.png" alt="remove row" /></a>
+               <a href="" class="move" onclick="return false;" title="<?php echo $this->tr('Přidat řádek');?>"><img src="<?php echo Url_Request::getBaseWebDir(true)?>/images/icons/arrow_up_down.png" alt="move row"  /></a>
+               <a href="" onclick="addRow(this); return false;" title="<?php echo $this->tr('Přidat řádek');?>"><img src="<?php echo Url_Request::getBaseWebDir(true)?>/images/icons/table_row_insert.png" alt="add row" /></a>
+               <a href="" onclick="delRow(this); return false;" title="<?php echo $this->tr('Odstranit řádek');?>"><img src="<?php echo Url_Request::getBaseWebDir(true)?>/images/icons/table_row_delete.png" alt="remove row" /></a>
             </td>
          </tr>
    </tfoot>   
@@ -103,7 +103,7 @@ echo $this->form->renderEnd();
    <script type="text/javascript">
    var dt = null;   
    var rowTpl = null;
-   var lastRow = <?=$rowkey+1?>;
+   var lastRow = <?php echo $rowkey+1?>;
    $(function() {
       dt = $('#dataTable tbody');
       rowTpl = $('#dataTableRowTpl');
@@ -142,8 +142,8 @@ echo $this->form->renderEnd();
    </script>
    <p class="note">
    <ul>
-      <li><?= $this->tr('Položky lze přesunovat uchopením myší a přesunutí na vybranou pozici.'); ?></li>
-      <li><?=$this->tr('Před změnou jazyka je nutné položky uložit, jinak dojde ke ztrátě dat.');?></li>
+      <li><?php echo  $this->tr('Položky lze přesunovat uchopením myší a přesunutí na vybranou pozici.'); ?></li>
+      <li><?php echo $this->tr('Před změnou jazyka je nutné položky uložit, jinak dojde ke ztrátě dat.');?></li>
    </ul>
 </p>
 </div>

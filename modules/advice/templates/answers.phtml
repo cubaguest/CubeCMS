@@ -1,4 +1,4 @@
-<?
+<?php 
 $t = $this->category()->getName().' - '. $this->tr('seznam dotazů');
 Template::addPageTitle($t);
 
@@ -9,27 +9,27 @@ $this->addJsPlugin($jsJqGrid);
 $this->addFile("css://style.css");
 
 ?>
-<h1><?echo $t;?></h1>
+<h1><?php echo $t;?></h1>
 <div class="main-content-form-edit">
    <table id="table-questions"></table>
    <div id="table-questions-toolbar">
-      <!--<label for="select-drug-id"><?=$this->tr('Drogy')?>:</label>
+      <!--<label for="select-drug-id"><?php echo $this->tr('Drogy')?>:</label>
       <select id="select-drug-id" name="sel_drug">
-         <?
+         <?php 
          /*foreach ($this->groups as $grp) {
             $grpsArr[(int)$grp[Model_Groups::COLUMN_ID]] = $grp[Model_Groups::COLUMN_NAME];
-            ?><option value="<?=$grp->{Model_Groups::COLUMN_ID}?>" title="<?=$grp->{Model_Groups::COLUMN_NAME}?>"><?=$grp->{Model_Groups::COLUMN_NAME}.' - '.$grp->{Model_Groups::COLUMN_LABEL}?></option><?
+            ?><option value="<?php echo $grp->{Model_Groups::COLUMN_ID}?>" title="<?php echo $grp->{Model_Groups::COLUMN_NAME}?>"><?php echo $grp->{Model_Groups::COLUMN_NAME}.' - '.$grp->{Model_Groups::COLUMN_LABEL}?></option><?php 
          }*/
          ?>
          <option value="0">kokain</option>
       </select>
       
-      <label for="select-group-id"><?=$this->tr('Skupina')?>:</label>
+      <label for="select-group-id"><?php echo $this->tr('Skupina')?>:</label>
       <select id="select-group-id" name="sel_group">
-         <?
+         <?php 
          /*foreach ($this->groups as $grp) {
             $grpsArr[(int)$grp[Model_Groups::COLUMN_ID]] = $grp[Model_Groups::COLUMN_NAME];
-            ?><option value="<?=$grp->{Model_Groups::COLUMN_ID}?>" title="<?=$grp->{Model_Groups::COLUMN_NAME}?>"><?=$grp->{Model_Groups::COLUMN_NAME}.' - '.$grp->{Model_Groups::COLUMN_LABEL}?></option><?
+            ?><option value="<?php echo $grp->{Model_Groups::COLUMN_ID}?>" title="<?php echo $grp->{Model_Groups::COLUMN_NAME}?>"><?php echo $grp->{Model_Groups::COLUMN_NAME}.' - '.$grp->{Model_Groups::COLUMN_LABEL}?></option><?php 
          }*/
          ?>
          <option value="0">kokain</option>
@@ -38,7 +38,7 @@ $this->addFile("css://style.css");
    <div id="table-questions-pager"></div>
    <br />
    <p>
-      <a href="<?=$this->link()->route()?>" title="<?=$this->tr('Přejít zpět na úvodní stranu poradny')?>">&Lt; <?=$this->tr('Zpět na úvodní stranu')?></a>
+      <a href="<?php echo $this->link()->route()?>" title="<?php echo $this->tr('Přejít zpět na úvodní stranu poradny')?>">&Lt; <?php echo $this->tr('Zpět na úvodní stranu')?></a>
    </p>
    <div id="question-info">
       
@@ -48,7 +48,7 @@ $this->addFile("css://style.css");
 <script type="text/javascript">
    /* <![CDATA[ */
    // base vars
-   var colors = <?=json_encode($this->answerColors)?>;
+   var colors = <?php echo json_encode($this->answerColors)?>;
    
    /* JqGrid formaters */
    function answerFormatter( cellvalue) 
@@ -56,9 +56,9 @@ $this->addFile("css://style.css");
       // format the cellvalue to new format
       
       if(cellvalue.length == 0){
-         return '<span style="color: red; font-weight: bold;"><?=$this->tr('Ne')?></span>';
+         return '<span style="color: red; font-weight: bold;"><?php echo $this->tr('Ne')?></span>';
       }
-      return '<span title="'+stripFormatter(cellvalue)+'"><?=$this->tr('Ano');?></span>';
+      return '<span title="'+stripFormatter(cellvalue)+'"><?php echo $this->tr('Ano');?></span>';
    }
    
    function stripFormatter(html) 
@@ -86,10 +86,10 @@ $this->addFile("css://style.css");
    function publicFormatter(cellvalue, options, rowObject ) 
    {
       var input = '<input type="checkbox" name="question_public" ';
-      if(rowObject.<?=Advice_Model::COLUMN_IS_PUBLIC?> == true){
+      if(rowObject.<?php echo Advice_Model::COLUMN_IS_PUBLIC?> == true){
          input += 'checked="checked" '
       }
-      if(rowObject.<?=Advice_Model::COLUMN_IS_PUBLIC_ALLOW?> != true){
+      if(rowObject.<?php echo Advice_Model::COLUMN_IS_PUBLIC_ALLOW?> != true){
          input += 'disabled="disabled" '
       }
       return input+'/>';
@@ -112,39 +112,39 @@ $this->addFile("css://style.css");
    $(document).ready(function(){
       var questionsGrid = $("#table-questions").jqGrid({
             ajaxGridOptions : {type:"POST"},
-            url: '<?=$this->link()->route('questionsList');?>?idgrp=0'/*+$('#select-group-id').val().toString()*/,
+            url: '<?php echo $this->link()->route('questionsList');?>?idgrp=0'/*+$('#select-group-id').val().toString()*/,
             datatype: "json",
             colNames:[
                'ID', 
-               '<?=$this->tr('Dotaz')?>', 
-               '<?=$this->tr('Veřejný')?>', 
-               '<?=$this->tr('Odpověď')?>', 
-               '<?=$this->tr('Vytvořeno')?>',
-               '<?=$this->tr('Štítek')?>', 
-               '<?=$this->tr('Akce')?>'
+               '<?php echo $this->tr('Dotaz')?>', 
+               '<?php echo $this->tr('Veřejný')?>', 
+               '<?php echo $this->tr('Odpověď')?>', 
+               '<?php echo $this->tr('Vytvořeno')?>',
+               '<?php echo $this->tr('Štítek')?>', 
+               '<?php echo $this->tr('Akce')?>'
             ],
             colModel:[
-               {name:'<?=Advice_Model::COLUMN_ID?>',index:'<?=Advice_Model::COLUMN_ID?>',
+               {name:'<?php echo Advice_Model::COLUMN_ID?>',index:'<?php echo Advice_Model::COLUMN_ID?>',
                   width:40,fixed: true, editable:false, searchtype:"integer"
                },
                
-               {name:'<?=Advice_Model::COLUMN_QUESTION?>',index:'<?=Advice_Model::COLUMN_QUESTION?>',
+               {name:'<?php echo Advice_Model::COLUMN_QUESTION?>',index:'<?php echo Advice_Model::COLUMN_QUESTION?>',
                   formatter : stripFormatter
                },
                
-               {name:'<?=Advice_Model::COLUMN_IS_PUBLIC?>',index:'<?=Advice_Model::COLUMN_IS_PUBLIC?>', 
+               {name:'<?php echo Advice_Model::COLUMN_IS_PUBLIC?>',index:'<?php echo Advice_Model::COLUMN_IS_PUBLIC?>', 
                   width:33,fixed: true, formatter: publicFormatter 
                },
 
-               {name:'<?=Advice_Model::COLUMN_ANSWER?>',index:'<?=Advice_Model::COLUMN_ANSWER?>',
+               {name:'<?php echo Advice_Model::COLUMN_ANSWER?>',index:'<?php echo Advice_Model::COLUMN_ANSWER?>',
                   width:33,fixed:true, formatter : answerFormatter, title : false
                },
                
-               {name:'<?=Advice_Model::COLUMN_DATE_ADD?>', index:'<?=Advice_Model::COLUMN_DATE_ADD?>', 
+               {name:'<?php echo Advice_Model::COLUMN_DATE_ADD?>', index:'<?php echo Advice_Model::COLUMN_DATE_ADD?>', 
                   width:80,fixed: true, formatter:'date', formatoptions:{srcformat: "Y-m-d H:i:s", newformat: 'd.m.Y'}
                },
                
-               {name:'<?=Advice_Model::COLUMN_COLOR?>',index:'<?=Advice_Model::COLUMN_COLOR?>',
+               {name:'<?php echo Advice_Model::COLUMN_COLOR?>',index:'<?php echo Advice_Model::COLUMN_COLOR?>',
                   width:82,fixed:true, formatter : colorFormatter, title : false
                },
                
@@ -160,13 +160,13 @@ $this->addFile("css://style.css");
             rowNum:20,
             rowList:[10,20,40,100],
             pager: '#table-questions-pager',
-            sortname: '<?=Advice_Model::COLUMN_DATE_ADD?>',
+            sortname: '<?php echo Advice_Model::COLUMN_DATE_ADD?>',
             sortorder: 'desc',
-            caption:"<?=$this->tr('Dotazy poradny')?>",
+            caption:"<?php echo $this->tr('Dotazy poradny')?>",
             jsonReader: {
                repeatitems : false, root:"rows"
             },
-            editurl : "<?=$this->link()->route("changeAttribute")?>",
+            editurl : "<?php echo $this->link()->route("changeAttribute")?>",
             autowidth : true,
             height: '100%',
             toolbar: [true,"top"]
@@ -179,7 +179,7 @@ $this->addFile("css://style.css");
          $('select[name="row-color"]').live('change', function(){
             var $obj = $(this); var newColor = $obj.val(); var rowId = $obj.parents('tr').attr('id');
             $.ajax({
-               url: "<?=$this->link()->route("changeAttribute")?>",
+               url: "<?php echo $this->link()->route("changeAttribute")?>",
                type: "POST",
                data: {id : rowId, oper : 'color', v : newColor},
                success : function(){
@@ -194,17 +194,17 @@ $this->addFile("css://style.css");
             var val = false;
             if($obj.is(':checked')){ val = true; }
             $.ajax({
-               url: "<?=$this->link()->route("changeAttribute")?>",
+               url: "<?php echo $this->link()->route("changeAttribute")?>",
                type: "POST", data: {id : rowId, oper : 'public', v : val}
             });
          });
          
          $('.ui-inline-edit').live('click', function(){
-            window.location = ('<?=$this->link()->route('editQuestion')?>').replace('{id}', $(this).parents('tr').attr('id'));
+            window.location = ('<?php echo $this->link()->route('editQuestion')?>').replace('{id}', $(this).parents('tr').attr('id'));
          });
          
          $('.jqgrow').live('dblclick', function(){
-            window.location = ('<?=$this->link()->route('editQuestion')?>').replace('{id}', $(this).attr('id'));
+            window.location = ('<?php echo $this->link()->route('editQuestion')?>').replace('{id}', $(this).attr('id'));
          });
          
          $('.jqgrow').live('click', function(){
@@ -212,8 +212,8 @@ $this->addFile("css://style.css");
             var id = $(this).attr('id');
             $info
                .html("").css({ "background-color" : "transparent", color : "black" }) // reset colors
-               .append($('<h2></h2>').text('<?=$this->tr('Informace o dotazu')?>'))
-               .append($('<h3></h3>').text('<?=$this->tr('Dotaz')?>'))
+               .append($('<h2></h2>').text('<?php echo $this->tr('Informace o dotazu')?>'))
+               .append($('<h3></h3>').text('<?php echo $this->tr('Dotaz')?>'))
                .append($('<p></p>').html( $('td:nth-child(2)',this).text()) );
              
             var color = $('td:nth-child(6) option:selected',this).val();
@@ -225,7 +225,7 @@ $this->addFile("css://style.css");
             }
              
             if($('td:nth-child(4) span',this).attr("title") != null){
-               $info.append($('<h3></h3>').text('<?=$this->tr('Odpověď')?>'))
+               $info.append($('<h3></h3>').text('<?php echo $this->tr('Odpověď')?>'))
                .append($('<p></p>').html( $('td:nth-child(4) span',this).attr("title")));
             }   
          });

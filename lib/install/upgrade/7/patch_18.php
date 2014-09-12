@@ -1,4 +1,4 @@
-<?
+<?php 
 // repair order in shop attributes
 if(defined('VVE_SHOP') && VVE_SHOP == true){
    // aktualizace pořadí atributů a jejich skupin

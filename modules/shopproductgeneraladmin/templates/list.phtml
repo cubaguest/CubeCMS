@@ -1,4 +1,4 @@
-<?
+<?php 
 $this->addFile('css://style.less');
 $jQuery = new JsPlugin_JQuery();
 $jQuery->addUIDraggable();
@@ -6,28 +6,28 @@ $this->addJsPlugin($jQuery);
 $this->addJsPlugin(new JsPlugin_PrettyPhoto());
 
 ?>
-<h1><?
+<h1><?php 
 echo $this->category()->getName();
 ?></h1>
 <div class="content content-admin">
    <div id="product-category-select">
-      <form method="get" id="form-filter-cat" action="<?=$this->link()?>" class="ui-widget ui-state-default ui-cube-widget ui-widget-toolbox ui-corner-all">
-         <label for="select-category"><?ps($this->tr('Kategorie'))?>:</label>
+      <form method="get" id="form-filter-cat" action="<?php echo $this->link()?>" class="ui-widget ui-state-default ui-cube-widget ui-widget-toolbox ui-corner-all">
+         <label for="select-category"><?php ps($this->tr('Kategorie'))?>:</label>
          <select id="select-category" name="idc"  onchange="this.form.submit();">
-            <option value=""><?ps($this->tr('Všechny'))?></option>
-            <?foreach($this->catsList as $c){?>
+            <option value=""><?php ps($this->tr('Všechny'))?></option>
+            <?php foreach($this->catsList as $c){?>
             <option
-               <? if(isset($_GET['idc']) && $_GET['idc'] == $c->getPK()){ echo 'selected="selected"'; } ?>
-                    value="<?=$c->getPK()?>"><?ps($c->{Model_Category::COLUMN_NAME})?> - (<?
+               <?php  if(isset($_GET['idc']) && $_GET['idc'] == $c->getPK()){ echo 'selected="selected"'; } ?>
+                    value="<?php echo $c->getPK()?>"><?php ps($c->{Model_Category::COLUMN_NAME})?> - (<?php 
                ps($this->tr(array('%s produkt', '%s produkty', '%s produktů'), $c->products));
 //               ps(sprintf(
 //                  $this->tr('%s produktů'), $c->products));
 
                ?>)</option>
-            <?}?>
+            <?php }?>
          </select>
       </form>
-      <?
+      <?php 
       $this->moduleButtons = array(
          array(
             'link' => $this->link()->route('add'),
@@ -39,50 +39,50 @@ echo $this->category()->getName();
       $this->includeTpl('modules/buttons.phtml', true);
       ?>
    </div>
-   <form method="post" action="<?=$this->link()?>" id="form-products-list">
+   <form method="post" action="<?php echo $this->link()?>" id="form-products-list">
    <table id="products-list" class="full-width ui-cube-widget ui-widget">
       <thead>
          <tr class="ui-widget-header">
             <th><input type="checkbox" id="select-all" /></th>
             <th>ID</th>
-            <th colspan="2"><?ps($this->tr('Zboží'))?></th>
-            <th><?ps($this->tr('Aktivní'))?></th>
-            <th><?ps($this->tr('Množství'))?></th>
-            <th><?ps($this->tr('Cena'))?></th>
+            <th colspan="2"><?php ps($this->tr('Zboží'))?></th>
+            <th><?php ps($this->tr('Aktivní'))?></th>
+            <th><?php ps($this->tr('Množství'))?></th>
+            <th><?php ps($this->tr('Cena'))?></th>
             <th></th>
          </tr>
       </thead>
       <tbody>
-         <?if(!empty($this->products)){
+         <?php if(!empty($this->products)){
             foreach ($this->products as $p) {
                $src = vve_image_cacher(Shop_Product_Controller::getImagesDir(true).'small/'.$p->{Shop_Model_Product::COLUMN_IMAGE}, 40, 40);
                $srcBig = Shop_Product_Controller::getImagesDir(true).$p->{Shop_Model_Product::COLUMN_IMAGE};
                ?>
             <tr class="ui-widget-content product-row">
-               <td><input type="checkbox" name="product[<?ps($p->getPK())?>]" class="product-mark" /></td>
-               <td><?=$p->getPK()?></td>
+               <td><input type="checkbox" name="product[<?php ps($p->getPK())?>]" class="product-mark" /></td>
+               <td><?php echo $p->getPK()?></td>
                <td>
-                  <a href="<?=$srcBig?>" rel="prettyPhoto" title="<?ps($p->{Shop_Model_Product::COLUMN_NAME})?>"><img src="<?=$src?>" alt="<?ps($p->{Shop_Model_Product::COLUMN_NAME})?>" /></a>
+                  <a href="<?php echo $srcBig?>" rel="prettyPhoto" title="<?php ps($p->{Shop_Model_Product::COLUMN_NAME})?>"><img src="<?php echo $src?>" alt="<?php ps($p->{Shop_Model_Product::COLUMN_NAME})?>" /></a>
                </td>
                <td>
                   <div>
-<!--                     <a href="--><?//=$this->link()->route('detail', array('idp' => $p->getPK()))?><!--">-->
-                        <?ps($p->{Shop_Model_Product::COLUMN_NAME})?>
+<!--                     <a href="--><?php //=$this->link()->route('detail', array('idp' => $p->getPK()))?><!--">-->
+                        <?php ps($p->{Shop_Model_Product::COLUMN_NAME})?>
 <!--                     </a>-->
                   </div>
-                  <?if($p->{Model_Category::COLUMN_NAME}){?>
+                  <?php if($p->{Model_Category::COLUMN_NAME}){?>
                   <div class="category-name">(
-                     <?$l = clone $this->link()?>
-                     <a href="<?=$l->clear()->category($p->{Model_Category::COLUMN_URLKEY})?>">
-                        <?ps($p->{Model_Category::COLUMN_NAME})?>
+                     <?php $l = clone $this->link()?>
+                     <a href="<?php echo $l->clear()->category($p->{Model_Category::COLUMN_URLKEY})?>">
+                        <?php ps($p->{Model_Category::COLUMN_NAME})?>
                      </a>
                      )</div>
-                  <?}?>
+                  <?php }?>
                </td>
                <td>
-                  <a href="<?=$this->link()->param('idp', $p->getPK())->param('action', 'changeState')?>"
-                          ><img src="images/icons/<?echo $p->{Shop_Model_Product::COLUMN_ACTIVE} ? 'enable.png' : 'disable.png'?>" /></a>
-                  <?
+                  <a href="<?php echo $this->link()->param('idp', $p->getPK())->param('action', 'changeState')?>"
+                          ><img src="images/icons/<?php echo $p->{Shop_Model_Product::COLUMN_ACTIVE} ? 'enable.png' : 'disable.png'?>" /></a>
+                  <?php 
                   $curDate =  new DateTime();
                   $newEdnDate = new DateTime($p->{Shop_Model_Product::COLUMN_IS_NEW_TO_DATE});
                   $newEdnDate->setTime(23,59,59);
@@ -92,7 +92,7 @@ echo $this->category()->getName();
                   ?>
                </td>
                <td>
-                  <?
+                  <?php 
                   if($p->{Shop_Model_Product::COLUMN_STOCK}){
                      ps((int)$p->quantity . ' ' .$p->{Shop_Model_Product::COLUMN_UNIT});
                   } else {
@@ -101,7 +101,7 @@ echo $this->category()->getName();
                   ?>
                </td>
                <td class="price">
-                  <?
+                  <?php 
                   if($p->priceMax == null){
                      echo Shop_Tools::getPriceOfProduct($p);
                   } else {
@@ -111,40 +111,40 @@ echo $this->category()->getName();
                   ?>
                </td>
                <td class="actions">
-                  <a href="<?=$this->link()->route('edit', array('idp' => $p->getPK()))?>" title="<?ps($this->tr('Upravit zboží'))?>"
+                  <a href="<?php echo $this->link()->route('edit', array('idp' => $p->getPK()))?>" title="<?php ps($this->tr('Upravit zboží'))?>"
                      class="button-edit-product"><img src="/images/icons/pencil.png" /></a>
-                  <a href="<?=$this->link()->route('editVariants', array('idp' => $p->getPK()))?>"  title="<?ps($this->tr('Upravit varianty zboží'))?>"
+                  <a href="<?php echo $this->link()->route('editVariants', array('idp' => $p->getPK()))?>"  title="<?php ps($this->tr('Upravit varianty zboží'))?>"
                      class="button-edit-product"><img src="/images/icons/style_edit.png" /></a>
-                  <a href="<?=$this->link()->param('duplicate', $p->getPK())?>" title="<?ps($this->tr('Duplikovat zboží'))?>"
+                  <a href="<?php echo $this->link()->param('duplicate', $p->getPK())?>" title="<?php ps($this->tr('Duplikovat zboží'))?>"
                      class="button-edit-product"><img src="/images/icons/page_copy.png" /></a>
-                  <a href="<?=$this->link()->param('id', $p->getPK())->param('action', 'delete')?>"
-                     onclick="return confirm('<?ps($this->tr('Smazat toto zboží?'))?>');"
-                     title="<?ps($this->tr('Smazat zboží'))?>"
+                  <a href="<?php echo $this->link()->param('id', $p->getPK())->param('action', 'delete')?>"
+                     onclick="return confirm('<?php ps($this->tr('Smazat toto zboží?'))?>');"
+                     title="<?php ps($this->tr('Smazat zboží'))?>"
                      class="button-delete-product"><img src="/images/icons/delete.png" /></a>
                </td>
             </tr>
-            <?}
+            <?php }
          } else {?>
          <tr class="ui-widget-content ui-state-disabled">
-               <td colspan="8"><?ps($this->tr('Zboží nebylo nalezeno'))?></td>
+               <td colspan="8"><?php ps($this->tr('Zboží nebylo nalezeno'))?></td>
             </tr>
-         <?}?>
+         <?php }?>
       </tbody>
       <tfoot>
          <tr class="ui-widget-header">
             <td colspan="8">
-               <?ps($this->tr('Zaškrtnuté'))?>:
+               <?php ps($this->tr('Zaškrtnuté'))?>:
                <select name="list-action">
-                  <option><?ps($this->tr('Označené:'))?></option>
-                  <option value="activate"><?ps($this->tr('Aktivovat'))?></option>
-                  <option value="deactivate"><?ps($this->tr('Deaktivovat'))?></option>
-                  <optgroup label="<?ps($this->tr('Přesunot do kateogrie'))?>">
-                     <?foreach($this->catsList as $c){?>
-                     <option value="move_to_<?=$c->getPK()?>"><?ps($c->{Model_Category::COLUMN_NAME})?>
-                        - (<?ps($this->tr(array('%s produkt', '%s produkty', '%s produktů'), $c->products));?>)</option>
-                     <?}?>
+                  <option><?php ps($this->tr('Označené:'))?></option>
+                  <option value="activate"><?php ps($this->tr('Aktivovat'))?></option>
+                  <option value="deactivate"><?php ps($this->tr('Deaktivovat'))?></option>
+                  <optgroup label="<?php ps($this->tr('Přesunot do kateogrie'))?>">
+                     <?php foreach($this->catsList as $c){?>
+                     <option value="move_to_<?php echo $c->getPK()?>"><?php ps($c->{Model_Category::COLUMN_NAME})?>
+                        - (<?php ps($this->tr(array('%s produkt', '%s produkty', '%s produktů'), $c->products));?>)</option>
+                     <?php }?>
                   </optgroup>
-                  <option value="delete"><?ps($this->tr('Smazat'))?></option>
+                  <option value="delete"><?php ps($this->tr('Smazat'))?></option>
                </select>
             </td>
          </tr>
@@ -169,14 +169,14 @@ echo $this->category()->getName();
       $('form#form-products-list').submit(function(){
          // kontrola výběru
          if($('input.product-mark:checked').length == 0){
-            alert('<?ps($this->tr('Není vybráno žádné zboží!'))?>');
+            alert('<?php ps($this->tr('Není vybráno žádné zboží!'))?>');
             $(this).val($("option:first", $(this)).val());
             return false;
          }
 
          // delete má potvrzení
          if($('select[name="list-action"]').val() == "delete"){
-            return confirm('<?ps($this->tr('Opravdu smazat označené produkty?'))?>')
+            return confirm('<?php ps($this->tr('Opravdu smazat označené produkty?'))?>')
          }
       });
 

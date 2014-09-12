@@ -1,4 +1,4 @@
-<?
+<?php 
 $this->addFile("css://style.css");
 if(empty ($this->poll)) return;
 $icon = null;
@@ -10,13 +10,13 @@ if($this->panelObj()->getBackImage() != null){
    $backImg = 'background-image: url(\''.Panel_Obj::getBackImgDir().$this->panelObj()->getBackImage().'\');';
 }
 ?>
-<div class="panel-box-label"><?=$icon?><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=$this->panelObj()->getName()?></a></div>
-<div class="panel-box-content" style="<?=$backImg?>">
+<div class="panel-box-label"><?php echo $icon?><a href="<?php echo $this->link()?>" title="<?php echo htmlspecialchars($this->panelObj()->getName())?>"><?php echo $this->panelObj()->getName()?></a></div>
+<div class="panel-box-content" style="<?php echo $backImg?>">
    <p class="panel-box-label-article">
-      <?=$this->poll->{Polls_Model::COLUMN_QUESTION}?>
+      <?php echo $this->poll->{Polls_Model::COLUMN_QUESTION}?>
    </p>
    <div>
-      <?
+      <?php 
       $this->subkey = '_p';
       if ($this->formmulti != null) {
       // více možností
@@ -32,11 +32,11 @@ if($this->panelObj()->getBackImage() != null){
       }?>
    </div>
 </div>
-<?
+<?php 
 // vložení skriptu pro ajax
 $this->includeTpl('voteScript.phtml');
 ?>
 <div class="panel-box-link-more">
-   <a href="<?=$this->link()?>"
-      title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->tr('Více')?></a>
+   <a href="<?php echo $this->link()?>"
+      title="<?php echo htmlspecialchars($this->category()->getLabel())?>"><?php echo $this->tr('Více')?></a>
 </div>

@@ -1,4 +1,4 @@
-<?
+<?php 
 $jq = new JsPlugin_JQuery();
 $jq->addUIButton();
 $this->addJsPlugin($jq);
@@ -6,20 +6,20 @@ $this->addJsPlugin($jq);
 define('ADMINER_PATH', AppCore::getAppLibDir()."modules".DIRECTORY_SEPARATOR."services".DIRECTORY_SEPARATOR."adminer".DIRECTORY_SEPARATOR);
 
 ?>
-<h1><?=$this->tr('Administrace databáze')?></h1>
-<?$this->includeTpl('navigation.phtml');?>
+<h1><?php echo $this->tr('Administrace databáze')?></h1>
+<?php $this->includeTpl('navigation.phtml');?>
 <div class="post content">
-   <? 
+   <?php  
 //    include ADMINER_PATH."init.php" ;
    ?>
    <div id="iframe-buttons" style="margin-bottom: 10px">
-      <a id="button-enable-fullscreen"><?ps($this->tr('Na celou obrazovku'))?></a>
+      <a id="button-enable-fullscreen"><?php ps($this->tr('Na celou obrazovku'))?></a>
    </div>
-   <iframe id="adminer-iframe" src="<?=Url_Request::getBaseWebDir(true).'modules/services/adminer/init.php?'
+   <iframe id="adminer-iframe" src="<?php echo Url_Request::getBaseWebDir(true).'modules/services/adminer/init.php?'
       .'server='.VVE_DB_SERVER.'&amp;username='.VVE_DB_USER.'&amp;database='.VVE_DB_NAME?>" 
       style="width: 100%; height: 800px; margin:0; padding: 0;">
    </iframe>
-   <a id="button-disable-fullscreen" href="<?=$this->link()?>#fullscreen"><img src="images/icons/cross.png" alt="close" /></a>
+   <a id="button-disable-fullscreen" href="<?php echo $this->link()?>#fullscreen"><img src="images/icons/cross.png" alt="close" /></a>
    <script type="text/javascript">
       $(document).ready(function(){
          $( "#button-enable-fullscreen" ).button({

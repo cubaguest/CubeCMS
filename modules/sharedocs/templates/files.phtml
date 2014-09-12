@@ -1,4 +1,4 @@
-<?
+<?php 
 $jq = new JsPlugin_JQuery();
 $jq->addUIDialog();
 
@@ -6,28 +6,28 @@ $this->addJsPlugin($jq);
 $this->addFile('css://style.css');
 ?>
 
-<h1><?ps($this->directory->{ShareDocs_Model_Dirs::COLUMN_NAME})?></h1>
+<h1><?php ps($this->directory->{ShareDocs_Model_Dirs::COLUMN_NAME})?></h1>
 <p>
-   <?=$this->tr('Poslední změna provedena').': '.  vve_date('%x %G:%i', new DateTime($this->directory->{ShareDocs_Model_Dirs::COLUMN_DATE_LAST_CHANGE}))?>
+   <?php echo $this->tr('Poslední změna provedena').': '.  vve_date('%x %G:%i', new DateTime($this->directory->{ShareDocs_Model_Dirs::COLUMN_DATE_LAST_CHANGE}))?>
 </p>
 
 <div id="sharedocs-edit-buttons" class="module-tool-buttons">
-   <form action="<?=$this->link()->route()?>" method="get">
-      <p><input type="submit" value="<?=$this->tr('Zpět na seznam')?>" class="button-cancel" /></p>
+   <form action="<?php echo $this->link()->route()?>" method="get">
+      <p><input type="submit" value="<?php echo $this->tr('Zpět na seznam')?>" class="button-cancel" /></p>
    </form>
-   <?if($this->right == ShareDocs_Controller::RIGHT_WRITE){?>
-   <form action="<?=$this->link()->route('editFile', array('idfile' => 0))?>" method="get">
-      <p><input type="submit" value="<?=$this->tr('Nahrát soubor')?>" /></p>
+   <?php if($this->right == ShareDocs_Controller::RIGHT_WRITE){?>
+   <form action="<?php echo $this->link()->route('editFile', array('idfile' => 0))?>" method="get">
+      <p><input type="submit" value="<?php echo $this->tr('Nahrát soubor')?>" /></p>
    </form>
-   <?}?>
-   <?if($this->controll == true){?>
-   <form action="<?=$this->link()->route('editDirAccess')?>" method="get">
+   <?php }?>
+   <?php if($this->controll == true){?>
+   <form action="<?php echo $this->link()->route('editDirAccess')?>" method="get">
       <p>
-         <input type="submit" value="<?=$this->tr('Oprávnění ke složce')?>" title="<?=$this->tr('Upravit oprávnění ke složce')?>" class="button-warning" />
+         <input type="submit" value="<?php echo $this->tr('Oprávnění ke složce')?>" title="<?php echo $this->tr('Upravit oprávnění ke složce')?>" class="button-warning" />
       	<input type="hidden" name="back" value="detail" />
       </p>
    </form>
-   <?
+   <?php 
    $this->formDelDir->html()->setAttrib('name', 'form-delete-dir');
    echo $this->formDelDir->renderStart();
    $this->formDelDir->id->setValues($this->directory->{ShareDocs_Model_Dirs::COLUMN_ID});
@@ -37,19 +37,19 @@ $this->addFile('css://style.css');
    echo $this->formDelDir->renderEnd();
    }?>
    <br />
-   <?=$this->tr('Filtrace')?>: <input id="filter-dirs" name="filter-dirs" class="filter-list" value=""/>
+   <?php echo $this->tr('Filtrace')?>: <input id="filter-dirs" name="filter-dirs" class="filter-list" value=""/>
 </div>
 
 <script type="text/javascript">
    $(document).ready(function(){
-      <?if($this->controll == true){?>
+      <?php if($this->controll == true){?>
       $('form[name="form-delete-dir"]').submit(function(){
-         if(!confirm('<?=$this->tr('Smazat tuto složku včetně všech souborů ?')?>')){
+         if(!confirm('<?php echo $this->tr('Smazat tuto složku včetně všech souborů ?')?>')){
             return false;
          }      
          return true;
       });
-      <?}?>
+      <?php }?>
       // filter
       $('.filter-list').keyup(function(){
          var filter = $(this).val();
@@ -66,18 +66,18 @@ $this->addFile('css://style.css');
 </script>   
 <div class="main-content-detail filter-items-list" id="sharedocs-list-files">
    
-<?if (!empty($this->files)) {
+<?php if (!empty($this->files)) {
    foreach ($this->files as $file) {?>
-   <div class="ui-widget ui-sharedocs-item" id="directory-<?=$file->{ShareDocs_Model_Files::COLUMN_ID}?>">
+   <div class="ui-widget ui-sharedocs-item" id="directory-<?php echo $file->{ShareDocs_Model_Files::COLUMN_ID}?>">
       <div class="ui-widget-header">
-         <a href="<?=$this->link()->route('file', array('idfile' => $file->{ShareDocs_Model_Files::COLUMN_ID} ))?>" 
-            title="<?=$file->{ShareDocs_Model_Files::COLUMN_NAME}?>" class="file-name item-name">
-            <?=$file->{ShareDocs_Model_Files::COLUMN_NAME}?>
+         <a href="<?php echo $this->link()->route('file', array('idfile' => $file->{ShareDocs_Model_Files::COLUMN_ID} ))?>" 
+            title="<?php echo $file->{ShareDocs_Model_Files::COLUMN_NAME}?>" class="file-name item-name">
+            <?php echo $file->{ShareDocs_Model_Files::COLUMN_NAME}?>
          </a>
-         <span class="font-small">(<?=$this->tr('Přidáno')?>: <?=vve_date('%x %G:%i', new DateTime($file->{ShareDocs_Model_Revs::COLUMN_DATE_ADD}))?>)</span>
-         <?/* if($this->controll){?>
+         <span class="font-small">(<?php echo $this->tr('Přidáno')?>: <?php echo vve_date('%x %G:%i', new DateTime($file->{ShareDocs_Model_Revs::COLUMN_DATE_ADD}))?>)</span>
+         <?php /* if($this->controll){?>
          <div class="module-row-edit-buttons">
-            <?
+            <?php 
             $this->formDelFile->html()->setAttrib('name', 'form-delete-dir');
             echo $this->formDelFile->renderStart();
             echo $this->formDelFile->id->controll();
@@ -87,18 +87,18 @@ $this->addFile('css://style.css');
             echo $this->formDelFile->renderEnd();
             ?>
          </div>   
-         <?}*/?>
+         <?php }*/?>
          
       </div>
-      <?if($file->{ShareDocs_Model_Files::COLUMN_TITLE} != null){?>
-      <div class="ui-widget-content dir-title item-desc"><?=$file->{ShareDocs_Model_Files::COLUMN_TITLE}?></div>
-      <?}?>
+      <?php if($file->{ShareDocs_Model_Files::COLUMN_TITLE} != null){?>
+      <div class="ui-widget-content dir-title item-desc"><?php echo $file->{ShareDocs_Model_Files::COLUMN_TITLE}?></div>
+      <?php }?>
    </div>
-   <?}
+   <?php }
 } else {
    ?>
    <div class="ui-widget ui-state-error ui-sharedocs-item">
-      <div class="ui-widget-content ui-state-error-text"><?=$this->tr('Žádný soubor nebyl nahrán')?></div>
+      <div class="ui-widget-content ui-state-error-text"><?php echo $this->tr('Žádný soubor nebyl nahrán')?></div>
    </div>
-<? } ?>
+<?php  } ?>
 </div>

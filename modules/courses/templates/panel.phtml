@@ -1,4 +1,4 @@
-<?
+<?php 
 $icon = null;
 if($this->panelObj()->getIcon() != null){
    $icon = '<img src="'.Panel_Obj::getIconDir().$this->panelObj()->getIcon().'" alt="'.$this->panelObj()->getIcon().'" />';
@@ -8,15 +8,15 @@ if($this->panelObj()->getBackImage() != null){
    $backImg = 'background-image: url(\''.Panel_Obj::getBackImgDir().$this->panelObj()->getBackImage().'\');';
 }
 ?>
-<p class="panelLabel"><?=$icon?><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=$this->panelObj()->getName()?></a></p>
-<div style="<?=$backImg?>">
-   <?foreach ($this->courses as $course) {?>
-   <a href="<?=$this->link()->route('detail', array('urlkey' => $course->{Courses_Model_Courses::COLUMN_URLKEY}))?>"
-      title="<?=htmlspecialchars($course->{Courses_Model_Courses::COLUMN_NAME})?>"><?=vve_tpl_truncate($course->{Courses_Model_Courses::COLUMN_NAME},25)?></a><br />
-      <p><?=$course->{Courses_Model_Courses::COLUMN_TEXT_SHORT}?></p>
-   <?}?>
+<p class="panelLabel"><?php echo $icon?><a href="<?php echo $this->link()?>" title="<?php echo htmlspecialchars($this->panelObj()->getName())?>"><?php echo $this->panelObj()->getName()?></a></p>
+<div style="<?php echo $backImg?>">
+   <?php foreach ($this->courses as $course) {?>
+   <a href="<?php echo $this->link()->route('detail', array('urlkey' => $course->{Courses_Model_Courses::COLUMN_URLKEY}))?>"
+      title="<?php echo htmlspecialchars($course->{Courses_Model_Courses::COLUMN_NAME})?>"><?php echo vve_tpl_truncate($course->{Courses_Model_Courses::COLUMN_NAME},25)?></a><br />
+      <p><?php echo $course->{Courses_Model_Courses::COLUMN_TEXT_SHORT}?></p>
+   <?php }?>
 </div>
 <p class="panelLinkMore">
-   <a href="<?=$this->link()?>"
-      title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->_('Více')?></a>
+   <a href="<?php echo $this->link()?>"
+      title="<?php echo htmlspecialchars($this->category()->getLabel())?>"><?php echo $this->_('Více')?></a>
 </p>

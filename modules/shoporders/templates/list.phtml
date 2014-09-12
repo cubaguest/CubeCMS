@@ -1,11 +1,11 @@
-<?
+<?php 
 $jsJqGrid = new Component_JqGrid_JsPlugin();
 $this->addJsPlugin($jsJqGrid);
 $jQuery = new JsPlugin_JQuery();
 $this->addJsPlugin($jQuery);
 $this->addFile('css://style.css');
 ?>
-<h1><?= $this->category()->getName() ?></h1>
+<h1><?php echo  $this->category()->getName() ?></h1>
 <div class="main-content-admin-form">
    <table id="table-orders"></table>
    <div id="table-orders-pager"></div>
@@ -19,7 +19,7 @@ $this->addFile('css://style.css');
    
       function showOrder(id, callback){
          selOrderId = id;
-         var link = '<?= $this->link()->route('viewOrder') ?>';
+         var link = '<?php echo  $this->link()->route('viewOrder') ?>';
          $.ajax({
             url: link.replace('{id}', id),
             cache: false,
@@ -38,11 +38,11 @@ $this->addFile('css://style.css');
          });
       }
       function downloadOrder(type, id){
-         window.location.href = ('<?=$this->link()->route('exportOrder')?>').replace('{id}', id).replace('{output}', type);
+         window.location.href = ('<?php echo $this->link()->route('exportOrder')?>').replace('{id}', id).replace('{output}', type);
       }
       function deleteOrder(id){
-         var link = '<?= $this->link()->route('deleteOrder') ?>';
-         if(!confirm('<?= $this->tr('Opravdu smazat objednávku?') ?>')){
+         var link = '<?php echo  $this->link()->route('deleteOrder') ?>';
+         if(!confirm('<?php echo  $this->tr('Opravdu smazat objednávku?') ?>')){
             return;
          }
          $.ajax({ url: link,type: "POST", cache: false,
@@ -89,9 +89,9 @@ $this->addFile('css://style.css');
          ordersGrid = $("#table-orders").jqGrid({
             datatype: 'json',
             ajaxGridOptions : {type:"POST"},
-            url: '<?= $this->link()->route('ordersList'); ?>',
-            colNames:['ID', '<?= $this->tr('Jméno a příjmení') ?>', '<?= $this->tr('Přijato') ?>', '<?= $this->tr('Datum odběru') ?>', '<?= $this->tr('Status') ?>',
-               '<?= $this->tr('Cena') ?>', '<?= $this->tr('Akce') ?>'],
+            url: '<?php echo  $this->link()->route('ordersList'); ?>',
+            colNames:['ID', '<?php echo  $this->tr('Jméno a příjmení') ?>', '<?php echo  $this->tr('Přijato') ?>', '<?php echo  $this->tr('Datum odběru') ?>', '<?php echo  $this->tr('Status') ?>',
+               '<?php echo  $this->tr('Cena') ?>', '<?php echo  $this->tr('Akce') ?>'],
             colModel:[
                {name:'id',	index:'id',	width:50, fixed :true, formatter: 'showNewStatus'},
                {name:'name', index:'name', formatter: 'showNewStatus'},
@@ -111,18 +111,18 @@ $this->addFile('css://style.css');
             jsonReader: {
                repeatitems : false, root:"rows"
             },
-            caption: "<?= $this->tr('Přehled objednávek') ?>",
+            caption: "<?php echo  $this->tr('Přehled objednávek') ?>",
             height: '100%',
-            editurl : '<?= $this->link()->route('view', array('id' => '{ID}')); ?>',
+            editurl : '<?php echo  $this->link()->route('view', array('id' => '{ID}')); ?>',
             gridComplete: function(){ 
                var ids = $(this).jqGrid('getDataIDs'); 
                var button;
                for(var i=0; i < ids.length;i++){ 
                   var cl = ids[i]; 
-                  button = '<input type="image" src="images/icons/magnifier.png" value="<?= $this->tr('Ukaž') ?>" onclick="showOrder(\''+ids[i]+'\');" />'
-                     +'<input type="image" src="images/icons/printer.png" value="<?= $this->tr('Tisk') ?>" onclick="printOrder(\''+ids[i]+'\');\" />'
-                     +'<input type="image" src="images/icons/delete.png" value="<?= $this->tr('Smazat') ?>" onclick="deleteOrder(\''+ids[i]+'\');" />'
-                     +'<input type="image" src="images/files/pdf.gif" value="<?= $this->tr('Tisknout') ?>" onclick="downloadOrder(\'pdf\', \''+ids[i]+'\');" />'
+                  button = '<input type="image" src="images/icons/magnifier.png" value="<?php echo  $this->tr('Ukaž') ?>" onclick="showOrder(\''+ids[i]+'\');" />'
+                     +'<input type="image" src="images/icons/printer.png" value="<?php echo  $this->tr('Tisk') ?>" onclick="printOrder(\''+ids[i]+'\');\" />'
+                     +'<input type="image" src="images/icons/delete.png" value="<?php echo  $this->tr('Smazat') ?>" onclick="deleteOrder(\''+ids[i]+'\');" />'
+                     +'<input type="image" src="images/files/pdf.gif" value="<?php echo  $this->tr('Tisknout') ?>" onclick="downloadOrder(\'pdf\', \''+ids[i]+'\');" />'
                   ; 
                   $(this).jqGrid('setRowData',ids[i],{act:button}); 
                }

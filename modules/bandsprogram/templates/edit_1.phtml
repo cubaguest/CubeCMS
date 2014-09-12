@@ -1,4 +1,4 @@
-<?
+<?php 
 $this->addCssFile("style-edit.css");
 $this->addPageTitle($this->_('Program'));
 $this->addPageHeadline($this->_('Program'));
@@ -11,9 +11,9 @@ $this->itemIndex = 0;
 ?>
 
 <div class="article-list">
-   <?=$this->form->renderStart();?>
+   <?php echo $this->form->renderStart();?>
    <ul class="program">
-      <?// tady vakreslení existujících položek
+      <?php // tady vakreslení existujících položek
       foreach ($this->currentProgram as $item) {
          $this->type = $item['type'];
          // dopočet hodnot
@@ -38,28 +38,28 @@ $this->itemIndex = 0;
    </ul>
    <br />
    <p>
-      <label for="programSelTypeAdd"><?=$this->_("Přidat")?>:</label>&nbsp;
+      <label for="programSelTypeAdd"><?php echo $this->_("Přidat")?>:</label>&nbsp;
       <select name="addtype" id="programSelTypeAdd">
-         <optgroup label="<?=$this->_("Položky");?>">
-            <option value="band"><?=$this->_("Skupinu");?></option>
-            <option value="other"><?=$this->_("Jiné");?></option>
-            <option value="note"><?=$this->_("Poznámka");?></option>
-            <option value="space"><?=$this->_("Mezera");?></option>
+         <optgroup label="<?php echo $this->_("Položky");?>">
+            <option value="band"><?php echo $this->_("Skupinu");?></option>
+            <option value="other"><?php echo $this->_("Jiné");?></option>
+            <option value="note"><?php echo $this->_("Poznámka");?></option>
+            <option value="space"><?php echo $this->_("Mezera");?></option>
          </optgroup>
-         <optgroup label="<?=$this->_("Rozdělení");?>">
-            <option value="day"><?=$this->_("Den");?></option>
-            <option value="stage"><?=$this->_("Stage");?></option>
+         <optgroup label="<?php echo $this->_("Rozdělení");?>">
+            <option value="day"><?php echo $this->_("Den");?></option>
+            <option value="stage"><?php echo $this->_("Stage");?></option>
          </optgroup>
       </select>
-      <input name="add" type="button" value="<?=$this->_("Přidat")?>" />
-      <input name="refresh" type="button" value="<?=$this->_("Přepočítat")?>" />
-      <?=$this->form->save->controll();?>
+      <input name="add" type="button" value="<?php echo $this->_("Přidat")?>" />
+      <input name="refresh" type="button" value="<?php echo $this->_("Přepočítat")?>" />
+      <?php echo $this->form->save->controll();?>
    </p>
-   <?echo $this->form->renderEnd();?>
+   <?php echo $this->form->renderEnd();?>
    <hr class="reseter" />
 </div>
 
-<?
+<?php 
 $jQuery = new JsPlugin_JQuery();
 $jQuery->setCfgParam("theme", "ui-lightness");
 $jQuery->addUISortable();
@@ -69,7 +69,7 @@ $this->addJsPlugin(new JsPlugin_TextAreaAutoResize());
 
 <script type="text/javascript">
    /* <![CDATA[ */
-   var itemIndex = <?=$this->itemIndex?>;
+   var itemIndex = <?php echo $this->itemIndex?>;
    $(document).ready(function(){
       $form = $('form#formProgram');
       $tpl = $('ul#tpl');
@@ -90,7 +90,7 @@ $this->addJsPlugin(new JsPlugin_TextAreaAutoResize());
       $('input[name=add]', $form).click(function(){
          var type = $("select[name=addtype]", $form).val();
 
-         $.get('<?=$this->link()->route('programItem')?>',
+         $.get('<?php echo $this->link()->route('programItem')?>',
          { type: type, index: itemIndex },
          function(data){
             $('ul.program', $form).append(data);
@@ -198,5 +198,5 @@ $this->addJsPlugin(new JsPlugin_TextAreaAutoResize());
    }
    /* ]]> */
 </script>
-<? echo $this->toolbox; // TOOLBOX ?>
-<?$this->includeTpl("buttonback.phtml", true);?>
+<?php  echo $this->toolbox; // TOOLBOX ?>
+<?php $this->includeTpl("buttonback.phtml", true);?>

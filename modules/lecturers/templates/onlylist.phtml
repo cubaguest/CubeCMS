@@ -1,4 +1,4 @@
-   <?
+   <?php 
    function printDegree($degree) {
    if ($degree != null) {
       echo $degree;
@@ -11,24 +11,24 @@
    if(!empty ($vars['lecturers'])) {
       foreach ($vars['lecturers'] as $lecturer) {
          ?>
-   <div class="article-list-record module-lecturers-list-record" id="lecturer-<?=$lecturer->{Lecturers_Model::COLUMN_ID}?>">
-      <<?=$vars['hE']?> class="<?=$vars['hEClass']?>" id="lecturer-<?=$lecturer->{Lecturers_Model::COLUMN_ID}?>">
-         <?
+   <div class="article-list-record module-lecturers-list-record" id="lecturer-<?php echo $lecturer->{Lecturers_Model::COLUMN_ID}?>">
+      <<?php echo $vars['hE']?> class="<?php echo $vars['hEClass']?>" id="lecturer-<?php echo $lecturer->{Lecturers_Model::COLUMN_ID}?>">
+         <?php 
          printDegree($lecturer->{Lecturers_Model::COLUMN_DEGREE});
          echo $lecturer->{Lecturers_Model::COLUMN_NAME}.'&nbsp;';
          echo $lecturer->{Lecturers_Model::COLUMN_SURNAME}.'&nbsp;';
          printDegree($lecturer->{Lecturers_Model::COLUMN_DEGREE_AFTER});
          ?>
-      </<?=$vars['hE']?>>
+      </<?php echo $vars['hE']?>>
       <div class="article-list-record-content">
-         <?if($lecturer->{Lecturers_Model::COLUMN_IMAGE} != null){?>
+         <?php if($lecturer->{Lecturers_Model::COLUMN_IMAGE} != null){?>
          <div class="article-list-record-box-image module-lecturers-list-record-box-image">
-                  <?=vve_tpl_image_tag(AppCore::getAppDataDir().Lecturers_Controller::DATA_DIR.DIRECTORY_SEPARATOR
+                  <?php echo vve_tpl_image_tag(AppCore::getAppDataDir().Lecturers_Controller::DATA_DIR.DIRECTORY_SEPARATOR
                           .$lecturer->{Lecturers_Model::COLUMN_IMAGE}, $lecturer->{Lecturers_Model::COLUMN_IMAGE}, 140);?>
          </div>
-         <?}?>
-         <?echo $lecturer->{Lecturers_Model::COLUMN_TEXT};?>
-         <?
+         <?php }?>
+         <?php echo $lecturer->{Lecturers_Model::COLUMN_TEXT};?>
+         <?php 
          if($this->toolboxEdit != null){
             $this->toolboxEdit->lecture_edit->setAction($this->link()->route('edit', array('id' => $lecturer->{Lecturers_Model::COLUMN_ID})));
             $this->toolboxEdit->lecture_del_->getForm()->id->setValues($lecturer->{Lecturers_Model::COLUMN_ID});
@@ -38,7 +38,7 @@
       <hr class="reseter" />
       </div>
    </div>
-         <?}
+         <?php }
    } else {
       echo ($this->_('Není vložen žádný lektor'));
    }?>

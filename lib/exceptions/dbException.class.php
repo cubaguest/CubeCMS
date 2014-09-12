@@ -1,4 +1,4 @@
-<?
+<?php 
 /**
  * Třída pro obsluhu vyjímek db modulů
  * Třída rozšiřuje třídu Exception

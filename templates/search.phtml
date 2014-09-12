@@ -1,9 +1,9 @@
 <h1>
-   <span><?=_("hledání výrazu").sprintf(' "%s"',$this->articleName())?></span>
+   <span><?php echo _("hledání výrazu").sprintf(' "%s"',$this->articleName())?></span>
 </h1>
 <div class="content">
    <h2>
-      <?
+      <?php 
       if($this->searchResultsCount == 0) {
          printf(_("Nebyl nalezen žádný výsledek. Zkontrolujte hledaný výraz."));
       } else if($this->searchResultsCount == 1) {
@@ -17,23 +17,23 @@
    </h2>
 </div>
 <div id="searchResults">
-   <?
+   <?php 
    if(!empty ($this->searchResults)) {
       foreach ($this->searchResults as $result) {?>
    <div class="searchResult content">
       <h2>
-         <a href="<?=$result['category_url'];?>" title="<?=$result['category']?>"><?=$result['category']?></a>
-               <?if(!empty ($result['article'])) {?>
+         <a href="<?php echo $result['category_url'];?>" title="<?php echo $result['category']?>"><?php echo $result['category']?></a>
+               <?php if(!empty ($result['article'])) {?>
          &nbsp;&raquo;&nbsp;
-         <a href="<?=$result['url']?>" title="<?=$result['category']?>"><?=$result['article']?></a>
-               <?}?>
+         <a href="<?php echo $result['url']?>" title="<?php echo $result['category']?>"><?php echo $result['article']?></a>
+               <?php }?>
       </h2>
       <div>
-               <?=$result['text']?><br />
-               <?=_("více")?>: <a href="<?=$result['url']?>" title="<?=$result['category']." ".$result['article']?>"><?=$result['url']?></a>
+               <?php echo $result['text']?><br />
+               <?php echo _("více")?>: <a href="<?php echo $result['url']?>" title="<?php echo $result['category']." ".$result['article']?>"><?php echo $result['url']?></a>
       </div>
    </div>
-      <?}?>
+      <?php }?>
    <div class="contentLine"></div>
-   <?}?>
+   <?php }?>
 </div>

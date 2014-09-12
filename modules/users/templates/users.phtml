@@ -1,4 +1,4 @@
-<?
+<?php 
 $this->addPageTitle($this->tr('Uživatelé'));
 //$this->addCssFile('style.css');
 $jsJqGrid = new Component_JqGrid_JsPlugin();
@@ -8,17 +8,17 @@ $this->addJsPlugin($jQuery);
 
 $grpsArr = array();
 ?>
-<h1><?=$this->tr('Uživatelé');?></h1>
-<?$this->includeTpl('navigation.phtml');?>
+<h1><?php echo $this->tr('Uživatelé');?></h1>
+<?php $this->includeTpl('navigation.phtml');?>
 
 <div class="main-content-detail">
    <table id="table-users"></table>
    <div id="table-users-toolbar">
-      <label for="select-group-id"><?=$this->tr('Skupina')?>:</label>
+      <label for="select-group-id"><?php echo $this->tr('Skupina')?>:</label>
       <select id="select-group-id" name="sel_group">
-         <?foreach ($this->groups as $grp) {
+         <?php foreach ($this->groups as $grp) {
             $grpsArr[(int)$grp[Model_Groups::COLUMN_ID]] = $grp[Model_Groups::COLUMN_NAME];
-            ?><option value="<?=$grp->{Model_Groups::COLUMN_ID}?>" title="<?=$grp->{Model_Groups::COLUMN_NAME}?>"><?=$grp->{Model_Groups::COLUMN_NAME}.' - '.$grp->{Model_Groups::COLUMN_LABEL}?></option><?
+            ?><option value="<?php echo $grp->{Model_Groups::COLUMN_ID}?>" title="<?php echo $grp->{Model_Groups::COLUMN_NAME}?>"><?php echo $grp->{Model_Groups::COLUMN_NAME}.' - '.$grp->{Model_Groups::COLUMN_LABEL}?></option><?php 
          }
          ?>
       </select>
@@ -27,7 +27,7 @@ $grpsArr = array();
    <hr class="reseter" />
    <br />
 </div>
-<?
+<?php 
 ?>
 <script type="text/javascript" charset="utf-8">
       /* <![CDATA[ */
@@ -35,65 +35,65 @@ $grpsArr = array();
       $(document).ready(function() {
          var usersGrid = $("#table-users").jqGrid({
             ajaxGridOptions : {type:"POST"},
-            url: '<?=$this->link()->route('usersList');?>?idgrp='+$('#select-group-id').val().toString(),
+            url: '<?php echo $this->link()->route('usersList');?>?idgrp='+$('#select-group-id').val().toString(),
             datatype: "json",
-            colNames:['ID', '<?=$this->tr('Už.jméno')?>', '<?=$this->tr('Jméno')?>', '<?=$this->tr('Přijmení')?>',
-               '<?=$this->tr('Heslo')?>', '<?=$this->tr('E-mail')?>', '<?=$this->tr('Tel.')?>', '<?=$this->tr('Adresa')?>', 
-               '<?=$this->tr('Blokace')?>', '<?=$this->tr('Poznámka')?>', '<?=$this->tr('Skupina')?>'],
+            colNames:['ID', '<?php echo $this->tr('Už.jméno')?>', '<?php echo $this->tr('Jméno')?>', '<?php echo $this->tr('Přijmení')?>',
+               '<?php echo $this->tr('Heslo')?>', '<?php echo $this->tr('E-mail')?>', '<?php echo $this->tr('Tel.')?>', '<?php echo $this->tr('Adresa')?>', 
+               '<?php echo $this->tr('Blokace')?>', '<?php echo $this->tr('Poznámka')?>', '<?php echo $this->tr('Skupina')?>'],
             colModel:[
-               {name:'<?=Model_Users::COLUMN_ID?>',index:'<?=Model_Users::COLUMN_ID?>',
+               {name:'<?php echo Model_Users::COLUMN_ID?>',index:'<?php echo Model_Users::COLUMN_ID?>',
                   width:33,fixed: true,editable:false},
-               {name:'<?=Model_Users::COLUMN_USERNAME?>',index:'<?=Model_Users::COLUMN_USERNAME?>', 
+               {name:'<?php echo Model_Users::COLUMN_USERNAME?>',index:'<?php echo Model_Users::COLUMN_USERNAME?>', 
                   width:150,fixed: true,editable:true,editoptions:{size:20},
-                  formoptions:{ rowpos:2, label: "<?=$this->tr('Uživ. jméno')?>",elmprefix:"(*)"}},
-               {name:'<?=Model_Users::COLUMN_NAME?>',index:'<?=Model_Users::COLUMN_NAME?>', 
+                  formoptions:{ rowpos:2, label: "<?php echo $this->tr('Uživ. jméno')?>",elmprefix:"(*)"}},
+               {name:'<?php echo Model_Users::COLUMN_NAME?>',index:'<?php echo Model_Users::COLUMN_NAME?>', 
                   width:80,fixed: true,editable:true,editoptions:{size:20},
-                  formoptions:{ rowpos:3, label: "<?=$this->tr('Jméno')?>",elmprefix:"(*)"}},
-               {name:'<?=Model_Users::COLUMN_SURNAME?>',index:'<?=Model_Users::COLUMN_SURNAME?>', 
+                  formoptions:{ rowpos:3, label: "<?php echo $this->tr('Jméno')?>",elmprefix:"(*)"}},
+               {name:'<?php echo Model_Users::COLUMN_SURNAME?>',index:'<?php echo Model_Users::COLUMN_SURNAME?>', 
                   width:80,fixed: true,editable:true,editoptions:{size:20},
-                  formoptions:{ rowpos:4, label: "<?=$this->tr('Přijmení')?>",elmprefix:"(*)"}},
-               {name:'<?=Model_Users::COLUMN_PASSWORD?>',index:'<?=Model_Users::COLUMN_PASSWORD?>',
+                  formoptions:{ rowpos:4, label: "<?php echo $this->tr('Přijmení')?>",elmprefix:"(*)"}},
+               {name:'<?php echo Model_Users::COLUMN_PASSWORD?>',index:'<?php echo Model_Users::COLUMN_PASSWORD?>',
                   width:1,fixed:true,hidedlg:false, hidden:true, editable:true,edittype:'password',editoptions:{size:20},
-                  formoptions:{ rowpos:5, label: "<?=$this->tr('Heslo')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
-               {name:'<?=Model_Users::COLUMN_MAIL?>',index:'<?=Model_Users::COLUMN_MAIL?>', 
+                  formoptions:{ rowpos:5, label: "<?php echo $this->tr('Heslo')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
+               {name:'<?php echo Model_Users::COLUMN_MAIL?>',index:'<?php echo Model_Users::COLUMN_MAIL?>', 
                   width:150,fixed: true,editable:true,editoptions:{size:20},
-                  formoptions:{ rowpos:6, label: "<?=$this->tr('E-mail')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
+                  formoptions:{ rowpos:6, label: "<?php echo $this->tr('E-mail')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
                
-               {name:'<?=Model_Users::COLUMN_PHONE?>',index:'<?=Model_Users::COLUMN_PHONE?>', 
+               {name:'<?php echo Model_Users::COLUMN_PHONE?>',index:'<?php echo Model_Users::COLUMN_PHONE?>', 
                   width:100, fixed : true, editable: true,editoptions:{size:20},
-                  formoptions:{ rowpos:7, label: "<?=$this->tr('Tel.')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
+                  formoptions:{ rowpos:7, label: "<?php echo $this->tr('Tel.')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
                   
-               {name:'<?=Model_Users::COLUMN_ADDRESS?>',index:'<?=Model_Users::COLUMN_ADDRESS?>', 
+               {name:'<?php echo Model_Users::COLUMN_ADDRESS?>',index:'<?php echo Model_Users::COLUMN_ADDRESS?>', 
                   width:1,fixed:true,hidedlg:false, hidden:true, editable:true, edittype:"textarea", editoptions:{rows:"2",cols:"20"},
-                  formoptions:{ rowpos:8, label: "<?=$this->tr('Adresa')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
+                  formoptions:{ rowpos:8, label: "<?php echo $this->tr('Adresa')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
                
-               {name:'<?=Model_Users::COLUMN_BLOCKED?>',index:'<?=Model_Users::COLUMN_BLOCKED?>', formatter: 'checkbox', 
+               {name:'<?php echo Model_Users::COLUMN_BLOCKED?>',index:'<?php echo Model_Users::COLUMN_BLOCKED?>', formatter: 'checkbox', 
                   formatoptions:{disabled: false, 'class' : 'blockUser'}, 
                   width:50,fixed: true,editable:true,edittype:'checkbox', editoptions:{size:20, value:"true:false"},
-                  formoptions:{ rowpos:9, label: "<?=$this->tr('Blokace')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
-               {name:'<?=Model_Users::COLUMN_NOTE?>',index:'<?=Model_Users::COLUMN_NOTE?>', 
+                  formoptions:{ rowpos:9, label: "<?php echo $this->tr('Blokace')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
+               {name:'<?php echo Model_Users::COLUMN_NOTE?>',index:'<?php echo Model_Users::COLUMN_NOTE?>', 
                   editable: true,edittype:"textarea", editoptions:{rows:"2",cols:"20"},
-                  formoptions:{ rowpos:10, label: "<?=$this->tr('Poznámka')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
-               {name:'<?=Model_Users::COLUMN_GROUP_ID?>',index:'<?=Model_Users::COLUMN_GROUP_ID?>', 
+                  formoptions:{ rowpos:10, label: "<?php echo $this->tr('Poznámka')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
+               {name:'<?php echo Model_Users::COLUMN_GROUP_ID?>',index:'<?php echo Model_Users::COLUMN_GROUP_ID?>', 
                   width:90,fixed: true, editable: true,edittype:"select",
-                  editoptions:{value: <?=json_encode($grpsArr)?>},formoptions:{ rowpos:11, 
-                     label: "<?=$this->tr('Skupina')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}}
+                  editoptions:{value: <?php echo json_encode($grpsArr)?>},formoptions:{ rowpos:11, 
+                     label: "<?php echo $this->tr('Skupina')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}}
             ],
             rowNum:20,
             rowList:[10,20,40,100],
             pager: '#table-users-pager',
-            sortname: '<?=Model_Users::COLUMN_ID?>',
-            caption:"<?=$this->tr('Uživatelé v systému')?>",
+            sortname: '<?php echo Model_Users::COLUMN_ID?>',
+            caption:"<?php echo $this->tr('Uživatelé v systému')?>",
             autowidth : true,
             height: '100%',
-            editurl:"<?=$this->link()->route('editUser')?>",
+            editurl:"<?php echo $this->link()->route('editUser')?>",
             toolbar: [true,"top"]
          });
          $("#t_table-users").append($('#table-users-toolbar'));
          /* změna skupiny */
          $("#select-group-id").change(function(){
             baseId = this.value;
-            usersGrid.jqGrid('setGridParam', { url: '<?=$this->link()->route('usersList');?>?idgrp='+this.value});
+            usersGrid.jqGrid('setGridParam', { url: '<?php echo $this->link()->route('usersList');?>?idgrp='+this.value});
             usersGrid.trigger("reloadGrid");
          });
          /* změna statusu usera */
@@ -102,7 +102,7 @@ $grpsArr = array();
             var idUser = $(this).parent('td').parent('tr').attr('id');
             if($(this).is(':checked')){newStatus = true;}
             $.ajax({
-               url: "<?=$this->link()->route('blockUser')?>", type: "POST",
+               url: "<?php echo $this->link()->route('blockUser')?>", type: "POST",
                data: ({id : idUser, blocked : newStatus})
             });
          });
@@ -112,7 +112,7 @@ $grpsArr = array();
             // edit options
             {reloadAfterSubmit:true, jqModal:true, closeOnEscape:true,viewPagerButtons:false,
                width:400,
-               bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné')?>",closeAfterEdit:true,
+               bottominfo:"<?php echo $this->tr('Položky označené (*) jsou povinné')?>",closeAfterEdit:true,
                afterSubmit : function(respond){
                   var res = eval("("+respond.responseText+")");
                   var msg = res.errmsg.toString();
@@ -126,7 +126,7 @@ $grpsArr = array();
             // add options
             {reloadAfterSubmit:true,jqModal:true, closeOnEscape:true, 
                width:400,
-               bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné')?>", closeAfterAdd: true,
+               bottominfo:"<?php echo $this->tr('Položky označené (*) jsou povinné')?>", closeAfterAdd: true,
                afterSubmit : function(respond){
                   var res = eval("("+respond.responseText+")");
                   var msg = res.errmsg.toString();

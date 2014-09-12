@@ -1,9 +1,9 @@
-<?
+<?php 
 $this->addFile('css://engine:style-admin.less');// need for buttons style
 ?>
 <div class="module-navigation-container">
 <ul class="module-navigation">
-<?
+<?php 
 $curLink = new Url_Link();
 $curLink = (string)$curLink;
 foreach ($this->items as $name => $link) {
@@ -20,15 +20,15 @@ foreach ($this->items as $name => $link) {
    $curLink == (string)$link ? $classes[] = 'active' : '';
    
    ?>
-   <li class="<?=implode(' ', $classes);?>"
-       ><a href="<?=$link?>" title="<?=$this->tr('Přejít na').' '.$name?>"><?
+   <li class="<?php echo implode(' ', $classes);?>"
+       ><a href="<?php echo $link?>" title="<?php echo $this->tr('Přejít na').' '.$name?>"><?php 
    if($icon != null && strpos($icon, '.png') !== false){
-      ?><img src="<?=vve_get_tpl_file('icons/'.$icon, VVE_TPL_FILE_IMAGE)?>" alt="icon <?=$icon?>" /><?
+      ?><img src="<?php echo vve_get_tpl_file('icons/'.$icon, VVE_TPL_FILE_IMAGE)?>" alt="icon <?php echo $icon?>" /><?php 
    } else if($icon != null){
-      ?><span class="icon icon-<?=$icon?>"></span><?
+      ?><span class="icon icon-<?php echo $icon?>"></span><?php 
    }
-   ?><span class="name"><?=$name?></span></a></li>
-<?
+   ?><span class="name"><?php echo $name?></span></a></li>
+<?php 
 }
 ?>
 </ul>

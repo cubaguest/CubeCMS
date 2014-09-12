@@ -1,4 +1,4 @@
-<?
+<?php 
 /**
  * Třída pro obsluhu vyjímek souborů obrázků
  * Třída rozšiřuje třídu Exception

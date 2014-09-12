@@ -1,4 +1,4 @@
-<h1><?ps($this->category()->getName())?></h1>
+<h1><?php ps($this->category()->getName())?></h1>
 <div class="admin-content">
 <?php
    $this->moduleButtons = array(
@@ -11,19 +11,19 @@
    );
    $this->includeTpl('modules/buttons.phtml', true);
    ?>
-   <?if(!empty($this->items)){?>
-   <div id="codebook-list" class="cubecms-widget cubecms-list <?=$this->sorting ? 'cubecms-list-sortable' : ''?>">
-      <?foreach ($this->items as $item) {?>
-      <div class="item cubecms-list-row" id="codebook-item-<?=$item->getPK()?>" data-id="<?=$item->getPK()?>">
+   <?php if(!empty($this->items)){?>
+   <div id="codebook-list" class="cubecms-widget cubecms-list <?php echo $this->sorting ? 'cubecms-list-sortable' : ''?>">
+      <?php foreach ($this->items as $item) {?>
+      <div class="item cubecms-list-row" id="codebook-item-<?php echo $item->getPK()?>" data-id="<?php echo $item->getPK()?>">
          <div class="header">
-            <?if($this->sorting){?>
+            <?php if($this->sorting){?>
             <span class="sort"><span class="icon icon-arrows-v"></span></span>
-            <?}?>
+            <?php }?>
             <span class="name">
-               <?ps($item->{$this->columnName})?>
+               <?php ps($item->{$this->columnName})?>
             </span>
             <span class="tools">
-               <?
+               <?php 
                $this->toolboxItem->setTemplate(Template_Toolbox2::TEMPLATE_INLINE);
                $this->toolboxItem->editItem->setAction($this->link()->route('edit', array('id' => $item->getPK())));
                $this->toolboxItem->item_delete_->getForm()->id->setValues($item->getPK());
@@ -32,9 +32,9 @@
             </span>
          </div>
       </div>
-      <?}?>
+      <?php }?>
    </div>
-   <?if($this->sorting){
+   <?php if($this->sorting){
       $jq = new JsPlugin_JQuery();
       $jq->addUISortable();
       $this->addJsPlugin($jq);
@@ -52,7 +52,7 @@
                      var id = ui.item.data('id');
                      var index = ui.item.index()+1;
                      $.ajax({
-                        url : '<?=$this->link()->route('sort')?>',
+                        url : '<?php echo $this->link()->route('sort')?>',
                         data : {id : id, position : index},
                         type : 'POST',
                         success : function(data){
@@ -67,10 +67,10 @@
             });
          });
       </script>
-   <?}?>
-   <?} else {?>
+   <?php }?>
+   <?php } else {?>
    <div class="alert alert-warning">
          <?php ps($this->tr('Není vložena žádná položka')); ?>
    </div>
-   <?}?>
+   <?php }?>
 </div>

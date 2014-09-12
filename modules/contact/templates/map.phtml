@@ -1,5 +1,5 @@
-<h2 id="contact-map-headline"><?=$this->tr('Mapa jak se k nám dostanete')?></h2>
-<?
+<h2 id="contact-map-headline"><?php echo $this->tr('Mapa jak se k nám dostanete')?></h2>
+<?php 
 $url = 'http://maps.google.com/maps/api/staticmap?';
 
 if($this->urlParams != null) {
@@ -13,4 +13,4 @@ if($this->markers != null) {
 }
 //echo $url;
 ?>
-<div class="contact-map"><img src="<?echo $url?>" alt="<?=$this->tr('Mapa')?>"/></div>
+<div class="contact-map"><img src="<?php echo $url?>" alt="<?php echo $this->tr('Mapa')?>"/></div>

@@ -1,13 +1,13 @@
-<?
+<?php 
 $h = $this->tr('Změna hesla');
 $this->addPageTitle($h);
 $this->form->gener->htmlSubLabel()->addContent('<a href="#" onclick="suggestPassword(); return false;">'.$this->tr('obnovit').'</a>'
         .'&nbsp;&nbsp;&nbsp;<a href="#" onclick="copyPassword(); return false;">'.$this->tr('kopírovat').'</a>', true);
 ?>
-<h1><?=$h;?></h1>
+<h1><?php echo $h;?></h1>
 <div class="main-content-form-edit">
-   <?echo $this->form;?>
-   <?
+   <?php echo $this->form;?>
+   <?php 
    echo new Html_Element_Script('function suggestPassword() {
    var pwchars = "abcdefhjmnpqrstuvwxyz23456789ABCDEFGHJKLMNPQRSTUVWYXZ";
    var passwordlength;    // do we want that to be dynamic?  no, keep it simple :)

@@ -1,4 +1,4 @@
-<?
+<?php 
 $icon = null;
 if($this->panelObj()->getIcon() != null) {
    $icon = '<img src="'.Panel_Obj::getIconDir().$this->panelObj()->getIcon().'" alt="'.$this->panelObj()->getIcon().'" />';
@@ -9,23 +9,23 @@ if($this->panelObj()->getBackImage() != null) {
 }
 ?>
 
-<p class="panel-box-label"><?=$icon?><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=$this->panelObj()->getName()?></a></p>
-<div class="panel-box-content" style="<?=$backImg?>">
-   <?
+<p class="panel-box-label"><?php echo $icon?><a href="<?php echo $this->link()?>" title="<?php echo htmlspecialchars($this->panelObj()->getName())?>"><?php echo $this->panelObj()->getName()?></a></p>
+<div class="panel-box-content" style="<?php echo $backImg?>">
+   <?php 
    $width = 170; // ZDE MĚNIT VELIKOST !!!
    $height = ceil($width/4*3);
    ?>
    <!--[if !IE]> -->
-   <object id="flash" type="application/x-shockwave-flash"  height="<?=$height?>" width="<?=$width?>"
-           data="<?=$this->clip?>&hl=cs_CZ&fs=1&rel=0">
+   <object id="flash" type="application/x-shockwave-flash"  height="<?php echo $height?>" width="<?php echo $width?>"
+           data="<?php echo $this->clip?>&hl=cs_CZ&fs=1&rel=0">
       <!-- <![endif]-->
 
       <!--[if IE]>
       <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
         codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,0,0"
-        width="<?=$width?>" height="<?=$height?>">
+        width="<?php echo $width?>" height="<?php echo $height?>">
       <!--><!--dgx-->
-      <param name="movie" value="<?=$this->clip?>&hl=cs_CZ&fs=1&rel=0" />
+      <param name="movie" value="<?php echo $this->clip?>&hl=cs_CZ&fs=1&rel=0" />
       <param name="allowFullScreen" value="true" />
       <param name="allowscriptaccess" value="always" />
       <param name="menu" value="false" />
@@ -35,6 +35,6 @@ if($this->panelObj()->getBackImage() != null) {
 
 </div>
 <p class="panel-box-link-more">
-   <a href="<?=$this->link()?>"
-      title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->_('Více')?></a>
+   <a href="<?php echo $this->link()?>"
+      title="<?php echo htmlspecialchars($this->category()->getLabel())?>"><?php echo $this->_('Více')?></a>
 </p>

@@ -11,14 +11,14 @@ if(Auth::isLogin() == false){
    die;
 }
 
-echo ('<?xml version="1.0" encoding="utf-8"?>');
+echo ('<?php xml version="1.0" encoding="utf-8"?>');
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?=Locales::getLang()?>" lang="<?=Locales::getLang()?>">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo Locales::getLang()?>" lang="<?php echo Locales::getLang()?>">
    <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/tinymce/tiny_mce.js"></script>
-<script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/tinymce/tiny_mce_popup.js"></script>
-<script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/filebrowser/filebrowser.js"></script>
+<script type="text/javascript" src="<?php echo Url_Request::getBaseWebDir()?>jscripts/tinymce/tiny_mce.js"></script>
+<script type="text/javascript" src="<?php echo Url_Request::getBaseWebDir()?>jscripts/tinymce/tiny_mce_popup.js"></script>
+<script type="text/javascript" src="<?php echo Url_Request::getBaseWebDir()?>jscripts/filebrowser/filebrowser.js"></script>
 {*-STYLESHEETS-*}
 {*-JAVASCRIPTS-*}
    </head>
@@ -26,18 +26,18 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
    <script language="javascript" type="text/javascript">
    $(document).ready(function(){
       // počáteční nastavení
-      FileBrowser.uploadLink = '<?=$this->uploadLink?>';
-      FileBrowser.baseUrl = '<?=Url_Request::getBaseWebDir();?>';
-      FileBrowser.sessionId = '<?=session_id()?>';
+      FileBrowser.uploadLink = '<?php echo $this->uploadLink?>';
+      FileBrowser.baseUrl = '<?php echo Url_Request::getBaseWebDir();?>';
+      FileBrowser.sessionId = '<?php echo session_id()?>';
       FileBrowser.listType = 'fil';
       tinyMCEPopup.onInit.add(FileBrowserDialogue.init, FileBrowserDialogue);
    });
-   var imageBigSizeW = <?=VVE_DEFAULT_PHOTO_W?>;
-   var imageBigSizeH = <?=VVE_DEFAULT_PHOTO_H?>;
-   var imageSmallSizeW = <?=VVE_IMAGE_THUMB_W?>;
-   var imageSmallSizeH = <?=VVE_IMAGE_THUMB_H?>;
-   var maxUploadFileSize = <?=VVE_MAX_UPLOAD_SIZE?>; // in MB
-   var cookieName = '<?=VVE_SESSION_NAME?>_Cube_Cms_brpath';
+   var imageBigSizeW = <?php echo VVE_DEFAULT_PHOTO_W?>;
+   var imageBigSizeH = <?php echo VVE_DEFAULT_PHOTO_H?>;
+   var imageSmallSizeW = <?php echo VVE_IMAGE_THUMB_W?>;
+   var imageSmallSizeH = <?php echo VVE_IMAGE_THUMB_H?>;
+   var maxUploadFileSize = <?php echo VVE_MAX_UPLOAD_SIZE?>; // in MB
+   var cookieName = '<?php echo VVE_SESSION_NAME?>_Cube_Cms_brpath';
    var tips = new Array('Pomocí klávesy CTRL a SHIFT lze označit více položek najednou.',
                         'Při označení více obrázků jsou akce aplikovány na všechny.',
                         'Přesun a kopírování položek lze pomocí chránky.',
@@ -54,7 +54,7 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
    <tr valign="top">
       <td rowspan="3" style="width: 400px; height: 350px;">
          <ul id="itemsList">
-            <li><?=_('Nenačteno')?></li>
+            <li><?php echo _('Nenačteno')?></li>
          </ul>
       </td>
       <td style="height: 150px;padding: 0;margin: 0;">
@@ -73,7 +73,7 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
       <td>
          <div>
             <div style="float: left" class="swfupload-control"><span id="spanButtonPlaceholder"></span></div>
-            <span id="uploading-files"><img src="../../../images/progress.gif" alt="loading..." width="16"/></span>&nbsp;Max:<?=VVE_MAX_UPLOAD_SIZE?>MB
+            <span id="uploading-files"><img src="../../../images/progress.gif" alt="loading..." width="16"/></span>&nbsp;Max:<?php echo VVE_MAX_UPLOAD_SIZE?>MB
             <div style="float: right">
                <input id="buttonGoPublic" type="image" src="../../../images/icons/folder_star.png" title="Přejít do veřejné složky" onclick="FileBrowser.goPublic()" />
                <input id="buttonGoHome" type="image" src="../../../images/icons/house.png" title="Přejít do osobní složky" onclick="FileBrowser.goHome()" />
@@ -115,7 +115,7 @@ echo ('<?xml version="1.0" encoding="utf-8"?>');
       <div id="working" style="display: none;">
          <p>
             Zpracovávám...
-            <img src="<?=Url_Request::getBaseWebDir()?>images/ajaxProgress.gif" alt="..." /><br />
+            <img src="<?php echo Url_Request::getBaseWebDir()?>images/ajaxProgress.gif" alt="..." /><br />
             <span style="font-size: xx-small">(Pokud zpracování trvá příliš dlouho, zkuste klávesou F5 obnovit stránku.)</span>
          </p>
       </div>

@@ -1,4 +1,4 @@
-<? // načtení detailu
+<?php  // načtení detailu
 $this->addPageTitle($this->_('Archiv'));
 $this->addPageHeadline($this->_('Archiv'));
 
@@ -8,20 +8,20 @@ $this->addJsPlugin($jQuery);
 ?>
 <div>
    <div id="articlesArchiveList">
-      <?
+      <?php 
       foreach ($this->articles as $year => $rows) {?>
-      <h2 class="archiveYearLabel year<?=$year?>"><a href="#"><?=$year?></a></h2>
+      <h2 class="archiveYearLabel year<?php echo $year?>"><a href="#"><?php echo $year?></a></h2>
       <div class="">
          <ul>
-         <?foreach ($rows as $row){?>
+         <?php foreach ($rows as $row){?>
             <li>
-               <a href="<?=$this->link()->route('detail', array('urlkey' => $row->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
-                  title="<?=$row->{Articles_Model_Detail::COLUMN_NAME}?>"><?=$row->{Articles_Model_Detail::COLUMN_NAME}?></a>
+               <a href="<?php echo $this->link()->route('detail', array('urlkey' => $row->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
+                  title="<?php echo $row->{Articles_Model_Detail::COLUMN_NAME}?>"><?php echo $row->{Articles_Model_Detail::COLUMN_NAME}?></a>
             </li>
-         <?}?>
+         <?php }?>
          </ul>
       </div>
-      <?}?>
+      <?php }?>
    </div>
    <hr class="reseter" />
    <script type="text/javascript">
@@ -33,4 +33,4 @@ $this->addJsPlugin($jQuery);
       });
    </script>
 </div>
-<?$this->includeTpl("buttonback.phtml", true);?>
+<?php $this->includeTpl("buttonback.phtml", true);?>

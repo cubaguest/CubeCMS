@@ -1,29 +1,29 @@
-<?
+<?php 
 if(!defined('VVE_TOOLBOX_ICON_SIZE')) define('VVE_TOOLBOX_ICON_SIZE', 16);
 ?>
 <div class="toolbox">
-   <?
+   <?php 
    foreach ($this->getTools() as $tool) {?>
-   <form method="post" action="<?=$tool['link'];?>"
-      <?if($tool['message'] != null) {?>onsubmit="return (confirm('<?=$tool["message"]?>'));"<?}?>>
-               <?
+   <form method="post" action="<?php echo $tool['link'];?>"
+      <?php if($tool['message'] != null) {?>onsubmit="return (confirm('<?php echo $tool["message"]?>'));"<?php }?>>
+               <?php 
                if($tool['nameHidden'] != null) {?>
-      <input type="hidden" value="<?=$tool['valueHidden'];?>" name="<?=$tool['nameHidden'];?>" />
-         <?}?>
-      <!--<input type="image" src="images/toolbox/<?=$tool['icon'];?>" name="<?=$tool['name'];?>"
-             value="<?=$tool['value'];?>" title="<?=$tool['title'];?>" />-->
+      <input type="hidden" value="<?php echo $tool['valueHidden'];?>" name="<?php echo $tool['nameHidden'];?>" />
+         <?php }?>
+      <!--<input type="image" src="images/toolbox/<?php echo $tool['icon'];?>" name="<?php echo $tool['name'];?>"
+             value="<?php echo $tool['value'];?>" title="<?php echo $tool['title'];?>" />-->
       <p>
-         <?
+         <?php 
          if(is_int($tool['icon'])) {?>
-      <input type="submit" name="<?=$tool['name'];?>" value="<?=$tool['value'];?>"
-             title="<?=$tool['title'];?>" style="background-image: url('images/toolbox/icons.png'); background-position: 0 <?=$tool['icon']*VVE_TOOLBOX_ICON_SIZE-VVE_TOOLBOX_ICON_SIZE;?>px" />
-                <?} else {?>
-      <input type="submit" name="<?=$tool['name'];?>" value="<?=$tool['value'];?>"
-             title="<?=$tool['title'];?>" style="background-image: url('images/icons/<?=$tool['icon'];?>')" />
-         <?}?>
+      <input type="submit" name="<?php echo $tool['name'];?>" value="<?php echo $tool['value'];?>"
+             title="<?php echo $tool['title'];?>" style="background-image: url('images/toolbox/icons.png'); background-position: 0 <?php echo $tool['icon']*VVE_TOOLBOX_ICON_SIZE-VVE_TOOLBOX_ICON_SIZE;?>px" />
+                <?php } else {?>
+      <input type="submit" name="<?php echo $tool['name'];?>" value="<?php echo $tool['value'];?>"
+             title="<?php echo $tool['title'];?>" style="background-image: url('images/icons/<?php echo $tool['icon'];?>')" />
+         <?php }?>
       </p>
    </form>
-   <?}?>
+   <?php }?>
 </div>
 
 <script type="text/javascript">

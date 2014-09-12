@@ -151,7 +151,7 @@ $pluginUrl = "http://".$_SERVER['HTTP_HOST'].$str."jsplugin/tinymce/cat-".$_GET[
 <script language="javascript" type="text/javascript">
    // počáteční nastavení
    tinyMCEPopup.onInit.add(FileBrowserDialogue.init, FileBrowserDialogue);
-   var sessionId = '<?=$_REQUEST['sessionid']?>';
+   var sessionId = '<?php echo $_REQUEST['sessionid']?>';
 </script>
 <table style="" id="mainTable">
    <tr>
@@ -203,7 +203,7 @@ $pluginUrl = "http://".$_SERVER['HTTP_HOST'].$str."jsplugin/tinymce/cat-".$_GET[
    <tr>
       <td colspan="3">
          <div>
-            <form id="uploadForm" action="<?=$pluginUrl?>uploadFile.html" method="post" enctype="multipart/form-data"
+            <form id="uploadForm" action="<?php echo $pluginUrl?>uploadFile.html" method="post" enctype="multipart/form-data"
                   target="upload_target" onsubmit="FileBrowserFilesFunctions.startUpload();"
                   style="display:inline;">
                <label for="newfile">Nahrát soubor:</label>

@@ -1,4 +1,4 @@
-<?
+<?php 
 $h = $this->category()->getName().' - '.  vve_date("%L, %x", $this->date);
 if($this->text->{DayMenu_Model::COLUMN_CONCEPT} == true){
    $h .= ' - '.$this->tr('koncept');
@@ -6,19 +6,19 @@ if($this->text->{DayMenu_Model::COLUMN_CONCEPT} == true){
 Template_Core::setPageTitle($h);
 echo $this->toolbox;
 ?>
-<h1><?echo $h;?></h1>
+<h1><?php echo $h;?></h1>
 <div class="main-content-detail">
    <div class="main-content-text">
-   <?
+   <?php 
    if($this->category()->getRights()->isWritable()){
       // show day selector
       
       ?>
       <div class="admin-info-text">
-      <form id="form-select-date" method="get" action="<?=$this->link()?>">
+      <form id="form-select-date" method="get" action="<?php echo $this->link()?>">
          <div>
-            <label for="input-set-date"><?=$this->tr('Menu na datum')?></label>: 
-         <input id="input-set-date" name="date" value="<?=vve_date("%x", $this->date)?>" type="text" size="12" />
+            <label for="input-set-date"><?php echo $this->tr('Menu na datum')?></label>: 
+         <input id="input-set-date" name="date" value="<?php echo vve_date("%x", $this->date)?>" type="text" size="12" />
          <input id="button-set-date" value="Zobrazit" type="submit"/>
          </div>
       </form>
@@ -34,24 +34,24 @@ echo $this->toolbox;
          });
       });
       </script>
-      <?
+      <?php 
       $jq = new JsPlugin_JQuery();
       $jq->addUIDatepicker();
       $this->addJsPlugin($jq);
    } else {
      /* if(isset ($_GET['day'])){?>
-         <a href="<?=$this->link()->param('day');?>" 
-            title="<?echo $this->tr('Přejít na menu na dnešek')?>"
-            ><?echo $this->tr('Menu na dnešek');?></a>
-      <?} else {?>
-         <a href="<?=$this->link()->param('day', $this->day+1 > 7 ? $di = 1 : $this->day+1);?>" 
-            title="<?$this->tr('Přejít na menu na zítřek')?>"
-            ><?echo $this->tr('Menu na zítřek')?></a>
-      <?}*/
+         <a href="<?php echo $this->link()->param('day');?>" 
+            title="<?php echo $this->tr('Přejít na menu na dnešek')?>"
+            ><?php echo $this->tr('Menu na dnešek');?></a>
+      <?php } else {?>
+         <a href="<?php echo $this->link()->param('day', $this->day+1 > 7 ? $di = 1 : $this->day+1);?>" 
+            title="<?php $this->tr('Přejít na menu na zítřek')?>"
+            ><?php echo $this->tr('Menu na zítřek')?></a>
+      <?php }*/
    }
    echo ($this->filter($this->text->{DayMenu_Model::COLUMN_TEXT},'emoticons'));?>
    </div>
-   <?
+   <?php 
    if($this->text != false AND $this->category()->getParam('shareTools', true) == true){
          $this->includeTpl('articletools.phtml', true, array(
             'lastEditTime' => $this->text->{Text_Model::COLUMN_CHANGED_TIME},
@@ -61,7 +61,7 @@ echo $this->toolbox;
    }
    ?>
 </div>
-<?
+<?php 
 if(($this->text != null AND strpos((string)$this->text->{Text_Model::COLUMN_TEXT}, 'pirobox') !== false)
    OR ($this->textPrivate != null AND strpos((string)$this->textPrivate->{Text_Model::COLUMN_TEXT}, 'pirobox') !== false)){
 $this->addJsPlugin(new JsPlugin_PiroBox())?>
@@ -70,5 +70,5 @@ $this->addJsPlugin(new JsPlugin_PiroBox())?>
       $(document).ready(function(){$().piroBox({slideShow : true,slideSpeed : 3});});
       /* ]]> */
 </script>
-<?}
+<?php }
 ?>

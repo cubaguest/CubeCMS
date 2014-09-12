@@ -1,4 +1,4 @@
-<?
+<?php 
 
 $title = $this->tr('Vložení dotazu do poradny');
 Template::addPageTitle($title);
@@ -9,11 +9,11 @@ if($this->conditionCat != null){
    $this->form->agree->setSubLabel(sprintf($this->tr('Zaškrtnutím sohlasíte s <a href="%s" title="podmínky užití služby">podmínkami užití služby</a>'), (string)$this->conditionCatLink )  );
 }
 ?>
-<h1><?echo $title;?></h1>
+<h1><?php echo $title;?></h1>
 <div class="main-content-detail">
-   <?echo $this->form;?>
+   <?php echo $this->form;?>
 </div>
-<?
+<?php 
 //$this->addJsPlugin(new JsPlugin_JQuery());
 ?>
    <script type="text/javascript">

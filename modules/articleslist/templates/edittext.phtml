@@ -1,4 +1,4 @@
-<?
+<?php 
 // nasatvení maximálního kontextu
 Template::setPVar('MAX_CONTENT', true);
 
@@ -15,10 +15,10 @@ $tinymce->setCfgParam('theme',  JsPlugin_TinyMce::TINY_THEME_ADVANCED_SIMPLE);
 $this->addJsPlugin($tinymce);
 
 ?>
-<h1><?=$this->_('Úprava úvodního textu kategorie').' '.$this->category()->getName();?></h1>
+<h1><?php echo $this->_('Úprava úvodního textu kategorie').' '.$this->category()->getName();?></h1>
 <div id="editActionsLabelForm">
-   <?print($this->form);?>
+   <?php print($this->form);?>
 </div>
-<?
+<?php 
 $this->includeTpl('buttonback.phtml', true);
 ?>

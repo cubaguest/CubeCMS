@@ -1,12 +1,12 @@
-<?
+<?php 
 $this->addFile("css://login:style.css");
 $this->addPageTitle($this->tr('Zapomenuté heslo'));
 ?>
-<h1><?=$this->tr('Zapomenuté heslo')?></h1>
+<h1><?php echo $this->tr('Zapomenuté heslo')?></h1>
 <div class="main-content-detail">
    <div class="main-content-text">
-      <p><?=$this->tr('Nové heslo Vám bude zasláno na e-mail uvedený v účtu. Pokud
+      <p><?php echo $this->tr('Nové heslo Vám bude zasláno na e-mail uvedený v účtu. Pokud
          Vám heslo nebude sedět, můžete si jej změnit ve Vašem účtu.')?></p>
    </div>
-   <?=$this->form;?>
+   <?php echo $this->form;?>
 </div>

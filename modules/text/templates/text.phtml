@@ -1,4 +1,4 @@
-<?
+<?php 
 /**
  * @template "Hlavní šablona"
  */
@@ -22,14 +22,14 @@ $doc->loadHTML(vve_html_convert_entities($this->text->{Text_Model::COLUMN_TEXT})
 $text = $doc->saveHTML();
 $text = $this->text->{Text_Model::COLUMN_TEXT};*/
 ?>
-<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $h1;?> <?=vve_tpl_show_text_langs($this->text->{Text_Model::COLUMN_TEXT});?></h1>
+<h1><?php $this->includeFile('tpl://engine:headline/icon.phtml'); echo $h1;?> <?php echo vve_tpl_show_text_langs($this->text->{Text_Model::COLUMN_TEXT});?></h1>
 <div class="main-content-detail">
-   <div class="main-content-text"><?echo ($this->filter($this->text->{Text_Model::COLUMN_TEXT},'emoticons')).$this->toolbox;?></div>
-   <?if($this->textPrivate != false AND (string)$this->textPrivate->{Text_Model::COLUMN_TEXT} != null){
-      ?><div class="main-content-text"><?
+   <div class="main-content-text"><?php echo ($this->filter($this->text->{Text_Model::COLUMN_TEXT},'emoticons')).$this->toolbox;?></div>
+   <?php if($this->textPrivate != false AND (string)$this->textPrivate->{Text_Model::COLUMN_TEXT} != null){
+      ?><div class="main-content-text"><?php 
       echo $this->textPrivate->{Text_Model::COLUMN_TEXT};
       echo $this->toolboxPrivate;
-   ?></div><?
+   ?></div><?php 
    }
    if($this->text != false && $this->category()->getParam('shareTools', true) == true && $this->articleTools !== false){
          $this->includeTpl('articletools.phtml', true, array(
@@ -41,7 +41,7 @@ $text = $this->text->{Text_Model::COLUMN_TEXT};*/
    }
    ?>
 </div>
-<?
+<?php 
 if(($this->text != null AND strpos((string)$this->text->{Text_Model::COLUMN_TEXT}, 'pirobox') !== false)
    OR ($this->textPrivate != null AND strpos((string)$this->textPrivate->{Text_Model::COLUMN_TEXT}, 'pirobox') !== false)){
    $this->addJsPlugin(new JsPlugin_PiroBox());
@@ -51,4 +51,4 @@ if(($this->text != null AND strpos((string)$this->text->{Text_Model::COLUMN_TEXT
       $(document).ready(function(){$().piroBox({slideShow : true,slideSpeed : 3});});
       /* ]]> */
    </script>
-<?}?>
+<?php }?>

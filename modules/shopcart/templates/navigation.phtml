@@ -1,4 +1,4 @@
-<?
+<?php 
 $step = $this->step == null ? 1 : $this->step;
 $steps = array(
    1 => $this->tr('Krok 1. Košík'),
@@ -8,9 +8,9 @@ $steps = array(
 ?>
 <div>
    <ul class="shop-step-list">
-   <?foreach ($steps as $stepNum => $s) {?>
-      <li class="<?if($stepNum == $step){ echo 'selected';} ?>"><?=$s?></li>
-   <?}?>
+   <?php foreach ($steps as $stepNum => $s) {?>
+      <li class="<?php if($stepNum == $step){ echo 'selected';} ?>"><?php echo $s?></li>
+   <?php }?>
    </ul>
    <hr class="reseter" />
 </div>

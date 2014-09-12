@@ -1,4 +1,4 @@
-<?
+<?php 
 $this->addCssFile("style.css");
 $this->addJsPlugin(new JsPlugin_JCrop());
 
@@ -11,32 +11,32 @@ $sizesSmall = getimagesize($this->category()->getModule()->getDataDir(false) . $
 
 
 ?>
-<h1><?= $this->tr('úprava portrétu'); ?></h1>
+<h1><?php echo  $this->tr('úprava portrétu'); ?></h1>
 <div class="main-content-form-edit">
-<?
+<?php 
 echo $this->form->renderStart();
 ?>
    <fieldset class="fieldset-alt">
-      <legend><span class="form-legend-name"><?= $this->tr('Aktuální portrét') ?></span></legend>
+      <legend><span class="form-legend-name"><?php echo  $this->tr('Aktuální portrét') ?></span></legend>
       <table class="form-table">
          <tr>
             <td>
-               <img src="<?=$path.$imgName?>" />
+               <img src="<?php echo $path.$imgName?>" />
             </td>
          </tr>
       </table>
    </fieldset>
    <fieldset class="fieldset-alt">
-      <legend><span class="form-legend-name"><?= $this->tr('Výběr') ?></span><span class="form-legend-text"><?= $this->tr('Myší vyberte oblast ze které se má vytvořit miniatura') ?></span></legend>
+      <legend><span class="form-legend-name"><?php echo  $this->tr('Výběr') ?></span><span class="form-legend-text"><?php echo  $this->tr('Myší vyberte oblast ze které se má vytvořit miniatura') ?></span></legend>
    <table class="form-table">
       <tr>
          <td id="cropImage" style="width: 320px">
-            <img width="300" class="edit-image-preview" src="<?= $path.$imgOriginalName ?>" alt="image " />
+            <img width="300" class="edit-image-preview" src="<?php echo  $path.$imgOriginalName ?>" alt="image " />
          </td>
          <td>
-            <?= $this->tr('Náhled') ?>
-            <p id="preview" style="overflow:hidden; width:<?= $this->imgW?>px; height:<?=$this->imgH?>px;">
-               <img src="<?=$path.$imgOriginalName?>" />
+            <?php echo  $this->tr('Náhled') ?>
+            <p id="preview" style="overflow:hidden; width:<?php echo  $this->imgW?>px; height:<?php echo $this->imgH?>px;">
+               <img src="<?php echo $path.$imgOriginalName?>" />
             </p>
          </td>
       </tr>
@@ -48,7 +48,7 @@ echo $this->form->renderStart();
       <tr class="hidden">
          <th class="form-labels"></th>
          <td class="form-controlls">
-            <?
+            <?php 
             $this->form->start_x->setValues(0);
             print($this->form->start_x->controll());
             ?>
@@ -57,7 +57,7 @@ echo $this->form->renderStart();
       <tr class="hidden">
          <th class="form-labels"></th>
          <td class="form-controlls">
-            <?
+            <?php 
             $this->form->start_y->setValues(0);
             print($this->form->start_y->controll())
             ?>
@@ -66,7 +66,7 @@ echo $this->form->renderStart();
       <tr class="hidden">
          <th class="form-labels"></th>
          <td class="form-controlls">
-            <?
+            <?php 
             $this->form->width->setValues($this->imgW);
             print($this->form->width->controll())
             ?>
@@ -75,7 +75,7 @@ echo $this->form->renderStart();
       <tr class="hidden">
          <th class="form-labels"></th>
          <td class="form-controlls">
-            <?
+            <?php 
             $this->form->height->setValues($this->imgH);
             echo ($this->form->height->controll());
             ?>
@@ -83,17 +83,17 @@ echo $this->form->renderStart();
       </tr>
       <tr>
          <th class="form-labels"></th>
-         <td class="form-controlls"><?= $this->form->save->controll() ?></td>
+         <td class="form-controlls"><?php echo  $this->form->save->controll() ?></td>
       </tr>
       </tbody>
    </table>
 </fieldset>
-<?echo $this->form->renderEnd();?>
+<?php echo $this->form->renderEnd();?>
 <script type="text/javascript">
 /* <![CDATA[ */
-   var croping = <?echo $this->imgC == true ? "true" : "false"?>;
-   var imgW = <?= $this->imgW; ?>;
-   var imgH = <?= $this->imgH; ?>;
+   var croping = <?php echo $this->imgC == true ? "true" : "false"?>;
+   var imgW = <?php echo  $this->imgW; ?>;
+   var imgH = <?php echo  $this->imgH; ?>;
    var ratio = croping == true ? Math.round(imgW / imgH) : null;
       
    function showPreview(coords){
@@ -103,8 +103,8 @@ echo $this->form->renderStart();
 
          if(croping){
             $('#preview img').css({
-               width: Math.round(rw * <?= $sizes[0] ?>) + 'px',
-               height: Math.round(rh * <?= $sizes[1] ?>) + 'px',
+               width: Math.round(rw * <?php echo  $sizes[0] ?>) + 'px',
+               height: Math.round(rh * <?php echo  $sizes[1] ?>) + 'px',
                marginLeft: '-' + Math.round(rw * coords.x) + 'px',
                marginTop: '-' + Math.round(rh * coords.y) + 'px'
             });
@@ -116,8 +116,8 @@ echo $this->form->renderStart();
 //               marginTop: '-' + Math.round(rh * coords.y) + 'px'
             });
             $('#preview img').css({
-//               width: Math.round(rw * <?= $sizes[0] ?>) + 'px',
-//               height: Math.round(rh * <?= $sizes[1] ?>) + 'px',
+//               width: Math.round(rw * <?php echo  $sizes[0] ?>) + 'px',
+//               height: Math.round(rh * <?php echo  $sizes[1] ?>) + 'px',
                marginLeft: '-' + coords.x + 'px',
                marginTop: '-' + coords.y + 'px'
             });
@@ -131,7 +131,7 @@ echo $this->form->renderStart();
 
    $(document).ready(function() {
       $('#cropImage img').Jcrop({
-         trueSize: [<?= $sizes[0] ?>,<?= $sizes[1]; ?>],
+         trueSize: [<?php echo  $sizes[0] ?>,<?php echo  $sizes[1]; ?>],
          onChange: showPreview,
          onSelect: showPreview,
          minSize: [ imgW , imgH ],

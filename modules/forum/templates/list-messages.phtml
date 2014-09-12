@@ -1,4 +1,4 @@
-<?
+<?php 
 $this->addJsPlugin(new JsPlugin_JQuery());
 $this->addFile('css://style.less');
 $h = $this->topic->{Forum_Model_Topics::COLUMN_NAME};
@@ -10,14 +10,14 @@ $this->addJsPlugin($jqcss);
 $expire = new DateTime();
 $expire->modify('+1 year');
 ?>
-<h1><?=$h?></h1>
+<h1><?php echo $h?></h1>
 <div class="forum-items main-content-list">
    <ul class="forum-topic-messages">
       <li class="topic-header ui-widget-header item">
          <table class="full-width">
             <tr class="">
-            <th class="message-author"><?=$this->tr('Autor');?></th>
-            <th class="message-text"><?=$this->tr('Zpráva');?></th>
+            <th class="message-author"><?php echo $this->tr('Autor');?></th>
+            <th class="message-text"><?php echo $this->tr('Zpráva');?></th>
          </tr>
          </table>
       </li>
@@ -25,17 +25,17 @@ $expire->modify('+1 year');
          <table class="full-width">
             <tr>
                <td class="message-author">
-                  <?=ps($this->topic->{Forum_Model_Topics::COLUMN_CREATED_BY})?>
+                  <?php echo ps($this->topic->{Forum_Model_Topics::COLUMN_CREATED_BY})?>
                   <div class="message-params">
-                     <?printf($this->tr('Přidáno: %s'), vve_date('%d.%m.%Y %G:%i', new DateTime($this->topic->{Forum_Model_Topics::COLUMN_DATE_ADD})));?>
+                     <?php printf($this->tr('Přidáno: %s'), vve_date('%d.%m.%Y %G:%i', new DateTime($this->topic->{Forum_Model_Topics::COLUMN_DATE_ADD})));?>
                   </div>
                </td>
                <td class="message-text">
-                  <?echo $this->toolboxTopic;?>
+                  <?php echo $this->toolboxTopic;?>
                   <div class="text">
-                     <?echo $this->topic->{Forum_Model_Topics::COLUMN_TEXT};?>
+                     <?php echo $this->topic->{Forum_Model_Topics::COLUMN_TEXT};?>
                   </div>
-                  <?if(isset($this->attachments[0]) && !empty($this->attachments[0])){ 
+                  <?php if(isset($this->attachments[0]) && !empty($this->attachments[0])){ 
                      $str = null;
                      foreach ($this->attachments[0] as $file) {
                         $imgTag = new Html_Element('a', htmlspecialchars($file->{Forum_Model_Attachments::COLUMN_FILENAME}));
@@ -47,25 +47,25 @@ $expire->modify('+1 year');
                         $str .= '<li>'.$imgTag.'</li>';
                      }?>
                   <div class="attachments">
-                     <strong><?=$this->tr('Přílohy')?></strong>
-                     <ul><?=$this->filter($str, 'filesicons');?></ul>
+                     <strong><?php echo $this->tr('Přílohy')?></strong>
+                     <ul><?php echo $this->filter($str, 'filesicons');?></ul>
                   </div>
-                  <?} ?>
+                  <?php } ?>
                </td>
             </tr>
             <tr>
                <td>
                </td>
                <td class="message-tools">
-                  <?
+                  <?php 
                   $linkToAdd = $this->link()
                      ->route('addMessage', array('id' => $this->topic->{Forum_Model_Topics::COLUMN_ID})); 
                   ?>
-                  <?if($this->category()->getRights()->isWritable() && $this->topic->{Forum_Model_Topics::COLUMN_CLOSED} == false){?>
-                  <a href="<?=$linkToAdd ?>" 
-                     title="<?=$this->tr('Reagovat na tento příspěvek')?>" 
-                     ><img src="/images/icons/comment_add.png" alt="add" /> <?=$this->tr('Reagovat')?></a>
-                  <?}?>
+                  <?php if($this->category()->getRights()->isWritable() && $this->topic->{Forum_Model_Topics::COLUMN_CLOSED} == false){?>
+                  <a href="<?php echo $linkToAdd ?>" 
+                     title="<?php echo $this->tr('Reagovat na tento příspěvek')?>" 
+                     ><img src="/images/icons/comment_add.png" alt="add" /> <?php echo $this->tr('Reagovat')?></a>
+                  <?php }?>
                </td>
             </tr>
          </table>
@@ -74,15 +74,15 @@ $expire->modify('+1 year');
       if(!empty ($this->messages)){ 
          function renderMessages($messages, $_this, $tr){
             foreach ($messages as $message) {?>
-            <li id="message-<?=$message->{Forum_Model_Messages::COLUMN_ID}?>"
-                style="margin-left: <?=(int)($message->{Forum_Model_Messages::COLUMN_DEPTH}*20+10)?>px"
-                class="item ui-widget-content <?if($message->{Forum_Model_Messages::COLUMN_CENSORED})echo "ui-state-disabled";?>">
+            <li id="message-<?php echo $message->{Forum_Model_Messages::COLUMN_ID}?>"
+                style="margin-left: <?php echo (int)($message->{Forum_Model_Messages::COLUMN_DEPTH}*20+10)?>px"
+                class="item ui-widget-content <?php if($message->{Forum_Model_Messages::COLUMN_CENSORED})echo "ui-state-disabled";?>">
                   <table class="full-width">
                      <tr>
                         <td class="message-author">
-                           <?echo ps($message->{Forum_Model_Messages::COLUMN_CREATED_BY}).'<br/>';?>
+                           <?php echo ps($message->{Forum_Model_Messages::COLUMN_CREATED_BY}).'<br/>';?>
                            <div class="message-params">
-                           <?if($message->{Forum_Model_Messages::COLUMN_CREATED_BY_MODERATOR} == true){
+                           <?php if($message->{Forum_Model_Messages::COLUMN_CREATED_BY_MODERATOR} == true){
                               echo $tr->tr('Moderátor').'<br/>';
                            } else if($message->{Forum_Model_Messages::COLUMN_ID_USER} == 0){
                               echo $tr->tr('Anonymní').'<br/>';
@@ -95,7 +95,7 @@ $expire->modify('+1 year');
                            </div>
                         </td>
                         <td class="message-text" rowspan="2">
-                           <?
+                           <?php 
                            if($_this->toolboxMessage instanceof Template_Toolbox2 && ($_this->category()->getRights()->isControll()
                               || $message->{Forum_Model_Messages::COLUMN_ID_USER} == Auth::getUserId() )){
                               $_this->toolboxMessage->edit_message->setAction($_this->link()->route('editMessage', array('idm' => $message->{Forum_Model_Messages::COLUMN_ID})));
@@ -107,7 +107,7 @@ $expire->modify('+1 year');
                            }
                            ?>
                            <div class="text">
-                           <?
+                           <?php 
                            if($_this->category()->getRights()->isControll() || $message->{Forum_Model_Messages::COLUMN_CENSORED} == false){
                               if($message->{Forum_Model_Messages::COLUMN_NAME} != null){
                                  echo '<h2>'.$message->{Forum_Model_Messages::COLUMN_NAME}.'</h2>';
@@ -117,7 +117,7 @@ $expire->modify('+1 year');
                         echo '<p>'.$tr->tr('Příspěvek byl cenzurován.').'<p>';
                            }?>
                            </div>
-                           <?if(isset($_this->attachments[$message->{Forum_Model_Messages::COLUMN_ID}]) && !empty($_this->attachments[$message->{Forum_Model_Messages::COLUMN_ID}])){ 
+                           <?php if(isset($_this->attachments[$message->{Forum_Model_Messages::COLUMN_ID}]) && !empty($_this->attachments[$message->{Forum_Model_Messages::COLUMN_ID}])){ 
                               $str = null;
                               foreach ($_this->attachments[$message->{Forum_Model_Messages::COLUMN_ID}] as $file) {
                                  $imgTag = new Html_Element('a', htmlspecialchars($file->{Forum_Model_Attachments::COLUMN_FILENAME}));
@@ -129,66 +129,66 @@ $expire->modify('+1 year');
                                  $str .= '<li>'.$imgTag.'</li>';
                               }?>
                            <div class="attachments">
-                        <strong><?=$tr->tr('Přílohy')?></strong>
-                        <ul><?=$_this->filter($str, 'filesicons');?></ul>
+                        <strong><?php echo $tr->tr('Přílohy')?></strong>
+                        <ul><?php echo $_this->filter($str, 'filesicons');?></ul>
                            </div>
-                           <?} ?>
+                           <?php } ?>
                      </td>
                   </tr>
                   <tr>
                      <td class="message-vote">
-      <!--                  <strong>--><?//ps($this->tr('Hodnocen�'))?><!--</strong><br />-->
+      <!--                  <strong>--><?php //ps($this->tr('Hodnocen�'))?><!--</strong><br />-->
                      </td>
                   </tr>
-                  <?if($_this->category()->getRights()->isControll() && $message->{Forum_Model_Messages::COLUMN_VOTE_SPAM} > 10){?>
+                  <?php if($_this->category()->getRights()->isControll() && $message->{Forum_Model_Messages::COLUMN_VOTE_SPAM} > 10){?>
                   <tr>
                      <td colspan="2">
                         <div class="message message-warning">
-                     <strong><?ps(sprintf($tr->tr('%s krát označen jako "nevhodné/SPAM"'), $message->{Forum_Model_Messages::COLUMN_VOTE_SPAM}))?></strong>
+                     <strong><?php ps(sprintf($tr->tr('%s krát označen jako "nevhodné/SPAM"'), $message->{Forum_Model_Messages::COLUMN_VOTE_SPAM}))?></strong>
                         </div>
                      </td>
                   </tr>
-                  <?}?>
+                  <?php }?>
                   <tr>
                      <td>
                         <div class="message-vote clearfix">
-                           <?if($message->voteEnabled){?>
-                           <form class="form-vote form-vote-up" method="post" action="<?=$_this->link()->route('voteMessage')?>">
+                           <?php if($message->voteEnabled){?>
+                           <form class="form-vote form-vote-up" method="post" action="<?php echo $_this->link()->route('voteMessage')?>">
                               <input type="hidden" name="action" value="voteUp" />
-                              <input type="hidden" name="id" value="<?=$message->getPK()?>" />
-                              <input type="image" name="imgsubmit" class="vote-button vote-button-up" src="images/icons/go-up.png" title="<?ps($tr->tr('Hotnotit: výborně'))?>" />
+                              <input type="hidden" name="id" value="<?php echo $message->getPK()?>" />
+                              <input type="image" name="imgsubmit" class="vote-button vote-button-up" src="images/icons/go-up.png" title="<?php ps($tr->tr('Hotnotit: výborně'))?>" />
                            </form>
-                           <?}?>
+                           <?php }?>
                            <span class="vote-counter">
-                        <?if(!$message->voteEnabled){ ps($tr->tr('Hlasů').": ");}?>
-                              <?ps($message->{Forum_Model_Messages::COLUMN_VOTE})?>
+                        <?php if(!$message->voteEnabled){ ps($tr->tr('Hlasů').": ");}?>
+                              <?php ps($message->{Forum_Model_Messages::COLUMN_VOTE})?>
                            </span>
-                           <?if($message->voteEnabled){?>
-                           <form class="form-vote form-vote-down" method="post" action="<?=$_this->link()->route('voteMessage')?>">
+                           <?php if($message->voteEnabled){?>
+                           <form class="form-vote form-vote-down" method="post" action="<?php echo $_this->link()->route('voteMessage')?>">
                               <input type="hidden" name="action" value="voteDown" />
-                              <input type="hidden" name="id" value="<?=$message->getPK()?>" />
-                        <input class="vote-button vote-button-down" type="image" src="images/icons/go-down.png" title="<?ps($tr->tr('Hotnotit: zbytečný'))?>" />
+                              <input type="hidden" name="id" value="<?php echo $message->getPK()?>" />
+                        <input class="vote-button vote-button-down" type="image" src="images/icons/go-down.png" title="<?php ps($tr->tr('Hotnotit: zbytečný'))?>" />
                            </form>
-                           <form class="form-vote form-vote-spam" method="post" action="<?=$_this->link()->route('voteMessage')?>">
+                           <form class="form-vote form-vote-spam" method="post" action="<?php echo $_this->link()->route('voteMessage')?>">
                               <input type="hidden" name="action" value="voteSpam" />
-                              <input type="hidden" name="id" value="<?=$message->getPK()?>" />
-                              <input class="vote-button vote-button-spam" type="image" src="images/icons/decline.png" title="<?ps($tr->tr('Nahlásit nevhodné / SPAM'))?>" />
+                              <input type="hidden" name="id" value="<?php echo $message->getPK()?>" />
+                              <input class="vote-button vote-button-spam" type="image" src="images/icons/decline.png" title="<?php ps($tr->tr('Nahlásit nevhodné / SPAM'))?>" />
                            </form>
-                           <?}?>
+                           <?php }?>
                         </div>
                      </td>
                      <td class="message-tools">
                         <div class="message-vote-label clearfix"></div>
-                        <?
+                        <?php 
                         $linkToAdd = $_this->link()
                            ->route('addMessage', array('id' => $_this->topic->{Forum_Model_Topics::COLUMN_ID}))
                            ->param('msg', $message->{Forum_Model_Messages::COLUMN_ID}); 
                         ?>
-                        <?if($_this->category()->getRights()->isWritable() && $_this->topic->{Forum_Model_Topics::COLUMN_CLOSED} == false){?>
-                        <a href="<?=$linkToAdd ?>" 
-                           title="<?=$tr->tr('Reagovat na tento příspěvek')?>" 
-                           ><img src="/images/icons/comment_add.png" alt="add" /> <?=$tr->tr('Reagovat')?></a>
-                        <?}?>
+                        <?php if($_this->category()->getRights()->isWritable() && $_this->topic->{Forum_Model_Topics::COLUMN_CLOSED} == false){?>
+                        <a href="<?php echo $linkToAdd ?>" 
+                           title="<?php echo $tr->tr('Reagovat na tento příspěvek')?>" 
+                           ><img src="/images/icons/comment_add.png" alt="add" /> <?php echo $tr->tr('Reagovat')?></a>
+                        <?php }?>
                      </td>
                   </tr>
                </table>
@@ -203,19 +203,19 @@ $expire->modify('+1 year');
       }
       ?>
       <li class="topic-footer ui-widget-content item message-tools">
-         <a href="<?=$this->link()->route('rssTopic', array('id' => $this->topic->{Forum_Model_Topics::COLUMN_ID}))?>" 
-            title="<?=$this->tr('Sledovat diskusi pomocí rss')?>" 
-            ><img src="/images/icons/rss.png" alt="add" /> <?=$this->tr('Sledovat')?></a>
-         <?if($this->category()->getRights()->isWritable() && $this->topic->{Forum_Model_Topics::COLUMN_CLOSED} == false){?>
-         <a href="<?=$this->link()->route('addMessage', array('id' => $this->topic->{Forum_Model_Topics::COLUMN_ID}))?>" 
-            title="<?=$this->tr('Přidat nový příspěvek')?>" 
-            ><img src="/images/icons/comment_add.png" alt="add" /> <?=$this->tr('Přidat příspěvek')?></a>
-         <?}?>
+         <a href="<?php echo $this->link()->route('rssTopic', array('id' => $this->topic->{Forum_Model_Topics::COLUMN_ID}))?>" 
+            title="<?php echo $this->tr('Sledovat diskusi pomocí rss')?>" 
+            ><img src="/images/icons/rss.png" alt="add" /> <?php echo $this->tr('Sledovat')?></a>
+         <?php if($this->category()->getRights()->isWritable() && $this->topic->{Forum_Model_Topics::COLUMN_CLOSED} == false){?>
+         <a href="<?php echo $this->link()->route('addMessage', array('id' => $this->topic->{Forum_Model_Topics::COLUMN_ID}))?>" 
+            title="<?php echo $this->tr('Přidat nový příspěvek')?>" 
+            ><img src="/images/icons/comment_add.png" alt="add" /> <?php echo $this->tr('Přidat příspěvek')?></a>
+         <?php }?>
       </li>
    </ul>
-   <div class="link-back"><a href="<?=$this->link()->route()?>" title="<?=$this->tr('Zpět na seznam témat');?>">&Lt; <?=$this->tr('Zpět na seznam témat');?></a></div>
+   <div class="link-back"><a href="<?php echo $this->link()->route()?>" title="<?php echo $this->tr('Zpět na seznam témat');?>">&Lt; <?php echo $this->tr('Zpět na seznam témat');?></a></div>
 </div>
-<? 
+<?php  
 $this->addJsPlugin(new JsPlugin_PrettyPhoto());
 ?>
 <script type="text/javascript">
@@ -245,17 +245,17 @@ $this->addJsPlugin(new JsPlugin_PrettyPhoto());
             success : function(respond){
                if(respond.infomsg && respond.errmsg.length == 0){
                   var $msg = $('#message-'+respond.idMessage);
-                  var idsStrored = getCookie('<?=Forum_Controller::COOKIE_NAME?>');
+                  var idsStrored = getCookie('<?php echo Forum_Controller::COOKIE_NAME?>');
                   var ids = idsStrored == null ? new Array() : idsStrored.split('|');
                   if($.inArray(respond.idMessage, ids) == -1){
                      ids.push(respond.idMessage);
                   }
-                  document.cookie ='<?=Forum_Controller::COOKIE_NAME?>='+ids.join('|')+'; expires=<?=$expire->format(DATE_COOKIE)?>; path=/'
-                  $('.vote-counter', $msg).text('<?ps($this->tr('Hlasů'))?>: '+respond.votes);
-                  <?if(!$this->category()->getRights()->isControll()){?>
+                  document.cookie ='<?php echo Forum_Controller::COOKIE_NAME?>='+ids.join('|')+'; expires=<?php echo $expire->format(DATE_COOKIE)?>; path=/'
+                  $('.vote-counter', $msg).text('<?php ps($this->tr('Hlasů'))?>: '+respond.votes);
+                  <?php if(!$this->category()->getRights()->isControll()){?>
                   // disable buttons
                   $('.form-vote,.message-vote-label', $msg).remove();
-                  <?}?>
+                  <?php }?>
                }
             }
          });

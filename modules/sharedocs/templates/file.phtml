@@ -1,4 +1,4 @@
-<?
+<?php 
 $this->addFile('css://style.css');
 
 $this->addJsPlugin(new JsPlugin_JQuery());
@@ -21,22 +21,22 @@ if($this->file->{ShareDocs_Model_Files::COLUMN_LOCKED} &&
 
 ?>
 
-<h1><? ps(sprintf($this->tr('Dokument "%s"'), $this->file->{ShareDocs_Model_Files::COLUMN_NAME} ));
+<h1><?php  ps(sprintf($this->tr('Dokument "%s"'), $this->file->{ShareDocs_Model_Files::COLUMN_NAME} ));
 ?></h1>
 <div class="main-content-detail">
-   <? // titulek souboru
+   <?php  // titulek souboru
    if($this->file->{ShareDocs_Model_Files::COLUMN_TITLE} != null){?>
-   <div class="main-content-text"><?=$this->file->{ShareDocs_Model_Files::COLUMN_TITLE}?></div>
-   <?}?>
+   <div class="main-content-text"><?php echo $this->file->{ShareDocs_Model_Files::COLUMN_TITLE}?></div>
+   <?php }?>
    <div id="sharedocs-edit-buttons" class="module-tool-buttons">
-      <form action="<?=$this->link()->route('dirList')?>" method="get">
-         <p><input type="submit" value="<?=$this->tr('Zpět do složky')?>" class="button-cancel" /></p>
+      <form action="<?php echo $this->link()->route('dirList')?>" method="get">
+         <p><input type="submit" value="<?php echo $this->tr('Zpět do složky')?>" class="button-cancel" /></p>
       </form>
-      <?if($this->right == ShareDocs_Controller::RIGHT_WRITE){?>
-      <form action="<?=$this->link()->route('editFile')?>" method="get">
-         <p><input type="submit" value="<?=$this->tr('Upravit informace')?>" /></p>
+      <?php if($this->right == ShareDocs_Controller::RIGHT_WRITE){?>
+      <form action="<?php echo $this->link()->route('editFile')?>" method="get">
+         <p><input type="submit" value="<?php echo $this->tr('Upravit informace')?>" /></p>
       </form>
-      <?
+      <?php 
       $this->formDelete->html()
          ->setAttrib('name', 'form-delete-file');
       echo $this->formDelete->renderStart();
@@ -48,17 +48,17 @@ if($this->file->{ShareDocs_Model_Files::COLUMN_LOCKED} &&
       echo $this->formDelete->delete->controll();
       echo $this->formDelete->renderEnd();
       ?>
-      <?}?>
+      <?php }?>
    </div>
-   <?
+   <?php 
    ?>
-   <h2><?=$this->tr('Informace')?></h2>
+   <h2><?php echo $this->tr('Informace')?></h2>
    <table class="ui-widget ui-file-info full-width">
       <tbody>
          <tr>
-            <th class="ui-widget-header"><?=$this->tr('Soubor je zamknut')?>:</th>
+            <th class="ui-widget-header"><?php echo $this->tr('Soubor je zamknut')?>:</th>
             <td class="ui-widget-content">
-               <?
+               <?php 
                if($this->fileLock != null){
                   echo "<strong>".$this->tr('Ano')."</strong>";
                } else {
@@ -77,11 +77,11 @@ if($this->file->{ShareDocs_Model_Files::COLUMN_LOCKED} &&
                ?>
             </td>
          </tr>
-         <?if($this->fileLock){?>
+         <?php if($this->fileLock){?>
          <tr>
-            <th class="ui-widget-header"><?=$this->tr('Soubor zamknul')?>:</th>
+            <th class="ui-widget-header"><?php echo $this->tr('Soubor zamknul')?>:</th>
             <td class="ui-widget-content">
-               <?
+               <?php 
                   echo "<strong>".$this->fileLock->{Model_Users::COLUMN_USERNAME}
                      ." (".$this->fileLock->{Model_Users::COLUMN_NAME}." ".$this->fileLock->{Model_Users::COLUMN_SURNAME}.") "
                      ."</strong>";
@@ -89,35 +89,35 @@ if($this->file->{ShareDocs_Model_Files::COLUMN_LOCKED} &&
             </td>
          </tr>
          <tr>
-            <th class="ui-widget-header"><?=$this->tr('E-mail uživatele')?>:</th>
+            <th class="ui-widget-header"><?php echo $this->tr('E-mail uživatele')?>:</th>
             <td class="ui-widget-content">
-               <a href="mailto:<?=$this->fileLock->{Model_Users::COLUMN_MAIL}?>" title="<?=$this->tr('Napsat uživateli')?>"
-                  ><?=$this->fileLock->{Model_Users::COLUMN_MAIL}?></a>
+               <a href="mailto:<?php echo $this->fileLock->{Model_Users::COLUMN_MAIL}?>" title="<?php echo $this->tr('Napsat uživateli')?>"
+                  ><?php echo $this->fileLock->{Model_Users::COLUMN_MAIL}?></a>
             </td>
          </tr>
-         <?}?>
+         <?php }?>
          
          
          <tr><td class="" colspan="2"></td></tr>
          <tr>
-            <th class="ui-widget-header"><?=$this->tr('Název souboru')?>:</th>
-            <td class="ui-widget-content"><?=$this->file->{ShareDocs_Model_Revs::COLUMN_ORIG_FILENAME}?></td>
+            <th class="ui-widget-header"><?php echo $this->tr('Název souboru')?>:</th>
+            <td class="ui-widget-content"><?php echo $this->file->{ShareDocs_Model_Revs::COLUMN_ORIG_FILENAME}?></td>
          </tr>
          <tr>
-            <th class="ui-widget-header"><?=$this->tr('Velikost')?>:</th>
-            <td class="ui-widget-content"><?=$fsize?></td>
+            <th class="ui-widget-header"><?php echo $this->tr('Velikost')?>:</th>
+            <td class="ui-widget-content"><?php echo $fsize?></td>
          </tr>
          <tr><td class="" colspan="2"></td></tr>
          <tr>
-            <th class="ui-widget-header" colspan="2"><?=$this->tr('Poslední úprava')?></th>
+            <th class="ui-widget-header" colspan="2"><?php echo $this->tr('Poslední úprava')?></th>
          </tr>
          <tr>
-            <th class="ui-widget-header"><?=$this->tr('Datum')?>:</th>
-            <td class="ui-widget-content"><?=vve_date("%x %G:%i", new DateTime($this->file->{ShareDocs_Model_Revs::COLUMN_DATE_ADD}))?></td>
+            <th class="ui-widget-header"><?php echo $this->tr('Datum')?>:</th>
+            <td class="ui-widget-content"><?php echo vve_date("%x %G:%i", new DateTime($this->file->{ShareDocs_Model_Revs::COLUMN_DATE_ADD}))?></td>
          </tr>
          <tr>
-            <th class="ui-widget-header"><?=$this->tr('Uživatel')?>:</th>
-            <td class="ui-widget-content"><?
+            <th class="ui-widget-header"><?php echo $this->tr('Uživatel')?>:</th>
+            <td class="ui-widget-content"><?php 
             echo $this->file->{Model_Users::COLUMN_USERNAME};
             if($this->file->{Model_Users::COLUMN_NAME} != null){
                echo " (".$this->file->{Model_Users::COLUMN_NAME}.' '.$this->file->{Model_Users::COLUMN_SURNAME}.")";
@@ -125,26 +125,26 @@ if($this->file->{ShareDocs_Model_Files::COLUMN_LOCKED} &&
             ?></td>
          </tr>
          <tr>
-            <th class="ui-widget-header"><?=$this->tr('Popis')?>:</th>
+            <th class="ui-widget-header"><?php echo $this->tr('Popis')?>:</th>
             <td class="ui-widget-content">
-               <span title="<?ps($this->file->{ShareDocs_Model_Revs::COLUMN_NOTE})?>"><?=vve_tpl_truncate($this->file->{ShareDocs_Model_Revs::COLUMN_NOTE}, 200)?></span>
+               <span title="<?php ps($this->file->{ShareDocs_Model_Revs::COLUMN_NOTE})?>"><?php echo vve_tpl_truncate($this->file->{ShareDocs_Model_Revs::COLUMN_NOTE}, 200)?></span>
             </td>
          </tr>
       </tbody>
    </table>
    
-   <h2><?=$this->tr('Operace s dokumentem')?></h2>
+   <h2><?php echo $this->tr('Operace s dokumentem')?></h2>
    
    <div class="">
       <table class="ui-widget ui-file-info full-width">
          <tr>
             <th class="ui-widget-header">
-               <?=$this->tr('Stažení aktuální verze')?>
+               <?php echo $this->tr('Stažení aktuální verze')?>
             </th>
          </tr>
          <tr>
             <td class="ui-widget-content">
-               <?
+               <?php 
                $this->formDownload->html()->addClass(isset ($this->formDownload->lock) ? "with-lock" : null);
                echo $this->formDownload->renderStart();
                $this->formDownload->rev->setValues(null);
@@ -156,38 +156,38 @@ if($this->file->{ShareDocs_Model_Files::COLUMN_LOCKED} &&
                }
                echo $this->formDownload->renderEnd();
                ?>
-               <?if($this->downloadFile){?><iframe src="<?=$this->link()->param('dw', 'true')?>" id="download_file" name="download_file" width="0" height="0" scrolling="no" frameborder="0"></iframe><?}?>
+               <?php if($this->downloadFile){?><iframe src="<?php echo $this->link()->param('dw', 'true')?>" id="download_file" name="download_file" width="0" height="0" scrolling="no" frameborder="0"></iframe><?php }?>
             </td>
          </tr>
-         <?if(isset ($this->formDownload->lock)){?>
+         <?php if(isset ($this->formDownload->lock)){?>
          <tr>
             <td class="ui-widget-content note">
-               <?=$this->tr('Zamknutí souboru slouží pro jeho editaci. Pokud je editace hotova, stačí nahrát novou verzi a soubor se odemkne.')?>
+               <?php echo $this->tr('Zamknutí souboru slouží pro jeho editaci. Pokud je editace hotova, stačí nahrát novou verzi a soubor se odemkne.')?>
             </td>
          </tr>
-         <?}?>
+         <?php }?>
          <tr><td></td></tr>
          <tr>
             <th class="ui-widget-header">
-               <?=$this->tr('odkaz pro stažení.')?>
+               <?php echo $this->tr('odkaz pro stažení.')?>
             </th>
          </tr>
          <tr>
             <td class="ui-widget-content">
-               <a href="<?=$this->link()?>#file-public-link-download" id="button-file-public-link-generate">
+               <a href="<?php echo $this->link()?>#file-public-link-download" id="button-file-public-link-generate">
                   <img src="images/icons/add.png" alt="add-icon"/>
-                  <?=$this->tr('Vytvořit odkaz')?>
+                  <?php echo $this->tr('Vytvořit odkaz')?>
                </a>
             </td>
          </tr>
          <tr>
             <td class="ui-widget-content note">
-               <?  printf($this->tr('Odkaz pro stažení umožňuje stáhnout soubor bez přihlášení v systému. Jeho platnost je %s hodin.'), ShareDocs_Controller::TOKEN_MAX_HOURS )?>
+               <?php   printf($this->tr('Odkaz pro stažení umožňuje stáhnout soubor bez přihlášení v systému. Jeho platnost je %s hodin.'), ShareDocs_Controller::TOKEN_MAX_HOURS )?>
             </td>
          </tr>
       </table>
       
-      <?
+      <?php 
       if($this->formUpload != null){
          if($fileIsLockedByOtherUser){
             $this->formUpload->html()->setAttrib('onsubmit', 'return confirm(\''.$this->tr('Tento soubor je zamknut jiným uživatelem. Přesto nahrát novou verzi?').'\')');
@@ -196,36 +196,36 @@ if($this->file->{ShareDocs_Model_Files::COLUMN_LOCKED} &&
       ?>
       <table class="ui-widget ui-file-info full-width">
          <tr>
-            <th colspan="2" class="ui-widget-header"><?=$this->tr('Nahrání nové verze')?></th>
+            <th colspan="2" class="ui-widget-header"><?php echo $this->tr('Nahrání nové verze')?></th>
          </tr>
-         <?if($fileIsLockedByOtherUser){?>
+         <?php if($fileIsLockedByOtherUser){?>
          <tr>
             <td colspan="2" class="ui-state-error">
                <span class="ui-icon ui-icon-alert" style="float: left;"></span>
-               <span class="ui-state-error-text"><?=$this->tr('POZOR! Soubor je zamknut jiným uživatelem! Při nahrání již nebude uživatelův soubor aktuální!')?></span>
+               <span class="ui-state-error-text"><?php echo $this->tr('POZOR! Soubor je zamknut jiným uživatelem! Při nahrání již nebude uživatelův soubor aktuální!')?></span>
             </td>
          </tr>
-         <?}?>
+         <?php }?>
          <tr>
             <th class="ui-widget-content">
-               <?
+               <?php 
                echo $this->formUpload->file->label();
                ?>
             </th>
             <td class="ui-widget-content">
-               <?
+               <?php 
                echo $this->formUpload->file->controll();
                ?>
             </td>
          </tr>
          <tr>
             <th class="ui-widget-content">
-               <?
+               <?php 
                echo $this->formUpload->note->label();
                ?>
             </th>
             <td class="ui-widget-content">
-               <?
+               <?php 
                echo $this->formUpload->note->controll();
                ?>
             </td>
@@ -233,38 +233,38 @@ if($this->file->{ShareDocs_Model_Files::COLUMN_LOCKED} &&
          <tr>
             <td class="ui-widget-content"></td>
             <td class="ui-widget-content">
-               <?
+               <?php 
                echo $this->formUpload->upload->controll();
                ?>
             </td>
          </tr>
       </table>
-         <?
+         <?php 
          echo $this->formUpload->renderEnd();
       }?>
    </div>
    
-   <h2><?printf($this->tr('Historie úprav (%s)'),$this->revisionsCount )?></h2>
+   <h2><?php printf($this->tr('Historie úprav (%s)'),$this->revisionsCount )?></h2>
    <table class="ui-file-revisions-info full-width">
       <thead>
          <tr>
-            <th scope="col" class="ui-widget-header ui-file-number"><?=$this->tr('Č.')?></th>
-            <th scope="col" class="ui-widget-header ui-file-date"><?=$this->tr('Datum')?></th>
-            <th scope="col" class="ui-widget-header ui-file-user"><?=$this->tr('Vložil')?></th>
-            <th scope="col" class="ui-widget-header ui-file-note"><?=$this->tr('Popis')?></th>
+            <th scope="col" class="ui-widget-header ui-file-number"><?php echo $this->tr('Č.')?></th>
+            <th scope="col" class="ui-widget-header ui-file-date"><?php echo $this->tr('Datum')?></th>
+            <th scope="col" class="ui-widget-header ui-file-user"><?php echo $this->tr('Vložil')?></th>
+            <th scope="col" class="ui-widget-header ui-file-note"><?php echo $this->tr('Popis')?></th>
             <th scope="col" class="ui-widget-header ui-file-actions"></th>
          </tr>
       </thead>
       <tbody>
-         <?
+         <?php 
          foreach ($this->revisions as $rev) {?>
          <tr>
-            <td class="ui-widget-content ui-file-number"><?=$rev->{ShareDocs_Model_Revs::COLUMN_NUMBER}?></td>
-            <td class="ui-widget-content ui-file-date"><?=vve_date("%x %G:%i", new DateTime($rev->{ShareDocs_Model_Revs::COLUMN_DATE_ADD}))?></td>
-            <td class="ui-widget-content ui-file-user"><?=$rev->{Model_Users::COLUMN_USERNAME}?></td>
-            <td class="ui-widget-content ui-file-note"><?=$rev->{ShareDocs_Model_Revs::COLUMN_NOTE}?></td>
+            <td class="ui-widget-content ui-file-number"><?php echo $rev->{ShareDocs_Model_Revs::COLUMN_NUMBER}?></td>
+            <td class="ui-widget-content ui-file-date"><?php echo vve_date("%x %G:%i", new DateTime($rev->{ShareDocs_Model_Revs::COLUMN_DATE_ADD}))?></td>
+            <td class="ui-widget-content ui-file-user"><?php echo $rev->{Model_Users::COLUMN_USERNAME}?></td>
+            <td class="ui-widget-content ui-file-note"><?php echo $rev->{ShareDocs_Model_Revs::COLUMN_NOTE}?></td>
             <td class="ui-widget-content ui-file-actions">
-               <?
+               <?php 
                echo $this->formDownload->renderStart();
                $this->formDownload->rev->setValues($rev->{ShareDocs_Model_Revs::COLUMN_ID});
                echo $this->formDownload->rev->controll();
@@ -274,7 +274,7 @@ if($this->file->{ShareDocs_Model_Files::COLUMN_LOCKED} &&
                ?>
             </td>
          </tr>
-         <?}?>
+         <?php }?>
       </tbody>
    </table>
    <script type="text/javascript">
@@ -282,7 +282,7 @@ if($this->file->{ShareDocs_Model_Files::COLUMN_LOCKED} &&
       $('#button-file-public-link-generate').click(function(){
          var $link = $(this);
          $.ajax({
-            url: "<?=$this->link()->route('generatePublicLink')?>",
+            url: "<?php echo $this->link()->route('generatePublicLink')?>",
             success: function(data){
                if(typeof data.link !== "undefined"){
                   $link.attr('href', data.link).text(data.link).unbind('click');

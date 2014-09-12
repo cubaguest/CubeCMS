@@ -1,4 +1,4 @@
-<?
+<?php 
 $h = sprintf($this->tr('úprava menu pro den %s'), vve_date("%L, %x", $this->date));
 Template_Core::setPageTitle($h);
 
@@ -6,9 +6,9 @@ $jq = new JsPlugin_JQuery();
 $jq->addUIDatepicker();
 $this->addJsPlugin($jq);
 ?>
-<h1><?=$h?></h1>
+<h1><?php echo $h?></h1>
 <div class="main-content-form-edit" id="text-edit-form">
-   <?
+   <?php 
    $this->form->text->html()->setAttrib('cols', 60)->setAttrib('rows', 40);
    echo ($this->form);
    ?>

@@ -1,4 +1,4 @@
-<?
+<?php 
 $this->addFile('css://engine:shop/style.less');
 $this->addFile('js://engine:shop.js');
 $jq = new JsPlugin_JQuery();
@@ -18,7 +18,7 @@ $this->addPageTitle($h);
 // datepickery
 //$this->form->created_date->html()->addClass('datepicker');
 ?>
-<h1><?=$h;?></h1>
+<h1><?php echo $h;?></h1>
 <div class="main-content-form-edit">
    <?php
    if($this->moduleActionButtons == null){
@@ -38,46 +38,46 @@ $this->addPageTitle($h);
 </div>
 <div class="main-content-form-edit" id="products-variants-edit-content">
    <ul>
-      <li><a href="<?=$this->link()?>#products-variants"><?=$this->tr('Tvorba variant')?></a></li>
-      <li><a href="<?=$this->link()?>#product-combinations"><?=$this->tr('Kombinace')?></a></li>
-      <li><a href="<?=$this->link()?>#product-code-edit"><?=$this->tr('Nastavení kódu produktu')?></a></li>
+      <li><a href="<?php echo $this->link()?>#products-variants"><?php echo $this->tr('Tvorba variant')?></a></li>
+      <li><a href="<?php echo $this->link()?>#product-combinations"><?php echo $this->tr('Kombinace')?></a></li>
+      <li><a href="<?php echo $this->link()?>#product-code-edit"><?php echo $this->tr('Nastavení kódu produktu')?></a></li>
    </ul>
 
    <div id="products-variants" class="ui-table-widget">
       <div class="">
          <p>
-            <?printf($this->tr('Základní cena produktu: <strong>%s</strong> bez daně, s daní: <strong>%s</strong>'),
+            <?php printf($this->tr('Základní cena produktu: <strong>%s</strong> bez daně, s daní: <strong>%s</strong>'),
             Shop_Tools::getPrice($this->product->{Shop_Model_Product::COLUMN_PRICE}), Shop_Tools::getPriceOfProduct($this->product) );
             ?>
          </p>
-         <?
+         <?php 
          $this->formEditVariants->html()->setAttrib('id', 'form-create-combinations');
          echo($this->formEditVariants->renderStart());
          ?>
          <table id="products-variants-table" class="full-width variants-table">
             <thead>
                <tr class="ui-widget-header">
-                  <th colspan="2"><?=$this->tr('Varianty')?></th>
-                  <th><?=$this->tr('Výchozí')?></th>
+                  <th colspan="2"><?php echo $this->tr('Varianty')?></th>
+                  <th><?php echo $this->tr('Výchozí')?></th>
                   <th>
-                     <?=$this->tr('Cena varianty')?><br />
-                     <span class="font-small"><?=$this->tr('bez ceny produktu')?></span>
+                     <?php echo $this->tr('Cena varianty')?><br />
+                     <span class="font-small"><?php echo $this->tr('bez ceny produktu')?></span>
                   </th>
-                  <th><?=$this->tr('Kód varianty')?></th>
-                  <th><?=$this->tr('Váha varianty')?></th>
+                  <th><?php echo $this->tr('Kód varianty')?></th>
+                  <th><?php echo $this->tr('Váha varianty')?></th>
                   <th></th>
                </tr>
             </thead>
             <tfoot>
                <tr class="ui-widget-content">
                   <td colspan="7" class="font-small">
-                     * - <?ps($this->tr('Pro tuto vlastnost nejsou vygenerovány kombinace. Nebude zobrazena ve výběru u produktu.'))?>
+                     * - <?php ps($this->tr('Pro tuto vlastnost nejsou vygenerovány kombinace. Nebude zobrazena ve výběru u produktu.'))?>
                   </td>
                </tr>
                <tr>
                   <td colspan="7">
                      <div class="controls">
-                        <?
+                        <?php 
                         if(!empty($this->productVarinats)){
                            echo $this->formEditVariants->generatePrice->control();
                            echo $this->formEditVariants->generatePrice->label(null, true);
@@ -89,7 +89,7 @@ $this->addPageTitle($h);
                </tr>
             </tfoot>
             <tbody>
-            <? if(!empty($this->productVarinats)){
+            <?php  if(!empty($this->productVarinats)){
                $prevGroupId = null;
                foreach($this->productVarinats as $variant){
                   // kontrola nové varianty
@@ -98,24 +98,24 @@ $this->addPageTitle($h);
                      ?>
                   <tr class="group-name ui-state-active">
                      <td colspan="7">
-                        <?ps($variant->{Shop_Model_AttributesGroups::COLUMN_NAME})?>
-                        ID: <?=$variant->{Shop_Model_Attributes::COLUMN_ID_GROUP}?>
+                        <?php ps($variant->{Shop_Model_AttributesGroups::COLUMN_NAME})?>
+                        ID: <?php echo $variant->{Shop_Model_Attributes::COLUMN_ID_GROUP}?>
                      </td>
                   </tr>
-                     <?
+                     <?php 
                   }
                ?>
-               <tr id="variant-<?=$variant->getPK()?>"
-                   class="variant ui-state-default <?if($variant->{Shop_Model_ProductCombinationHasVariant::COLUMN_ID_COMBINATION} == null) echo "ui-state-active";?>">
+               <tr id="variant-<?php echo $variant->getPK()?>"
+                   class="variant ui-state-default <?php if($variant->{Shop_Model_ProductCombinationHasVariant::COLUMN_ID_COMBINATION} == null) echo "ui-state-active";?>">
                   <td></td>
-                  <td><?
+                  <td><?php 
                      ps($variant->{Shop_Model_Attributes::COLUMN_NAME});
                      if($variant->{Shop_Model_ProductCombinationHasVariant::COLUMN_ID_COMBINATION} == null){
                         echo " *";
                      }
                      ?></td>
                   <td>
-                     <?
+                     <?php 
                      $this->formEditVariants->default->setMultiple($variant->{Shop_Model_Attributes::COLUMN_ID_GROUP});
                      $this->formEditVariants->default->setOptions(array($variant->{Shop_Model_ProductVariants::COLUMN_ID}));
                      $this->formEditVariants->default->setRenderlabelInControl(false);
@@ -125,8 +125,8 @@ $this->addPageTitle($h);
                   <td>
                      <table class="price-table">
                         <tr>
-                           <td><?=$this->tr('Bez daně:')?></td>
-                           <td><?
+                           <td><?php echo $this->tr('Bez daně:')?></td>
+                           <td><?php 
                               $this->formEditVariants->price->html()->addClass('price_without_tax');
                               $this->formEditVariants->price->setMultiple($variant->{Shop_Model_ProductVariants::COLUMN_ID});
                               $this->formEditVariants->price->setValues($variant->{Shop_Model_ProductVariants::COLUMN_PRICE_ADD});
@@ -134,49 +134,49 @@ $this->addPageTitle($h);
                               ?></td>
                         </tr>
                         <tr>
-                           <td><?=$this->tr('S daní:')?></td>
+                           <td><?php echo $this->tr('S daní:')?></td>
                            <td>
                               <input type="text" class="product_variants_price_class price_with_tax"
-                                     value="<? echo Shop_Tools::getPrice(
+                                     value="<?php  echo Shop_Tools::getPrice(
                                         $variant->{Shop_Model_ProductVariants::COLUMN_PRICE_ADD},
-                                        $this->product->{Shop_Model_Tax::COLUMN_VALUE}, false);?>"> <?=VVE_SHOP_CURRENCY_NAME?>
+                                        $this->product->{Shop_Model_Tax::COLUMN_VALUE}, false);?>"> <?php echo VVE_SHOP_CURRENCY_NAME?>
                            </td>
                         </tr>
                      </table>
                   </td>
-                  <td><?
+                  <td><?php 
                      $this->formEditVariants->code->setMultiple($variant->{Shop_Model_ProductVariants::COLUMN_ID});
                      $this->formEditVariants->code->setValues($variant->{Shop_Model_ProductVariants::COLUMN_CODE_ADD});
                      echo $this->formEditVariants->code->control();
                      ?></td>
-                  <td><?
+                  <td><?php 
                      $this->formEditVariants->weight->setMultiple($variant->{Shop_Model_ProductVariants::COLUMN_ID});
                      $this->formEditVariants->weight->setValues($variant->{Shop_Model_ProductVariants::COLUMN_WEIGHT_ADD});
                      echo $this->formEditVariants->weight->control();
                      ?> Kg</td>
                   <td>
-                     <a href="<?=$this->link()->param('deleteComb', $variant->{Shop_Model_ProductVariants::COLUMN_ID})?>"
+                     <a href="<?php echo $this->link()->param('deleteComb', $variant->{Shop_Model_ProductVariants::COLUMN_ID})?>"
                         class="button-delete-variant" >
                         <img src="/images/icons/delete.png" alt="del" />
                      </a>
 
                   </td>
                </tr>
-               <?
+               <?php 
                }
             } else {?>
                <tr>
-                  <td colspan="6"><?=$this->tr('Není přiřazena žádná varianta')?></td>
+                  <td colspan="6"><?php echo $this->tr('Není přiřazena žádná varianta')?></td>
                </tr>
-               <?}?>
+               <?php }?>
             </tbody>
          </table>
-         <?echo($this->formEditVariants->renderEnd());?>
+         <?php echo($this->formEditVariants->renderEnd());?>
       </div>
       <div id="products-new-variant" class="">
-         <h2 class=""><?=$this->tr('Přidání varianty')?></h2>
+         <h2 class=""><?php echo $this->tr('Přidání varianty')?></h2>
          <div class="">
-            <?
+            <?php 
             echo $this->formAddVariant->renderStart();
             echo '<div class="controls">';
             echo $this->formAddVariant->ids;
@@ -194,11 +194,11 @@ $this->addPageTitle($h);
 
    <div id="product-code-edit" class="">
       <p class="">
-         <?ps($this->tr('Pro dynamické generování kódu stačí doplnit id atributu ve formátu "{id}".
+         <?php ps($this->tr('Pro dynamické generování kódu stačí doplnit id atributu ve formátu "{id}".
             Tedy například z kódu PRODUCT-{5}-{3} se generuje PRODUCT-RED-A4.'));?>
       </p>
       <div class="">
-         <?
+         <?php 
          $this->formProductCode->html()->setAttrib('id', 'form-save-product-code');
          echo $this->formProductCode->renderStart();
          echo '<div class="controls">';
@@ -209,20 +209,20 @@ $this->addPageTitle($h);
          ?>
       </div>
       <br />
-      <h2><?=$this->tr('Skupiny přiřazené k produktu')?></h2>
+      <h2><?php echo $this->tr('Skupiny přiřazené k produktu')?></h2>
       <div>
          <table id="products-attributes-groups-table" class="full-width attributes-table ui-table-widget">
             <thead>
             <tr class="ui-widget-header">
-               <th><?=$this->tr('Název skupiny')?></th>
+               <th><?php echo $this->tr('Název skupiny')?></th>
                <th></th>
             </tr>
             </thead>
             <tbody>
-               <?foreach($this->variantsGroups as $group){?>
+               <?php foreach($this->variantsGroups as $group){?>
                <tr class="ui-state-default">
                   <td>
-                     <?
+                     <?php 
                      ps($group->{Shop_Model_AttributesGroups::COLUMN_NAME}." ");
                      ps('ID: '.$group->{Shop_Model_AttributesGroups::COLUMN_ID}.'. ');
                      echo '<span class="font-small">';
@@ -231,13 +231,13 @@ $this->addPageTitle($h);
                      ?>
                   </td>
                   <td class="variants-groups-buttons">
-                     <a href="<?=$this->link()?>#add-attr-<?=$group->{Shop_Model_Attributes::COLUMN_ID_GROUP}?>"
+                     <a href="<?php echo $this->link()?>#add-attr-<?php echo $group->{Shop_Model_Attributes::COLUMN_ID_GROUP}?>"
                         class="button-add-code" ><img src="/images/icons/add.png" alt="add" />
-                        <?ps($this->tr('přidat do kódu'))?>
+                        <?php ps($this->tr('přidat do kódu'))?>
                      </a>
                   </td>
                </tr>
-               <?} ?>
+               <?php } ?>
             </tbody>
          </table>
 
@@ -245,25 +245,25 @@ $this->addPageTitle($h);
    </div>
 
    <div id="product-combinations" class="">
-      <?
+      <?php 
       echo $this->formComb->renderStart();
       ?>
       <table id="products-combinations-table" class="full-width combinations-table ui-table-widget">
          <thead>
             <tr class="ui-widget-header">
-               <th><?=$this->tr('Kombinace')?></th>
-               <th><?=$this->tr('Kód')?></th>
-               <th><?
+               <th><?php echo $this->tr('Kombinace')?></th>
+               <th><?php echo $this->tr('Kód')?></th>
+               <th><?php 
                   echo $this->tr('Váha');
                   $this->orderParam = 'word';
                   echo $this->includeFile('tpl://engine:modules/buttons-table-order.phtml');
                   ?></th>
-               <th><?
+               <th><?php 
                   echo $this->tr('Množství');
                   $this->orderParam = 'qord';
                   echo $this->includeFile('tpl://engine:modules/buttons-table-order.phtml');
                   ?></th>
-               <th><?
+               <th><?php 
                   echo $this->tr('Cena bez dph');
                   $this->orderParam = 'pord';
                   echo $this->includeFile('tpl://engine:modules/buttons-table-order.phtml');
@@ -272,46 +272,46 @@ $this->addPageTitle($h);
             </tr>
             <tr class="ui-state-default">
                <td colspan="5" class="combination-controll">
-                  <?echo $this->formComb->save?>
+                  <?php echo $this->formComb->save?>
                </td>
             </tr>
          </thead>
          <tfoot>
             <tr class="ui-state-default">
                <td colspan="5" class="combination-controll">
-                  <?echo $this->formComb->save?>
+                  <?php echo $this->formComb->save?>
                </td>
             </tr>
          </tfoot>
          <tbody>
-            <?
+            <?php 
             if(!empty($this->productCombinations)){
                $row = 1;
                foreach($this->productCombinations as $c){?>
-               <tr class="ui-state-default <?
+               <tr class="ui-state-default <?php 
                   if($c->{Shop_Model_ProductCombinations::COLUMN_IS_DEFAULT}) echo ' ui-state-active';
                   if($c->{Shop_Model_ProductCombinations::COLUMN_QTY} == 0) echo " ui-state-error";
                   ?>">
-                  <td class="combination-name"><?
+                  <td class="combination-name"><?php 
                      if($c->{Shop_Model_ProductCombinations::COLUMN_IS_DEFAULT}){
-                        ?><img src="/images/icons/asterisk_yellow.png" alt="default" title="<?=$this->tr('Výchozí kombinace')?>" /> <?
+                        ?><img src="/images/icons/asterisk_yellow.png" alt="default" title="<?php echo $this->tr('Výchozí kombinace')?>" /> <?php 
                      }
                      ps($c->comb_name)?></td>
-                  <td class="combination-code"><?
+                  <td class="combination-code"><?php 
                      echo Shop_Tools::getProductCode(
                         $this->product->{Shop_Model_Product::COLUMN_CODE},
                         json_decode($c->comb_codes_json)
                      );
                      ?></td>
-                  <td class="combination-weight"><?
+                  <td class="combination-weight"><?php 
                      ps( round($this->product->{Shop_Model_Product::COLUMN_WEIGHT}+$c->weight, 2)." Kg");
                      ?></td>
-                  <td class="combination-qty"><?
+                  <td class="combination-qty"><?php 
                      $this->formComb->qty->setMultiple($c->{Shop_Model_ProductCombinations::COLUMN_ID});
                      $this->formComb->qty->setValues($c->{Shop_Model_ProductCombinations::COLUMN_QTY});
                      echo $this->formComb->qty->control();
                      ?></td>
-                  <td class="combination-price"><?
+                  <td class="combination-price"><?php 
 //                     ps( ($c->price > 0 ? "+".$c->price : $c->price)." Kč");
 //                     echo "<br />";
                      $this->formComb->price->setMultiple($c->{Shop_Model_ProductCombinations::COLUMN_ID});
@@ -323,37 +323,37 @@ $this->addPageTitle($h);
                      // ps(Shop_Tools::getPriceOfProduct($this->product, $c->{Shop_Model_ProductCombinations::COLUMN_PRICE}));
                      ?></td>
 <!--                  <td class="varinas-groups-buttons">-->
-<!--                     <a href="--><?//=$this->link()->param('cdel', $c->{Shop_Model_ProductCombinations::COLUMN_ID})?><!--"-->
+<!--                     <a href="--><?php //=$this->link()->param('cdel', $c->{Shop_Model_ProductCombinations::COLUMN_ID})?><!--"-->
 <!--                     class="button-comb-delete" ><img src="/images/icons/delete.png" alt="delete" /></a>-->
 <!--                  </td>-->
                </tr>
-               <?
+               <?php 
                if($row % 10 == 0){?>
                <tr>
-                  <td colspan="5" class="ui-widget-content combination-controll"><?echo $this->formComb->save?></td>
+                  <td colspan="5" class="ui-widget-content combination-controll"><?php echo $this->formComb->save?></td>
                </tr>
-               <?}
+               <?php }
                   $row++;
                }
             } else {?>
                <tr class="ui-state-disabled">
-                  <td colspan="5"><?=$this->tr('Žádná kombinace není generována.')?></td>
+                  <td colspan="5"><?php echo $this->tr('Žádná kombinace není generována.')?></td>
                </tr>
-            <?}?>
+            <?php }?>
          </tbody>
       </table>
-      <?
+      <?php 
       echo $this->formComb->renderEnd();
       ?>
    </div>
 
    <script type="text/javascript">
-      var tax = <?=number_format($this->product->{Shop_Model_Tax::COLUMN_VALUE} == 0 ? 0 : $this->product->{Shop_Model_Tax::COLUMN_VALUE}/100, 2, '.', '' )?>;
+      var tax = <?php echo number_format($this->product->{Shop_Model_Tax::COLUMN_VALUE} == 0 ? 0 : $this->product->{Shop_Model_Tax::COLUMN_VALUE}/100, 2, '.', '' )?>;
       $(document).ready(function(){
 
          function updateContent ()
          {
-            $.get('<?=$this->link()?>', function(data) {
+            $.get('<?php echo $this->link()?>', function(data) {
                var $data = $(data);
                $('#products-variants-table').html($('#products-variants-table', $data).html());
                $('#products-attributes-groups-table').html($('#products-attributes-groups-table', $data).html());
@@ -382,27 +382,27 @@ $this->addPageTitle($h);
                }
                outHtml += $(this).text()+", ";
             });
-            $('#form-selected-variants').html(/*"<strong><?=$this->tr('Vybráno')?>:</strong><br />"+*/outHtml);
+            $('#form-selected-variants').html(/*"<strong><?php echo $this->tr('Vybráno')?>:</strong><br />"+*/outHtml);
          });
 
          $('.price_without_tax, .price_with_tax').live('change', function(){
             if($(this).hasClass('price_without_tax')){
-               $(this).parents('table.price-table').find('.price_with_tax').val( CubeCMS.Shop.getProductPrice(parseFloat($(this).val()), tax, <?=VVE_SHOP_PRICE_ROUND_DECIMAL?>) );
+               $(this).parents('table.price-table').find('.price_with_tax').val( CubeCMS.Shop.getProductPrice(parseFloat($(this).val()), tax, <?php echo VVE_SHOP_PRICE_ROUND_DECIMAL?>) );
             } else {
-               $(this).parents('table.price-table').find('.price_without_tax').val( CubeCMS.Shop.roundPrice(parseFloat($(this).val())/(1+tax), <?=VVE_SHOP_PRICE_ROUND_DECIMAL?>) );
+               $(this).parents('table.price-table').find('.price_without_tax').val( CubeCMS.Shop.roundPrice(parseFloat($(this).val())/(1+tax), <?php echo VVE_SHOP_PRICE_ROUND_DECIMAL?>) );
             }
          });
 
          $('.button-delete-variant').live('click', function(){
-            if(!confirm('<?=$this->tr('Smazat tuto varinatu?')?>')){
+            if(!confirm('<?php echo $this->tr('Smazat tuto varinatu?')?>')){
                return false;
             }
             var $this = $(this);
-            var loadbox = CubeCMS.Loader.showLoadBox($this, '<?=$this->tr('Vymazávám')?>');
+            var loadbox = CubeCMS.Loader.showLoadBox($this, '<?php echo $this->tr('Vymazávám')?>');
 
             $.ajax({
                type: 'POST',
-               url: '<?=$this->link()->route('editVariantsXHR')?>',
+               url: '<?php echo $this->link()->route('editVariantsXHR')?>',
                data : {deleteComb : (new RegExp('deleteComb=([0-9]+)')).exec($this.attr('href'))[1] },
                success: function(data){
                   updateContent();
@@ -427,10 +427,10 @@ $this->addPageTitle($h);
          });
 
          $('#form-save-product-code').submit(function(){
-            var loadbox = CubeCMS.Loader.showLoadBox(this, '<?=$this->tr('Ukládám')?>');
+            var loadbox = CubeCMS.Loader.showLoadBox(this, '<?php echo $this->tr('Ukládám')?>');
             $.ajax({
                type: 'POST',
-               url: '<?=$this->link()->route('editVariantsXHR')?>',
+               url: '<?php echo $this->link()->route('editVariantsXHR')?>',
                data: $(this).serialize(),
                success: function(data){
                   updateContent();
@@ -451,10 +451,10 @@ $this->addPageTitle($h);
             return false;
          });
          $('#form-create-combinations').submit(function(){
-            var loadbox = CubeCMS.Loader.showLoadBox(this, '<?=$this->tr('Ukládám')?>');
+            var loadbox = CubeCMS.Loader.showLoadBox(this, '<?php echo $this->tr('Ukládám')?>');
             $.ajax({
                type: 'POST',
-               url: '<?=$this->link()->route('editVariantsXHR')?>',
+               url: '<?php echo $this->link()->route('editVariantsXHR')?>',
                data: $(this).serialize(),
                success: function(data){
                   updateContent();

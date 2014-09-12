@@ -1,4 +1,4 @@
-<? // načtení detailu
+<?php  // načtení detailu
 $this->addPageTitle($this->action->{Actions_Model::COLUMN_NAME});
 
 $jQuery = new JsPlugin_JQuery();
@@ -7,16 +7,16 @@ $this->addJsPlugin($jQuery);
 $images = $this->images;
 echo $this->toolbox;
 ?>
-<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $this->action->{Actions_Model::COLUMN_NAME};?></h1>
+<h1><?php $this->includeFile('tpl://engine:headline/icon.phtml'); echo $this->action->{Actions_Model::COLUMN_NAME};?></h1>
 <div class="main-content-detail">
-   <?if($this->action->{Actions_Model::COLUMN_IMAGE} != null) {?>
+   <?php if($this->action->{Actions_Model::COLUMN_IMAGE} != null) {?>
    <div class="main-content-image"><!-- SOF TEXT -->
-      <?echo (vve_tpl_image_tag(vve_tpl_art_title_image($this->action->{Actions_Model::COLUMN_IMAGE}), 'image', 300,null, 'actionImage'));?>
+      <?php echo (vve_tpl_image_tag(vve_tpl_art_title_image($this->action->{Actions_Model::COLUMN_IMAGE}), 'image', 300,null, 'actionImage'));?>
    </div>
-   <?}?>
+   <?php }?>
    <div class="main-content-annotation">
       <p class="main-content-dates">
-               <?
+               <?php 
                $startDate = vve_date("%x", new DateTime($this->action->{Actions_Model::COLUMN_DATE_START}));
                $stopDate = vve_date("%x", new DateTime($this->action->{Actions_Model::COLUMN_DATE_STOP}));
                print ($startDate);
@@ -30,7 +30,7 @@ echo $this->toolbox;
                }?>
             </p>
             <p class="main-content-other">
-               <?
+               <?php 
                if($this->action->{Actions_Model::COLUMN_PLACE} != null) {
                   echo ',&nbsp;'.$this->action->{Actions_Model::COLUMN_PLACE};
                }
@@ -41,25 +41,25 @@ echo $this->toolbox;
                   printf(',&nbsp;'.strtolower($this->tr('V předprodeji: %d Kč')),$this->action->{Actions_Model::COLUMN_PREPRICE});
                }?>
             </p>
-         <?if($this->action->{Actions_Model::COLUMN_NOTE} != null) {?>
-         <p class="action-note"><?=$this->action->{Actions_Model::COLUMN_NOTE}?></p>
-            <?}?>
+         <?php if($this->action->{Actions_Model::COLUMN_NOTE} != null) {?>
+         <p class="action-note"><?php echo $this->action->{Actions_Model::COLUMN_NOTE}?></p>
+            <?php }?>
          <br />
    </div>
    <div class="main-content-text">
-         <?
+         <?php 
          echo $this->action->{Actions_Model::COLUMN_TEXT};
          ?>
          <hr class="reseter" />
    </div>
    <br />
-   <h2><?=$this->tr('Fotografie k akci')?></h2>
-   <? // images gallery
+   <h2><?php echo $this->tr('Fotografie k akci')?></h2>
+   <?php  // images gallery
    $this->imagesBaseDir = $this->category()->getModule()->getDataDir(true).$this->websubdir;
    $this->includeFile('tpl://engine:photogalery.phtml');
    ?>
    <hr class="reseter" />
-   <?
+   <?php 
    $this->includeFile("tpl://forms:snipshet.phtml");
    if($this->isPreview == false){
       $this->includeTpl("buttonback.phtml", true, array('text' => $this->tr('Zpět na seznam')));

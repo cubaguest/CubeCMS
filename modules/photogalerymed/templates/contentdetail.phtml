@@ -1,33 +1,33 @@
-<?
+<?php 
 $addDate = new DateTime($this->article->{Articles_Model::COLUMN_ADD_TIME});
 $editDate = new DateTime($this->article->{Articles_Model::COLUMN_EDIT_TIME});
 ?>
 <div>
-   <h2><?echo htmlspecialchars($this->article->{Articles_Model::COLUMN_NAME})?></h2>
+   <h2><?php echo htmlspecialchars($this->article->{Articles_Model::COLUMN_NAME})?></h2>
    <p>
-      <?=$this->_('Přidáno')." ".strftime("%x %X", $addDate->format("U"))
+      <?php echo $this->_('Přidáno')." ".strftime("%x %X", $addDate->format("U"))
               ."&nbsp;".$this->_('uživatelem')."&nbsp;".$this->article->{Model_Users::COLUMN_USERNAME}?>.&nbsp;
-      <?=$this->_('Zobrazeno')?>:&nbsp;<?=$this->article->{Articles_Model::COLUMN_SHOWED}?>&times;
+      <?php echo $this->_('Zobrazeno')?>:&nbsp;<?php echo $this->article->{Articles_Model::COLUMN_SHOWED}?>&times;
    </p>
-   <?if($this->article->{Articles_Model::COLUMN_TEXT} != null) {?>
+   <?php if($this->article->{Articles_Model::COLUMN_TEXT} != null) {?>
    <div class="photogaleryMedText">
-         <?=$this->article->{Articles_Model::COLUMN_TEXT}?>
+         <?php echo $this->article->{Articles_Model::COLUMN_TEXT}?>
    </div>
    <br />
-      <?}?>
+      <?php }?>
    <div class="photogaleryMedImages">
-      <?while ($image = $this->images->fetch()) {
+      <?php while ($image = $this->images->fetch()) {
          ?>
-      <a href="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir
+      <a href="<?php echo $this->category()->getModule()->getDataDir(true).$this->websubdir
                     .Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR.$image[PhotoGalery_Model_Images::COLUMN_FILE]?>"
-         title="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>">
-         <img src="<?=$this->category()->getModule()->getDataDir(true).$this->websubdir.Photogalery_Controller::DIR_SMALL.URL_SEPARATOR
-                         .$image[PhotoGalery_Model_Images::COLUMN_FILE]?>" alt="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>" />
+         title="<?php echo $image->{PhotoGalery_Model_Images::COLUMN_NAME}?>">
+         <img src="<?php echo $this->category()->getModule()->getDataDir(true).$this->websubdir.Photogalery_Controller::DIR_SMALL.URL_SEPARATOR
+                         .$image[PhotoGalery_Model_Images::COLUMN_FILE]?>" alt="<?php echo $image->{PhotoGalery_Model_Images::COLUMN_NAME}?>" />
       </a>
-         <?}?>
+         <?php }?>
    </div>
    <hr class="reseter" />
-   <?$this->includeTpl('articletools.phtml', true, array(
+   <?php $this->includeTpl('articletools.phtml', true, array(
            'lastEditTime' => $this->article->{Articles_Model::COLUMN_EDIT_TIME},
            'lastEditUser' => $this->article->{Model_Users::COLUMN_USERNAME},
            'linkToPdf' => $this->link()->route('detailpdf'),

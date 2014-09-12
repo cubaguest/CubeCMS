@@ -1,18 +1,18 @@
-<?
+<?php 
 // detekce IE 6 a menších
 $this->setPVar('IE', false);
 if (preg_match('/(?i)msie [1-6]/', $_SERVER['HTTP_USER_AGENT']) AND ! isset($_COOKIE['show_ie_warning'])) {
    $this->setPVar('IE', true);
 }
-print ('<?xml version="1.0" encoding="utf-8"?>');?> 
+print ('<?php xml version="1.0" encoding="utf-8"?>');?> 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?=Locales::getLang()?>" lang="<?=Locales::getLang()?>">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo Locales::getLang()?>" lang="<?php echo Locales::getLang()?>">
    <head>
       <?php $this->renderHeaderBase();?>
-      <link rel="stylesheet" type="text/css" href="<?=$this->style('style-print.css') ?>" />
+      <link rel="stylesheet" type="text/css" href="<?php echo $this->style('style-print.css') ?>" />
       
       <?php $this->renderHeaderCSSJS()?>
-      <script type="text/javascript">/* <![CDATA[ */<?$this->renderHeaderScripts()?>/* ]]> */</script>
+      <script type="text/javascript">/* <![CDATA[ */<?php $this->renderHeaderScripts()?>/* ]]> */</script>
       <script type="text/javascript">
          /* <![CDATA[ */
          function printpage() {window.print();}
@@ -22,10 +22,10 @@ print ('<?xml version="1.0" encoding="utf-8"?>');?>
    <body id="pageTop" onload="printpage();">
       <div id="body">
          <?php if(VVE_DEBUG_LEVEL > 0){ echo Debug::printDebug(); echo Debug_Timer::printTimers(); }?>
-         <? $this->includeTpl("modules.phtml", true); ?>
+         <?php  $this->includeTpl("modules.phtml", true); ?>
          <hr class="reseter" />
          <div id="foot">
-            <?=_('Odkaz: ') . $this->link(); ?>
+            <?php echo _('Odkaz: ') . $this->link(); ?>
          </div><!-- footwrap -->
       </div><!-- bodywrap /-->
    </body>

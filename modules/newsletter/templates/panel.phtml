@@ -1,4 +1,4 @@
-<?
+<?php 
 $icon = null;
 if($this->panelObj()->getIcon() != null){
    $icon = '<img src="'.Panel_Obj::getIconDir().$this->panelObj()->getIcon().'" alt="'.$this->panelObj()->getIcon().'" />';
@@ -9,28 +9,28 @@ if($this->panelObj()->getBackImage() != null){
 }
 $this->form->html()->addClass('regMailFormPanel');
 ?>
-<div class="name"><?=$icon?><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=$this->panelObj()->getName()?></a></div>
-<div class="content" style="<?=$backImg?>">
+<div class="name"><?php echo $icon?><a href="<?php echo $this->link()?>" title="<?php echo htmlspecialchars($this->panelObj()->getName())?>"><?php echo $this->panelObj()->getName()?></a></div>
+<div class="content" style="<?php echo $backImg?>">
    <div class="text">
-      <?=$this->tr('Registrace k odběru novinek e-mailem')?>
+      <?php echo $this->tr('Registrace k odběru novinek e-mailem')?>
    </div>
    <div class="text">
-   <?echo $this->form->renderStart();?>
-      <?
+   <?php echo $this->form->renderStart();?>
+      <?php 
       $this->form->mail->html()->setAttrib('size', '15');
       echo $this->form->mail->label().'<br />';
       echo $this->form->mail->controll().'<br />';?>
       <p>
-      <?echo $this->form->send->controll()?><br />
+      <?php echo $this->form->send->controll()?><br />
       </p>
-      <?echo $this->form->renderEnd();?>
+      <?php echo $this->form->renderEnd();?>
    </div>
 </div>
 <div class="link-more">
-   <a href="<?=$this->link()?>"
-      title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->tr('Více')?></a>
+   <a href="<?php echo $this->link()?>"
+      title="<?php echo htmlspecialchars($this->category()->getLabel())?>"><?php echo $this->tr('Více')?></a>
 </div>
-<?if(!defined('VVE_REGMAIL_RENDER')){
+<?php if(!defined('VVE_REGMAIL_RENDER')){
 define('VVE_REGMAIL_RENDER', true);
    ?>
 <script type="text/javascript">
@@ -41,7 +41,7 @@ define('VVE_REGMAIL_RENDER', true);
       $.ajax({
          type: "POST",
          cache: false,
-         url: '<?=$this->link()->clear()->route();?>',
+         url: '<?php echo $this->link()->clear()->route();?>',
          data: jform.serialize(),
          dataType: "json",
          success: function(data) {
@@ -56,4 +56,4 @@ define('VVE_REGMAIL_RENDER', true);
    });
    /* ]]> */
 </script>
-<?}?>
+<?php }?>

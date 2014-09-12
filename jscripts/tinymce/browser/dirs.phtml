@@ -1,6 +1,6 @@
-<li class="open" id="rootDir" rel="root" title="<?=VVE_DATA_DIR?>"><a href="#"><ins>&nbsp;</ins>data</a>
+<li class="open" id="rootDir" rel="root" title="<?php echo VVE_DATA_DIR?>"><a href="#"><ins>&nbsp;</ins>data</a>
    <ul>
-      <?
+      <?php 
       function printDirs($dirList, $prefix, $writableDirs) {
          foreach ($dirList as $key => $dir) {
             $d = $prefix.URL_SEPARATOR.$key;

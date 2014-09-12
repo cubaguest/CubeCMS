@@ -1,48 +1,48 @@
 <br />
-<h2><?=$this->tr('Výsledky hledání')?>:&nbsp;<span class="font-small"><?printf($this->tr('Nalezeno %s výsledků'),$this->countAllResults)?></span></h2>
+<h2><?php echo $this->tr('Výsledky hledání')?>:&nbsp;<span class="font-small"><?php printf($this->tr('Nalezeno %s výsledků'),$this->countAllResults)?></span></h2>
 <div class="main-content-list">
-<?
+<?php 
 $i = 1;
 foreach ($this->results as $result) {
 $class = 'record-odd';
 if($i % 2 != 0) $class = 'record-even';
 ?>
-<div class="main-content-list-record <?=$class?>">
+<div class="main-content-list-record <?php echo $class?>">
 <h3>
-   <?// pokud se jedná o jiný web
+   <?php // pokud se jedná o jiný web
    if($result[Search::R_I_WEB_NAME] != VVE_WEB_NAME){?>
-   <a href="<?=$result[Search::R_I_WEB_LINK]?>" title="<?=htmlspecialchars($result[Search::R_I_WEB_NAME])?>"
-      ><?=htmlspecialchars($result[Search::R_I_WEB_NAME])?></a>&nbsp;&raquo;&nbsp;
-   <?
+   <a href="<?php echo $result[Search::R_I_WEB_LINK]?>" title="<?php echo htmlspecialchars($result[Search::R_I_WEB_NAME])?>"
+      ><?php echo htmlspecialchars($result[Search::R_I_WEB_NAME])?></a>&nbsp;&raquo;&nbsp;
+   <?php 
    }
    // pokud je stejná adresa
    if($result[Search::R_I_CAT_LINK] == $result[Search::R_I_LINK]){?>
-   <a href="<?=$result[Search::R_I_CAT_LINK]?>" title="<?=htmlspecialchars($result[Search::R_I_CAT_NAME])?>"
-      ><?=htmlspecialchars($result[Search::R_I_CAT_NAME])?>
-      <?if((string)$result[Search::R_I_NAME] != null){ print('-&nbsp;'.$result[Search::R_I_NAME]);}?>
+   <a href="<?php echo $result[Search::R_I_CAT_LINK]?>" title="<?php echo htmlspecialchars($result[Search::R_I_CAT_NAME])?>"
+      ><?php echo htmlspecialchars($result[Search::R_I_CAT_NAME])?>
+      <?php if((string)$result[Search::R_I_NAME] != null){ print('-&nbsp;'.$result[Search::R_I_NAME]);}?>
    </a>
-<?} else { // pokud se adresa liší?>
-   <a href="<?=$result[Search::R_I_CAT_LINK]?>" title="<?=htmlspecialchars($result[Search::R_I_CAT_NAME])?>"><?=htmlspecialchars($result[Search::R_I_CAT_NAME])?></a>
-   <?if($result[Search::R_I_NAME] != null){?>
-   &nbsp;&raquo;&nbsp;<a href="<?=$result[Search::R_I_LINK]?>" title="<?=$result[Search::R_I_NAME]?>"><?=$result[Search::R_I_NAME]?></a>
-   <?}
+<?php } else { // pokud se adresa liší?>
+   <a href="<?php echo $result[Search::R_I_CAT_LINK]?>" title="<?php echo htmlspecialchars($result[Search::R_I_CAT_NAME])?>"><?php echo htmlspecialchars($result[Search::R_I_CAT_NAME])?></a>
+   <?php if($result[Search::R_I_NAME] != null){?>
+   &nbsp;&raquo;&nbsp;<a href="<?php echo $result[Search::R_I_LINK]?>" title="<?php echo $result[Search::R_I_NAME]?>"><?php echo $result[Search::R_I_NAME]?></a>
+   <?php }
 }
 ?>
 </h3>
 <div>
-   <?if(VVE_DEBUG_LEVEL >= 1){?><p class="font-small">relevantion:&nbsp;<?=round($result[Search::R_I_RELEVATION], 2)?></p><?}?>
-   <?=$result[Search::R_I_TEXT]?>
+   <?php if(VVE_DEBUG_LEVEL >= 1){?><p class="font-small">relevantion:&nbsp;<?php echo round($result[Search::R_I_RELEVATION], 2)?></p><?php }?>
+   <?php echo $result[Search::R_I_TEXT]?>
 </div>
-<p><?
+<p><?php 
 if($result[Search::R_I_LINK] != null){?>
-   <a href="<?=$result[Search::R_I_LINK]?>" title="<?=$this->tr('Přejít na adresu')?>"><?=$result[Search::R_I_LINK]?></a>
-<?} else {?>
-   <a href="<?=$result[Search::R_I_CAT_LINK]?>" title="<?=$this->tr('Přejít na adresu')?>"><?=$result[Search::R_I_CAT_LINK]?></a>
-<?}
+   <a href="<?php echo $result[Search::R_I_LINK]?>" title="<?php echo $this->tr('Přejít na adresu')?>"><?php echo $result[Search::R_I_LINK]?></a>
+<?php } else {?>
+   <a href="<?php echo $result[Search::R_I_CAT_LINK]?>" title="<?php echo $this->tr('Přejít na adresu')?>"><?php echo $result[Search::R_I_CAT_LINK]?></a>
+<?php }
 ?></p>
 <hr />
 </div>
-<?
+<?php 
 $i++;
 }
 print $this->scrollComp;

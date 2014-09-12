@@ -1,4 +1,4 @@
-<?
+<?php 
 $icon = null;
 if($this->panelObj()->getIcon() != null){
    $icon = '<img src="'.Panel_Obj::getIconDir().$this->panelObj()->getIcon().'" alt="'.$this->panelObj()->getIcon().'" />';
@@ -8,18 +8,18 @@ if($this->panelObj()->getBackImage() != null){
    $backImg = 'background-image: url(\''.Panel_Obj::getBackImgDir().$this->panelObj()->getBackImage().'\');';
 }
 ?>
-<p class="panel-box-label"><?=$icon?><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=$this->panelObj()->getName()?></a></p>
-<div class="panel-box-content" style="<?=$backImg?>">
-   <a href="<?=$this->link()->route('detail', array('urlkey' => $this->band->{Bands_Model::COLUMN_URLKEY}))?>"
-      title="<?=htmlspecialchars($this->band->{Bands_Model::COLUMN_NAME})?>"
-      ><strong><?=$this->band->{Bands_Model::COLUMN_NAME}?></strong></a>
+<p class="panel-box-label"><?php echo $icon?><a href="<?php echo $this->link()?>" title="<?php echo htmlspecialchars($this->panelObj()->getName())?>"><?php echo $this->panelObj()->getName()?></a></p>
+<div class="panel-box-content" style="<?php echo $backImg?>">
+   <a href="<?php echo $this->link()->route('detail', array('urlkey' => $this->band->{Bands_Model::COLUMN_URLKEY}))?>"
+      title="<?php echo htmlspecialchars($this->band->{Bands_Model::COLUMN_NAME})?>"
+      ><strong><?php echo $this->band->{Bands_Model::COLUMN_NAME}?></strong></a>
    <div class="panel-box-content-image">
-      <?=vve_tpl_image_tag($this->category()->getModule()->getDataDir(true)
+      <?php echo vve_tpl_image_tag($this->category()->getModule()->getDataDir(true)
         . $this->band->{Bands_Model::COLUMN_IMAGE}, $this->band->{Bands_Model::COLUMN_IMAGE}, 170); ?>
    </div>
 
 </div>
 <p class="panel-box-link-more">
-   <a href="<?=$this->link()->route('detail', array('urlkey' => $this->band->{Bands_Model::COLUMN_URLKEY}))?>"
-      title="<?=htmlspecialchars($this->band->{Bands_Model::COLUMN_NAME})?>"><?=$this->_('Více')?></a>
+   <a href="<?php echo $this->link()->route('detail', array('urlkey' => $this->band->{Bands_Model::COLUMN_URLKEY}))?>"
+      title="<?php echo htmlspecialchars($this->band->{Bands_Model::COLUMN_NAME})?>"><?php echo $this->_('Více')?></a>
 </p>

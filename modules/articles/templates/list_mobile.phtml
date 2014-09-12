@@ -1,9 +1,9 @@
-<?
+<?php 
 $h1 = $this->category()->getName()
 ?>
-<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $h1;?></h1>
+<h1><?php $this->includeFile('tpl://engine:headline/icon.phtml'); echo $h1;?></h1>
 <div class="list-posts">
-   <?if(!empty ($this->articles)) {
+   <?php if(!empty ($this->articles)) {
       foreach ($this->articles as $article) {
          $showClass = $public = null;
          if($article->{Articles_Model::COLUMN_CONCEPT} == true){
@@ -18,7 +18,7 @@ $h1 = $this->category()->getName()
                vve_tpl_art_title_image($article->{Articles_Model::COLUMN_TITLE_IMAGE}),$article->{Articles_Model::COLUMN_NAME}, 100, 100);
          } else {
             $doc = new DOMDocument();
-            @$doc->loadHTML('<?xml encoding="UTF-8">' .$article->{Articles_Model::COLUMN_TEXT});
+            @$doc->loadHTML('<?php xml encoding="UTF-8">' .$article->{Articles_Model::COLUMN_TEXT});
             $xml = simplexml_import_dom($doc); // just to make xpath more simple
             $images = $xml->xpath('//img');
             if(!empty ($images) && isset ($images[0])){
@@ -26,23 +26,23 @@ $h1 = $this->category()->getName()
             }
          }
          ?>
-      <div class="post <?=$showClass?>">
-         <h2><a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model::COLUMN_URLKEY}))?>"
-               title="<?=htmlspecialchars($article->{Articles_Model::COLUMN_NAME})?>"><?=htmlspecialchars($article->{Articles_Model::COLUMN_NAME})?></a>
+      <div class="post <?php echo $showClass?>">
+         <h2><a href="<?php echo $this->link()->route('detail', array('urlkey' => $article->{Articles_Model::COLUMN_URLKEY}))?>"
+               title="<?php echo htmlspecialchars($article->{Articles_Model::COLUMN_NAME})?>"><?php echo htmlspecialchars($article->{Articles_Model::COLUMN_NAME})?></a>
          </h2>
-         <a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model::COLUMN_URLKEY}))?>"
-               title="<?=htmlspecialchars($article->{Articles_Model::COLUMN_NAME})?>">
-            <span class="date"><?=strftime("%x %X", $editTime->format("U"))?> - <?=$article->{Model_Users::COLUMN_USERNAME}?></span>
-            <span class="text"><?
+         <a href="<?php echo $this->link()->route('detail', array('urlkey' => $article->{Articles_Model::COLUMN_URLKEY}))?>"
+               title="<?php echo htmlspecialchars($article->{Articles_Model::COLUMN_NAME})?>">
+            <span class="date"><?php echo strftime("%x %X", $editTime->format("U"))?> - <?php echo $article->{Model_Users::COLUMN_USERNAME}?></span>
+            <span class="text"><?php 
                echo vve_tpl_truncate(strip_tags((string)$article->{Articles_Model::COLUMN_ANNOTATION} != null ? 
                $article->{Articles_Model::COLUMN_ANNOTATION} : $article->{Articles_Model::COLUMN_TEXT}), 200);
                ?></span>
-            <span class="showed"><?=$this->tr('Zobrazeno')?>:&nbsp;<?=$article->{Articles_Model::COLUMN_SHOWED}?>&times;</span>
+            <span class="showed"><?php echo $this->tr('Zobrazeno')?>:&nbsp;<?php echo $article->{Articles_Model::COLUMN_SHOWED}?>&times;</span>
          </a>
          <hr class="reseter" />
       </div>
-      <?}?>
-   <?
+      <?php }?>
+   <?php 
       echo $this->scrollComp;
    } else {
       echo ($this->tr('Není vložen žádný článek'));

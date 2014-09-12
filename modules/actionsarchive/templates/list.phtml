@@ -1,15 +1,15 @@
-<?
+<?php 
 $this->addPageTitle(sprintf($this->_('Strana %s'), $this->page));
 ?>
-<h1><?=$this->_('Archiv akcí')?></h1>
+<h1><?php echo $this->_('Archiv akcí')?></h1>
 <div>
-   <?if($this->text != false) {?>
+   <?php if($this->text != false) {?>
    <div>
-         <?=$this->text->{Text_Model_Detail::COLUMN_TEXT}?>
+         <?php echo $this->text->{Text_Model_Detail::COLUMN_TEXT}?>
    </div>
-      <?}?>
+      <?php }?>
 
-   <?while ($row = $this->actions->fetch()) {
+   <?php while ($row = $this->actions->fetch()) {
       if($row->{Actions_Model_Detail::COLUMN_PUBLIC}) $class = "";
       else $class = 'nonPublicAction';
       $subLabel = $row->{Actions_Model_Detail::COLUMN_NAME};
@@ -28,17 +28,17 @@ $this->addPageTitle(sprintf($this->_('Strana %s'), $this->page));
               array('urlkey' => $row->{Actions_Model_Detail::COLUMN_URLKEY}));
 
       ?>
-   <div class="<?=$class?>">
-      <h2><a href="<?=$actionLink?>"
-             title="<?=$row->{Actions_Model_Detail::COLUMN_NAME}?>"
-             ><?=$subLabel?></a></h2>
-            <?if($row->{Actions_Model_Detail::COLUMN_AUTHOR} != null) {?>
+   <div class="<?php echo $class?>">
+      <h2><a href="<?php echo $actionLink?>"
+             title="<?php echo $row->{Actions_Model_Detail::COLUMN_NAME}?>"
+             ><?php echo $subLabel?></a></h2>
+            <?php if($row->{Actions_Model_Detail::COLUMN_AUTHOR} != null) {?>
       <p>
-               <?=$row->{Actions_Model_Detail::COLUMN_AUTHOR}?>
+               <?php echo $row->{Actions_Model_Detail::COLUMN_AUTHOR}?>
       </p>
-            <?}?>
+            <?php }?>
       <p>
-            <?
+            <?php 
             $startDate = vve_date("%x", new DateTime($row->{Actions_Model_Detail::COLUMN_DATE_START}));
             $stopDate = vve_date("%x", new DateTime($row->{Actions_Model_Detail::COLUMN_DATE_STOP}));
             print ($startDate);
@@ -61,24 +61,24 @@ $this->addPageTitle(sprintf($this->_('Strana %s'), $this->page));
             }
             ?>
       </p>
-         <?if($row->{Actions_Model_Detail::COLUMN_NOTE} != null) {?>
-      <p><?=$row->{Actions_Model_Detail::COLUMN_NOTE}?></p>
-            <?}?>
+         <?php if($row->{Actions_Model_Detail::COLUMN_NOTE} != null) {?>
+      <p><?php echo $row->{Actions_Model_Detail::COLUMN_NOTE}?></p>
+            <?php }?>
       <p>
-            <?
+            <?php 
             if($row->{Actions_Model_Detail::COLUMN_IMAGE} != null) {
                print (vve_tpl_image_tag($dataDir.$row[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]
                        .DIRECTORY_SEPARATOR.$row->{Actions_Model_Detail::COLUMN_IMAGE}, 'image', 50,50, 'actionImage'));
             }
             ?>
-            <?=vve_tpl_xhtml_cut(strip_tags($row->{Actions_Model_Detail::COLUMN_TEXT},'<br><a><b><strong><em><i>'), 600);?>
+            <?php echo vve_tpl_xhtml_cut(strip_tags($row->{Actions_Model_Detail::COLUMN_TEXT},'<br><a><b><strong><em><i>'), 600);?>
       </p>
       <p style="text-align: right">
-         <a href="<?=$actionLink?>" title="<?=$this->_('Více')?>"><?=$this->_('Více')?></a>
+         <a href="<?php echo $actionLink?>" title="<?php echo $this->_('Více')?>"><?php echo $this->_('Více')?></a>
       </p>
    </div>
 
-      <?}
+      <?php }
    print ($this->scrollComp);
    ?>
 </div>

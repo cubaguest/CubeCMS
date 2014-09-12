@@ -1,17 +1,17 @@
-<?
+<?php 
 if(Template::browser()->isMobile()){ return; }
 ?>
 
 <div class="article-tools">
-   <?if(isset($vars['lastEditTime'])) {
+   <?php if(isset($vars['lastEditTime'])) {
       if(($vars['lastEditTime'] instanceof DateTime) == false) {
          $vars['lastEditTime'] = new DateTime($vars['lastEditTime']);
       }?>
    <div>
-         <?=$this->tr('Naposled upraveno')?>&nbsp;<?=strftime("%x %X", $vars['lastEditTime']->format("U"))?>
-         <?if(isset($vars['lastEditUser'])) {?>
-      &nbsp;<?=$this->tr('uživatelem')?>&nbsp;<span style="font-style: italic"><?=$vars['lastEditUser']?></span>,
-            <?}
+         <?php echo $this->tr('Naposled upraveno')?>&nbsp;<?php echo strftime("%x %X", $vars['lastEditTime']->format("U"))?>
+         <?php if(isset($vars['lastEditUser'])) {?>
+      &nbsp;<?php echo $this->tr('uživatelem')?>&nbsp;<span style="font-style: italic"><?php echo $vars['lastEditUser']?></span>,
+            <?php }
          if(isset($vars['createdByUser'])) {
             printf($this->tr('Vytvořil: %s.'),$vars['createdByUser']);
          }
@@ -22,29 +22,29 @@ if(Template::browser()->isMobile()){ return; }
 
    </div>
    <br />
-   <?}?>
-   <?if(isset($vars['linkToPdf']) OR isset($vars['linkToTxt'])) { ?>
+   <?php }?>
+   <?php if(isset($vars['linkToPdf']) OR isset($vars['linkToTxt'])) { ?>
    <div class="donwload">
-      <strong><?=$this->tr('Stáhnout')?>:</strong>
-      <?if(isset($vars['linkToPdf'])) { ?>
-   <a href="<?=$vars['linkToPdf']?>" title="<?=$this->tr('Stáhnout')?> pdf"><?=$this->tr('pdf (tisk)')?></a>&nbsp;
-         <?}?>
-      <?if(isset($vars['linkToTxt'])) { ?>
-   <a href="<?=$vars['linkToTxt']?>" title="<?=$this->tr('Stáhnout')?> txt"><?=$this->tr('txt')?></a>&nbsp;
-         <?}?>
-      <?if(isset($vars['linkToHtml'])) { ?>
-   <a href="<?=$vars['linkToHtml']?>" title="<?=$this->tr('Stáhnout')?> html"><?=$this->tr('html (tisk)')?></a>&nbsp;
-         <?}?>
+      <strong><?php echo $this->tr('Stáhnout')?>:</strong>
+      <?php if(isset($vars['linkToPdf'])) { ?>
+   <a href="<?php echo $vars['linkToPdf']?>" title="<?php echo $this->tr('Stáhnout')?> pdf"><?php echo $this->tr('pdf (tisk)')?></a>&nbsp;
+         <?php }?>
+      <?php if(isset($vars['linkToTxt'])) { ?>
+   <a href="<?php echo $vars['linkToTxt']?>" title="<?php echo $this->tr('Stáhnout')?> txt"><?php echo $this->tr('txt')?></a>&nbsp;
+         <?php }?>
+      <?php if(isset($vars['linkToHtml'])) { ?>
+   <a href="<?php echo $vars['linkToHtml']?>" title="<?php echo $this->tr('Stáhnout')?> html"><?php echo $this->tr('html (tisk)')?></a>&nbsp;
+         <?php }?>
    </div>
    <br />
-   <?}?>   
+   <?php }?>   
    
 <div class="facebook-button">
-   <?$this->addFile('https://connect.facebook.net/'.Locales::getLangLocale().'/all.js#xfbml=1');?>
+   <?php $this->addFile('https://connect.facebook.net/'.Locales::getLangLocale().'/all.js#xfbml=1');?>
    <fb:like href="" show_faces="false" layout="standard" width="380" action="recommend" font=""></fb:like>
 </div>
 <div class="share-button">
-   <script type="text/javascript" src="https://apis.google.com/js/plusone.js">{lang: '<?=Locales::getLang()?>'}</script>
+   <script type="text/javascript" src="https://apis.google.com/js/plusone.js">{lang: '<?php echo Locales::getLang()?>'}</script>
    <g:plusone size="small"></g:plusone>
 <!-- AddThis Button BEGIN -->
    <div class="addthis_toolbox addthis_default_style">
@@ -55,7 +55,7 @@ if(Template::browser()->isMobile()){ return; }
 </div>
 <!-- AddThis Button END -->
 <div class="nav-button">
-   <a href="<?=$this->link()?>#pageTop" title="<?=$this->tr('Přejít na začátek')?>">
-      &#94;&nbsp;<?=$this->tr('nahoru')?></a>
+   <a href="<?php echo $this->link()?>#pageTop" title="<?php echo $this->tr('Přejít na začátek')?>">
+      &#94;&nbsp;<?php echo $this->tr('nahoru')?></a>
 </div>
 </div>

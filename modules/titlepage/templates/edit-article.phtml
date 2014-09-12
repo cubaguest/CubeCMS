@@ -1,5 +1,5 @@
-<h1><?=$this->tr('Úprava položky se článkem')?></h1>
-<?
+<h1><?php echo $this->tr('Úprava položky se článkem')?></h1>
+<?php 
 $jQuery = new JsPlugin_JQuery();
 $this->addJsPlugin($jQuery);
 
@@ -10,8 +10,8 @@ echo $this->form;
       $('select[name=article_item_category_id]').change(function(){
          var idc = $(this).val();
          $.ajax({
-            type: "POST", url: "<?=$this->link()->route('getList')?>",
-               data: ({idc : idc, type : '<?=TitlePage_Controller::ITEM_TYPE_ARTICLE?>'}),
+            type: "POST", url: "<?php echo $this->link()->route('getList')?>",
+               data: ({idc : idc, type : '<?php echo TitlePage_Controller::ITEM_TYPE_ARTICLE?>'}),
                success : function(msg){
                   $('select[name=article_item_article_id]').html(null);
                   $.each(msg.list, function(key, value){

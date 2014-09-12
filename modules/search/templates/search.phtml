@@ -1,36 +1,36 @@
-<?
+<?php 
 $this->addCssFile('style.css');
 echo $this->toolbox;
 ?>
-<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $this->category()->getName();?></h1>
+<h1><?php $this->includeFile('tpl://engine:headline/icon.phtml'); echo $this->category()->getName();?></h1>
 <div class="main-content-detail">
    <div class="search-box">
-      <form method="get" action="<?=$this->link()?>">
-         <label for="search_string"><?=$this->tr('Hledat')?>:&nbsp;</label>
-         <input id="search_string" type="text" size="35" name="q" value="<?=$this->searchString?>" />
-         <?
+      <form method="get" action="<?php echo $this->link()?>">
+         <label for="search_string"><?php echo $this->tr('Hledat')?>:&nbsp;</label>
+         <input id="search_string" type="text" size="35" name="q" value="<?php echo $this->searchString?>" />
+         <?php 
          if(count($this->apis) > 0){?>
          <select name="s">
-            <option value="all" <?=$this->searchTarget == 'all' ? ' selected="selected"' :''?>
-                    ><?=$this->tr('všude')?></option>
-            <option value="this" <?=$this->searchTarget == 'this' ? ' selected="selected"' :''?>
-                    ><?=VVE_WEB_NAME?></option>
-            <?while ($api = current($this->apis)) {?>
-            <option value="<?=$api->{Search_Model_Api::COLUMN_ID}?>"
-               <?=$this->searchTarget == $api->{Search_Model_Api::COLUMN_ID} ? ' selected="selected"' :''?>
-                    ><?=$api->{Search_Model_Api::COLUMN_NAME}?></option>
-            <?
+            <option value="all" <?php echo $this->searchTarget == 'all' ? ' selected="selected"' :''?>
+                    ><?php echo $this->tr('všude')?></option>
+            <option value="this" <?php echo $this->searchTarget == 'this' ? ' selected="selected"' :''?>
+                    ><?php echo VVE_WEB_NAME?></option>
+            <?php while ($api = current($this->apis)) {?>
+            <option value="<?php echo $api->{Search_Model_Api::COLUMN_ID}?>"
+               <?php echo $this->searchTarget == $api->{Search_Model_Api::COLUMN_ID} ? ' selected="selected"' :''?>
+                    ><?php echo $api->{Search_Model_Api::COLUMN_NAME}?></option>
+            <?php 
             next($this->apis);
             }?>
          </select>
-         <?}?>
-         <input type="submit" value="<?=$this->tr('Hledat')?>" />
+         <?php }?>
+         <input type="submit" value="<?php echo $this->tr('Hledat')?>" />
       </form>
    </div>
 </div>
-   <?
+   <?php 
    if($this->search === true) $this->includeFile('tpl://results.phtml');
    ?>
-   <?
+   <?php 
    echo $this->toolbox;
    ?>

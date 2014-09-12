@@ -1,4 +1,4 @@
-<?
+<?php 
 $this->addCssFile("style.css");
 // do titulku
 if($this->edit) {
@@ -32,18 +32,18 @@ if($this->courseImage != null){
    $this->form->deleteImg->setSubLabel($this->tr('Uloženo').':<br /><img src="'.$this->courseImage.'" height="50" />');
 }
 ?>
-<h1><?=$h?></h1>
+<h1><?php echo $h?></h1>
 <div id="editArticleForm">
-   <?print($this->form);?>
+   <?php print($this->form);?>
    <script type="text/javascript">
       /* <![CDATA[ */
       $(document).ready(function(){
-         $.datepicker.setDefaults(['<?=Locales::getLang()?>'] ) ;
+         $.datepicker.setDefaults(['<?php echo Locales::getLang()?>'] ) ;
          $("input[name=course_dateStart]").datepicker();
          $("input[name=course_dateStop]").datepicker();
 
          $("#course_place").autocomplete({
-            source: "<?=$this->link()->route('placesList')?>",
+            source: "<?php echo $this->link()->route('placesList')?>",
             minLength: 2
          });
 

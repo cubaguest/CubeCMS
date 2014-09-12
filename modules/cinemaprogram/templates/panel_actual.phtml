@@ -1,4 +1,4 @@
-<?//<desc>Panel seznam nadcházejících akcí</desc>
+<?php //<desc>Panel seznam nadcházejících akcí</desc>
 //if(!empty ($this->movies)) {
 $icon = null;
 if($this->panelObj()->getIcon() != null) {
@@ -9,15 +9,15 @@ if($this->panelObj()->getBackImage() != null) {
    $backImg = 'background-image: url(\''.Panel_Obj::getBackImgDir().$this->panelObj()->getBackImage().'\');';
 }
 if($this->rssLink != null) {?>
-<a style="float: right" href="<?=$this->rssLink?>" title="rss"><img src="<?=vve_get_tpl_file('icons/rss-icon.png', VVE_TPL_FILE_IMAGE)?>" alt="rss" /></a>
-   <?}?>
-<p class="panelLabel"><?=$icon?><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=$this->panelObj()->getName()?></a></p>
-<div class="panelMovies" style="<?=$backImg?>">
-   <?
+<a style="float: right" href="<?php echo $this->rssLink?>" title="rss"><img src="<?php echo vve_get_tpl_file('icons/rss-icon.png', VVE_TPL_FILE_IMAGE)?>" alt="rss" /></a>
+   <?php }?>
+<p class="panelLabel"><?php echo $icon?><a href="<?php echo $this->link()?>" title="<?php echo htmlspecialchars($this->panelObj()->getName())?>"><?php echo $this->panelObj()->getName()?></a></p>
+<div class="panelMovies" style="<?php echo $backImg?>">
+   <?php 
    while ($movie = $this->movies->fetch()) {
       $time = new DateTime($movie->{CinemaProgram_Model_Detail::COL_T_TIME});?>
    <p>
-         <?
+         <?php 
 //         if($movie->{CinemaProgram_Model_Detail::COL_T_DATE} != date('Y-m-d')){
          $date = new DateTime($movie->{CinemaProgram_Model_Detail::COL_T_DATE});
          print(vve_date('%L %d.%m.', $date).'&nbsp;');
@@ -26,10 +26,10 @@ if($this->rssLink != null) {?>
                  ?>
    </p>
    <p class="panelMovieName">
-      <a href="<?=$this->link()->route('detail', array('id' => $movie->{CinemaProgram_Model_Detail::COL_ID},
+      <a href="<?php echo $this->link()->route('detail', array('id' => $movie->{CinemaProgram_Model_Detail::COL_ID},
                     'name' => vve_cr_url_key($movie->{CinemaProgram_Model_Detail::COL_NAME})));?>"
-         title="<?=$movie->{CinemaProgram_Model_Detail::COL_NAME}?>">
-               <?
+         title="<?php echo $movie->{CinemaProgram_Model_Detail::COL_NAME}?>">
+               <?php 
                print($movie->{CinemaProgram_Model_Detail::COL_NAME});
                if($movie->{CinemaProgram_Model_Detail::COL_NAME_ORIG} != null) {
                   print('<br /><span style="font-style: italic">('.$movie->{CinemaProgram_Model_Detail::COL_NAME}.')</span>');
@@ -37,28 +37,28 @@ if($this->rssLink != null) {?>
                ?>
       </a>
    </p>
-   <p class="panelMoviePrice"><?=$movie->{CinemaProgram_Model_Detail::COL_LENGTH}?>&nbsp;min/<?=$movie->{CinemaProgram_Model_Detail::COL_PRICE}?>&nbsp;Kč</p>
-      <?
+   <p class="panelMoviePrice"><?php echo $movie->{CinemaProgram_Model_Detail::COL_LENGTH}?>&nbsp;min/<?php echo $movie->{CinemaProgram_Model_Detail::COL_PRICE}?>&nbsp;Kč</p>
+      <?php 
       if($movie->{CinemaProgram_Model_Detail::COL_IMAGE} != null) {
          ?>
    <p class="image" style="width: 100%; overflow: hidden;">
-      <a href="<?=$this->link()->route('detail', array('id' => $movie->{CinemaProgram_Model_Detail::COL_ID},
+      <a href="<?php echo $this->link()->route('detail', array('id' => $movie->{CinemaProgram_Model_Detail::COL_ID},
                        'name' => vve_cr_url_key($movie->{CinemaProgram_Model_Detail::COL_NAME})));?>"
-         title="<?=$movie->{CinemaProgram_Model_Detail::COL_NAME}?>">
+         title="<?php echo $movie->{CinemaProgram_Model_Detail::COL_NAME}?>">
          <img style="width: 100%;"
-              src="<?=$this->webdatadir.$movie->{CinemaProgram_Model_Detail::COL_IMAGE}?>"
-              alt="<?=$this->_('titulní obrázek filmu').' '
+              src="<?php echo $this->webdatadir.$movie->{CinemaProgram_Model_Detail::COL_IMAGE}?>"
+              alt="<?php echo $this->_('titulní obrázek filmu').' '
                             .htmlspecialchars($movie->{CinemaProgram_Model_Detail::COL_NAME})?>"/>
       </a>
    </p>
-         <?
+         <?php 
       }?>
    <br />
-      <?
+      <?php 
    }?>
 </div>
 <p class="panelLinkMore">
-   <a href="<?=$this->link()?>"
-      title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->_('Více')?></a>
+   <a href="<?php echo $this->link()?>"
+      title="<?php echo htmlspecialchars($this->category()->getLabel())?>"><?php echo $this->_('Více')?></a>
 </p>
-<?//}?>
+<?php //}?>

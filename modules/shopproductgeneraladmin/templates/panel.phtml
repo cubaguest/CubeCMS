@@ -1,4 +1,4 @@
-<?
+<?php 
 if(empty($this->products)){
    return;
 }
@@ -13,8 +13,8 @@ $backImg = null;
 if($this->panelObj()->getBackImage() != null){
    $backImg = 'background-image: url(\''.Panel_Obj::getBackImgDir().$this->panelObj()->getBackImage().'\');';
 }?>
-<div class="name"><?=$icon?><?ps($this->panelObj()->getName())?></div>
-<?foreach ($this->products as $product) {
+<div class="name"><?php echo $icon?><?php ps($this->panelObj()->getName())?></div>
+<?php foreach ($this->products as $product) {
    $link = (string)$this->link()
       ->category($product->curlkey)
       ->route('detail', array('urlkey' => $product->{Shop_Model_Product::COLUMN_URLKEY}));
@@ -23,19 +23,19 @@ if($this->panelObj()->getBackImage() != null){
    ?>
 <div class="content article">
    <div class="name">
-      <a href="<?=$link?>" title="<?ps($product->{Shop_Model_Product::COLUMN_NAME})?>"
-              ><?ps($product->{Shop_Model_Product::COLUMN_NAME})?></a>
+      <a href="<?php echo $link?>" title="<?php ps($product->{Shop_Model_Product::COLUMN_NAME})?>"
+              ><?php ps($product->{Shop_Model_Product::COLUMN_NAME})?></a>
    </div>
    <div>
-      <a href="<?=$link?>" title="<?ps($product->{Shop_Model_Product::COLUMN_NAME})?>">
-         <img src="<?=$src?>" alt="<?ps($product->{Shop_Model_Product::COLUMN_NAME})?>" />
+      <a href="<?php echo $link?>" title="<?php ps($product->{Shop_Model_Product::COLUMN_NAME})?>">
+         <img src="<?php echo $src?>" alt="<?php ps($product->{Shop_Model_Product::COLUMN_NAME})?>" />
       </a>
    </div>
    <div>
-      <?ps($this->tr('Cena:')." ".Shop_Tools::getPriceOfProduct($product, $product->{Shop_Model_ProductCombinations::COLUMN_PRICE}, true))?>
+      <?php ps($this->tr('Cena:')." ".Shop_Tools::getPriceOfProduct($product, $product->{Shop_Model_ProductCombinations::COLUMN_PRICE}, true))?>
    </div>
    <div class="link-more">
-      <a href="<?=$link?>" title="<?ps($product->{Shop_Model_Product::COLUMN_NAME})?>"><?ps($this->tr('Více'))?></a>
+      <a href="<?php echo $link?>" title="<?php ps($product->{Shop_Model_Product::COLUMN_NAME})?>"><?php ps($this->tr('Více'))?></a>
    </div>
 </div>
-<?}?>
+<?php }?>

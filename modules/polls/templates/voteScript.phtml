@@ -1,4 +1,4 @@
-<?
+<?php 
 if(!defined('VVE_MODULE_POOLS_SCRIPT')) {
    define('VVE_MODULE_POOLS_SCRIPT', true);
    ?>
@@ -8,21 +8,21 @@ if(!defined('VVE_MODULE_POOLS_SCRIPT')) {
       var $form = $(this);
       // kontrola alespoň jedné volby
       if($form.has('input[type=checkbox]').length > 0 && $('input[type=checkbox]:checked', $form).length == 0){
-         errMsg('<?=$this->_('Musíte vybrat alespoň jednu možnost ankety')?>', true);
+         errMsg('<?php echo $this->_('Musíte vybrat alespoň jednu možnost ankety')?>', true);
          return false;
       }
       showLoadBox($form);
-      $.ajax({type: "POST", cache: false, url: '<?=$this->link()->clear()->route();?>',
+      $.ajax({type: "POST", cache: false, url: '<?php echo $this->link()->clear()->route();?>',
          data: $form.serialize(),
          success: function(data) {
             vveShowMessages(data);
-            $form.parent('div').load('<?=$this->link()->clear()->route('pollData');?>',{id : data.id});
+            $form.parent('div').load('<?php echo $this->link()->clear()->route('pollData');?>',{id : data.id});
          }
       });
       return false;
    });
    /* ]]> */
 </script>
-   <?
+   <?php 
 }
 ?>

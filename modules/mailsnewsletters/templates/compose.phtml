@@ -1,18 +1,18 @@
-<?
+<?php 
 $h = $this->tr('Vytvořit newsletter');
 $this->addPageTitle($h);
 $this->addFile('css://style.less');
 ?>
-<h1><?=$h?></h1>
-<?=$this->includeTpl('navigation.phtml');?>
+<h1><?php echo $h?></h1>
+<?php echo $this->includeTpl('navigation.phtml');?>
 <div class="main-content-detail" id="sendMailForm">
-<? 
+<?php  
 $this->form->send->cancel->html()->addClass('cancel');
 $this->form->send->cancel->html()->setAttrib('onclick', 'return confirm(\''.$this->tr('Opravdu zrušit změny?').'\')');
 echo $this->form;
 ?>
 </div>
-<? 
+<?php  
 $jq = new JsPlugin_JQuery();
 $jq->addUIDatepicker();
 $this->addJsPlugin($jq);

@@ -1,4 +1,4 @@
-<?
+<?php 
 echo $this->toolbox;
 $h1 = $this->tr('Přidání události');
 
@@ -12,9 +12,9 @@ $jq->addUIDatepicker();
 $jq->addUITimepicker();
 $this->addJsPlugin($jq);
 ?>
-<h1><?ps($h1)?></h1>
+<h1><?php ps($h1)?></h1>
 <div class="form-edit">
-   <?
+   <?php 
    echo $this->form;
    ?>
    <script type="text/javascript">

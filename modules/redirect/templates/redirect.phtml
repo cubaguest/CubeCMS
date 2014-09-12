@@ -1,15 +1,15 @@
-<?
+<?php 
 echo $this->toolbox;
 ?>
-<h1><?=$this->category()->getName()?></h1>
+<h1><?php echo $this->category()->getName()?></h1>
 <div class="main-content-text">
-   <p><?echo $this->tr('Přesměrování na stránku');?>:<br />
-      <a id="refirect-target-link" href="<?=$this->url?>" title="<?=$this->tr('Přejít ihned')?>" ><?=$this->url?></a><br />
-      <?printf($this->tr('Přesměrování proběhne za %s sekund.'),'<input type="text" id="redirect-countdown" value="5" size="2" style="width: 30px;" />' )?>
-      <a href="<?=$this->link()?>#" onclick="stopCountDown()" title="<?=$this->tr('zastavit odpočet');?>"><?=$this->tr('stop');?></a>
+   <p><?php echo $this->tr('Přesměrování na stránku');?>:<br />
+      <a id="refirect-target-link" href="<?php echo $this->url?>" title="<?php echo $this->tr('Přejít ihned')?>" ><?php echo $this->url?></a><br />
+      <?php printf($this->tr('Přesměrování proběhne za %s sekund.'),'<input type="text" id="redirect-countdown" value="5" size="2" style="width: 30px;" />' )?>
+      <a href="<?php echo $this->link()?>#" onclick="stopCountDown()" title="<?php echo $this->tr('zastavit odpočet');?>"><?php echo $this->tr('stop');?></a>
    </p>
    <p class="admin-info-text">
-      <?=$this->tr('Toto přesměrování vidí pouze administrátoři. Normální uživatel je přímo přesměrován.e');?>
+      <?php echo $this->tr('Toto přesměrování vidí pouze administrátoři. Normální uživatel je přímo přesměrován.e');?>
    </p>
    <script type="text/javascript">
    var timer;

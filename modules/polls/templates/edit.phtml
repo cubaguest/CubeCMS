@@ -1,4 +1,4 @@
-<?
+<?php 
 // do titulku
 if($this->edit) {
    $h = $this->tr('úprava ankety').' '.$this->name;
@@ -8,49 +8,49 @@ if($this->edit) {
 $this->addPageTitle($h);
 
 ?>
-<h1><?=$h;?></h1>
+<h1><?php echo $h;?></h1>
 <div class="main-content-form-edit" id="article-edit-form">
-   <?=$this->form->renderStart()?>
+   <?php echo $this->form->renderStart()?>
       <fieldset>
          <table id="answerForm"  class="form-table">
             <tr>
                <th class="form-labels">
-                  <?=$this->form->question->label();?>
+                  <?php echo $this->form->question->label();?>
                </th>
                <td class="form-controlls">
-                  <?=$this->form->question->controllAll();?>
+                  <?php echo $this->form->question->controllAll();?>
                   <span></span>
                </td>
             </tr>
             <tr>
                <th class="form-labels">
-                  <?=$this->form->multianswer->label();?>
+                  <?php echo $this->form->multianswer->label();?>
                </th>
                <td class="form-controlls">
-                  <?=$this->form->multianswer->controllAll();?>
+                  <?php echo $this->form->multianswer->controllAll();?>
                   <span></span>
                </td>
             </tr>
             <tr>
                <th class="form-labels">
-                  <?=$this->form->active->label();?>
+                  <?php echo $this->form->active->label();?>
                </th>
                <td class="form-controlls">
-                  <?=$this->form->active->controllAll();?>
+                  <?php echo $this->form->active->controllAll();?>
                   <span></span>
                </td>
             </tr>
-            <?if(isset($this->form->clear)){?>
+            <?php if(isset($this->form->clear)){?>
             <tr>
                <th class="form-labels">
-                  <?=$this->form->clear->label();?>
+                  <?php echo $this->form->clear->label();?>
                </th>
                <td class="form-controlls">
-                  <?=$this->form->clear->controllAll();?>
+                  <?php echo $this->form->clear->controllAll();?>
                   <span></span>
                </td>
             </tr>
-            <?}
+            <?php }
             $vals = $this->form->answer->getValues();
             if(count($vals) == 0) {
                $vals = array(0,1);
@@ -59,12 +59,12 @@ $this->addPageTitle($h);
                $this->form->answer->setDimensional($i);
                $this->form->answerCount->setDimensional($i);
                ?>
-            <tr id="pollAnswer_<?=$i?>" class="pollAnswer">
+            <tr id="pollAnswer_<?php echo $i?>" class="pollAnswer">
                <th class="form-labels">
-                  <?echo($this->form->answer->label())?>
+                  <?php echo($this->form->answer->label())?>
                </th>
                <td class="form-controlls">
-                     <?
+                     <?php 
                      $this->form->answer->html()->setAttrib('size', 20);
                      echo($this->form->answer->controll());
                      
@@ -72,29 +72,29 @@ $this->addPageTitle($h);
                      $this->form->answerCount->html()->setAttrib('size', 5)->addClass('mini');
                      echo($this->form->answerCount->controll());
                   ?>
-                  <a href="<?=$this->link()?>#delete-row" onclick="return deleteAnswerRow(this);" title="<?=$this->tr('Odstranit řádek')?>"
-                     class="form-row-action-icon"><img src="<?=vve_get_tpl_file('icons/delete.png', VVE_TPL_FILE_IMAGE)?>" alt="delete" /></a>
+                  <a href="<?php echo $this->link()?>#delete-row" onclick="return deleteAnswerRow(this);" title="<?php echo $this->tr('Odstranit řádek')?>"
+                     class="form-row-action-icon"><img src="<?php echo vve_get_tpl_file('icons/delete.png', VVE_TPL_FILE_IMAGE)?>" alt="delete" /></a>
                </td>
             </tr>
-            <?}?>
+            <?php }?>
             <tr>
                <td></td>
                <td>
-                  <a class="form-row-action-icon" href="<?=$this->link()?>#add-row" onclick="return addAnswerRow();" title="<?=$this->tr('Přidat odpověď')?>">
-                     <img src="<?=vve_get_tpl_file('icons/add.png', VVE_TPL_FILE_IMAGE)?>" alt="add" />&nbsp;<?=$this->tr('Přidat odpověď')?>
+                  <a class="form-row-action-icon" href="<?php echo $this->link()?>#add-row" onclick="return addAnswerRow();" title="<?php echo $this->tr('Přidat odpověď')?>">
+                     <img src="<?php echo vve_get_tpl_file('icons/add.png', VVE_TPL_FILE_IMAGE)?>" alt="add" />&nbsp;<?php echo $this->tr('Přidat odpověď')?>
                   </a>
                </td>
             </tr>
             <tr>
                <th class="form-labels"></th>
                <td class="form-controlls">
-                  <?=$this->form->send->controllAll();?>
+                  <?php echo $this->form->send->controllAll();?>
                   <span></span>
                </td>
             </tr>
          </table>
       </fieldset>
-   <?=$this->form->renderEnd()?>
+   <?php echo $this->form->renderEnd()?>
    <script type="text/javascript">
       /* <![CDATA[ */
       function addAnswerRow(){

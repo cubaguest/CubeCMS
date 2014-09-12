@@ -1,4 +1,4 @@
-<?
+<?php 
 $this->addPageTitle($this->tr('Skupiny'));
 //$this->addCssFile('style.css');
 $jsJqGrid = new Component_JqGrid_JsPlugin();
@@ -6,8 +6,8 @@ $this->addJsPlugin($jsJqGrid);
 $jQuery = new JsPlugin_JQuery();
 $this->addJsPlugin($jQuery);
 ?>
-<h1><?=$this->tr('Skupiny');?></h1>
-<?$this->includeTpl('navigation.phtml');?>
+<h1><?php echo $this->tr('Skupiny');?></h1>
+<?php $this->includeTpl('navigation.phtml');?>
 
 <div class="main-content-detail">
    <table id="table-groups"></table>
@@ -15,7 +15,7 @@ $this->addJsPlugin($jQuery);
    <hr class="reseter" />
    <br />
 </div>
-<?
+<?php 
 ?>
 <script type="text/javascript" charset="utf-8">
       /* <![CDATA[ */
@@ -23,44 +23,44 @@ $this->addJsPlugin($jQuery);
       $(document).ready(function() {
          var groupsGrid = $("#table-groups").jqGrid({
             ajaxGridOptions : {type:"POST"},
-            url: '<?=$this->link()->route('groupsList');?>',
+            url: '<?php echo $this->link()->route('groupsList');?>',
             datatype: "json",
-            colNames:['ID', '<?=$this->tr('Název')?>', '<?=$this->tr('Popis')?>', '<?=$this->tr('Admin')?>', '<?=$this->tr('Omezení na domény')?>'],
+            colNames:['ID', '<?php echo $this->tr('Název')?>', '<?php echo $this->tr('Popis')?>', '<?php echo $this->tr('Admin')?>', '<?php echo $this->tr('Omezení na domény')?>'],
             colModel:[
-               {name:'<?=Model_Groups::COLUMN_ID?>',index:'<?=Model_Groups::COLUMN_ID?>',
+               {name:'<?php echo Model_Groups::COLUMN_ID?>',index:'<?php echo Model_Groups::COLUMN_ID?>',
                   width:33,fixed: true,editable:false},
-               {name:'<?=Model_Groups::COLUMN_NAME?>',index:'<?=Model_Groups::COLUMN_NAME?>', 
+               {name:'<?php echo Model_Groups::COLUMN_NAME?>',index:'<?php echo Model_Groups::COLUMN_NAME?>', 
                   width:130,fixed: true, editable:true,editoptions:{size:20},
-                  formoptions:{ rowpos:2, label: "<?=$this->tr('Název')?>",elmprefix:"(*)"}},
-               {name:'<?=Model_Groups::COLUMN_LABEL?>',index:'<?=Model_Groups::COLUMN_LABEL?>', 
+                  formoptions:{ rowpos:2, label: "<?php echo $this->tr('Název')?>",elmprefix:"(*)"}},
+               {name:'<?php echo Model_Groups::COLUMN_LABEL?>',index:'<?php echo Model_Groups::COLUMN_LABEL?>', 
                   width:250,editable: true,edittype:"textarea", editoptions:{rows:"2",cols:"18"},
-                  formoptions:{ rowpos:3, label: "<?=$this->tr('Popis')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
-               {name:'<?=Model_Groups::COLUMN_IS_ADMIN?>',index:'<?=Model_Groups::COLUMN_IS_ADMIN?>', formatter: 'checkbox',
+                  formoptions:{ rowpos:3, label: "<?php echo $this->tr('Popis')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
+               {name:'<?php echo Model_Groups::COLUMN_IS_ADMIN?>',index:'<?php echo Model_Groups::COLUMN_IS_ADMIN?>', formatter: 'checkbox',
                   width:50,fixed:true, editable:true,edittype:'checkbox', editoptions:{size:20, value:"true:false"
                   },
-                  formoptions:{ rowpos:4, label: "<?=$this->tr('Admin')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
+                  formoptions:{ rowpos:4, label: "<?php echo $this->tr('Admin')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
                {name:'sites',index:'sites', width:170, fixed : true, editable: true, edittype:"select", editoptions: {
-                     value: <?=json_encode($this->sites)?>,
+                     value: <?php echo json_encode($this->sites)?>,
                      multiple: true, size: 3
                   },
-                  formoptions:{ rowpos:5, label: "<?=$this->tr('Uživatel<br />pouze pro<br />domény')?>",
+                  formoptions:{ rowpos:5, label: "<?php echo $this->tr('Uživatel<br />pouze pro<br />domény')?>",
                      elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
             ],
             rowNum:20,
             rowList:[10,20,40,100],
             pager: '#table-groups-pager',
-            sortname: '<?=Model_Groups::COLUMN_ID?>',
-            caption:"<?=$this->tr('Skupiny v systému')?>",
+            sortname: '<?php echo Model_Groups::COLUMN_ID?>',
+            caption:"<?php echo $this->tr('Skupiny v systému')?>",
             autowidth : true,
             height: '100%',
-            editurl:"<?=$this->link()->route('editGroup')?>"
+            editurl:"<?php echo $this->link()->route('editGroup')?>"
          });
-         $.jgrid.del.msg = '<strong>'+$.jgrid.del.msg+"</strong><br /><?=$this->tr('Budou smazáni také všichni<br />uživatelé těchto skupin')?>.";
+         $.jgrid.del.msg = '<strong>'+$.jgrid.del.msg+"</strong><br /><?php echo $this->tr('Budou smazáni také všichni<br />uživatelé těchto skupin')?>.";
          groupsGrid.jqGrid('navGrid','#table-groups-pager',
             {edit:true,add:true,del:true},
             // edit options
             {reloadAfterSubmit:true, jqModal:true, closeOnEscape:true,viewPagerButtons:false,width:400, 
-               bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné')?>",closeAfterEdit:true,
+               bottominfo:"<?php echo $this->tr('Položky označené (*) jsou povinné')?>",closeAfterEdit:true,
                afterSubmit : function(respond){
                   var res = eval("("+respond.responseText+")");
                   var msg = res.errmsg.toString();
@@ -85,7 +85,7 @@ $this->addJsPlugin($jQuery);
             },
             // add options
             {reloadAfterSubmit:true,jqModal:true, closeOnEscape:true, 
-               bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné')?>", closeAfterAdd: true,width:400,
+               bottominfo:"<?php echo $this->tr('Položky označené (*) jsou povinné')?>", closeAfterAdd: true,width:400,
                afterSubmit : function(respond){
                   var res = eval("("+respond.responseText+")");
                   var msg = res.errmsg.toString();

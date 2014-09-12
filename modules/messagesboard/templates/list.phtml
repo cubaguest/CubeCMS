@@ -1,13 +1,13 @@
-<?
+<?php 
 $this->addCssFile("style.css");
 $h1 = $this->category()->getName();
 echo $this->toolbox;
 ?>
-<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $h1;?></h1>
+<h1><?php $this->includeFile('tpl://engine:headline/icon.phtml'); echo $h1;?></h1>
 <div class="main-content-list messagesboard">
-   <?if(!empty ($this->messages)) {?>
+   <?php if(!empty ($this->messages)) {?>
       <div class="main-content-list-records">
-      <?
+      <?php 
       $i = 1;
       foreach ($this->messages as $msg) {
          $addTime = new DateTime($msg->{MessagesBoard_Model::COLUMN_TIME_ADD});
@@ -19,14 +19,14 @@ echo $this->toolbox;
          
          ?>
          <div class="message-wrap" style="width: 33%;">
-         <div class="main-content-list-record" style="<?=$style;?>">
-            <span class="font-small"><?=vve_date("%X %x", $addTime);?></span>
-            <div class="main-content-list-record-text"><?echo $msg->{MessagesBoard_Model::COLUMN_TEXT};?></div>
-            <span class="font-small"><?=$msg->{Model_Users::COLUMN_USERNAME};?></span>
-            <?echo $msg->toolbox;?>
+         <div class="main-content-list-record" style="<?php echo $style;?>">
+            <span class="font-small"><?php echo vve_date("%X %x", $addTime);?></span>
+            <div class="main-content-list-record-text"><?php echo $msg->{MessagesBoard_Model::COLUMN_TEXT};?></div>
+            <span class="font-small"><?php echo $msg->{Model_Users::COLUMN_USERNAME};?></span>
+            <?php echo $msg->toolbox;?>
          </div>
       </div>
-      <?
+      <?php 
       if($i % 3 == 0){
          echo '<hr class="reseter" />';
       }
@@ -34,11 +34,11 @@ echo $this->toolbox;
       }?>
       <hr class="reseter" />
    </div>
-   <?
+   <?php 
       echo $this->scrollComp;
    } else {
       echo ($this->tr('Není vložena žádná zpráva'));
    }?>
    <br />
-   <?if($this->form instanceof Form){$this->includeFile('tpl://form.phtml');}?>
+   <?php if($this->form instanceof Form){$this->includeFile('tpl://form.phtml');}?>
 </div>

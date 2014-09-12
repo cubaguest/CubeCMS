@@ -1,20 +1,20 @@
-<?
+<?php 
 $this->addCssFile("style.css");
 $this->includeTpl('sortLabel.phtml');
 $h1 = $this->category()->getName().$this->sortText;
 echo $this->toolbox;
 ?>
-<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $h1;?></h1>
+<h1><?php $this->includeFile('tpl://engine:headline/icon.phtml'); echo $h1;?></h1>
 <div class="main-content-list">
-   <?=$this->includeTpl('sort.phtml')?>
-   <?if((string)$this->text->{Text_Model::COLUMN_TEXT} != null AND !isset($_GET[Component_Scroll::GET_PARAM]) AND !isset($_GET[Articles_Controller::PARAM_SORT])){?>
+   <?php echo $this->includeTpl('sort.phtml')?>
+   <?php if((string)$this->text->{Text_Model::COLUMN_TEXT} != null AND !isset($_GET[Component_Scroll::GET_PARAM]) AND !isset($_GET[Articles_Controller::PARAM_SORT])){?>
    <div class="main-content-text">
-      <?=$this->filter((string)$this->text->{Text_Model::COLUMN_TEXT}, array('anchors','emoticons'))?>
+      <?php echo $this->filter((string)$this->text->{Text_Model::COLUMN_TEXT}, array('anchors','emoticons'))?>
       <hr class="reseter" />
    </div>   
-   <?}?>
+   <?php }?>
    <div class="main-content-list-records">
-   <?if(!empty ($this->articles)) {
+   <?php if(!empty ($this->articles)) {
       foreach ($this->articles as $article) {
          $showClass = $public = null;
          if($article->{Articles_Model::COLUMN_CONCEPT} == true){
@@ -28,43 +28,43 @@ echo $this->toolbox;
          $xml = simplexml_import_dom($doc); // just to make xpath more simple
          $image = $xml->xpath('//img');
          ?>
-      <div class="main-content-list-record <?=$showClass?>">
-         <h2><a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model::COLUMN_URLKEY}))?>"
-               title="<?=htmlspecialchars($article->{Articles_Model::COLUMN_NAME})?>"><?=htmlspecialchars($article->{Articles_Model::COLUMN_NAME})?>&nbsp;
+      <div class="main-content-list-record <?php echo $showClass?>">
+         <h2><a href="<?php echo $this->link()->route('detail', array('urlkey' => $article->{Articles_Model::COLUMN_URLKEY}))?>"
+               title="<?php echo htmlspecialchars($article->{Articles_Model::COLUMN_NAME})?>"><?php echo htmlspecialchars($article->{Articles_Model::COLUMN_NAME})?>&nbsp;
                <span class="font-small">
-               <?=strftime("%x %X", $editTime->format("U"))?> - <?=$article->{Model_Users::COLUMN_USERNAME}?></span>
-            </a><span class="font-small"><?=$public?></span><?
+               <?php echo strftime("%x %X", $editTime->format("U"))?> - <?php echo $article->{Model_Users::COLUMN_USERNAME}?></span>
+            </a><span class="font-small"><?php echo $public?></span><?php 
             if($this->category()->getRights()->isControll()){
                echo langsImages($article->{Articles_Model::COLUMN_URLKEY});
             }
             ?>
          </h2>
-         <? // nalezneme v textu první obrázek, pokud ano vykreslíme jej
+         <?php  // nalezneme v textu první obrázek, pokud ano vykreslíme jej
          if(!empty ($image) && isset ($image[0])) {?>
-            <div class="main-content-list-record-image"><?=vve_tpl_image_tag($image[0]['src'], $image[0]['alt'] != null ? $image[0]['alt'] : "article title image", 140, 100);?></div>
-         <?}?>
-            <?if((string)$article->{Articles_Model::COLUMN_ANNOTATION} != null){?>
-               <div class="main-content-list-record-annotation"><?echo $article->{Articles_Model::COLUMN_ANNOTATION};?></div>
-            <?} else {?>
-               <div class="main-content-list-record-text"><?echo vve_tpl_truncate(strip_tags($article->{Articles_Model::COLUMN_TEXT}), 640);?></div>
-            <?}?>
+            <div class="main-content-list-record-image"><?php echo vve_tpl_image_tag($image[0]['src'], $image[0]['alt'] != null ? $image[0]['alt'] : "article title image", 140, 100);?></div>
+         <?php }?>
+            <?php if((string)$article->{Articles_Model::COLUMN_ANNOTATION} != null){?>
+               <div class="main-content-list-record-annotation"><?php echo $article->{Articles_Model::COLUMN_ANNOTATION};?></div>
+            <?php } else {?>
+               <div class="main-content-list-record-text"><?php echo vve_tpl_truncate(strip_tags($article->{Articles_Model::COLUMN_TEXT}), 640);?></div>
+            <?php }?>
          <hr class="reseter" />
-         <div class="main-content-showed"><?=$this->tr('Zobrazeno')?>:&nbsp;<?=$article->{Articles_Model::COLUMN_SHOWED}?>&times;</div>
+         <div class="main-content-showed"><?php echo $this->tr('Zobrazeno')?>:&nbsp;<?php echo $article->{Articles_Model::COLUMN_SHOWED}?>&times;</div>
          <div class="main-content-link-more">
-            <a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model::COLUMN_URLKEY}))?>"
-               title="<?=$this->tr("více o").' '.$article->{Articles_Model::COLUMN_NAME}?>">[&nbsp;<?=$this->tr("více")?>&nbsp;]</a>
+            <a href="<?php echo $this->link()->route('detail', array('urlkey' => $article->{Articles_Model::COLUMN_URLKEY}))?>"
+               title="<?php echo $this->tr("více o").' '.$article->{Articles_Model::COLUMN_NAME}?>">[&nbsp;<?php echo $this->tr("více")?>&nbsp;]</a>
          </div>
          <hr class="reseter" />
       </div>
-      <?}?>
-   <?
+      <?php }?>
+   <?php 
       echo $this->scrollComp;
    } else {
       echo ($this->tr('Není vložen žádný článek'));
    }
    ?>
    </div>
-   <?
+   <?php 
    // rss ikony
    $feeds = new Component_Feed();
    $feeds->setConfig('feedLink', $this->link()->clear());

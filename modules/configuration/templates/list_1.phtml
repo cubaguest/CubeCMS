@@ -1,4 +1,4 @@
-<?
+<?php 
 $jqui = new JsPlugin_JQuery();
 //$jqui->addUIAccordion();
 
@@ -8,32 +8,32 @@ $this->addJsPlugin($jqcss);
 
 $this->addCssFile("style.css");
 ?>
-<h1><?=$this->category()->getName();?></h1>
+<h1><?php echo $this->category()->getName();?></h1>
 <div class="main-content main-content-form-edit">
    <div id="sections">
-      <?foreach ($this->list as $section) {?>
-      <h2 class="ui-accordion-header ui-helper-reset ui-state-default ui-corner-all"><a class="head" href="<?=$this->link()?>#" title="Rozbalit"><img
-               src="<?= vve_get_tpl_file('buttons/expand.gif', VVE_TPL_FILE_IMAGE)?>" alt="toggle" /><?=$section['name'];?></a></h2>
+      <?php foreach ($this->list as $section) {?>
+      <h2 class="ui-accordion-header ui-helper-reset ui-state-default ui-corner-all"><a class="head" href="<?php echo $this->link()?>#" title="Rozbalit"><img
+               src="<?php echo  vve_get_tpl_file('buttons/expand.gif', VVE_TPL_FILE_IMAGE)?>" alt="toggle" /><?php echo $section['name'];?></a></h2>
       <div class="section">
-         <p><?=$section['desc'];?></p>
+         <p><?php echo $section['desc'];?></p>
          <table class="valuesTable">
-            <?foreach ($section['options'] as $option) {?>
+            <?php foreach ($section['options'] as $option) {?>
             <tr>
-               <th class="header-cell" colspan="2"><?if($option->{Model_Config::COLUMN_LABEL} != null){echo $option->{Model_Config::COLUMN_LABEL};} else {echo '<em>('.$this->tr('Bez popisu').')</em>';}?>
-                  <form method="post" action="<?=$this->link()->route('edit', array('id' => $option->{Model_Config::COLUMN_ID}))?>">
-                     <p><input type="image" src="<?=vve_get_tpl_file('icons/wrench.png', VVE_TPL_FILE_IMAGE)?>"
-                         value="edit" name="category_edit" title="<?=$this->tr('Upravit')?>" /></p>
+               <th class="header-cell" colspan="2"><?php if($option->{Model_Config::COLUMN_LABEL} != null){echo $option->{Model_Config::COLUMN_LABEL};} else {echo '<em>('.$this->tr('Bez popisu').')</em>';}?>
+                  <form method="post" action="<?php echo $this->link()->route('edit', array('id' => $option->{Model_Config::COLUMN_ID}))?>">
+                     <p><input type="image" src="<?php echo vve_get_tpl_file('icons/wrench.png', VVE_TPL_FILE_IMAGE)?>"
+                         value="edit" name="category_edit" title="<?php echo $this->tr('Upravit')?>" /></p>
                   </form>
                </th>
             </tr>
             <tr class="end-row">
-               <td width="200" class="key-cell"><?=$option->{Model_Config::COLUMN_KEY}?></td>
-               <td><?=$option->{Model_Config::COLUMN_VALUE}?></td>
+               <td width="200" class="key-cell"><?php echo $option->{Model_Config::COLUMN_KEY}?></td>
+               <td><?php echo $option->{Model_Config::COLUMN_VALUE}?></td>
             </tr>
-            <?}?>
+            <?php }?>
          </table>
       </div>
-      <?}?>
+      <?php }?>
    </div>
    <br />
    <br />
@@ -45,10 +45,10 @@ $this->addCssFile("style.css");
             var $cnt = $(this).parent().next();
             if($cnt.is(':hidden')) {
                $cnt.show();
-               $('img',$(this)).attr('src', '<?=vve_get_tpl_file('buttons/collapse.gif', VVE_TPL_FILE_IMAGE)?>');
+               $('img',$(this)).attr('src', '<?php echo vve_get_tpl_file('buttons/collapse.gif', VVE_TPL_FILE_IMAGE)?>');
             } else {
                $cnt.hide();
-               $('img',$(this)).attr('src', '<?=vve_get_tpl_file('buttons/expand.gif', VVE_TPL_FILE_IMAGE)?>');
+               $('img',$(this)).attr('src', '<?php echo vve_get_tpl_file('buttons/expand.gif', VVE_TPL_FILE_IMAGE)?>');
             }
             return false;
          });//.next().hide();

@@ -1,4 +1,4 @@
-<?
+<?php 
 // načtení detailu
 Template_Core::addToPageTitle($this->course->{Courses_Model_Courses::COLUMN_NAME});
 Template_Core::setPageKeywords($this->course->{Courses_Model_Courses::COLUMN_KEYWORDS});
@@ -32,18 +32,18 @@ switch ($this->course->{Courses_Model_Courses::COLUMN_TYPE}) {
       margin-left: 2em;
    }
 </style>
-<h1><?=$this->course->{Courses_Model_Courses::COLUMN_NAME}?></h1>
+<h1><?php echo $this->course->{Courses_Model_Courses::COLUMN_NAME}?></h1>
 <div class="main-content-detail module-courses-detail">
-   <?
+   <?php 
    echo $this->course->{Courses_Model_Courses::COLUMN_TEXT_SHORT}.'<br />';
    if($this->courseImage != null){?>
-      <img style="float: right; width: 150px;" src="<?=$this->courseImage?>" alt="obrázek kurzu <?=$this->course->{Courses_Model_Courses::COLUMN_NAME}?>" />
-   <?
+      <img style="float: right; width: 150px;" src="<?php echo $this->courseImage?>" alt="obrázek kurzu <?php echo $this->course->{Courses_Model_Courses::COLUMN_NAME}?>" />
+   <?php 
    }
    ?>
    <ul class="module-courses-detail-params">
       <li>
-         <?
+         <?php 
          echo '<span class="course-param">'.$this->_('Termín ').$type . ":</span>";
          echo vve_date("%x", new DateTime($this->course->{Courses_Model_Courses::COLUMN_DATE_START}));
          if ($this->course->{Courses_Model_Courses::COLUMN_DATE_STOP} != null) {
@@ -51,11 +51,11 @@ switch ($this->course->{Courses_Model_Courses::COLUMN_TYPE}) {
          }
          ?>
       </li>
-      <?if($this->course->{Courses_Model_Courses::COLUMN_TIME_START} != null && $this->course->{Courses_Model_Courses::COLUMN_TIME_START} != "00:00:00"){?>
-      <li><? echo '<span class="course-param">'.$this->_('Předpokládaný čas začátku') . ":</span>" . $this->course->{Courses_Model_Courses::COLUMN_TIME_START}; ?></li>
-      <?}?>
-      <li><?echo '<span class="course-param">'.$this->_('Místo konání') . ":</span>" . $this->course->{Courses_Model_Courses::COLUMN_PLACE};?></li>
-      <?if ($this->course->{Courses_Model_Courses::COLUMN_HOURS_LEN} != 0) {
+      <?php if($this->course->{Courses_Model_Courses::COLUMN_TIME_START} != null && $this->course->{Courses_Model_Courses::COLUMN_TIME_START} != "00:00:00"){?>
+      <li><?php  echo '<span class="course-param">'.$this->_('Předpokládaný čas začátku') . ":</span>" . $this->course->{Courses_Model_Courses::COLUMN_TIME_START}; ?></li>
+      <?php }?>
+      <li><?php echo '<span class="course-param">'.$this->_('Místo konání') . ":</span>" . $this->course->{Courses_Model_Courses::COLUMN_PLACE};?></li>
+      <?php if ($this->course->{Courses_Model_Courses::COLUMN_HOURS_LEN} != 0) {
             echo '<li>'
             . '<span class="course-param">'. $this->_('Délka ').$type . ":</span>"
             . $this->course->{Courses_Model_Courses::COLUMN_HOURS_LEN} . '&nbsp;' . $this->_('hodin')
@@ -68,64 +68,64 @@ switch ($this->course->{Courses_Model_Courses::COLUMN_TYPE}) {
             . '</li>';
       }
       if($this->course->{Courses_Model_Courses::COLUMN_SEATS} != 0){?>
-      <li><?echo '<span class="course-param">'.$this->_('Kapacita') . ":</span>" . $this->course->{Courses_Model_Courses::COLUMN_SEATS} . '&nbsp;' . $this->_('míst');?></li>
-      <li><?echo '<span class="course-param">'.$this->_('Volných') . ":</span>" . $this->freeSeats . '&nbsp;' . $this->_('míst');?></li>
-      <?}
+      <li><?php echo '<span class="course-param">'.$this->_('Kapacita') . ":</span>" . $this->course->{Courses_Model_Courses::COLUMN_SEATS} . '&nbsp;' . $this->_('míst');?></li>
+      <li><?php echo '<span class="course-param">'.$this->_('Volných') . ":</span>" . $this->freeSeats . '&nbsp;' . $this->_('míst');?></li>
+      <?php }
       // akreditace
       if($this->course->{Courses_Model_Courses::COLUMN_AKREDIT_MPSV} != null){?>
-      <li><? echo '<span class="course-param">'.$this->_('Akreditace MPSV') . ":</span>" . $this->course->{Courses_Model_Courses::COLUMN_AKREDIT_MPSV}; ?></li>
-      <?}
+      <li><?php  echo '<span class="course-param">'.$this->_('Akreditace MPSV') . ":</span>" . $this->course->{Courses_Model_Courses::COLUMN_AKREDIT_MPSV}; ?></li>
+      <?php }
       if($this->course->{Courses_Model_Courses::COLUMN_AKREDIT_MSMT} != null){?>
-      <li><? echo '<span class="course-param">'.$this->_('Akreditace MŠMT') . ":</span>" . $this->course->{Courses_Model_Courses::COLUMN_AKREDIT_MSMT}; ?></li>
-      <?}
+      <li><?php  echo '<span class="course-param">'.$this->_('Akreditace MŠMT') . ":</span>" . $this->course->{Courses_Model_Courses::COLUMN_AKREDIT_MSMT}; ?></li>
+      <?php }
       if($this->course->{Courses_Model_Courses::COLUMN_TAGRT_GROUPS} != null){?>
-      <li><? echo '<span class="course-param">'.$this->_('Cílové skupiny') . ":</span>" . $this->course->{Courses_Model_Courses::COLUMN_TAGRT_GROUPS}; ?></li>
-      <?}
+      <li><?php  echo '<span class="course-param">'.$this->_('Cílové skupiny') . ":</span>" . $this->course->{Courses_Model_Courses::COLUMN_TAGRT_GROUPS}; ?></li>
+      <?php }
 
       ?>
       </ul>
       <br />
       <div class="main-content-text">
-         <?=$this->course->{Courses_Model_Courses::COLUMN_TEXT} ?>
+         <?php echo $this->course->{Courses_Model_Courses::COLUMN_TEXT} ?>
       </div>
       <hr class="reseter" />
       <br />
 
-      <?if($this->isPrivate === true AND $this->course->{Courses_Model_Courses::COLUMN_TEXT_PRIVATE} != null){?>
-      <h2><?=$this->_('Neveřejná data');?></h2>
+      <?php if($this->isPrivate === true AND $this->course->{Courses_Model_Courses::COLUMN_TEXT_PRIVATE} != null){?>
+      <h2><?php echo $this->_('Neveřejná data');?></h2>
       <div class="main-content-text">
-         <?=$this->course->{Courses_Model_Courses::COLUMN_TEXT_PRIVATE} ?>
+         <?php echo $this->course->{Courses_Model_Courses::COLUMN_TEXT_PRIVATE} ?>
       </div>
       <hr class="reseter" />
       <br />
-      <?}?>
+      <?php }?>
 
-      <h2><?=$this->_('Lektoři ').$type?></h2>
-      <?
+      <h2><?php echo $this->_('Lektoři ').$type?></h2>
+      <?php 
       $this->includeTpl('onlylist.phtml', false, array('lecturers' => $this->lecturers,'hE' => 'span', 'hEClass' => 'course-lecturer-name'), 'lecturers');
          /*foreach ($this->lecturers as $lecturer) {
             if($lecturer->{Lecturers_Model::COLUMN_IMAGE} != null){
             ?>
          <p style="float: left">
-            <img src="<?=Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR
+            <img src="<?php echo Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR
             .  Lecturers_Controller::DATA_DIR.URL_SEPARATOR.$lecturer->{Lecturers_Model::COLUMN_IMAGE}?>" alt="" />
          </p>
-         <?}?>
+         <?php }?>
          <span class="course-lecturer-name">
-         <?
+         <?php 
          if($lecturer->{Lecturers_Model::COLUMN_DEGREE} != null)
             echo $lecturer->{Lecturers_Model::COLUMN_DEGREE}.' &nbsp;';
          echo $lecturer->{Lecturers_Model::COLUMN_NAME}.'&nbsp;';
          echo $lecturer->{Lecturers_Model::COLUMN_SURNAME};
          ?>
             </span><br />
-            <?=$lecturer->{Lecturers_Model::COLUMN_TEXT};?>
+            <?php echo $lecturer->{Lecturers_Model::COLUMN_TEXT};?>
          <hr class="reseter" />
          <br />
-         <?
+         <?php 
          }*/
          ?>
-   <?
+   <?php 
          $this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->clear()->route(), 'text' => $this->_('Zpět na seznam kurzů')));
          echo '<br />';
          echo $this->toolbox;

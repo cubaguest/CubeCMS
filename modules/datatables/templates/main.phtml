@@ -4,12 +4,12 @@ $this->addFile('css://style.css');
 ?>
 <h1><?php echo $this->category()->getName()?></h1>
 <div class="main-content-text">
-<?
+<?php 
 if(!empty($this->rows)){?>
-   <table style="width: 100%;" class="ui-widget ui-widget-content datatable-main <?=('datatable-main-cols-').$this->colls?>">
-      <?foreach ($this->rows as $row) {?>      
-      <tr class="ui-state-default <?if($row['header'] == 1) echo "ui-state-highlight"?>">
-         <?
+   <table style="width: 100%;" class="ui-widget ui-widget-content datatable-main <?php echo ('datatable-main-cols-').$this->colls?>">
+      <?php foreach ($this->rows as $row) {?>      
+      <tr class="ui-state-default <?php if($row['header'] == 1) echo "ui-state-highlight"?>">
+         <?php 
          $rstr = '<td class="column-%s">%s</td>';
          if($row['header'] == 1) $rstr = '<th class="column-%s">%s</th>';
          for ($i = 0; $i < $this->colls; $i++) {
@@ -17,13 +17,13 @@ if(!empty($this->rows)){?>
          }
          ?>
       </tr>
-      <?}?>
+      <?php }?>
    </table>
-<?} else {?>
+<?php } else {?>
    <p class="admin-info-text">
-      <?echo $this->tr('Žádná tabulka nebyla uložena')?>
+      <?php echo $this->tr('Žádná tabulka nebyla uložena')?>
    </p>
-<?}?>
+<?php }?>
    
    
 </div>

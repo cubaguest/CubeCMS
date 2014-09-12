@@ -1,10 +1,10 @@
-<?
+<?php 
 $h1 = sprintf($this->tr('Úprava textu kategorie %s'), $this->category()->getName());
 Template_Core::setPageTitle($h1);
 ?>
-<h1><?=$h1?></h1>
+<h1><?php echo $h1?></h1>
 <div class="main-content-form-edit" id="text-edit-form">
-   <?
+   <?php 
    $this->form->text->html()->setAttrib('cols', 60)->setAttrib('rows', 40);
    echo ($this->form);
    ?>

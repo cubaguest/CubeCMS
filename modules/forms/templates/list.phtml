@@ -1,10 +1,10 @@
-<?
+<?php 
 $this->addFile("css://style.css");
 echo $this->toolbox;
 ?>
-<h1><?ps($this->category()->getName());?></h1>
+<h1><?php ps($this->category()->getName());?></h1>
 <div id="forms-main" class="form-edit">
-   <?
+   <?php 
    $this->moduleButtons = array(
       array(
          'link' => $this->link()->route('createForm'),
@@ -20,7 +20,7 @@ echo $this->toolbox;
    <table class="ui-widget full-width form-item">
       <tr class="ui-widget-header">
          <td class="form-name" colspan="2">
-            <?
+            <?php 
             echo $form->{Forms_Model::COLUMN_NAME};
             
             $toolbox = clone $this->toolboxItem;
@@ -36,14 +36,14 @@ echo $this->toolbox;
          </td>
       </tr>
       <tr class="ui-widget-content">
-         <th scope="row" class="param-name"><?=$this->tr('Formulář odeslán')?>:</th>
-         <td><?=$form->{Forms_Model::COLUMN_SENDED}?>x</td>
+         <th scope="row" class="param-name"><?php echo $this->tr('Formulář odeslán')?>:</th>
+         <td><?php echo $form->{Forms_Model::COLUMN_SENDED}?>x</td>
       </tr>
    </table>
-   <?}
+   <?php }
    }?>
 </div>
-<?
+<?php 
 $jq = new JsPlugin_JQuery();
 $this->addJsPlugin($jq);
 $this->addJsPlugin(new JsPlugin_JQueryCSS());

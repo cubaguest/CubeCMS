@@ -1,4 +1,4 @@
-<?
+<?php 
 if(isset ($vars['link'])){
    $link = (string)$vars['link'];
 } else if(isset ($this->linkBack) AND $this->linkBack != null){
@@ -14,5 +14,5 @@ if(isset ($vars['text'])){
 }
 ?>
 <p class="buttonBack">
-   <a href="<?=$link?>" title="<?=$text?>"><span>&laquo;</span>&nbsp;<?=$text?></a>
+   <a href="<?php echo $link?>" title="<?php echo $text?>"><span>&laquo;</span>&nbsp;<?php echo $text?></a>
 </p>

@@ -1,7 +1,7 @@
-<?
+<?php 
 $url = new Url_Link();
 $url->rmParam();
 ?>
 <div id="fb-root"></div>
-<?$this->addFile('https://connect.facebook.net/'.Locales::getLangLocale().'/all.js#xfbml=1');?>
-<fb:comments href="<?=$url?>" width="600"></fb:comments>
+<?php $this->addFile('https://connect.facebook.net/'.Locales::getLangLocale().'/all.js#xfbml=1');?>
+<fb:comments href="<?php echo $url?>" width="600"></fb:comments>

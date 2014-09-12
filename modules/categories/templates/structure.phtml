@@ -1,4 +1,4 @@
-<?
+<?php 
 $this->addCssFile("style.less");
 $jq = new JsPlugin_JQuery();
 $jq->addUIDialog();
@@ -25,11 +25,11 @@ function vveCatsRenderFunc($menuArr) {
 echo $this->toolbox;
 ?>
 
-<h1><?=$this->tr("Struktura stránek")?></h1>
-<?//=$this->includeTpl('navigation.phtml');?>
+<h1><?php echo $this->tr("Struktura stránek")?></h1>
+<?php //=$this->includeTpl('navigation.phtml');?>
 <div class="main-content-detail">
-   <p><?=$this->tr('Ve struktuře jsou zobrazeny také zkryté položky.');?></p>
-   <?//sekce
+   <p><?php echo $this->tr('Ve struktuře jsou zobrazeny také zkryté položky.');?></p>
+   <?php //sekce
    $typeClass = 'mainStruct';
    $id = 'categories-table';
    if($this->isMainMenu != true) {
@@ -40,33 +40,33 @@ echo $this->toolbox;
    ?>
    <hr />
    <div id="category-buttons">
-      <form name="form-add" method="post" action="<?=$this->link()->route('add')?>">
-         <input type="submit" value="<?=$this->tr('Přidat')?>" name="category_add" />
+      <form name="form-add" method="post" action="<?php echo $this->link()->route('add')?>">
+         <input type="submit" value="<?php echo $this->tr('Přidat')?>" name="category_add" />
       </form>
-      <form name="form-edit" method="post" action="<?=$this->link()->route('edit',array('categoryid' => '-ID-'))?>">
-         <input type="submit" value="<?=$this->tr('Upravit')?>" name="category_edit" />
+      <form name="form-edit" method="post" action="<?php echo $this->link()->route('edit',array('categoryid' => '-ID-'))?>">
+         <input type="submit" value="<?php echo $this->tr('Upravit')?>" name="category_edit" />
       </form>
-      <form name="form-settings" method="post" action="<?=$this->link()->route('settings',array('categoryid' => '-ID-'))?>">
-         <input type="submit" value="<?=$this->tr('Nastavit')?>" name="category_settings"  />
+      <form name="form-settings" method="post" action="<?php echo $this->link()->route('settings',array('categoryid' => '-ID-'))?>">
+         <input type="submit" value="<?php echo $this->tr('Nastavit')?>" name="category_settings"  />
       </form>
-      <button id="button-copy-cat"><?=$this->tr('Kopírovat')?></button>
-      <form name="form-delete" method="post" action="<?=$this->link()?>">
-         <input class="button-cancel" type="submit" value="<?=$this->tr('Smazat')?>" name="category_delete"  />
+      <button id="button-copy-cat"><?php echo $this->tr('Kopírovat')?></button>
+      <form name="form-delete" method="post" action="<?php echo $this->link()?>">
+         <input class="button-cancel" type="submit" value="<?php echo $this->tr('Smazat')?>" name="category_delete"  />
          <input type="hidden" value="" name="category_id" />
       </form>
-      <label title="<?=$this->tr('Upravít URL adresy kategorie a podkategorií.')?>"
-             for="checkbox-regen-url"><?=$this->tr('Upravit URL adresy při přesunu')?></label>
+      <label title="<?php echo $this->tr('Upravít URL adresy kategorie a podkategorií.')?>"
+             for="checkbox-regen-url"><?php echo $this->tr('Upravit URL adresy při přesunu')?></label>
       <input id="checkbox-regen-url" type="checkbox" name="cat_regenerate_urls" checked="checked"
-             title="<?=$this->tr('Upravít URL adresy kategorie a podkategorií.')?>" />
+             title="<?php echo $this->tr('Upravít URL adresy kategorie a podkategorií.')?>" />
    </div>
    <br />
    <div id="category-structure-wrap">
-      <div id="category-structure" class="<?=$typeClass?>"><?if($this->structure != null){echo vveCatsRenderFunc($this->structure);}?></div>
+      <div id="category-structure" class="<?php echo $typeClass?>"><?php if($this->structure != null){echo vveCatsRenderFunc($this->structure);}?></div>
    </div>
    
    <div id="category-info"><div></div></div>
    <hr class="reseter" />
-   <div id="copy-cat-dialog" title="<?=$this->tr('Kopírování kategorie')?>"><? echo $this->formCopy;?></div>
+   <div id="copy-cat-dialog" title="<?php echo $this->tr('Kopírování kategorie')?>"><?php  echo $this->formCopy;?></div>
    <script type="text/javascript">
       /* <![CDATA[ */
       function getIdCat(str){
@@ -77,7 +77,7 @@ echo $this->toolbox;
       function loadCatinfo(idc){
          showLoadBox($('#category-info').parent('div'));
          $.ajax({
-               type: "GET", url: "<?=$this->link()->route("getCatInfo")?>", cache : false,
+               type: "GET", url: "<?php echo $this->link()->route("getCatInfo")?>", cache : false,
                data: {idc : idc},
                success: function(data){
                   $('#category-info div').hide().html(data).show();
@@ -106,7 +106,7 @@ echo $this->toolbox;
             if($('input[name=cat_regenerate_urls]').is(':checked')){newPos.regenerate = true;}
             showLoadBox('#category-structure');
             $.ajax({
-               type: "POST", url: "<?=$this->link()->route("moveCat")?>",
+               type: "POST", url: "<?php echo $this->link()->route("moveCat")?>",
                data: newPos,
                success: function(data){
                   hideLoadBox();
@@ -120,13 +120,13 @@ echo $this->toolbox;
       $('input[name=cat_ind_panels]').live('change', function(){
          var sendData = {enabled : false,idc : $(this).parents('div#category-info').find('input[name=id_cat]').val()};
          if($(this).is(":checked")){sendData.enabled = true;}
-         $.ajax({type: "POST", url: "<?=$this->link()->route("changeIndPanels")?>",data: sendData,
+         $.ajax({type: "POST", url: "<?php echo $this->link()->route("changeIndPanels")?>",data: sendData,
             success: function(msg){}})
       });
       // změna visibility
       $('select[name=cat_visibility]').live('change', function(){
          var sendData = {idc : $(this).parents('div#category-info').find('input[name=id_cat]').val(),value : $(this).val()};
-         $.ajax({type: "POST", url: "<?=$this->link()->route("changeVisibility")?>",
+         $.ajax({type: "POST", url: "<?php echo $this->link()->route("changeVisibility")?>",
             data: sendData, success: function(msg){}})
       });
       // editace a nastavení
@@ -146,7 +146,7 @@ echo $this->toolbox;
          var idstr = $('#category-structure').jstree("get_selected").attr('id');
          if(typeof(idstr) != "undefined"){
             var id = getIdCat(idstr);
-            this.action = '<?=$this->link()->route('add')?>?id='+id;
+            this.action = '<?php echo $this->link()->route('add')?>?id='+id;
          }
          return true;
       });
@@ -154,7 +154,7 @@ echo $this->toolbox;
       $('form[name=form-delete]').submit(function(){
          var node = $('#category-structure').jstree("get_selected");
          if(node.length == 0) return false;
-         var q = '<?=$this->tr('Oprvadu odstranit kategorii "%s"? (Odstraní se také její potomci.)')?>';
+         var q = '<?php echo $this->tr('Oprvadu odstranit kategorii "%s"? (Odstraní se také její potomci.)')?>';
          q = q.replace('%s', node.text());
          if(confirm(q)){
             // doplnění id
@@ -181,7 +181,7 @@ echo $this->toolbox;
 
       // kopírování
       var $copyDialog = $('#copy-cat-dialog').dialog({
-         autoOpen: <?echo $this->showCopyDialog == true ? "true" : "false" ?>,
+         autoOpen: <?php echo $this->showCopyDialog == true ? "true" : "false" ?>,
 			height: 220,
 			width: 500,
 			// position: "top",

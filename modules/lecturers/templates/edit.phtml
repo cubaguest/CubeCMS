@@ -1,4 +1,4 @@
-<?
+<?php 
 // do titulku
 if($this->edit) {
    $this->addPageTitle(sprintf($this->_('úprava lektora "%s"'),$this->lecturer->{Lecturers_Model::COLUMN_NAME}.' '.$this->lecturer->{Lecturers_Model::COLUMN_SURNAME}));
@@ -18,7 +18,7 @@ if(isset ($this->form->imgdel)){
 ?>
 
 <div class="article-form-edit">
-   <?
+   <?php 
    echo($this->form);
    ?>
 </div>

@@ -1,38 +1,38 @@
-<h1><?=$this->tr('Zrušení upozornění')?></h1>
+<h1><?php echo $this->tr('Zrušení upozornění')?></h1>
 <div class="text">
-   <?
+   <?php 
    // zpráva
    $dateAdd = new DateTime($this->message->{Forum_Model_Messages::COLUMN_DATE_ADD})
    ?>
-   <h2><?ps( $this->tr('Vaše zpráva') )?>: <?ps( $this->message->{Forum_Model_Messages::COLUMN_NAME} != null ? $this->message->{Forum_Model_Messages::COLUMN_NAME} : null)?></h2>
+   <h2><?php ps( $this->tr('Vaše zpráva') )?>: <?php ps( $this->message->{Forum_Model_Messages::COLUMN_NAME} != null ? $this->message->{Forum_Model_Messages::COLUMN_NAME} : null)?></h2>
    <p><em>
-      <? ps(
+      <?php  ps(
          $this->tr('Přidal').": ".  $this->message->{Forum_Model_Messages::COLUMN_CREATED_BY} .", "
          .$this->tr('přidáno').": ".  vve_date('%x %X', $dateAdd) .", "
          .$this->tr('e-mail').": ".  $this->message->{Forum_Model_Messages::COLUMN_EMAIL}
          )?>
       </em>
    </p>
-   <?=$this->message->{Forum_Model_Messages::COLUMN_TEXT}?>
-   <?
+   <?php echo $this->message->{Forum_Model_Messages::COLUMN_TEXT}?>
+   <?php 
    // téma
    $dateAdd = new DateTime($this->topic->{Forum_Model_Topics::COLUMN_DATE_ADD})
    ?>
-   <h2><?ps( $this->tr('Téma') )?>: <?ps( $this->topic->{Forum_Model_Topics::COLUMN_NAME} )?></h2>
-   <p><em><?ps(
+   <h2><?php ps( $this->tr('Téma') )?>: <?php ps( $this->topic->{Forum_Model_Topics::COLUMN_NAME} )?></h2>
+   <p><em><?php ps(
          $this->tr('Přidal').": ".  $this->topic->{Forum_Model_Topics::COLUMN_CREATED_BY} .", "
          .$this->tr('přidáno').": ".  vve_date('%x %X', $dateAdd)
       )?></em></p>
-   <?=$this->topic->{Forum_Model_Topics::COLUMN_TEXT}?>
+   <?php echo $this->topic->{Forum_Model_Topics::COLUMN_TEXT}?>
    <hr class="reseter" />
    <br />
    <p>
-      <?if($this->message->{Forum_Model_Messages::COLUMN_SEND_NOTIFY}){?>
-         <?=$this->tr('Pokud chcete opravdu zrušit upozornění, klikněte zde')?>: 
-         <a href="<?=$this->link()->param('confirm', true)?>" title="<?=$this->tr('Chci zrušit upozornění!')?>"
-            ><?=$this->tr('Chci zrušit upozornění!')?></a>
-      <?} else {?>
-         <?=$this->tr('Notifikace reakcí na e-mail je vypnuta')?>.
-      <?}?>
+      <?php if($this->message->{Forum_Model_Messages::COLUMN_SEND_NOTIFY}){?>
+         <?php echo $this->tr('Pokud chcete opravdu zrušit upozornění, klikněte zde')?>: 
+         <a href="<?php echo $this->link()->param('confirm', true)?>" title="<?php echo $this->tr('Chci zrušit upozornění!')?>"
+            ><?php echo $this->tr('Chci zrušit upozornění!')?></a>
+      <?php } else {?>
+         <?php echo $this->tr('Notifikace reakcí na e-mail je vypnuta')?>.
+      <?php }?>
    </p>
 </div>

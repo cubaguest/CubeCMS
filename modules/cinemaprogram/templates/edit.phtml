@@ -1,5 +1,5 @@
 <div>
-   <?
+   <?php 
    // do titulku
    if($this->edit) {
       $this->addPageTitle($this->_('úprava filmu'));
@@ -25,67 +25,67 @@
    $tinymce2->setCfgParam('editor_selector', 'mceEditorSimple');
    $this->addJsPlugin($tinymce2);
    ?>
-   <?=$this->form->html()?>
-   <form action="<?=$this->link()?>" method="post" enctype="multipart/form-data">
+   <?php echo $this->form->html()?>
+   <form action="<?php echo $this->link()?>" method="post" enctype="multipart/form-data">
       <fieldset>
-         <legend><?=$this->_('Informace o filmu')?></legend>
+         <legend><?php echo $this->_('Informace o filmu')?></legend>
          <table class="formTableGroup">
             <tr>
                <th class="formLabels">
-                  <?=$this->form->name->label();?>
+                  <?php echo $this->form->name->label();?>
                </th>
                <td class="formControlls">
-                  <?=$this->form->name->controllAll();?>
+                  <?php echo $this->form->name->controllAll();?>
                   <span></span>
                </td>
             </tr>
             <tr>
                <th class="formLabels">
-                  <?=$this->form->originalname->label();?>
+                  <?php echo $this->form->originalname->label();?>
                </th>
                <td class="formControlls">
-                  <?=$this->form->originalname->controllAll();?>
+                  <?php echo $this->form->originalname->controllAll();?>
                   <span></span>
                </td>
             </tr>
             <tr>
                <th class="formLabels">
-                  <?=$this->form->label->label();?>
+                  <?php echo $this->form->label->label();?>
                </th>
                <td class="formControlls">
-                  <?$this->form->label->html()->addClass('mceEditorSimple');
+                  <?php $this->form->label->html()->addClass('mceEditorSimple');
                   $this->form->label->html()->setAttrib('rows', 15);
                   ?>
-                  <?=$this->form->label->controllAll();?>
+                  <?php echo $this->form->label->controllAll();?>
                   <span></span>
                </td>
             </tr>
             <tr>
                <th class="formLabels">
-                  <?=$this->form->length->label();?>
+                  <?php echo $this->form->length->label();?>
                </th>
                <td class="formControlls">
-                  <?$this->form->length->html()->setAttrib('size', 3);?>
-                  <?$this->form->length->html()->setAttrib('maxlength', 3);?>
-                  <?=$this->form->length->controllAll();?>
+                  <?php $this->form->length->html()->setAttrib('size', 3);?>
+                  <?php $this->form->length->html()->setAttrib('maxlength', 3);?>
+                  <?php echo $this->form->length->controllAll();?>
                   <span></span>
                </td>
             </tr>
             <tr>
                <th class="formLabels">
-                  <?=$this->form->type->label();?>
+                  <?php echo $this->form->type->label();?>
                </th>
                <td class="formControlls">
-                  <?=$this->form->type->controllAll();?>
+                  <?php echo $this->form->type->controllAll();?>
                   <span></span>
                </td>
             </tr>
             <tr>
                <th class="formLabels">
-                  <?=$this->form->image->label();?>
+                  <?php echo $this->form->image->label();?>
                </th>
                <td class="formControlls">
-                  <?
+                  <?php 
                   if($this->edit AND $this->movie->{CinemaProgram_Model_Detail::COL_IMAGE} != null) {
                      $this->form->image->setSubLabel($this->_('Uloženo').":&nbsp;".vve_tpl_image_tag(
                              $this->category()->getModule()->getDataDir()
@@ -95,98 +95,98 @@
                   ?>
                </td>
             </tr>
-            <?if(isset ($this->form->image_del)) {?>
+            <?php if(isset ($this->form->image_del)) {?>
             <tr>
                <th class="formLabels">
-                  <?=$this->form->image_del->label();?>
+                  <?php echo $this->form->image_del->label();?>
                </th>
                <td class="formControlls">
-                  <?=$this->form->image_del->controllAll();?>
+                  <?php echo $this->form->image_del->controllAll();?>
                </td>
             </tr>
-            <?}?>
+            <?php }?>
             <tr>
                <th class="formLabels">
-                  <?=$this->form->imdbid->label();?>
+                  <?php echo $this->form->imdbid->label();?>
                </th>
                <td class="formControlls">
-                  <?$this->form->imdbid->html()->setAttrib('size', 8);?>
-                  <?=$this->form->imdbid->controll();?>
-                  <a href="#" id="testImdbLink" title="<?=$this->_('Test odkazu na IMDB')?>">Test</a>
-                  <?=$this->form->imdbid->subLabel();?>
-                  <?=$this->form->imdbid->labelValidations();?>
-               </td>
-            </tr>
-            <tr>
-               <th class="formLabels">
-                  <?=$this->form->csfdid->label();?>
-               </th>
-               <td class="formControlls">
-                  <?$this->form->csfdid->html()->setAttrib('size', 8);?>
-                  <?=$this->form->csfdid->controll();?>
-                  <a href="#" id="testCsfdLink" title="<?=$this->_('Test odkazu na ČSFD')?>">Test</a>
-                  <?=$this->form->csfdid->subLabel();?>
-                  <?=$this->form->csfdid->labelValidations();?>
+                  <?php $this->form->imdbid->html()->setAttrib('size', 8);?>
+                  <?php echo $this->form->imdbid->controll();?>
+                  <a href="#" id="testImdbLink" title="<?php echo $this->_('Test odkazu na IMDB')?>">Test</a>
+                  <?php echo $this->form->imdbid->subLabel();?>
+                  <?php echo $this->form->imdbid->labelValidations();?>
                </td>
             </tr>
             <tr>
                <th class="formLabels">
-                  <?=$this->form->critique->label();?>
+                  <?php echo $this->form->csfdid->label();?>
                </th>
                <td class="formControlls">
-                  <?=$this->form->critique->controllAll();?>
+                  <?php $this->form->csfdid->html()->setAttrib('size', 8);?>
+                  <?php echo $this->form->csfdid->controll();?>
+                  <a href="#" id="testCsfdLink" title="<?php echo $this->_('Test odkazu na ČSFD')?>">Test</a>
+                  <?php echo $this->form->csfdid->subLabel();?>
+                  <?php echo $this->form->csfdid->labelValidations();?>
                </td>
             </tr>
             <tr>
                <th class="formLabels">
-                  <?=$this->form->orderlink->label();?>
+                  <?php echo $this->form->critique->label();?>
                </th>
                <td class="formControlls">
-                  <?=$this->form->orderlink->controllAll();?>
+                  <?php echo $this->form->critique->controllAll();?>
+               </td>
+            </tr>
+            <tr>
+               <th class="formLabels">
+                  <?php echo $this->form->orderlink->label();?>
+               </th>
+               <td class="formControlls">
+                  <?php echo $this->form->orderlink->controllAll();?>
                </td>
             </tr>
          </table>
       </fieldset>
       <fieldset>
-         <legend><?=$this->_('Informace o promítání')?></legend>
+         <legend><?php echo $this->_('Informace o promítání')?></legend>
          <table class="formTableGroup">
             <tr>
                <th class="formLabels">
-                  <?=$this->form->price->label();?>
+                  <?php echo $this->form->price->label();?>
                </th>
                <td class="formControlls">
-                  <?=$this->form->price->controllAll();?>
+                  <?php echo $this->form->price->controllAll();?>
                   <span></span>
                </td>
             </tr>
             <tr>
                <th class="formLabels">
-                  <?=$this->form->access->label();?>
+                  <?php echo $this->form->access->label();?>
                </th>
                <td class="formControlls">
-                  <?=$this->form->access->controllAll();?>
+                  <?php echo $this->form->access->controllAll();?>
                   <span></span>
                </td>
             </tr>
             <tr>
                <th class="formLabels">
-                  <?=$this->form->filmclub->label();?>
+                  <?php echo $this->form->filmclub->label();?>
                </th>
                <td class="formControlls">
-                  <?=$this->form->filmclub->controllAll();?>
+                  <?php echo $this->form->filmclub->controllAll();?>
                   <span></span>
                </td>
             </tr>
             <tr>
                <th class="formLabels">
-                  <?=$this->form->filmtype->label();?>
+                  <?php echo $this->form->filmtype->label();?>
                </th>
                <td class="formControlls">
-                  <?=$this->form->filmtype->controllAll();?>
+                  <?php echo $this->form->filmtype->controllAll();?>
                </td>
             </tr>
          </table>
-         <?
+         <?php 
          $lastId = 1;
          $vals = $this->form->dateId->getValues();
          if(count($vals) == 0){
@@ -195,37 +195,37 @@
          if(!$this->edit) {}
             ?>
          <table class="formTableGroup" id="dateRowsTable">
-               <?
+               <?php 
                $this->form->date->html()->setAttrib('size', 10);
                $this->form->date->html()->addClass('datepicker');
                $this->form->time->html()->setAttrib('size', 5);
                foreach ($vals as $i => $val) {?>
             <tr>
                <th class="formLabels">
-                        <?print($this->form->date->label())?>
+                        <?php print($this->form->date->label())?>
                </th>
                <td class="formControlls">
-                        <?
+                        <?php 
 
                         $this->form->date->setDimensional($i);
                         print($this->form->date->controll())
                             ?>
                </td>
                <th class="formLabels" style="width:50px">
-                        <?=$this->form->time->label()?>
+                        <?php echo $this->form->time->label()?>
                </th>
                <td>
-                        <?
+                        <?php 
 //                        $this->form->time->html()->setAttrib('onChange', 'return checkTime(this)');
                         $this->form->time->setDimensional($i);
                         print($this->form->time->controll())?>
                </td>
                <td>
-                  <a href="#" onclick="return deleteDateRow(this);" title="<?=$this->_('Odstranit řádek')?>">
-                     <img src="<?=vve_get_tpl_file('icons/date_delete.png', VVE_TPL_FILE_IMAGE)?>" alt="delete" />
-                     &nbsp;<?=$this->_('Odstranit řádek')?>
+                  <a href="#" onclick="return deleteDateRow(this);" title="<?php echo $this->_('Odstranit řádek')?>">
+                     <img src="<?php echo vve_get_tpl_file('icons/date_delete.png', VVE_TPL_FILE_IMAGE)?>" alt="delete" />
+                     &nbsp;<?php echo $this->_('Odstranit řádek')?>
                   </a>
-                        <?
+                        <?php 
                         $this->form->dateDeleted->setDimensional($i);
                         $this->form->dateDeleted->setValues('false');
                         print($this->form->dateDeleted->controll());
@@ -238,7 +238,7 @@
                         ?>
                </td>
             </tr>
-               <?}
+               <?php }
                $lastId = $i;
                ?>
          </table>
@@ -246,9 +246,9 @@
             <tr>
                <th class="formLabels"></th>
                <td>
-                  <a href="#" onclick="return addDateRow();" title="<?=$this->_('Přidat řádek')?>">
-                     <img src="<?=vve_get_tpl_file('icons/date_add.png', VVE_TPL_FILE_IMAGE)?>" alt="date add" />
-                     <?=$this->_('Přidat řádek')?>
+                  <a href="#" onclick="return addDateRow();" title="<?php echo $this->_('Přidat řádek')?>">
+                     <img src="<?php echo vve_get_tpl_file('icons/date_add.png', VVE_TPL_FILE_IMAGE)?>" alt="date add" />
+                     <?php echo $this->_('Přidat řádek')?>
                   </a>
                </td>
             </tr>
@@ -266,7 +266,7 @@
    </form>
 
 
-   <?
+   <?php 
    // link pro loading dokumentace k modulu
    //$linkModDoc = new Url_Link_ModuleRequest();
    //$linkModDoc->action('moduledoc', 'html');
@@ -274,11 +274,11 @@
    <script type="text/javascript">
       /* <![CDATA[ */
       $(document).ready(function(){
-         $.datepicker.setDefaults(['<?=Locales::getLang()?>'] ) ;
-         //$.datepicker.regional['<?=Locales::getLang()?>']
+         $.datepicker.setDefaults(['<?php echo Locales::getLang()?>'] ) ;
+         //$.datepicker.regional['<?php echo Locales::getLang()?>']
          $("input.datepicker").datepicker();
       });
-      var lastId = <?=$lastId?>;
+      var lastId = <?php echo $lastId?>;
       // add row
       function addDateRow(){
          lastId++;
@@ -326,17 +326,17 @@
 
       // test csfd odkazu
       $('#testCsfdLink').click(function(){
-         var link = '<?=CinemaProgram_Controller::CSFD_LINK_ID?>';
+         var link = '<?php echo CinemaProgram_Controller::CSFD_LINK_ID?>';
          link = link.replace(/\{ID\}/, $('input[name=movie_csfdid]').val());
-         window.open(link,"<?=$this->_('Test odkazu ČSFD')?>", "");
+         window.open(link,"<?php echo $this->_('Test odkazu ČSFD')?>", "");
          return false;
       });
 
       // test imdb odkazu
       $('#testImdbLink').click(function(){
-         var link = '<?=CinemaProgram_Controller::IMDB_LINK_ID?>';
+         var link = '<?php echo CinemaProgram_Controller::IMDB_LINK_ID?>';
          link = link.replace(/\{ID\}/, $('input[name=movie_imdbid]').val());
-         window.open(link, "<?=$this->_('Test odkazu IMDB')?>", "");
+         window.open(link, "<?php echo $this->_('Test odkazu IMDB')?>", "");
          return false;
       });
       function testImdbId(){
@@ -346,5 +346,5 @@
       }
       /* ]]> */
    </script>
-   <?=$this->includeTpl('buttonback.phtml', true)?>
+   <?php echo $this->includeTpl('buttonback.phtml', true)?>
 </div>

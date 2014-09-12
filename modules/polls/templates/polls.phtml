@@ -1,19 +1,19 @@
-<?
+<?php 
 $this->addFile("css://style.css");
 $h1 = $this->category()->getName();
 echo $this->toolbox;
 ?>
-<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $h1;?></h1>
+<h1><?php $this->includeFile('tpl://engine:headline/icon.phtml'); echo $h1;?></h1>
 <div class="main-content-list">
    <div class="main-content-list-records">
-   <?
+   <?php 
    if(!empty ($this->polls)){
    foreach ($this->polls as $poll) {
    ?>
    <div class="main-content-list-record">
-   <h2><?=$poll->{Polls_Model::COLUMN_QUESTION}?></h2>
-      <div style="position: relative" id="poll_<?=$poll->{Polls_Model::COLUMN_ID}?>">
-         <?if($poll->{Polls_Model::COLUMN_ACTIVE} == true AND !in_array($poll->{Polls_Model::COLUMN_ID}, $this->votedPolls)) {
+   <h2><?php echo $poll->{Polls_Model::COLUMN_QUESTION}?></h2>
+      <div style="position: relative" id="poll_<?php echo $poll->{Polls_Model::COLUMN_ID}?>">
+         <?php if($poll->{Polls_Model::COLUMN_ACTIVE} == true AND !in_array($poll->{Polls_Model::COLUMN_ID}, $this->votedPolls)) {
             // více možností
             if ($poll->{Polls_Model::COLUMN_IS_MULTI} == true) {
                $this->formmulti->html()->addClass('pollVoteForm');
@@ -34,7 +34,7 @@ echo $this->toolbox;
             }
          } else {
             // jenom, zobrazení?>
-            <?
+            <?php 
             $pollTpl = new Template_Module($this->link(), $this->category());
             $pollTpl->addTplFile('poll_read.phtml');
             $pollTpl->poll = $poll;
@@ -42,7 +42,7 @@ echo $this->toolbox;
          }
          ?>
       </div>
-      <?
+      <?php 
       if($this->toolboxPoll instanceof Template_Toolbox2){
          $this->formDelete->id->setValues($poll->{Polls_Model::COLUMN_ID}); /* This is not real good */
          $this->toolboxPoll->poll_edit->setAction($this->link()->route('edit', array('id' => $poll->{Polls_Model::COLUMN_ID})));
@@ -50,7 +50,7 @@ echo $this->toolbox;
       }
       ?>
    </div>
-      <?
+      <?php 
    }
    echo $this->scrollComp; // skrolery
       $jQuery = new JsPlugin_JQuery();
@@ -58,7 +58,7 @@ echo $this->toolbox;
       // vložení skriptu pro ajax
       $this->includeTpl('voteScript.phtml');
    } else {?>
-   <p><?=$this->_('Žádná anketa není vložena')?></p>
-   <?}?>
+   <p><?php echo $this->_('Žádná anketa není vložena')?></p>
+   <?php }?>
 </div>
 </div>

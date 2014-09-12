@@ -1,12 +1,12 @@
-<?
+<?php 
 $h = $this->template == null ? $this->tr('Vytvořit šablonu') : sprintf($this->tr('Úprava šablony %s'), $this->template->{MailsNewsletters_Model_Templates::COLUMN_NAME}) ;
 $this->addPageTitle($h);
 $this->addFile('css://style.less');
 ?>
-<h1><?ps($h)?></h1>
-<?=$this->includeTpl('navigation.phtml');?>
+<h1><?php ps($h)?></h1>
+<?php echo $this->includeTpl('navigation.phtml');?>
 <div class="main-content-form-edit" id="mails-send-mail-form">
-   <?
+   <?php 
    echo $this->form;
     ?>
 </div>

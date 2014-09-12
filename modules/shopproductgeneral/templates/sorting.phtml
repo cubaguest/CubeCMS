@@ -1,24 +1,24 @@
-<?
+<?php 
 $sorts = Shop_Product_Controller::getSortTypes();
 $nums = array($this->category()->getParam('scroll', 10),30,60,100);
 ?>
 <div class="products-sorting">
-   <form action="<?=$this->link()?>" method="get">
-      <label><?=$this->tr('Řadit podle')?></label>: 
+   <form action="<?php echo $this->link()?>" method="get">
+      <label><?php echo $this->tr('Řadit podle')?></label>: 
       <select name="sort" onchange="this.form.submit();">
-         <option value="" <?if( !isset ($_GET['sort']) || $_GET['sort'] == null){ echo 'selected="selected"';}?>
-                 ><?=$this->tr('Výchozí');?></option>   
-         <?foreach ($sorts as $key => $sort) {?>
-         <option value="<?=$key?>" <?if( isset ($_GET['sort']) && $_GET['sort'] == $key ){ echo 'selected="selected"';}?>
-                 ><?=$sort['name']?></option>   
-         <?}?>
+         <option value="" <?php if( !isset ($_GET['sort']) || $_GET['sort'] == null){ echo 'selected="selected"';}?>
+                 ><?php echo $this->tr('Výchozí');?></option>   
+         <?php foreach ($sorts as $key => $sort) {?>
+         <option value="<?php echo $key?>" <?php if( isset ($_GET['sort']) && $_GET['sort'] == $key ){ echo 'selected="selected"';}?>
+                 ><?php echo $sort['name']?></option>   
+         <?php }?>
       </select>
-      <label><?=$this->tr('Zobrazi')?></label>: 
+      <label><?php echo $this->tr('Zobrazi')?></label>: 
       <select name="num" onchange="this.form.submit();">
-         <?  foreach ($nums as $num) {?>
-         <option value="<?=$num?>" <?if( isset ($_GET['num']) && $_GET['num'] == $num ){ echo 'selected="selected"';}?>
-           ><?=$num?></option>   
-         <?}?>
+         <?php   foreach ($nums as $num) {?>
+         <option value="<?php echo $num?>" <?php if( isset ($_GET['num']) && $_GET['num'] == $num ){ echo 'selected="selected"';}?>
+           ><?php echo $num?></option>   
+         <?php }?>
       </select>
    </form>
 </div>

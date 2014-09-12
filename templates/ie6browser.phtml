@@ -1,5 +1,5 @@
 <div id="IEWarning">
-   <strong>Používáte zastaralý prohlížeč (<?print(date('Y')-2001)?> let)</strong>
+   <strong>Používáte zastaralý prohlížeč (<?php print(date('Y')-2001)?> let)</strong>
    <div>
       Pro&nbsp;lepší uživatelský komfort, rychlejší prohlížení stránek a bezpečnost Vašeho počítače
       doporučujeme upgrade na&nbsp;novější verzi nebo přechod na&nbsp;jiný typ prohlížeče.<br />
@@ -16,7 +16,7 @@
          <img src="images/browsers/ie.png" alt="Internet Explorer logo" /><br />
          Internet Explorer
       </a>
-      <a href="http://www.mozilla.com/<?=Locales::getLang()?>/" title="Mozilla Firefox"
+      <a href="http://www.mozilla.com/<?php echo Locales::getLang()?>/" title="Mozilla Firefox"
          onclick="return ! window.open(this.href);"
          style="display: block;float: left; padding-right: 10px; width: 60px; text-align: center">
          <img src="images/browsers/firefox.png" alt="Mozilla Firefox logo" /><br />
@@ -41,7 +41,7 @@
    <hr class="reseter" />
    <br />
    <p style="text-align: right;">
-      <a href="<?=$this->link()?>" title="Již nezobrazovat" onclick="return disableIEMessage()">Již nezobrazovat</a>
+      <a href="<?php echo $this->link()?>" title="Již nezobrazovat" onclick="return disableIEMessage()">Již nezobrazovat</a>
    </p>
 </div>
 <script type="text/javascript">

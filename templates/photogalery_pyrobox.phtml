@@ -1,4 +1,4 @@
-<?
+<?php 
 /* 
  * Šablona pro fotogalerie
  */
@@ -21,14 +21,14 @@ $images = $this->images;
 $c = count($images);
 if($c != 0){?>
    <div class="main-content-images">
-      <?
+      <?php 
       foreach ($images as $image) {
          $imgFile = isset($image->{$propFile}) ? $image->{$propFile} : $image[$propFile];
          ?>
-         <a class="pirobox_gall image" rel="prettyPhoto[pp_gal]" href="<?=$dirMedium.$imgFile?>" title="<?=$image->{$propAlt}?>" >
-            <img src="<?=$dirSmall.$imgFile?>" alt="<?=$image->{$propName}?>" />
+         <a class="pirobox_gall image" rel="prettyPhoto[pp_gal]" href="<?php echo $dirMedium.$imgFile?>" title="<?php echo $image->{$propAlt}?>" >
+            <img src="<?php echo $dirSmall.$imgFile?>" alt="<?php echo $image->{$propName}?>" />
          </a>
-         <?
+         <?php 
       }
       echo $this->toolboxImages;
       ?>
@@ -39,11 +39,11 @@ if($c != 0){?>
       $(document).ready(function(){$().piroBox({slideShow : true,slideSpeed : 3});});
       /* ]]> */
    </script>
-<?} else if($this->toolboxImages != null){?>
+<?php } else if($this->toolboxImages != null){?>
    <div class="admin-info-text">
-      <?
+      <?php 
       echo $this->tr('Galerie neobsahuje žádný obrázek.');
       echo $this->toolboxImages;
       ?>
    </div>
-<?}?>
+<?php }?>

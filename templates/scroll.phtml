@@ -1,31 +1,31 @@
 <!--Sipky pro posun stranek-->
-<?
+<?php 
 if($this->countAllPages > 1){?>
 <div class="scroll">
    <div class="left-box">
-   <? //Sipka na předchozí
+   <?php  //Sipka na předchozí
    if($this->activeButtonPrevious){?>
-      <a href="<?=$this->pageLink()->param($this->pageParam, $this->selectedPage-1)?>" title="<?=$this->tr('Předchozí')?>">
-         <?=$this->tr('Předchozí')?>
+      <a href="<?php echo $this->pageLink()->param($this->pageParam, $this->selectedPage-1)?>" title="<?php echo $this->tr('Předchozí')?>">
+         <?php echo $this->tr('Předchozí')?>
       </a>
-   <?} else {?>
-      <span><?=$this->tr('Předchozí')?></span>
-   <?}?>
+   <?php } else {?>
+      <span><?php echo $this->tr('Předchozí')?></span>
+   <?php }?>
    </div>
    
    <div class="right-box">
-      <? //Sipka na další
+      <?php  //Sipka na další
       if($this->activeButtonNext){?>
-      <a href="<?=$this->pageLink()->param($this->pageParam, $this->selectedPage+1)?>" title="<?=$this->tr('Další')?>">
-         <?=$this->tr('Další')?>
+      <a href="<?php echo $this->pageLink()->param($this->pageParam, $this->selectedPage+1)?>" title="<?php echo $this->tr('Další')?>">
+         <?php echo $this->tr('Další')?>
       </a>
-   <?} else {?>
-      <span><?=$this->tr('Další')?></span>
-   <?}?>
+   <?php } else {?>
+      <span><?php echo $this->tr('Další')?></span>
+   <?php }?>
    </div>
    
    <div class="numbers">
-      <? if($this->selectedPage > 1 && !isset ($this->pagesLeftSideArray[1])){
+      <?php  if($this->selectedPage > 1 && !isset ($this->pagesLeftSideArray[1])){
          $link = $this->pageLink()->param($this->pageParam, 1);
          echo "<a href=\"$link\" title=\"1\">1</a> ...";
       }
@@ -58,4 +58,4 @@ if($this->countAllPages > 1){?>
       ?>
    </div>
 </div>
-<?}?>
+<?php }?>

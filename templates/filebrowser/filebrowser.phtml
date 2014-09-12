@@ -15,34 +15,34 @@ if(Auth::isLogin() == false){
 <html>
    <head>
       <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-      <?$this->renderHeaderCSSJS()?>
-      <script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/enginehelpers.min.js"></script>
-      <script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/tinymce/tiny_mce.js"></script>
-      <script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/tinymce/tiny_mce_popup.js"></script>
-      <script type="text/javascript">/* <![CDATA[ */<?$this->renderHeaderScripts()?>/* ]]> */</script>
-      <?if(VVE_DEBUG_LEVEL > 1){?>
-         <script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/filebrowser/filebrowser.js"></script>
-      <?} else {?>
-         <script type="text/javascript" src="<?=Url_Request::getBaseWebDir()?>jscripts/filebrowser/filebrowser.js"></script>
-      <?}?>
+      <?php $this->renderHeaderCSSJS()?>
+      <script type="text/javascript" src="<?php echo Url_Request::getBaseWebDir()?>jscripts/enginehelpers.min.js"></script>
+      <script type="text/javascript" src="<?php echo Url_Request::getBaseWebDir()?>jscripts/tinymce/tiny_mce.js"></script>
+      <script type="text/javascript" src="<?php echo Url_Request::getBaseWebDir()?>jscripts/tinymce/tiny_mce_popup.js"></script>
+      <script type="text/javascript">/* <![CDATA[ */<?php $this->renderHeaderScripts()?>/* ]]> */</script>
+      <?php if(VVE_DEBUG_LEVEL > 1){?>
+         <script type="text/javascript" src="<?php echo Url_Request::getBaseWebDir()?>jscripts/filebrowser/filebrowser.js"></script>
+      <?php } else {?>
+         <script type="text/javascript" src="<?php echo Url_Request::getBaseWebDir()?>jscripts/filebrowser/filebrowser.js"></script>
+      <?php }?>
    </head>
    <body id="cubecms-filebrowser">
    <script language="javascript" type="text/javascript">
    
    var browserParams = {
       // základní adresy
-      uploadLink: '<?=$this->uploadLink?>',
-      baseUrl: '<?=Url_Request::getBaseWebDir();?>',
-      sessionId: '<?=session_id()?>',
-      listType: '<?echo isset($_GET['t']) ? $_GET['t'] : Component_TinyMCE_Browser::LIST_TYPE_FILES;?>',
-      imageBigSizeW: <?=VVE_DEFAULT_PHOTO_W?>,
-      imageBigSizeH: <?=VVE_DEFAULT_PHOTO_H?>,
-      imageSmallSizeW: <?=VVE_IMAGE_THUMB_W?>,
-      imageSmallSizeH: <?=VVE_IMAGE_THUMB_H?>,
-      maxUploadFileSize: <?=VVE_MAX_UPLOAD_SIZE?>, // in MB
-      cookieName: '<?=VVE_SESSION_NAME?>_Cube_Cms_brpath',
-      baseListPath: '<? echo Auth::isAdmin() ? '/public/' : '/home/'.Auth::getUserName().'/'; ?>',
-      openDir: <?echo (isset($_GET['forcedir']) && $_GET['forcedir'] != null ) ? "'".urldecode($_GET['forcedir'])."'" : 'false';?>,
+      uploadLink: '<?php echo $this->uploadLink?>',
+      baseUrl: '<?php echo Url_Request::getBaseWebDir();?>',
+      sessionId: '<?php echo session_id()?>',
+      listType: '<?php echo isset($_GET['t']) ? $_GET['t'] : Component_TinyMCE_Browser::LIST_TYPE_FILES;?>',
+      imageBigSizeW: <?php echo VVE_DEFAULT_PHOTO_W?>,
+      imageBigSizeH: <?php echo VVE_DEFAULT_PHOTO_H?>,
+      imageSmallSizeW: <?php echo VVE_IMAGE_THUMB_W?>,
+      imageSmallSizeH: <?php echo VVE_IMAGE_THUMB_H?>,
+      maxUploadFileSize: <?php echo VVE_MAX_UPLOAD_SIZE?>, // in MB
+      cookieName: '<?php echo VVE_SESSION_NAME?>_Cube_Cms_brpath',
+      baseListPath: '<?php  echo Auth::isAdmin() ? '/public/' : '/home/'.Auth::getUserName().'/'; ?>',
+      openDir: <?php echo (isset($_GET['forcedir']) && $_GET['forcedir'] != null ) ? "'".urldecode($_GET['forcedir'])."'" : 'false';?>,
       translations : {}
    };
 //   $(document).ready(function(){
@@ -118,8 +118,8 @@ if(Auth::isLogin() == false){
                   <div class="form-row">
                      <?php ps($this->tr('Zrcadlit'))?>
                      <select name="flip">
-                        <option value="<?=IMG_FLIP_HORIZONTAL?>">Horizontálně</option>
-                        <option value="<?=IMG_FLIP_VERTICAL?>">Vertikálně</option>
+                        <option value="<?php echo IMG_FLIP_HORIZONTAL?>">Horizontálně</option>
+                        <option value="<?php echo IMG_FLIP_VERTICAL?>">Vertikálně</option>
                      </select>
                   </div>
                   <div class="form-row">
@@ -135,7 +135,7 @@ if(Auth::isLogin() == false){
                <form method="post" action="" onsubmit="CubeBrowserFileActionsWidget.watermarkImages(); return false;">
                   <div class="form-row">
                      <label for="input-watemark-text"><?php ps($this->tr('Text'))?></label>:<br />
-                     <input name="text" type="text" value="<?=CUBE_CMS_WEB_NAME?>" id="input-watemark-text" />
+                     <input name="text" type="text" value="<?php echo CUBE_CMS_WEB_NAME?>" id="input-watemark-text" />
                   </div>
                   <div class="form-row">
                      <label><?php ps($this->tr('Kódy barev'))?> (000000)</label>:<br />
@@ -147,14 +147,14 @@ if(Auth::isLogin() == false){
                   <div class="form-row">
                      <?php ps($this->tr('Pozice'))?><br />
                      <select name="posX">
-                        <option value="left"><?ps($this->tr('Vlevo'))?></option>
-                        <option value="center"><?ps($this->tr('Uprostřed'))?></option>
-                        <option value="right" selected=""><?ps($this->tr('Vpravo'))?></option>
+                        <option value="left"><?php ps($this->tr('Vlevo'))?></option>
+                        <option value="center"><?php ps($this->tr('Uprostřed'))?></option>
+                        <option value="right" selected=""><?php ps($this->tr('Vpravo'))?></option>
                      </select>
                      <select name="posY">
-                        <option value="top"><?ps($this->tr('Nahoře'))?></option>
-                        <option value="center"><?ps($this->tr('Uprostřed'))?></option>
-                        <option value="bottom" selected=""><?ps($this->tr('Dole'))?></option>
+                        <option value="top"><?php ps($this->tr('Nahoře'))?></option>
+                        <option value="center"><?php ps($this->tr('Uprostřed'))?></option>
+                        <option value="bottom" selected=""><?php ps($this->tr('Dole'))?></option>
                      </select>
                   </div>
                   
@@ -172,39 +172,39 @@ if(Auth::isLogin() == false){
                   <div class="form-row">
                      <label for="image-filter-select"><?php ps($this->tr('Filtr'))?></label>
                      <select name="filter" id="image-filter-select">
-                        <option value="<?=IMG_FILTER_GRAYSCALE?>" data-adv="0"><?ps($this->tr('Odstíny šedi'))?></option>
-                        <option value="<?=IMG_FILTER_NEGATE?>" data-adv="0"><?ps($this->tr('Negativ'))?></option>
-                        <!--<option value="<?=IMG_FILTER_NEGATE?>"><? ps($this->tr('Zaostřit'))?></option>-->
+                        <option value="<?php echo IMG_FILTER_GRAYSCALE?>" data-adv="0"><?php ps($this->tr('Odstíny šedi'))?></option>
+                        <option value="<?php echo IMG_FILTER_NEGATE?>" data-adv="0"><?php ps($this->tr('Negativ'))?></option>
+                        <!--<option value="<?php echo IMG_FILTER_NEGATE?>"><?php  ps($this->tr('Zaostřit'))?></option>-->
                         
-                        <option value="<?=IMG_FILTER_SELECTIVE_BLUR?>"data-adv="0"><?ps($this->tr('Rozostřit (selektivní)'))?></option>
+                        <option value="<?php echo IMG_FILTER_SELECTIVE_BLUR?>"data-adv="0"><?php ps($this->tr('Rozostřit (selektivní)'))?></option>
                         
-                        <option value="<?=IMG_FILTER_GAUSSIAN_BLUR?>" data-adv="0"><?ps($this->tr('Rozostřit (gausian)'))?></option>
+                        <option value="<?php echo IMG_FILTER_GAUSSIAN_BLUR?>" data-adv="0"><?php ps($this->tr('Rozostřit (gausian)'))?></option>
                         
-                        <option value="<?=IMG_FILTER_PIXELATE?>" 
+                        <option value="<?php echo IMG_FILTER_PIXELATE?>" 
                                 data-adv="1"
                                 data-advtitle="0 až 255"
                                 data-advmin=""
                                 data-advmax="255"
                                 data-advdefault="10"
-                                ><?ps($this->tr('Pixelizovat'))?></option>
+                                ><?php ps($this->tr('Pixelizovat'))?></option>
                         
-                        <option value="<?=IMG_FILTER_BRIGHTNESS?>" 
+                        <option value="<?php echo IMG_FILTER_BRIGHTNESS?>" 
                                 data-adv="1"
                                 data-advtitle="-255 až 255"
                                 data-advmin="-255"
                                 data-advmax="255"
                                 data-advdefault="40"
-                                ><?ps($this->tr('Světlost'))?></option>
+                                ><?php ps($this->tr('Světlost'))?></option>
                         
-                        <option value="<?=IMG_FILTER_CONTRAST?>"
+                        <option value="<?php echo IMG_FILTER_CONTRAST?>"
                                 data-adv="1"
                                 data-advtitle="-255 až 255"
                                 data-advmin="-255"
                                 data-advmax="255"
                                 data-advdefault="-40"
-                                ><?ps($this->tr('Kontrast'))?></option>
+                                ><?php ps($this->tr('Kontrast'))?></option>
                         
-                        <option value="<?=IMG_FILTER_EDGEDETECT?>" data-adv="0"><?ps($this->tr('Detekce hran'))?></option>
+                        <option value="<?php echo IMG_FILTER_EDGEDETECT?>" data-adv="0"><?php ps($this->tr('Detekce hran'))?></option>
                         
                         <option value="sepia" 
                                 data-adv="1"
@@ -212,7 +212,7 @@ if(Auth::isLogin() == false){
                                 data-advmin="-255"
                                 data-advmax="255"
                                 data-advdefault="60"
-                                ><?ps($this->tr('Sépie'))?></option>
+                                ><?php ps($this->tr('Sépie'))?></option>
                      </select>
                   </div>
                   <div class="form-row" id="fitler-settings">
@@ -249,7 +249,7 @@ if(Auth::isLogin() == false){
                <div class="col-tools">
                   <button id="toolbox-button-home" 
                           class="button-icon" 
-                          onclick="CubeBrowserListWidget.loadPath('/home/<?=Auth::getUserName()?>/'); return false;"
+                          onclick="CubeBrowserListWidget.loadPath('/home/<?php echo Auth::getUserName()?>/'); return false;"
                           title="<?php ps($this->tr('Domů'))?>"><span class="icon icon-home"></span></button>
                   <button id="toolbox-button-public" 
                           class="button-icon" 
@@ -296,7 +296,7 @@ if(Auth::isLogin() == false){
                </div>
                <div class="col-buttons">
                   <button id="button-create-folder" onclick="CubeBrowser.openNewDirDialog()"><span class="icon icon-plus"></span> <?php ps($this->tr('Nová složka'))?></button>
-                  <?
+                  <?php 
                   $this->uploadForm->setDecorator(new Form_Decorator_Clear());
                   $this->uploadForm->html()->setAttrib('target', 'fb_u_target')->setAttrib('id', 'upload-form');
                   echo $this->uploadForm->renderStart();
@@ -306,7 +306,7 @@ if(Auth::isLogin() == false){
                   echo $this->uploadForm->file->control();
                   ?>
                   <button id="toolbox-button-upload" type="button"><span class="icon icon-upload"></span> <?php ps($this->tr('Nahrát'))?></button>
-                  <?
+                  <?php 
                   echo $this->uploadForm->renderEnd();
                   ?>
                </div>
@@ -336,7 +336,7 @@ if(Auth::isLogin() == false){
                   <span class="actions">
                      <a href="#" onclick="CubeBrowser.openRenameDialog(this); return false;"><span class="icon icon-pencil"></span></a>
                      <a href="#" onclick="CubeBrowser.openDeleteDialog(this); return false;" class="button-remove"><span class="icon icon-times"></span></a>
-                     <a href="" class="button-open-external" title="<?ps($this->tr('Otevřít v novém okně'))?>"><span class="icon icon-share"></span></a>
+                     <a href="" class="button-open-external" title="<?php ps($this->tr('Otevřít v novém okně'))?>"><span class="icon icon-share"></span></a>
                   </span>
                   <span class="preview"><img src="" alt="" /></span>
                </li>
@@ -357,7 +357,7 @@ if(Auth::isLogin() == false){
                      $rStr = rand(0, 2);
                      $types = array('info', "warning", 'error');
                      ?>
-                  <li class="msg msg-<?=$types[$rStr]?>">položka <?=$i?></li>
+                  <li class="msg msg-<?php echo $types[$rStr]?>">položka <?php echo $i?></li>
                   <?php }*/?>
                </ul>
                <a href="" class="button-clear-list" onclick="CubeBrowserLogsWidget.clear(); return false;"><span class="icon icon-times"></span></a>
@@ -369,7 +369,7 @@ if(Auth::isLogin() == false){
                   /*$rand = rand(1, 20);
                   for ($i = 1; $i <= $rand; $i++) {?>
                   <li>
-                     <a href="">položka <?=$i?></a><a class="button-remove" href=""><span class="icon icon-times"></span></a>
+                     <a href="">položka <?php echo $i?></a><a class="button-remove" href=""><span class="icon icon-times"></span></a>
                   </li>
                   <?php }
                    */?>
@@ -396,11 +396,11 @@ if(Auth::isLogin() == false){
    <div id="working" style="display: none;">
       <p>
          Zpracovávám...
-         <img src="<?=Url_Request::getBaseWebDir()?>images/ajaxProgress.gif" alt="..." /><br />
+         <img src="<?php echo Url_Request::getBaseWebDir()?>images/ajaxProgress.gif" alt="..." /><br />
          <span style="font-size: xx-small">(Pokud zpracování trvá příliš dlouho, zkuste klávesou F5 obnovit stránku.)</span>
       </p>
    </div>
-   <iframe id="upload_target" name="fb_u_target" src="<?=$this->uploadLink?>&method=iframe" style="width:0;height:0;border:0px solid #fff;"></iframe>
+   <iframe id="upload_target" name="fb_u_target" src="<?php echo $this->uploadLink?>&method=iframe" style="width:0;height:0;border:0px solid #fff;"></iframe>
    <div id="dialog-copy" class="dialog">
       <div class="dialog-content">
          <div class="title"><?php ps($this->tr('Kopírovat vybrané'))?></div>

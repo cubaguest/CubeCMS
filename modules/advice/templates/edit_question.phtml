@@ -1,4 +1,4 @@
-<?
+<?php 
 
 $title = $this->question->{Advice_Model::COLUMN_NAME} != null 
    ? $this->question->{Advice_Model::COLUMN_NAME} 
@@ -16,18 +16,18 @@ if (isset ($this->form->drugs)) {
 }
 
 ?>
-<h1 style="<?if($this->question->{Advice_Model::COLUMN_COLOR} != ""){echo "border-bottom: 5px solid #".$this->question->{Advice_Model::COLUMN_COLOR}.";";}?>"><?ps($title);?></h1>
+<h1 style="<?php if($this->question->{Advice_Model::COLUMN_COLOR} != ""){echo "border-bottom: 5px solid #".$this->question->{Advice_Model::COLUMN_COLOR}.";";}?>"><?php ps($title);?></h1>
 <div class="main-content-detail">
    <p class="text">
-      <?=$this->tr("Vloženo").': '.vve_date("%x", new DateTime($this->question->{Advice_Model::COLUMN_DATE_ADD}))?>,<br />
-      <strong><?echo $this->tr("Souhlas se zveřejněním").": ".($this->question->{Advice_Model::COLUMN_IS_PUBLIC_ALLOW} == true ? $this->tr('Ano') : $this->tr('Ne'));?></strong>
+      <?php echo $this->tr("Vloženo").': '.vve_date("%x", new DateTime($this->question->{Advice_Model::COLUMN_DATE_ADD}))?>,<br />
+      <strong><?php echo $this->tr("Souhlas se zveřejněním").": ".($this->question->{Advice_Model::COLUMN_IS_PUBLIC_ALLOW} == true ? $this->tr('Ano') : $this->tr('Ne'));?></strong>
    </p>
-   <?
+   <?php 
    $this->form->html()->setAttrib('id', 'form-edit-question');
    echo $this->form;
    ?>
 </div>
-<?
+<?php 
 $this->addJsPlugin(new JsPlugin_JQuery());
 ?>
    <script type="text/javascript">
@@ -49,7 +49,7 @@ $this->addJsPlugin(new JsPlugin_JQuery());
             if($('input[name="question_sendAnswer"]').lenght != 0 &&
                !$('input[name="question_sendAnswer"]').is(":checked") &&
                answer != "" && answer != origAnswer ){
-<!--               if(confirm('--><?//=$this->tr('Odpověď byla vyplněna. Chcete ji odeslat emailem?')?><!--')){-->
+<!--               if(confirm('--><?php //=$this->tr('Odpověď byla vyplněna. Chcete ji odeslat emailem?')?><!--')){-->
 <!--                  $('input[name="question_sendAnswer"]').attr('checked', true);-->
 <!--               }-->
             }

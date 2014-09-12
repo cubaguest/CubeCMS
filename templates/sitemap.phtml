@@ -1,4 +1,4 @@
-<?
+<?php 
 // funkce pro render menu
 function vveRenderMap($menuArr, $link, $catsArr) {
    print ("<ul>\n");
@@ -27,10 +27,10 @@ function vveRenderMap($menuArr, $link, $catsArr) {
    print ("</ul>\n");
 }
 ?>
-<h1><?= $this->tr("Mapa stránek") ?></h1>
+<h1><?php echo  $this->tr("Mapa stránek") ?></h1>
 <div class="main-content-detail">
    <div class="main-content-text page-sitemap">
-<?= vveRenderMap($this->categories, $this->link(), $this->catArr) ?>
+<?php echo  vveRenderMap($this->categories, $this->link(), $this->catArr) ?>
       <hr class="reseter" />
    </div>
 </div>

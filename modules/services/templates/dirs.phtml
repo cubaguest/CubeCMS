@@ -1,15 +1,15 @@
-<?
+<?php 
 $this->addPageTitle($this->tr('Diskový prostor'));
 ?>
-<h1><?= $this->tr('Diskový prostor'); ?></h1>
-<? $this->includeTpl('navigation.phtml'); ?>
+<h1><?php echo  $this->tr('Diskový prostor'); ?></h1>
+<?php  $this->includeTpl('navigation.phtml'); ?>
 <div class="main-content-detail">
    <h2>Cache</h2>
    <div>
       Vyčištění odkládacího prostoru pro soubory.<br />
       Aktuální velikost:
-      <span style="font-weight:bold;<? if ($this->isBigSize === true) { echo ("color:red;");}?>">
-         <?if ($this->cacheSize > 1024 * 1024) {
+      <span style="font-weight:bold;<?php  if ($this->isBigSize === true) { echo ("color:red;");}?>">
+         <?php if ($this->cacheSize > 1024 * 1024) {
             echo (round($this->cacheSize / (1024 * 1024), 2) . "&nbsp;MB");
          } else if ($this->cacheSize > 1024) {
             echo (round($this->cacheSize / (1024), 2) . "&nbsp;KB");
@@ -17,15 +17,15 @@ $this->addPageTitle($this->tr('Diskový prostor'));
             echo (round($this->cacheSize, 2) . "&nbsp;B");
          }?>
       </span>
-      <form action="<?= $this->link() ?>" method="post">
-         <?=$this->formClearCache->clear->controll() ?>
+      <form action="<?php echo  $this->link() ?>" method="post">
+         <?php echo $this->formClearCache->clear->controll() ?>
       </form>
    </div>
    <br />
    <h2>Data</h2>
    <div>
       Aktuální velikost:
-      <span><?if ($this->dataSize > 1024 * 1024) {
+      <span><?php if ($this->dataSize > 1024 * 1024) {
             echo (round($this->dataSize / (1024 * 1024), 2) . "&nbsp;MB");
          } else if ($this->dataSize > 1024) {
             echo (round($this->dataSize / (1024), 2) . "&nbsp;KB");

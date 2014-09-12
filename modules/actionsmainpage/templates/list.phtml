@@ -1,4 +1,4 @@
-<?
+<?php 
 $this->addPageHeadline($this->category->getName());
 
 $jQuery = new JsPlugin_JQuery();
@@ -8,7 +8,7 @@ $this->addJsPlugin(new JsPlugin_PiroBox());
 ?>
 
 <div>
-   <?
+   <?php 
    $step = 1;
    $printType = true;
    $someImages = false;
@@ -49,20 +49,20 @@ $this->addJsPlugin(new JsPlugin_PiroBox());
       }
       ?>
    <div>
-         <?if($printType) {?>
-      <p><?=$type;?></p>
-            <?}?>
-      <h2><a href="<?=$this->link()->category($row->curlkey)
+         <?php if($printType) {?>
+      <p><?php echo $type;?></p>
+            <?php }?>
+      <h2><a href="<?php echo $this->link()->category($row->curlkey)
                         ->route('detail', array('urlkey' => $row->{Actions_Model_Detail::COLUMN_URLKEY}))?>"
-             title="<?=$row->{Actions_Model_Detail::COLUMN_NAME}?>"
-             ><?=$subLabel?></a></h2>
-            <?if($row->{Actions_Model_Detail::COLUMN_AUTHOR} != null) {?>
+             title="<?php echo $row->{Actions_Model_Detail::COLUMN_NAME}?>"
+             ><?php echo $subLabel?></a></h2>
+            <?php if($row->{Actions_Model_Detail::COLUMN_AUTHOR} != null) {?>
       <p>
-               <?=$row->{Actions_Model_Detail::COLUMN_AUTHOR}?>
+               <?php echo $row->{Actions_Model_Detail::COLUMN_AUTHOR}?>
       </p>
-            <?}?>
+            <?php }?>
       <p>
-            <?
+            <?php 
             $startDate = vve_date("%x", new DateTime($row->{Actions_Model_Detail::COLUMN_DATE_START}));
             $stopDate = vve_date("%x", new DateTime($row->{Actions_Model_Detail::COLUMN_DATE_STOP}));
             print ($startDate);
@@ -85,54 +85,54 @@ $this->addJsPlugin(new JsPlugin_PiroBox());
             }
             ?>
       </p>
-      <?if($row->{Actions_Model_Detail::COLUMN_NOTE} != null) {?>
-      <p><?=$row->{Actions_Model_Detail::COLUMN_NOTE}?></p>
-            <?}?>
+      <?php if($row->{Actions_Model_Detail::COLUMN_NOTE} != null) {?>
+      <p><?php echo $row->{Actions_Model_Detail::COLUMN_NOTE}?></p>
+            <?php }?>
       <div class="actionTabs">
-            <?if($countImages > 0) {?>
+            <?php if($countImages > 0) {?>
          <ul>
-            <li><a href="#actionText_<?=$step?>"><?=$this->_('Text')?></a></li>
-            <li><a href="#actionImages_<?=$step?>"><?=$this->_('Fotky')?></a></li>
+            <li><a href="#actionText_<?php echo $step?>"><?php echo $this->_('Text')?></a></li>
+            <li><a href="#actionImages_<?php echo $step?>"><?php echo $this->_('Fotky')?></a></li>
          </ul>
-               <?}?>
-         <div id="actionText_<?=$step?>"><!-- SOF TEXT -->
+               <?php }?>
+         <div id="actionText_<?php echo $step?>"><!-- SOF TEXT -->
 
             <p>
-                  <?
+                  <?php 
                   if($row->{Actions_Model_Detail::COLUMN_IMAGE} != null) {
                      print (vve_tpl_image_tag($datadir.$row->{Actions_Model_Detail::COLUMN_IMAGE}, 'image', 50,50, 'actionImage'));
                   }
                   ?>
-                  <?=vve_tpl_xhtml_cut(strip_tags($row->{Actions_Model_Detail::COLUMN_TEXT},'<br><a><b><strong><em><i>'), 600);?>
+                  <?php echo vve_tpl_xhtml_cut(strip_tags($row->{Actions_Model_Detail::COLUMN_TEXT},'<br><a><b><strong><em><i>'), 600);?>
             </p>
          </div>
-            <?if($countImages > 0) {
+            <?php if($countImages > 0) {
                $someImages = true;
                $images = $photosModel->getImages($row->{Actions_Model_Detail::COLUMN_ID_CAT},
                        $row->{Actions_Model_Detail::COLUMN_ID});
                ?>
-         <div id="actionImages_<?=$step?>">
-                  <?while ($image = $images->fetch()) {?>
-            <a class="pirobox_gall" href="<?=$datadir.Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR.$image[PhotoGalery_Model_Images::COLUMN_FILE]?>"
-               title="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>">
-               <img src="<?=$datadir.Photogalery_Controller::DIR_SMALL.URL_SEPARATOR.$image[PhotoGalery_Model_Images::COLUMN_FILE]?>"
-                    alt="<?=$image->{PhotoGalery_Model_Images::COLUMN_NAME}?>" />
+         <div id="actionImages_<?php echo $step?>">
+                  <?php while ($image = $images->fetch()) {?>
+            <a class="pirobox_gall" href="<?php echo $datadir.Photogalery_Controller::DIR_MEDIUM.URL_SEPARATOR.$image[PhotoGalery_Model_Images::COLUMN_FILE]?>"
+               title="<?php echo $image->{PhotoGalery_Model_Images::COLUMN_NAME}?>">
+               <img src="<?php echo $datadir.Photogalery_Controller::DIR_SMALL.URL_SEPARATOR.$image[PhotoGalery_Model_Images::COLUMN_FILE]?>"
+                    alt="<?php echo $image->{PhotoGalery_Model_Images::COLUMN_NAME}?>" />
             </a>
-                     <?}?>
+                     <?php }?>
          </div>
-               <?}?>
+               <?php }?>
          <p style="text-align: right">
-            <a href="<?=$this->link()->category($row->curlkey)->route('detail',
+            <a href="<?php echo $this->link()->category($row->curlkey)->route('detail',
                           array('urlkey' => $row->{Actions_Model_Detail::COLUMN_URLKEY}))?>"
-               title="<?=$this->_('Více')?>"><?=$this->_('Více')?></a>
+               title="<?php echo $this->_('Více')?>"><?php echo $this->_('Více')?></a>
          </p>
       </div>
    </div>
    <hr class="reseter" />
-      <?
+      <?php 
       $step++;
    }?>
-   <?if($someImages) {?>
+   <?php if($someImages) {?>
    <script type="text/javascript">
       /* <![CDATA[ */
       $(".actionTabs").tabs({});
@@ -153,5 +153,5 @@ $this->addJsPlugin(new JsPlugin_PiroBox());
       });
       /* ]]> */
    </script>
-      <?}?>
+      <?php }?>
 </div>

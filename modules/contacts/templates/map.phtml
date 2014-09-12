@@ -48,18 +48,18 @@ G_DEFAULT_MAP_TYPES - Ein Array aus den drei Typen � n�tzlich f�r die 	  i
          }
 
          // pobočky
-<?foreach ($this->contacts as $contact) {
+<?php foreach ($this->contacts as $contact) {
    if($contact['position_x'] != null AND $contact['position_y'] != null) {?>
-         var point = new GLatLng(<?=$contact['position_x']?>, <?=$contact['position_y']?>);
+         var point = new GLatLng(<?php echo $contact['position_x']?>, <?php echo $contact['position_y']?>);
          var content = '<div style="width: 320px;">\n\
-<h4><?=$contact["name"]?></h4><br />\n\
-<?=imageTag($this->module()->getDir()->getDataDir()."small/".$contact[Contacts_Model_Detail::COLUMN_CONTACT_FILE],
+<h4><?php echo $contact["name"]?></h4><br />\n\
+<?php echo imageTag($this->module()->getDir()->getDataDir()."small/".$contact[Contacts_Model_Detail::COLUMN_CONTACT_FILE],
           $contact[Contacts_Model_Detail::COLUMN_CONTACT_FILE], 80, 80, " float:left; margin:0 10px 10px 0;");?>\n\
-<b><?=$contact["name_type"]?></b>\n\
-<?=addcslashes($contact[Contacts_Model_Detail::COLUMN_CONTACT_TEXT], "\r\n'\\")?>\n\
+<b><?php echo $contact["name_type"]?></b>\n\
+<?php echo addcslashes($contact[Contacts_Model_Detail::COLUMN_CONTACT_TEXT], "\r\n'\\")?>\n\
 </div>';
          createMarker(point,content, "red");
-<?}}?>
+<?php }}?>
          }
       }
       $(document).ready(initialize());

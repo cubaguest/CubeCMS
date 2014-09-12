@@ -1,4 +1,4 @@
-<?
+<?php 
 if(Template::browser()->isMobile() && ( !isset($_COOKIE['mobile'] ) || $_COOKIE['mobile'] == false ) ){
    $this->includeFile("tpl://index_handle.phtml");
    return;
@@ -31,19 +31,19 @@ $this->addFile('js://base.js');
 ?><!DOCTYPE html>
 <html>
    <head>
-      <?$this->renderHeaderBase();?>
-      <?$this->renderHeaderRSS();?>
+      <?php $this->renderHeaderBase();?>
+      <?php $this->renderHeaderRSS();?>
       <!--[if lte IE 6]>
-      <link rel="stylesheet" type="text/css" href="<?=$this->style('style_ie6.css')?>" />
+      <link rel="stylesheet" type="text/css" href="<?php echo $this->style('style_ie6.css')?>" />
       <script type="text/javascript" src="./jscripts/fix_eolas.js" defer="defer"></script>
       <![endif]-->
-      <?$this->renderHeaderCSSJS()?>
-      <script type="text/javascript">/* <![CDATA[ */<?$this->renderHeaderScripts()?>/* ]]> */</script>
+      <?php $this->renderHeaderCSSJS()?>
+      <script type="text/javascript">/* <![CDATA[ */<?php $this->renderHeaderScripts()?>/* ]]> */</script>
    </head>
-   <body id="pageTop" class="<? echo $this->getBodyClasses(true);?>" >
-      <? $this->renderBodyBegin();?>
-      <? //NavigationMenu_View::listView(); ?>
-      <div id="bodywrap" style="<?
+   <body id="pageTop" class="<?php  echo $this->getBodyClasses(true);?>" >
+      <?php  $this->renderBodyBegin();?>
+      <?php  //NavigationMenu_View::listView(); ?>
+      <div id="bodywrap" style="<?php 
                     $back = Category::getSelectedCategory()->getCatDataObj()->{Model_Category::COLUMN_BACKGROUND};
                     if($back != null){
                        echo "background-image: url('".Category::getImageDir(Category::DIR_BACKGROUND).$back."')"; }
@@ -52,7 +52,7 @@ $this->addFile('js://base.js');
             <a name="start_page"></a> <!-- PRESKAKOVANI POD FLASH-->
             <div id="menuBox">
                <div id="menuMain">
-                  <? $this->includeTplObj($this->menuObj); ?> <!-- render menu-->
+                  <?php  $this->includeTplObj($this->menuObj); ?> <!-- render menu-->
                </div>
                <hr class="separator" />
             </div>
@@ -61,8 +61,8 @@ $this->addFile('js://base.js');
          </div><!-- headwrap -->
          <div id="colswrap">
             <div id="col1wrap" class="column">
-               <div id="col1pad" class="<?if(!empty($this->panels['left'])) echo "col1pad_plusleft";?><?if(!Template::isFullWidth()) echo " col1pad_plusright";?>">
-                  <?
+               <div id="col1pad" class="<?php if(!empty($this->panels['left'])) echo "col1pad_plusleft";?><?php if(!Template::isFullWidth()) echo " col1pad_plusright";?>">
+                  <?php 
                   $this->includeTpl("messages.phtml", true);
                   $navTpl = new Template_Navigation();
                   echo $navTpl;
@@ -72,80 +72,80 @@ $this->addFile('js://base.js');
                   }
                   if(VVE_DEBUG_LEVEL > 0){ echo Debug::printDebug(); echo Debug_Timer::printTimers(); }
                   ?>
-                  <div class="main-content module-<?=  Category::getSelectedCategory()->getModule()->getName()?>">
-                  <? $this->includeTpl("modules.phtml", true); ?>
+                  <div class="main-content module-<?php echo   Category::getSelectedCategory()->getModule()->getName()?>">
+                  <?php  $this->includeTpl("modules.phtml", true); ?>
                   <hr class="reseter" />
                   </div>
                </div><!-- col1pad -->
             </div><!-- col1wrap -->
 
-            <? // levy panel ?>
+            <?php  // levy panel ?>
             <div id="col2wrap" class="column">
                <div id="col2pad">
                   <div id="langs">
-                     <?foreach (Template::pVar('appLangs') as $lang) {
+                     <?php foreach (Template::pVar('appLangs') as $lang) {
                         $class = null;
                         if($lang['name'] == Locales::getLang()) $class = 'selected';
-                        ?><a href="<?=$lang['link'];?>" title="<?=$lang['label'];?>" class="<?=$class?>"><?=$lang['name'];?></a>&nbsp;<?
+                        ?><a href="<?php echo $lang['link'];?>" title="<?php echo $lang['label'];?>" class="<?php echo $class?>"><?php echo $lang['name'];?></a>&nbsp;<?php 
                      }?>
                   </div>
-                  <?echo CustomMenu_View::getMenu('left');?>
-                  <?
+                  <?php echo CustomMenu_View::getMenu('left');?>
+                  <?php 
                   if(!empty($this->panels['left'])) {
                      foreach ($this->panels['left'] as $panelL) {?>
-                  <div class="panel panel-left panel-<?=$panelL->category()->getModule()->getName()?>">
-                           <?$this->includeTplObj($panelL);?>
+                  <div class="panel panel-left panel-<?php echo $panelL->category()->getModule()->getName()?>">
+                           <?php $this->includeTplObj($panelL);?>
                   </div>
-                     <?}
+                     <?php }
                   }?>
                   <hr class="reseter" />
                </div><!-- col2pad -->
             </div><!-- col2wrap -->
 
-            <? // pravy panel
+            <?php  // pravy panel
             if(!Template::isFullWidth()){?>
             <div id="col3wrap" class="column">
                <div id="col3pad">
-                  <?echo Banners_View::getBanners('right')?>
-                  <?
+                  <?php echo Banners_View::getBanners('right')?>
+                  <?php 
                   if(!empty($this->panels['right'])) {
                      foreach ($this->panels['right'] as $panelR) {?>
-                  <div class="panel panel-right panel-<?=$panelR->category()->getModule()->getName()?>">
-                           <?$this->includeTplObj($panelR);?>
+                  <div class="panel panel-right panel-<?php echo $panelR->category()->getModule()->getName()?>">
+                           <?php $this->includeTplObj($panelR);?>
                   </div>
-                     <?}
+                     <?php }
                   }?>
                   <hr class="reseter" />
                </div><!-- col2pad -->
             </div><!-- col2wrap -->
-            <?}?>
+            <?php }?>
 
             <div class="reseter">&nbsp;</div>
          </div><!-- colswrap -->
 
          <div class="reseter">&nbsp;</div>
          <div>
-            <?echo Banners_View::getBanners('bottom')?>
+            <?php echo Banners_View::getBanners('bottom')?>
          </div>
          <div id="footwrap">
-            <?
+            <?php 
             if(!empty($this->panels['bottom'])) {
                foreach ($this->panels['bottom'] as $panelB) {?>
             <div class="panel" style="float:left; width: 200px;">
-                     <?$this->includeTplObj($panelB);?>
+                     <?php $this->includeTplObj($panelB);?>
             </div>
-               <?}
+               <?php }
             }?>
             <hr class="reseter" />
-            <?echo CustomMenu_View::getMenu('bottom');?>
-            <?//$this->includeTpl("login.phtml", true);//je v panelu?>
-            <a href="<?=$this->link()->clear(true)->file('sitemap.html');?>" title="<?=$this->tr("Mapa stránek")?>"><?=$this->tr("Mapa stránek")?></a>&nbsp;
-            <a href="<?=$this->link()->clear(true)->file('rss.html');?>" title="<?=$this->tr("Přehled rss zdrojů")?>"><?=$this->tr("Rss kanály")?></a>
+            <?php echo CustomMenu_View::getMenu('bottom');?>
+            <?php //$this->includeTpl("login.phtml", true);//je v panelu?>
+            <a href="<?php echo $this->link()->clear(true)->file('sitemap.html');?>" title="<?php echo $this->tr("Mapa stránek")?>"><?php echo $this->tr("Mapa stránek")?></a>&nbsp;
+            <a href="<?php echo $this->link()->clear(true)->file('rss.html');?>" title="<?php echo $this->tr("Přehled rss zdrojů")?>"><?php echo $this->tr("Rss kanály")?></a>
             <hr class="reseter" />
          </div><!-- footwrap -->
       </div><!-- bodywrap /-->
       <hr class="reseter" />
-      <?
+      <?php 
       $this->renderBodyEnd();
       ?>
    </body>

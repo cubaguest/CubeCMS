@@ -1,4 +1,4 @@
-<?
+<?php 
 echo $this->toolbox;
 $this->addFile('css://style.css');
 $h1 = $this->tr('Seznam kategorií');
@@ -8,22 +8,22 @@ Template_Core::addPageTitle($this->tr('kategorie událostí'));
 
 $catImgDir = $this->category()->getModule()->getDataDir(true).Events_Controller::DIR_CAT_IMAGES."/";
 ?>
-<h1><?=$this->category()->getName()?></h1>
+<h1><?php echo $this->category()->getName()?></h1>
 <div class="form-edit">
    <div>
-      <a href="<?=$this->link()->route('addCat')?>" title="<?=$this->tr('Přidat novou kategorii')?>"
-         ><img src="images/icons/add.png" alt="add" /> <?=$this->tr('Přidat kategorii')?></a>
+      <a href="<?php echo $this->link()->route('addCat')?>" title="<?php echo $this->tr('Přidat novou kategorii')?>"
+         ><img src="images/icons/add.png" alt="add" /> <?php echo $this->tr('Přidat kategorii')?></a>
    </div>
-   <?
+   <?php 
    if(!empty($this->categories)){
    foreach ($this->categories as $cat) {?>
    <table class="ui-widget full-width event-cat-item">
-      <tr class="ui-widget-header <?if($cat->{Events_Model_Categories::COL_IS_PUBLIC}){?>ui-state-hover<?}?>">
+      <tr class="ui-widget-header <?php if($cat->{Events_Model_Categories::COL_IS_PUBLIC}){?>ui-state-hover<?php }?>">
          <td class="event-name" colspan="2">
-            <?
+            <?php 
             if($cat->{Events_Model_Categories::COL_IMAGE} != null){?>
-            <img src="<?=$catImgDir.$cat->{Events_Model_Categories::COL_IMAGE}?>" width="16" />
-            <?}
+            <img src="<?php echo $catImgDir.$cat->{Events_Model_Categories::COL_IMAGE}?>" width="16" />
+            <?php }
             echo $cat->{Events_Model_Categories::COL_NAME};
             
             $toolbox = clone $this->toolboxItem;
@@ -43,40 +43,40 @@ $catImgDir = $this->category()->getModule()->getDataDir(true).Events_Controller:
             ?>
          </td>
       </tr>
-      <?if($cat->{Events_Model_Categories::COL_CONTACT} != null){?>
+      <?php if($cat->{Events_Model_Categories::COL_CONTACT} != null){?>
       <tr class="ui-widget-content">
-         <th scope="row" class="param-name"><?=$this->tr('Kontakt')?>:</th>
-         <td><?=$cat->{Events_Model_Categories::COL_CONTACT}?></td>
+         <th scope="row" class="param-name"><?php echo $this->tr('Kontakt')?>:</th>
+         <td><?php echo $cat->{Events_Model_Categories::COL_CONTACT}?></td>
       </tr>
-      <?}?>
-      <?if($cat->{Events_Model_Categories::COL_WWW} != null){?>
+      <?php }?>
+      <?php if($cat->{Events_Model_Categories::COL_WWW} != null){?>
       <tr class="ui-widget-content">
-         <th scope="row" class="param-name"><?=$this->tr('WWW')?>:</th>
-         <td><a href="<?=$cat->{Events_Model_Categories::COL_WWW}?>" class="link-external" title="<?=$this->tr('Otevřít v novém okně')?>"
-                ><?ps($cat->{Events_Model_Categories::COL_WWW});?></a></td>
+         <th scope="row" class="param-name"><?php echo $this->tr('WWW')?>:</th>
+         <td><a href="<?php echo $cat->{Events_Model_Categories::COL_WWW}?>" class="link-external" title="<?php echo $this->tr('Otevřít v novém okně')?>"
+                ><?php ps($cat->{Events_Model_Categories::COL_WWW});?></a></td>
       </tr>
-      <?}?>
-      <?if($cat->{Events_Model_Categories::COL_NOTE} != null){?>
+      <?php }?>
+      <?php if($cat->{Events_Model_Categories::COL_NOTE} != null){?>
       <tr class="ui-widget-content">
-         <th scope="row" class="param-name"><?=$this->tr('Poznámka')?>:</th>
-         <td><?=$cat->{Events_Model_Categories::COL_NOTE}?></td>
+         <th scope="row" class="param-name"><?php echo $this->tr('Poznámka')?>:</th>
+         <td><?php echo $cat->{Events_Model_Categories::COL_NOTE}?></td>
       </tr>
-      <?}?>
-      <?if($cat->{Events_Model_Categories::COL_IS_PUBLIC} == false){?>
+      <?php }?>
+      <?php if($cat->{Events_Model_Categories::COL_IS_PUBLIC} == false){?>
       <tr class="ui-widget-content">
-         <th scope="row" class="param-name"><?=$this->tr('Přistupový odkaz')?>:</th>
-         <td class="event-cat-token"><?
+         <th scope="row" class="param-name"><?php echo $this->tr('Přistupový odkaz')?>:</th>
+         <td class="event-cat-token"><?php 
          if($cat->{Events_Model_Categories::COL_ACCESS_TOKEN} != null){
             $link = $this->link()->route('listEvents')->param('token', $cat->{Events_Model_Categories::COL_ACCESS_TOKEN});
             ?>
-            <a href="<?=$link?>" title="<?=$this->tr('Odkaz pro přístup z venku')?>"><?=$link;?></a> 
-         <?} else {
+            <a href="<?php echo $link?>" title="<?php echo $this->tr('Odkaz pro přístup z venku')?>"><?php echo $link;?></a> 
+         <?php } else {
             echo '<em>'.$this->tr('Není vytvořen. Klikněte na ikonku klíče v nastrojích položky.').'</em>';
          }?>
          </td>
       </tr>
-      <?}?>
+      <?php }?>
    </table>
-   <?}
+   <?php }
    }?>
 </div>

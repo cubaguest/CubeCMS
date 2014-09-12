@@ -1,5 +1,5 @@
 <div class="banners banners-in_articles">
-<span class="title"><?=$this->tr('Reklama');?></span>
+<span class="title"><?php echo $this->tr('Reklama');?></span>
 <?php
 foreach ($this->banners as $banner) {
    $linkClick = (string)$this->linkClick->param('bid', $banner->{Banners_Model::COLUMN_ID});
@@ -10,14 +10,14 @@ foreach ($this->banners as $banner) {
       echo vve_tpl_flash($flashUrl, 200, 100);
    } else {
       if($banner->{Banners_Model::COLUMN_URL} != null){?>
-         <a href="<?=$linkClick;?>"
-            title="<?ps($banner->{Banners_Model::COLUMN_NAME})?>"
-            rel="nofollow" class="<?if($banner->{Banners_Model::COLUMN_NEW_WINDOW}){echo "link-external";}?>"><?
+         <a href="<?php echo $linkClick;?>"
+            title="<?php ps($banner->{Banners_Model::COLUMN_NAME})?>"
+            rel="nofollow" class="<?php if($banner->{Banners_Model::COLUMN_NEW_WINDOW}){echo "link-external";}?>"><?php 
       }
-      ?><img src="<?=$this->dir.$banner->{Banners_Model::COLUMN_FILE}?>" height="100"
-           alt="<?ps($banner->{Banners_Model::COLUMN_NAME})?>" /><?
-      if($banner->{Banners_Model::COLUMN_URL} != null){?></a><?}?>
-   <?
+      ?><img src="<?php echo $this->dir.$banner->{Banners_Model::COLUMN_FILE}?>" height="100"
+           alt="<?php ps($banner->{Banners_Model::COLUMN_NAME})?>" /><?php 
+      if($banner->{Banners_Model::COLUMN_URL} != null){?></a><?php }?>
+   <?php 
    }
 }
 ?>

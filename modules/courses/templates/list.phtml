@@ -1,4 +1,4 @@
-<?
+<?php 
 $this->addCssFile('style.css');
 if($this->isAllList == true){
    $this->addPageTitle($this->_('Seznam všech kurzů'));
@@ -15,27 +15,27 @@ if($this->isAllList == true){
       padding: 4px;
    }
 </style>
-<h1><?=$h1?></h1>
+<h1><?php echo $h1?></h1>
 <div class="main-content-list module-courses-list">
-   <?if(!empty ($this->courses)) {?>
+   <?php if(!empty ($this->courses)) {?>
    <table class="table">
       <thead>
          <tr>
-            <th width="300"><?=$this->_('název')?></th>
-            <th width="100"><?=$this->_('termín')?></th>
-            <th><?=$this->_('délka')?></th>
-            <th><?=$this->_('cena')?></th>
+            <th width="300"><?php echo $this->_('název')?></th>
+            <th width="100"><?php echo $this->_('termín')?></th>
+            <th><?php echo $this->_('délka')?></th>
+            <th><?php echo $this->_('cena')?></th>
          </tr>
       </thead>
       <tbody>
-      <?
+      <?php 
       foreach ($this->courses as $course) {?>
-         <tr class="<?if($course->{Courses_Model_Courses::COLUMN_IN_LIST} == false) echo 'course-not-in-list-row'?>">
+         <tr class="<?php if($course->{Courses_Model_Courses::COLUMN_IN_LIST} == false) echo 'course-not-in-list-row'?>">
             <td>
-               <?
+               <?php 
                if($course->{Courses_Model_Courses::COLUMN_IS_NEW} == true){?>
                <img src="images/icons/new-16x16.png" alt="new" width="16"/>
-               <?
+               <?php 
                }
                if($course->{Courses_Model_Courses::COLUMN_TEXT_SHORT} != null
                   OR $course->{Courses_Model_Courses::COLUMN_TEXT_SHORT} != ''){
@@ -44,15 +44,15 @@ if($this->isAllList == true){
                   $title = $course->{Courses_Model_Courses::COLUMN_NAME};
                }
                ?>
-               <a href="<?=$this->link()->route('detailCourse', array('urlkey' => $course->{Courses_Model_Courses::COLUMN_URLKEY}))?>"
-                  title="<?=htmlspecialchars($title)?>"
-                  ><?=$course->{Courses_Model_Courses::COLUMN_NAME}?></a><?
+               <a href="<?php echo $this->link()->route('detailCourse', array('urlkey' => $course->{Courses_Model_Courses::COLUMN_URLKEY}))?>"
+                  title="<?php echo htmlspecialchars($title)?>"
+                  ><?php echo $course->{Courses_Model_Courses::COLUMN_NAME}?></a><?php 
                   if($course->{Courses_Model_Courses::COLUMN_TYPE} == Courses_Controller::TYPE_CONFERENTION) echo ' (konference)';
                   else if($course->{Courses_Model_Courses::COLUMN_TYPE} == Courses_Controller::TYPE_SEMINARE) echo ' (seminář)';
                   ?>
             </td>
             <td align="center">
-               <?
+               <?php 
                echo vve_date("%x", new DateTime($course->{Courses_Model_Courses::COLUMN_DATE_START}));
                if($course->{Courses_Model_Courses::COLUMN_DATE_STOP} != null){
                   echo '<br /> - <br />'.vve_date("%x", new DateTime($course->{Courses_Model_Courses::COLUMN_DATE_STOP}));
@@ -60,32 +60,32 @@ if($this->isAllList == true){
                ?>
             </td>
             <td align="center">
-               <?if($course->{Courses_Model_Courses::COLUMN_HOURS_LEN} != null){
+               <?php if($course->{Courses_Model_Courses::COLUMN_HOURS_LEN} != null){
                   echo $course->{Courses_Model_Courses::COLUMN_HOURS_LEN}.' '.$this->_('hodin');
                }?>
             </td>
             <td align="right">
-               <?if($course->{Courses_Model_Courses::COLUMN_PRICE} != null){
+               <?php if($course->{Courses_Model_Courses::COLUMN_PRICE} != null){
                   echo number_format($course->{Courses_Model_Courses::COLUMN_PRICE}, 0, ',', ' ').' '.$this->_('Kč');
                }?>
             </td>
          </tr>
-     <?}?>
+     <?php }?>
       </tbody>
    </table>
    <br />
-   <?
+   <?php 
    } else {
       print ($this->_('Není vložen žádný kurz'));
    }?>
-   <?if($this->isAllList == true){?>
-   <a href="<?=$this->link()->route(null);?>" title="<?=$this->_('Seznam aktuálních kurzů');?>"
-      ><?=$this->_('Seznam aktuálních kurzů');?></a>
-   <?
+   <?php if($this->isAllList == true){?>
+   <a href="<?php echo $this->link()->route(null);?>" title="<?php echo $this->_('Seznam aktuálních kurzů');?>"
+      ><?php echo $this->_('Seznam aktuálních kurzů');?></a>
+   <?php 
    } else {?>
-   <a href="<?=$this->link()->route('listAllCourses');?>" title="<?=$this->_('Seznam všech kurzů');?>"
-      ><?=$this->_('Seznam všech kurzů');?></a>
-   <?}
+   <a href="<?php echo $this->link()->route('listAllCourses');?>" title="<?php echo $this->_('Seznam všech kurzů');?>"
+      ><?php echo $this->_('Seznam všech kurzů');?></a>
+   <?php }
    echo $this->toolbox;
    ?>
 </div>

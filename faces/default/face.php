@@ -1,4 +1,4 @@
-<?
+<?php 
 /**
  * Hlavní konfigurační soubor vzhledu
  * Default face

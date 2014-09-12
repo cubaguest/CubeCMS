@@ -1,11 +1,11 @@
-<h1><?echo $this->category()->getName();?></h1>
+<h1><?php echo $this->category()->getName();?></h1>
 <div class="main-content-detail">
-   <div class="main-content-text"><?
+   <div class="main-content-text"><?php 
    if ($this->text != null) {
       echo $this->text;
    }
    echo $this->toolbox;
-   ?></div><?
+   ?></div><?php 
 if ($this->category()->getParam(Contact_Controller::PARAM_MAP, true) == true) {
    switch ($this->category()->getParam(Contact_Controller::PARAM_MAP_TYPE, Contact_Controller::PARAM_MAP_TYPE_IMAGE)) {
       case Contact_Controller::PARAM_MAP_TYPE_IFRAME:

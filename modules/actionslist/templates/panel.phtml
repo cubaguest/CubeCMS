@@ -1,4 +1,4 @@
-<?//<desc>Panel seznam nadcházejících akcí</desc>
+<?php //<desc>Panel seznam nadcházejících akcí</desc>
 if(!empty ($this->actions)) {
    $icon = null;
    if($this->panelObj()->getIcon() != null) {
@@ -9,21 +9,21 @@ if(!empty ($this->actions)) {
       $backImg = 'background-image: url(\''.Panel_Obj::getBackImgDir().$this->panelObj()->getBackImage().'\');';
    }
    if($this->rssLink != null) {?>
-<a style="float: right" href="<?=$this->rssLink?>" title="rss"><img src="<?=vve_get_tpl_file('icons/rss-icon.png', VVE_TPL_FILE_IMAGE)?>" alt="rss" /></a>
-         <?}?>
-<p class="panelLabel"><?=$icon?><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=$this->panelObj()->getName()?></a></p>
-<div class="panelActions" style="<?=$backImg?>">
-      <?
+<a style="float: right" href="<?php echo $this->rssLink?>" title="rss"><img src="<?php echo vve_get_tpl_file('icons/rss-icon.png', VVE_TPL_FILE_IMAGE)?>" alt="rss" /></a>
+         <?php }?>
+<p class="panelLabel"><?php echo $icon?><a href="<?php echo $this->link()?>" title="<?php echo htmlspecialchars($this->panelObj()->getName())?>"><?php echo $this->panelObj()->getName()?></a></p>
+<div class="panelActions" style="<?php echo $backImg?>">
+      <?php 
       $step = 1;
          foreach ($this->actions AS $row){
          // podnadpis
          if($row->{Actions_Model_Detail::COLUMN_SUBANME} != null) {
             print(new Html_Element('p', $row->{Actions_Model_Detail::COLUMN_SUBANME}));
          }?>
-   <p><a href="<?=$this->link()->category($row->curlkey)->route('detail', array('urlkey' => $row->{Actions_Model_Detail::COLUMN_URLKEY}))?>"
-         title="<?=$row->{Actions_Model_Detail::COLUMN_NAME}?>"
-         ><?=$row->{Actions_Model_Detail::COLUMN_NAME}?></a></p>
-            <?
+   <p><a href="<?php echo $this->link()->category($row->curlkey)->route('detail', array('urlkey' => $row->{Actions_Model_Detail::COLUMN_URLKEY}))?>"
+         title="<?php echo $row->{Actions_Model_Detail::COLUMN_NAME}?>"
+         ><?php echo $row->{Actions_Model_Detail::COLUMN_NAME}?></a></p>
+            <?php 
             // čas a datum
             $startDate = vve_date("%x", new DateTime($row->{Actions_Model_Detail::COLUMN_DATE_START}));
             $stopDate = vve_date("%x", new DateTime($row->{Actions_Model_Detail::COLUMN_DATE_STOP}));
@@ -56,7 +56,7 @@ if(!empty ($this->actions)) {
    }?>
 </div>
 <p class="panelLinkMore">
-   <a href="<?=$this->link()?>"
-      title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->_('Více')?></a>
+   <a href="<?php echo $this->link()?>"
+      title="<?php echo htmlspecialchars($this->category()->getLabel())?>"><?php echo $this->_('Více')?></a>
 </p>
-   <?}?>
+   <?php }?>

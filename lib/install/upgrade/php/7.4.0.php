@@ -1,4 +1,4 @@
-<?
+<?php 
 // Remove admin categories and rights - is in admmenu.xml
 
 $modelCats = new Model_Category();

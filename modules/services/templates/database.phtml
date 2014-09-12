@@ -1,4 +1,4 @@
-<?
+<?php 
 $this->addPageTitle($this->tr('Databáze'));
 //$this->addCssFile('style.css');
 $jsJqGrid = new Component_JqGrid_JsPlugin();
@@ -6,8 +6,8 @@ $this->addJsPlugin($jsJqGrid);
 $jQuery = new JsPlugin_JQuery();
 $this->addJsPlugin($jQuery);
 ?>
-<h1><?=$this->tr('Databáze');?></h1>
-<?$this->includeTpl('navigation.phtml');?>
+<h1><?php echo $this->tr('Databáze');?></h1>
+<?php $this->includeTpl('navigation.phtml');?>
 
 <div class="main-content-detail">
    <table id="table-tables"></table>
@@ -16,12 +16,12 @@ $this->addJsPlugin($jQuery);
    <br />
    <table>
    	<tr>
-   		<td><? 
+   		<td><?php  
             echo $this->formOptimizeDbTables->renderStart();
             echo $this->formOptimizeDbTables->optimise->controll();
             echo $this->formOptimizeDbTables->renderEnd();
    		?></td>
-   		<td><? 
+   		<td><?php  
             echo $this->formRepairDbTables->renderStart();
             echo $this->formRepairDbTables->repair->controll();
             echo $this->formRepairDbTables->renderEnd();
@@ -35,22 +35,22 @@ $this->addJsPlugin($jQuery);
       $(document).ready(function() {
          var addressGrid = $("#table-tables").jqGrid({
             ajaxGridOptions : {type:"POST"},
-            url: '<?=$this->link()->route('tablesList');?>',
+            url: '<?php echo $this->link()->route('tablesList');?>',
             datatype: "json",
-            colNames:['<?=$this->tr('Název')?>', '<?=$this->tr('Řádků')?>', '<?=$this->tr('Velikost (B)')?>', '<?=$this->tr('Kolace')?>', '<?=$this->tr('Engine')?>', '<?=$this->tr('Kontrola')?>'],
+            colNames:['<?php echo $this->tr('Název')?>', '<?php echo $this->tr('Řádků')?>', '<?php echo $this->tr('Velikost (B)')?>', '<?php echo $this->tr('Kolace')?>', '<?php echo $this->tr('Engine')?>', '<?php echo $this->tr('Kontrola')?>'],
             colModel:[
-               {name:'<?=Model_Tables::COL_TABLE_NAME?>',index:'<?=Model_Tables::COL_TABLE_NAME?>', editable:false},
-               {name:'<?=Model_Tables::COL_TABLE_ROWS?>',index:'<?=Model_Tables::COL_TABLE_ROWS?>', width:60, fixed: true,editable:false},
-               {name:'<?=Model_Tables::COL_DATA_LENGTH?>',index:'<?=Model_Tables::COL_DATA_LENGTH?>', width:90,fixed: true,editable:false},
-               {name:'<?=Model_Tables::COL_TABLE_COLLATION?>',index:'<?=Model_Tables::COL_TABLE_COLLATION?>', width:100,fixed: true,editable:false},
-               {name:'<?=Model_Tables::COL_ENGINE?>',index:'<?=Model_Tables::COL_ENGINE?>', width:70,fixed: true,editable:false},
+               {name:'<?php echo Model_Tables::COL_TABLE_NAME?>',index:'<?php echo Model_Tables::COL_TABLE_NAME?>', editable:false},
+               {name:'<?php echo Model_Tables::COL_TABLE_ROWS?>',index:'<?php echo Model_Tables::COL_TABLE_ROWS?>', width:60, fixed: true,editable:false},
+               {name:'<?php echo Model_Tables::COL_DATA_LENGTH?>',index:'<?php echo Model_Tables::COL_DATA_LENGTH?>', width:90,fixed: true,editable:false},
+               {name:'<?php echo Model_Tables::COL_TABLE_COLLATION?>',index:'<?php echo Model_Tables::COL_TABLE_COLLATION?>', width:100,fixed: true,editable:false},
+               {name:'<?php echo Model_Tables::COL_ENGINE?>',index:'<?php echo Model_Tables::COL_ENGINE?>', width:70,fixed: true,editable:false},
                {name:'check',index:'check', width:100,sortable:false, editable:false},
             ],
             rowNum:20,
             rowList:[10,20,40,100],
             pager: '#table-tables-pager',
-            sortname: '<?=Model_Tables::COL_TABLE_NAME?>',
-            caption:"<?=$this->tr('Tabulky v databázi')?>",
+            sortname: '<?php echo Model_Tables::COL_TABLE_NAME?>',
+            caption:"<?php echo $this->tr('Tabulky v databázi')?>",
             autowidth : true,
             height: '100%'
          });

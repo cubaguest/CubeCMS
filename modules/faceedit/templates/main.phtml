@@ -1,4 +1,4 @@
-<?
+<?php 
 $this->addPageTitle($this->tr('Úprava vzhledu'));
 $this->addFile('css://style.less');
 $jQuery = new JsPlugin_JQuery();
@@ -6,21 +6,21 @@ $this->addJsPlugin($jQuery);
 
 $grpsArr = array();
 ?>
-<h1><?=$this->tr('Úprava zdrojových kódu vzhledu');?></h1>
+<h1><?php echo $this->tr('Úprava zdrojových kódu vzhledu');?></h1>
 <div class="content-admin">
    vaberte soubor. Pokud je k dispozici soubor s příponou "less" použijte ten. Css soubor je generován automaticky z LESS
    
    <div id="faceedit-files" class="">
       <h2>Soubory</h2>
       <div class="file-selector clearfix">
-         <form action="<?=$this->link()->route('editFile')?>">
+         <form action="<?php echo $this->link()->route('editFile')?>">
             <div class="label">
                <lable>Šablony</lable>:
             </div>
             <div class="control">
                <select name="file" id="">
                   <?php foreach ($this->filesPHTML as $file) {?>
-                  <option value="<?=$file?>"><?php ps($file)?></option>
+                  <option value="<?php echo $file?>"><?php ps($file)?></option>
                   <?php }?>
                </select>
                <button type="submit">Upravit</button>
@@ -28,14 +28,14 @@ $grpsArr = array();
          </form>
       </div>
       <div class="file-selector clearfix">
-         <form action="<?=$this->link()->route('editFile')?>">
+         <form action="<?php echo $this->link()->route('editFile')?>">
             <div class="label">
                <lable>Soubory stylů</lable>:
             </div>
             <div class="control">
                <select name="file" id="">
                   <?php foreach ($this->filesCSS as $file) {?>
-                  <option value="<?=$file?>"><?php ps($file)?></option>
+                  <option value="<?php echo $file?>"><?php ps($file)?></option>
                   <?php }?>
                </select>
                <button type="submit">Upravit</button>
@@ -43,14 +43,14 @@ $grpsArr = array();
          </form>
       </div>
       <div class="file-selector clearfix">
-         <form action="<?=$this->link()->route('editFile')?>">
+         <form action="<?php echo $this->link()->route('editFile')?>">
             <div class="label">
                <lable>PHP Soubory</lable>:
             </div>
             <div class="control">
                <select name="file" id="">
                   <?php foreach ($this->filesPHP as $file) {?>
-                  <option value="<?=$file?>"><?php ps($file)?></option>
+                  <option value="<?php echo $file?>"><?php ps($file)?></option>
                   <?php }?>
                </select>
                <button type="submit">Upravit</button>

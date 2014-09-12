@@ -1,9 +1,9 @@
-<?
+<?php 
 $this->addPageTitle($this->headline);
 ?>
-<h1><?echo $this->headline;?></h1>
+<h1><?php echo $this->headline;?></h1>
 <div class="main-content-detail main-content-form-edit contact-form-edit">
-   <?
+   <?php 
    // donastavení formuláře
    $this->formEdit->text->html()->setAttrib('cols', 60)->setAttrib('rows', 30);
 

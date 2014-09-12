@@ -1,10 +1,10 @@
-<?
+<?php 
 $h = $this->tr('Úprava úvodního textu');
 Template_Core::addPageTitle($h);
 ?>
-<h1><?ps($h) ?></h1>
+<h1><?php ps($h) ?></h1>
 <div class="content-edit-form">
-   <?
+   <?php 
    $this->form->text->html()->setAttrib('cols', 60)->setAttrib('rows', 20);
    echo ($this->form);
    ?>

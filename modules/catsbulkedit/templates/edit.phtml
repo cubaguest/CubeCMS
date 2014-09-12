@@ -1,4 +1,4 @@
-<?
+<?php 
 $this->addFile('css://style.css');
 // do titulku
 $h = sprintf( $this->tr('Úprava parametru "%s"'), $this->paramName );
@@ -20,41 +20,41 @@ function renderCatsList($childs, $form, $link, $param)
    ?>
       <li>
          <div class="name ui-widget-header">
-            <?ps($obj->{Model_Category::COLUMN_NAME}); ?> 
-            <a href="<?=$link->category($obj->{Model_Category::COLUMN_URLKEY})?>"
-               title="<?ps($obj->{Model_Category::COLUMN_ALT})?>"
-               class="link-external"><em>(URL: <?ps($obj->{Model_Category::COLUMN_URLKEY})?>)</em></a>
+            <?php ps($obj->{Model_Category::COLUMN_NAME}); ?> 
+            <a href="<?php echo $link->category($obj->{Model_Category::COLUMN_URLKEY})?>"
+               title="<?php ps($obj->{Model_Category::COLUMN_ALT})?>"
+               class="link-external"><em>(URL: <?php ps($obj->{Model_Category::COLUMN_URLKEY})?>)</em></a>
          </div>
          <div class="form ui-widget-content">
-            <? 
+            <?php  
 //             echo $form->param->label();
             echo $form->param->labelLangs();
             echo $form->param->controllAll();
             ?>
          </div>
-         <? if(!$child->isEmpty()){?>
+         <?php  if(!$child->isEmpty()){?>
          <ul>
-            <?renderCatsList($child, $form, $link, $param) ?>
+            <?php renderCatsList($child, $form, $link, $param) ?>
          </ul>      
-         <?}?>
+         <?php }?>
       </li>   
-   <?
+   <?php 
    }
 }
 ?>
-<h1><?ps($h) ?></h1>
+<h1><?php ps($h) ?></h1>
 <div class="main-content-detail main-content-form-edit">
-   <?=$this->form->renderStart();?>
+   <?php echo $this->form->renderStart();?>
    <fieldset>
    <ul id="categories-list" class="ui-widget form-table">
-      <? 
+      <?php  
       renderCatsList($this->struct, $this->form, $this->link()->clear(), $this->param);
       ?>
-      <li><?echo $this->form->save->controllAll();?></li>
+      <li><?php echo $this->form->save->controllAll();?></li>
    </ul>
    </fieldset>
-   <?=$this->form->renderEnd();?>
-   <? 
+   <?php echo $this->form->renderEnd();?>
+   <?php  
    ?>
    <script type="text/javascript">
       /* <![CDATA[ */

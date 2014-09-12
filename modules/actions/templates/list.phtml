@@ -1,25 +1,25 @@
-<?
+<?php 
 $this->addPageTitle(vve_date("%x", $this->dateFrom).' - '.vve_date("%x", $this->dateTo));
 echo $this->toolbox; // tolbox pro přidání
 ?>
-<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $this->category->getName().' - '.vve_date("%x", $this->dateFrom).' - '.vve_date("%x", $this->dateTo)?></h1>
+<h1><?php $this->includeFile('tpl://engine:headline/icon.phtml'); echo $this->category->getName().' - '.vve_date("%x", $this->dateFrom).' - '.vve_date("%x", $this->dateTo)?></h1>
 <div class="main-content-list">
-   <?
+   <?php 
    if($this->text != false) {?>
    <div class="text">
-         <?
+         <?php 
          echo $this->text->{Text_Model_Detail::COLUMN_TEXT};
          echo $this->toolboxText; // toolbox pro úpravu úvodního textu
          ?>
    </div>
-      <?}?>
+      <?php }?>
 
    <div class="tools">
-      <a href="<?=$this->link()->route('archive')?>" title="<?=$this->tr('Archiv')?>"><?=$this->tr('Archiv')?></a>
+      <a href="<?php echo $this->link()->route('archive')?>" title="<?php echo $this->tr('Archiv')?>"><?php echo $this->tr('Archiv')?></a>
    </div>
-   <?if(!empty ($this->actions)){?>
+   <?php if(!empty ($this->actions)){?>
    <div class="post-list events-list">
-   <?
+   <?php 
    foreach ($this->actions as $row) {
       if($row->{Actions_Model::COLUMN_PUBLIC}) $class = "";
       else $class = 'main-content-no-public';
@@ -35,21 +35,21 @@ echo $this->toolbox; // tolbox pro přidání
          $image = "<img src=\"$imgSrc\" alt=\"$imgAlt\" class=\"title-image image-left\" />";
       }
 
-      ?><div class="post event <?=$class?>">
-      <h2><a href="<?=$this->link()->route('detail', array('urlkey' => $row->{Actions_Model::COLUMN_URLKEY}))?>"
-             title="<?=$row->{Actions_Model::COLUMN_NAME}?>"
-             ><?=$subLabel?></a><?
+      ?><div class="post event <?php echo $class?>">
+      <h2><a href="<?php echo $this->link()->route('detail', array('urlkey' => $row->{Actions_Model::COLUMN_URLKEY}))?>"
+             title="<?php echo $row->{Actions_Model::COLUMN_NAME}?>"
+             ><?php echo $subLabel?></a><?php 
             if($this->category()->getRights()->isControll()){
                echo '&nbsp;'.langsImages($row->{Actions_Model::COLUMN_URLKEY});
             }
             ?></h2>
-            <?if($row->{Actions_Model::COLUMN_AUTHOR} != null) {?>
+            <?php if($row->{Actions_Model::COLUMN_AUTHOR} != null) {?>
       <div class="text author">
-               <?=$row->{Actions_Model::COLUMN_AUTHOR}?>
+               <?php echo $row->{Actions_Model::COLUMN_AUTHOR}?>
       </div>
-            <?}?>
+            <?php }?>
       <div class="text info">
-            <?
+            <?php 
             $startDate = vve_date("%x", new DateTime($row->{Actions_Model::COLUMN_DATE_START}));
             $stopDate = vve_date("%x", new DateTime($row->{Actions_Model::COLUMN_DATE_STOP}));
             echo ($startDate);
@@ -72,34 +72,34 @@ echo $this->toolbox; // tolbox pro přidání
             }
             ?>
       </div>
-         <?if($row->{Actions_Model::COLUMN_NOTE} != null) {?>
+         <?php if($row->{Actions_Model::COLUMN_NOTE} != null) {?>
       <div class="text note">
-          <?=$row->{Actions_Model::COLUMN_NOTE}?>
+          <?php echo $row->{Actions_Model::COLUMN_NOTE}?>
       </div>
-            <?}?>
-      <?if($image != null) {?><div class="title-image"><?=$image?></div><?}?>
+            <?php }?>
+      <?php if($image != null) {?><div class="title-image"><?php echo $image?></div><?php }?>
       <div class="text">
-            <?=vve_tpl_xhtml_cut(strip_tags($row->{Actions_Model::COLUMN_TEXT},VVE_SHORT_TEXT_TAGS), 600);?>
+            <?php echo vve_tpl_xhtml_cut(strip_tags($row->{Actions_Model::COLUMN_TEXT},VVE_SHORT_TEXT_TAGS), 600);?>
       </div>
       <p class="mlink-more">
-         <a href="<?=$this->link()->route('detail', array('urlkey' => $row->{Actions_Model::COLUMN_URLKEY}))?>"
-            title="<?=$this->tr('Více')?>"><?=$this->tr('Více')?></a>
+         <a href="<?php echo $this->link()->route('detail', array('urlkey' => $row->{Actions_Model::COLUMN_URLKEY}))?>"
+            title="<?php echo $this->tr('Více')?>"><?php echo $this->tr('Více')?></a>
       </p>
       <hr class="reseter"/>
       </div>
-      <?}
+      <?php }
       ?>
    </div>
-   <?
+   <?php 
    } else if($this->category()->getParam(Actions_Controller::PARAM_SHOW_EVENT_DIRECTLY, false)) {?>
-      <div class="text"><?=$this->tr('Není žádná aktuální nebo nadcházející událost')?></div> 
-   <?} 
+      <div class="text"><?php echo $this->tr('Není žádná aktuální nebo nadcházející událost')?></div> 
+   <?php } 
    
    if(!$this->category()->getParam(Actions_Controller::PARAM_SHOW_EVENT_DIRECTLY, false)){?>
-     &laquo;&nbsp;<a href="<?=$this->linkBack?>" title="<?=$this->linkBackLabel?>"
-      ><?=$this->linkBackLabel?></a>&nbsp;&brvbar;&nbsp;<a
-      href="<?=$this->linkNext?>" title="<?=$this->linkNextLabel?>"><?=$this->linkNextLabel?></a>&nbsp;&raquo;
-   <?}
+     &laquo;&nbsp;<a href="<?php echo $this->linkBack?>" title="<?php echo $this->linkBackLabel?>"
+      ><?php echo $this->linkBackLabel?></a>&nbsp;&brvbar;&nbsp;<a
+      href="<?php echo $this->linkNext?>" title="<?php echo $this->linkNextLabel?>"><?php echo $this->linkNextLabel?></a>&nbsp;&raquo;
+   <?php }
    // rss ikony
 //    $feeds = new Component_Feed();
 //    $feeds->setConfig('feedLink', $this->link()->clear());

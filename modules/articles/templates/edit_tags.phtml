@@ -1,13 +1,13 @@
-<?
+<?php 
 $this->addFile("css://articles:style.css?original");
 $this->addJsPlugin(new Component_JqGrid_JsPlugin());
 // do titulku
 $h = $this->tr('Správa štítků');
 $this->addPageTitle($h);
 ?>
-<h1><?=$h;?></h1>
+<h1><?php echo $h;?></h1>
 <div class="main-content-form-edit" id="article-edit-form">
-   <?
+   <?php 
    $this->moduleButtons = array(
       array(
          'link' => $this->link()->route(),
@@ -21,44 +21,44 @@ $this->addPageTitle($h);
    <table id="table-tags"></table>
    <div id="table-tags-pager"></div>
    <hr class="reseter" />
-   <?
+   <?php 
    ?>
 </div>
 <script type="text/javascript">
    /* <![CDATA[ */
       $(document).ready(function() {
     	  function crossformatter ( cellvalue, options, rowObject ) {
-    		   return cellvalue+' <?=$this->tr('krát')?>';
+    		   return cellvalue+' <?php echo $this->tr('krát')?>';
     	  }
           
          var tagsGrid = $("#table-tags").jqGrid({
             ajaxGridOptions : {type:"POST"},
-            url: '<?=$this->link()->route('listTags');?>',
+            url: '<?php echo $this->link()->route('listTags');?>',
             datatype: "json",
-            colNames:['ID', '<?=$this->tr('Název')?>', '<?=$this->tr('Použito')?>'],
+            colNames:['ID', '<?php echo $this->tr('Název')?>', '<?php echo $this->tr('Použito')?>'],
             colModel:[
-               {name:'<?=Articles_Model_Tags::COLUMN_ID?>',index:'<?=Articles_Model_Tags::COLUMN_ID?>',
+               {name:'<?php echo Articles_Model_Tags::COLUMN_ID?>',index:'<?php echo Articles_Model_Tags::COLUMN_ID?>',
                    width:33,fixed: true,editable:false},
-               {name:'<?=Articles_Model_Tags::COLUMN_NAME?>',index:'<?=Articles_Model_Tags::COLUMN_NAME?>', 
+               {name:'<?php echo Articles_Model_Tags::COLUMN_NAME?>',index:'<?php echo Articles_Model_Tags::COLUMN_NAME?>', 
                   editable:true,editoptions:{size:20},
-                  formoptions:{ rowpos:2, label: "<?=$this->tr('Název')?>",elmprefix:"(*)"}},
+                  formoptions:{ rowpos:2, label: "<?php echo $this->tr('Název')?>",elmprefix:"(*)"}},
                {name:'tag_used',index:'tag_used', width:100,fixed: true,editable:false, formatter: crossformatter}
             ],
             rowNum:10,
             rowList:[10,20,40,100],
             pager: '#table-tags-pager',
-            sortname: '<?=Articles_Model_Tags::COLUMN_NAME?>',
-            caption:"<?=$this->tr('Štítky položek')?>",
+            sortname: '<?php echo Articles_Model_Tags::COLUMN_NAME?>',
+            caption:"<?php echo $this->tr('Štítky položek')?>",
             autowidth : true,
             height: '100%',
             jsonReader: { repeatitems : false, root:"rows" },
-            editurl:"<?=$this->link()->route('editTag')?>"
+            editurl:"<?php echo $this->link()->route('editTag')?>"
          });
          tagsGrid.jqGrid('navGrid','#table-tags-pager',
             {edit:true,add:true,del:true},
             // edit options
             {reloadAfterSubmit:true, jqModal:true, closeOnEscape:true,viewPagerButtons:false, 
-               bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné')?>",closeAfterEdit:true,
+               bottominfo:"<?php echo $this->tr('Položky označené (*) jsou povinné')?>",closeAfterEdit:true,
                afterSubmit : function(respond){
                   var res = eval("("+respond.responseText+")");
                   var msg = res.errmsg.toString();
@@ -70,7 +70,7 @@ $this->addPageTitle($h);
             },
             // add options
             {reloadAfterSubmit:true,jqModal:true, closeOnEscape:true, 
-               bottominfo:"<?=$this->tr('Položky označené (*) jsou povinné')?>", closeAfterAdd: true,
+               bottominfo:"<?php echo $this->tr('Položky označené (*) jsou povinné')?>", closeAfterAdd: true,
                afterSubmit : function(respond){
                   var res = eval("("+respond.responseText+")");
                   var msg = res.errmsg.toString();

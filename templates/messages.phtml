@@ -1,5 +1,5 @@
-<div class="message message-info <?if(empty ($this->messages)){ echo "hidden";}?>" id="infoMessages">
-     <?// Vypis hlasek
+<div class="message message-info <?php if(empty ($this->messages)){ echo "hidden";}?>" id="infoMessages">
+     <?php // Vypis hlasek
      if(!empty ($this->messages)) {
         foreach ($this->messages as $message) {
            echo '<p>'.$message . '</p>';
@@ -7,9 +7,9 @@
      }?>
 </div>
 <!--{*-CORE_ERRORS-*}-->
-<? // chyby modulu?>
-<div class="message message-err <?if(empty ($this->moduleErrors) AND Template::pVar('IE_WARN') == false) { echo "hidden";}?>" id="errMessages">
-   <?
+<?php  // chyby modulu?>
+<div class="message message-err <?php if(empty ($this->moduleErrors) AND Template::pVar('IE_WARN') == false) { echo "hidden";}?>" id="errMessages">
+   <?php 
    if(Template::pVar('IE_WARN') == true){ $this->includeTpl('ie6browser.phtml',true); }
    if(!empty ($this->moduleErrors)) {
       echo("<strong>".$this->tr("Chyba:")."</strong>");

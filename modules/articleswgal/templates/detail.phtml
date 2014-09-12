@@ -1,4 +1,4 @@
-<?
+<?php 
 $this->addCssFile("style.css");
 
 $this->addPageTitle($this->article->{Articles_Model_Detail::COLUMN_NAME});
@@ -16,28 +16,28 @@ if ($this->article->{Articles_Model::COLUMN_TITLE_IMAGE} != null) {
 }
 
 ?>
-<h1><?=$this->article->{Articles_Model_Detail::COLUMN_NAME};?></h1>
+<h1><?php echo $this->article->{Articles_Model_Detail::COLUMN_NAME};?></h1>
 <div class="main-content-detail">
-   <?if((string)$this->article->{Articles_Model_Detail::COLUMN_ANNOTATION} != null){?>
-         <div class="main-content-annotation"><?
-         if($image != null) {?><div class="main-content-image"><?=$image?></div><? $image = null;}
+   <?php if((string)$this->article->{Articles_Model_Detail::COLUMN_ANNOTATION} != null){?>
+         <div class="main-content-annotation"><?php 
+         if($image != null) {?><div class="main-content-image"><?php echo $image?></div><?php  $image = null;}
          echo $this->article->{Articles_Model_Detail::COLUMN_ANNOTATION};?>
       <hr class="reseter" />
    </div>
-   <?}?>
+   <?php }?>
    <div class="main-content-text">
-      <?
+      <?php 
       echo $this->article->{Articles_Model_Detail::COLUMN_TEXT};
       ?>
       <hr class="reseter" />
    </div>
-   <?$this->includeTpl('privateText.phtml', false,null, 'articles');//private text?>
-   <? // images gallery
+   <?php $this->includeTpl('privateText.phtml', false,null, 'articles');//private text?>
+   <?php  // images gallery
    $this->imagesBaseDir = $this->category()->getModule()->getDataDir(true).$this->websubdir;
    $this->includeFile('tpl://engine:photogalery.phtml');
    ?>
    <hr class="reseter" />
-   <?
+   <?php 
    if($this->category()->getParam('shareTools', true) == true){
       $this->includeTpl('articletools.phtml', true, array(
            'lastEditTime' => $this->article->{Articles_Model_Detail::COLUMN_EDIT_TIME},
@@ -48,7 +48,7 @@ if ($this->article->{Articles_Model::COLUMN_TITLE_IMAGE} != null) {
    }
    ?>
 
-   <?
+   <?php 
    if($this->article != null AND ( 
       strpos((string)$this->article->{Articles_Model_Detail::COLUMN_TEXT}, 'pirobox') !== false
       OR strpos((string)$this->article->{Articles_Model::COLUMN_TEXT_PRIVATE}, 'pirobox') !== false)){
@@ -60,6 +60,6 @@ if ($this->article->{Articles_Model::COLUMN_TITLE_IMAGE} != null) {
       $(document).ready(function(){$().piroBox({slideShow : true,slideSpeed : 3});});
       /* ]]> */
    </script>
-<?}?>
+<?php }?>
 </div>
-<?$this->includeTpl("buttonback.phtml", true, array('link'=>(string)$this->l()->route('normal')));?>
+<?php $this->includeTpl("buttonback.phtml", true, array('link'=>(string)$this->l()->route('normal')));?>

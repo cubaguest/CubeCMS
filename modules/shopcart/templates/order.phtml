@@ -1,152 +1,152 @@
-<?
+<?php 
 $this->addFile('css://style.less');
 $h = $this->tr('Platební a poštovní informace');
 Template_Core::addPageTitle($h);
 $this->addJsPlugin(new JsPlugin_JQuery());
 $this->step = 2;
 ?>
-<h1><?=$h?></h1>
-<?$this->includeFile('tpl://navigation.phtml')?>
+<h1><?php echo $h?></h1>
+<?php $this->includeFile('tpl://navigation.phtml')?>
 <div class="main-content-detail">
    
-   <?// echo $this->formItems->renderStart();
+   <?php // echo $this->formItems->renderStart();
    echo $this->formOrder->renderStart();
    ?>
 
    <fieldset class="fieldset-alt">
-      <legend><span class="form-legend-name"><?=$this->tr('Informace o zákazníkovi')?></span></legend>
+      <legend><span class="form-legend-name"><?php echo $this->tr('Informace o zákazníkovi')?></span></legend>
       <table class="form-table">
          <tr>
-            <th class="form-labels"><?=$this->formOrder->customerName->label();?></th>
-            <td class="form-controlls"><?=$this->formOrder->customerName->ControlAll();?></td>
+            <th class="form-labels"><?php echo $this->formOrder->customerName->label();?></th>
+            <td class="form-controlls"><?php echo $this->formOrder->customerName->ControlAll();?></td>
          </tr>
          <tr>
-            <th class="form-labels"><?=$this->formOrder->customerSurname->label();?></th>
-            <td class="form-controlls"><?=$this->formOrder->customerSurname->ControlAll();?></td>
+            <th class="form-labels"><?php echo $this->formOrder->customerSurname->label();?></th>
+            <td class="form-controlls"><?php echo $this->formOrder->customerSurname->ControlAll();?></td>
          </tr>
          <tr>
-            <th class="form-labels"><?=$this->formOrder->customerEmail->label();?></th>
-            <td class="form-controlls"><?=$this->formOrder->customerEmail->controlAll();?></td>
+            <th class="form-labels"><?php echo $this->formOrder->customerEmail->label();?></th>
+            <td class="form-controlls"><?php echo $this->formOrder->customerEmail->controlAll();?></td>
          </tr>
          <tr>
-            <th class="form-labels"><?=$this->formOrder->customerPhone->label();?></th>
-            <td class="form-controlls"><?=$this->formOrder->customerPhone->controlAll();?></td>
+            <th class="form-labels"><?php echo $this->formOrder->customerPhone->label();?></th>
+            <td class="form-controlls"><?php echo $this->formOrder->customerPhone->controlAll();?></td>
          </tr>
       </table>
    </fieldset>
    <fieldset class="fieldset-alt">
-      <legend><span class="form-legend-name"><?=$this->tr('Fakturační adresa')?></span></legend>
+      <legend><span class="form-legend-name"><?php echo $this->tr('Fakturační adresa')?></span></legend>
       <table class="form-table">
          <tr>
-            <th class="form-labels"><?=$this->formOrder->paymentStreet->label();?></th>
-            <td class="form-controlls"><?=$this->formOrder->paymentStreet->controlAll();?></td>
+            <th class="form-labels"><?php echo $this->formOrder->paymentStreet->label();?></th>
+            <td class="form-controlls"><?php echo $this->formOrder->paymentStreet->controlAll();?></td>
       </tr>
-         <tr><th class="form-labels"><?=$this->formOrder->paymentCity->label();?></th>
-            <td class="form-controlls"><?=$this->formOrder->paymentCity->controlAll();?></td>
+         <tr><th class="form-labels"><?php echo $this->formOrder->paymentCity->label();?></th>
+            <td class="form-controlls"><?php echo $this->formOrder->paymentCity->controlAll();?></td>
          </tr>
          <tr>
-            <th class="form-labels"><?=$this->formOrder->paymentPostCode->label();?></th>
-            <td class="form-controlls"><?=$this->formOrder->paymentPostCode->controlAll();?></td>
+            <th class="form-labels"><?php echo $this->formOrder->paymentPostCode->label();?></th>
+            <td class="form-controlls"><?php echo $this->formOrder->paymentPostCode->controlAll();?></td>
          </tr>
          <tr>
-            <th class="form-labels"><?=$this->formOrder->paymentCountry->label();?></th>
-            <td class="form-controlls"><?=$this->formOrder->paymentCountry->controlAll();?></td>
+            <th class="form-labels"><?php echo $this->formOrder->paymentCountry->label();?></th>
+            <td class="form-controlls"><?php echo $this->formOrder->paymentCountry->controlAll();?></td>
          </tr>
          <tr>
-            <th class="form-labels"><?=$this->formOrder->paymentCompanyName->label();?></th>
-            <td class="form-controlls"><?=$this->formOrder->paymentCompanyName->controlAll();?></td>
+            <th class="form-labels"><?php echo $this->formOrder->paymentCompanyName->label();?></th>
+            <td class="form-controlls"><?php echo $this->formOrder->paymentCompanyName->controlAll();?></td>
          </tr>
          <tr>
-            <th class="form-labels"><?=$this->formOrder->paymentCompanyIC->label();?></th>
-            <td class="form-controlls"><?=$this->formOrder->paymentCompanyIC->controlAll();?></td>
+            <th class="form-labels"><?php echo $this->formOrder->paymentCompanyIC->label();?></th>
+            <td class="form-controlls"><?php echo $this->formOrder->paymentCompanyIC->controlAll();?></td>
          </tr>
          <tr>
-            <th class="form-labels"><?=$this->formOrder->paymentCompanyDIC->label();?></th>
-            <td class="form-controlls"><?=$this->formOrder->paymentCompanyDIC->controlAll();?></td>
+            <th class="form-labels"><?php echo $this->formOrder->paymentCompanyDIC->label();?></th>
+            <td class="form-controlls"><?php echo $this->formOrder->paymentCompanyDIC->controlAll();?></td>
          </tr>
       </table>
    </fieldset>
    <fieldset class="fieldset-alt">
-      <legend><span class="form-legend-name"><?=$this->tr('Dodací adresa')?></span></legend>
+      <legend><span class="form-legend-name"><?php echo $this->tr('Dodací adresa')?></span></legend>
       <table class="form-table">
          <tr>
-            <th class="form-labels"><?=$this->formOrder->isDeliveryAddress->label();?></th>
-         <td class="form-controlls"><?=$this->formOrder->isDeliveryAddress->controlAll();?></td>
+            <th class="form-labels"><?php echo $this->formOrder->isDeliveryAddress->label();?></th>
+         <td class="form-controlls"><?php echo $this->formOrder->isDeliveryAddress->controlAll();?></td>
       </tr>
          <tr>
-            <th class="form-labels"><?=$this->formOrder->deliveryName->label();?></th>
-            <td class="form-controlls"><?=$this->formOrder->deliveryName->controlAll();?></td>
+            <th class="form-labels"><?php echo $this->formOrder->deliveryName->label();?></th>
+            <td class="form-controlls"><?php echo $this->formOrder->deliveryName->controlAll();?></td>
          </tr>
          <tr>
-            <th class="form-labels"><?=$this->formOrder->deliveryStreet->label();?></th>
-            <td class="form-controlls"><?=$this->formOrder->deliveryStreet->controlAll();?></td>
+            <th class="form-labels"><?php echo $this->formOrder->deliveryStreet->label();?></th>
+            <td class="form-controlls"><?php echo $this->formOrder->deliveryStreet->controlAll();?></td>
          </tr>
          <tr>
-            <th class="form-labels"><?=$this->formOrder->deliveryCity->label();?></th>
-            <td class="form-controlls"><?=$this->formOrder->deliveryCity->controlAll();?></td>
+            <th class="form-labels"><?php echo $this->formOrder->deliveryCity->label();?></th>
+            <td class="form-controlls"><?php echo $this->formOrder->deliveryCity->controlAll();?></td>
          </tr>
          <tr>
-            <th class="form-labels"><?=$this->formOrder->deliveryPostCode->label();?></th>
-            <td class="form-controlls"><?=$this->formOrder->deliveryPostCode->controlAll();?></td>
+            <th class="form-labels"><?php echo $this->formOrder->deliveryPostCode->label();?></th>
+            <td class="form-controlls"><?php echo $this->formOrder->deliveryPostCode->controlAll();?></td>
          </tr>
          <tr>
-            <th class="form-labels"><?=$this->formOrder->deliveryCountry->label();?></th>
-            <td class="form-controlls"><?=$this->formOrder->deliveryCountry->controlAll();?></td>
+            <th class="form-labels"><?php echo $this->formOrder->deliveryCountry->label();?></th>
+            <td class="form-controlls"><?php echo $this->formOrder->deliveryCountry->controlAll();?></td>
          </tr>
       </table>
    </fieldset>
    <fieldset class="fieldset-alt">
-      <legend><span class="form-legend-name"><?=$this->tr('Rekapitulace objednávky')?></span></legend>
+      <legend><span class="form-legend-name"><?php echo $this->tr('Rekapitulace objednávky')?></span></legend>
       <table class="form-table">
          <thead>
             <tr>
-               <th><?=$this->tr('Název')?></th>
-               <th><?=$this->tr('Množství')?></th>
-               <th><?=$this->tr('Cena')?></th>
+               <th><?php echo $this->tr('Název')?></th>
+               <th><?php echo $this->tr('Množství')?></th>
+               <th><?php echo $this->tr('Cena')?></th>
             </tr>
          </thead>
          <tbody>
-            <?foreach ($this->cart as $item) {?>
+            <?php foreach ($this->cart as $item) {?>
             <tr>
                <td>
-                  <a href="<?=$item->getUrl()?>" title="<?ps($item->getName());?>"><?ps($item->getName());?></a>
-                  <?
+                  <a href="<?php echo $item->getUrl()?>" title="<?php ps($item->getName());?>"><?php ps($item->getName());?></a>
+                  <?php 
                   if($item->getNote() != null){ echo "<br />";ps($item->getNote()); }
                   ?>
                </td>
                <td class="column-unit">
-                  <?
+                  <?php 
                   ps($item->getQty()." ".$item->getUnit());
                   ?>
                </td>
                <td class="column-price">
-                  <?
+                  <?php 
                   echo Shop_Tools::getFormatedPrice($item->getPrice(true));
                   ?>
                </td>
             </tr>
-            <?}?>
+            <?php }?>
          </tbody>
          <tfoot>
             <tr>
                <td colspan="2">
-                  <?printf( $this->tr('<strong>Doprava:</strong> %s'), $this->shipping->{Shop_Model_Shippings::COLUMN_NAME} )?>
+                  <?php printf( $this->tr('<strong>Doprava:</strong> %s'), $this->shipping->{Shop_Model_Shippings::COLUMN_NAME} )?>
                </td>
-               <td class="column-price"><?=Shop_Tools::getFormatedPrice($this->shippingPrice)?></td>
+               <td class="column-price"><?php echo Shop_Tools::getFormatedPrice($this->shippingPrice)?></td>
             </tr>
             <tr>
                <td colspan="2">
-                  <?printf( $this->tr('<strong>Platba:</strong> %s'), $this->payment->{Shop_Model_Payments::COLUMN_NAME} )?>
+                  <?php printf( $this->tr('<strong>Platba:</strong> %s'), $this->payment->{Shop_Model_Payments::COLUMN_NAME} )?>
                </td>
-               <td class="column-price"><?=Shop_Tools::getFormatedPrice($this->paymentPrice)?></td>
+               <td class="column-price"><?php echo Shop_Tools::getFormatedPrice($this->paymentPrice)?></td>
             </tr>
             <tr>
                <th colspan="2">
-                  <?=$this->tr('Cena celkem:')?>
+                  <?php echo $this->tr('Cena celkem:')?>
                </th>
                <th class="column-price">
                   <span class="price price-total">
-                     <?=Shop_Tools::getFormatedPrice($this->priceTotal)?>
+                     <?php echo Shop_Tools::getFormatedPrice($this->priceTotal)?>
                   </span>
                </th>
             </tr>
@@ -154,20 +154,20 @@ $this->step = 2;
       </table>
    </fieldset>
    <fieldset class="fieldset-alt">
-      <legend><span class="form-legend-name"><?=$this->tr('Odeslání objednávky')?></span></legend>
+      <legend><span class="form-legend-name"><?php echo $this->tr('Odeslání objednávky')?></span></legend>
       <table class="form-table">
          <tr>
-            <th class="form-labels"><?=$this->formOrder->note->label();?></th>
-            <td class="form-controlls"><?=$this->formOrder->note->controlAll();?></td>
+            <th class="form-labels"><?php echo $this->formOrder->note->label();?></th>
+            <td class="form-controlls"><?php echo $this->formOrder->note->controlAll();?></td>
       </tr>
       <tr>
-         <th class="form-labels"><?=$this->formOrder->send->label();?></th>
-         <td class="form-controlls"><?=$this->formOrder->send->controlAll();?></td>
+         <th class="form-labels"><?php echo $this->formOrder->send->label();?></th>
+         <td class="form-controlls"><?php echo $this->formOrder->send->controlAll();?></td>
       </tr>
    </table>
    </fieldset>
 
-   <?
+   <?php 
    echo $this->formOrder->renderEnd();
    ?>
    <script type="text/javascript">

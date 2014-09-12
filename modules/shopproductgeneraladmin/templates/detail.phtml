@@ -1,4 +1,4 @@
-<?
+<?php 
 $this->addFile('css://style.less');
 $this->addFile('js://engine:shop.js');
 $piroBox = new JsPlugin_PrettyPhoto();
@@ -43,36 +43,36 @@ if($this->productCombinations){
 }
 
 ?>
-<h1><?
+<h1><?php 
 echo $this->product->{Shop_Model_Product::COLUMN_NAME};
 echo strtotime($this->product->{Shop_Model_Product::COLUMN_IS_NEW_TO_DATE})+(24*60*60) >= time() ? ' - '.$this->tr('Novinka!') : null;
 echo !$this->product->{Shop_Model_Product::COLUMN_ACTIVE} ? ' - '.$this->tr('neaktivní') : null;
 ?></h1>
 <div class="content">
    <div class="text">
-      <?=$this->product->{Shop_Model_Product::COLUMN_TEXT_SHORT}?>
+      <?php echo $this->product->{Shop_Model_Product::COLUMN_TEXT_SHORT}?>
    </div>
-   <?if($this->product->{Shop_Model_Product::COLUMN_IMAGE} != null){?>
+   <?php if($this->product->{Shop_Model_Product::COLUMN_IMAGE} != null){?>
    <div class="title-image">
-      <?
+      <?php 
       $imgSmall = Shop_Product_Controller::getImagesDir(true).'small/'.$this->product->{Shop_Model_Product::COLUMN_IMAGE};
       $imgSmall = vve_image_cacher(Shop_Product_Controller::getImagesDir(true).$this->product->{Shop_Model_Product::COLUMN_IMAGE}, 300);
       ?>
-      <a href="<?=Shop_Product_Controller::getImagesDir(true).$this->product->{Shop_Model_Product::COLUMN_IMAGE}?>"
-         rel="prettyPhoto" title="<?ps($this->product->{Shop_Model_Product::COLUMN_NAME})?>"
-         ><img src="<?=$imgSmall?>" alt="<?=$this->product->{Shop_Model_Product::COLUMN_NAME}?>"/></a>
+      <a href="<?php echo Shop_Product_Controller::getImagesDir(true).$this->product->{Shop_Model_Product::COLUMN_IMAGE}?>"
+         rel="prettyPhoto" title="<?php ps($this->product->{Shop_Model_Product::COLUMN_NAME})?>"
+         ><img src="<?php echo $imgSmall?>" alt="<?php echo $this->product->{Shop_Model_Product::COLUMN_NAME}?>"/></a>
    </div>
-   <?}?>
+   <?php }?>
    <div class="product-detail shop-product-attributes">
-      <?if($this->product->{Shop_Model_Product::COLUMN_CODE} != null){?>
+      <?php if($this->product->{Shop_Model_Product::COLUMN_CODE} != null){?>
       <div class="attr-line clearfix">
-         <div class="left"><?=$this->tr('Kód')?></div>
-         <div class="right product-code"><?=$productCode?></div>
+         <div class="left"><?php echo $this->tr('Kód')?></div>
+         <div class="right product-code"><?php echo $productCode?></div>
       </div>
-      <?}?>
+      <?php }?>
       <div class="attr-line clearfix">
-         <div class="left"><?=$this->tr('Dostupnost')?></div>
-         <div class="right product-qty"><?
+         <div class="left"><?php echo $this->tr('Dostupnost')?></div>
+         <div class="right product-qty"><?php 
             if($productQty > 0 && $this->product->{Shop_Model_Product::COLUMN_STOCK}){
                printf($this->tr('Skladem %s %s'), $productQty, $this->product->{Shop_Model_Product::COLUMN_UNIT});
             } else if($productQty < 0 || !$this->product->{Shop_Model_Product::COLUMN_STOCK}){
@@ -84,30 +84,30 @@ echo !$this->product->{Shop_Model_Product::COLUMN_ACTIVE} ? ' - '.$this->tr('nea
          </div>
       </div>
       <div class="attr-line clearfix">
-         <div class="left"><?=$this->tr('Váha')?></div>
-         <div class="right product-weight"><?
+         <div class="left"><?php echo $this->tr('Váha')?></div>
+         <div class="right product-weight"><?php 
             echo round($productWight, 3)." Kg";
           ?></div>
       </div>
-      <?if($this->product->{Shop_Model_Product::COLUMN_PERSONAL_PICKUP_ONLY} == true){?>
+      <?php if($this->product->{Shop_Model_Product::COLUMN_PERSONAL_PICKUP_ONLY} == true){?>
       <div class="attr-line clearfix">
-         <div class="left"><?=$this->tr('Odběr')?></div>
-         <div class="right"><? echo $this->tr('Pouze osobní'); ?></div>
+         <div class="left"><?php echo $this->tr('Odběr')?></div>
+         <div class="right"><?php  echo $this->tr('Pouze osobní'); ?></div>
       </div>
-      <?}?>
-      <?
+      <?php }?>
+      <?php 
       // render Combinations
       ?>
       <div class="attr-line clearfix">
-         <div class="left product-price-label"><?=$this->tr('Cena s daní')?></div>
-         <div class="right product-price"><? echo Shop_Tools::getFormatedPrice($productPrice, $this->product->{Shop_Model_Tax::COLUMN_VALUE}); ?></div>
+         <div class="left product-price-label"><?php echo $this->tr('Cena s daní')?></div>
+         <div class="right product-price"><?php  echo Shop_Tools::getFormatedPrice($productPrice, $this->product->{Shop_Model_Tax::COLUMN_VALUE}); ?></div>
       </div>
       <div class="attr-line clearfix">
-         <div class="left product-price-label"><?=$this->tr('Cena bez daně')?></div>
-         <div class="right product-price-wout-tax"><? echo Shop_Tools::getFormatedPrice($productPrice); ?></div>
+         <div class="left product-price-label"><?php echo $this->tr('Cena bez daně')?></div>
+         <div class="right product-price-wout-tax"><?php  echo Shop_Tools::getFormatedPrice($productPrice); ?></div>
       </div>
       <div id="product-buy-form">
-      <?
+      <?php 
       if($this->formAddToCart instanceof Form ){
          echo $this->formAddToCart->renderStart();
          $this->formAddToCart->productId->setValues($this->product->{Shop_Model_Product::COLUMN_ID});
@@ -144,67 +144,67 @@ echo !$this->product->{Shop_Model_Product::COLUMN_ACTIVE} ? ' - '.$this->tr('nea
    
    
    <hr class="reseter" />
-   <h2><?=$this->tr('Popis')?></h2>
+   <h2><?php echo $this->tr('Popis')?></h2>
    <div class="main-content-text">
-      <?echo $this->product->{Shop_Model_Product::COLUMN_TEXT};?>
+      <?php echo $this->product->{Shop_Model_Product::COLUMN_TEXT};?>
    </div>
    <br />
-<?
+<?php 
    $this->includeTpl("buttonback.phtml", true, array('text' => $this->tr('Zpět na seznam zboží')));
 ?>
    <script type="text/javascript">
       /* <![CDATA[ */
-      CubeCMS.Shop.currency = '<?=Shop_Tools::getCurrency()?>';
-      CubeCMS.Shop.roundDecimals = <?=(int)VVE_SHOP_PRICE_ROUND_DECIMAL?>;
-      CubeCMS.Shop.decimals = <?=(int)VVE_SHOP_PRICE_DECIMALS?>;
-      var defaultCombinationId = <?echo ($this->defaultCombination ? $this->defaultCombination->{Shop_Model_ProductCombinations::COLUMN_ID} : 0 )?>;
+      CubeCMS.Shop.currency = '<?php echo Shop_Tools::getCurrency()?>';
+      CubeCMS.Shop.roundDecimals = <?php echo (int)VVE_SHOP_PRICE_ROUND_DECIMAL?>;
+      CubeCMS.Shop.decimals = <?php echo (int)VVE_SHOP_PRICE_DECIMALS?>;
+      var defaultCombinationId = <?php echo ($this->defaultCombination ? $this->defaultCombination->{Shop_Model_ProductCombinations::COLUMN_ID} : 0 )?>;
 
       CubeCMS.Shop.setProduct({
-         code: '<?=$this->product->{Shop_Model_Product::COLUMN_CODE}?>',
-         price: <?=$this->product->{Shop_Model_Product::COLUMN_PRICE}?>,
-         tax: <?=number_format($this->product->{Shop_Model_Tax::COLUMN_VALUE} == 0 ? 0 : $this->product->{Shop_Model_Tax::COLUMN_VALUE}/100, 2, '.', '' )?>,
-         weight: <?=number_format($this->product->{Shop_Model_Product::COLUMN_WEIGHT}, 2, '.', '' )?>,
-         qty: <?=$this->product->{Shop_Model_Product::COLUMN_QUANTITY}?>,
-         unit: '<?=$this->product->{Shop_Model_Product::COLUMN_UNIT}?>'
+         code: '<?php echo $this->product->{Shop_Model_Product::COLUMN_CODE}?>',
+         price: <?php echo $this->product->{Shop_Model_Product::COLUMN_PRICE}?>,
+         tax: <?php echo number_format($this->product->{Shop_Model_Tax::COLUMN_VALUE} == 0 ? 0 : $this->product->{Shop_Model_Tax::COLUMN_VALUE}/100, 2, '.', '' )?>,
+         weight: <?php echo number_format($this->product->{Shop_Model_Product::COLUMN_WEIGHT}, 2, '.', '' )?>,
+         qty: <?php echo $this->product->{Shop_Model_Product::COLUMN_QUANTITY}?>,
+         unit: '<?php echo $this->product->{Shop_Model_Product::COLUMN_UNIT}?>'
       });
 
       $(document).ready(function(){
          // init spinner
          var spinner = $('input[name="product_add_qty"]').spinner({
-            min : <?=$this->product->{Shop_Model_Product::COLUMN_UNIT_SIZE}?>,
-            step : <?=$this->product->{Shop_Model_Product::COLUMN_UNIT_SIZE}?>
-         <?if($this->product->{Shop_Model_Product::COLUMN_STOCK} && !VVE_SHOP_ALLOW_BUY_NOT_IN_STOCK){ echo ",max : ".$productQty;}?>
+            min : <?php echo $this->product->{Shop_Model_Product::COLUMN_UNIT_SIZE}?>,
+            step : <?php echo $this->product->{Shop_Model_Product::COLUMN_UNIT_SIZE}?>
+         <?php if($this->product->{Shop_Model_Product::COLUMN_STOCK} && !VVE_SHOP_ALLOW_BUY_NOT_IN_STOCK){ echo ",max : ".$productQty;}?>
          });
 
          function changeCombination(varArr){
             $.each(CubeCMS.Shop.combinations, function(key, value){
                if($(varArr).not(this.variants).length == 0 && $(this.variants).not(varArr).length == 0){
-                  var multipler = parseInt( $('input[name="product_add_qty"]').val() )/<?=$this->product->{Shop_Model_Product::COLUMN_UNIT_SIZE}?>;
+                  var multipler = parseInt( $('input[name="product_add_qty"]').val() )/<?php echo $this->product->{Shop_Model_Product::COLUMN_UNIT_SIZE}?>;
                   // update price
                   var price = multipler * CubeCMS.Shop.getProductPrice(CubeCMS.Shop.product.price+this.price, CubeCMS.Shop.product.tax);
                   var priceWoutTax = multipler * ( CubeCMS.Shop.product.price + this.price );
                   $('.product-price').text( CubeCMS.Shop.getFormattedPrice(price) );
                   $('.product-price-wout-tax').text( CubeCMS.Shop.getFormattedPrice(priceWoutTax));
 
-                  <?if($this->product->{Shop_Model_Product::COLUMN_STOCK}){?>
+                  <?php if($this->product->{Shop_Model_Product::COLUMN_STOCK}){?>
                   // update qty
-                  var str = '<?=$this->tr('Vyprodáno')?>';
+                  var str = '<?php echo $this->tr('Vyprodáno')?>';
                   $('.product-to-cart').show();
                   if(this.qty > 0){
-                     str = '<?=$this->tr('Skladem {0} {1}')?>'.format(this.qty, CubeCMS.Shop.product.unit);
+                     str = '<?php echo $this->tr('Skladem {0} {1}')?>'.format(this.qty, CubeCMS.Shop.product.unit);
                   } else if(this.qty < 0){
-                     str = '<?=$this->tr('Skladem')?>';
+                     str = '<?php echo $this->tr('Skladem')?>';
                   } else {
                      // hide buy box
-                     <?if(!VVE_SHOP_ALLOW_BUY_NOT_IN_STOCK){
+                     <?php if(!VVE_SHOP_ALLOW_BUY_NOT_IN_STOCK){
                         echo "$('.product-to-cart').hide();\n";
                      }?>
                   }
-                  <?if(!VVE_SHOP_ALLOW_BUY_NOT_IN_STOCK){
+                  <?php if(!VVE_SHOP_ALLOW_BUY_NOT_IN_STOCK){
                      echo "spinner.spinner( \"option\", \"max\", this.qty);";
                   }?>
                   $('.product-qty').text(str);
-                  <?}?>
+                  <?php }?>
 
                   // update code
                   $('.product-code').text(CubeCMS.Shop.getProductCode(this.codes));
@@ -215,7 +215,7 @@ echo !$this->product->{Shop_Model_Product::COLUMN_ACTIVE} ? ' - '.$this->tr('nea
    //         console.log(varArr);
          }
 
-         <?echo $combJS;?>
+         <?php echo $combJS;?>
 
          $("a[rel^='prettyPhoto']").prettyPhoto();
 
@@ -228,13 +228,13 @@ echo !$this->product->{Shop_Model_Product::COLUMN_ACTIVE} ? ' - '.$this->tr('nea
          });
          $('input[name="product_add_qty"]').change(function(){
             if($(this).val() == ""){
-               $(this).val(<?=$this->product->{Shop_Model_Product::COLUMN_UNIT_SIZE}?>);
+               $(this).val(<?php echo $this->product->{Shop_Model_Product::COLUMN_UNIT_SIZE}?>);
             }
             if($('select.select-variant').length > 0){
                $('select.select-variant').first().change();
             } else {
                // přepočítat zboží podle množství
-               var multipler = parseInt( $('input[name="product_add_qty"]').val() )/<?=$this->product->{Shop_Model_Product::COLUMN_UNIT_SIZE}?>;
+               var multipler = parseInt( $('input[name="product_add_qty"]').val() )/<?php echo $this->product->{Shop_Model_Product::COLUMN_UNIT_SIZE}?>;
                $('.product-weight').text( multipler * (CubeCMS.Shop.product.weight) + " Kg");
                var price = multipler * CubeCMS.Shop.getProductPrice(CubeCMS.Shop.product.price, CubeCMS.Shop.product.tax);
                var priceWoutTax = multipler * CubeCMS.Shop.roundPrice( CubeCMS.Shop.product.price);

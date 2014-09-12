@@ -1,14 +1,14 @@
-<?
+<?php 
 $this->addCssFile("style.css");
 $this->includeFile('tpl://articles:sortLabel.phtml');
 $h1 = $this->category()->getName().$this->sortText;
 echo $this->toolbox;
 ?>
-<h1><?=$h1;?></h1>
+<h1><?php echo $h1;?></h1>
 <div class="main-content-list">
-   <?=$this->includeFile('tpl://articles:sort.phtml')?>
+   <?php echo $this->includeFile('tpl://articles:sort.phtml')?>
    <div class="main-content-list-records">
-   <?if(!empty ($this->articles)) {
+   <?php if(!empty ($this->articles)) {
       foreach ($this->articles as $article) {
          $showClass = $public = null;
          if($article->{Articles_Model_Detail::COLUMN_CONCEPT} == 1){
@@ -31,35 +31,35 @@ echo $this->toolbox;
             }
          }
          ?>
-   <div class="main-content-list-record <?=$showClass?>">
-      <h2><a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
-             title="<?=htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>"><?=htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>&nbsp;
+   <div class="main-content-list-record <?php echo $showClass?>">
+      <h2><a href="<?php echo $this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
+             title="<?php echo htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>"><?php echo htmlspecialchars($article->{Articles_Model_Detail::COLUMN_NAME})?>&nbsp;
             <span class="font-small">
-             <?=strftime("%x %X", $editTime->format("U"))?> - <?=$article->{Model_Users::COLUMN_USERNAME}?></span>
-         </a><?='<span class="font-small">'.$public.'</span>'?>
+             <?php echo strftime("%x %X", $editTime->format("U"))?> - <?php echo $article->{Model_Users::COLUMN_USERNAME}?></span>
+         </a><?php echo '<span class="font-small">'.$public.'</span>'?>
       </h2>
-      <?if($mainImage != false) {?><div class="main-content-list-record-image"><?echo $mainImage;?></div><?}?>
-      <?if((string)$article->{Articles_Model_Detail::COLUMN_ANNOTATION} != null){?>
-         <div class="main-content-list-record-annotation"><?echo $article->{Articles_Model_Detail::COLUMN_ANNOTATION};?></div>
-      <?} else if((string)$article->{Articles_Model_Detail::COLUMN_TEXT} != null) {?>
-         <div class="main-content-list-record-text"><?echo vve_tpl_truncate(strip_tags($article->{Articles_Model_Detail::COLUMN_TEXT}), 640);?></div>
-      <?}?>
+      <?php if($mainImage != false) {?><div class="main-content-list-record-image"><?php echo $mainImage;?></div><?php }?>
+      <?php if((string)$article->{Articles_Model_Detail::COLUMN_ANNOTATION} != null){?>
+         <div class="main-content-list-record-annotation"><?php echo $article->{Articles_Model_Detail::COLUMN_ANNOTATION};?></div>
+      <?php } else if((string)$article->{Articles_Model_Detail::COLUMN_TEXT} != null) {?>
+         <div class="main-content-list-record-text"><?php echo vve_tpl_truncate(strip_tags($article->{Articles_Model_Detail::COLUMN_TEXT}), 640);?></div>
+      <?php }?>
       <hr class="reseter" />
-      <div class="main-content-showed"><?=$this->tr('Zobrazeno')?>:&nbsp;<?=$article->{Articles_Model_Detail::COLUMN_SHOWED}?>&times;</div>
+      <div class="main-content-showed"><?php echo $this->tr('Zobrazeno')?>:&nbsp;<?php echo $article->{Articles_Model_Detail::COLUMN_SHOWED}?>&times;</div>
       <div class="main-content-link-more">
-         <a href="<?=$this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
-            title="<?=$this->tr("více o").' '.$article->{Articles_Model_Detail::COLUMN_NAME}?>">[&nbsp;<?=$this->tr("více")?>&nbsp;]</a>
+         <a href="<?php echo $this->link()->route('detail', array('urlkey' => $article->{Articles_Model_Detail::COLUMN_URLKEY}))?>"
+            title="<?php echo $this->tr("více o").' '.$article->{Articles_Model_Detail::COLUMN_NAME}?>">[&nbsp;<?php echo $this->tr("více")?>&nbsp;]</a>
       </div>
       <hr class="reseter" />
    </div>
-     <?}
+     <?php }
       echo $this->scrollComp;
    } else {
       echo ($this->tr('Není vložen žádný článek'));
    }
    ?>
    </div>
-   <?
+   <?php 
    // rss ikony
    $feeds = new Component_Feed();
    $feeds->setConfig('feedLink', $this->link()->clear());

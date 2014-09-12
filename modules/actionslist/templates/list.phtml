@@ -1,18 +1,18 @@
-<?
+<?php 
 $this->addPageTitle(vve_date("%x", $this->dateFrom).' - '.vve_date("%x", $this->dateTo));
 
 if($this->category()->getRights()->isWritable()) {?>
 <div id="gotoAddList" style="display: none"></div>
-   <?}?>
-<h1><?=$this->category->getName().' - '.vve_date("%x", $this->dateFrom).' - '.vve_date("%x", $this->dateTo);?></h1>
+   <?php }?>
+<h1><?php echo $this->category->getName().' - '.vve_date("%x", $this->dateFrom).' - '.vve_date("%x", $this->dateTo);?></h1>
 <div>
-   <?if($this->text != false){?>
+   <?php if($this->text != false){?>
    <div>
-      <?=$this->text->{Text_Model_Detail::COLUMN_TEXT}?>
+      <?php echo $this->text->{Text_Model_Detail::COLUMN_TEXT}?>
    </div>
-   <?}?>
+   <?php }?>
 
-   <?while ($row = $this->actions->fetch()) {
+   <?php while ($row = $this->actions->fetch()) {
       if($row->{Actions_Model_Detail::COLUMN_PUBLIC}) $class = "";
       else $class = 'nonPublicAction';
       $subLabel = $row->{Actions_Model_Detail::COLUMN_NAME};
@@ -28,18 +28,18 @@ if($this->category()->getRights()->isWritable()) {?>
       }
 
       ?>
-   <div class="<?=$class?>">
-      <h2><a href="<?=$this->link()->category($row->curlkey)
+   <div class="<?php echo $class?>">
+      <h2><a href="<?php echo $this->link()->category($row->curlkey)
                         ->route('detail', array('urlkey' => $row->{Actions_Model_Detail::COLUMN_URLKEY}))?>"
-             title="<?=$row->{Actions_Model_Detail::COLUMN_NAME}?>"
-             ><?=$subLabel?></a></h2>
-            <?if($row->{Actions_Model_Detail::COLUMN_AUTHOR} != null) {?>
+             title="<?php echo $row->{Actions_Model_Detail::COLUMN_NAME}?>"
+             ><?php echo $subLabel?></a></h2>
+            <?php if($row->{Actions_Model_Detail::COLUMN_AUTHOR} != null) {?>
       <p>
-               <?=$row->{Actions_Model_Detail::COLUMN_AUTHOR}?>
+               <?php echo $row->{Actions_Model_Detail::COLUMN_AUTHOR}?>
       </p>
-            <?}?>
+            <?php }?>
       <p>
-            <?
+            <?php 
             $startDate = vve_date("%x", new DateTime($row->{Actions_Model_Detail::COLUMN_DATE_START}));
             $stopDate = vve_date("%x", new DateTime($row->{Actions_Model_Detail::COLUMN_DATE_STOP}));
             print ($startDate);
@@ -62,31 +62,31 @@ if($this->category()->getRights()->isWritable()) {?>
             }
             ?>
       </p>
-      <?if($row->{Actions_Model_Detail::COLUMN_NOTE} != null) {?>
-      <p><?=$row->{Actions_Model_Detail::COLUMN_NOTE}?></p>
-            <?}?>
+      <?php if($row->{Actions_Model_Detail::COLUMN_NOTE} != null) {?>
+      <p><?php echo $row->{Actions_Model_Detail::COLUMN_NOTE}?></p>
+            <?php }?>
       <p>
-            <?
+            <?php 
             if($row->{Actions_Model_Detail::COLUMN_IMAGE} != null) {
                print (vve_tpl_image_tag($dataDir.$row[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]
                        .DIRECTORY_SEPARATOR.$row->{Actions_Model_Detail::COLUMN_IMAGE}, 'image', 50,50, 'actionImage'));
             }
             ?>
-            <?=vve_tpl_xhtml_cut(strip_tags($row->{Actions_Model_Detail::COLUMN_TEXT},'<br><a><b><strong><em><i>'), 600);?>
+            <?php echo vve_tpl_xhtml_cut(strip_tags($row->{Actions_Model_Detail::COLUMN_TEXT},'<br><a><b><strong><em><i>'), 600);?>
       </p>
       <p style="text-align: right">
-         <a href="<?=$this->link()->route('detail',
+         <a href="<?php echo $this->link()->route('detail',
                        array('urlkey' => $row->{Actions_Model_Detail::COLUMN_URLKEY}))?>"
-            title="<?=$this->_('Více')?>"><?=$this->_('Více')?></a>
+            title="<?php echo $this->_('Více')?>"><?php echo $this->_('Více')?></a>
       </p>
    </div>
 
-      <?}?>
+      <?php }?>
 
-   &laquo;<a href="<?=$this->linkBack?>" title="<?=$this->linkBackLabel?>"><?=$this->linkBackLabel?></a>&nbsp;&brvbar;&nbsp;
-   <a href="<?=$this->linkNext?>" title="<?=$this->linkNextLabel?>"><?=$this->linkNextLabel?></a>&raquo;
+   &laquo;<a href="<?php echo $this->linkBack?>" title="<?php echo $this->linkBackLabel?>"><?php echo $this->linkBackLabel?></a>&nbsp;&brvbar;&nbsp;
+   <a href="<?php echo $this->linkNext?>" title="<?php echo $this->linkNextLabel?>"><?php echo $this->linkNextLabel?></a>&raquo;
 
-   <?
+   <?php 
    if($this->category()->getRights()->isWritable()) {
       $toolbox = new Template_Toolbox();
       if($this->category()->getRights()->isControll()) {
@@ -106,7 +106,7 @@ if($this->category()->getRights()->isWritable()) {?>
          var jParent = $(this).parents('div.toolbox');
          if(jParent.data('isSelect') != true){
             var $selectBox = $('<div></div>').attr('id', 'toolSelAddCat');
-            $selectBox.load('<?=$this->link()->route('listCatAdd')?>',null,function(){
+            $selectBox.load('<?php echo $this->link()->route('listCatAdd')?>',null,function(){
                $selectBox.find('select').bind('change', function(){
                   $(this).parent('form').attr('action', $(this).val()).submit();
                });
@@ -121,5 +121,5 @@ if($this->category()->getRights()->isWritable()) {?>
       /* ]]> */
    </script>
 
-      <?}?>
+      <?php }?>
 </div>

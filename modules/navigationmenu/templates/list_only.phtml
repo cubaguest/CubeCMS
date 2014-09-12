@@ -1,46 +1,46 @@
-<?
+<?php 
 $model = new NavigationMenu_Models_List();
 $listSubdomains = $model->getSubdomainsList()->fetchAll();
 $listProjects = $model->getProjectsList()->fetchAll();
 
 ?>
 <div class="navigationMenu">
-   <?if(!empty ($listSubdomains)){?>
+   <?php if(!empty ($listSubdomains)){?>
    <ul id="subdomains">
-      <?//while ($row = $listSubdomains->fetch()) {?>
-      <?foreach ($listSubdomains as $row) {?>
+      <?php //while ($row = $listSubdomains->fetch()) {?>
+      <?php foreach ($listSubdomains as $row) {?>
       <li>
-         <a href="<?=$row->{NavigationMenu_Models_List::COL_URL}?>"
-            title="<?=$row->{NavigationMenu_Models_List::COL_NAME}?>" <?if($row->{NavigationMenu_Models_List::COL_FOLLOW} == false){echo 'rel="nofollow"';}?> 
-            <?if($row->{NavigationMenu_Models_List::COL_NEW_WIN} == true){echo 'class="link-external"';}?>>
-            <?
+         <a href="<?php echo $row->{NavigationMenu_Models_List::COL_URL}?>"
+            title="<?php echo $row->{NavigationMenu_Models_List::COL_NAME}?>" <?php if($row->{NavigationMenu_Models_List::COL_FOLLOW} == false){echo 'rel="nofollow"';}?> 
+            <?php if($row->{NavigationMenu_Models_List::COL_NEW_WIN} == true){echo 'class="link-external"';}?>>
+            <?php 
             if($row->{NavigationMenu_Models_List::COL_ICON} != null) {?>
-         <img src="<?=Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR.$this->getModuleName()
+         <img src="<?php echo Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR.$this->getModuleName()
                .URL_SEPARATOR.$row->{NavigationMenu_Models_List::COL_ICON}?>"
-              alt="<?=$row->{NavigationMenu_Models_List::COL_ICON}?> icon" />
-                 <?}?>
-         <?=$row->{NavigationMenu_Models_List::COL_NAME}?></a>
+              alt="<?php echo $row->{NavigationMenu_Models_List::COL_ICON}?> icon" />
+                 <?php }?>
+         <?php echo $row->{NavigationMenu_Models_List::COL_NAME}?></a>
       </li>
-      <?}?>
+      <?php }?>
    </ul>
-   <?}?>
-   <?if(!empty ($listProjects)){?>
+   <?php }?>
+   <?php if(!empty ($listProjects)){?>
    <ul id="projects">
-      <?foreach ($listProjects as $row) {?>
+      <?php foreach ($listProjects as $row) {?>
       <li>
-         <a href="<?=$row->{NavigationMenu_Models_List::COL_URL}?>"
-            title="<?=$row->{NavigationMenu_Models_List::COL_NAME}?>" <?if($row->{NavigationMenu_Models_List::COL_FOLLOW} == false){echo 'rel="nofollow"';}?> 
-            <?if($row->{NavigationMenu_Models_List::COL_NEW_WIN} == true){echo 'class="link-external"';}?>>
-            <?
+         <a href="<?php echo $row->{NavigationMenu_Models_List::COL_URL}?>"
+            title="<?php echo $row->{NavigationMenu_Models_List::COL_NAME}?>" <?php if($row->{NavigationMenu_Models_List::COL_FOLLOW} == false){echo 'rel="nofollow"';}?> 
+            <?php if($row->{NavigationMenu_Models_List::COL_NEW_WIN} == true){echo 'class="link-external"';}?>>
+            <?php 
             if($row->{NavigationMenu_Models_List::COL_ICON} != null) {?>
-         <img src="<?=Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR.$this->getModuleName()
+         <img src="<?php echo Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR.$this->getModuleName()
                .URL_SEPARATOR.$row->{NavigationMenu_Models_List::COL_ICON}?>"
-              alt="<?=$row->{NavigationMenu_Models_List::COL_ICON}?> icon" />
-                 <?}?>
-         <?=$row->{NavigationMenu_Models_List::COL_NAME}?></a>
+              alt="<?php echo $row->{NavigationMenu_Models_List::COL_ICON}?> icon" />
+                 <?php }?>
+         <?php echo $row->{NavigationMenu_Models_List::COL_NAME}?></a>
       </li>
-      <?}?>
+      <?php }?>
    </ul>
-   <?}?>
+   <?php }?>
    <hr class="reseter" />
 </div>

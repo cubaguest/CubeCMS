@@ -1,4 +1,4 @@
-<?
+<?php 
 $url = "http://" . $_SERVER['SERVER_NAME'];
 $maintenanceTitle = 'Aktualizace systému';
 $maintenanceMessage =
@@ -6,12 +6,12 @@ $maintenanceMessage =
    Zkuste prosím přijít později.<br /><br />
 ';
 setlocale(LC_ALL, 'cs_CZ.UTF-8');
-echo '<?xml version="1.0" encoding="UTF-8"?>'; ?>
+echo '<?php xml version="1.0" encoding="UTF-8"?>'; ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
    <head>
       <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-      <title><?= $maintenanceTitle ?></title>
+      <title><?php echo  $maintenanceTitle ?></title>
       <style type="text/css">
          body, html {
             font-size: 90%;
@@ -56,16 +56,16 @@ echo '<?xml version="1.0" encoding="UTF-8"?>'; ?>
    <body>
       <div id="mainBoxWrap">
       <div id="mainBox">
-         <h1><?= $maintenanceTitle; ?></h1>
-         <img class="mainImage" alt="maintance" src="<?=$url?>/images/maintenance.gif" />
-         <p class="mainBoxText"><?= $maintenanceMessage ?></p>
-         <?if(defined('MAINTENANCE_DATE') && MAINTENANCE_DATE != null){?>
-         <p class="mainBoxText"><strong>Předpokládaný čas opětovného spuštění:</strong>&nbsp;<?=MAINTENANCE_DATE;?></p>
-         <?}?>
-         <?if(defined('MAINTENANCE_EMAIL')){?>
-         <p class="mainBoxContact"><strong>Kontakt:</strong><br /><?=MAINTENANCE_EMAIL?><br />
+         <h1><?php echo  $maintenanceTitle; ?></h1>
+         <img class="mainImage" alt="maintance" src="<?php echo $url?>/images/maintenance.gif" />
+         <p class="mainBoxText"><?php echo  $maintenanceMessage ?></p>
+         <?php if(defined('MAINTENANCE_DATE') && MAINTENANCE_DATE != null){?>
+         <p class="mainBoxText"><strong>Předpokládaný čas opětovného spuštění:</strong>&nbsp;<?php echo MAINTENANCE_DATE;?></p>
+         <?php }?>
+         <?php if(defined('MAINTENANCE_EMAIL')){?>
+         <p class="mainBoxContact"><strong>Kontakt:</strong><br /><?php echo MAINTENANCE_EMAIL?><br />
             <span class="small">Kontaktujte nás pouze v nutných případech.</span> </p>
-         <?}?>
+         <?php }?>
       </div>
       </div>
    </body>

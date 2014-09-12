@@ -1,6 +1,6 @@
-<form action="<?=$this->link();?>" method="post" enctype="multipart/form-data">
+<form action="<?php echo $this->link();?>" method="post" enctype="multipart/form-data">
    <input name="addimage_image" type="file" value="" />
-   <input name="sessionid" type="hidden" value="<?=session_id();?>"/>
-   <input name="addimage_idArt" type="hidden" value="<?=$this->addForm->idArt->getUnfilteredValues()?>" />
+   <input name="sessionid" type="hidden" value="<?php echo session_id();?>"/>
+   <input name="addimage_idArt" type="hidden" value="<?php echo $this->addForm->idArt->getUnfilteredValues()?>" />
    <input name="addimage_send" type="submit" value="send"/>
 </form>

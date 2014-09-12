@@ -1,14 +1,14 @@
-<?
+<?php 
 $h = $this->_('Náhled šablony').' '.$this->tpl->{Templates_Model::COLUMN_NAME};
 $this->addPageTitle($h);
 ?>
-<h1><?=$h;?></h1>
+<h1><?php echo $h;?></h1>
 <div class="main-content-detail">
-   <a href="<?=$this->link()->param('time', time())?>" title="<?echo $this->_('Obnovit náhled')?>"
-      ><img src="<?=Template::getFileDir('icons/page_refresh.png', Template::IMAGES_DIR, false,true)?>"
-        alt="icon reload" />&nbsp;<?echo $this->_('Obnovit náhled')?></a>
+   <a href="<?php echo $this->link()->param('time', time())?>" title="<?php echo $this->_('Obnovit náhled')?>"
+      ><img src="<?php echo Template::getFileDir('icons/page_refresh.png', Template::IMAGES_DIR, false,true)?>"
+        alt="icon reload" />&nbsp;<?php echo $this->_('Obnovit náhled')?></a>
 </div>
-<?
+<?php 
 switch ($this->previewType) {
    case 'normal':
    default:
@@ -17,6 +17,6 @@ switch ($this->previewType) {
 }
 ?>
 <hr class="reseter" />
-<?
+<?php 
 $this->linkBack = $this->link()->clear();
 $this->includeTpl("buttonback.phtml", true);?>

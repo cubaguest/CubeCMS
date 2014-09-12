@@ -1,4 +1,4 @@
-<?
+<?php 
 $jq = new JsPlugin_JQuery();
 $jq->addUIDatepicker();
 $this->addJsPlugin($jq);
@@ -20,9 +20,9 @@ $this->form->urlkey->html()->setAttrib('size', 60)->addClass('form-element-long'
 // datepickery
 //$this->form->created_date->html()->addClass('datepicker');
 ?>
-<h1><?=$h;?></h1>
+<h1><?php echo $h;?></h1>
 <div class="main-content-form-edit" id="article-edit-form">
-   <?echo($this->form);
+   <?php echo($this->form);
    
    $taxesPrint = array();
    foreach($this->taxes as $tax){ 
@@ -30,7 +30,7 @@ $this->form->urlkey->html()->setAttrib('size', 60)->addClass('form-element-long'
    }
    ?>
    <script type="text/javascript">
-      var taxes = <?echo json_encode($taxesPrint)?>;
+      var taxes = <?php echo json_encode($taxesPrint)?>;
    
       $(document).ready(function(){
          var $iPrice = $('input[name="product_price"]');

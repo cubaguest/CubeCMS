@@ -1,11 +1,11 @@
-<?
+<?php 
 if($this->item['name'] != null){?>
-<h2><a href="<?=$this->item['link']?>" title="<?=$this->tr('Přejít na').' '.$this->item['name']?>"><?=$this->item['name'];?></a></h2>
-<?} else {?>
-<h2><a href="<?=$this->item['link']?>" title="<?=$this->tr('Přejít na').' '.$this->item['title']?>"><?=vve_tpl_truncate($this->item['title'], 70);?></a></h2>
-<?}
+<h2><a href="<?php echo $this->item['link']?>" title="<?php echo $this->tr('Přejít na').' '.$this->item['name']?>"><?php echo $this->item['name'];?></a></h2>
+<?php } else {?>
+<h2><a href="<?php echo $this->item['link']?>" title="<?php echo $this->tr('Přejít na').' '.$this->item['title']?>"><?php echo vve_tpl_truncate($this->item['title'], 70);?></a></h2>
+<?php }
 if($this->item['image'] != null){?>
-<img src="<?=$this->item['image']?>" alt="<?=$this->item['imageAlt']?>"/>
-<?}
+<img src="<?php echo $this->item['image']?>" alt="<?php echo $this->item['imageAlt']?>"/>
+<?php }
 echo $this->item['data'];
 ?>

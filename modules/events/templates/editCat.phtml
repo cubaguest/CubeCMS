@@ -1,4 +1,4 @@
-<?
+<?php 
 echo $this->toolbox;
 $h1 = $this->tr('Přidání kategorie událostí');
 
@@ -7,18 +7,18 @@ if($this->eventCat != null){
 }
 Template_Core::setPageTitle($h1);
 ?>
-<h1><?ps($h1)?></h1>
+<h1><?php ps($h1)?></h1>
 <div class="form-edit">
-   <?
+   <?php 
    echo $this->form;
    ?>
-   <?
+   <?php 
    $this->addJsPlugin(new JsPlugin_JQueryDropDown());
    ?>
    <script type="text/javascript">
       $(document).ready(function(){
          $('select[name="editcat_imageSelect"] option').each(function(){
-            $(this).attr('title', '<?=$this->category()->getModule()->getDataDir(true)?>cats/'+$(this).attr('value'));
+            $(this).attr('title', '<?php echo $this->category()->getModule()->getDataDir(true)?>cats/'+$(this).attr('value'));
          });
          $('select[name="editcat_imageSelect"]').msDropDown({
             visibleRows:5,rowHeight:23

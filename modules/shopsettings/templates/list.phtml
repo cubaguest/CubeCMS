@@ -1,11 +1,11 @@
-<?
+<?php 
 $jsJqGrid = new Component_JqGrid_JsPlugin();
 $this->addJsPlugin($jsJqGrid);
 $jQuery = new JsPlugin_JQuery();
 $this->addJsPlugin($jQuery);
 $this->addFile('css://style.css');
 ?>
-<h1><?= $this->category()->getName() ?></h1>
+<h1><?php echo  $this->category()->getName() ?></h1>
 <div class="main-content-form-edit">
    <table id="table-orders"></table>
    <div id="table-orders-pager"></div>
@@ -16,7 +16,7 @@ $this->addFile('css://style.css');
       /* <![CDATA[ */
       var selectedGroupId = 0;
       function showOrder(id){
-         var link = '<?=$this->link()->route('viewOrder')?>';
+         var link = '<?php echo $this->link()->route('viewOrder')?>';
          $.ajax({
             url: link.replace('{id}', id),
             cache: false,
@@ -63,9 +63,9 @@ $this->addFile('css://style.css');
          var ordersGrid = $("#table-orders").jqGrid({
             datatype: 'json',
             ajaxGridOptions : {type:"POST"},
-            url: '<?=$this->link()->route('ordersList');?>',
-            colNames:['ID', '<?=$this->tr('Jméno a příjmení')?>', '<?=$this->tr('Datum')?>', '<?=$this->tr('Status')?>',
-            '<?=$this->tr('Cena')?>', '<?=$this->tr('Akce')?>'],
+            url: '<?php echo $this->link()->route('ordersList');?>',
+            colNames:['ID', '<?php echo $this->tr('Jméno a příjmení')?>', '<?php echo $this->tr('Datum')?>', '<?php echo $this->tr('Status')?>',
+            '<?php echo $this->tr('Cena')?>', '<?php echo $this->tr('Akce')?>'],
             colModel:[
                {name:'id',	index:'id',	width:50, fixed :true, formatter: 'showNewStatus'},
                {name:'name', index:'name', formatter: 'showNewStatus'},
@@ -84,15 +84,15 @@ $this->addFile('css://style.css');
             jsonReader: {
                repeatitems : false, root:"rows"
             },
-            caption: "<?=$this->tr('Přehled objednávek')?>",
+            caption: "<?php echo $this->tr('Přehled objednávek')?>",
             height: '100%',
-            editurl : '<?=$this->link()->route('view', array('id' => '{ID}'));?>',
+            editurl : '<?php echo $this->link()->route('view', array('id' => '{ID}'));?>',
             gridComplete: function(){ 
                var ids = $(this).jqGrid('getDataIDs'); 
                var button;
                for(var i=0; i < ids.length;i++){ 
                   var cl = ids[i]; 
-                  button = "<input type='button' value='<?=$this->tr('Ukaž')?>' onclick=\"showOrder("+ids[i]+");\" />"; 
+                  button = "<input type='button' value='<?php echo $this->tr('Ukaž')?>' onclick=\"showOrder("+ids[i]+");\" />"; 
                   $(this).jqGrid('setRowData',ids[i],{act:button}); 
                } 
             },

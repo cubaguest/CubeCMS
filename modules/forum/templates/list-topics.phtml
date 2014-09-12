@@ -1,4 +1,4 @@
-<?
+<?php 
 $this->addJsPlugin(new JsPlugin_JQuery());
 $this->addFile('css://style.less');
 $jq = new JsPlugin_JQuery();
@@ -7,57 +7,57 @@ $this->addJsPlugin($jq);
 $this->addJsPlugin($jqcss);
 echo $this->toolbox;
 ?>
-<h1><?=$this->category()->getName();?></h1>
+<h1><?php echo $this->category()->getName();?></h1>
 <div class="forum-items main-content-list">
    <table class="forum-topics full-width ui-widget">
       <thead class="header">
          <tr class="ui-widget-header">
-            <th class="name"><?=$this->tr('Téma');?></th>
-            <th class="author"><?=$this->tr('Autor');?></th>
-            <th class="count-messages"><?=$this->tr('Příspěvků');?></th>
-            <th class="last-message"><?=$this->tr('Poslední reakce');?></th>
+            <th class="name"><?php echo $this->tr('Téma');?></th>
+            <th class="author"><?php echo $this->tr('Autor');?></th>
+            <th class="count-messages"><?php echo $this->tr('Příspěvků');?></th>
+            <th class="last-message"><?php echo $this->tr('Poslední reakce');?></th>
          </tr>
       </thead>
       <tbody>
-      <?if(!empty ($this->topics)){ ?>
-         <?foreach ($this->topics as $topic) {
+      <?php if(!empty ($this->topics)){ ?>
+         <?php foreach ($this->topics as $topic) {
             $lastDate = new DateTime( $topic->last_message_date == null ? $topic->{Forum_Model_Topics::COLUMN_DATE_ADD} : $topic->last_message_date );
             ?>
          <tr class="item row ui-widget-content">
             <td class="name">
-               <a href="<?=$this->link()->route('showTopic', array('id' => $topic->{Forum_Model_Topics::COLUMN_ID}))?>"
-                  title="<?=ps($topic->{Forum_Model_Topics::COLUMN_NAME})?>"><?=ps($topic->{Forum_Model_Topics::COLUMN_NAME})?></a>
-                  <?if($topic->{Forum_Model_Topics::COLUMN_SOLVED}){echo '<span class="font-small"> - vyřešeno</span>';}?><br />
+               <a href="<?php echo $this->link()->route('showTopic', array('id' => $topic->{Forum_Model_Topics::COLUMN_ID}))?>"
+                  title="<?php echo ps($topic->{Forum_Model_Topics::COLUMN_NAME})?>"><?php echo ps($topic->{Forum_Model_Topics::COLUMN_NAME})?></a>
+                  <?php if($topic->{Forum_Model_Topics::COLUMN_SOLVED}){echo '<span class="font-small"> - vyřešeno</span>';}?><br />
             </td>
-            <td class="author"><?=ps($topic->{Forum_Model_Topics::COLUMN_CREATED_BY})?></td>
-            <td class="count-messages"><?=ps((int)$topic->messages_count)?></td>
-            <td class="last-message"><?=vve_date('%d.%m.%Y %G:%i', $lastDate)?></td>
+            <td class="author"><?php echo ps($topic->{Forum_Model_Topics::COLUMN_CREATED_BY})?></td>
+            <td class="count-messages"><?php echo ps((int)$topic->messages_count)?></td>
+            <td class="last-message"><?php echo vve_date('%d.%m.%Y %G:%i', $lastDate)?></td>
          </tr>
          <tr class="ui-widget-content">
             <td colspan="5">
                <p class="text">
-                  <?echo vve_tpl_truncate(strip_tags($topic->{Forum_Model_Topics::COLUMN_TEXT}), 50)?>
+                  <?php echo vve_tpl_truncate(strip_tags($topic->{Forum_Model_Topics::COLUMN_TEXT}), 50)?>
                </p>
             </td>
          </tr>
-      <?}
+      <?php }
       } else {?>
          <tr class="item row">
-            <td colspan="5"><?=$this->tr('Žádné téma není vytvořeno')?></td>
+            <td colspan="5"><?php echo $this->tr('Žádné téma není vytvořeno')?></td>
          </tr>
-      <?}?>
+      <?php }?>
       </tbody>
-      <?if($this->category()->getRights()->isWritable()){?>
+      <?php if($this->category()->getRights()->isWritable()){?>
       <tfoot>
       <tr class="item row">
          <td colspan="5">
             <img src="/images/icons/comment_add.png" alt="add" />
-            <a href="<?=$this->link()->route('addTopic')?>" title="<?=$this->tr('Vytvořit nové téma')?>" ><?=$this->tr('Vytvořit téma')?></a>
+            <a href="<?php echo $this->link()->route('addTopic')?>" title="<?php echo $this->tr('Vytvořit nové téma')?>" ><?php echo $this->tr('Vytvořit téma')?></a>
          </td>
       </tr>
       </tfoot>
-      <?}?>
+      <?php }?>
    </table>
    
-   <?echo ($this->scrollComp);?>
+   <?php echo ($this->scrollComp);?>
 </div>

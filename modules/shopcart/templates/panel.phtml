@@ -1,4 +1,4 @@
-<?
+<?php 
 $icon = null;
 if($this->panelObj()->getIcon() != null){
    $icon = '<img src="'.Panel_Obj::getIconDir().$this->panelObj()->getIcon().'" alt="'.$this->panelObj()->getIcon().'" />';
@@ -8,13 +8,13 @@ if($this->panelObj()->getBackImage() != null){
    $backImg = 'background-image: url(\''.Panel_Obj::getBackImgDir().$this->panelObj()->getBackImage().'\');';
 }
 ?>
-<div class="panel-box-label"><?=$icon?><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=$this->panelObj()->getName()?></a></div>
+<div class="panel-box-label"><?php echo $icon?><a href="<?php echo $this->link()?>" title="<?php echo htmlspecialchars($this->panelObj()->getName())?>"><?php echo $this->panelObj()->getName()?></a></div>
    <div class="panel-box-content">
-   <?
+   <?php 
    foreach ($this->cart as $item) {?>
-      <a href="<?=$item->getUrl()?>" title="<?=htmlspecialchars($item->getName())?>"><?=vve_tpl_truncate($item->getName(),20)?></a> - <?=$item->getPrice().' '.VVE_SHOP_CURRENCY_NAME?><br />
-   <?}
+      <a href="<?php echo $item->getUrl()?>" title="<?php echo htmlspecialchars($item->getName())?>"><?php echo vve_tpl_truncate($item->getName(),20)?></a> - <?php echo $item->getPrice().' '.VVE_SHOP_CURRENCY_NAME?><br />
+   <?php }
    ?>
-      <strong><?=$this->tr('Celkem:').' '.$this->cart->getPrice().' '.VVE_SHOP_CURRENCY_NAME?></strong><br />
-   <a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->tr('Přejít k pokladně'))?>"><?=$this->tr('Přejít k pokladně')?></a>
+      <strong><?php echo $this->tr('Celkem:').' '.$this->cart->getPrice().' '.VVE_SHOP_CURRENCY_NAME?></strong><br />
+   <a href="<?php echo $this->link()?>" title="<?php echo htmlspecialchars($this->tr('Přejít k pokladně'))?>"><?php echo $this->tr('Přejít k pokladně')?></a>
    </div>

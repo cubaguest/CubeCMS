@@ -1,4 +1,4 @@
-<?//<desc>Panel zobrazuje seznam skupin</desc>
+<?php //<desc>Panel zobrazuje seznam skupin</desc>
 $icon = null;
 if($this->panelObj()->getIcon() != null){
    $icon = '<img src="'.Panel_Obj::getIconDir().$this->panelObj()->getIcon().'" alt="'.$this->panelObj()->getIcon().'" />';
@@ -8,28 +8,28 @@ if($this->panelObj()->getBackImage() != null){
    $backImg = 'background-image: url(\''.Panel_Obj::getBackImgDir().$this->panelObj()->getBackImage().'\');';
 }
 ?>
-<p class="panelLabel"><?=$icon?><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=$this->panelObj()->getName()?></a></p>
-<span class="panelSubLabel"><?=$this->_('Skupiny')?></span>
-<div style="<?=$backImg?>">
-   <?foreach ($this->links as $link) {
+<p class="panelLabel"><?php echo $icon?><a href="<?php echo $this->link()?>" title="<?php echo htmlspecialchars($this->panelObj()->getName())?>"><?php echo $this->panelObj()->getName()?></a></p>
+<span class="panelSubLabel"><?php echo $this->_('Skupiny')?></span>
+<div style="<?php echo $backImg?>">
+   <?php foreach ($this->links as $link) {
       $params = null;
       if($link->{NavigationMenu_Models_List::COL_URL} == true) $params = ' rel="nofollow"';
       if($link->{NavigationMenu_Models_List::COL_NEW_WIN} == true) $params .= ' class="linkNewWin" onclick="return ! window.open(this.href);"';
       ?>
-   <a href="<?=$link->{NavigationMenu_Models_List::COL_URL}?>"
-      title="<?=htmlspecialchars($link->{NavigationMenu_Models_List::COL_NAME})?>"<?=$params?>>
-   <?if($link->{NavigationMenu_Models_List::COL_ICON} != null){?>
-      <img src="<?=Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR.NavigationMenu_Controller::ICONS_DIR
+   <a href="<?php echo $link->{NavigationMenu_Models_List::COL_URL}?>"
+      title="<?php echo htmlspecialchars($link->{NavigationMenu_Models_List::COL_NAME})?>"<?php echo $params?>>
+   <?php if($link->{NavigationMenu_Models_List::COL_ICON} != null){?>
+      <img src="<?php echo Url_Request::getBaseWebDir().VVE_DATA_DIR.URL_SEPARATOR.NavigationMenu_Controller::ICONS_DIR
                .URL_SEPARATOR.$link->{NavigationMenu_Models_List::COL_ICON}?>"
-           alt="icon <?=htmlspecialchars($link->{NavigationMenu_Models_List::COL_NAME})?>" />
-      <?}?>
-      <?=vve_tpl_truncate($link->{NavigationMenu_Models_List::COL_NAME},25)?></a>
+           alt="icon <?php echo htmlspecialchars($link->{NavigationMenu_Models_List::COL_NAME})?>" />
+      <?php }?>
+      <?php echo vve_tpl_truncate($link->{NavigationMenu_Models_List::COL_NAME},25)?></a>
    <br />
-   <?
+   <?php 
    }
    ?>
 </div>
 <p class="panelLinkMore">
-   <a href="<?=$this->link()?>"
-      title="<?=htmlspecialchars($this->category()->getLabel())?>"><?=$this->_('Více')?></a>
+   <a href="<?php echo $this->link()?>"
+      title="<?php echo htmlspecialchars($this->category()->getLabel())?>"><?php echo $this->_('Více')?></a>
 </p>

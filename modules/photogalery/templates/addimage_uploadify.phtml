@@ -1,14 +1,14 @@
-<?
+<?php 
 $this->addJsPlugin(new JsPlugin_Uploadify());
 ?>
-<h1><?=$this->_('Přidání obrázku');?></h1>
+<h1><?php echo $this->_('Přidání obrázku');?></h1>
 <div class="main-content-form-edit">
    <span id="loader" style="display:none"><img src="images/progress.gif" alt="Loading..." width="16" /></span>
    <div id="sidebar">
       <!-- form to be replaced by uploadify -->
-      <form id="mainftp" method="post" action="<?=$this->link()?>" enctype="multipart/form-data">
+      <form id="mainftp" method="post" action="<?php echo $this->link()?>" enctype="multipart/form-data">
          <div>
-         <? print ($this->addForm->image->label());
+         <?php  print ($this->addForm->image->label());
          print ($this->addForm->image->labelValidations());
          print ($this->addForm->idArt->controll());
          print ($this->addForm->image->controll());
@@ -16,46 +16,46 @@ $this->addJsPlugin(new JsPlugin_Uploadify());
          </div>
       </form>
    </div>
-   <p><?=$this->_('Doporučená maximální velikost souboru je 2MB. Pokud je soubor větší, nemusí se
+   <p><?php echo $this->_('Doporučená maximální velikost souboru je 2MB. Pokud je soubor větší, nemusí se
 správně nebo vůbec provést změna velikosti obrázku z&nbsp;důvodu nedostatku paměti na serveru. 
 (Obrázek je měněn po jednotlivých bodech.)');?></p>
    <br />
 </div>
-   <?$this->includeTpl("buttonback.phtml", true, array('link'=>$this->link()->route('detail')));?>
+   <?php $this->includeTpl("buttonback.phtml", true, array('link'=>$this->link()->route('detail')));?>
 <br />
 <script type="text/javascript">
    /* <![CDATA[ */
    jQuery(document).ready(function() {
       $('#mainftp').uploadify({
          'uploader': 'jscripts/jqueryuploadify/uploadify.swf',
-         'script': '<?=$this->link()->route('uploadFile');?>',
-         'checkScript': '<?=$this->link()->route('checkFile');?>',
+         'script': '<?php echo $this->link()->route('uploadFile');?>',
+         'checkScript': '<?php echo $this->link()->route('checkFile');?>',
          'multi': true,
          'auto': true,
          'height': '32', //height of your browse button file
          'width': '105', //width of your browse button file
          'sizeLimit': '2048000',  //remove this to set no limit on upload size
          'simUploadLimit': '2', //remove this to set no limit on simultaneous uploads
-         //'buttonImg' : 'images/browse_<?=Locales::getLang()?>.png',
-         'buttonText': '<?=$this->_('Vybrat obrázky')?>',
+         //'buttonImg' : 'images/browse_<?php echo Locales::getLang()?>.png',
+         'buttonText': '<?php echo $this->_('Vybrat obrázky')?>',
          'cancelImg': 'images/cancel.png',
          'fileDesc': 'images',
          'fileExt': '*.jpg;*.jpeg;*.png;*.gif;*.JPG,*.JPEG',
          'fileDataName': 'addimage_image',
-         'scriptData': {'sessionid': '<?=session_id();?>', 'addimage_send' : 'send', 'addimage_idArt' : <?=$this->addForm->idArt->getUnfilteredValues()?>},
+         'scriptData': {'sessionid': '<?php echo session_id();?>', 'addimage_send' : 'send', 'addimage_idArt' : <?php echo $this->addForm->idArt->getUnfilteredValues()?>},
          onProgress: function() {$('#loader').show();$('#mainftpQueue').show();},
          onSelect : function(){$('#errMessages').empty().hide();$('#infoMessages').empty().hide();},
          onAllComplete: function() {
             $('#loader').hide();
             $('#mainftpQueue').hide();
             $('#allfiles').load(location.href+" #allfiles>*","",function(){
-               formShowOnlyLang('<?=Locales::getLang()?>');
+               formShowOnlyLang('<?php echo Locales::getLang()?>');
             });
-            $('#infoMessages').append("<p><?=$this->_('Obrázky byly nahrány')?></p>").show();
+            $('#infoMessages').append("<p><?php echo $this->_('Obrázky byly nahrány')?></p>").show();
             //location.reload(); //uncomment this line if youw ant to refresh the whole page instead of just the #allfiles div
          },
          onError : function(event, queueID, fileObj, errObj){
-            $('#errMessages').append('<p><?=$this->_('Obrázek')?> '+fileObj.name+' <?=$this->_("se nepodařilo nahrát")?></p>').show();
+            $('#errMessages').append('<p><?php echo $this->_('Obrázek')?> '+fileObj.name+' <?php echo $this->_("se nepodařilo nahrát")?></p>').show();
          }
       });
    });

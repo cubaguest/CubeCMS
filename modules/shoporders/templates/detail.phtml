@@ -1,20 +1,20 @@
-<h2><? printf($this->tr('Objednávka č. %s'), $this->order->{Shop_Model_Orders::COLUMN_ID}) ?></h2>
+<h2><?php  printf($this->tr('Objednávka č. %s'), $this->order->{Shop_Model_Orders::COLUMN_ID}) ?></h2>
 <p id="orderActionsButtons">
-   <a href="<?=$this->link()->route('exportOrder', array('output' => 'pdf'))?>" title="<?=$this->tr('stáhnout pdf')?>">
-      <img src="/images/files/pdf.gif" alt="pdf"/> <?=$this->tr('stáhnout')?>
+   <a href="<?php echo $this->link()->route('exportOrder', array('output' => 'pdf'))?>" title="<?php echo $this->tr('stáhnout pdf')?>">
+      <img src="/images/files/pdf.gif" alt="pdf"/> <?php echo $this->tr('stáhnout')?>
    </a>
-   <a href="javascript:window.print();" title="<?=$this->tr('tisknout objednávku')?>">
-      <img src="/images/icons/printer.png" alt="print"/> <?=$this->tr('tisknout')?>
+   <a href="javascript:window.print();" title="<?php echo $this->tr('tisknout objednávku')?>">
+      <img src="/images/icons/printer.png" alt="print"/> <?php echo $this->tr('tisknout')?>
    </a>
 </p>
 <table class="full-width ui-widget" id="table-order-detail">
    <tr class="ui-widget-header ui-corner-top">
-      <th><?= $this->tr('Fakturační adresa') ?></th>
-      <th><?= $this->tr('Dodací adresa') ?></th>
+      <th><?php echo  $this->tr('Fakturační adresa') ?></th>
+      <th><?php echo  $this->tr('Dodací adresa') ?></th>
    </tr>
    <tr class="ui-widget-content">
       <td class="address">
-         <?
+         <?php 
          if ($this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY} != null) {
             echo "<strong>".$this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY} . '</strong><br />';
          }
@@ -34,7 +34,7 @@
          ?>
       </td>
       <td class="address">
-         <?
+         <?php 
          echo "<strong>".$this->order->{Shop_Model_Orders::COLUMN_DELIVERY_NAME} . '</strong><br />';
          echo $this->order->{Shop_Model_Orders::COLUMN_DELIVERY_STREET} . '<br />';
          echo $this->order->{Shop_Model_Orders::COLUMN_DELIVERY_CITY} .
@@ -45,23 +45,23 @@
    </tr>
 </table>
 <br />
-<h3><?= $this->tr('Souhrn položek'); ?></h3>
+<h3><?php echo  $this->tr('Souhrn položek'); ?></h3>
 <table class="full-width" id="table-order-items">
    <thead>
       <tr class="ui-widget-header">
-         <th><?= $this->tr('Název') ?></th>
-         <th><?= $this->tr('Množství') ?></th>
-         <th><?= $this->tr('Cena') ?></th>
+         <th><?php echo  $this->tr('Název') ?></th>
+         <th><?php echo  $this->tr('Množství') ?></th>
+         <th><?php echo  $this->tr('Cena') ?></th>
       </tr>
    </thead>
    <tbody>
-      <?
+      <?php 
       $fullPrice = 0;
       foreach ($this->items as $item) {
          $fullPrice += $item->{Shop_Model_OrderItems::COLUMN_PRICE};
          ?>
       <tr class="ui-widget-content">
-            <td><?
+            <td><?php 
          echo $item->{Shop_Model_OrderItems::COLUMN_NAME};
          if ($item->{Shop_Model_OrderItems::COLUMN_NOTE} != null) {
             echo '<div class="product-note">';
@@ -69,28 +69,28 @@
             echo '</div>';
          }
          ?></td>
-            <td><?
+            <td><?php 
             echo $item->{Shop_Model_OrderItems::COLUMN_QTY} . ' ' . $item->{Shop_Model_OrderItems::COLUMN_UNIT};
          ?>
             </td>
-            <td class="column-price"><?=Shop_Tools::getFormatedPrice($item->{Shop_Model_OrderItems::COLUMN_PRICE})?></td>
+            <td class="column-price"><?php echo Shop_Tools::getFormatedPrice($item->{Shop_Model_OrderItems::COLUMN_PRICE})?></td>
          </tr>
-      <? } ?>
+      <?php  } ?>
       <tr><td colspan="3" class="spacer">&nbsp;</td></tr>
       <tr class="ui-widget-content">
-         <td colspan="2"><?=$this->tr('Mezisoučet')?></td>
-         <td class="column-price"><?=Shop_Tools::getFormatedPrice($fullPrice)?></td>
+         <td colspan="2"><?php echo $this->tr('Mezisoučet')?></td>
+         <td class="column-price"><?php echo Shop_Tools::getFormatedPrice($fullPrice)?></td>
       </tr>
       <tr><td colspan="3" class="spacer">&nbsp;</td></tr>
       <tr class="ui-widget-content">
-         <th><?
+         <th><?php 
       echo $this->tr("Doprava").': '.$this->order->{Shop_Model_Orders::COLUMN_SHIPPING_METHOD};
       if($this->order->{Shop_Model_Orders::COLUMN_PICKUP_DATE} != null){
          printf($this->tr(' - datum odběru: %s'), vve_date("%x", new DateTime($this->order->{Shop_Model_Orders::COLUMN_PICKUP_DATE})));
       }
       ?></th>
          <td></td>
-         <td class="column-price"><?
+         <td class="column-price"><?php 
             if ($this->order->{Shop_Model_Orders::COLUMN_SHIPPING_PRICE} == 0) {
                echo $this->tr('zdarma');
             } else {
@@ -99,11 +99,11 @@
       ?></td>
       </tr>
       <tr class="ui-widget-content">
-         <th><?
+         <th><?php 
             echo $this->tr("Platba").': '.$this->order->{Shop_Model_Orders::COLUMN_PAYMENT_METHOD};
       ?></th>
          <td></td>
-         <td class="column-price"><?
+         <td class="column-price"><?php 
             if ($this->order->{Shop_Model_Orders::COLUMN_PAYMENT_PRICE} == 0) {
                echo $this->tr('zdarma');
             } else {
@@ -113,37 +113,37 @@
       </tr>
       <tr><td colspan="3" class="spacer">&nbsp;</td></tr>
       <tr class="order-full-price ui-widget-content ui-state-highlight">
-         <td colspan="2"><?= $this->tr('Cena celkem') ?></td>
-         <td class="column-price"><?= Shop_Tools::getFormatedPrice($this->order->{Shop_Model_Orders::COLUMN_TOTAL})?></td>
+         <td colspan="2"><?php echo  $this->tr('Cena celkem') ?></td>
+         <td class="column-price"><?php echo  Shop_Tools::getFormatedPrice($this->order->{Shop_Model_Orders::COLUMN_TOTAL})?></td>
       </tr>
    </tbody>
 </table>
 <br />
-<h3><?=$this->tr('Stavy')?></h3>
+<h3><?php echo $this->tr('Stavy')?></h3>
 <table class="ui-widget full-width" id="table-order-status">
    <thead>
       <tr class="ui-widget-header">
-         <th class="column-date"><?=$this->tr('Datum a čas');?></th>
-         <th><?=$this->tr('Název');?></th>
-         <th><?=$this->tr('Poznámka');?></th>
+         <th class="column-date"><?php echo $this->tr('Datum a čas');?></th>
+         <th><?php echo $this->tr('Název');?></th>
+         <th><?php echo $this->tr('Poznámka');?></th>
       </tr>
    </thead>
    <tbody>
-      <?if($this->statuses == false){?>
+      <?php if($this->statuses == false){?>
       <tr id="order-no-status-msg" class="ui-widget-content">
-         <td colspan="3"><?=$this->tr('Źádné změny stavu nebyly provedeny');?></td>
+         <td colspan="3"><?php echo $this->tr('Źádné změny stavu nebyly provedeny');?></td>
       </tr>
-      <?} else { foreach ($this->statuses as $status) {?>
+      <?php } else { foreach ($this->statuses as $status) {?>
       <tr class="ui-widget-content">
-         <td><?=vve_date('%x %X', new DateTime($status->{Shop_Model_OrderStatus::COLUMN_TIME_ADD}))?></td>
-         <td><?=$status->{Shop_Model_OrderStatus::COLUMN_NAME}?></td>
-         <td><?=$status->{Shop_Model_OrderStatus::COLUMN_NOTE}?></td>
+         <td><?php echo vve_date('%x %X', new DateTime($status->{Shop_Model_OrderStatus::COLUMN_TIME_ADD}))?></td>
+         <td><?php echo $status->{Shop_Model_OrderStatus::COLUMN_NAME}?></td>
+         <td><?php echo $status->{Shop_Model_OrderStatus::COLUMN_NOTE}?></td>
       </tr>
-      <?}?>
-      <?}?>
+      <?php }?>
+      <?php }?>
    </tbody>
 </table>
-<? 
+<?php  
 $this->formStatus->html()->setAttrib('name', 'form-order-status');
 echo $this->formStatus->renderStart();
 echo $this->formStatus->id->controll();
@@ -151,30 +151,30 @@ echo $this->formStatus->id->controll();
 <table class="ui-widget full-width" id="table-order-status-form">
    <tbody>
       <tr class="ui-widget-header">
-         <th colspan="2" class=""><?=$this->tr('Nový stav');?></th>
+         <th colspan="2" class=""><?php echo $this->tr('Nový stav');?></th>
       </tr>
       <tr class="ui-widget-content">
-         <th><?=$this->formStatus->name->label();?></th>
-         <td><?echo $this->formStatus->nameSel->controll().' '.$this->tr('nebo').' '.$this->formStatus->name->controll();?></td>
+         <th><?php echo $this->formStatus->name->label();?></th>
+         <td><?php echo $this->formStatus->nameSel->controll().' '.$this->tr('nebo').' '.$this->formStatus->name->controll();?></td>
       </tr>
       <tr class="ui-widget-content">
-         <th><?=$this->formStatus->note->label();?></th>
-         <td><?=$this->formStatus->note->controll();?></td>
+         <th><?php echo $this->formStatus->note->label();?></th>
+         <td><?php echo $this->formStatus->note->controll();?></td>
       </tr>
       <tr class="ui-widget-content">
          <th></th>
-         <td><?
+         <td><?php 
          echo $this->formStatus->infoCust->label();
          echo $this->formStatus->infoCust->controll();
          ?></td>
       </tr>
       <tr class="ui-widget-content">
          <th></th>
-         <td><?=$this->formStatus->add->controll();?></td>
+         <td><?php echo $this->formStatus->add->controll();?></td>
       </tr>
    </tbody>
 </table>
-<?=$this->formStatus->renderEnd()?>
+<?php echo $this->formStatus->renderEnd()?>
 <script type="text/javascript" charset="utf-8">
    /* <![CDATA[ */
    // změna statusu

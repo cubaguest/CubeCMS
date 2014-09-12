@@ -1,4 +1,4 @@
-<?
+<?php 
 $this->addPageTitle($this->tr('Úprava souboru'));
 $jQuery = new JsPlugin_JQuery();
 $this->addJsPlugin($jQuery);
@@ -67,7 +67,7 @@ $this->addFile('css://codemirror/cobalt.css');
 
 $grpsArr = array();
 ?>
-<h1><?ps(sprintf($this->tr('Úprava souboru %s'), null));?></h1>
+<h1><?php ps(sprintf($this->tr('Úprava souboru %s'), null));?></h1>
 <style type="text/css">
     .CodeMirror {border-top: 1px solid black; border-bottom: 1px solid black;}
 </style>
@@ -106,7 +106,7 @@ $grpsArr = array();
    $this->includeTpl('modules/buttons.phtml', true);
    
    ?>
-   <textarea id="editor"><?=htmlspecialchars($this->fileContent)?></textarea>
+   <textarea id="editor"><?php echo htmlspecialchars($this->fileContent)?></textarea>
 </div>
 <script type="text/javascript" charset="utf-8">
    /* <![CDATA[ */
@@ -119,7 +119,7 @@ $grpsArr = array();
    };
    
    window.editor = CodeMirror.fromTextArea(te, {
-      mode: "<?=$mode?>",
+      mode: "<?php echo $mode?>",
       lineNumbers: true,
       lineWrapping: true,
       indentUnit: 3,
@@ -178,9 +178,9 @@ $grpsArr = array();
       console.log('Ukládám');
       $.ajax({
          type : 'POST',
-         url : '<?=$this->link()->route('saveFile')?>',
+         url : '<?php echo $this->link()->route('saveFile')?>',
          data : {
-            file : '<?=$this->file?>',
+            file : '<?php echo $this->file?>',
             content : editor.getValue()
          },
          complete : function(){
@@ -194,7 +194,7 @@ $grpsArr = array();
    
    $('#button-save').click(function(){ saveFile(); return false; });
    $('#button-clear').click(function(){ 
-      if(confirm('<?=$this->tr('Opravdu vymazat obsah?')?>')){
+      if(confirm('<?php echo $this->tr('Opravdu vymazat obsah?')?>')){
          editor.setValue("");
       }
       return false;
@@ -203,7 +203,7 @@ $grpsArr = array();
    $('#button-redo').click(function(){ editor.redo(); return false; });
    $('#button-close').click(function(){ 
       if($('#button-save').hasClass('not-saved')){
-         if(!confirm('<?=$this->tr('Obsah není uložen. Chcete jej opravdu zavřít?')?>')){
+         if(!confirm('<?php echo $this->tr('Obsah není uložen. Chcete jej opravdu zavřít?')?>')){
             return false;
          }
       }

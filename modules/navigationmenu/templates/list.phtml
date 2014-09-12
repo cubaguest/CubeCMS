@@ -1,4 +1,4 @@
-<?
+<?php 
 $model = new NavigationMenu_Models_List();
 $listSubdomains = $model->getSubdomainsList();
 $listProjects = $model->getProjectsList();
@@ -7,153 +7,153 @@ $listPartners = $model->getPartnersList();
 
 ?>
 <div class="navMenuList">
-   <h2><?=$this->_("Podstránky")?></h2>
+   <h2><?php echo $this->_("Podstránky")?></h2>
    <table>
-      <?while ($row = $listSubdomains->fetch()) {
+      <?php while ($row = $listSubdomains->fetch()) {
       $params = null;
       if($row->{NavigationMenu_Models_List::COL_URL} == true) $params = ' rel="nofollow"';
       if($row->{NavigationMenu_Models_List::COL_NEW_WIN} == true) $params .= ' target="_blank"';
       ?>
       <tr>
          <td width="200">
-               <?
+               <?php 
                if($row->{NavigationMenu_Models_List::COL_ICON} != null) {?>
-            <img src="<?=$this->category()->getModule()->getDataDir(true).$row->{NavigationMenu_Models_List::COL_ICON}?>"
-                 alt="<?=$row->{NavigationMenu_Models_List::COL_ICON}?> icon" />
-                    <?}?>
-            <a href="<?=$row->{NavigationMenu_Models_List::COL_URL}?>"
-               title="<?=$row->{NavigationMenu_Models_List::COL_NAME}?>"<?=$params?>><?=$row->{NavigationMenu_Models_List::COL_NAME}?></a>
+            <img src="<?php echo $this->category()->getModule()->getDataDir(true).$row->{NavigationMenu_Models_List::COL_ICON}?>"
+                 alt="<?php echo $row->{NavigationMenu_Models_List::COL_ICON}?> icon" />
+                    <?php }?>
+            <a href="<?php echo $row->{NavigationMenu_Models_List::COL_URL}?>"
+               title="<?php echo $row->{NavigationMenu_Models_List::COL_NAME}?>"<?php echo $params?>><?php echo $row->{NavigationMenu_Models_List::COL_NAME}?></a>
          </td>
-            <?if($this->category()->getRights()->isWritable()) {?>
-         <td><?=$row->{NavigationMenu_Models_List::COL_ORDER}?>&nbsp;</td>
+            <?php if($this->category()->getRights()->isWritable()) {?>
+         <td><?php echo $row->{NavigationMenu_Models_List::COL_ORDER}?>&nbsp;</td>
          <td>
                   
-            <form method="post" action="<?=$this->link()->route('edit', array('id' => $row->{NavigationMenu_Models_List::COL_ID}))?>" style="display:inline;">
-               <input type="image" src="<?=vve_get_tpl_file('icons/link_edit.png', VVE_TPL_FILE_IMAGE)?>"
-                      value="edit" name="link_edit" title="<?=$this->_('Upravit')?>" />
+            <form method="post" action="<?php echo $this->link()->route('edit', array('id' => $row->{NavigationMenu_Models_List::COL_ID}))?>" style="display:inline;">
+               <input type="image" src="<?php echo vve_get_tpl_file('icons/link_edit.png', VVE_TPL_FILE_IMAGE)?>"
+                      value="edit" name="link_edit" title="<?php echo $this->_('Upravit')?>" />
             </form>
-            <form method="post" action="<?=$this->link()?>" style="display:inline;" onsubmit="return submitRemove('<?=$row->{NavigationMenu_Models_List::COL_NAME};?>')">
-               <input type="hidden" value="<?=$row->{NavigationMenu_Models_List::COL_ID}?>" name="link_id" />
-               <input type="image" src="<?=vve_get_tpl_file('icons/link_delete.png', VVE_TPL_FILE_IMAGE)?>"
-                      value="remove" name="link_remove" title="<?=$this->_('Odtranit')?>" />
+            <form method="post" action="<?php echo $this->link()?>" style="display:inline;" onsubmit="return submitRemove('<?php echo $row->{NavigationMenu_Models_List::COL_NAME};?>')">
+               <input type="hidden" value="<?php echo $row->{NavigationMenu_Models_List::COL_ID}?>" name="link_id" />
+               <input type="image" src="<?php echo vve_get_tpl_file('icons/link_delete.png', VVE_TPL_FILE_IMAGE)?>"
+                      value="remove" name="link_remove" title="<?php echo $this->_('Odtranit')?>" />
             </form>
          </td>
-            <?}?>
+            <?php }?>
       </tr>
-      <?}?>
+      <?php }?>
    </table>
    <br />
-   <h2><?=$this->_("Projekty")?></h2>
+   <h2><?php echo $this->_("Projekty")?></h2>
    <table>
-      <?while ($row = $listProjects->fetch()) {
+      <?php while ($row = $listProjects->fetch()) {
       $params = null;
       if($row->{NavigationMenu_Models_List::COL_URL} == true) $params = ' rel="nofollow"';
       if($row->{NavigationMenu_Models_List::COL_NEW_WIN} == true) $params .= ' target="_blank"';
       ?>
       <tr>
          <td width="200">
-               <?
+               <?php 
                if($row->{NavigationMenu_Models_List::COL_ICON} != null) {?>
-            <img src="<?=$this->category()->getModule()->getDataDir(true).$row->{NavigationMenu_Models_List::COL_ICON}?>"
-                 alt="<?=$row->{NavigationMenu_Models_List::COL_ICON}?> icon" />
-                    <?}?>
-            <a href="<?=$row->{NavigationMenu_Models_List::COL_URL}?>"
-               title="<?=$row->{NavigationMenu_Models_List::COL_NAME}?>"<?=$params?>><?=$row->{NavigationMenu_Models_List::COL_NAME}?></a>
+            <img src="<?php echo $this->category()->getModule()->getDataDir(true).$row->{NavigationMenu_Models_List::COL_ICON}?>"
+                 alt="<?php echo $row->{NavigationMenu_Models_List::COL_ICON}?> icon" />
+                    <?php }?>
+            <a href="<?php echo $row->{NavigationMenu_Models_List::COL_URL}?>"
+               title="<?php echo $row->{NavigationMenu_Models_List::COL_NAME}?>"<?php echo $params?>><?php echo $row->{NavigationMenu_Models_List::COL_NAME}?></a>
          </td>
-            <?if($this->category()->getRights()->isWritable()) {?>
-         <td><?=$row->{NavigationMenu_Models_List::COL_ORDER}?>&nbsp;</td>
+            <?php if($this->category()->getRights()->isWritable()) {?>
+         <td><?php echo $row->{NavigationMenu_Models_List::COL_ORDER}?>&nbsp;</td>
          <td>
-            <form method="post" action="<?=$this->link()->route('edit', array('id' => $row->{NavigationMenu_Models_List::COL_ID}))?>" style="display:inline;">
-               <input type="image" src="<?=vve_get_tpl_file('icons/link_edit.png', VVE_TPL_FILE_IMAGE)?>"
-                      value="edit" name="link_edit" title="<?=$this->_('Upravit')?>" />
+            <form method="post" action="<?php echo $this->link()->route('edit', array('id' => $row->{NavigationMenu_Models_List::COL_ID}))?>" style="display:inline;">
+               <input type="image" src="<?php echo vve_get_tpl_file('icons/link_edit.png', VVE_TPL_FILE_IMAGE)?>"
+                      value="edit" name="link_edit" title="<?php echo $this->_('Upravit')?>" />
             </form>
-            <form method="post" action="<?=$this->link()?>" style="display:inline;" onsubmit="return submitRemove('<?=$row->{NavigationMenu_Models_List::COL_NAME};?>')">
-               <input type="hidden" value="<?=$row->{NavigationMenu_Models_List::COL_ID}?>" name="link_id" />
-               <input type="image" src="<?=vve_get_tpl_file('icons/link_delete.png', VVE_TPL_FILE_IMAGE)?>"
-                      value="remove" name="link_remove" title="<?=$this->_('Odtranit')?>" />
+            <form method="post" action="<?php echo $this->link()?>" style="display:inline;" onsubmit="return submitRemove('<?php echo $row->{NavigationMenu_Models_List::COL_NAME};?>')">
+               <input type="hidden" value="<?php echo $row->{NavigationMenu_Models_List::COL_ID}?>" name="link_id" />
+               <input type="image" src="<?php echo vve_get_tpl_file('icons/link_delete.png', VVE_TPL_FILE_IMAGE)?>"
+                      value="remove" name="link_remove" title="<?php echo $this->_('Odtranit')?>" />
             </form>
          </td>
-            <?}?>
+            <?php }?>
       </tr>
-      <?}?>
+      <?php }?>
    </table>
    <br />
-   <h2><?=$this->_("Skupiny")?></h2>
+   <h2><?php echo $this->_("Skupiny")?></h2>
    <table>
-      <?while ($row = $listGroups->fetch()) {
+      <?php while ($row = $listGroups->fetch()) {
       $params = null;
       if($row->{NavigationMenu_Models_List::COL_URL} == true) $params = ' rel="nofollow"';
       if($row->{NavigationMenu_Models_List::COL_NEW_WIN} == true) $params = ' target="_blank"';
          ?>
       <tr>
          <td width="200">
-               <?
+               <?php 
                if($row->{NavigationMenu_Models_List::COL_ICON} != null) {?>
-            <img src="<?=$this->category()->getModule()->getDataDir(true).$row->{NavigationMenu_Models_List::COL_ICON}?>"
-                 alt="<?=$row->{NavigationMenu_Models_List::COL_ICON}?> icon" />
-                    <?}?>
-            <a href="<?=$row->{NavigationMenu_Models_List::COL_URL}?>"
-               title="<?=$row->{NavigationMenu_Models_List::COL_NAME}?>"<?=$params?>><?=$row->{NavigationMenu_Models_List::COL_NAME}?></a>
+            <img src="<?php echo $this->category()->getModule()->getDataDir(true).$row->{NavigationMenu_Models_List::COL_ICON}?>"
+                 alt="<?php echo $row->{NavigationMenu_Models_List::COL_ICON}?> icon" />
+                    <?php }?>
+            <a href="<?php echo $row->{NavigationMenu_Models_List::COL_URL}?>"
+               title="<?php echo $row->{NavigationMenu_Models_List::COL_NAME}?>"<?php echo $params?>><?php echo $row->{NavigationMenu_Models_List::COL_NAME}?></a>
          </td>
-            <?if($this->category()->getRights()->isWritable()) {?>
-         <td><?=$row->{NavigationMenu_Models_List::COL_ORDER}?>&nbsp;</td>
+            <?php if($this->category()->getRights()->isWritable()) {?>
+         <td><?php echo $row->{NavigationMenu_Models_List::COL_ORDER}?>&nbsp;</td>
          <td>
-            <form method="post" action="<?=$this->link()->route('edit', array('id' => $row->{NavigationMenu_Models_List::COL_ID}))?>" style="display:inline;">
-               <input type="image" src="<?=vve_get_tpl_file('icons/link_edit.png', VVE_TPL_FILE_IMAGE)?>"
-                      value="edit" name="link_edit" title="<?=$this->_('Upravit')?>" />
+            <form method="post" action="<?php echo $this->link()->route('edit', array('id' => $row->{NavigationMenu_Models_List::COL_ID}))?>" style="display:inline;">
+               <input type="image" src="<?php echo vve_get_tpl_file('icons/link_edit.png', VVE_TPL_FILE_IMAGE)?>"
+                      value="edit" name="link_edit" title="<?php echo $this->_('Upravit')?>" />
             </form>
-            <form method="post" action="<?=$this->link()?>" style="display:inline;" onsubmit="return submitRemove('<?=$row->{NavigationMenu_Models_List::COL_NAME};?>')">
-               <input type="hidden" value="<?=$row->{NavigationMenu_Models_List::COL_ID}?>" name="link_id" />
-               <input type="image" src="<?=vve_get_tpl_file('icons/link_delete.png', VVE_TPL_FILE_IMAGE)?>"
-                      value="remove" name="link_remove" title="<?=$this->_('Odtranit')?>" />
+            <form method="post" action="<?php echo $this->link()?>" style="display:inline;" onsubmit="return submitRemove('<?php echo $row->{NavigationMenu_Models_List::COL_NAME};?>')">
+               <input type="hidden" value="<?php echo $row->{NavigationMenu_Models_List::COL_ID}?>" name="link_id" />
+               <input type="image" src="<?php echo vve_get_tpl_file('icons/link_delete.png', VVE_TPL_FILE_IMAGE)?>"
+                      value="remove" name="link_remove" title="<?php echo $this->_('Odtranit')?>" />
             </form>
          </td>
-            <?}?>
+            <?php }?>
       </tr>
-      <?}?>
+      <?php }?>
    </table>
    <br />
-   <h2><?=$this->_("Partneři")?></h2>
+   <h2><?php echo $this->_("Partneři")?></h2>
    <table>
-      <?while ($row = $listPartners->fetch()) {
+      <?php while ($row = $listPartners->fetch()) {
       $params = null;
       if($row->{NavigationMenu_Models_List::COL_URL} == true) $params = ' rel="nofollow"';
       if($row->{NavigationMenu_Models_List::COL_NEW_WIN} == true) $params = ' target="_blank"';
          ?>
       <tr>
          <td width="200">
-               <?
+               <?php 
                if($row->{NavigationMenu_Models_List::COL_ICON} != null) {?>
-            <img src="<?=$this->category()->getModule()->getDataDir(true).$row->{NavigationMenu_Models_List::COL_ICON}?>"
-                 alt="<?=$row->{NavigationMenu_Models_List::COL_ICON}?> icon" />
-                    <?}?>
-            <a href="<?=$row->{NavigationMenu_Models_List::COL_URL}?>"
-               title="<?=$row->{NavigationMenu_Models_List::COL_NAME}?>"<?=$params?>><?=$row->{NavigationMenu_Models_List::COL_NAME}?></a>
+            <img src="<?php echo $this->category()->getModule()->getDataDir(true).$row->{NavigationMenu_Models_List::COL_ICON}?>"
+                 alt="<?php echo $row->{NavigationMenu_Models_List::COL_ICON}?> icon" />
+                    <?php }?>
+            <a href="<?php echo $row->{NavigationMenu_Models_List::COL_URL}?>"
+               title="<?php echo $row->{NavigationMenu_Models_List::COL_NAME}?>"<?php echo $params?>><?php echo $row->{NavigationMenu_Models_List::COL_NAME}?></a>
          </td>
-            <?if($this->category()->getRights()->isWritable()) {?>
-         <td><?=$row->{NavigationMenu_Models_List::COL_ORDER}?>&nbsp;</td>
+            <?php if($this->category()->getRights()->isWritable()) {?>
+         <td><?php echo $row->{NavigationMenu_Models_List::COL_ORDER}?>&nbsp;</td>
          <td>
-            <form method="post" action="<?=$this->link()->route('edit', array('id' => $row->{NavigationMenu_Models_List::COL_ID}))?>" style="display:inline;">
-               <input type="image" src="<?=vve_get_tpl_file('icons/link_edit.png', VVE_TPL_FILE_IMAGE)?>"
-                      value="edit" name="link_edit" title="<?=$this->_('Upravit')?>" />
+            <form method="post" action="<?php echo $this->link()->route('edit', array('id' => $row->{NavigationMenu_Models_List::COL_ID}))?>" style="display:inline;">
+               <input type="image" src="<?php echo vve_get_tpl_file('icons/link_edit.png', VVE_TPL_FILE_IMAGE)?>"
+                      value="edit" name="link_edit" title="<?php echo $this->_('Upravit')?>" />
             </form>
-            <form method="post" action="<?=$this->link()?>" style="display:inline;" onsubmit="return submitRemove('<?=$row->{NavigationMenu_Models_List::COL_NAME};?>')">
-               <input type="hidden" value="<?=$row->{NavigationMenu_Models_List::COL_ID}?>" name="link_id" />
-               <input type="image" src="<?=vve_get_tpl_file('icons/link_delete.png', VVE_TPL_FILE_IMAGE)?>"
-                      value="remove" name="link_remove" title="<?=$this->_('Odtranit')?>" />
+            <form method="post" action="<?php echo $this->link()?>" style="display:inline;" onsubmit="return submitRemove('<?php echo $row->{NavigationMenu_Models_List::COL_NAME};?>')">
+               <input type="hidden" value="<?php echo $row->{NavigationMenu_Models_List::COL_ID}?>" name="link_id" />
+               <input type="image" src="<?php echo vve_get_tpl_file('icons/link_delete.png', VVE_TPL_FILE_IMAGE)?>"
+                      value="remove" name="link_remove" title="<?php echo $this->_('Odtranit')?>" />
             </form>
          </td>
-            <?}?>
+            <?php }?>
       </tr>
-      <?}?>
+      <?php }?>
    </table>
    <script type="text/javascript">
       function submitRemove(msg){
-         return confirm('<?=$this->_('Opravdu smazat odkaz: ')?>'+msg+'?');
+         return confirm('<?php echo $this->_('Opravdu smazat odkaz: ')?>'+msg+'?');
       }
    </script>
 
-   <?// toolbox
+   <?php // toolbox
    if($this->category()->getRights()->isWritable()) {
       $toolbox = new Template_Toolbox();
       $toolbox->addTool('add_nav_link', $this->_("Přidat odkaz"),

@@ -1,4 +1,4 @@
-<?
+<?php 
 $this->addFile("css://photogalery:style.less");
 $this->addPageTitle($this->tr('úprava miniatury'));
 $this->addJsPlugin(new JsPlugin_JCrop());
@@ -7,42 +7,42 @@ $this->addJsPlugin(new JsPlugin_JCrop());
 $sizes = getimagesize($this->category()->getModule()->getDataDir(false) . $this->subdir . Photogalery_Controller::DIR_MEDIUM
       . DIRECTORY_SEPARATOR . $this->image->{PhotoGalery_Model_Images::COLUMN_FILE});
 ?>
-<h1><?= $this->tr('úprava miniatury'); ?></h1>
+<h1><?php echo  $this->tr('úprava miniatury'); ?></h1>
 <div class="main-content-form-edit">
-<?
+<?php 
 echo $this->form->renderStart();
 ?>
    <fieldset class="fieldset-alt">
-      <legend><span class="form-legend-name"><?= $this->tr('Miniatura') ?></span></legend>
+      <legend><span class="form-legend-name"><?php echo  $this->tr('Miniatura') ?></span></legend>
       <table class="form-table">
          <tr>
             <td>
-               <strong><?=$this->tr('Původní')?></strong>
+               <strong><?php echo $this->tr('Původní')?></strong>
                <p>
-               <?= vve_tpl_image_tag($this->category()->getModule()->getDataDir(true) . $this->websubdir . Photogalery_Controller::DIR_SMALL
+               <?php echo  vve_tpl_image_tag($this->category()->getModule()->getDataDir(true) . $this->websubdir . Photogalery_Controller::DIR_SMALL
                   . URL_SEPARATOR . $this->image->{PhotoGalery_Model_Images::COLUMN_FILE},
                   $this->image->{PhotoGalery_Model_Images::COLUMN_FILE}, Photogalery_Controller::MEDIUM_WIDTH) ?>
                </p>
             </td>
             <td>
-               <strong><?=$this->tr('Nová')?></strong>
-               <p id="preview" style="overflow:hidden; width:<?= $this->category()->getParam('small_width', VVE_IMAGE_THUMB_W) ?>px;
-                       height:<?= $this->category()->getParam('small_height', VVE_IMAGE_THUMB_H) ?>px;">
-                  <img src="<?= $this->category()->getModule()->getDataDir(true) . $this->websubdir . Photogalery_Controller::DIR_MEDIUM
+               <strong><?php echo $this->tr('Nová')?></strong>
+               <p id="preview" style="overflow:hidden; width:<?php echo  $this->category()->getParam('small_width', VVE_IMAGE_THUMB_W) ?>px;
+                       height:<?php echo  $this->category()->getParam('small_height', VVE_IMAGE_THUMB_H) ?>px;">
+                  <img src="<?php echo  $this->category()->getModule()->getDataDir(true) . $this->websubdir . Photogalery_Controller::DIR_MEDIUM
                      . URL_SEPARATOR . $this->image->{PhotoGalery_Model_Images::COLUMN_FILE} ?>"
-                       alt="<?= $this->image->{PhotoGalery_Model_Images::COLUMN_FILE} ?>" />
+                       alt="<?php echo  $this->image->{PhotoGalery_Model_Images::COLUMN_FILE} ?>" />
                </p>
             </td>
          </tr>
       </table>
    </fieldset>
    <fieldset class="fieldset-alt">
-      <legend><span class="form-legend-name"><?= $this->tr('Výběr') ?></span><span class="form-legend-text"><?= $this->tr('Myší vyberte oblast ze které se má vytvořit miniatura') ?></span></legend>
+      <legend><span class="form-legend-name"><?php echo  $this->tr('Výběr') ?></span><span class="form-legend-text"><?php echo  $this->tr('Myší vyberte oblast ze které se má vytvořit miniatura') ?></span></legend>
    <table class="form-table">
       <tr>
          <td id="cropImage">
-            <img width="500" class="edit-image-preview" src="<?= $this->category()->getModule()->getDataDir(true) . $this->websubdir . Photogalery_Controller::DIR_MEDIUM
-               . URL_SEPARATOR . $this->image->{PhotoGalery_Model_Images::COLUMN_FILE} ?>" alt="image <?= $this->image->{PhotoGalery_Model_Images::COLUMN_FILE}; ?>" />
+            <img width="500" class="edit-image-preview" src="<?php echo  $this->category()->getModule()->getDataDir(true) . $this->websubdir . Photogalery_Controller::DIR_MEDIUM
+               . URL_SEPARATOR . $this->image->{PhotoGalery_Model_Images::COLUMN_FILE} ?>" alt="image <?php echo  $this->image->{PhotoGalery_Model_Images::COLUMN_FILE}; ?>" />
          </td>
       </tr>
    </table>
@@ -53,7 +53,7 @@ echo $this->form->renderStart();
       <tr class="hidden">
          <th class="form-labels"></th>
          <td class="form-controlls">
-            <?
+            <?php 
             $this->form->start_x->setValues(0);
             print($this->form->start_x->controll());
             ?>
@@ -62,7 +62,7 @@ echo $this->form->renderStart();
       <tr class="hidden">
          <th class="form-labels"></th>
          <td class="form-controlls">
-            <?
+            <?php 
             $this->form->start_y->setValues(0);
             print($this->form->start_y->controll())
             ?>
@@ -71,7 +71,7 @@ echo $this->form->renderStart();
       <tr class="hidden">
          <th class="form-labels"></th>
          <td class="form-controlls">
-            <?
+            <?php 
             $this->form->width->setValues($this->category()->getParam('small_width', VVE_IMAGE_THUMB_W));
             print($this->form->width->controll())
             ?>
@@ -80,7 +80,7 @@ echo $this->form->renderStart();
       <tr class="hidden">
          <th class="form-labels"></th>
          <td class="form-controlls">
-            <?
+            <?php 
             $this->form->height->setValues($this->category()->getParam('small_height', VVE_IMAGE_THUMB_H));
             echo ($this->form->height->controll());
             ?>
@@ -88,28 +88,28 @@ echo $this->form->renderStart();
       </tr>
       <tr>
          <th class="form-labels"></th>
-         <td class="form-controlls"><?= $this->form->save->controll() ?></td>
+         <td class="form-controlls"><?php echo  $this->form->save->controll() ?></td>
       </tr>
       <tr>
          <td class="form-labels"></td>
-         <td class="form-controlls"><?= $this->form->goBack->label(); ?><?= $this->form->goBack->controll(); ?></td>
+         <td class="form-controlls"><?php echo  $this->form->goBack->label(); ?><?php echo  $this->form->goBack->controll(); ?></td>
       </tr>
       </tbody>
    </table>
 </fieldset>
-<?echo $this->form->renderEnd();?>
+<?php echo $this->form->renderEnd();?>
 <script type="text/javascript">
 /* <![CDATA[ */
    function showPreview(coords){
-      var rw = <?= $this->category()->getParam('small_width', VVE_IMAGE_THUMB_W); ?>;
-      var rh = <?= $this->category()->getParam('small_height', VVE_IMAGE_THUMB_H); ?>;
+      var rw = <?php echo  $this->category()->getParam('small_width', VVE_IMAGE_THUMB_W); ?>;
+      var rh = <?php echo  $this->category()->getParam('small_height', VVE_IMAGE_THUMB_H); ?>;
       if (parseInt(coords.w) > 0){
          var rw = rw/coords.w;
          var rh = rh/coords.h;
 
          $('#preview img').css({
-            width: Math.round(rw * <?= $sizes[0] ?>) + 'px',
-            height: Math.round(rh * <?= $sizes[1] ?>) + 'px',
+            width: Math.round(rw * <?php echo  $sizes[0] ?>) + 'px',
+            height: Math.round(rh * <?php echo  $sizes[1] ?>) + 'px',
             marginLeft: '-' + Math.round(rw * coords.x) + 'px',
             marginTop: '-' + Math.round(rh * coords.y) + 'px'
          });
@@ -122,14 +122,14 @@ echo $this->form->renderStart();
 
    $(document).ready(function() {
       $('#cropImage img').Jcrop({
-         trueSize: [<?= $sizes[0] ?>,<?= $sizes[1]; ?>],
+         trueSize: [<?php echo  $sizes[0] ?>,<?php echo  $sizes[1]; ?>],
          onChange: showPreview,
          onSelect: showPreview,
-         minSize: [ <?= $this->category()->getParam('small_width', VVE_IMAGE_THUMB_W); ?>,
-            <?= $this->category()->getParam('small_height', VVE_IMAGE_THUMB_H); ?> ],
-         setSelect: [ 0, 0, <?= $this->category()->getParam('small_width', VVE_IMAGE_THUMB_W); ?>,
-            <?= $this->category()->getParam('small_height', VVE_IMAGE_THUMB_H); ?> ],
-         aspectRatio: <?= str_replace(',', '.', round($this->category()->getParam('small_width', VVE_IMAGE_THUMB_W) 
+         minSize: [ <?php echo  $this->category()->getParam('small_width', VVE_IMAGE_THUMB_W); ?>,
+            <?php echo  $this->category()->getParam('small_height', VVE_IMAGE_THUMB_H); ?> ],
+         setSelect: [ 0, 0, <?php echo  $this->category()->getParam('small_width', VVE_IMAGE_THUMB_W); ?>,
+            <?php echo  $this->category()->getParam('small_height', VVE_IMAGE_THUMB_H); ?> ],
+         aspectRatio: <?php echo  str_replace(',', '.', round($this->category()->getParam('small_width', VVE_IMAGE_THUMB_W) 
             / $this->category()->getParam('small_height', VVE_IMAGE_THUMB_H), 2)) ?>
       });
    });

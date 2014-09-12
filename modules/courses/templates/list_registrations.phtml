@@ -1,4 +1,4 @@
-<?
+<?php 
 // načtení detailu
 $h = $this->_('Registrace ke kurzu') . ' "' . $this->course->{Courses_Model_Courses::COLUMN_NAME} . '"';
 $this->addPageTitle($h);
@@ -21,26 +21,26 @@ $this->addPageTitle($h);
       margin-bottom: 5px;
    }
 </style>
-<h1><?=$h?></h1>
+<h1><?php echo $h?></h1>
 <div class="main-content-detail module-courses-registrations-list">
-   <? if (!empty($this->registrations)) {
+   <?php  if (!empty($this->registrations)) {
  ?>
       <p class="module-courses-registrations-list-controlls">
-         <a class="registrations-expand-all-button" href="<?=$this->link() ?>#"
-         title="<?=$this->_('Rozbalit vše'); ?>"
-         ><img src="<?=Template::getFileDir('icons/expand.gif', Template::IMAGES_DIR, false, true) ?>" alt="icon expand"
-            />&nbsp;<?=$this->_('Rozbalit vše'); ?></a>&nbsp;
-      <a class="registrations-collapse-all-button" href="<?=$this->link() ?>#"
-         title="<?=$this->_('Sbalit vše'); ?>"
-         ><img src="<?=Template::getFileDir('icons/collapse.gif', Template::IMAGES_DIR, false, true) ?>" alt="icon expand"
-            />&nbsp;<?=$this->_('Sbalit vše'); ?></a>
+         <a class="registrations-expand-all-button" href="<?php echo $this->link() ?>#"
+         title="<?php echo $this->_('Rozbalit vše'); ?>"
+         ><img src="<?php echo Template::getFileDir('icons/expand.gif', Template::IMAGES_DIR, false, true) ?>" alt="icon expand"
+            />&nbsp;<?php echo $this->_('Rozbalit vše'); ?></a>&nbsp;
+      <a class="registrations-collapse-all-button" href="<?php echo $this->link() ?>#"
+         title="<?php echo $this->_('Sbalit vše'); ?>"
+         ><img src="<?php echo Template::getFileDir('icons/collapse.gif', Template::IMAGES_DIR, false, true) ?>" alt="icon expand"
+            />&nbsp;<?php echo $this->_('Sbalit vše'); ?></a>
 
    </p>
-   <? foreach ($this->registrations as $registration) {
+   <?php  foreach ($this->registrations as $registration) {
  ?>
       <div class="module-courses-registration">
          <div class="registration-detail-tools">
-            <?
+            <?php 
             $this->formCancel->html()->setAttrib('onsubmit', 'return confirm(\''.$this->_('Opravdu zušit registraci?').'\');');
             echo $this->formCancel->renderStart();
             echo "<p>";
@@ -53,15 +53,15 @@ $this->addPageTitle($h);
 
             ?>
             
-<!--         <form action="<?=$this->link()?>" method="post" onsubmit="return confirm('<?=$this->_('Opravdu zušit registraci?')?>');">
+<!--         <form action="<?php echo $this->link()?>" method="post" onsubmit="return confirm('<?php echo $this->_('Opravdu zušit registraci?')?>');">
             <p>
                <input type="hidden"
             </p>   
          </form>-->
       </div>
-      <a href="<?=$this->link() ?>#" class="registration-name">
-         <img src="<?=Template::getFileDir('icons/expand.gif', Template::IMAGES_DIR, false, true) ?>" alt="icon expand" />
-         <?
+      <a href="<?php echo $this->link() ?>#" class="registration-name">
+         <img src="<?php echo Template::getFileDir('icons/expand.gif', Template::IMAGES_DIR, false, true) ?>" alt="icon expand" />
+         <?php 
          if ($registration->{Courses_Model_Registrations::COLUMN_DEGREE} != null) {
             echo $registration->{Courses_Model_Registrations::COLUMN_DEGREE} . '&nbsp;';
          }
@@ -72,31 +72,31 @@ $this->addPageTitle($h);
       <div class="module-courses-registration-detail">
 <!--         <table>
             <tr>
-               <th width="200"><?=$this->_('Pracovní zařazení');
+               <th width="200"><?php echo $this->_('Pracovní zařazení');
          ?></th>
-               <td><?=$registration->{Courses_Model_Registrations::COLUMN_GRADE}
+               <td><?php echo $registration->{Courses_Model_Registrations::COLUMN_GRADE}
          ?></td>
-               <th width="200"><?=$this->_('Pracovní zařazení');
+               <th width="200"><?php echo $this->_('Pracovní zařazení');
          ?></th>
-               <td><?=$registration->{Courses_Model_Registrations::COLUMN_GRADE}
+               <td><?php echo $registration->{Courses_Model_Registrations::COLUMN_GRADE}
          ?></td>
             </tr>
          </table>-->
 
-         <span class="registration-detail-label"><?=$this->_('Pracovní zařazení'); ?>:</span>
-         <?=$registration->{Courses_Model_Registrations::COLUMN_GRADE}
+         <span class="registration-detail-label"><?php echo $this->_('Pracovní zařazení'); ?>:</span>
+         <?php echo $registration->{Courses_Model_Registrations::COLUMN_GRADE}
          ?><br />
-         <span class="registration-detail-label"><?=$this->_('Délka praxe');
+         <span class="registration-detail-label"><?php echo $this->_('Délka praxe');
          ?>:</span>
-         <?=$registration->{Courses_Model_Registrations::COLUMN_PRACTICE_LENGHT} ?><br />
-         <span class="registration-detail-label"><?=$this->_('Telefon'); ?>:</span>
-         <?=$registration->{Courses_Model_Registrations::COLUMN_PHONE} ?><br />
-         <span class="registration-detail-label"><?=$this->_('E-mail'); ?>:</span>
-         <?=$registration->{Courses_Model_Registrations::COLUMN_MAIL} ?><br />
+         <?php echo $registration->{Courses_Model_Registrations::COLUMN_PRACTICE_LENGHT} ?><br />
+         <span class="registration-detail-label"><?php echo $this->_('Telefon'); ?>:</span>
+         <?php echo $registration->{Courses_Model_Registrations::COLUMN_PHONE} ?><br />
+         <span class="registration-detail-label"><?php echo $this->_('E-mail'); ?>:</span>
+         <?php echo $registration->{Courses_Model_Registrations::COLUMN_MAIL} ?><br />
          <br />
-         <span class="registration-detail-label"><?=$this->_('Kurz je hrazen');
+         <span class="registration-detail-label"><?php echo $this->_('Kurz je hrazen');
          ?>:</span>
-            <?
+            <?php 
             if ($registration->{Courses_Model_Registrations::COLUMN_PAY_TYPE} == Courses_Controller::PAY_TYPE_ORGANISATION) {
                echo $this->_('Organizací') . '<br />';
             } else {
@@ -105,26 +105,26 @@ $this->addPageTitle($h);
             ?>
          <br/>
          <p>
-<? if ($registration->{Courses_Model_Registrations::COLUMN_PAY_TYPE} == Courses_Controller::PAY_TYPE_ORGANISATION) { ?>
+<?php  if ($registration->{Courses_Model_Registrations::COLUMN_PAY_TYPE} == Courses_Controller::PAY_TYPE_ORGANISATION) { ?>
 
-               <span class="registration-detail-label"><?=$this->_('Název organizace'); ?>:</span>
-                  <?=$registration->{Courses_Model_Registrations::COLUMN_ORG_NAME} ?><br />
-            <span class="registration-detail-label"><?=$this->_('Adresa rganizace'); ?>:</span>
-               <?=$registration->{Courses_Model_Registrations::COLUMN_ORG_ADDR} ?><br />
-            <span class="registration-detail-label"><?=$this->_('IČO organizace'); ?>:</span>
-               <?=$registration->{Courses_Model_Registrations::COLUMN_ORG_ICO} ?><br />
-            <span class="registration-detail-label"><?=$this->_('Telefon do organizace'); ?>:</span>
-               <?=$registration->{Courses_Model_Registrations::COLUMN_ORG_PHONE} ?><br />
-<? } else { ?>
-            <span class="registration-detail-label"><?=$this->_('Adresa'); ?>:</span>
-               <?=$registration->{Courses_Model_Registrations::COLUMN_PRIVATE_ADDR} ?><br />
-   <?
+               <span class="registration-detail-label"><?php echo $this->_('Název organizace'); ?>:</span>
+                  <?php echo $registration->{Courses_Model_Registrations::COLUMN_ORG_NAME} ?><br />
+            <span class="registration-detail-label"><?php echo $this->_('Adresa rganizace'); ?>:</span>
+               <?php echo $registration->{Courses_Model_Registrations::COLUMN_ORG_ADDR} ?><br />
+            <span class="registration-detail-label"><?php echo $this->_('IČO organizace'); ?>:</span>
+               <?php echo $registration->{Courses_Model_Registrations::COLUMN_ORG_ICO} ?><br />
+            <span class="registration-detail-label"><?php echo $this->_('Telefon do organizace'); ?>:</span>
+               <?php echo $registration->{Courses_Model_Registrations::COLUMN_ORG_PHONE} ?><br />
+<?php  } else { ?>
+            <span class="registration-detail-label"><?php echo $this->_('Adresa'); ?>:</span>
+               <?php echo $registration->{Courses_Model_Registrations::COLUMN_PRIVATE_ADDR} ?><br />
+   <?php 
          }
    ?>
                </p>
             </div>
          </div>
-<?
+<?php 
       }
       $jQuery = new JsPlugin_JQuery();
       $this->addJsPlugin($jQuery);
@@ -138,11 +138,11 @@ $this->addPageTitle($h);
                if($(this).data('hidden') == true){
                   $(this).data('hidden', false)
                   $(this).next('div.module-courses-registration-detail').slideUp(200);
-                  $('img', this).attr('src', '<?=Template::getFileDir('icons/expand.gif', Template::IMAGES_DIR, false, true) ?>');
+                  $('img', this).attr('src', '<?php echo Template::getFileDir('icons/expand.gif', Template::IMAGES_DIR, false, true) ?>');
                } else {
                   $(this).data('hidden', true)
                   $(this).next('div.module-courses-registration-detail').slideDown(200);
-                  $('img', this).attr('src', '<?=Template::getFileDir('icons/collapse.gif', Template::IMAGES_DIR, false, true) ?>');
+                  $('img', this).attr('src', '<?php echo Template::getFileDir('icons/collapse.gif', Template::IMAGES_DIR, false, true) ?>');
                }
                return false;
             });
@@ -159,13 +159,13 @@ $this->addPageTitle($h);
          });
          /* ]]> */
       </script>
-<?
+<?php 
    } else {
       print ($this->_('K tomuto kurzu není připojena žádná registrace'));
    }
 ?>
 </div>
- <?
+ <?php 
 $this->includeTpl("buttonback.phtml", true, array('link' => $this->link()->route('detailCourse'), 'text' => $this->_('Zpět na detail kurzu')));
 ?>
 

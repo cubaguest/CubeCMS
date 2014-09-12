@@ -1,4 +1,4 @@
-<?
+<?php 
 $icon = null;
 if($this->panelObj()->getIcon() != null){
    $icon = '<img src="'.Panel_Obj::getIconDir().$this->panelObj()->getIcon().'" alt="'.$this->panelObj()->getIcon().'" />';
@@ -9,28 +9,28 @@ if($this->panelObj()->getBackImage() != null){
 }
 $form = Auth::getAuthenticator('internal')->getLoginForm();
 ?>
-<div class="name"><?=$icon?><a href="<?=$this->l();?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=$this->panelObj()->getName()?></a></div>
-<div class="content" style="<?=$backImg?>">
-<?
+<div class="name"><?php echo $icon?><a href="<?php echo $this->l();?>" title="<?php echo htmlspecialchars($this->panelObj()->getName())?>"><?php echo $this->panelObj()->getName()?></a></div>
+<div class="content" style="<?php echo $backImg?>">
+<?php 
 $form->setAction($this->currentLink);
 echo $form->renderStart();
 ?>
    <div>
-      <? if(!Auth::isLogin()){?>
-      <?=$form->{Auth_Provider_Internal::FORM_USERNAME}->label();?><br />
-      <?=$form->{Auth_Provider_Internal::FORM_USERNAME}->control();?><br />
+      <?php  if(!Auth::isLogin()){?>
+      <?php echo $form->{Auth_Provider_Internal::FORM_USERNAME}->label();?><br />
+      <?php echo $form->{Auth_Provider_Internal::FORM_USERNAME}->control();?><br />
       
-      <?=$form->{Auth_Provider_Internal::FORM_PASSWORD}->label();?><br />
-      <?=$form->{Auth_Provider_Internal::FORM_PASSWORD}->control();?><br />
+      <?php echo $form->{Auth_Provider_Internal::FORM_PASSWORD}->label();?><br />
+      <?php echo $form->{Auth_Provider_Internal::FORM_PASSWORD}->control();?><br />
       
-      <?=$form->{Auth_Provider_Internal::FORM_PERMANENT}->label();?>
-      <?=$form->{Auth_Provider_Internal::FORM_PERMANENT}->control();?><br />
+      <?php echo $form->{Auth_Provider_Internal::FORM_PERMANENT}->label();?>
+      <?php echo $form->{Auth_Provider_Internal::FORM_PERMANENT}->control();?><br />
       
-      <?=$form->{Auth_Provider_Internal::FORM_SUBMIT}->control();?>
-      <? } else { ?>
-      <?=$this->tr('Přihlášen')?>: <a href="<?=$this->l();?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=Auth::getUserName()?></a><br />
-      <input id="login_submit" type="submit" name="<?=Auth::FORM_LOGOUT?>" value="<?=$this->tr('odhlásit')?>" />
-      <? } ?>
+      <?php echo $form->{Auth_Provider_Internal::FORM_SUBMIT}->control();?>
+      <?php  } else { ?>
+      <?php echo $this->tr('Přihlášen')?>: <a href="<?php echo $this->l();?>" title="<?php echo htmlspecialchars($this->panelObj()->getName())?>"><?php echo Auth::getUserName()?></a><br />
+      <input id="login_submit" type="submit" name="<?php echo Auth::FORM_LOGOUT?>" value="<?php echo $this->tr('odhlásit')?>" />
+      <?php  } ?>
    </div>
-<?=$form->renderEnd()?>
+<?php echo $form->renderEnd()?>
 </div>

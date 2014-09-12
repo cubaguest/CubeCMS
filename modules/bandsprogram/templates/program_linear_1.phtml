@@ -1,12 +1,12 @@
-<?
+<?php 
 $this->addPageTitle($this->_('Program'));
 $this->addPageHeadline($this->_('Program'));
 
 $this->addCssFile("style.css");
 ?>
 <div class="article-detail-content bandsprogram-content">
-   <?if($this->currentProgram != null){?>
-   <?}?>
+   <?php if($this->currentProgram != null){?>
+   <?php }?>
 
 
 
@@ -18,35 +18,35 @@ $this->addCssFile("style.css");
 
 
    <ul>
-   <?
+   <?php 
    $curTime = new DateTime();
    foreach ($this->currentProgram as $item) {?>
-      <?
+      <?php 
       switch ($item['type']) {
          case 'day':?>
             <li class="programItem programDay">
-            <p class="programText programDayText"><?=$item->text?></p>
+            <p class="programText programDayText"><?php echo $item->text?></p>
             </li>
-            <?
+            <?php 
             $curTime = new DateTime($item->time);
             break;
          case 'stage':?>
             <li class="programItem programStage">
-            <p class="programText programStageText"><?=$item->text?></p>
+            <p class="programText programStageText"><?php echo $item->text?></p>
             </li>
-            <?
+            <?php 
             $curTime = new DateTime($item->time);
             break;
          case 'band':?>
             <li class="programItem programBand">
-            <p class="programTime"><?=$curTime->format("G:i");?></p>
+            <p class="programTime"><?php echo $curTime->format("G:i");?></p>
             <p class="programText programBandText">
-               <a href="<?=$this->bands[(int)$item->bandid]['link']?>"
-                  title="<?=$this->bands[(int)$item->bandid]['name'].' - '.$this->_('přejít')?>"
-                  ><?=$this->bands[(int)$item->bandid]['name']?></a>
+               <a href="<?php echo $this->bands[(int)$item->bandid]['link']?>"
+                  title="<?php echo $this->bands[(int)$item->bandid]['name'].' - '.$this->_('přejít')?>"
+                  ><?php echo $this->bands[(int)$item->bandid]['name']?></a>
             </p>
             </li>
-            <?
+            <?php 
             // parsing času
             $matches = array();
             preg_match('/([0-9]{1,2}):([0-9]{2})/', (string)$item->time, $matches);
@@ -54,10 +54,10 @@ $this->addCssFile("style.css");
             break;
          case 'other':?>
             <li class="programItem programOther">
-            <p class="programTime"><?=$curTime->format("G:i");?></p>
-            <p class="programText programOtherText"><?=$item->text?></p>
+            <p class="programTime"><?php echo $curTime->format("G:i");?></p>
+            <p class="programText programOtherText"><?php echo $item->text?></p>
             </li>
-            <?
+            <?php 
             // parsing času
             $matches = array();
             preg_match('/([0-9]{1,2}):([0-9]{2})/', (string)$item->time, $matches);
@@ -65,19 +65,19 @@ $this->addCssFile("style.css");
             break;
          case 'note':?>
             <li class="programItem programNote">
-            <p class="programText programNoteText"><?=$item->text?></p>
+            <p class="programText programNoteText"><?php echo $item->text?></p>
             </li>
-            <?
+            <?php 
             break;
          case 'space':?>
             <li class="programItem programSpace"><hr /></li>
-            <?
+            <?php 
             break;
       }
    }?>
    </ul>
    <br />
-   <?
+   <?php 
    if($this->hideArtTools != true){
       $this->includeTpl('articletools.phtml', true, array(
          'linkToPdf' => $this->link()->route('exportProgram', array('output' => 'pdf'))->rmparam(),
@@ -85,10 +85,10 @@ $this->addCssFile("style.css");
          'shares' => $this->shares));
    }
    ?>
-   <?
+   <?php 
    } else {
       echo $this->_('Program nebyl definován');
    }?>
 
-   <?=$this->toolbox;// TOOLBOXY?>
+   <?php echo $this->toolbox;// TOOLBOXY?>
 </div>

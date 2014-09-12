@@ -1,14 +1,14 @@
-<? // načtení detailu
+<?php  // načtení detailu
 $h = $this->section->{Projects_Model_Sections::COLUMN_NAME};
 $this->addPageTitle($h);
 echo $this->toolbox;
 ?>
 
-<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo htmlspecialchars($h);?></h1>
+<h1><?php $this->includeFile('tpl://engine:headline/icon.phtml'); echo htmlspecialchars($h);?></h1>
 <div class="main-content-detail">
-   <div class="main-content-text"><?=$this->filter((string)$this->section->{Projects_Model_Sections::COLUMN_TEXT}, array('emoticons'))?></div>
+   <div class="main-content-text"><?php echo $this->filter((string)$this->section->{Projects_Model_Sections::COLUMN_TEXT}, array('emoticons'))?></div>
    <hr class="reseter" />
-   <?$this->includeTpl('articletools.phtml', true, array('shares' => array('url' => $this->link(), 'title' => $h)));?>
+   <?php $this->includeTpl('articletools.phtml', true, array('shares' => array('url' => $this->link(), 'title' => $h)));?>
 </div>
 
 

@@ -1,71 +1,71 @@
 <div id="editContactForm" class="content">
    <ul class="langMenu">
-      <? foreach ($this->pVar("appLangsNames") as $key => $lang) {?>
+      <?php  foreach ($this->pVar("appLangsNames") as $key => $lang) {?>
       <li>
-         <a href="#contactLang<?=$key?>" class="selectedd">
-            <img src="images/lang/<?=$key?>.png" alt="<?=$lang?>" />
-               <?=$lang?>
+         <a href="#contactLang<?php echo $key?>" class="selectedd">
+            <img src="images/lang/<?php echo $key?>.png" alt="<?php echo $lang?>" />
+               <?php echo $lang?>
          </a>
       </li>
-      <?}?>
+      <?php }?>
    </ul>
 
    <div class="tabsContent">
-      <form method="post" action="<?=$this->l();?>" enctype="multipart/form-data">
-         <? foreach ($this->pVar("appLangsNames") as $key => $lang) {?>
-         <p id="contactLang<?=$key?>" class="tabcontent">
-               <?=$this->_("Název kontaktu");?>*:<br />
-            <input type="text" size="40" maxlength="50" name="contact_name[<?=$key?>]"
-                   value="<?=$this->post("contact_name[$key]", $this->contact['name'][$key]);?>" /><br />
-               <?=$this->_("Text kontaktu (adresa, telefon, ...)");?>*:<br />
+      <form method="post" action="<?php echo $this->l();?>" enctype="multipart/form-data">
+         <?php  foreach ($this->pVar("appLangsNames") as $key => $lang) {?>
+         <p id="contactLang<?php echo $key?>" class="tabcontent">
+               <?php echo $this->_("Název kontaktu");?>*:<br />
+            <input type="text" size="40" maxlength="50" name="contact_name[<?php echo $key?>]"
+                   value="<?php echo $this->post("contact_name[$key]", $this->contact['name'][$key]);?>" /><br />
+               <?php echo $this->_("Text kontaktu (adresa, telefon, ...)");?>*:<br />
             <textarea class="textarea_tinymce textarea" rows="25" cols="70"
-                      name="contact_text[<?=$key;?>]"><?=$this->post("contact_text[$key]", $this->contact['text'][$key]);?></textarea>
+                      name="contact_text[<?php echo $key;?>]"><?php echo $this->post("contact_text[$key]", $this->contact['text'][$key]);?></textarea>
          </p>
          <br />
-            <?=$this->_("Obrázek kontaktu")." \"".$this->contact[Contacts_Model_Detail::COLUMN_CONTACT_FILE]?>":<br />
+            <?php echo $this->_("Obrázek kontaktu")." \"".$this->contact[Contacts_Model_Detail::COLUMN_CONTACT_FILE]?>":<br />
          <input name="contact_file" type="file" value="" /><br />
          <br />
-         <?=$this->_("Priorita (celé číslo od 0 do 100, čím větší, tím bude kontakt výše)")?>:
+         <?php echo $this->_("Priorita (celé číslo od 0 do 100, čím větší, tím bude kontakt výše)")?>:
          <input name="contact_priority" type="text" size="3" maxlength="4"
-                value="<?=$this->post("contact_priority", $this->contact['priority']);?>"/>
+                value="<?php echo $this->post("contact_priority", $this->contact['priority']);?>"/>
          <br />
          <br />
-            <?=$this->_("GPS pozice na Google Maps")?>:<br />
-            <?=$this->_("Souřadnicce X")?>:
+            <?php echo $this->_("GPS pozice na Google Maps")?>:<br />
+            <?php echo $this->_("Souřadnicce X")?>:
          <input name="contact_position_x" type="text" size="10" maxlength="10" 
-                value="<?=$this->post("contact_position_x", $this->contact['position_x']);?>"/>
-            <?=$this->_("Souřadnicce Y")?>:
+                value="<?php echo $this->post("contact_position_x", $this->contact['position_x']);?>"/>
+            <?php echo $this->_("Souřadnicce Y")?>:
          <input name="contact_position_y" type="text" size="10" maxlength="10" 
-                value="<?=$this->post("contact_position_y", $this->contact['position_y']);?>"/>
+                value="<?php echo $this->post("contact_position_y", $this->contact['position_y']);?>"/>
          <br />
          <br />
-            <?=$this->_("Typ kontaktu")?>:
+            <?php echo $this->_("Typ kontaktu")?>:
          <select name="contact_id_type">
-            <?foreach ($this->contactTypes as $contType) {?>
-            <?if($this->post("contact_id_type", $this->contact['id_type']) == $contType['id_type']) {?>
-            <option value="<?=$contType[Contacts_Model_Types::COLUMN_ID]?>" selected="sellected">
-               <?=$contType[Contacts_Model_Types::COLUMN_NAME]?>
+            <?php foreach ($this->contactTypes as $contType) {?>
+            <?php if($this->post("contact_id_type", $this->contact['id_type']) == $contType['id_type']) {?>
+            <option value="<?php echo $contType[Contacts_Model_Types::COLUMN_ID]?>" selected="sellected">
+               <?php echo $contType[Contacts_Model_Types::COLUMN_NAME]?>
             </option>
-               <?} else {?>
-            <option value="<?=$contType[Contacts_Model_Types::COLUMN_ID]?>">
-               <?=$contType[Contacts_Model_Types::COLUMN_NAME]?>
+               <?php } else {?>
+            <option value="<?php echo $contType[Contacts_Model_Types::COLUMN_ID]?>">
+               <?php echo $contType[Contacts_Model_Types::COLUMN_NAME]?>
             </option>
-            <?}?>
-            <?}?>
+            <?php }?>
+            <?php }?>
          </select>
          <br />
-         <?}?>
+         <?php }?>
          <br />
-         <input name="contact_reset" type="reset" value="<?=$this->_m("Obnovit")?>" />
-         <input name="contact_send" type="submit" value="<?=$this->_m("Odeslat")?>" />
-         <?if($this->edit) {?>
-         <input name="contact_id" type="hidden" value="<?=$this->contact['id_contact']?>" />
-         <?}?>
+         <input name="contact_reset" type="reset" value="<?php echo $this->_m("Obnovit")?>" />
+         <input name="contact_send" type="submit" value="<?php echo $this->_m("Odeslat")?>" />
+         <?php if($this->edit) {?>
+         <input name="contact_id" type="hidden" value="<?php echo $this->contact['id_contact']?>" />
+         <?php }?>
 
       </form>
 
    </div>
-   <?$this->includeTpl("buttonback.phtml", true, array('link' => $this->l()->action()->article()));?>
+   <?php $this->includeTpl("buttonback.phtml", true, array('link' => $this->l()->action()->article()));?>
    <script type="text/javascript">
       $(document).ready(function(){
          $("#editContactForm").tabs();

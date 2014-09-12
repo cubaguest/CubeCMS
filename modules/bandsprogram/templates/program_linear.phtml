@@ -1,17 +1,17 @@
-<?
+<?php 
 $this->addPageTitle($this->_('Program'));
 $this->addPageHeadline($this->_('Program'));
 
 $this->addCssFile("style.css");
 ?>
 <div class="article-detail-content bandsprogram-content">
-   <?if($this->currentProgram != null){
+   <?php if($this->currentProgram != null){
    foreach ($this->currentProgram as $day) {
       echo "<h2>".$day['text']."</h2>";
       foreach ($day->stage as $stage) {?>
-         <h3><?=$stage['name']?></h3>
+         <h3><?php echo $stage['name']?></h3>
          <ul>
-            <?foreach ($stage->item as $item) {
+            <?php foreach ($stage->item as $item) {
                echo "<li>";
                $startTime = new DateTime($item->time);
                $deltaTime = new DateTime($item->lenght);
@@ -28,7 +28,7 @@ $this->addCssFile("style.css");
             }?>
          </ul>
 
-<?
+<?php 
       }
 
    }
@@ -37,7 +37,7 @@ $this->addCssFile("style.css");
 
 
    <br />
-   <?
+   <?php 
    if($this->hideArtTools != true){
       $this->includeTpl('articletools.phtml', true, array(
          'linkToPdf' => $this->link()->route('exportProgram', array('output' => 'pdf'))->rmparam(),
@@ -48,5 +48,5 @@ $this->addCssFile("style.css");
       echo $this->_('Program nebyl definován');
    }?>
 
-   <?=$this->toolbox;// TOOLBOXY?>
+   <?php echo $this->toolbox;// TOOLBOXY?>
 </div>

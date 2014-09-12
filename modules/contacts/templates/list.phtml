@@ -1,24 +1,24 @@
-<?if($this->sys()->rights()->isWritable()) {
+<?php if($this->sys()->rights()->isWritable()) {
       $this->includeTplObj($this->toolbox);
 }?>
 
-<?foreach ($this->contacts as $contact) {?>
+<?php foreach ($this->contacts as $contact) {?>
 <div class="contact">
-   <h2><?=$contact["name"]?></h2>
-   <a href="<?=$this->module()->getDir()->getDataDir().$contact[Contacts_Model_Detail::COLUMN_CONTACT_FILE]?>"
-      title="<?=$this->_("Budova kontaktu")?> <?=$contact["name"]?>" rel="lightbox">
-      <img src="<?=$this->module()->getDir()->getDataDir()."small/".$contact[Contacts_Model_Detail::COLUMN_CONTACT_FILE]?>"
-        alt="image<?=$contact[Contacts_Model_Detail::COLUMN_CONTACT_FILE]?> " />
+   <h2><?php echo $contact["name"]?></h2>
+   <a href="<?php echo $this->module()->getDir()->getDataDir().$contact[Contacts_Model_Detail::COLUMN_CONTACT_FILE]?>"
+      title="<?php echo $this->_("Budova kontaktu")?> <?php echo $contact["name"]?>" rel="lightbox">
+      <img src="<?php echo $this->module()->getDir()->getDataDir()."small/".$contact[Contacts_Model_Detail::COLUMN_CONTACT_FILE]?>"
+        alt="image<?php echo $contact[Contacts_Model_Detail::COLUMN_CONTACT_FILE]?> " />
    </a>
-   <b><?=$contact["name_type"]?></b>
-   <?=$contact[Contacts_Model_Detail::COLUMN_CONTACT_TEXT];?>
-   <?if($this->sys()->rights()->isWritable()){?>
-   <br />Priorita:<?=$contact['priority']?><br />
-   <?$this->includeTplObj($contact['toolbox'])?>
-   <?}?>
+   <b><?php echo $contact["name_type"]?></b>
+   <?php echo $contact[Contacts_Model_Detail::COLUMN_CONTACT_TEXT];?>
+   <?php if($this->sys()->rights()->isWritable()){?>
+   <br />Priorita:<?php echo $contact['priority']?><br />
+   <?php $this->includeTplObj($contact['toolbox'])?>
+   <?php }?>
    <hr class="reseter" />
 </div>
-<?}?>
+<?php }?>
 
 <script type="text/javascript">
    $(function() {

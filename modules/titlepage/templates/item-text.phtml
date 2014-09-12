@@ -1,11 +1,11 @@
-<?
+<?php 
 if($this->item['name'] != null){
    echo '<h2>'.$this->item['name'].'</h2>';
 }
 if($this->item['image'] != null AND strpos($this->item['image'],'http') === false){?>
-<img src="<?=$this->category()->getModule()->getDataDir(true).$this->item['image']?>" alt="<?=$this->item['image']?>"/><?
+<img src="<?php echo $this->category()->getModule()->getDataDir(true).$this->item['image']?>" alt="<?php echo $this->item['image']?>"/><?php 
 } else if($this->item['image'] != null) {?>
-<img src="<?=$this->item['image']?>" alt="<?=$this->item['imageAlt']?>"/><?
+<img src="<?php echo $this->item['image']?>" alt="<?php echo $this->item['imageAlt']?>"/><?php 
 
 }
 echo $this->item['data'];

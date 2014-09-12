@@ -1,4 +1,4 @@
-<?
+<?php 
 if(!empty ($this->panels)){
 $previousPos = null;
 foreach ($this->panels as $key => $panel) {
@@ -6,10 +6,10 @@ foreach ($this->panels as $key => $panel) {
 <tr>
    <td colspan="5"><hr/></td>
 </tr>
-      <?}?>
+      <?php }?>
 <tr class="ui-widget-content ui-state-default">
    <td>
-         <?
+         <?php 
          if((string)$panel->{Model_Panel::COLUMN_NAME} != null) {
             echo ($panel->{Model_Panel::COLUMN_NAME}.' (<span title="'.$this->tr('Kategorie').'">'.$panel->{Model_Category::COLUMN_NAME}.'</span>)');
          } else {
@@ -20,7 +20,7 @@ foreach ($this->panels as $key => $panel) {
          }
          ?>
    </td>
-   <td><?
+   <td><?php 
       if(!empty($this->facePanels)){
          ps($this->facePanels[$panel->{Model_Panel::COLUMN_POSITION}]);
       } else {
@@ -28,34 +28,34 @@ foreach ($this->panels as $key => $panel) {
       }
       ?></td>
    <td>
-      <form method="post" action="<?=$this->link()->clear()?>" style="display:inline;">
-         <input type="text" name="panel_position" value="<?=$panel->{Model_Panel::COLUMN_ORDER}?>" style="width: 30px" size="4" />
-         <input type="hidden" name="panel_id" value="<?=$panel->{Model_Panel::COLUMN_ID}?>" />
-         <input type="image" src="<?=vve_get_tpl_file('icons/accept.png', VVE_TPL_FILE_IMAGE)?>"
-                value="edit" name="panel_changepos" title="<?=$this->tr('Uložit')?>" />
+      <form method="post" action="<?php echo $this->link()->clear()?>" style="display:inline;">
+         <input type="text" name="panel_position" value="<?php echo $panel->{Model_Panel::COLUMN_ORDER}?>" style="width: 30px" size="4" />
+         <input type="hidden" name="panel_id" value="<?php echo $panel->{Model_Panel::COLUMN_ID}?>" />
+         <input type="image" src="<?php echo vve_get_tpl_file('icons/accept.png', VVE_TPL_FILE_IMAGE)?>"
+                value="edit" name="panel_changepos" title="<?php echo $this->tr('Uložit')?>" />
       </form>
    </td>
    <td>
-      <form method="post" action="<?=$this->link()->route('settings', array('id' => $panel->{Model_Panel::COLUMN_ID}))?>" style="display:inline;">
-         <input type="image" src="<?=vve_get_tpl_file('icons/cog_edit.png', VVE_TPL_FILE_IMAGE)?>"
-                value="edit" name="panel_edit" title="<?=$this->tr('Nastavení panelu')?>" />
+      <form method="post" action="<?php echo $this->link()->route('settings', array('id' => $panel->{Model_Panel::COLUMN_ID}))?>" style="display:inline;">
+         <input type="image" src="<?php echo vve_get_tpl_file('icons/cog_edit.png', VVE_TPL_FILE_IMAGE)?>"
+                value="edit" name="panel_edit" title="<?php echo $this->tr('Nastavení panelu')?>" />
       </form>
-      <form method="post" action="<?=$this->link()->route('edit', array('id' => $panel->{Model_Panel::COLUMN_ID}))?>" style="display:inline;">
-         <input type="image" src="<?=vve_get_tpl_file('icons/page_edit.png', VVE_TPL_FILE_IMAGE)?>"
-                value="edit" name="panel_edit" title="<?=$this->tr('Upravit')?>" />
+      <form method="post" action="<?php echo $this->link()->route('edit', array('id' => $panel->{Model_Panel::COLUMN_ID}))?>" style="display:inline;">
+         <input type="image" src="<?php echo vve_get_tpl_file('icons/page_edit.png', VVE_TPL_FILE_IMAGE)?>"
+                value="edit" name="panel_edit" title="<?php echo $this->tr('Upravit')?>" />
       </form>
-      <form method="post" action="<?=$this->link()->route()?>" style="display:inline;" onsubmit="return confirm('<?=$this->tr('Smazat panel')?>?');">
-         <input type="hidden" name="panel_id" value="<?=$panel->{Model_Panel::COLUMN_ID}?>" />
-         <input type="image" src="<?=vve_get_tpl_file('icons/page_delete.png', VVE_TPL_FILE_IMAGE)?>"
-                value="edit" name="panel_delete" title="<?=$this->tr('Smazat')?>" />
+      <form method="post" action="<?php echo $this->link()->route()?>" style="display:inline;" onsubmit="return confirm('<?php echo $this->tr('Smazat panel')?>?');">
+         <input type="hidden" name="panel_id" value="<?php echo $panel->{Model_Panel::COLUMN_ID}?>" />
+         <input type="image" src="<?php echo vve_get_tpl_file('icons/page_delete.png', VVE_TPL_FILE_IMAGE)?>"
+                value="edit" name="panel_delete" title="<?php echo $this->tr('Smazat')?>" />
       </form>
    </td>
 </tr>
-   <?
+   <?php 
    $previousPos = $panel->{Model_Panel::COLUMN_POSITION};
 }
 } else {?>
 <tr class="ui-widget-content ui-state-disabled">
-   <td colspan="4"><?=$this->tr('Není uložen žádný panel');?></td>
+   <td colspan="4"><?php echo $this->tr('Není uložen žádný panel');?></td>
 </tr>
-<?}
+<?php }

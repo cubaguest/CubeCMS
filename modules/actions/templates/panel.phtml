@@ -1,4 +1,4 @@
-<?//<desc>Panel seznam nadcházejících akcí</desc>
+<?php //<desc>Panel seznam nadcházejících akcí</desc>
 if(!empty ($this->actions)) {
    $icon = null;
    if($this->panelObj()->getIcon() != null) {
@@ -9,21 +9,21 @@ if(!empty ($this->actions)) {
       $backImg = 'background-image: url(\''.Panel_Obj::getBackImgDir().$this->panelObj()->getBackImage().'\');';
    }
    if($this->rssLink != null) {?>
-<a style="float: right" href="<?=$this->rssLink?>" title="rss"><img src="<?=vve_get_tpl_file('icons/rss-icon.png', VVE_TPL_FILE_IMAGE)?>" alt="rss" /></a>
-         <?}?>
-<div class="panel-box-label"><?=$icon?><a href="<?=$this->link()?>" title="<?=htmlspecialchars($this->panelObj()->getName())?>"><?=$this->panelObj()->getName()?></a></div>
-<div class="panel-box-content" style="<?=$backImg?>">
-      <?
+<a style="float: right" href="<?php echo $this->rssLink?>" title="rss"><img src="<?php echo vve_get_tpl_file('icons/rss-icon.png', VVE_TPL_FILE_IMAGE)?>" alt="rss" /></a>
+         <?php }?>
+<div class="panel-box-label"><?php echo $icon?><a href="<?php echo $this->link()?>" title="<?php echo htmlspecialchars($this->panelObj()->getName())?>"><?php echo $this->panelObj()->getName()?></a></div>
+<div class="panel-box-content" style="<?php echo $backImg?>">
+      <?php 
       $step = 1;
          foreach ($this->actions AS $row){
          // podnadpis
          if($row->{Actions_Model_Detail::COLUMN_SUBANME} != null) {
             echo $row->{Actions_Model_Detail::COLUMN_SUBANME};
          }?>
-      <span class="panel-box-label-article"><a href="<?=$this->link()->route('detail', array('urlkey' => $row->{Actions_Model_Detail::COLUMN_URLKEY}))?>"
-         title="<?=$row->{Actions_Model_Detail::COLUMN_NAME}?>"
-         ><?=$row->{Actions_Model_Detail::COLUMN_NAME}?></a></span>
-            <?
+      <span class="panel-box-label-article"><a href="<?php echo $this->link()->route('detail', array('urlkey' => $row->{Actions_Model_Detail::COLUMN_URLKEY}))?>"
+         title="<?php echo $row->{Actions_Model_Detail::COLUMN_NAME}?>"
+         ><?php echo $row->{Actions_Model_Detail::COLUMN_NAME}?></a></span>
+            <?php 
             // čas a datum
             $startDate = vve_date("%x", new DateTime($row->{Actions_Model_Detail::COLUMN_DATE_START}));
             $stopDate = vve_date("%x", new DateTime($row->{Actions_Model_Detail::COLUMN_DATE_STOP}));
@@ -34,8 +34,8 @@ if(!empty ($this->actions)) {
             if($row->{Actions_Model_Detail::COLUMN_TIME} != NULL) {
                $timeStr .= ', '.preg_replace("/:[0-9]+$/", null, $row->{Actions_Model_Detail::COLUMN_TIME});
             }?>
-            <div class="panel-box-content"><?echo $timeStr?></div>
-            <?
+            <div class="panel-box-content"><?php echo $timeStr?></div>
+            <?php 
             // cena
             if ($row->{Actions_Model_Detail::COLUMN_PRICE} != null
                     AND $row->{Actions_Model_Detail::COLUMN_PREPRICE} != null) {
@@ -49,11 +49,11 @@ if(!empty ($this->actions)) {
                printf('<p>'.$this->tr('cena: <span title="Na místě">%s</span> Kč').'</p>',
                        $row->{Actions_Model_Detail::COLUMN_PRICE});
             }?>
-            <div class="panel-box-content"><?=vve_tpl_truncate(strip_tags($row->{Actions_Model_Detail::COLUMN_TEXT}),150)?></div>
-            <p class="panel-box-link-more"><a href="<?=$this->link()?>"
-               title="<?=$this->tr('Více o ').$row->{Actions_Model_Detail::COLUMN_NAME}?>"><?=$this->tr('Více')?></a>
+            <div class="panel-box-content"><?php echo vve_tpl_truncate(strip_tags($row->{Actions_Model_Detail::COLUMN_TEXT}),150)?></div>
+            <p class="panel-box-link-more"><a href="<?php echo $this->link()?>"
+               title="<?php echo $this->tr('Více o ').$row->{Actions_Model_Detail::COLUMN_NAME}?>"><?php echo $this->tr('Více')?></a>
             </p>
-            <?
+            <?php 
             if($step == $this->count) {
                break;
             };
@@ -61,7 +61,7 @@ if(!empty ($this->actions)) {
    }?>
 </div>
 <p class="panel-box-link-more">
-   <a href="<?=$this->link()?>"
-      title="<?=$this->tr('Více akcí z ').htmlspecialchars($this->category()->getLabel())?>"><?=$this->tr('Více akcí')?></a>
+   <a href="<?php echo $this->link()?>"
+      title="<?php echo $this->tr('Více akcí z ').htmlspecialchars($this->category()->getLabel())?>"><?php echo $this->tr('Více akcí')?></a>
 </p>
-   <?}?>
+   <?php }?>

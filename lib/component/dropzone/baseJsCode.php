@@ -1,16 +1,16 @@
 <script type="text/javascript">
    Dropzone.autoDiscover = false;
-   $("div<?=$params['selector']?>").dropzone({
-      url: "<?=$linkUpload?>", 
-      dictDefaultMessage: "<?=$this->tr('Pro nahrání zde klikněte nebo přetáhněte soubory')?>", 
-      dictFallbackMessage: "<?=$this->tr('Váš prohlížeč nepodporuje drag&drop.')?>", 
-      dictInvalidFileType: "<?=$this->tr('Vložen nesprávný typ souboru.')?>", 
-      dictCancelUpload: "<?=$this->tr('Zrušit')?>", 
-      dictRemoveFile: "<?=$this->tr('Odebrat')?>", 
-      dictFileTooBig: "<?=$this->tr('Soubor je příliš velký. Maximálně {{maxFilesize}}.')?>", 
-      dictMaxFilesExceeded: "<?=$this->tr('Nahrán maximální počet souborů ({{maxFiles}}) a nelze nahrát další.')?>", 
-      maxFilesize: <?=round($params['maxFileSize']/(1024*1024))?>, 
-      maxFiles: <?=$params['maxFiles']?>, 
+   $("div<?php echo $params['selector']?>").dropzone({
+      url: "<?php echo $linkUpload?>", 
+      dictDefaultMessage: "<?php echo $this->tr('Pro nahrání zde klikněte nebo přetáhněte soubory')?>", 
+      dictFallbackMessage: "<?php echo $this->tr('Váš prohlížeč nepodporuje drag&drop.')?>", 
+      dictInvalidFileType: "<?php echo $this->tr('Vložen nesprávný typ souboru.')?>", 
+      dictCancelUpload: "<?php echo $this->tr('Zrušit')?>", 
+      dictRemoveFile: "<?php echo $this->tr('Odebrat')?>", 
+      dictFileTooBig: "<?php echo $this->tr('Soubor je příliš velký. Maximálně {{maxFilesize}}.')?>", 
+      dictMaxFilesExceeded: "<?php echo $this->tr('Nahrán maximální počet souborů ({{maxFiles}}) a nelze nahrát další.')?>", 
+      maxFilesize: <?php echo round($params['maxFileSize']/(1024*1024))?>, 
+      maxFiles: <?php echo $params['maxFiles']?>, 
       addRemoveLinks: true, 
       paramName: 'dropzone_file', 
       acceptedFiles: 'image/jpeg,image/png', 
@@ -19,9 +19,9 @@
          if (file.previewElement) {
             if ((_ref = file.previewElement) != null) {
                $.ajax({
-                  url: '<?=$linkDelete?>',
+                  url: '<?php echo $linkDelete?>',
                   type: "POST",
-                  data: {file: file._fileName, path : "<?=$params['path']?>" },
+                  data: {file: file._fileName, path : "<?php echo $params['path']?>" },
                   success: function() {
                      _ref.parentNode.removeChild(file.previewElement);
                   }
@@ -31,25 +31,25 @@
          return this._updateMaxFilesReachedClass();
       }
       ,sending: function(file, xhr, formData) {
-         formData.append("dropzone_path", "<?=$params['path']?>");
+         formData.append("dropzone_path", "<?php echo $params['path']?>");
          formData.append("_dropzone__check", "send");
-         <? foreach ($params['postData'] as $key => $value) {?>
-            formData.append("<?=$key?>", "<?=$value?>");
-         <?}?>
+         <?php  foreach ($params['postData'] as $key => $value) {?>
+            formData.append("<?php echo $key?>", "<?php echo $value?>");
+         <?php }?>
       },
       init: function () {
-         <?  foreach ($params['images'] as $key => $image) {?>
-            var file_<?=$key?> = { 
-               name: "<?=$image['name']?>", 
-               _fileName: "<?=$image['name']?>", 
-               size: <?=$image['size']?>, 
-               type: '<?=$image['mime']?>', 
-               id: <?=(int)$image['id']?> 
+         <?php   foreach ($params['images'] as $key => $image) {?>
+            var file_<?php echo $key?> = { 
+               name: "<?php echo $image['name']?>", 
+               _fileName: "<?php echo $image['name']?>", 
+               size: <?php echo $image['size']?>, 
+               type: '<?php echo $image['mime']?>', 
+               id: <?php echo (int)$image['id']?> 
             };
-            this.options.addedfile.call(this, file_<?=$key?>);
-            this.options.thumbnail.call(this, file_<?=$key?>, "<?=$image['url']?>");
-         <?}?>
-         this.options.maxFiles = this.options.maxFiles - <?=count($params['images'])?>;
+            this.options.addedfile.call(this, file_<?php echo $key?>);
+            this.options.thumbnail.call(this, file_<?php echo $key?>, "<?php echo $image['url']?>");
+         <?php }?>
+         this.options.maxFiles = this.options.maxFiles - <?php echo count($params['images'])?>;
          return this._updateMaxFilesReachedClass();
       },
       success : function(file, response){

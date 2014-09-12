@@ -1,9 +1,9 @@
-<?
+<?php 
 $this->addPageTitle($this->_('úprava textu'));
 $this->addPageHeadline($this->_('úprava textu'));
 ?>
 <div id="editTextForm">
-   <?
+   <?php 
    $this->form->text->html()->setAttrib('cols', 60)->setAttrib('rows', 10)->addClass("mceEditor");
    $tinymce = new JsPlugin_TinyMce();
    $tinymce->setCfgParam('theme', 'advancedsimple');
@@ -11,5 +11,5 @@ $this->addPageHeadline($this->_('úprava textu'));
    print ($this->form);
    ?>
 </div>
-<?
+<?php 
 $this->includeTpl("buttonback.phtml", true, array('link'=>(string)$this->l()->route(null)));?>

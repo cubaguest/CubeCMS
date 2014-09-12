@@ -1,11 +1,11 @@
-<h1><?echo $this->category()->getName();?></h1>
-<? 
+<h1><?php echo $this->category()->getName();?></h1>
+<?php  
 if(empty($this->boxes)){
    return;
 }
 ?>
 <div class="main-content-admin-form" id="banners-list">
-   <?
+   <?php 
    $this->moduleButtons = array(
       array(
          'link' => $this->link()->route('add'),
@@ -25,18 +25,18 @@ if(empty($this->boxes)){
    
    $this->addJsPlugin(new JsPlugin_PrettyPhoto());
    ?>
-      <?foreach ($this->boxes as $key => $box) {?>
-      <h2 class=""><?ps($box['label'])?></h2>
-      <ul id="banners-box-<?=$key?>" class="banners-box">
-         <? foreach ($box['banners'] as $banner) {?>
-         <li class="banner" id="banner-<?=$banner->{Banners_Model::COLUMN_ID}?>">
+      <?php foreach ($this->boxes as $key => $box) {?>
+      <h2 class=""><?php ps($box['label'])?></h2>
+      <ul id="banners-box-<?php echo $key?>" class="banners-box">
+         <?php  foreach ($box['banners'] as $banner) {?>
+         <li class="banner" id="banner-<?php echo $banner->{Banners_Model::COLUMN_ID}?>">
             <div class="base ui-state-default">
                <span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
-               <a class="name" href="<?=$this->link()?>#" title="<?ps($this->tr('Ukázat detaily'))?>"
-                                     ><img src="<?=Url_Request::getBaseWebDir(true)?>images/buttons/expand.gif" alt="expand" /><? ps($banner->{Banners_Model::COLUMN_NAME})?></a>
-               <span class="clicks">(<? printf($this->tr('%s kliknutí za poslední měsíc'), $banner->clicks)?>)</span>
+               <a class="name" href="<?php echo $this->link()?>#" title="<?php ps($this->tr('Ukázat detaily'))?>"
+                                     ><img src="<?php echo Url_Request::getBaseWebDir(true)?>images/buttons/expand.gif" alt="expand" /><?php  ps($banner->{Banners_Model::COLUMN_NAME})?></a>
+               <span class="clicks">(<?php  printf($this->tr('%s kliknutí za poslední měsíc'), $banner->clicks)?>)</span>
                <span class="tools">
-               <? 
+               <?php  
                   $toolbox = clone $this->toolboxItem;
                   $toolbox->banner_status_->setIcon($banner->{Banners_Model::COLUMN_ACTIVE} == true ? 'enable.png' : 'disable.png');
                   $toolbox->banner_status_->getForm()->id->setValues($banner->{Banners_Model::COLUMN_ID});
@@ -47,17 +47,17 @@ if(empty($this->boxes)){
                ?>
                </span>
             </div>
-            <div class="detail ui-state-active" id="banner-<?=$banner->{Banners_Model::COLUMN_ID}?>-detail">
+            <div class="detail ui-state-active" id="banner-<?php echo $banner->{Banners_Model::COLUMN_ID}?>-detail">
                <div class="target">
-                  <?=$this->tr('Cíl banneru:')?>
-                  <a href="<?=$banner->{Banners_Model::COLUMN_URL}?>" class="link-external"
-                  ><?ps($banner->{Banners_Model::COLUMN_URL})?></a>
+                  <?php echo $this->tr('Cíl banneru:')?>
+                  <a href="<?php echo $banner->{Banners_Model::COLUMN_URL}?>" class="link-external"
+                  ><?php ps($banner->{Banners_Model::COLUMN_URL})?></a>
                </div>
                <div class="chart">
-               <?=$this->tr('Nahrávám ...')?><img src="/images/progress_small.gif" />
+               <?php echo $this->tr('Nahrávám ...')?><img src="/images/progress_small.gif" />
                </div>
                <div class="buttons">
-                  <?
+                  <?php 
                   $link = null;
                   if(pathinfo($banner->{Banners_Model::COLUMN_FILE}, PATHINFO_EXTENSION) == 'swf'){
                      $link = $this->category()->getModule()->getDataDir(true).$banner->{Banners_Model::COLUMN_FILE}
@@ -65,25 +65,25 @@ if(empty($this->boxes)){
                   } else {
                      $link = $this->category()->getModule()->getDataDir(true).$banner->{Banners_Model::COLUMN_FILE};
                   }?>
-                  <a href="<?=$link;?>" rel="prettyPhoto" class="banner-preview" title="<? ps($banner->{Banners_Model::COLUMN_NAME})?>" 
-                     ><?=$this->tr('Náhled')?></a>
-                  <a href="<?=$banner->{Banners_Model::COLUMN_URL}?>" class="banner-url link-external" 
-                     title="<? ps($banner->{Banners_Model::COLUMN_NAME})?>"><?=$this->tr('Otevřít cíl')?></a>
+                  <a href="<?php echo $link;?>" rel="prettyPhoto" class="banner-preview" title="<?php  ps($banner->{Banners_Model::COLUMN_NAME})?>" 
+                     ><?php echo $this->tr('Náhled')?></a>
+                  <a href="<?php echo $banner->{Banners_Model::COLUMN_URL}?>" class="banner-url link-external" 
+                     title="<?php  ps($banner->{Banners_Model::COLUMN_NAME})?>"><?php echo $this->tr('Otevřít cíl')?></a>
                </div>
             </div>
          </li>   
-         <? }?>
+         <?php  }?>
       </ul>
-      <?}?>
+      <?php }?>
    <script type="text/javascript">
       google.load("visualization", "1", {packages:["corechart"]});
       function createChart($chart, idb) {
          $.ajax({
-            url: "<?=$this->link()->route('clicksList')?>",
+            url: "<?php echo $this->link()->route('clicksList')?>",
             type: "GET",
             data: {idb : idb},
             success : function(data){
-               var dataArr = [ ['<?=$this->tr('Datum')?>', '<?=$this->tr('Kliknutí')?>'] ];
+               var dataArr = [ ['<?php echo $this->tr('Datum')?>', '<?php echo $this->tr('Kliknutí')?>'] ];
                
                $.each(data.days, function(day, clicks){
                   dataArr.push([day, clicks]);
@@ -93,7 +93,7 @@ if(empty($this->boxes)){
 
                var options = {
                   height : 150,
-                  title: '<?=$this->tr('Přehled kliknutí na banner')?>',
+                  title: '<?php echo $this->tr('Přehled kliknutí na banner')?>',
                   hAxis : { minValue : 0, format : "#x" }
                };
 //               document.getElementById('chart_div')
@@ -121,7 +121,7 @@ if(empty($this->boxes)){
 				   var index = ui.item.index();
 			     // alert('moved new: '+boxName+ " id:"+bannerId+" pos:"+index);
 			      $.ajax({
-			    	   url : '<?=$this->link()->route('moveBanner')?>',
+			    	   url : '<?php echo $this->link()->route('moveBanner')?>',
 			    	   data : {idb : bannerId, box : boxName, pos : index},
 			    	   type : 'POST',
 			    	   success : function(data){

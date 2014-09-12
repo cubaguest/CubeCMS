@@ -1,4 +1,4 @@
-<?
+<?php 
 $h1 = $this->category()->getName();
 //$this->addJsPlugin(new JsPlugin_JQuery());
 $this->addJsPlugin(new JsPlugin_JQueryCSS());
@@ -6,9 +6,9 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
 $this->addFile('css://style.css');
 //$this->addFile('js://datastore.js');
 ?>
-<h1><?$this->includeFile('tpl://engine:headline/icon.phtml'); echo $h1;?></h1>
+<h1><?php $this->includeFile('tpl://engine:headline/icon.phtml'); echo $h1;?></h1>
 <div class="main-content-detail">
    <div class="main-content-text">
-      <div id="datastorage-structure"><?$this->includeFile("tpl://list.phtml");?></div>
+      <div id="datastorage-structure"><?php $this->includeFile("tpl://list.phtml");?></div>
    </div>
 </div>

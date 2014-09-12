@@ -1,4 +1,4 @@
-<?
+<?php 
 //$jqui->addUIAccordion();
 
 $jqui = new JsPlugin_JQuery();
@@ -15,18 +15,18 @@ $this->formLocEdit->send->setImage('/images/icons/cog_edit.png');
 $this->formLocDelete->send->setImage('/images/icons/delete.png');
 $this->formLocDelete->html()->setAttrib('name', 'form-remove-value');
 ?>
-<h1><?=$this->category()->getName();?></h1>
+<h1><?php echo $this->category()->getName();?></h1>
 <div class="main-content main-content-form-edit">
    <div id="groups-tabs">
       <ul>
-         <?foreach ($this->groups as $id => $grp) {?>
-      	<li><a href="<?=$this->link()?>#grptab-<?=$id?>"><?=$grp['name']?></a></li>
-         <?}?>
+         <?php foreach ($this->groups as $id => $grp) {?>
+      	<li><a href="<?php echo $this->link()?>#grptab-<?php echo $id?>"><?php echo $grp['name']?></a></li>
+         <?php }?>
       </ul>
-      <?foreach ($this->groups as $id => $grp) {?>
-    	<div id="grptab-<?=$id?>">
-         <p><?=$grp['desc']?></p>
-            <?  foreach ($this->options[$id] as $option){
+      <?php foreach ($this->groups as $id => $grp) {?>
+    	<div id="grptab-<?php echo $id?>">
+         <p><?php echo $grp['desc']?></p>
+            <?php   foreach ($this->options[$id] as $option){
                // doplnění id do formů
                if($option->global != null){
                   $this->formGlEdit->id->setValues($option->global->{Model_ConfigGlobal::COLUMN_ID});
@@ -40,13 +40,13 @@ $this->formLocDelete->html()->setAttrib('name', 'form-remove-value');
                ?>
          <table class="ui-widget-content">
             <tr class="ui-widget-header">
-               <th colspan="2" style="text-align: left;"><?=$option->{Model_Config::COLUMN_LABEL}?></th>
-               <th colspan="2" style="text-align: right;"><?=$option->{Model_Config::COLUMN_KEY}?></th>
+               <th colspan="2" style="text-align: left;"><?php echo $option->{Model_Config::COLUMN_LABEL}?></th>
+               <th colspan="2" style="text-align: right;"><?php echo $option->{Model_Config::COLUMN_KEY}?></th>
             </tr>
-            <tr class="option-row <?if($option->local != null){ echo "ui-state-disabled";} else {echo "ui-state-active";}?>">
-               <td class="column-type"><?=$this->tr('Globální')?></td>
+            <tr class="option-row <?php if($option->local != null){ echo "ui-state-disabled";} else {echo "ui-state-active";}?>">
+               <td class="column-type"><?php echo $this->tr('Globální')?></td>
                <td colspan="2">
-                  <?if($option->global != null){
+                  <?php if($option->global != null){
                      if($option->global->{Model_Config::COLUMN_HIDDEN} == true){
                         echo $this->tr('Tajná hodnota.');
                      } else {
@@ -57,7 +57,7 @@ $this->formLocDelete->html()->setAttrib('name', 'form-remove-value');
                   }?>
                </td>
                <td class="column-action">
-                  <?
+                  <?php 
                   if($this->allowGlobalEdit && is_object($option->global)){
                      $this->formGlEdit->id->setValues($option->global->{Model_ConfigGlobal::COLUMN_ID});
                      echo $this->formGlEdit->render(new Form_Decorator_Clear());
@@ -66,10 +66,10 @@ $this->formLocDelete->html()->setAttrib('name', 'form-remove-value');
                   ?>
                </td>
             </tr>
-            <tr class="option-row <?if($option->local == null){ echo "ui-state-disabled";} else {echo "ui-state-active";}?>">
-               <td><?=$this->tr('Lokální')?></td>
+            <tr class="option-row <?php if($option->local == null){ echo "ui-state-disabled";} else {echo "ui-state-active";}?>">
+               <td><?php echo $this->tr('Lokální')?></td>
                <td colspan="2">
-                  <?if($option->local != null){
+                  <?php if($option->local != null){
                      if($option->local->{Model_Config::COLUMN_HIDDEN} == true){
                         echo $this->tr('Tajná hodnota.');
                      } else {
@@ -80,7 +80,7 @@ $this->formLocDelete->html()->setAttrib('name', 'form-remove-value');
                   }?>
                </td>
                <td class="column-action">
-                  <?
+                  <?php 
                   if($option->local != null){
                      $this->formLocEdit->id->setValues($option->local->{Model_Config::COLUMN_ID});
                      echo $this->formLocEdit->render(new Form_Decorator_Clear());
@@ -90,9 +90,9 @@ $this->formLocDelete->html()->setAttrib('name', 'form-remove-value');
                </td>
             </tr>
          </table>
-            <?}?>
+            <?php }?>
      	</div>
-      <?}?>
+      <?php }?>
    </div>
    <br />
    <br />
@@ -106,7 +106,7 @@ $this->formLocDelete->html()->setAttrib('name', 'form-remove-value');
          });
          
          $('form[name=form-remove-value]').submit(function(){
-            if(!confirm('<?=$this->tr('Opravdu odstranit vybranou proměnnu?')?>')){
+            if(!confirm('<?php echo $this->tr('Opravdu odstranit vybranou proměnnu?')?>')){
                return false;
             }
          });
@@ -117,10 +117,10 @@ $this->formLocDelete->html()->setAttrib('name', 'form-remove-value');
 //            var $cnt = $(this).parent().next();
 //            if($cnt.is(':hidden')) {
 //               $cnt.show();
-//               $('img',$(this)).attr('src', '<?=vve_get_tpl_file('buttons/collapse.gif', VVE_TPL_FILE_IMAGE)?>');
+//               $('img',$(this)).attr('src', '<?php echo vve_get_tpl_file('buttons/collapse.gif', VVE_TPL_FILE_IMAGE)?>');
 //            } else {
 //               $cnt.hide();
-//               $('img',$(this)).attr('src', '<?=vve_get_tpl_file('buttons/expand.gif', VVE_TPL_FILE_IMAGE)?>');
+//               $('img',$(this)).attr('src', '<?php echo vve_get_tpl_file('buttons/expand.gif', VVE_TPL_FILE_IMAGE)?>');
 //            }
 //            return false;
 //         });//.next().hide();

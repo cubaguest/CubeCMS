@@ -1,5 +1,5 @@
 <div class="comments-list">
-   <?
+   <?php 
    echo '<span class="comments-label"><strong>';
    printf($this->tr('Komentáře (%s), nové: (%s).'),$this->countComments, $this->unreaded);
    echo '</strong></span>';
@@ -11,7 +11,7 @@
       echo $this->tr('<p>Není uložen žádný komentář</p>');
    }
    ?>
-   <?if($this->isClosed == true) {
+   <?php if($this->isClosed == true) {
       echo $this->tr('<p>Diskuze byla uzavřena</p>');
    }?>
 </div>

@@ -1,4 +1,4 @@
-<?
+<?php 
 $this->addJsPlugin(new JsPlugin_SWFUpload());
 $this->addJsPlugin(new JsPlugin_PiroBox());
 $this->addFile("css://style.css");
@@ -10,10 +10,10 @@ $this->addJsPlugin($jq);
    
    <div class="swfupload-control">
       <span id="swfUButtonPlaceholder"></span>
-      <button type="button" name="upload" id="uplaod-button"><?=$this->tr('Nahrát');?></button>
+      <button type="button" name="upload" id="uplaod-button"><?php echo $this->tr('Nahrát');?></button>
    </div>
-   <button type="button" name="create-dir" id="create-dir-button"><?=$this->tr('Vytvořit složku');?></button>
-   <?
+   <button type="button" name="create-dir" id="create-dir-button"><?php echo $this->tr('Vytvořit složku');?></button>
+   <?php 
    // delete items
    echo $this->formDeleteItems->html()->setAttrib('id', 'delete-items');
    echo $this->formDeleteItems->renderStart();
@@ -25,14 +25,14 @@ $this->addJsPlugin($jq);
    <input type="submit" name="open-move-items" value="Přesunout"/>
    <div id="upload-queue" class="ui-widget action-details">
       <div class="ui-widget-header">
-         <strong><?=$this->tr("Fronta odesílání")?>:</strong>&nbsp;
-         <button onclick="clearUploadQueue();" title="<?=$this->tr('Vyčistit');?>" class="button-cancel"><?=$this->tr('Vyčistit');?></button>
+         <strong><?php echo $this->tr("Fronta odesílání")?>:</strong>&nbsp;
+         <button onclick="clearUploadQueue();" title="<?php echo $this->tr('Vyčistit');?>" class="button-cancel"><?php echo $this->tr('Vyčistit');?></button>
       </div>
       <ul id="upload-list" class="ui-widget-content"></ul>
    </div>
    <div id="move-form" class="ui-widget action-details">
       <p class="validateTips"></p>
-      <?
+      <?php 
       $this->formMoveItems->html()->setAttrib('id', 'move-items');
       echo $this->formMoveItems->renderStart();
       echo $this->formMoveItems->items;
@@ -46,7 +46,7 @@ $this->addJsPlugin($jq);
    </div>
    <div id="rename-form" class="ui-widget action-details">
       <p class="validateTips"></p>
-      <?
+      <?php 
          echo $this->formRenameItem->renderStart();
          $this->formRenameItem->oldname->setValues(null);
          $this->formRenameItem->newname->setValues(null);
@@ -59,7 +59,7 @@ $this->addJsPlugin($jq);
    </div>
    <div id="createdir-form" class="ui-widget action-details">
       <p class="validateTips"></p>
-      <?
+      <?php 
          echo $this->formCreateDir->renderStart();
          echo $this->formCreateDir->name->label().'<br />';
          echo $this->formCreateDir->name->controll().'<br />';
@@ -68,8 +68,8 @@ $this->addJsPlugin($jq);
       ?>
    </div>
    <script type="text/javascript">
-      var uploadUrl = '<?=$this->link()->route('uploadFile')?>';
-      var sessionId = '<?=session_id();?>';
+      var uploadUrl = '<?php echo $this->link()->route('uploadFile')?>';
+      var sessionId = '<?php echo session_id();?>';
 //      alert('doc ready');
    </script>
 </div>
