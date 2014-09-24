@@ -135,33 +135,6 @@ class Polls_Model_Detail extends Polls_Model {
       }
    }
 
-   /**
-    * Metoda vyhledává články -- je tu kvůli zbytečnému nenačítání modelu List
-    * @param integer $idCat
-    * @param string $string
-    * @param bool $publicOnly
-    * @return PDOStatement
-    */
-   public function search($idCat, $string) {
-      $dbc = Db_PDO::getInstance();
-
-      $dbst = $dbc->prepare('SELECT *, ('.round(VVE_SEARCH_ARTICLE_REL_MULTIPLIER).' * MATCH('.self::COL_NAME.') AGAINST (:sstring)'
-              .' +'.round(VVE_SEARCH_ARTICLE_REL_MULTIPLIER).' * MATCH('.self::COL_NAME_ORIG.') AGAINST (:sstring)'
-              .' + MATCH('.self::COL_LABEL_CLEAR.') AGAINST (:sstring)) as '.Search::COLUMN_RELEVATION
-              .' FROM '.Db_PDO::table(self::DB_TABLE)
-              .' WHERE MATCH('.self::COL_NAME.', '.self::COL_NAME_ORIG.', '.self::COL_LABEL_CLEAR.') AGAINST (:sstring IN BOOLEAN MODE)'
-              .' AND `'.self::COL_ID_CAT.'` = :idCat'
-              .' ORDER BY '.round(VVE_SEARCH_ARTICLE_REL_MULTIPLIER).' * MATCH('.self::COL_NAME.') AGAINST (:sstring)'
-              .' + '.round(VVE_SEARCH_ARTICLE_REL_MULTIPLIER).' * MATCH('.self::COL_NAME_ORIG.') AGAINST (:sstring)'
-              .' + MATCH('.self::COL_LABEL_CLEAR.') AGAINST (:sstring) DESC');
-
-      $dbst->bindValue(':idCat', $idCat, PDO::PARAM_INT);
-      $dbst->bindValue(':sstring', $string, PDO::PARAM_STR);
-      $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
-      $dbst->execute();
-      return $dbst;
-   }
-
     /**
     * Metoda vrací počet anket
     *

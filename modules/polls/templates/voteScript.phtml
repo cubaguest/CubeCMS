@@ -21,6 +21,15 @@ if(!defined('VVE_MODULE_POOLS_SCRIPT')) {
       });
       return false;
    });
+   $(document).ready(function(){
+      $('.poll-votes input[type="radio"]').removeProp('checked');
+      $('.poll-votes form').submit(function(){
+         if($(this).find('input:checked').length === 0){
+            alert('Nevybrali jste ani jednu možnost hlasování');
+            return false;
+         }
+      });
+   }); 
    /* ]]> */
 </script>
    <?php 
