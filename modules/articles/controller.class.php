@@ -843,18 +843,11 @@ class Articles_Controller extends Controller {
       $artRecord->{Articles_Model::COLUMN_ID_USER_LAST_EDIT} = Auth::getUserId();
       $artRecord->{Articles_Model::COLUMN_EDIT_TIME} = new DateTime();
 
-      if(isset ($form->titleImage)){
-         $artRecord->{Articles_Model::COLUMN_TITLE_IMAGE} = $form->titleImage->getValues();
+      if(isset ($form->image) && !empty($form->image->getValues())){
+         $img = $form->image->getValues();
+         $artRecord->{Articles_Model::COLUMN_TITLE_IMAGE} = $img['name'];
       }
-      /* TITLE IMAGE */
-      if(isset ($form->titleImageUpload) AND $form->titleImageUpload->getValues() != null){
-         $image = new Filesystem_File_Image($form->titleImageUpload);
-         $image->saveAs(AppCore::getAppDataDir().VVE_ARTICLE_TITLE_IMG_DIR, 
-            $this->category()->getParam('TITLE_IMAGE_WIDTH', VVE_ARTICLE_TITLE_IMG_W), 
-            $this->category()->getParam('TITLE_IMAGE_HWIGHT', VVE_ARTICLE_TITLE_IMG_H), 
-            $this->category()->getParam('TITLE_IMAGE_CROP', VVE_ARTICLE_TITLE_IMG_C));
-         $artRecord->{Articles_Model::COLUMN_TITLE_IMAGE} = $image->getName();
-      }
+      
       /* SAVE ARTICLE */
       $lastId = $model->save($artRecord);
       
@@ -967,23 +960,9 @@ class Articles_Controller extends Controller {
       $iDesc->setSubLabel($this->tr('Pokud není zadán pokusí se použít anotaci, jinak zůstne prázdný.'));
       $form->addElement($iDesc, $fGrpParams);
       
-      $eImage = new Form_Element_File('titleImageUpload', $this->tr('Titulní obrázek'));
-      $eImage->addValidation(new Form_Validator_FileExtension('jpg;png;gif'));
-      $form->addElement($eImage, $fGrpParams);
-      
-      if(is_dir(AppCore::getAppDataDir().VVE_ARTICLE_TITLE_IMG_DIR)){
-         $images = glob(AppCore::getAppDataDir().VVE_ARTICLE_TITLE_IMG_DIR.DIRECTORY_SEPARATOR . "*.{jpg,gif,png,JPG,GIF,PNG}", GLOB_BRACE);
-         //print each file name
-         if(!empty ($images)){
-            $elemImgSel = new Form_Element_Select('titleImage', $this->tr('Uložené titulní obrázky'));
-            $elemImgSel->setOptions(array($this->tr('Žádný') => null));
-            
-            foreach($images as $image) {
-               $elemImgSel->setOptions(array(basename($image) => basename($image)), true);
-            }
-            $form->addElement($elemImgSel, $fGrpParams);
-         }
-      }
+      $elemImage = new Form_Element_ImageSelector('image', $this->tr('Titulní obrázek'));
+      $elemImage->setUploadDir(Utils_CMS::getTitleImagePath(false));
+      $form->addElement($elemImage, $fGrpParams);
       
       $fGrpPublic = $form->addgroup('public', $this->tr('Parametry zveřejnění a vytvoření'));
       
@@ -1090,8 +1069,8 @@ class Articles_Controller extends Controller {
             $form->created_date->setValues(vve_date('%x',$addTime));
             $form->created_time->setValues(vve_date('%H:%i',$addTime));
          }
-         if(isset ($form->titleImage)){
-            $form->titleImage->setValues($article->{Articles_Model::COLUMN_TITLE_IMAGE});
+         if(isset($form->image)){
+            $form->image->setValues($article->{Articles_Model::COLUMN_TITLE_IMAGE});
          }
          if(isset($form->creatorId)){
             $form->creatorId->setValues($article->{Articles_Model::COLUMN_ID_USER});
