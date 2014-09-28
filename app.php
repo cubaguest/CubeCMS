@@ -479,13 +479,15 @@ class AppCore extends TrObject {
     */
    private function _initMessagesAndErrors()
    {
-      if(CUBE_CMS_DEBUG_LEVEL > 0){
+      if(CUBE_CMS_DEBUG_LEVEL > 0 || isset($_GET['DEBUG'])){
          error_reporting(-1);
          ini_set('display_errors', 1);
       } else {
-         error_reporting(E_ERROR|E_WARNING|E_PARSE);
+         error_reporting(E_ERROR|E_PARSE);
          ini_set('display_errors', 0);
       }
+      ini_set("log_errors", 1);
+      ini_set("error_log", AppCore::getAppWebDir()."logs".DIRECTORY_SEPARATOR."php-error-".date('Y-m-d').".log");
       set_error_handler(array('CoreErrors', 'errorHandler') );
       set_exception_handler( array( 'CoreErrors', 'exceptionHandler' ) );
       register_shutdown_function( array( 'AppCore', 'shutDownHandler' ) );
@@ -1041,7 +1043,7 @@ class AppCore extends TrObject {
          }
          die ();
       }
-
+     
       if(CUBE_CMS_DEBUG_LEVEL >= 3 AND function_exists('xdebug_start_trace')){
          xdebug_start_trace(AppCore::getAppCacheDir().'trace.log');
       }
