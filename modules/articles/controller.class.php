@@ -832,11 +832,12 @@ class Articles_Controller extends Controller {
       }
 
       // add time
-      $addDateTime = new DateTime();
-      if(isset($form->created_date)){
-         $addDateTime = new DateTime($form->created_date->getValues().' '.$form->created_time->getValues());
+      if($artRecord->isNew()){
+         $artRecord->{Articles_Model::COLUMN_ADD_TIME} = new DateTime();
       } 
-      $artRecord->{Articles_Model::COLUMN_ADD_TIME} = $addDateTime;
+      if(isset($form->created_date)){
+         $artRecord->{Articles_Model::COLUMN_ADD_TIME} = new DateTime($form->created_date->getValues().' '.$form->created_time->getValues());
+      } 
 
 
       $artRecord->{Articles_Model::COLUMN_ID_USER_LAST_EDIT} = Auth::getUserId();
@@ -1508,15 +1509,17 @@ class Articles_Controller extends Controller {
       $form->addElement($elemSort, $fGrpView);
 
       $elemDisableList = new Form_Element_Checkbox('disableList', $this->tr('Vypnout úvodní seznam'));
+      $elemDisableList->setAdvanced(true);
       $elemDisableList->setSubLabel($this->tr('Pokud je list vypnut, stránka je automaticky přesměrována na první položku. V detailu je pak načten seznam položek.'));
       if(isset($settings[self::PARAM_DISABLE_LIST])) {
          $elemDisableList->setValues($settings[self::PARAM_DISABLE_LIST]);
       }
       $form->addElement($elemDisableList, $fGrpView);
 
-      $fGrpEditSet = $form->addGroup('editSettings', $this->tr('Nastavení úprav'));
+      $fGrpEditSet = $form->addGroup('editSettings', $this->tr('Úpravy a editace'));
 
       $elemEditorType = new Form_Element_Select('editor_type', $this->tr('Typ editoru'));
+      $elemEditorType->setAdvanced(true);
       $elemEditorType->setOptions(array(
          $this->tr('žádný (pouze textová oblast)') => 'none',
          $this->tr('jednoduchý (Wysiwyg)') => 'simple',
@@ -1557,8 +1560,9 @@ class Articles_Controller extends Controller {
       $form->addElement($elemCommentsClosed, 'discussion');
 
       
-      $fGrpAdv = $form->addGroup('advanced', $this->tr('Pokročilé')); 
+//      $fGrpAdv = $form->addGroup('advanced', $this->tr('Připojení kateogriií')); 
       $elemMountCats = new Form_Element_Select('mountedCats', $this->tr('Připojit kategorie'));
+      $elemMountCats->setAdvanced(true);
       $elemMountCats->setMultiple();
       
       $modelCats = new Model_Category();
@@ -1575,9 +1579,11 @@ class Articles_Controller extends Controller {
       if(isset($settings[self::PARAM_MOUNTED_CATS])) {
          $elemMountCats->setValues(explode(';', $settings[self::PARAM_MOUNTED_CATS]));
       }
-      $form->addElement($elemMountCats, $fGrpAdv);
+      $form->addElement($elemMountCats, $fGrpView);
       
+//      $fGrpNewPosts = $form->addGroup('notify', $this->tr('Nové příspěvky')); 
       $elemNotify = new Form_Element_Select('sendNotify', 'Odeslat upozornění při přidání položky');
+      $elemNotify->setAdvanced(true);
       $elemNotify->setSubLabel($this->tr('Odešle zadaným uživatelům upozornění na nově přidanou položku <strong>obyčejným</strong> uživatelem'));
       // načtení uživatelů
       $modelUsers = new Model_Users();
@@ -1597,7 +1603,7 @@ class Articles_Controller extends Controller {
          $elemNotify->setValues(explode(';', $settings[self::PARAM_NOTIFY_RECIPIENTS]));
       }
 
-      $form->addElement($elemNotify, $fGrpAdv);
+      $form->addElement($elemNotify, $fGrpEditSet);
 
       $fGrpEMail = $form->addGroup('emailLoad', $this->tr('Načítání z e-mailu'),
          $this->tr("Pokud je nastaven přístup k e-malové schránce, stránka automaticky načítá z tét schránky nové
@@ -1605,20 +1611,24 @@ class Articles_Controller extends Controller {
          (např. blog5685stranky@domena.cz) a držte ji v tajnosti. V opačném případě se Vám mohou zobrazovat nechtěné příspěvky."));
 
       $elemMailName = new Form_Element_Text('mailName', $this->tr('E-mail'));
+      $elemMailName->setAdvanced(true);
       $elemMailName->addValidation(new Form_Validator_Email());
       $elemMailName->setValues(isset($settings[self::PARAM_MAIL_NAME]) ? $settings[self::PARAM_MAIL_NAME] : null);
       $form->addElement($elemMailName, $fGrpEMail);
 
       $elemMailPass = new Form_Element_Text('mailPass', $this->tr('Heslo schránky'));
+      $elemMailPass->setAdvanced(true);
       $elemMailPass->setSubLabel($this->tr('Heslo je při úpravě zkryto'));
       $form->addElement($elemMailPass, $fGrpEMail);
 
       $elemMailServer = new Form_Element_Text('mailServer', $this->tr('Server schránky'));
+      $elemMailServer->setAdvanced(true);
       $elemMailServer->setSubLabel($this->tr('Např.: imap.serve.cz (pro jiný port: imap.server.cz:995). Pokud není zadán, apliakce se pokusí server detekovat z e-mailu s předponou imap.'));
       $elemMailServer->setValues( isset($settings[self::PARAM_MAIL_SERVER]) ? $settings[self::PARAM_MAIL_SERVER] : null);
       $form->addElement($elemMailServer, $fGrpEMail);
 
       $elemMailSecKey = new Form_Element_Text('mailSecKey', $this->tr('Bezpečnostní řetězec'));
+      $elemMailSecKey->setAdvanced(true);
       $elemMailSecKey->setSubLabel($this->tr('Nasatvte na náhodný řetězec. E-maily, které se mají načíst potom musí tento řetězec obsahovat, jinak budou odmítnuty.'));
       $elemMailSecKey->setValues( isset($settings[self::PARAM_MAIL_SECURE_KEY]) ? $settings[self::PARAM_MAIL_SECURE_KEY] : null);
       $form->addElement($elemMailSecKey, $fGrpEMail);
@@ -1630,6 +1640,7 @@ class Articles_Controller extends Controller {
 
       $elemAllowPrivateZone = new Form_Element_Checkbox('allow_private_zone',
               $this->tr('Povolit privátní zónu'));
+      $elemAllowPrivateZone->setAdvanced(true);
       $form->addElement($elemAllowPrivateZone, $fGrpPrivate);
       if(isset($settings[self::PARAM_PRIVATE_ZONE])) {
          $form->allow_private_zone->setValues($settings[self::PARAM_PRIVATE_ZONE]);
