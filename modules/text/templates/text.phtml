@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * @template "Hlavní šablona"
  */
@@ -8,47 +8,32 @@ if($this->text != false AND (string)$this->text->{Text_Model::COLUMN_LABEL} != n
 } else {
    $h1 = $this->category()->getName();
 }
-if($this->toolboxPrivate == null){
-   echo $this->toolbox;
-   $this->toolbox = null;
-}
-/* dořešit galerii pro obrázky v textu -- pomocí DOMDocument to nejde, přidávají se entity, které tam nepatří.
-$doc = new DOMDocument('1.0', 'UTF-8');
-$doc->resolveExternals = false;
-$doc->substituteEntities = false;
-$doc->encoding = "utf-8";
-//var_dump(vve_html_convert_entities($this->text->{Text_Model::COLUMN_TEXT}));
-$doc->loadHTML(vve_html_convert_entities($this->text->{Text_Model::COLUMN_TEXT}));
-$text = $doc->saveHTML();
-$text = $this->text->{Text_Model::COLUMN_TEXT};*/
+echo $this->toolbox;
 ?>
-<h1><?php $this->includeFile('tpl://engine:headline/icon.phtml'); echo $h1;?> <?php echo vve_tpl_show_text_langs($this->text->{Text_Model::COLUMN_TEXT});?></h1>
-<div class="main-content-detail">
-   <div class="main-content-text"><?php echo ($this->filter($this->text->{Text_Model::COLUMN_TEXT},'emoticons')).$this->toolbox;?></div>
-   <?php if($this->textPrivate != false AND (string)$this->textPrivate->{Text_Model::COLUMN_TEXT} != null){
-      ?><div class="main-content-text"><?php 
-      echo $this->textPrivate->{Text_Model::COLUMN_TEXT};
-      echo $this->toolboxPrivate;
-   ?></div><?php 
-   }
-   if($this->text != false && $this->category()->getParam('shareTools', true) == true && $this->articleTools !== false){
-         $this->includeTpl('articletools.phtml', true, array(
-            'lastEditTime' => $this->text->{Text_Model::COLUMN_CHANGED_TIME},
-//              'lastEditUser' => $this->article->{Model_Users::COLUMN_USERNAME},
-              'linkToPdf' => $this->link()->route('detailExport', array('output' => 'pdf')),
-              'linkToHtml' => $this->link()->route('detailExport', array('output' => 'html')),
-              'shares' => array('url' => $this->link(), 'title' => $this->category()->getName())));
-   }
-   ?>
+<h1><?php 
+   echo $h1;
+   echo $this->text ? Utils_CMS::getLangsImages($this->text->{Text_Model::COLUMN_TEXT}) : null;
+   ?></h1>
+<div class="content">
+   <div class="text post">
+      <?php 
+      $this->includeFile('tpl://engine:components/titleimage.phtml'); 
+      if($this->text && (string)$this->text->{Text_Model::COLUMN_TEXT_CLEAR} != null){
+         echo ($this->filter($this->text->{Text_Model::COLUMN_TEXT},'emoticons'));
+      } else {
+         ?>
+      <div class="admin-info-text"><?php printf($this->tr('Źádný text nebyl vyplněn. <a class="" href="%s">Upravit</a>.'), $this->link()->route('edit'));?></div>
+         <?php
+      }
+      ?>
+   </div>
+   <?php if($this->textPrivate != false && (string)$this->textPrivate->{Text_Model::COLUMN_TEXT} != null){
+      ?>
+   <div class="main-content-text">
+         <?php
+            echo $this->textPrivate->{Text_Model::COLUMN_TEXT};
+            echo $this->toolboxPrivate;
+         ?>
+      </div>
+   <?php } ?>
 </div>
-<?php 
-if(($this->text != null AND strpos((string)$this->text->{Text_Model::COLUMN_TEXT}, 'pirobox') !== false)
-   OR ($this->textPrivate != null AND strpos((string)$this->textPrivate->{Text_Model::COLUMN_TEXT}, 'pirobox') !== false)){
-   $this->addJsPlugin(new JsPlugin_PiroBox());
-   ?>
-   <script type="text/javascript">
-      /* <![CDATA[ */
-      $(document).ready(function(){$().piroBox({slideShow : true,slideSpeed : 3});});
-      /* ]]> */
-   </script>
-<?php }?>

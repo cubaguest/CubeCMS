@@ -62,13 +62,7 @@ class Text_View extends View {
       }
       
       // text nebyl zadán
-      if($this->text == false){
-         $this->text = new Object();
-         $this->text->{Text_Model::COLUMN_TEXT} = null;
-         if($this->category()->getRights()->isWritable()){
-            $this->text->{Text_Model::COLUMN_TEXT} = $this->tr('Text nebyl vytvořen. Upravíte jej v administraci.');
-         }
-      } else {
+      if($this->text){
          $this->text->{Text_Model::COLUMN_TEXT} = $this->template()->filter((string)$this->text->{Text_Model::COLUMN_TEXT}, $textFilters);
       }
 
@@ -91,9 +85,7 @@ class Text_View extends View {
       $this->template()->addFile('tpl://text:previewform.phtml');
       // remove not necessary items
       if($this->toolbox instanceof Template_Toolbox2){
-         unset($this->toolbox->edit_text);            
-         unset($this->toolbox->edit_textpanel); 
-         $this->toolbox->setIcon('eye.png');           
+         unset($this->toolbox);            
       }
       $this->textPrivate = null;
       $this->toolboxPrivate = null;

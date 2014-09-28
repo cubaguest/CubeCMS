@@ -75,7 +75,8 @@ class Text_Controller extends Controller {
          }
       }
       $this->exportTextController($rec, $customFields);
-      
+      $this->category()->getDataObj()->{Model_Category::COLUMN_DESCRIPTION} = $rec->catdesc;
+      $this->category()->getDataObj()->{Model_Category::COLUMN_IMAGE} = $rec->catimage;
       $formPreview = new Form('text_preview_');
       $grp = $formPreview->addGroup('preview', $this->tr('Co s textem?'));
       $elemSubmit = new Form_Element_SaveCancel('save', array($this->tr('Uložit'), $this->tr('Zpět k úpravě')) );
@@ -173,6 +174,8 @@ class Text_Controller extends Controller {
          foreach($this->customFields as $key => $label){
             $customFields[$key] = $this->loadTempRecord($key);
          }
+         $this->category()->getDataObj()->{Model_Category::COLUMN_DESCRIPTION} = $textRec->catdesc;
+         $this->category()->getDataObj()->{Model_Category::COLUMN_IMAGE} = $textRec->catimage;
       }
       $form = $this->createEditForm($textRec, $customFields);
 
@@ -258,6 +261,7 @@ class Text_Controller extends Controller {
       $form = new Form("text_");
       
       $grpText = $form->addGroup('text', $this->tr('Text'));
+      $grpView = $form->addGroup('view', $this->tr('Vzhed'));
       
       $label = new Form_Element_Text('label', $this->tr('Nadpis'));
       $label->addFilter(new Form_Filter_StripTags());
@@ -269,10 +273,23 @@ class Text_Controller extends Controller {
       $textarea->setLangs();
       $textarea->addValidation(new Form_Validator_NotEmpty(null, Locales::getDefaultLang(true)));
       $form->addElement($textarea, $grpText);
+      
+      $perex = new Form_Element_TextArea('desc', $this->tr("Popis"));
+      $perex->setLangs();
+      $perex->setSubLabel($this->tr('Krátký popisek. Bývá uveden v přehledech a pro vyhledávače.'));
+      $form->addElement($perex, $grpText);
 
+      /* titulní obrázek */
+      $elemImage = new Form_Element_ImageSelector('image', $this->tr('Titulní obrázek'));
+      $elemImage->setUploadDir(Category::getImageDir(Category::DIR_IMAGE, true));
+      $elemImage->setValues($this->category()->getCatDataObj()->{Model_Category::COLUMN_ICON});
+      $form->addElement($elemImage, $grpView);
+      
       if($rec instanceof Model_ORM_Record){
          $form->text->setValues($rec->{Text_Model::COLUMN_TEXT});
          $form->label->setValues($rec->{Text_Model::COLUMN_LABEL});
+         $form->desc->setValues( isset($rec->catdesc) ? $rec->catdesc : $this->category()->getDataObj()->{Model_Category::COLUMN_DESCRIPTION});
+         $form->image->setValues( isset($rec->catimg) ? $rec->catimg : $this->category()->getDataObj()->{Model_Category::COLUMN_IMAGE});
       }
 
       // custom fileds
@@ -313,7 +330,7 @@ class Text_Controller extends Controller {
     * @param type $subkey -- subklíč dat
     * @param type $elementName -- název elementu s daty
     */
-   protected function processFormData(Form $form, $textRec, $subkey = self::TEXT_MAIN_KEY, $elementName = 'text', $toTemp = false)
+   protected function processFormData(Form $form, $textRec, $subkey = Text_Model::TEXT_MAIN_KEY, $elementName = 'text', $toTemp = false)
    {
       if(!isset ($form->{$elementName})){
          throw new InvalidArgumentException($this->tr('Nebyl předán správný název formulářového prvku s daty'));
@@ -338,19 +355,37 @@ class Text_Controller extends Controller {
          $textRec->{Text_Model::COLUMN_LABEL} = $form->label->getValues();
       }
       $textRec->{Text_Model::COLUMN_ID_USER_EDIT} = Auth::getUserId();
+      if($subkey == Text_Model::TEXT_MAIN_KEY){
+         $textRec->catdesc = $form->desc->getValues();
+         $img = $form->image->getValues();
+         $textRec->catimage = $img ? $img['name'] : null;
+      }
+      $textRec->category = Auth::getUserId();
 
       if($toTemp){
          $this->seveTempRecord($textRec, $subkey);
       } else {
          $textRec->save();
+         if($subkey == Text_Model::TEXT_MAIN_KEY){
+            $cat = $this->category()->getDataObj();
+            $cat->{Model_Category::COLUMN_DESCRIPTION} = $textRec->catdesc;
+            $cat->{Model_Category::COLUMN_IMAGE} = $textRec->catimage;
+            $cat->save();
+         }
       }
       return $textRec;
    }
 
    protected function processTempData($record)
    {
-      $this->textModel->save($record);
+      $record->save();
       $this->clearTempRecord($record->{Text_Model::COLUMN_SUBKEY});
+      if($record->{Text_Model::COLUMN_SUBKEY} == Text_Model::TEXT_MAIN_KEY){
+         $cat = $this->category()->getDataObj();
+         $cat->{Model_Category::COLUMN_DESCRIPTION} = $record->catdesc;
+         $cat->{Model_Category::COLUMN_IMAGE} = $record->catimage;
+         $cat->save();
+      }
    }
    
    protected function loadTempRecord($key = Text_Model::TEXT_MAIN_KEY)
