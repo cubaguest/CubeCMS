@@ -177,7 +177,7 @@ class Text_Controller extends Controller {
          $this->category()->getDataObj()->{Model_Category::COLUMN_DESCRIPTION} = $textRec->catdesc;
          $this->category()->getDataObj()->{Model_Category::COLUMN_IMAGE} = $textRec->catimage;
       }
-      $form = $this->createEditForm($textRec, $customFields);
+      $form = $this->createEditForm($textRec, $customFields, true);
 
       if($form->isSend() AND $form->send->getValues() == 'cancel'){
          $this->infoMsg()->addMessage($this->tr('Změny byly zrušeny'));
@@ -256,7 +256,7 @@ class Text_Controller extends Controller {
     * @param Model_ORM_Record $rec
     * @return Form 
     */
-   protected function createEditForm($rec, $customFields = array())
+   protected function createEditForm($rec, $customFields = array(), $mainText = false)
    {
       $form = new Form("text_");
       
@@ -274,22 +274,25 @@ class Text_Controller extends Controller {
       $textarea->addValidation(new Form_Validator_NotEmpty(null, Locales::getDefaultLang(true)));
       $form->addElement($textarea, $grpText);
       
-      $perex = new Form_Element_TextArea('desc', $this->tr("Popis"));
-      $perex->setLangs();
-      $perex->setSubLabel($this->tr('Krátký popisek. Bývá uveden v přehledech a pro vyhledávače.'));
-      $form->addElement($perex, $grpText);
-
-      /* titulní obrázek */
-      $elemImage = new Form_Element_ImageSelector('image', $this->tr('Titulní obrázek'));
-      $elemImage->setUploadDir(Category::getImageDir(Category::DIR_IMAGE, true));
-      $elemImage->setValues($this->category()->getCatDataObj()->{Model_Category::COLUMN_ICON});
-      $form->addElement($elemImage, $grpView);
+      if($mainText){
+         $perex = new Form_Element_TextArea('desc', $this->tr("Popis"));
+         $perex->setLangs();
+         $perex->setSubLabel($this->tr('Krátký popisek. Bývá uveden v přehledech a pro vyhledávače.'));
+         $form->addElement($perex, $grpText);
+         /* titulní obrázek */
+         $elemImage = new Form_Element_ImageSelector('image', $this->tr('Titulní obrázek'));
+         $elemImage->setUploadDir(Category::getImageDir(Category::DIR_IMAGE, true));
+         $elemImage->setValues($this->category()->getCatDataObj()->{Model_Category::COLUMN_ICON});
+         $form->addElement($elemImage, $grpView);
+      }
       
       if($rec instanceof Model_ORM_Record){
          $form->text->setValues($rec->{Text_Model::COLUMN_TEXT});
          $form->label->setValues($rec->{Text_Model::COLUMN_LABEL});
-         $form->desc->setValues( isset($rec->catdesc) ? $rec->catdesc : $this->category()->getDataObj()->{Model_Category::COLUMN_DESCRIPTION});
-         $form->image->setValues( isset($rec->catimg) ? $rec->catimg : $this->category()->getDataObj()->{Model_Category::COLUMN_IMAGE});
+         if($mainText){
+            $form->desc->setValues( isset($rec->catdesc) ? $rec->catdesc : $this->category()->getDataObj()->{Model_Category::COLUMN_DESCRIPTION});
+            $form->image->setValues( isset($rec->catimg) ? $rec->catimg : $this->category()->getDataObj()->{Model_Category::COLUMN_IMAGE});
+         }
       }
 
       // custom fileds
