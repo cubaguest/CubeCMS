@@ -1,18 +1,5 @@
 <?php 
-if(isset ($vars['link'])){
-   $link = (string)$vars['link'];
-} else if(isset ($this->linkBack) AND $this->linkBack != null){
-   $link = (string)$this->linkBack;
-} else {
-   $link = $this->l();
-}
-
-if(isset ($vars['text'])){
-   $text = $vars['text'];
-} else {
-   $text = $this->tr("Zpět");
-}
-?>
-<p class="buttonBack">
-   <a href="<?php echo $link?>" title="<?php echo $text?>"><span>&laquo;</span>&nbsp;<?php echo $text?></a>
-</p>
+/**
+ * @deprecated since version 8.1
+ */
+include dirname(__FILE__).DIRECTORY_SEPARATOR.'components'.DIRECTORY_SEPARATOR.'buttonback.phtml';
