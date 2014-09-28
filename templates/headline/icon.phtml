@@ -1,4 +1,5 @@
 <?php 
+return; 
 $icon = $alt = null;
 if (Template::pVar('HEADLINE_ICON') !== null) { // tohle asi mrsknout jinam do zvláštní šablony a loadovat  modulů
    $icon = $alt = Template::pVar('HEADLINE_ICON');
@@ -13,4 +14,3 @@ if (Template::pVar('HEADLINE_ICON') !== null) { // tohle asi mrsknout jinam do z
 if($icon != null){
    echo '<img src="' . $icon . '" alt="' . $alt . '" />';
 }
-?>
