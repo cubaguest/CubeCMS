@@ -7,91 +7,135 @@ class Actions_Controller extends Controller {
    const DEFAULT_TIMEWINDOW_TYPE = 'month';
 
    const PARAM_SHOW_EVENT_DIRECTLY = 'sed';
-
+   const PARAM_SHOW_ALL_EVENTS = 'sall';
 
    protected $action = null;
    /**
     * Kontroler pro zobrazení novinek
     */
-   public function mainController()
+   public function mainController($fromyear = null, $frommonth = null, $fromday = null, $toyear = null, $tomonth = null, $today = null)
    {
       //		Kontrola práv
       $this->checkReadableRights();
       if(!$this->category()->getParam(self::PARAM_SHOW_EVENT_DIRECTLY, false)){
-         $this->showEventsList();
+         $this->showEventsList($fromyear, $frommonth, $fromday, $toyear, $tomonth, $today);
       } else {
          // redirect to current event
          $model = new Actions_Model();
          $featured = $model->actualOnly($this->category()->getId())->record();
-         
+
          if($featured != false){
             $this->link()->route('detail', array('urlkey' => vve_get_lang_string($featured->{Actions_Model::COLUMN_URLKEY})))->reload();
          } else {
-            $this->showEventsList();
+            $this->showEventsList($fromyear, $frommonth, $fromday, $toyear, $tomonth, $today);
          }
       }
    }
-   
-   protected function showEventsList() 
+
+   protected function showEventsList($fromyear = null, $frommonth = null, $fromday = null, $toyear = null, $tomonth = null, $today = null)
    {
       // uložení datumu do session pokud existuje - kvuli návratu
       // odkaz zpět
       $this->link()->backInit();
-
-      if($this->getRequest('month') != null) {
-         $currentDateO = new DateTime($this->getRequest('year', date("Y")).'-'
-                         .$this->getRequest('month', date("m")).'-'
-                         .$this->getRequest('day', date("d")));
+      
+//      Debug::log($fromyear.'-'.$frommonth.'-'.$fromday, $toyear.'-'.$tomonth.'-'.$today);
+      
+      
+      $windowLen = $this->category()->getParam('time', self::DEFAULT_TIMEWINDOW);
+      $windowType = $this->category()->getParam('type', self::DEFAULT_TIMEWINDOW_TYPE);
+      
+      // výchozí posuny
+      $dateStart = new DateTime();
+      $dateEnd = new DateTime();
+//      $dateStart->setTime(0, 0, 0);
+      $dateEnd->setTime(23, 59, 59);
+      if(!$fromyear && !$frommonth && !$fromday){
       } else {
-         $currentDateO = new DateTime();
+         $dateStart->setTime(0, 0, 0);
+         if($frommonth && $fromday){
+            // rok, měs, den
+            $dateStart->setDate($fromyear, $frommonth, $fromday);
+            $dateEnd->setDate($fromyear, $frommonth, $fromday);
+            $windowType = 'day';
+         } else if($frommonth){
+            // rok, měs
+            $dateStart->setDate($fromyear, $frommonth, 1);
+            $dateEnd->setDate($fromyear, $frommonth, $dateStart->format('t'));
+            $windowType = 'month';
+         } else {
+            // rok
+            $dateStart->setDate($fromyear, 1, 1);
+            $dateEnd->setDate($fromyear, 12, 31);
+            $windowType = 'year';
+         }
+         $windowLen = 1;
       }
-
-      $dateNext = clone $currentDateO;
-      $datePrev = clone $currentDateO;
-      $time = $this->category()->getParam('time', self::DEFAULT_TIMEWINDOW);
-      switch (strtolower($this->category()->getParam('type', self::DEFAULT_TIMEWINDOW_TYPE))) {
-         case 'year':
-            $dateNext->modify("+".$time." year");
-            $datePrev->modify("-".$time." year");
-            $linkNextLabel = "+ ".$this->tr(array('%s rok','%s roky','%s let') ,(int)$time);
-            $linkBackLabel = "- ".$this->tr(array('%s rok','%s roky','%s let') ,(int)$time);
-            break;
-         case 'month':
-            $dateNext->modify("+".$time." month");
-            $datePrev->modify("-".$time." month");
-            $linkNextLabel = "+ ".$this->tr(array('%s měsíc','%s měsíce','%s měsíců') ,(int)$time);
-            $linkBackLabel = "- ".$this->tr(array('%s měsíc','%s měsíce','%s měsíců') ,(int)$time);
-            break;
-         case 'day':
-         default:
-            $dateNext->modify("+".$time." day");
-            $datePrev->modify("-".$time." day");
-            $linkNextLabel = "- ".$this->tr(array('%s den','%s dny','%s dnů') ,(int)$time);
-            $linkBackLabel = "- ".$this->tr(array('%s den','%s dny','%s dnů') ,(int)$time);
-            break;
+     
+      
+      if(!$toyear && !$tomonth && !$today){
+         // není datum konce - nastav podle časového okna
+         $c = clone $dateStart;
+         $c->modify('+ '.$windowLen.' '.$windowType);
+         $c->modify('-1 day');
+         $dateEnd->setDate($c->format('Y'), $c->format('m'), $c->format('d'));
+      } else {
+         if($tomonth && $today){
+            // rok, měs, den
+            $dateEnd->setDate($toyear, $tomonth, $today);    
+         } else if($tomonth){
+            // rok, měs
+            $dateEnd->setDate($toyear, $tomonth, 31);    
+         } else {
+            // rok
+            $dateEnd->setDate($toyear, 12, 31);    
+         }
       }
-
-      $acM = new Actions_Model_List();
-      $actions = $acM->getActions($this->category()->getId(), $currentDateO, $dateNext,
-              !$this->getRights()->isWritable());
-
-      $this->view()->actions = $actions->fetchAll();
-      $this->view()->dateFrom = $currentDateO;
-      $this->view()->dateTo = $dateNext;
-
-      // link další
-      $this->view()->linkNext = $this->link()->route('normaldate',
-            array('day' => $dateNext->format('j') , 'month' => $dateNext->format('n'),
-                  'year' => $dateNext->format('Y')));
-      $this->view()->linkNextLabel = $linkNextLabel;
-      // link předchozí
-      $this->view()->linkBack = $this->link()->route('normaldate',
-            array('day' => $datePrev->format('j') , 'month' => $datePrev->format('n'),
-                  'year' => $datePrev->format('Y')));
-      $this->view()->linkBackLabel = $linkBackLabel;
-
-      // načtení textu
-      $this->view()->text = $this->loadActionsText();
+      
+      // počítání nového okna z datuml a vytvoření datumů na předchozí a následující období
+      $datePrevStart = new DateTime();
+      $datePrevEnd = clone $dateStart;
+      $dateNextStart = clone $dateEnd;
+      $dateNextEnd = new DateTime();
+      
+      
+      if(!$this->category()->getParam(self::PARAM_SHOW_ALL_EVENTS, false)){
+         $actions = $this->getEvents($dateStart, $dateEnd);
+      } else {
+         $actions = $this->getAllEvents($dateStart, $dateEnd);
+      }
+      
+      $this->view()->actions = $actions;
+      $this->view()->windowType = $windowType;
+      $this->view()->windowLen = $windowLen;
+      $this->view()->dateStart = $dateStart;
+      $this->view()->dateEnd = $dateEnd;
+      
+      $modelAct = new Actions_Model();
+      $firstAct = $modelAct
+          ->where(Actions_Model::COLUMN_ID_CAT." = :idc", array('idc' => $this->category()->getId()))
+          ->order(array(Actions_Model::COLUMN_DATE_START))
+          ->record();
+      
+      $this->view()->firstActionDate = $firstAct ? new DateTime($firstAct->{Actions_Model::COLUMN_DATE_START}) : false;
+      return;
+   }
+   
+   protected function getEvents($dateStart, $dateEnd)
+   {
+      return Actions_Model::getActions(
+             $this->category()->getId(), // idc
+             $dateStart, $dateEnd, // rozsah
+             !Auth::isAdmin() // restrikca uživatele
+             );
+   }
+   
+   protected function getAllEvents()
+   {
+      $model = new Actions_Model();
+      return $model
+             ->where(Actions_Model::COLUMN_ID_CAT." = :idc", array('idc' => $this->category()->getId()))
+             ->order(array(Actions_Model::COLUMN_DATE_START, Actions_Model::COLUMN_TIME))
+             ->records();
    }
 
    protected function showEvent($urlkey = null)
@@ -109,7 +153,7 @@ class Actions_Controller extends Controller {
          ->where(Actions_Model::COLUMN_ID_CAT." = :idc AND (".Locales::getDefaultLang().")".Actions_Model::COLUMN_URLKEY." = :urlkey",
                array( 'urlkey' => $this->getRequest('urlkey'), 'idc' => $this->category()->getId() ) )
                ->record();
-         
+
          if($this->view()->action == false){
             throw new UnexpectedPageException();
          }
@@ -140,10 +184,10 @@ class Actions_Controller extends Controller {
          $date = new DateTime($this->view()->action->{Actions_Model::COLUMN_FORM_SHOW_TO});
          $curDate = new DateTime();
          $curDate->setTime(0, 0, 0);
-         if($this->view()->action->{Actions_Model::COLUMN_FORM_SHOW_TO} == null 
+         if($this->view()->action->{Actions_Model::COLUMN_FORM_SHOW_TO} == null
             || $date >= $curDate){
-            $this->view()->dForm = Forms_Controller::dynamicForm($this->view()->action->{Actions_Model::COLUMN_FORM}, 
-               array( 
+            $this->view()->dForm = Forms_Controller::dynamicForm($this->view()->action->{Actions_Model::COLUMN_FORM},
+               array(
                   'pagename'=> $this->view()->action->{Actions_Model::COLUMN_NAME},
                   ));
          }
@@ -160,7 +204,7 @@ class Actions_Controller extends Controller {
    {
       //		Kontrola práv
       $this->checkWritebleRights();
-   
+
       $rec = $this->loadTempEvent($this->getRequest('id'));
       if(!$rec ){
          $this->link()->route()->reload();
@@ -169,41 +213,39 @@ class Actions_Controller extends Controller {
       $this->view()->imagesDir = self::getActionImgDir($rec);
 
       $formPreview = new Form('text_preview_');
-      $grp = $formPreview->addGroup('preview', $this->tr('Co s textem?'));
-      
-      $elemActions = new Form_Element_Multi('action');
-      $elemActions->addElement(new Form_Element_Submit('back', $this->tr('Zpět k úpravě')));
-      $elemActions->addElement(new Form_Element_Submit('save', $this->tr('Uložit')));
+      $grp = $formPreview->addGroup('preview', $this->tr('Co s obsahem?'));
 
-      $eLang = new Form_Element_Select('lang', $this->tr('Jazyk'));
-      foreach (Locales::getAppLangsNames() as $lang => $name) {
-         $eLang->setOptions(array( $name => $lang), true);
-      }
-      $elemActions->addElement($eLang);
+      $elemSubmit = new Form_Element_SaveCancel('save', array($this->tr('Uložit'), $this->tr('Zpět k úpravě')) );
+      $elemSubmit->setCancelConfirm(false);
+      $formPreview->addElement($elemSubmit, $grp);
       
-      $formPreview->addElement($elemActions);
+//      $eLang = new Form_Element_Select('lang', $this->tr('Jazyk'));
+//      foreach (Locales::getAppLangsNames() as $lang => $name) {
+//         $eLang->setOptions(array( $name => $lang), true);
+//      }
+//      $elemActions->addElement($eLang);
+
+//      $formPreview->addElement($elemActions);
 
       if($formPreview->isSend()){
-         $actions = $formPreview->action->getValues();
-
-         if(isset($actions['save'])){
-            // store and show new event
-            $this->storeEvent($rec);
-            $this->infoMsg()->addMessage($this->tr('Událost byla uložena'));
-            $this->link()->route('detail', array('urlkey' => $rec->{Actions_Model::COLUMN_URLKEY} ))->param('tmp')->reload();
-         } else if(isset($actions['back'])){
+         if($formPreview->save->getValues() == false){
             // rediret to edit
             if($this->getRequest('id') == 0){
                $this->link()->route('add')->param('tmp', true)->reload();
             } else {
                $this->link()->route('edit', array('urlkey' => $rec->{Actions_Model::COLUMN_URLKEY}) )->param('tmp', true)->reload();
             }
+         } else {
+            // store and show new event
+            $this->storeEvent($rec);
+            $this->infoMsg()->addMessage($this->tr('Událost byla uložena'));
+            $this->link()->route('detail', array('urlkey' => $rec->{Actions_Model::COLUMN_URLKEY} ))->param('tmp')->reload();
          }
       }
-   
+
       $this->view()->formPreview = $formPreview;
    }
-   
+
    protected function deleteAction($action)
    {
       $this->deleteActionData($action);
@@ -298,7 +340,7 @@ class Actions_Controller extends Controller {
       if($form->isValid()) {
          $model = new Actions_Model();
          $event = $model->newRecord();
-         
+
          // vybrání exist. obrázku
          if(isset ($form->titleImage)){
             $event->{Actions_Model::COLUMN_IMAGE} = $form->titleImage->getValues();
@@ -306,13 +348,13 @@ class Actions_Controller extends Controller {
          // pokud je nový obr nahrajeme jej
          if($form->image->getValues() != null) {
             $imageObj = new File_Image($form->image);
-            $crop = $this->category()->getParam('img_crop', VVE_ARTICLE_TITLE_IMG_C) == true 
-               ? File_Image_Base::RESIZE_CROP : File_Image_Base::RESIZE_AUTO;
-            $imageObj->getData()->resize(
-               $this->category()->getParam('img_width', VVE_ARTICLE_TITLE_IMG_W), 
-               $this->category()->getParam('img_height', VVE_ARTICLE_TITLE_IMG_H), 
-               $crop
-               )->save();
+//            $crop = $this->category()->getParam('img_crop', VVE_ARTICLE_TITLE_IMG_C) == true
+//               ? File_Image_Base::RESIZE_CROP : File_Image_Base::RESIZE_AUTO;
+//            $imageObj->getData()->resize(
+//               $this->category()->getParam('img_width', VVE_ARTICLE_TITLE_IMG_W),
+//               $this->category()->getParam('img_height', VVE_ARTICLE_TITLE_IMG_H),
+//               $crop
+//               )->save();
             $imageObj->move(AppCore::getAppDataDir().VVE_ARTICLE_TITLE_IMG_DIR);
             $event->{Actions_Model::COLUMN_IMAGE} = $imageObj->getName();
          }
@@ -345,7 +387,7 @@ class Actions_Controller extends Controller {
       $event = $model->where(Actions_Model::COLUMN_ID_CAT." = :idc AND ".Actions_Model::COLUMN_URLKEY." = :urlkey",
          array( 'urlkey' => $this->getRequest('urlkey'), 'idc' => $this->category()->getId() ) )
          ->record();
-      
+
       if(!$event) {
          $event = $model->where(Actions_Model::COLUMN_ID_CAT." = :idc AND (".Locales::getDefaultLang().")".Actions_Model::COLUMN_URLKEY." = :urlkey",
             array( 'urlkey' => $this->getRequest('urlkey'), 'idc' => $this->category()->getId() ) )
@@ -372,7 +414,7 @@ class Actions_Controller extends Controller {
             $this->view()->previewLinkCancel = $this->link()->param('tmpclear', true);
          }
       }
-      
+
       $form = $this->createForm($event, true);
 
       // kontrola integrity data
@@ -387,23 +429,6 @@ class Actions_Controller extends Controller {
          }
       }
       if($form->isValid()) {
-         // vybrání exist. obrázku
-         if(isset ($form->titleImage)){
-            $event->{Actions_Model::COLUMN_IMAGE} = $form->titleImage->getValues();
-         }
-         // pokud je nový obr nahrajeme jej
-         if($form->image->getValues() != null) {
-            $imageObj = new File_Image($form->image);
-            $crop = $this->category()->getParam('img_crop', VVE_ARTICLE_TITLE_IMG_C) == true ? File_Image_Base::RESIZE_CROP : File_Image_Base::RESIZE_AUTO;
-            $imageObj->getData()->resize(
-               $this->category()->getParam('img_width', VVE_ARTICLE_TITLE_IMG_W), 
-               $this->category()->getParam('img_height', VVE_ARTICLE_TITLE_IMG_H), 
-               $crop
-               )->save();
-            $imageObj->move(AppCore::getAppDataDir().VVE_ARTICLE_TITLE_IMG_DIR);
-            $event->{Actions_Model::COLUMN_IMAGE} = $imageObj->getName();
-         }
-
          if($form->send->getValues() == 'save'){
             $this->storeEvent($event, $form);
             $this->infoMsg()->addMessage($this->tr('Událost byla uložena'));
@@ -431,7 +456,7 @@ class Actions_Controller extends Controller {
       $form = new Form('action_');
 
       $fGrpBase = $form->addGroup('base', $this->tr('Základní informace'));
-      
+
       $eName = new Form_Element_Text('name', $this->tr('Název'));
       $eName->setLangs();
       $eName->addValidation(new Form_Validator_NotEmpty(null, Locales::getDefaultLang(true)));
@@ -453,7 +478,7 @@ class Actions_Controller extends Controller {
       $eNote->setLangs();
       $eNote->html()->setAttrib('size', 50);
       $form->addElement($eNote, $fGrpBase);
-      
+
       $fGrpParams = $form->addGroup('params', $this->tr('Parametry konání'));
 
       $eDateS = new Form_Element_Text('date_start', $this->tr('Od'));
@@ -484,35 +509,21 @@ class Actions_Controller extends Controller {
       $form->addElement($ePrePrice, $fGrpParams);
 
       $fGrpOther = $form->addGroup('other', $this->tr('Ostatní'));
-      
+
       $ePub = new Form_Element_Checkbox('public', $this->tr('Veřejný'));
       $ePub->setSubLabel($this->tr('Veřejný - viditelný všem návštěvníkům'));
       $ePub->setValues(true);
       $form->addElement($ePub, $fGrpOther);
-      
-      $eFile = new Form_Element_File('image', $this->tr('Obrázek'));
-      $eFile->addValidation(new Form_Validator_FileExtension(array('jpg', 'png')));
-      $form->addElement($eFile, $fGrpOther);
 
-      if(is_dir(AppCore::getAppDataDir().VVE_ARTICLE_TITLE_IMG_DIR)){
-         $images = glob(AppCore::getAppDataDir().VVE_ARTICLE_TITLE_IMG_DIR.DIRECTORY_SEPARATOR . "*.{jpg,gif,png,JPG,GIF,PNG}", GLOB_BRACE);
-         //print each file name
-         if(!empty ($images)){
-            $elemImgSel = new Form_Element_Select('titleImage', $this->tr('Uložené obrázky'));
-            $elemImgSel->setOptions(array($this->tr('Žádný') => null));
-            
-            foreach($images as $image) {
-               $elemImgSel->setOptions(array(basename($image) => basename($image)), true);
-            }
-            $form->addElement($elemImgSel, $fGrpOther);
-         }
-      }
+      $elemImage = new Form_Element_ImageSelector('image', $this->tr('Titulní obrázek'));
+      $elemImage->setUploadDir(Utils_CMS::getTitleImagePath(false));
+      $form->addElement($elemImage, $fGrpParams);
 
       $eUrlKey = new Form_Element_Text('urlkey', $this->tr('Url klíč'));
       $eUrlKey->setLangs();
       $eUrlKey->setSubLabel($this->tr('Pokud není klíč zadán, je generován automaticky'));
       $form->addElement($eUrlKey, $fGrpOther);
-      
+
       $fModel = new Forms_Model();
       $forms = $fModel->getForms();
       if(!empty($forms)){
@@ -522,7 +533,7 @@ class Actions_Controller extends Controller {
             $eForm->setOptions(array($f->{Forms_Model::COLUMN_ID} => $f->{Forms_Model::COLUMN_NAME}), true);
          }
          $form->addElement($eForm, $fGrpOther);
-         
+
          $eFormShowTo = new Form_Element_Text('formShowToDate', $this->tr('Formulář zobrazit do'));
          $eFormShowTo->setSubLabel($this->tr('Pro neomezené zobrazení formuláře nechte prázdné'));
          $eFormShowTo->addValidation(new Form_Validator_Date());
@@ -537,9 +548,9 @@ class Actions_Controller extends Controller {
       $submits->addElement(new Form_Element_Submit('save', $this->tr('Uložit')));
       $submits->addElement(new Form_Element_Submit('preview', $this->tr('Náhled')));
       $form->addElement($submits);
-      
 
-      if ($actRecord != null){
+
+      if ($actRecord instanceof Model_ORM_Record){
          $form->name->setValues($actRecord->{Actions_Model::COLUMN_NAME});
          $form->text->setValues($actRecord->{Actions_Model::COLUMN_TEXT});
          $form->note->setValues($actRecord->{Actions_Model::COLUMN_NOTE});
@@ -558,15 +569,10 @@ class Actions_Controller extends Controller {
          $form->preprice->setValues($actRecord->{Actions_Model::COLUMN_PREPRICE});
          $form->author->setValues($actRecord->{Actions_Model::COLUMN_AUTHOR});
          $form->subname->setValues($actRecord->{Actions_Model::COLUMN_SUBANME});
-         if(isset ($form->titleImage)){
-            $form->titleImage->setValues($actRecord->{Actions_Model::COLUMN_IMAGE});
+         if($form->image){
+            $form->image->setValues($actRecord->{Actions_Model::COLUMN_IMAGE});
          }
-         if($actRecord->{Actions_Model::COLUMN_IMAGE} == null) {
-            $form->image->setSubLabel($this->tr('Źádný obrázek'));
-         } else {
-            $form->image->setSubLabel($actRecord->{Actions_Model::COLUMN_IMAGE});
-         }
-      
+
          if(isset ($form->form)){
             $form->form->setValues($actRecord->{Actions_Model::COLUMN_FORM});
             if($actRecord->{Actions_Model::COLUMN_FORM_SHOW_TO} != null){
@@ -574,7 +580,7 @@ class Actions_Controller extends Controller {
             }
          }
       }
-      
+
       return $form;
    }
 
@@ -606,6 +612,12 @@ class Actions_Controller extends Controller {
          $eventRec->{Actions_Model::COLUMN_ID_USER} = Auth::getUserId();
          $eventRec->{Actions_Model::COLUMN_PUBLIC} = $form->public->getValues();
 
+         // pokud je nový obr nahrajeme jej
+         if($form->image->getValues() != null) {
+            $img = $form->image->getValues();
+            $eventRec->{Actions_Model::COLUMN_IMAGE} = $img['name'];
+         }
+         
          if(isset($form->form)){
             $eventRec->{Actions_Model::COLUMN_FORM} = $form->form->getValues();
             $eventRec->{Actions_Model::COLUMN_FORM_SHOW_TO} = $form->formShowToDate->getValues();
@@ -635,9 +647,9 @@ class Actions_Controller extends Controller {
          }
          $model->save($eventRec);
          $this->clearTempEvent( $eventRec->getPK() );
-      }   
+      }
    }
-   
+
    /**
     * Metoda vygeneruje url klíče
     * @param <type> $urlkeys
@@ -658,29 +670,29 @@ class Actions_Controller extends Controller {
       }
       return $urlkeys;
    }
-   
+
    protected function createUniqueUrlKey($key, $lang, $id = 0)
    {
       if($key == null){
          return null;
       }
-      
+
       $model = new Actions_Model();
       $step = 1;
       $key = vve_cr_url_key($key);
       $origPart = $key;
-      
+
       $where = '('.$lang.')'.Actions_Model::COLUMN_URLKEY.' = :ukey AND '.Actions_Model::COLUMN_ID.' != :id';
       $keys = array('ukey' => $key, 'id' => (int)$id);// when is nul bad sql query is created
-      
+
       while ($model->where($where, $keys)->count() != 0 ) {
          $keys['ukey'] = $origPart.'-'.$step;
          $step++;
       }
-      
+
       return $keys['ukey'];
    }
-   
+
    public function editLabelController() {
       $this->checkControllRights();
       $form = new Form('modlabel');
@@ -691,7 +703,7 @@ class Actions_Controller extends Controller {
 
       $elemS = new Form_Element_SaveCancel('save');
       $form->addElement($elemS);
-      
+
       if($form->isSend() AND $form->save->getValues() == false){
           $this->link()->route()->reload();
       }
@@ -700,12 +712,12 @@ class Actions_Controller extends Controller {
          $textM = new Text_Model();
          $text = $textM->where(Text_Model::COLUMN_ID_CATEGORY." = :idc", array('idc' => $this->category()->getId()))
             ->setSelectAllLangs(true)->record();
-         
+
          if(!$text){
             $text = $textM->newRecord();
             $text->{Text_Model::COLUMN_ID_CATEGORY} = $this->category()->getId();
          }
-         
+
          $text->{Text_Model::COLUMN_ID_USER_EDIT} = Auth::getUserId();
          $text->{Text_Model::COLUMN_TEXT} = $form->text->getValues();
          $text->{Text_Model::COLUMN_TEXT} = vve_strip_tags( $form->text->getValues() );
@@ -752,7 +764,7 @@ class Actions_Controller extends Controller {
       }
       return false;
    }
-    
+
    protected function clearTempEvent($ida = 0)
    {
       $f = $this->getTempFileName($ida);
@@ -760,23 +772,23 @@ class Actions_Controller extends Controller {
          @unlink($f);
       }
    }
-    
+
    protected function isTempRecord($ida = 0)
    {
       $f = $this->getTempFileName($ida);
       return ( is_file($f) && filesize($f) > 0 );
    }
-   
-   protected function getTempFileName($ida = 0) 
+
+   protected function getTempFileName($ida = 0)
    {
       return AppCore::getAppCacheDir()."_prew_c".$this->category()->getId().'_'.(int)$ida."_u".Auth::getUserId().".tmp";
    }
-   
+
    public static function getActionImgDir(Model_ORM_Record $action)
    {
       return $action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()];
    }
-   
+
    protected function settings(&$settings,Form &$form) {
       $elemTimeWindow = new Form_Element_Text('time', 'Délka časového okna');
       $elemTimeWindow->setSubLabel('Udává délku časového okna, pomocí kterého se vybírají zobrazené události.<br /> Výchozí: '.self::DEFAULT_TIMEWINDOW.'');
@@ -800,15 +812,23 @@ class Actions_Controller extends Controller {
          $form->show_event_directly->setValues($settings[self::PARAM_SHOW_EVENT_DIRECTLY]);
       }
 
+      $elemShowAllEvents = new Form_Element_Checkbox('show_all_events', 'Zobrazit všechny události');
+      $elemShowAllEvents->setValues(false);
+      $form->addElement($elemShowAllEvents, 'view');
+      if(isset($settings[self::PARAM_SHOW_ALL_EVENTS])) {
+         $form->show_event_directly->setValues($settings[self::PARAM_SHOW_ALL_EVENTS]);
+      }
+
       if(isset($settings['type'])) {
          $form->type->setValues($settings['type']);
       } else {
          $form->type->setValues(self::DEFAULT_TIMEWINDOW_TYPE);
       }
-      
+
       if($form->isValid()) {
          $settings['time'] = $form->time->getValues();
          $settings[self::PARAM_SHOW_EVENT_DIRECTLY] = $form->show_event_directly->getValues();
+         $settings[self::PARAM_SHOW_ALL_EVENTS] = $form->show_all_events->getValues();
          // protože je vždy hodnota
          if($form->type->getValues() != self::DEFAULT_TIMEWINDOW_TYPE){
             $settings['type'] = $form->type->getValues();
@@ -818,4 +838,3 @@ class Actions_Controller extends Controller {
       }
    }
 }
-?>
