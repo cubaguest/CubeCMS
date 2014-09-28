@@ -4,6 +4,7 @@ class Form_Element_ImagesUploader extends Form_Element_File {
    protected $maxFileSize = 2097152;
    
    protected $inputDir;
+   protected $imagesKey = null;
 
    public function __construct($name, $label = null, $prefix = null)
    {
@@ -30,6 +31,11 @@ class Form_Element_ImagesUploader extends Form_Element_File {
       $this->inputDir->setValues($dir);
    }
 
+   public function setImagesKey($key)
+   {
+      $this->imagesKey = $key;
+   }
+   
    public function control($renderKey = null) 
    {
       $rKey = $renderKey != null ? $renderKey : $this->renderedId;
@@ -80,9 +86,13 @@ class Form_Element_ImagesUploader extends Form_Element_File {
       }
       
       $componentDZ = new Component_Dropzone();
+      if(!$this->isMultiple()){
+         $componentDZ->setConfig('maxFiles', 1);
+      }
       $componentDZ->setConfig('selector', '#dropzone-'.$this->renderedId);
       $componentDZ->setConfig('postData',array('target' => 'path') );
       $componentDZ->setConfig('path', $this->inputDir->getValues() );
+      $componentDZ->setConfig('imageskey', $this->imagesKey );
       
       $inputWrap->setContent($container);
       $wrap->addContent($inputWrap);

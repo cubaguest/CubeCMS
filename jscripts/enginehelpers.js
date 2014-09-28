@@ -35,6 +35,7 @@ CubeCMS = {
       this.Loader.init();
       this.ToolBox.init();
       this.Form.init();
+      this.Modal.init();
    }
 };
 
@@ -222,6 +223,21 @@ CubeCMS.Tools = {
       } while (fileSizeInBytes > 1024);
 
       return Math.max(fileSizeInBytes, 0.1).toFixed(1) + byteUnits[i];
+   },
+   
+   /**
+    * Vrátí veliksot scrollbaru
+    * @return int
+    */
+   getScrollBarWidth : function(){
+      // Create the measurement node
+      var scrollDiv = document.createElement("div");
+      scrollDiv.className = "scrollbar-measure";
+      document.body.appendChild(scrollDiv);
+      // Get the scrollbar width
+      var scrollbarWidth = scrollDiv.offsetWidth - scrollDiv.clientWidth;
+      document.body.removeChild(scrollDiv);
+      return scrollbarWidth;
    }
 };
 
@@ -620,6 +636,37 @@ CubeCMS.Form = {
       });
       
       
+   }
+};
+
+CubeCMS.Modal = {
+   init : function(){
+      $('body').on('click', '.cubecms-modal .close-modal',function(){
+         CubeCMS.Modal.close($(this).closest('.cubecms-modal'));
+         return false;
+      }).on('click', '.modal-open-button', function(){
+         CubeCMS.Modal.open( $( $(this).data('modal') ) );
+         return false;
+      });
+      // assign modal size id defined
+      $('.cubecms-modal').each(function(){
+         
+      });
+   },
+   open : function($target){
+      $target = $($target);
+      if($target.length > 0){
+         $("body").addClass('cubecms-modal-open').css({paddingRight : CubeCMS.Tools.getScrollBarWidth()});
+         $target.fadeIn(200);
+      }
+   },
+   close : function($target){
+      $target = $($target);
+      if($target.length > 0){
+         $target.fadeOut(200, function(){
+            $("body").removeClass('cubecms-modal-open').css({paddingRight : 0});
+         });
+      }
    }
 };
 

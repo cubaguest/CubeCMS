@@ -191,6 +191,10 @@ class Form_Decorator implements Form_Decorator_Interface {
          $sublabel->addClass('help-block');
          $cell->addContent($sublabel);
       }
+      $scripts = $element->scripts();
+      if($scripts != null){
+         $cell->addContent(new Html_Element_Script($scripts));
+      }
       
       return $cell;
    }
@@ -235,6 +239,7 @@ class Form_Decorator implements Form_Decorator_Interface {
           ->setAttrib('role', 'form');
       // kontrolní prvky
       $pHtml = new Html_Element('div', $form->elementCheckForm->control());
+      $pHtml->addContent($form->elementFormID->control());
       if($form->protectForm && $form->elementToken instanceof Form_Element_Token){
          $pHtml->addContent((string)$form->elementToken->controll());
       }

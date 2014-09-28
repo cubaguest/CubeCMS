@@ -3,13 +3,14 @@
  */
 
 @color-primary: #0080FF;
-@color-border: #aaa;
+@color-border: #ccc;
 @color-border-hover: #999;
 @color-border-important: #fc4949;
 @color-text: #666;
 @color-text-hover: #fff;
 @color-text-hover-alt: darken(@color-text, 50);
 @color-text-gray: #333;
+@color-text-important: #FF3323;
 @color-bg: #fff;
 @color-bg-header: #fff;
 @color-bg-content: #fff;
@@ -17,11 +18,14 @@
 @color-bg-hover-light: lighten(@color-bg-hover, 30%);
 @color-bg-important: #FF3323;
 @color-bg-gray: #efefef;
+@color-bg-gray-dark: darken(@color-bg-gray, 30%);
 
 @color-bg-hightlight: #FFF7B4;
 @color-border-hightlight: darken(@color-bg-hightlight, 30%);
 
 @font-size: 16px;
+@font-size-small: @font-size - 2;
+@font-size-large: @font-size + 2;
 @font-family: Candara, Calibri, Segoe, "Segoe UI", Optima, Arial, sans-serif;
 
 @border-radius: 5px;
@@ -32,7 +36,7 @@
 @padding-small: 5px;
 @padding-base-vertical: @padding-base;
 
-.rounded-corners(@radius: 5px) {
+.rounded-corners(@radius: @border-radius) {
    border-radius: @radius;
    -webkit-border-radius: @radius;
    -moz-border-radius: @radius;
@@ -53,3 +57,10 @@
    -moz-box-shadow: 0px 0px 4px 1px rgba(0,0,0,0.75);
    box-shadow: 0px 0px 4px 1px rgba(0,0,0,0.75);
 }
+// elemtn
+.inner-box-sahadow() { 
+   -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
+   -moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
+   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
+}
+

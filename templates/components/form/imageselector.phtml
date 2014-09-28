@@ -1,0 +1,23 @@
+<div class="cubecms-modal image-selector-modal" data-width="400" data-height="400" role="dialog" id="modal-image-selector-<?php echo $this->elementName.'_'.$this->rKey;?>" >
+   <div class="cubecms-modal-dialog">
+    <div class="cubecms-modal-content">
+      <div class="cubecms-modal-header">
+        <button type="button" class="close-modal" data-dismiss="cubecms-modal"><span aria-hidden="true">&times;</span></button>
+        <span class="cubecms-modal-title"><?php ps($this->tr('Uložené obrázky')); ?></span>
+      </div>
+      <div class="cubecms-modal-body clearfix">
+         <a class="modal-image-selector-image <?php echo $this->selected == "" ? "active" : ""?>" href="<?php echo $this->link()?>#" data-value=""
+               ><img src="<?php echo Utils_Image::cache(Utils_Url::pathToSystemUrl(AppCore::getAppLibDir()).Template::IMAGES_DIR."/no_image.png", 80, 80)?>" alt="" /></a>
+         <?php foreach($this->images as $img) {
+            ?>
+         <a class="modal-image-selector-image <?php echo $this->selected == $img ? "active" : ""?>" href="<?php echo $this->link()?>#" data-value="<?php echo $img?>"
+               ><img src="<?php echo Utils_Image::cache($this->imgurl.$img, 80, 80)?>" alt="" /></a>
+         <?php }?>
+      </div>
+      <div class="cubecms-modal-footer">
+         <button type="button" class="btn btn-default close-modal" data-dismiss="modal"><?php ps($this->tr('Zavřít')); ?></button>
+      </div>
+    </div>
+  </div>
+</div>
+

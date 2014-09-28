@@ -14,11 +14,11 @@
  * @abstract      Třída pro obsluhu formulářového prvku typu Input-Text
  */
 class Form_Element_File extends Form_Element {
-/**
- * Adresář pro upload souborů
- * @var string
- */
-   private $uploadDir = null;
+   /**
+    * Adresář pro upload souborů
+    * @var string
+    */
+   protected $uploadDir = null;
 
    private $overWrite = true;
    
@@ -90,8 +90,8 @@ class Form_Element_File extends Form_Element {
             $this->isValid(false);
          } else {
             // kontrola adresáře
-            $dir = new Filesystem_Dir($this->getUploadDir());
-            $dir->checkDir();
+            $dir = new FS_Dir($this->getUploadDir());
+            $dir->check();
             if(!$this->overWrite){
                $saveFileName = File::creatUniqueName($saveFileName, $dir);
             }
@@ -297,7 +297,7 @@ class Form_Element_File extends Form_Element {
    /**
     * Metoda naplní ovjekt typu file
     * @param string $className -- název třídy která se má vytvořit
-    * @return Filesystem_File -- objekt douboru
+    * @return File -- objekt douboru
     * @todo -- dořešit
     */
    public function createFileObject($className = null) {

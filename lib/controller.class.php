@@ -622,46 +622,15 @@ abstract class Controller extends TrObject {
       }
       
       // ostatní nastavení
-      /* IKONA uploadnutá */
-      $elemIconImageSelect = new Form_Element_Select('iconUploaded', $this->tr('Přiřazený titulní obrázek/ikona'));
-      $elemIconImageSelect->setOptions(array( $this->tr('žádný') => 'none'));
-      if(file_exists(Category::getImageDir(Category::DIR_ICON, true))){
-         $dirIterator = new DirectoryIterator(Category::getImageDir(Category::DIR_ICON, true));
-         foreach ($dirIterator as $item) {
-            if($item->isDir() OR $item->isDot()) continue;
-            $elemIconImageSelect->setOptions(array($item->getFilename() => $item->getFilename()), true);
-         }
-      }
-      if($this->category()->getCatDataObj()->{Model_Category::COLUMN_ICON} != null){
-         $elemIconImageSelect->setValues($this->category()->getCatDataObj()->{Model_Category::COLUMN_ICON});
-      }
-      $form->addElement($elemIconImageSelect, $grpImages);
-      /* IKONA */
-      $elemIcon = new  Form_Element_File('icon', $this->tr('Titulní obrázek/ Ikona'));
-      $elemIcon->setUploadDir(Category::getImageDir(Category::DIR_ICON, true));
-      $elemIcon->addValidation(new Form_Validator_FileExtension('jpg;png;gif'));
-      $form->addElement($elemIcon,$grpImages);
-
+      $elemImage = new Form_Element_ImageSelector('image', $this->tr('Titulní obrázek'));
+      $elemImage->setUploadDir(Category::getImageDir(Category::DIR_IMAGE, true));
+      $elemImage->setValues($this->category()->getCatDataObj()->{Model_Category::COLUMN_IMAGE});
+      $form->addElement($elemImage, $grpImages);
       
-      /* POZADí uploadnuté */
-      $elemBackImageSelect = new Form_Element_Select('backgroundUploaded', $this->tr('Přiřazené pozadí'));
-      $elemBackImageSelect->setOptions(array( $this->tr('žádné') => 'none'));
-      if(file_exists(Category::getImageDir(Category::DIR_BACKGROUND, true))){
-         $dirIterator = new DirectoryIterator(Category::getImageDir(Category::DIR_BACKGROUND, true));
-         foreach ($dirIterator as $item) {
-            if($item->isDir() OR $item->isDot()) continue;
-            $elemBackImageSelect->setOptions(array($item->getFilename() => $item->getFilename()), true);
-         }
-      }
-      if($this->category()->getCatDataObj()->{Model_Category::COLUMN_BACKGROUND} != null){
-         $elemBackImageSelect->setValues($this->category()->getCatDataObj()->{Model_Category::COLUMN_BACKGROUND});
-      }
-      $form->addElement($elemBackImageSelect, $grpImages);
-      /* POZADí */
-      $elemBackImage = new  Form_Element_File('background', $this->tr('Nahrání pozadí'));
-      $elemBackImage->setUploadDir(Category::getImageDir(Category::DIR_BACKGROUND, true));
-      $elemBackImage->addValidation(new Form_Validator_FileExtension('jpg;png;gif'));
-      $form->addElement($elemBackImage,$grpImages);
+      $elemBg = new Form_Element_ImageSelector('background', $this->tr('Přiřazené pozadí'));
+      $elemBg->setUploadDir(Category::getImageDir(Category::DIR_BACKGROUND, true));
+      $elemBg->setValues($this->category()->getCatDataObj()->{Model_Category::COLUMN_BACKGROUND});
+      $form->addElement($elemBg, $grpImages);
       
       /* nástroje pro sdílení */
       $elemShareTools = new Form_Element_Checkbox('shareTools', $this->tr('Nástroje pro sdílení obsahu'));
@@ -698,25 +667,13 @@ abstract class Controller extends TrObject {
          $categoryM = new Model_Category();
          $catRec = $categoryM->record($this->category()->getId());
 
-         // ikona
-         if($form->iconUploaded->getValues() == 'none' AND $form->icon->getValues() == null) {
-            $catRec->{Model_Category::COLUMN_ICON} = null;
-         } else if($form->icon->getValues() != null) {
-            $f = $form->icon->getValues();
-            $catRec->{Model_Category::COLUMN_ICON} = $f['name'];
-         } else if($form->iconUploaded->getValues() != 'none'){
-            $catRec->{Model_Category::COLUMN_ICON} = $form->iconUploaded->getValues();
-         }
+         // titulní obrázek
+         $image = $form->image->getValues();
+         $catRec->{Model_Category::COLUMN_IMAGE} = $image ? $image['name'] : "";
 
          // background
-         if($form->backgroundUploaded->getValues() == 'none' AND $form->background->getValues() == null) {
-            $catRec->{Model_Category::COLUMN_BACKGROUND} = null;
-         } else if($form->background->getValues() != null) {
-            $f = $form->background->getValues();
-            $catRec->{Model_Category::COLUMN_BACKGROUND} = $f['name'];
-         } else if($form->backgroundUploaded->getValues() != 'none'){
-            $catRec->{Model_Category::COLUMN_BACKGROUND} = $form->backgroundUploaded->getValues();
-         }
+         $bg = $form->background->getValues();
+         $catRec->{Model_Category::COLUMN_BACKGROUND} = $bg ? $bg['name'] : "";
 
          // uložení šablon
          foreach ($tplElements as $eName) {

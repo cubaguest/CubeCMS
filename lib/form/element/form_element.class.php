@@ -442,8 +442,16 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * Metoda nastaví prefix elementu
     * @param string $prefix -- prefix elementu ve formuláři
     */
-   final public function setPrefix($prefix) {
+   public function setPrefix($prefix) {
       $this->formElementPrefix = $prefix.$this->formElementPrefix;
+   }
+   
+   /**
+    * Metoda vrací prefix elementu
+    * @return string -- prefix elementu ve formuláři
+    */
+   public function getPrefix() {
+      return $this->formElementPrefix;
    }
 
    /**
@@ -451,7 +459,7 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * @param int $id
     * @return Form_Element
     */
-   final public function setRenderID($id)
+   public function setRenderID($id)
    {
       $this->renderedId = $id;
       return $this;

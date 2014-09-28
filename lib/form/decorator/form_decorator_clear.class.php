@@ -111,6 +111,10 @@ class Form_Decorator_Clear implements Form_Decorator_Interface {
    {
       $string = null;
       $string .= $element->control();
+      $scripts = $element->scripts();
+      if($scripts != null){
+         $string .= new Html_Element_Script($scripts);
+      }
       return $string;
    }
    
@@ -126,6 +130,7 @@ class Form_Decorator_Clear implements Form_Decorator_Interface {
       $html->addClass('form-inline');
       // kontrolní prvky
       $html->addContent($form->elementCheckForm->control());
+      $html->addContent($form->elementFormID->control());
       if($form->protectForm && $form->elementToken instanceof Form_Element_Token){
          $html->addContent($form->elementToken->controll());
       }

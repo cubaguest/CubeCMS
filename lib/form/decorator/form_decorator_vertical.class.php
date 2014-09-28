@@ -23,6 +23,7 @@ class Form_Decorator_Vertical extends Form_Decorator implements Form_Decorator_I
           ->setAttrib('role', 'form');
       // kontrolní prvky
       $pHtml = new Html_Element('div', $form->elementCheckForm->control());
+      $pHtml->addContent($form->elementFormID->control());
       if($form->protectForm && $form->elementToken instanceof Form_Element_Token){
          $pHtml->addContent((string)$form->elementToken->controll());
       }

@@ -70,6 +70,7 @@ class Form extends TrObject implements ArrayAccess, Iterator {
     * @var Form_Element_Hidden
     */
    public $elementCheckForm = null;
+   public $elementFormID = null;
    public $protectForm = false;
    public $elementToken = null;
    
@@ -92,6 +93,8 @@ class Form extends TrObject implements ArrayAccess, Iterator {
       $this->setSendMethod();
       $this->elementCheckForm = new Form_Element_Hidden('_'.$prefix.'_check');
       $this->elementCheckForm->setValues('send');
+      $this->elementFormID = new Form_Element_Hidden('_'.$prefix.'_formid');
+      $this->elementFormID->setValues(md5(microtime(true).$_SERVER['HTTP_USER_AGENT']));
       $this->protectForm = $protectForm;
       $this->setProtected($protectForm);
    }
@@ -186,6 +189,7 @@ class Form extends TrObject implements ArrayAccess, Iterator {
    public function renderStart() {
       $cnt = $this->html()->__toStringBegin();
       $p = new Html_Element('div', (string)$this->elementCheckForm->controll());
+      $p->addContent((string)$this->elementFormID->control());
       if($this->elementToken !== null){
          $p->addContent((string)$this->elementToken->controll());
       }
@@ -336,7 +340,10 @@ class Form extends TrObject implements ArrayAccess, Iterator {
                sprintf($this->tr("Bylo odesláno více dat než je možné přijmout. Maximálně lze odeslat %s."), vve_create_size_str(VVE_MAX_UPLOAD_SIZE) ) );
          }
       }
-      if($this->isSend == true) $this->populate();
+      if($this->isSend == true) {
+         $this->elementFormID->populate();
+         $this->populate();
+      }
       return $this->isSend;
    }
 
@@ -369,7 +376,7 @@ class Form extends TrObject implements ArrayAccess, Iterator {
     */
    public function populate() {
       $this->isPopulated = false;
-      foreach ($this->elements as $name => $element) {
+      foreach ($this->elements as $element) {
          if(!$element->isPopulated()){
             $element->populate();
          }
@@ -603,6 +610,14 @@ class Form extends TrObject implements ArrayAccess, Iterator {
     */
    public function getFormChecker() {
       return $this->elementCheckForm;
+   }
+   
+   /**
+    * Metoda vrací element identifikátoru formuláře
+    * @return Form_Element_Hidden
+    */
+   public function getFormID() {
+      return $this->elementFormID;
    }
 
    /*

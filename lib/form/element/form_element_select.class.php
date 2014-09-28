@@ -112,6 +112,7 @@ class Form_Element_Select extends Form_Element {
    public function control($renderKey = null) {
       $rKey = $renderKey != null ? $renderKey : $this->renderedId;
       $this->html()->clearContent();
+      $this->html()->addClass('form-control');
       if($this->isDimensional()){
          if($this->isMultiple) {
             $this->html()->setAttrib('name', $this->getName()."[".$this->dimensional."][]");
