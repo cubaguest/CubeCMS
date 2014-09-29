@@ -16,8 +16,8 @@ class Category_Core extends TrObject {
     * Název adresáře s ikonou kategorie
     */
    const DIR_IMAGES = 'categories';
-   const DIR_ICON = 'icons';
-   const DIR_IMAGE = 'icons';
+   const DIR_ICON = 'icon';
+   const DIR_IMAGE = 'title-images' ;
    const DIR_BACKGROUND = 'backgrounds';
    
    const IMAGE_TITLE = 'title';
@@ -300,7 +300,7 @@ class Category_Core extends TrObject {
     */
    public static function getCatIconDir()
    {
-      return self::getImageDir(self::DIR_ICON, false);
+      return self::getImageDir(self::DIR_IMAGE, false);
    }
 
    /**
@@ -309,12 +309,12 @@ class Category_Core extends TrObject {
     * @param bool $realpath -- jestli má být vrácena reálná cesta nebo url adresa
     * @return string -- adresář
     */
-   public static function getImageDir($type = self::DIR_ICON, $realpath = false)
+   public static function getImageDir($type = self::DIR_IMAGE, $realpath = false)
    {
       if ($realpath) {
-         return AppCore::getAppDataDir() . self::DIR_IMAGES . DIRECTORY_SEPARATOR . $type . DIRECTORY_SEPARATOR;
+         return AppCore::getAppDataDir() . $type . DIRECTORY_SEPARATOR;
       } else {
-         return Url_Request::getBaseWebDir() . VVE_DATA_DIR . URL_SEPARATOR . self::DIR_IMAGES . URL_SEPARATOR . $type . URL_SEPARATOR;
+         return Url_Request::getBaseWebDir() . VVE_DATA_DIR . URL_SEPARATOR . $type . URL_SEPARATOR;
       }
    }
    

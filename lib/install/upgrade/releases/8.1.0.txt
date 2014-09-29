@@ -1,0 +1,7 @@
+NEW:
+- Implementace nového form. prvku imageselector pro upload a výběr obrázku
+- Přidání stylů pro vlastní modal okna
+
+CHANGES:
+- Změna uložení totilních obrázků kategorie a sloučení s titulními obrázky článků
+- Změna struktury admin stylů
