@@ -21,6 +21,10 @@ class Module_Sitemap extends Module_Core {
       $cats = new Model_Category();
       $categories = $cats->setSelectAllLangs(false)->onlyWithAccess()->records();
 
+      if(function_exists('customSitemapCategories')){
+         $categories = customSitemapCategories($categories);
+      }
+      
       SiteMap::addPage(Url_Link::getMainWebDir(), $this->tr('Hlavní stránka'));
       foreach ($categories as $category) {
          $catObj = new Category(null, false, $category);
