@@ -117,18 +117,29 @@ abstract class JsPlugin extends TrObject {
 	 * Metoda pro spuštění akce JsPluginu
 	 */
 	public function runAction($actionName, $params, $outputType){
-      try {
+         $isAction = false;
+         if (method_exists($this, $actionName . 'Action')) {
+            $this->{$actionName . 'Action'} ();
+            $isAction = true;
+         }
+         
          $this->pluginParams = $params; /* tady se předávají parametry z url, nemělo by tu být spíš $_GET? */
          if (method_exists($this, $actionName . ucfirst($outputType) . 'View')) {
-            $this->{$actionName . ucfirst($outputType) . 'View'} ( );
+            $this->{$actionName . ucfirst($outputType) . 'View'} ();
          } else if (method_exists($this, $actionName . 'View')) {
             $this->{$actionName . 'View'} ();
          } else {
-            throw new UnexpectedValueException($this->tr('Neimplementována metoda JsPluginu'));
+            if(!$isAction){
+               throw new UnexpectedValueException(sprintf($this->tr('Neimplementována akce "%s" JsPluginu'), $actionName));
+            }
+            // pokud je výstup json a není funkce pro pohled, tak odešleme proměnné třídy
+            if(strtolower($outputType) == 'json'){
+               $respond = new XHR_Respond_VVEAPI();
+               $respond->setData(array_diff_key(get_object_vars($this), get_class_vars(__CLASS__)));
+               $respond->renderRespond();
+            }
+            // asi přidat implementaci také pro výstupy typu html a txt
          }
-      } catch (Exception $exc) {
-         echo $exc->getTraceAsString();
-      }
    }
 
 	/**
