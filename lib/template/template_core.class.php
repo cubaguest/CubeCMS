@@ -541,6 +541,9 @@ class Template_Core extends Template {
     */
    public static function setCoverImage($path)
    {
+      if(strpos($path, 'http') === false){
+         self::$coverImagePath = Url_Request::getBaseWebDir(false).$path;
+      }
       self::$coverImagePath = $path;
    }
 
