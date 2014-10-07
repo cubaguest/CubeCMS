@@ -185,9 +185,13 @@ class Model_Category extends Model_ORM {
    
    public function onlyWithAccess()
    {
-      return $this->withRights()->where(" ( SUBSTRING(`".Model_Rights::COLUMN_RIGHT."`, 1, 1) = 'r' OR "
+      $this->withRights()->where(" ( SUBSTRING(`".Model_Rights::COLUMN_RIGHT."`, 1, 1) = 'r' OR "
          ." ( `".Model_Rights::COLUMN_RIGHT."` IS NULL AND SUBSTRING(`".Model_Category::COLUMN_DEF_RIGHT."`, 1, 1) = 'r' )) ", 
          array(), true);
+      if(!Auth::isAdmin()){
+         $this->where(' AND '.self::COLUMN_DISABLE.'_'.Locales::getLang().' = 0', array(), true);
+      }
+      return $this;
    }
 
    /**
