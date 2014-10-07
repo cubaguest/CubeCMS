@@ -1019,12 +1019,9 @@ class AppCore extends TrObject {
          //    Inicializace chybových hlášek
          $this->_initMessagesAndErrors();
 
-         /*
-          * TODO: Tohle se musí doladit, protože to je začarovaný kruch. špatný návrh inicializace
-          * Locales závisí na URL_Requestu a URL_Request zívisí na Auth a Auth na Locales
-          */
          //inicializace lokalizace
          Locales::factory();
+         Url_Request::detectLang();
          // provedení autorizace
          Auth::authenticate();
          $adm = Menu_Admin::getInstance();

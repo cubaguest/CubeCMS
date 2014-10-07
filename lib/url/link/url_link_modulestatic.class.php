@@ -63,11 +63,8 @@ class Url_Link_ModuleStatic extends Url_Link {
     * @return string -- objekt jako řetězec
     */
    public function __toString() {
-      $returnString = Url_Request::getBaseWebDir().self::URL_REQUEST.URL_SEPARATOR;
-      if($this->lang != null) {
-         $returnString.=$this->getLang();
-      }
-      $returnString.=$this->moduleName.URL_SEPARATOR;
+      $returnString = Url_Request::getBaseWebDir().($this->lang != null ? $this->getLang() : "")
+         .self::URL_REQUEST."/".$this->moduleName."/";
 
       if($this->file != null) {
          $returnString.=$this->getFile();
@@ -80,4 +77,3 @@ class Url_Link_ModuleStatic extends Url_Link {
       return $returnString;
    }
 }
-?>

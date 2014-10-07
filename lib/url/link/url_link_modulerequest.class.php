@@ -52,10 +52,7 @@ class Url_Link_ModuleRequest extends Url_Link {
     * @return string -- objekt jako řetězec
     */
    public function __toString() {
-      $returnString = Url_Request::getBaseWebDir().self::URL_REQUEST.URL_SEPARATOR;
-      if($this->lang != null) {
-         $returnString.=$this->getLang();
-      }
+      $returnString = Url_Request::getBaseWebDir().($this->lang != null ? $this->getLang() : "").self::URL_REQUEST.URL_SEPARATOR;
       if($this->category != null) {
          $returnString.=$this->getCategory();
       }

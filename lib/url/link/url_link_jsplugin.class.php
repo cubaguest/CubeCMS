@@ -4,6 +4,8 @@
  * Třída pro tvorbu a práci s odkazy aplikace, umožňuje jejich pohodlnou
  * tvorbu a validaci, popřípadě změnu jednotlivých parametrů. Umožňuje také
  * přímé přesměrování na zvolený (vytvořený) odkaz pomocí klauzule redirect.
+ * 
+ * POZOR! Odkazy na virtuální soubory se generuje v JsPlugin_File
  *
  * @copyright  	Copyright (c) 2009 Jakub Matas
  * @version    	$Id: url_link.class.php 646 2009-08-28 13:44:00Z jakub $ VVE3.9.4 $Revision: 646 $
@@ -68,6 +70,13 @@ class Url_Link_JsPlugin extends Url_Link {
       $this->category = 'cat-'.Category::getSelectedCategory()->getId();
 //      $this->paramsArray = self::$currentParams;
    }
+   
+   
+   public function category($catKey = NULL)
+   {
+      // přidat načítání id pokud je vložen string
+      $this->category = 'cat-'.$catKey;
+   }
 
    /*
     * MAGICKÉ METODY
@@ -78,11 +87,8 @@ class Url_Link_JsPlugin extends Url_Link {
     * @return string -- objekt jako řetězec
     */
    public function __toString() {
-      $returnString = Url_Request::getBaseWebDir().self::URL_REQUEST.URL_SEPARATOR;
-      $returnString.=$this->pluginname.URL_SEPARATOR;
-      if($this->lang != null) {
-         $returnString.=$this->getLang();
-      }
+      $returnString = Url_Request::getBaseWebDir(). ($this->lang != null ? $this->getLang() : "").self::URL_REQUEST."/";
+      $returnString.=$this->pluginname."/";
       if($this->category != null) {
          $returnString.=$this->getCategory();
       }
@@ -97,4 +103,3 @@ class Url_Link_JsPlugin extends Url_Link {
       return $returnString;
    }
 }
-?>
