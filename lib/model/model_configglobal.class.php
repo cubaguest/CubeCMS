@@ -10,31 +10,106 @@
  * @abstract 		Třída pro vytvoření modelu pro práci s moduly
  */
 
-class Model_ConfigGlobal extends Model_Config {
+class Model_ConfigGlobal extends Model_ORM {
+   /**
+ * Tabulka s detaily
+ */
+   const DB_TABLE = 'cubecms_global_config';
+
+   /**
+    * slouce v db
+    */
+   const COLUMN_ID = 'id_config';
+   const COLUMN_ID_GROUP = 'id_group';
+   const COLUMN_KEY = 'key';
+   const COLUMN_VALUE = 'value';
+   const COLUMN_VALUES = 'values';
+   const COLUMN_PROTECTED = 'protected';
+   const COLUMN_TYPE = 'type';
+   const COLUMN_LABEL = 'label';
+   const COLUMN_HIDDEN = 'hidden_value';
+   const COLUMN_CALLBACK = 'callback_func';
+
+   const TYPE_STRING = 'string';
+   const TYPE_NUMBER = 'number';
+   const TYPE_BOOL = 'bool';
+   const TYPE_LIST = 'list';
+   const TYPE_LIST_MULTI = 'listmulti';
+   const TYPE_SER_DATA = 'ser_object';
+      
    private $globalTable = 'cubecms_global_config';
    private $mainTable = null;
-
+   
    protected function  _initTable() {
-      parent::_initTable();
       $this->mainTable = $this->getTableName();
-      $this->setTableName($this->globalTable, 't_ccfg_g', false);
+      $this->setTableName(self::DB_TABLE, 't_ccfg_g', false);
+
+      $this->addColumn(self::COLUMN_ID, array('datatype' => 'smallint', 'ai' => true, 'nn' => true, 'pk' => true));
+      $this->addColumn(self::COLUMN_ID_GROUP, array('datatype' => 'smallint', 'nn' => true, 'default' => 1));
+      $this->addColumn(self::COLUMN_KEY, array('datatype' => 'varchar(50)', 'nn' => true, 'uq' => true, 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_LABEL, array('datatype' => 'varchar(1000)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
+      $this->addColumn(self::COLUMN_VALUE, array('datatype' => 'text', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
+      $this->addColumn(self::COLUMN_VALUES, array('datatype' => 'varchar(200)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
+      $this->addColumn(self::COLUMN_PROTECTED, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => false));
+      $this->addColumn(self::COLUMN_TYPE, array('datatype' => 'varchar(15)', 'pdoparam' => PDO::PARAM_STR, 'default' => 'string')); // ENUM
+      $this->addColumn(self::COLUMN_HIDDEN, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => false));
+      $this->addColumn(self::COLUMN_CALLBACK, array('datatype' => 'varchar(40)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
+
+      $this->setPk(self::COLUMN_ID);
+
+      $this->addForeignKey(self::COLUMN_ID_GROUP, 'Model_ConfigGroups', Model_ConfigGroups::COLUMN_ID);
    }
+
+   /**
+    * Metoda nastaví proměnnou konfigurace
+    * @param $name
+    * @param $value
+    * @return bool
+    */
+   public static function setValue($name, $value)
+   {
+      $model = new self();
+      return $model
+         ->where(self::COLUMN_KEY." = :name", array('name' => $name))
+         ->update(array(self::COLUMN_VALUE => $value));
+   }
+   
+   /**
+    * Metoda vrací proměnnou konfigurace
+    * @param $name
+    * @param $default
+    * @return string
+    */
+   public static function getValue($name, $default)
+   {
+      // zkusíme nastavení pro aktuální site
+      $m = new Model_Config();
+      $r = $m
+         ->where(self::COLUMN_KEY." = :name", array('name' => $name))
+         ->record();
+      if($r){
+         return $r->{self::COLUMN_VALUE};
+      }
+      
+      // zkusíme globální config
+      $model = new self();
+      $r = $model
+         ->where(self::COLUMN_KEY." = :name", array('name' => $name))
+         ->record();
+      if($r){
+         return $r->{self::COLUMN_VALUE};
+      }
+      return $default;
+   }
+
 
    /**
     * Metoda nastaví vnitřní SQL dotaz na výbě záznamů z obou konfigurací
     */
    public function mergedConfigValues(){
-   /* SELECT * FROM
-      (SELECT `key`, `value` FROM vypecky_config UNION ALL SELECT `key`, `value` FROM cubecms_global_config) AS t
-      GROUP BY t.`key`*/
-//       if($dbc->exec("SELECT * FROM `information_schema`.`tables` WHERE `TABLE_SCHEMA` = '" . $this->getDbName() . "' AND `TABLE_SCHEMA` = '. $this->getTableName() .'")){
-//
-//       }
-
-      $this->currentSql = 'SELECT * FROM (SELECT `'.self::COLUMN_KEY.'`, `'.self::COLUMN_VALUE.'` FROM '.$this->mainTable.' UNION ALL SELECT `'.self::COLUMN_KEY.'`, `'.self::COLUMN_VALUE.'`'
-         .' FROM `'.$this->getTableName().'`) AS t GROUP BY t.`'.self::COLUMN_KEY.'`';
-
+      $m = new Model_Config();
+      $this->currentSql = 'SELECT * FROM (SELECT `'.self::COLUMN_KEY.'`, `'.self::COLUMN_VALUE.'` FROM '.$m->getTableName().' UNION ALL SELECT `'.self::COLUMN_KEY.'`, `'.self::COLUMN_VALUE.'`'
+         .' FROM `'.self::DB_TABLE.'`) AS t GROUP BY t.`'.self::COLUMN_KEY.'`';
       return $this;
    }
 }
-?>
