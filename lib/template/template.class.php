@@ -883,6 +883,7 @@ class Template extends TrObject {
             'import_dirs' => array( 
                Face::getCurrent()->getDir().'stylesheets/' => '/faces/'.Face::getCurrent()->getName()."/stylesheets/", // face styles 
                AppCore::getAppWebDir().'stylesheets/' => '/stylesheets/', // base styles 
+               AppCore::getAppLibDir().'stylesheets/' => '/stylesheets/', // base styles 
             ),
             'compress' => (VVE_DEBUG_LEVEL == 0),
             'cache_dir'=> AppCore::getAppCacheDir().Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR,
