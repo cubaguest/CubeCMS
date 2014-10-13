@@ -259,7 +259,7 @@ class Services_Controller extends Controller {
       $backupPath = self::getBackupPath();
       
       $dbc = Db_PDO::getInstance();
-      $filePrefix = $backupPath.'db-backup-'.vve_date("%Y-%M-%D_%H-%i");
+      $filePrefix = $backupPath.'db-backup-'.vve_date("%Y-%M-%D_%H-%i-%s").(CUBE_CMS_SUB_SITE_DIR == null ? '' : '_'.CUBE_CMS_SUB_SITE_DIR);
       $fileDb = $filePrefix.'.sql';
       $fileData = $filePrefix.'.zip';
 
@@ -374,12 +374,12 @@ class Services_Controller extends Controller {
    
    protected static function getBackupPath() 
    {
-      if(!is_dir(AppCore::getAppWebDir().'backup' )){
+      if(!is_dir(AppCore::getAppLibDir().'backup' )){
          // mkdir by ftp account
          // mkdir(AppCore::getAppWebDir().'backup');
          new CoreErrors(new CoreException( 'Neexistuje adresář pro zálohy. Vytvořte adresář "backup" v kořenu stránek.') ) ;
       }
-      return AppCore::getAppWebDir().'backup'.DIRECTORY_SEPARATOR;
+      return AppCore::getAppLibDir().'backup'.DIRECTORY_SEPARATOR;
    }
    
    public function dbadminController() 
