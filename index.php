@@ -5,7 +5,7 @@
 if(!defined('VVE_APP_IS_RUN')){
    define('VVE_APP_IS_RUN', true);
 }
-$libDir = getcwd().DIRECTORY_SEPARATOR;
+$libDir = dirname(__FILE__).DIRECTORY_SEPARATOR;
 $webDir = (isset($siteFile) ? realpath(dirname($siteFile)) : getcwd()).DIRECTORY_SEPARATOR;
 // include site config
 include $libDir.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'config.php';
