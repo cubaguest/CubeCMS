@@ -66,12 +66,23 @@ class Model_ConfigGlobal extends Model_ORM {
     * @param $value
     * @return bool
     */
-   public static function setValue($name, $value)
+   public static function setValue($name, $value, $type = self::TYPE_STRING, $grpId = 3)
    {
-      $model = new self();
-      return $model
-         ->where(self::COLUMN_KEY." = :name", array('name' => $name))
-         ->update(array(self::COLUMN_VALUE => $value));
+      $model = new static();
+      $rec = $model->where(self::COLUMN_KEY." = :name", array('name' => $name))->record();
+      if($type == self::TYPE_BOOL){
+         $value = $value ? 'true' : 'false';
+      }
+      Debug::log($model);
+      if(!$rec){
+         $rec = $model->newRecord();
+         $rec->{self::COLUMN_ID_GROUP} = $grpId;
+         $rec->{self::COLUMN_TYPE} = $type;
+         $rec->{self::COLUMN_KEY} = $name;
+      }
+      $rec->{self::COLUMN_VALUE} = $value;
+      $rec->save();
+      return $rec;
    }
    
    /**
@@ -84,21 +95,29 @@ class Model_ConfigGlobal extends Model_ORM {
    {
       // zkusíme nastavení pro aktuální site
       $m = new Model_Config();
+      $type = self::TYPE_STRING;
       $r = $m
          ->where(self::COLUMN_KEY." = :name", array('name' => $name))
          ->record();
       if($r){
-         return $r->{self::COLUMN_VALUE};
+         $default = $r->{self::COLUMN_VALUE};
+         $type = $r->{self::COLUMN_TYPE};
+      } else {
+         // zkusíme globální config
+         $model = new Model_ConfigGlobal();
+         $r = $model
+            ->where(self::COLUMN_KEY." = :name", array('name' => $name))
+            ->record();
+         if($r){
+            $default = $r->{self::COLUMN_VALUE};
+            $type = $r->{self::COLUMN_TYPE};
+         }
       }
       
-      // zkusíme globální config
-      $model = new self();
-      $r = $model
-         ->where(self::COLUMN_KEY." = :name", array('name' => $name))
-         ->record();
-      if($r){
-         return $r->{self::COLUMN_VALUE};
+      if($type == self::TYPE_BOOL){
+         $default = $default == 'true' ? true : false;
       }
+      
       return $default;
    }
 
