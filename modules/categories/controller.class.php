@@ -279,8 +279,7 @@ class Categories_Controller extends Controller {
             }
          }
          
-         $categoryModel->save($record);
-
+         $lastId = $record->save();
          // práva
          $this->assignRights($record->{Model_Category::COLUMN_ID}, $form);
 
@@ -424,7 +423,7 @@ class Categories_Controller extends Controller {
          $m = new $mClass($form->module->getValues());
 
 
-         $lastId = $categoryModel->save($record);
+         $lastId = $record->save();
          // práva
          $this->assignRights($lastId, $form);
       
