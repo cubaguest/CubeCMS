@@ -542,7 +542,7 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
       file_put_contents(AppCore::getAppCacheDir()."struct_before".date("Y-m-d_G:i").".tmp", $struct);
 
       $data = serialize($struct);
-      Model_Config::setValue('CATEGORIES_STRUCTURE', $data);
+      Model_Config::setValue('CATEGORIES_STRUCTURE', $data, Model_Config::TYPE_SER_DATA);
 
       self::clearCache();
       //self::loadStruct(); // vytváři nekonzistenci cache
