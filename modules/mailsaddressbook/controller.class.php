@@ -290,8 +290,9 @@ class MailsAddressBook_Controller extends Controller {
       $formImportGrpBasic = $formImport->addGroup('basic', $this->tr('Základní'));
       $formImportGrpAdv = $formImport->addGroup('advanced', $this->tr('Pokročilé'));
 
-      $eFile = new Form_Element_File('file', $this->tr('Soubor (*.csv)'));
-      $eFile->addValidation(new Form_Validator_FileExtension('csv'));
+      $eFile = new Form_Element_File('file', $this->tr('Soubor (csv nebo txt)'));
+      $eFile->setSubLabel($this->tr('Můžete vložit csv soubor s exportu'));
+      $eFile->addValidation(new Form_Validator_FileExtension('csv;txt'));
       $formImport->addElement($eFile, $formImportGrpBasic);
 
       $eGroup = new Form_Element_Select('group', $this->tr('Skupina'));
@@ -304,18 +305,42 @@ class MailsAddressBook_Controller extends Controller {
 
       if ($formImport->isValid()) {
          $modelMails = new MailsAddressBook_Model_Addressbook();
-         $file = $formImport->file->createFileObject('Filesystem_File_Text');
-         $mails = $file->getContent();
-         
+         $file = $formImport->file->createFileObject('File_Text');
+         $mails = $file->getData();
+         if(!$file->isUTF8()){
+            // cp 1250
+            $mails = iconv('cp1250', 'UTF8', $mails);
+         }
          $mailsArr = explode("\n", $mails);
          $numImports = 0;
          foreach ($mailsArr as $mail) {
-            if(empty($mail)) continue;
+            if($mail == ''){
+               continue;
+            }
+            $csv = str_getcsv($mail);
             
             $rec = $modelMails->newRecord();
-            $rec->{MailsAddressBook_Model_Addressbook::COLUMN_MAIL} = $mail;
-            $rec->{MailsAddressBook_Model_Addressbook::COLUMN_ID_GRP} = $formImport->group->getValues();
-            
+            // pouze řádky s emaily
+            if(count($csv) == 1){
+               $validator = new Validator_EMail($csv[0]);
+               if(!$validator->isValid()) {
+                  continue;
+               }
+               $rec->{MailsAddressBook_Model_Addressbook::COLUMN_MAIL} = $mail;
+               $rec->{MailsAddressBook_Model_Addressbook::COLUMN_ID_GRP} = $formImport->group->getValues();
+            } 
+            // je z exportu
+            else if(count($csv) == 4) {
+               
+               $validator = new Validator_EMail($csv[2]);
+               if(!$validator->isValid()) {
+                  continue;
+               }
+               $rec->{MailsAddressBook_Model_Addressbook::COLUMN_NAME} = $csv[0];
+               $rec->{MailsAddressBook_Model_Addressbook::COLUMN_SURNAME} = $csv[1];
+               $rec->{MailsAddressBook_Model_Addressbook::COLUMN_MAIL} = $csv[2];
+               $rec->{MailsAddressBook_Model_Addressbook::COLUMN_ID_GRP} = $formImport->group->getValues();
+            }
             $modelMails->save($rec);
             $numImports++;
          }
@@ -387,6 +412,14 @@ class MailsAddressBook_Controller extends Controller {
       $eExportType->setOptions(array('Excel (xls)' => 'xls', 'Excel (csv)' => 'csv', 'Prostý text (txt)' => 'txt'));
       $formExport->addElement($eExportType, $formExportGrpAdv);
 
+      $eCoding = new Form_Element_Select('charset', $this->tr('Znaková sada'));
+      $eCoding->setOptions(array(
+          'Windows cp-1250' => 'cp1250',
+          'Unicode UTF-8' => 'UTF-8',
+      ));
+      $eCoding->setSubLabel($this->tr('Lze použít pouze pro typy csv a txt.'));
+      $formExport->addElement($eCoding, $formExportGrpAdv);
+      
       $eCsvSep = new Form_Element_Text('csvsep', $this->tr('Oddělovač hodnot'));
       $eCsvSep->setSubLabel($this->tr('Pouze csv formát'));
       $eCsvSep->setValues(',');
@@ -408,6 +441,7 @@ class MailsAddressBook_Controller extends Controller {
                $comCsv = new Component_CSV();
                $comCsv->setConfig(Component_CSV::CFG_CELL_SEPARATOR, $formExport->csvsep->getValues());
                $comCsv->setConfig(Component_CSV::CFG_FLUSH_FILE, 'mails-'.date('Y-m-d').'.csv');
+               $comCsv->setConfig(Component_CSV::CFG_CHARSET, $formExport->charset->getValues());
                if($formExport->addheader->getValues() == true){
                   $comCsv->setCellLabels(array($this->tr('Jméno'),$this->tr('Přijmení'),$this->tr('E-mail'),$this->tr('Poznámka')));
                }
@@ -466,7 +500,7 @@ class MailsAddressBook_Controller extends Controller {
                Template_Output::factory('txt');
                Template_Output::setDownload('mails-'.date('Y-m-d').'.txt');
                Template_Output::sendHeaders();
-               echo $buffer;
+               echo iconv('UTF-8', $formExport->charset->getValues(), $buffer);
                flush();
                exit();
                break;
