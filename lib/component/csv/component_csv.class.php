@@ -14,6 +14,7 @@ class Component_CSV extends Component {
    const CFG_CELL_SEPARATOR = 'cell_separator';
    const CFG_ROW_SEPARATOR = 'row_separator';
    const CFG_FLUSH_FILE = 'file';
+   const CFG_CHARSET = 'charset';
    const QUOTE = '"';
 
    /**
@@ -34,7 +35,8 @@ class Component_CSV extends Component {
     */
    protected $config = array(self::CFG_CELL_SEPARATOR => ',',
                              self::CFG_ROW_SEPARATOR => "\r\n",
-                             self::CFG_FLUSH_FILE => 'file.csv'
+                             self::CFG_FLUSH_FILE => 'file.csv',
+                             self::CFG_CHARSET => 'UTF-8'
       );
 
    /**
@@ -90,9 +92,9 @@ class Component_CSV extends Component {
       array_walk_recursive($data, array(&$this, 'applyQuotes'));
       foreach ($data as $row) {
          $return .= implode($this->getConfig(self::CFG_CELL_SEPARATOR), $row).$this->getConfig(self::CFG_ROW_SEPARATOR);
-      };
-
-      return $return;
+      }
+      // výchozí je utf8
+      return iconv('UTF-8', $this->getConfig(self::CFG_CHARSET), $return);
    }
 
    private function applyQuotes(&$item, $key) {
