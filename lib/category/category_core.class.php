@@ -20,8 +20,8 @@ class Category_Core extends TrObject {
    const DIR_IMAGE = 'title-images' ;
    const DIR_BACKGROUND = 'backgrounds';
    
-   const IMAGE_TITLE = 'title';
-   const IMAGE_BG = 'bg';
+   const IMAGE_TITLE = 'title-images';
+   const IMAGE_BG = 'backgrounds';
 
    /**
     * Odělovač parametrů v pramaterech kategorie
@@ -326,12 +326,12 @@ class Category_Core extends TrObject {
     */
    public function getImage($type = 'title', $returnUrl = true)
    {
-      if($type == 'title' || $type == 'icon'){
+      if($type == 'title' || $type == 'icon' || $type == self::IMAGE_TITLE){
          if(!$this->getDataObj()->{Model_Category::COLUMN_IMAGE}){
             return null;
          }
          return self::getImageDir(self::DIR_IMAGE, !$returnUrl).$this->getDataObj()->{Model_Category::COLUMN_IMAGE};
-      } else if($type == 'bg' || $type == 'background'){
+      } else if($type == 'bg' || $type == 'background' || $type == 'backgrounds'){
          if(!$this->getDataObj()->{Model_Category::COLUMN_BACKGROUND}){
             return null;
          }
