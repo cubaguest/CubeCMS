@@ -71,19 +71,20 @@ class Session {
     * @param string $sessionName -- název session do ketré se bude ukládat
     */
    public static function factory() {
-      if(SERVER_PLATFORM == 'UNIX'){
+      if(( SERVER_PLATFORM == 'UNIX' && !defined('CUBE_CMS_SESSION_SAVE_HANDLER'))
+          || ( SERVER_PLATFORM == 'UNIX' && defined('CUBE_CMS_SESSION_SAVE_HANDLER') && CUBE_CMS_SESSION_SAVE_HANDLER == 'db' )){
          session_set_save_handler(array('Session', 'open'),
                          array('Session', 'close'),
                          array('Session', 'read'),
                          array('Session', 'write'),
                          array('Session', 'destroy'),
                          array('Session', 'gc'));
-      }
+      } 
 
-      ini_set('session.cookie_lifetime',  VVE_LOGIN_TIME);
-      ini_set('session.gc_maxlifetime',  VVE_LOGIN_TIME);
+      ini_set('session.cookie_lifetime',  CUBE_CMS_LOGIN_TIME);
+      ini_set('session.gc_maxlifetime',  CUBE_CMS_LOGIN_TIME);
       ini_set('session.gc_probability', 1);
-      if(VVE_DEBUG_LEVEL > 0){
+      if(CUBE_CMS_DEBUG_LEVEL > 0){
          ini_set('session.gc_divisor', 100);
       } else {
          ini_set('session.gc_divisor', 1000);
@@ -91,22 +92,23 @@ class Session {
       // pokud je id sessison přenesena v jiném parametru než než pře cookie
       if (isset($_REQUEST['sessionid'])) {
          session_id($_REQUEST['sessionid']);
-      } else if (isset($_REQUEST[VVE_SESSION_NAME])) {
-         session_id($_REQUEST[VVE_SESSION_NAME]);
+      } else if (isset($_REQUEST[CUBE_CMS_SESSION_NAME])) {
+         session_id($_REQUEST[CUBE_CMS_SESSION_NAME]);
       }
 
       //Nastaveni session
       if (Url_Request::getDomain() != 'localhost'){
-         session_set_cookie_params(VVE_LOGIN_TIME, '/', '.'.Url_Request::getDomain());
+         session_set_cookie_params(CUBE_CMS_LOGIN_TIME, '/', '.'.Url_Request::getDomain());
       } else {
-         session_set_cookie_params(VVE_LOGIN_TIME, '/');
+         session_set_cookie_params(CUBE_CMS_LOGIN_TIME, '/');
       }
-      session_name(VVE_SESSION_NAME);
+      session_name(CUBE_CMS_SESSION_NAME);
       session_start();
+      self::regenerateId();
       // cookie params
-      if(isset ($_COOKIE[VVE_SESSION_NAME])){
+      if(isset ($_COOKIE[CUBE_CMS_SESSION_NAME])){
          $cookieParams = session_get_cookie_params();
-         setcookie(VVE_SESSION_NAME, session_id(), time()+$cookieParams['lifetime'], $cookieParams['path'], $cookieParams['domain']);
+         setcookie(CUBE_CMS_SESSION_NAME, session_id(), time()+$cookieParams['lifetime'], $cookieParams['path'], $cookieParams['domain']);
       }
    }
 
