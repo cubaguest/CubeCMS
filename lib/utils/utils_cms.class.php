@@ -73,6 +73,8 @@ class Utils_CMS {
    {
       if($file instanceof Model_ORM_Record){
          $file = $file->$prop;
+      } else if($file instanceof Category){
+         return $file->getImage(Category::IMAGE_TITLE);
       }
       return Url_Request::getBaseWebDir().VVE_DATA_DIR.'/'.VVE_ARTICLE_TITLE_IMG_DIR.'/'.$file;
    }

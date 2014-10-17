@@ -161,5 +161,56 @@ class Utils_String {
       }
       return $string;
    }
+   
+   /**
+    * Funkce ořeže řetězec na zadanou délku
+    * @param string $text -- řetězec
+    * @param int $numb -- počet znaků
+    * @param string $etc -- ukončovací znaky
+    * @return string -- ořezaný řetězec
+    * @author alishahnovin@hotmail.com 2007
+    * @link http://php.net/manual/en/function.substr-replace.php
+    */
+   public static function truncate($text, $numb, $etc = "...") 
+   {
+      if (strlen($text) > $numb) {
+         $text = substr($text, 0, $numb);
+         $text = substr($text,0,strrpos($text," "));
 
+         $punctuation = ".!?:;,-"; //punctuation you want removed
+
+         $text = (strspn(strrev($text),  $punctuation)!=0)
+                 ?
+                 substr($text, 0, -strspn(strrev($text),  $punctuation))
+                 :
+                 $text;
+
+         $text = $text.$etc;
+      }
+      return $text;
+   }
+
+   /**
+    * Funkce rozdělí řetězce na poloviny a jednu vrátí (první polovina je vždy větší)
+    * @param string $text -- řetězec
+    * @param bool $firstHalf -- jestli se má vrátit první půlka nebo druhá
+    */
+   public static function splitToHalf($text, $firstHalf = true)
+   {
+      $text = strip_tags($text);
+      $splitstring1 = substr($text, 0, floor(strlen($text) / 2));
+      $splitstring2 = substr($text, floor(strlen($text) / 2));
+
+      if (substr($splitstring1, 0, -1) != ' ' AND substr($splitstring2, 0, 1) != ' ') {
+         $middle = strlen($splitstring1) + strpos($splitstring2, ' ') + 1;
+      } else {
+         $middle = strrpos(substr($text, 0, floor(strlen($text) / 2)), ' ') + 1;
+      }
+
+      if($firstHalf){
+         return substr($text, 0, $middle);
+      }
+      return substr($text, $middle);
+   }
+   
 }

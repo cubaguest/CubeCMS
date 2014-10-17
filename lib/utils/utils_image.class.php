@@ -62,4 +62,18 @@ class Utils_Image {
       return $path . ($getParasms != null ? '&' . $getParasms : null);
    }
 
+   /**
+    * 
+    * @param string|File $image
+    * @return boolean
+    */
+   public static function isLandscape($image)
+   {
+      $size = getimagesize((string)$image); 
+      $aspect = $size[1] / $size[0]; 
+      if ($aspect >= 1) {
+         return false;
+      }
+      return true;
+   }
 }
