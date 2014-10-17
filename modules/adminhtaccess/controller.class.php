@@ -211,6 +211,16 @@ RewriteRule ^cache/imgc/([a-z0-9]+)/([x0-9]+c?(?:-f_[0-9]*(?:_[0-9]*)?(?:_[0-9]*
       $domain = $mainsSite->getFullDomain();
       
       $str = "
+RewriteCond $1 ^jscripts/
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_URI} \.(js)$
+Rewriterule (.*) /index.php?internalApp=proxyjs&path=$1 [R=301,L,QSA]
+
+RewriteCond $1 ^faces/[a-z]+/jscripts/
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_URI} \.(js)$
+Rewriterule (.*) /index.php?internalApp=proxyjs&path=$1 [R=301,L,QSA]       
+
 RewriteCond $1 ^jscripts/      
 RewriteCond %{REQUEST_FILENAME} !-f
 Rewriterule (.*) http://$domain/$1 [L]

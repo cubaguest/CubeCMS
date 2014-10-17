@@ -5,11 +5,23 @@
 if(!defined('VVE_APP_IS_RUN')){
    define('VVE_APP_IS_RUN', true);
 }
-$libDir = dirname(__FILE__).DIRECTORY_SEPARATOR;
-$webDir = (isset($siteFile) ? realpath(dirname($siteFile)) : getcwd()).DIRECTORY_SEPARATOR;
+//if(is_link(__FILE__)){
+//   var_dump(readlink(__FILE__));
+//} else {
+//$libDir = dirname(__FILE__).DIRECTORY_SEPARATOR;
+//}
+if(isset($siteFile)){
+   $libDir = str_replace(basename(dirname($siteFile)), "", dirname($_SERVER['SCRIPT_FILENAME']));
+   $webDir = realpath(dirname($siteFile)).DIRECTORY_SEPARATOR;
+//   var_dump($libDir, $webDir);die;
+} else {
+   $libDir = dirname($_SERVER['SCRIPT_FILENAME']).DIRECTORY_SEPARATOR;
+   $webDir = getcwd().DIRECTORY_SEPARATOR;
+}
+
 // include site config
-include $libDir.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'config.php';
-$allowedInternalApps = array('imagecacher', 'maintenance');
+include $libDir.'config'.DIRECTORY_SEPARATOR.'config.php';
+$allowedInternalApps = array('imagecacher', 'maintenance', 'proxyjs');
 
 // maintenance mode
 $maintenance = is_file($webDir.'data'.DIRECTORY_SEPARATOR.'maintenance.lock');
