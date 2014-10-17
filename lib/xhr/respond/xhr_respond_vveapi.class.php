@@ -21,7 +21,7 @@ class XHR_Respond_VVEAPI extends XHR_Respond {
       $retData['infomsg'] = AppCore::getInfoMessages()->getMessages();
       $retData['errmsg'] = AppCore::getUserErrors()->getMessages();
       if(!CoreErrors::isEmpty()){
-         $retData['errmsg'] = array_merge($retData['errmsg'], (array)CoreErrors::getErrorsInArrayForPrint());
+         $retData['errmsg'] = array_merge($retData['errmsg'], CoreErrors::getErrors());
       }
       return json_encode($retData);
    }
