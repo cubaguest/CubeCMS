@@ -1,5 +1,5 @@
 <?php
-$lastID = 32795;
+$lastID = 32796;
 /* 
  * Základní sekce menu
  */
@@ -140,6 +140,10 @@ $this->addItem(Menu_Admin::SECTION_SETTINGS, new Menu_Admin_Item(
 $this->addItem(Menu_Admin::SECTION_SETTINGS, new Menu_Admin_Item(
     32776, array( 'cs' => 'Překlady', 'en' => 'Translations'),
    'system/translate', 'trstaticstexts', 'translate.png'
+));
+$this->addItem(Menu_Admin::SECTION_SETTINGS, new Menu_Admin_Item(
+    32796, array( 'cs' => 'Blokace IP adres', 'en' => 'IP address block'),
+   'system/ipblock', 'adminipblock', 'stop.png'
 ));
 $this->addItem(Menu_Admin::SECTION_SETTINGS, new Menu_Admin_Item(
     32795, array( 'cs' => 'Úprava htaccess', 'en' => 'Htaccess edit'),

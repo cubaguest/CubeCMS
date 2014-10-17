@@ -1,0 +1,11 @@
+<?php 
+$h = sprintf($this->tr('Úprava souboru htaccess pro doménu %s'), $this->domain->getFullDomain());
+$this->addPageTitle($h);
+$this->addFile('css://style.less');
+?>
+<h1><?php ps($h);?></h1>
+<div class="content-admin">
+   <?php echo $this->form?>
+   <h2><?php ps($this->tr('Aktuální obsah')); ?></h2>
+   <textarea class="full-width" rows="20" readonly="readonly"><?php echo $this->current?></textarea>
+</div>

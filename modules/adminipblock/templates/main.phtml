@@ -1,0 +1,84 @@
+<?php 
+$jsJqGrid = new Component_JqGrid_JsPlugin();
+$this->addJsPlugin($jsJqGrid);
+$jQuery = new JsPlugin_JQuery();
+$this->addJsPlugin($jQuery);
+
+$this->addPageTitle($this->tr('Blokace IP adres'));
+$this->addFile('css://style.less');
+?>
+<h1><?php echo $this->tr('Blokace IP adres');?></h1>
+<div class="content-admin clearfix">
+   <table id="table-iplist"></table>
+   <div id="table-iplist-pager"></div>
+</div>
+<script type="text/javascript" charset="utf-8">
+   /* <![CDATA[ */
+   var selectedGroupId = 0;
+   $(document).ready(function() {
+      var groupsGrid = $("#table-iplist").jqGrid({
+         ajaxGridOptions : {type:"POST"},
+         url: '<?php echo $this->link()->route('listIP');?>',
+         datatype: "json",
+         colNames:['IP', '<?php echo $this->tr('Datum přidání')?>'],
+         colModel:[
+            {name:'<?php echo Model_IPBlocks::COLUMN_ID?>',index:'<?php echo Model_IPBlocks::COLUMN_ID?>', 
+               width:500,fixed: true, editable:true,editoptions:{size:20},
+               formoptions:{ rowpos:2, label: "<?php echo $this->tr('IP adresa')?>",elmprefix:"(*)"}},
+            {name:'<?php echo Model_IPBlocks::COLUMN_TIME?>',index:'<?php echo Model_IPBlocks::COLUMN_TIME?>', 
+               editable: false}
+         ],
+         rowNum:50,
+         rowList:[10,20,40,100],
+         pager: '#table-iplist-pager',
+         sortname: '<?php echo Model_IPBlocks::COLUMN_ID?>',
+         caption:"<?php echo $this->tr('Blokované IP adresy')?>",
+         autowidth : true,
+         height: '100%',
+         editurl:"<?php echo $this->link()->route('editIP')?>",
+         multiselect: true
+      });
+
+      groupsGrid.jqGrid('navGrid','#table-iplist-pager',
+         {edit:true,add:true,del:true},
+         // edit options
+         {reloadAfterSubmit:true, jqModal:true, closeOnEscape:true,viewPagerButtons:false,width:400, 
+            bottominfo:"<?php echo $this->tr('Položky označené (*) jsou povinné')?>",closeAfterEdit:true,
+            afterSubmit : function(respond){
+               var res = eval("("+respond.responseText+")");
+               var msg = res.errmsg.toString();
+               if(res.infomsg.length > 0){
+                  msg = res.infomsg.toString();
+               }
+               return [res.allOk,msg];
+            },
+         },
+         // add options
+         {reloadAfterSubmit:true,jqModal:true, closeOnEscape:true, 
+            bottominfo:"<?php echo $this->tr('Položky označené (*) jsou povinné')?>", closeAfterAdd: true,width:400,
+            afterSubmit : function(respond){
+               var res = eval("("+respond.responseText+")");
+               var msg = res.errmsg.toString();
+               if(res.infomsg.length > 0){
+                  msg = res.infomsg.toString();
+               }
+               return [res.allOk,msg];
+            }
+         },  
+         // del options
+         {reloadAfterSubmit:true, jqModal:true, closeOnEscape:true, width: 300,
+            afterSubmit : function(respond, postdata){
+               var res = eval("("+respond.responseText+")");
+               var msg = res.errmsg.toString();
+               if(res.infomsg.length > 0){
+                  msg = res.infomsg.toString();
+               }
+               return [res.allOk,msg];
+            }
+         },
+         {multipleSearch:false, closeAfterSearch: true, closeOnEscape:true,sopt : ['eq','cn']},
+         {closeOnEscape:true}
+      );
+   });
+   /* ]]> */
+</script>
