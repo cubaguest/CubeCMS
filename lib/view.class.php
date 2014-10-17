@@ -144,11 +144,6 @@ abstract class View extends TrObject {
       }
    }
 
-/**
-    * Hlavní abstraktní třída pro vytvoření pohledu
-    */
-   public function mainView(){}
-
    /**
     * Metoda vrací objekt šablony, přes kerý se přiřazují proměnné do šablony
     * @return Template_Module -- objekt šablony
