@@ -46,22 +46,22 @@ class CoreErrors {
     * @return array -- pole vyjímek
     */
    public static function getErrors() {
-      $errArray = new ArrayObject();
+      $errArray = array();
 
       foreach (self::$exceptionsArray as $exception) {
-         $errArray->append(array('message'=>$exception->getMessage(),
+         $errArray[] = array('message'=>$exception->getMessage(),
              'file' => $exception->getFile(),
              'name' => get_class($exception),
              'line' => $exception->getLine(),
              'code' => $exception->getCode(),
-             'trace' => $exception->getTrace()));
+             'trace' => $exception->getTrace());
       }
       foreach (self::$errorsArray as $err) {
-         $errArray->append(array('message'=>$err['message'],
+         $errArray[] = array('message'=>$err['message'],
              'file' => $err['file'],
              'name' => $err['name'],
              'code' => $err['code'],
-             'line' => $err['line']));
+             'line' => $err['line']);
       }
 
       return $errArray;
