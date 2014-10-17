@@ -21,3 +21,5 @@ if(!defined('VVE_DB_PREFIX')){
 
 define('MAINTENANCE_EMAIL', 'pepa2@cube-studio.cz');
 define('MAINTENANCE_KEY', 'key2014');
+
+define('CUBE_CMS_DEBUG_SQL', true);

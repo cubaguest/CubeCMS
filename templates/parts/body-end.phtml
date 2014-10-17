@@ -76,6 +76,11 @@ if(VVE_DEBUG_LEVEL > 1 && !Template::browser()->isMobile() || isset($_GET['debug
             </tr>
          </table>
       </div>
+      <div>
+         <?php 
+         Debug_Sql::printQueries();
+         ?>
+      </div>
    </div>
 <?php }
 
