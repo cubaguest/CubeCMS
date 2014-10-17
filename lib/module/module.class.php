@@ -143,6 +143,7 @@ class Module
 
    protected function checkVersion($currentVersion)
    {
+      $this->updateDependModules();
       if($currentVersion == null){
          if(!Model_Module::isInstalled($this->getName())){
             $this->install();
@@ -150,7 +151,6 @@ class Module
       } else if(version_compare($this->version, $currentVersion) == 1){
          $this->update($currentVersion);
       }
-      $this->updateDependModules();
    }
 
    public function install()
