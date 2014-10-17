@@ -45,7 +45,7 @@ class XHR_Respond {
       $retData = $this->data;
       $retData['infomsg'] = AppCore::getInfoMessages()->getMessages();
       $retData['errmsg'] = AppCore::getUserErrors()->getMessages();
-      return 'respond';
+      return json_encode($retData);
    }
 
    /**
