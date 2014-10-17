@@ -6,6 +6,7 @@
 class DownloadFiles_Controller extends Controller {
    const PARAM_ALLOWED_TYPES = 'ft';
    const PARAM_COLS = 'cols';
+   const PARAM_PASS = 'pass';
 
    /**
  * Kontroler pro zobrazení textu
@@ -21,30 +22,61 @@ class DownloadFiles_Controller extends Controller {
       // mazání položky/položek
       $this->checkDeleteItem();
       
-      // load items
-      $model = new DownloadFiles_Model();
-
-      if($this->rights()->isWritable()){
-         if($this->getRequestParam('activate', false)){
-            $model
-               ->where(DownloadFiles_Model::COLUMN_ID." = :id", array('id' => $this->getRequestParam('activate')))
-               ->update(array(DownloadFiles_Model::COLUMN_ACTIVE => true));
-            $this->link()->rmParam('activate')->reload();
-         }
-      }
-
-      $files = $model
-            ->where(DownloadFiles_Model::COLUMN_ID_CATEGORY.' = :idc '
-               . ($this->rights()->isWritable() == false ? ' AND '.DownloadFiles_Model::COLUMN_ACTIVE." = 1" : null),
-                  array('idc' => $this->category()->getId()))
-            ->order(array(
-               DownloadFiles_Model::COLUMN_COLUMN => Model_ORM::ORDER_ASC, 
-               DownloadFiles_Model::COLUMN_TIME_ADD => Model_ORM::ORDER_DESC,
-               ))
-            ->records();
+      $pass = $this->category()->getParam(self::PARAM_PASS);
+      $session = new Session('dwfiles-'.$this->category()->getId());
       
-      $this->view()->files = $files;
-      $this->view()->dataDir = $this->module()->getDataDir(true);
+      $loadFiles = false;
+      if($pass == null || $this->category()->getRights()->isWritable() || $session->get()){
+         $loadFiles = true;
+      } else {
+         
+         $fLogin = new Form('login_');
+         $grp = $fLogin->addGroup('pass', $this->tr('Pro přístup zadejte heslo'));
+         $ePass = new Form_Element_Password('pass', $this->tr('Heslo'));
+         $ePass->addValidation(new Form_Validator_NotEmpty());
+         $fLogin->addElement($ePass, $grp);
+         
+         $send = new Form_Element_Submit('login', $this->tr('Přihlásit'));
+         $fLogin->addElement($send, $grp);
+         
+         if($fLogin->isSend() && $ePass->isValid() && $fLogin->pass->getValues() != $pass){
+            $ePass->setError($this->tr('Bylo zadáno nesprávné heslo pro přístup'));
+         }
+         
+         if($fLogin->isValid()){
+            // set session
+            $session->set(true);
+            $this->link()->redirect();
+         }
+         $this->view()->formLogin = $fLogin;
+      }
+      
+      if($loadFiles){
+         // load items
+         $model = new DownloadFiles_Model();
+
+         if($this->rights()->isWritable()){
+            if($this->getRequestParam('activate', false)){
+               $model
+                  ->where(DownloadFiles_Model::COLUMN_ID." = :id", array('id' => $this->getRequestParam('activate')))
+                  ->update(array(DownloadFiles_Model::COLUMN_ACTIVE => true));
+               $this->link()->rmParam('activate')->reload();
+            }
+         }
+
+         $files = $model
+               ->where(DownloadFiles_Model::COLUMN_ID_CATEGORY.' = :idc '
+                  . ($this->rights()->isWritable() == false ? ' AND '.DownloadFiles_Model::COLUMN_ACTIVE." = 1" : null),
+                     array('idc' => $this->category()->getId()))
+               ->order(array(
+                  DownloadFiles_Model::COLUMN_COLUMN => Model_ORM::ORDER_ASC, 
+                  DownloadFiles_Model::COLUMN_TIME_ADD => Model_ORM::ORDER_DESC,
+                  ))
+               ->records();
+
+         $this->view()->files = $files;
+         $this->view()->dataDir = $this->module()->getDataDir(true);
+      }
    }
    
    
@@ -218,6 +250,20 @@ class DownloadFiles_Controller extends Controller {
       return true;
    }
    
-}
+   protected function settings(&$settings, Form &$form) {
+      $fGrp = $form->addGroup('access', $this->tr('Přístup'));
 
-?>
+      $elemPass = new Form_Element_Text('pass', $this->tr('Heslo pro přístup'));
+      $elemPass->setSubLabel($this->tr('Pokud je heslo zadáno, položky se vypíší až po zadání hesla'));
+      $form->addElement($elemPass, $fGrp);
+
+      if(isset($settings[self::PARAM_PASS])) {
+         $form->pass->setValues($settings[self::PARAM_PASS]);
+      }
+      
+      // znovu protože mohl být už jednou validován bez těchto hodnot
+      if($form->isValid()) {
+         $settings[self::PARAM_PASS] = $form->pass->getValues();
+      }
+   }
+}

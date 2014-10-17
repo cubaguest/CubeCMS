@@ -6,33 +6,40 @@ echo $this->toolbox;
 ?>
 <h1><?php $this->includeFile('tpl://engine:headline/icon.phtml'); echo $h1;?></h1>
 <div class="posts-list files-list">
-   <?php if($this->files != false && !empty ($this->files)){?>
-      <?php foreach ($this->files as $file) {?>
-         <div class="text dwfile file clearfix">
-            <h2 id="dwfile-<?php echo $file->{DownloadFiles_Model::COLUMN_FILE}?>"><?php echo $file->{DownloadFiles_Model::COLUMN_NAME}?></h2>
-            <?php if(!$file->{DownloadFiles_Model::COLUMN_ACTIVE}){?>
-               <div class="message message-warning">
-                  <?php ps($this->tr('Naktivní'))?>
-                  - <a href="<?php echo $this->link()->param('activate', $file->getPK())?>"><strong><?php ps($this->tr('aktivovat'))?></strong></a><br />
+   <?php 
+   if($this->formLogin){
+         echo $this->formLogin;
+   } else {
+      if($this->files != false && !empty ($this->files)){?>
+         <?php foreach ($this->files as $file) {?>
+            <div class="text dwfile file clearfix">
+               <h2 id="dwfile-<?php echo $file->{DownloadFiles_Model::COLUMN_FILE}?>"><?php echo $file->{DownloadFiles_Model::COLUMN_NAME}?></h2>
+               <?php if(!$file->{DownloadFiles_Model::COLUMN_ACTIVE}){?>
+                  <div class="message message-warning">
+                     <?php ps($this->tr('Neaktivní'))?>
+                     - <a href="<?php echo $this->link()->param('activate', $file->getPK())?>"><strong><?php ps($this->tr('aktivovat'))?></strong></a><br />
+                  </div>
+               <?php }?>
+               <?php if($file->{DownloadFiles_Model::COLUMN_TEXT} != null){?><p><?php echo $file->{DownloadFiles_Model::COLUMN_TEXT}?></p><?php }?>
+               <div class="date">
+                  <?php echo $this->tr('Přidáno')?>: <strong><?php echo vve_date("%x", new DateTime($file->{DownloadFiles_Model::COLUMN_TIME_ADD}))?></strong>
                </div>
-            <?php }?>
-            <?php if($file->{DownloadFiles_Model::COLUMN_TEXT} != null){?><p><?php echo $file->{DownloadFiles_Model::COLUMN_TEXT}?></p><?php }?>
-            <div class="date">
-               <?php echo $this->tr('Přidáno')?>: <strong><?php echo vve_date("%x", new DateTime($file->{DownloadFiles_Model::COLUMN_TIME_ADD}))?></strong>
+               <div class="links">
+                  <a href="<?php echo $this->dataDir.$file->{DownloadFiles_Model::COLUMN_FILE}?>" title="<?php echo $this->tr('Zobrazit')?>"
+                     class="link-external"><span class="icon icon-external-link"></span> <?php echo $this->tr('Zobrazit')?></a>&nbsp;&nbsp;
+                  <a href="<?php echo $dwLink->file($file->{DownloadFiles_Model::COLUMN_FILE})?>" title="<?php echo $this->tr('Stáhnout')?>"
+                     ><span class="icon icon-download"></span> <?php echo $this->tr('Stáhnout')?></a>
+               </div>
+               <?php echo $file->toolbox;?>
             </div>
-            <div class="links">
-               <a href="<?php echo $this->dataDir.$file->{DownloadFiles_Model::COLUMN_FILE}?>" title="<?php echo $this->tr('Zobrazit')?>"><?php echo $this->tr('Zobrazit')?></a>
-               <a href="<?php echo $dwLink->file($file->{DownloadFiles_Model::COLUMN_FILE})?>" title="<?php echo $this->tr('Stáhnout')?>"><?php echo $this->tr('Stáhnout')?></a>
-            </div>
-            <?php echo $file->toolbox;?>
+         <?php }?>
+      <?php } else if($this->category()->getRights()->isWritable()) {?>
+         <div class="admin-info-text"><?php  echo $this->tr('Žádný soubor nebyl vložen. Soubor nahrajete pomocí nástrojů.'); ?></div>
+      <?php } else {?>
+         <div class="post text">
+            <?php echo $this->tr('Žádný soubor nebyl vložen.'); ?>
          </div>
       <?php }?>
-   <?php } else if($this->category()->getRights()->isWritable()) {?>
-      <div class="admin-info-text"><?php  echo $this->tr('Žádný soubor nebyl vložen. Soubor nahrajete pomocí nástrojů.'); ?></div>
-   <?php } else {?>
-      <div class="post text">
-         <?php echo $this->tr('Žádný soubor nebyl vložen.'); ?>
-      </div>
    <?php }?>
 </div>
 

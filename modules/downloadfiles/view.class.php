@@ -30,11 +30,13 @@ class DownloadFiles_View extends View {
          $toolDelete->setConfirmMeassage($this->tr('Opravdu smazat soubor?'));
          $toolboxEdit->addTool($toolDelete);
          
-         foreach ($this->template()->files as &$file) {
-            $toolboxEdit->dwfile_edit->setAction($this->link()->route('edit', array('id' => $file->{DownloadFiles_Model::COLUMN_ID})));
-            $this->formDelete->id->setValues($file->{DownloadFiles_Model::COLUMN_ID});
-            $toolDelete->setConfirmMeassage(sprintf($this->tr('Opravdu smazat soubor %s ?'), $file->{DownloadFiles_Model::COLUMN_NAME}));
-            $file->toolbox = clone $toolboxEdit;
+         if($this->template()->files){
+            foreach ($this->template()->files as &$file) {
+               $toolboxEdit->dwfile_edit->setAction($this->link()->route('edit', array('id' => $file->{DownloadFiles_Model::COLUMN_ID})));
+               $this->formDelete->id->setValues($file->{DownloadFiles_Model::COLUMN_ID});
+               $toolDelete->setConfirmMeassage(sprintf($this->tr('Opravdu smazat soubor %s ?'), $file->{DownloadFiles_Model::COLUMN_NAME}));
+               $file->toolbox = clone $toolboxEdit;
+            }
          }
          
          $this->toolboxItem = $toolboxEdit;

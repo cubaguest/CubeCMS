@@ -1,0 +1,2 @@
+ALTER TABLE `{PREFIX}dwfiles` ADD COLUMN `dwfile_active` TINYINT(1) NULL DEFAULT 1;
+
