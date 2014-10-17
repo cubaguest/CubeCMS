@@ -39,4 +39,13 @@ class Model_Sites extends Model_ORM {
       $this->addRelatioOneToMany(self::COLUMN_ID, 'Model_SitesGroups', Model_SitesGroups::COLUMN_ID_SITE);
    }
 }
-?>
+
+class Model_Sites_Record extends Model_ORM_Record {
+   public function getFullDomain()
+   {
+      if(strpos($this->{Model_Sites::COLUMN_DOMAIN}, '.') === false){
+         return $this->{Model_Sites::COLUMN_DOMAIN}.'.'.Url_Request::getDomain();
+      }
+      return $this->{Model_Sites::COLUMN_DOMAIN};
+   }
+}
