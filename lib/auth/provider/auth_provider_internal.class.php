@@ -35,19 +35,54 @@ class Auth_Provider_Internal extends Auth_Provider implements Auth_Provider_Inte
       $form = $this->getLoginForm();
 
       if($form->isSend() && $form->isValid()){
+         // kontrola počtu přihlášení podle ip. je dvojnásobná oproti loginu
+         $attempts = Model_UsersLoginAttempts::getLogins(0, Utils_Net::getClientIP());
+         if( ( (CUBE_CMS_MAX_FAILED_LOGINS * 2) - $attempts - 1) <= 0){
+            Model_IPBlocks::blockIP(Utils_Net::getClientIP());
+            Log::msg(sprintf($this->tr('IP adresa %s byla blokována pro útok hrubou silou'), Utils_Net::getClientIP()));
+            $link = new Url_Link(true);
+            $link->redirect();
+            return false;
+         }
+         
          $user = Model_Users::getUsersByUsername($form->{self::FORM_USERNAME}->getValues());
          if (!$user){
             $form->{self::FORM_USERNAME}->setError($this->tr('Nepodařilo se přihlásit. Zřejmě váš účet neexistuje.'));
+            
+            $attempt = Model_UsersLoginAttempts::getNewRecord();
+            $attempt->{Model_UsersLoginAttempts::COLUMN_ID_USER} = 0;
+            $attempt->{Model_UsersLoginAttempts::COLUMN_IP} = Utils_Net::getClientIP();
+            $attempt->save();
+            
             return false;
          } else if($user->{Model_Users::COLUMN_BLOCKED} == 1) {
             $form->{self::FORM_USERNAME}->setError($this->tr('Nepodařilo se přihlásit. Váš účet je bloková.'));
             return false;
          }
+         
+         $attempts = Model_UsersLoginAttempts::getLogins($user->getPK(), Utils_Net::getClientIP());
+         
+         $attemptsLogins  = ( CUBE_CMS_MAX_FAILED_LOGINS - $attempts);
+         if( $attemptsLogins <= 0){
+            $user->{Model_Users::COLUMN_BLOCKED} = 1;
+            $form->{self::FORM_USERNAME}->setError($this->tr('Váš účet byl zablokován z důvodu velkého množství pokusů o přihlášení. Kontaktujte nás.'));
+            Log::msg($this->tr('Uživatel byl blokován pro útok hrubou silou'), null, $user->{Model_Users::COLUMN_SURNAME});
+            $user->save();
+            // send mail
+            $this->sendBlockedMail($user);
+            return false;
+         }
+         
          $cryptedPassord = Auth::cryptPassword(htmlentities($form->{self::FORM_PASSWORD}->getValues(),ENT_QUOTES));
          if ( $cryptedPassord != $user->{Model_Users::COLUMN_PASSWORD}
             AND $cryptedPassord != $user->{Model_Users::COLUMN_PASSWORD_RESTORE}
             ){
-            $form->{self::FORM_PASSWORD}->setError($this->tr('Bylo zadáno špatné heslo.'));
+            $form->{self::FORM_PASSWORD}->setError(sprintf($this->tr('Bylo zadáno špatné heslo. Zbývající počet pokusů: %s.'), $attemptsLogins));
+            
+            $attempt = Model_UsersLoginAttempts::getNewRecord();
+            $attempt->{Model_UsersLoginAttempts::COLUMN_ID_USER} = $user->getPK();
+            $attempt->{Model_UsersLoginAttempts::COLUMN_IP} = Utils_Net::getClientIP();
+            $attempt->save();
             return false;
          }
       }
@@ -60,11 +95,13 @@ class Auth_Provider_Internal extends Auth_Provider implements Auth_Provider_Inte
             $model = new Model_Users();
             $model->save($user);
             unset ($model);
-            AppCore::getInfoMessages()->addMessage($tr->tr("Nové heslo bylo nastaveno."));
-            Log::msg($tr->tr('Uživateli bylo obnoveno nové heslo'), null, $user->{Model_Users::COLUMN_SURNAME});
+            AppCore::getInfoMessages()->addMessage($this->tr("Nové heslo bylo nastaveno."));
+            Log::msg($this->tr('Uživateli bylo obnoveno nové heslo'), null, $user->{Model_Users::COLUMN_SURNAME});
          }
+         // reset kontroly
+//         Model_UsersLoginAttempts::clearUserAttempts($user->getPK(), Utils_Net::getClientIP());
+         
          // uložení přihlášení
-
          $modelUserLogins = new Model_UsersLogins();
          $newLogin = $modelUserLogins->newRecord();
          $newLogin->{Model_UsersLogins::COLUMN_ID_USER} = $user->getPK();
@@ -104,6 +141,28 @@ class Auth_Provider_Internal extends Auth_Provider implements Auth_Provider_Inte
       return $this->getLoginForm()->{self::FORM_PERMANENT}->getValues();
    }
    
+   protected function sendBlockedMail($user)
+   {
+      $usermail = $user->{Model_Users::COLUMN_MAIL};
+      if($usermail == null){
+         if(!filter_var($user->{Model_Users::COLUMN_USERNAME}, FILTER_VALIDATE_EMAIL)){
+            return;
+         }
+         $usermail = $user->{Model_Users::COLUMN_USERNAME};
+      }
+      
+      $mail = new Email(true);
+          
+      $mail->setSubject($this->tr('Blokace učtu na stránkách '.CUBE_CMS_WEB_NAME));
+      $mail->addAddress($usermail);
+      
+      $snt = '<p>'.$this->tr('Váš účet byl zablokován z důvodu velkého množství pokusů o přihlášení. Pro odblokování nás kontaktujte.').'</p>';
+      $mail->setContent(Email::getBaseHtmlMail($snt));
+      
+      $mail->send();
+   }
+
+
    /**
     * Metoda pro generování nového hesla
     * @param $userName

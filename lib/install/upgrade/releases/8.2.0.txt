@@ -1,0 +1,5 @@
+NEW:
+- Implementace blokace pomocí ip adresy.
+- Implementace ochrany před bruteforce útokem na účety
+- Implementace proxy js pro nahrávání ja z jiné domény
+

@@ -24,7 +24,7 @@ class AppCore extends TrObject {
    /**
     * Verze enginu
     */
-   const ENGINE_VERSION = '8.1.0';
+   const ENGINE_VERSION = '8.2.0';
 
    /**
     * Obsahuje hlavní soubor aplikace
@@ -998,6 +998,17 @@ class AppCore extends TrObject {
          require AppCore::getAppWebDir().self::ENGINE_CONFIG_DIR.DIRECTORY_SEPARATOR.$fileName;
       }
    }
+   
+   private function checkAttacks()
+   {
+      // přidat rychlou deblokaci
+      
+      if(Model_IPBlocks::isBlocked(Utils_Net::getClientIP())){
+         echo 'Yout IP address is blocekd. Please write email to: '.CUBE_CMS_WEB_MASTER_EMAIL;
+         http_response_code(503);
+         die;
+      }
+   }
 
    /**
     * Hlavní metoda provádění aplikace
@@ -1010,6 +1021,8 @@ class AppCore extends TrObject {
          $this->_initDb();
          // config
          $this->_initConfig();
+         // kontrola útoků a blokací
+         $this->checkAttacks();
          // kontrola verze enginu
          $this->checkCoreVersion();
          // inicializace URL

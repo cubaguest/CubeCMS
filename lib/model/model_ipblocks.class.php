@@ -30,6 +30,13 @@ class Model_IPBlocks extends Model_ORM {
       $m = new self();
       return (bool)$m->where(self::COLUMN_ID." = :idb", array('idb' => inet_pton($ip)))->count(); 
    }
+   
+   public static function blockIP($ip)
+   {
+      $r = self::getNewRecord();
+      $r->{self::COLUMN_ID} = inet_pton($ip);
+      $r->save();
+   }
 }
 
 class Model_IPBlocks_Record extends Model_ORM_Record {
