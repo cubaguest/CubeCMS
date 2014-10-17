@@ -125,6 +125,10 @@ abstract class View extends TrObject {
          $viewName = $actionName.'View';
       } 
       else {
+         if($this->category() instanceof Category_Admin){
+            Template::setFullWidth(true);
+            $this->template->addFile('tpl://'.$actionName.'.phtml');
+         }
          return;
       }
       
