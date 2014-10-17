@@ -1,0 +1,31 @@
+<?php 
+$this->addPageTitle($this->tr('Nasatvení HTAccess'));
+$this->addFile('css://style.less');
+?>
+<h1><?php echo $this->tr('Výběr webu');?></h1>
+<div class="content-admin">
+   <div id="domains-list" class="cubecms-widget cubecms-list">
+      <?php foreach ($this->sites as $item) {?>
+      <div class="item cubecms-list-row" id="domain-item-<?php echo $item->getPK()?>" data-id="<?php echo $item->getPK()?>">
+         <div class="header">
+            <span class="name">
+               <a href="//<?=$item->getFullDomain()?>" class="link-external">
+               <?echo $item->{Model_Sites::COLUMN_IS_MAIN} ? '<strong>': ''?>
+               <?php ps($item->getFullDomain())?>
+               <em>(DIR: <?php ps('/'.$item->{Model_Sites::COLUMN_DIR})?>)</em>
+               
+               <?echo $item->{Model_Sites::COLUMN_IS_MAIN} ? '</strong>': ''?>
+               </a>
+            </span>
+            <span class="tools">
+               <?php 
+               $this->toolboxItem->setTemplate(Template_Toolbox2::TEMPLATE_INLINE);
+               $this->toolboxItem->editItem->setAction($this->link()->route('edit', array('id' => $item->getPK())));
+               echo $this->toolboxItem;
+               ?>
+            </span>
+         </div>
+      </div>
+      <?php }?>
+   </div>
+</div>
