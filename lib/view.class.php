@@ -124,13 +124,6 @@ abstract class View extends TrObject {
       } else if(method_exists($this, $actionName.'View')) {
          $viewName = $actionName.'View';
       } 
-      else {
-         if($this->category() instanceof Category_Admin){
-            Template::setFullWidth(true);
-            $this->template->addFile('tpl://'.$actionName.'.phtml');
-         }
-         return;
-      }
       
       $variables = $this->template()->getTemplateVars();
       foreach ($variables as $var){
@@ -138,9 +131,20 @@ abstract class View extends TrObject {
             $var->mainController();
          }
       }
-      $this->{$viewName}();
-      if ($this->actionName == "main" AND $this->category()->getRights()->isControll() ) {
-         $this->addBaseToolBox();
+      
+      if($viewName != null){
+         $this->{$viewName}();
+         if ($this->actionName == "main" AND $this->category()->getRights()->isControll() ) {
+            $this->addBaseToolBox();
+         }
+      } else {
+         if(!Url_Request::isXHRRequest()) {
+            if($this->category() instanceof Category_Admin){
+               Template::setFullWidth(true);
+               $this->template->addFile('tpl://'.$actionName.'.phtml');
+            }
+            return;
+         } 
       }
    }
 
