@@ -123,6 +123,12 @@ class Template extends TrObject {
 
    protected static $isFullPageWidth = false;
 
+   protected static $baseContentFilters = array(
+       'anchors',
+       'Forms_Controller::contentFilter',
+       
+   );
+
    /*
     * ============= MAGICKÉ METODY
    */
@@ -1060,6 +1066,8 @@ class Template extends TrObject {
     */
    public function filter($text, $filters){
       if(is_string($filters)) $filters = array($filters);
+      $filters = array_merge($filters, self::$baseContentFilters);
+      array_unique($filters);
       foreach ($filters as $filter) {
          if(strpos($filter, '::') !== false){
             $class = explode('::', $filter);
@@ -1102,5 +1110,19 @@ class Template extends TrObject {
     */
    public static function setFullWidth($full = false) {
       self::$isFullPageWidth = $full;
+   }
+   
+   public static function registerContentFilter($name)
+   {
+      self::$baseContentFilters[] = $name;
+      array_unique(self::$baseContentFilters);
+   }
+   
+   public static function unregisterContentFilter($name)
+   {
+      $index = array_search($name, self::$baseContentFilters);
+      if($index){
+         unset(self::$baseContentFilters[$index]);
+      }
    }
 }

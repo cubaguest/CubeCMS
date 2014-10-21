@@ -3,6 +3,8 @@
  * Soubor s výstupními filtry
  */
 
+/*  OLD names */
+
 /**
  * Funkce pro filtraci kotev na stránce
  * @param <type> $cnt
@@ -115,4 +117,3 @@ function _vve_filter_cacheimages_replaceImgPath($imgTag)
    return $imgTag;
 }
 
-?>
