@@ -19,7 +19,7 @@ echo $this->toolbox;
    foreach ($this->forms as $form) {?>
    <table class="ui-widget full-width form-item">
       <tr class="ui-widget-header">
-         <td class="form-name" colspan="2">
+         <td class="form-name" colspan="3">
             <?php 
             echo $form->{Forms_Model::COLUMN_NAME};
             
@@ -38,6 +38,7 @@ echo $this->toolbox;
       <tr class="ui-widget-content">
          <th scope="row" class="param-name"><?php echo $this->tr('Formulář odeslán')?>:</th>
          <td><?php echo $form->{Forms_Model::COLUMN_SENDED}?>x</td>
+         <td><?php ps($this->tr('Kód pro vložení'))?>: {FORM:<?php echo $form->getPK()?>}</td>
       </tr>
    </table>
    <?php }

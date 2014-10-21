@@ -510,6 +510,18 @@ class Forms_Controller extends Controller {
    }
    
    /**
+    * Filtrace obsahu a dosazení formulářů
+    * @param string $cnt
+    * @return string
+    */
+   public static function contentFilter($cnt) {
+      $cnt = preg_replace_callback('/\{[A-Z]+:([0-9]+)\}/', function($matches){
+            return Forms_Controller::dynamicForm($matches[1]);
+         }, $cnt);
+      return $cnt;
+   }
+   
+   /**
     * Metoda vytvoří a odešle email
     * @param Form $form
     * @param type $formRec
