@@ -45,6 +45,11 @@ class AppCore extends TrObject {
     * Adresář s knihovnami enginu
     */
    const ENGINE_LIB_DIR = 'lib';
+   
+   /**
+    * Adresář s logy enginu
+    */
+   const ENGINE_LOGS_DIR = 'lib';
 
    /**
     * Adresář s engine-pluginy
@@ -285,6 +290,15 @@ class AppCore extends TrObject {
    public static function getAppCacheDir()
    {
       return self::getAppWebDir().self::ENGINE_CACHE_DIR.DIRECTORY_SEPARATOR;
+   }
+   
+   /**
+    * Metoda vrací cestu k log adresáři aplikace
+    * @return string
+    */
+   public static function getAppLogDir()
+   {
+      return self::getAppWebDir().self::ENGINE_LOGS_DIR.DIRECTORY_SEPARATOR;
    }
 
    /**

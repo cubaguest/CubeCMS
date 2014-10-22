@@ -23,7 +23,7 @@ class Session {
     * Model se session
     * @var Model_ORM_Record
     */
-   private static $sessionRecord = null;
+//   private static $sessionRecord = null;
 
    /**
     * Konstruktor vytvoří objekt pro práci se session
@@ -89,7 +89,7 @@ class Session {
       } else {
          ini_set('session.gc_divisor', 1000);
       }
-      // pokud je id sessison přenesena v jiném parametru než než pře cookie
+      // pokud je id sessison přenesena v jiném parametru než než přez cookie
       if (isset($_REQUEST['sessionid'])) {
          session_id($_REQUEST['sessionid']);
       } else if (isset($_REQUEST[CUBE_CMS_SESSION_NAME])) {
@@ -98,37 +98,30 @@ class Session {
 
       //Nastaveni session
       if (Url_Request::getDomain() != 'localhost'){
-         session_set_cookie_params(CUBE_CMS_LOGIN_TIME, '/', '.'.Url_Request::getDomain());
+         session_set_cookie_params(CUBE_CMS_LOGIN_TIME, '/', '.'.Url_Request::getDomain(), true, true);
       } else {
-         session_set_cookie_params(CUBE_CMS_LOGIN_TIME, '/');
+         session_set_cookie_params(CUBE_CMS_LOGIN_TIME, '/', 'localhost', true, true);
       }
       session_name(CUBE_CMS_SESSION_NAME);
       session_start();
-      self::regenerateId();
+      if(!isset($_SESSION['_expire'])){
+         $_SESSION['_expire'] = time() + CUBE_CMS_LOGIN_TIME/2;
+      }
+      if($_SESSION['_expire'] < time()){
+         unset($_SESSION['_expire']);
+         self::regenerateId();
+      }
+      
       // cookie params
       if(isset ($_COOKIE[CUBE_CMS_SESSION_NAME])){
          $cookieParams = session_get_cookie_params();
-         setcookie(CUBE_CMS_SESSION_NAME, session_id(), time()+$cookieParams['lifetime'], $cookieParams['path'], $cookieParams['domain']);
+         setcookie(CUBE_CMS_SESSION_NAME, session_id(), time()+$cookieParams['lifetime'], 
+             $cookieParams['path'], $cookieParams['domain'], $cookieParams['secure'], $cookieParams['httponly']);
       }
    }
 
-   /**
-     *  Regenerates the session id.
-     *  <b>Call this method whenever you do a privilege change!</b>
-     *  @return void
-     */
     public static function regenerateId() {
-        // saves the old session's id
-        $oldSessionID = session_id();
-
-        // regenerates the id
-        // this function will create a new session, with a new id and containing the data from the old session
-        // but will not delete the old session
-        session_regenerate_id();
-
-        // because the session_regenerate_id() function does not delete the old session,
-        // we have to delete it manually
-        self::destroy($oldSessionID);
+       session_regenerate_id(true);
     }
 
    /**
@@ -156,26 +149,38 @@ class Session {
 
    public static function read($id) {
       $model = new Model_Session();
-      self::$sessionRecord = $model->where(Model_Session::COLUMN_KEY.' = :key ',array('key' => $id))->record();
-      if(self::$sessionRecord != false){
-         return (string)self::$sessionRecord->{Model_Session::COLUMN_VALUE};
+      $sess = $model->where(Model_Session::COLUMN_KEY.' = :key ',array('key' => $id))->record();
+      if($sess != false){
+         return (string)$sess->{Model_Session::COLUMN_VALUE};
       }
-      self::$sessionRecord = $model->newRecord();
+//      self::$sessionRecord = $model->newRecord();
       return (string)null;
    }
 
    public static function write($id, $sess_data) {
       $model = new Model_Session();
-      self::$sessionRecord->{Model_Session::COLUMN_KEY} = $id;
-      self::$sessionRecord->{Model_Session::COLUMN_VALUE} = $sess_data;
-      // pokud je nový zázname
-      if (self::$sessionRecord->isNew()) {
-         self::$sessionRecord->{Model_Session::COLUMN_IP} = $_SERVER['REMOTE_ADDR'];
-         self::$sessionRecord->{Model_Session::COLUMN_CREATED} = new DateTime();
+      $session = $model->where(Model_Session::COLUMN_KEY." = :key", array('key' => $id))->record();
+      if(!$session || $session->isNew()){
+         $session = $model->newRecord();
+         $session->{Model_Session::COLUMN_IP} = $_SERVER['REMOTE_ADDR'];
+         $session->{Model_Session::COLUMN_CREATED} = new DateTime();
       }
-      self::$sessionRecord->{Model_Session::COLUMN_UPDATED} = new DateTime();
-      $model->save(self::$sessionRecord);
+      $session->{Model_Session::COLUMN_KEY} = $id;
+      $session->{Model_Session::COLUMN_VALUE} = $sess_data;
+      $session->save();
+      
       return true;
+      
+//      self::$sessionRecord->{Model_Session::COLUMN_KEY} = $id;
+//      self::$sessionRecord->{Model_Session::COLUMN_VALUE} = $sess_data;
+//      // pokud je nový zázname
+//      if (self::$sessionRecord->isNew()) {
+//         self::$sessionRecord->{Model_Session::COLUMN_IP} = $_SERVER['REMOTE_ADDR'];
+//         self::$sessionRecord->{Model_Session::COLUMN_CREATED} = new DateTime();
+//      }
+//      self::$sessionRecord->{Model_Session::COLUMN_UPDATED} = new DateTime();
+//      $model->save(self::$sessionRecord);
+//      return true;
    }
 
    public static function destroy($id) {
@@ -188,7 +193,7 @@ class Session {
       $model = new Model_Session();
       //DELETE FROM vezeni_sessions WHERE ADDTIME(`updated`, SEC_TO_TIME(3600)) < NOW() 
       $deleted = $model->where(' ADDTIME('.Model_Session::COLUMN_UPDATED.', SEC_TO_TIME(:lftime)) <= NOW()', array('lftime' => $maxlifetime))->delete();
-      file_put_contents(AppCore::getAppCacheDir().'session.log', $maxlifetime.' > '.self::$sessionRecord->{Model_Session::COLUMN_KEY}.' del: '.$deleted);
+//      file_put_contents(AppCore::getAppCacheDir().'session.log', $maxlifetime.' > '.self::$sessionRecord->{Model_Session::COLUMN_KEY}.' del: '.$deleted);
       return true;
    }
 
