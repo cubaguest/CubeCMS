@@ -98,9 +98,9 @@ class Session {
 
       //Nastaveni session
       if (Url_Request::getDomain() != 'localhost'){
-         session_set_cookie_params(CUBE_CMS_LOGIN_TIME, '/', '.'.Url_Request::getDomain(), true, true);
+         session_set_cookie_params(CUBE_CMS_LOGIN_TIME, '/', '.'.Url_Request::getDomain(), false, true);
       } else {
-         session_set_cookie_params(CUBE_CMS_LOGIN_TIME, '/', 'localhost', true, true);
+         session_set_cookie_params(CUBE_CMS_LOGIN_TIME, '/', 'localhost', false, true);
       }
       session_name(CUBE_CMS_SESSION_NAME);
       session_start();
@@ -109,7 +109,7 @@ class Session {
       }
       if($_SESSION['_expire'] < time()){
          unset($_SESSION['_expire']);
-         self::regenerateId();
+         session_regenerate_id(true);
       }
       
       // cookie params
@@ -121,7 +121,6 @@ class Session {
    }
 
     public static function regenerateId() {
-       session_regenerate_id(true);
     }
 
    /**
