@@ -61,8 +61,6 @@ class Polls_Controller extends Controller {
             $this->errMsg()->addMessage($this->tr('V této anketě jste již hlasoval'));
          } else if($selected == null){
             $this->errMsg()->addMessage($this->tr('Nebyla vybrána žádná volba'));
-         } else if($selected->answer->getValues() == null || is_empty($selected)){
-            $this->errMsg()->addMessage($this->tr('Nebyl odeslán hlas'));
          } else {
             $votedPolls[] = $formVoteMulti->id_poll->getValues();
             if(VVE_DEBUG_LEVEL < 2){
