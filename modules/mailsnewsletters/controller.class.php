@@ -744,6 +744,7 @@ class MailsNewsletters_Controller extends Controller {
          ->records(PDO::FETCH_OBJ);
       
       if(!$mails){
+         echo 'Žádný e-mail k odeslání';
          return;
       }
 
@@ -782,10 +783,10 @@ class MailsNewsletters_Controller extends Controller {
          try {
             self::sendMail($mailObj, $mail->{MailsNewsletters_Model_Queue::COLUMN_MAIL}, $name);
             $modelQueue->delete($mail->{MailsNewsletters_Model_Queue::COLUMN_ID});
-            file_put_contents(AppCore::getAppCacheDir()."newsletter.log", "SEND:".$mail->{MailsNewsletters_Model_Queue::COLUMN_MAIL}."\n\n", FILE_APPEND);
+            file_put_contents(AppCore::getAppLogDir()."newsletter.log", "SEND:".$mail->{MailsNewsletters_Model_Queue::COLUMN_MAIL}."\n\n", FILE_APPEND);
          } catch (Exception $e) {
             // log
-            file_put_contents(AppCore::getAppCacheDir()."newsletter.log", "ERROR:".$e->getTraceAsString()."\n\n", FILE_APPEND);
+            file_put_contents(AppCore::getAppLogDir()."newsletter.log", "ERROR:".$e->getTraceAsString()."\n\n", FILE_APPEND);
          }
          $sended++;
       }
