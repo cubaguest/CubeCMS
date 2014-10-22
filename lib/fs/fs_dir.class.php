@@ -203,7 +203,7 @@ class FS_Dir extends TrObject {
       // tady patří detekce jestli byla předána cesta nebo jenom název
       
       if(@rename((string)$this, $this->getPath().$newName)){
-         $this->dir = $newName;
+         $this->name = $newName;
       } else {
          throw new UnexpectedValueException(sprintf($this->tr('Adresář "%s" se nepodařilo přejmenovat'), (string)$this));
       }
@@ -219,6 +219,19 @@ class FS_Dir extends TrObject {
          return true;
       }
       return false;
+   }
+   
+   /**
+    * Metoda pro přesun adresáře
+    * @param string $target -- kam se má adresář přesunout (cesta)
+    */
+   public function move($target){
+      if(@rename((string)$this, $target.$this->getName())){
+         $this->path = $target;
+      } else {
+         throw new UnexpectedValueException(sprintf($this->tr('Adresář "%s" se nepodařilo přesunout'), (string)$this));
+      }
+      return $this;
    }
    
    /**
