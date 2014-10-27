@@ -74,7 +74,7 @@ class Actions_Model extends Model_ORM {
       $this->addColumn(self::COLUMN_FORM, array('datatype' => 'int', 'pdoparam' => PDO::PARAM_INT, 'default' => 0));
       $this->addColumn(self::COLUMN_FORM_SHOW_TO, array('datatype' => 'datetime', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
       
-      $this->addForeignKey(self::COLUMN_ID_CAT, 'Model_Categories', Model_Category::COLUMN_CAT_ID);
+      $this->addForeignKey(self::COLUMN_ID_CAT, 'Model_Category', Model_Category::COLUMN_CAT_ID);
       $this->addForeignKey(self::COLUMN_ID_USER, 'Model_Users', Model_Users::COLUMN_ID);
    }
    
@@ -113,6 +113,59 @@ class Actions_Model extends Model_ORM {
          )", 
          array("idc" => $idc));
    }
-}
+   
+   public static function getActions($idc, DateTime $from, DateTime $to, $restrictUser = true)
+   {
+      if(!is_array($idc)){
+         $idc = array($idc);
+      }
+      $m = new self();
 
-?>
+      $m->joinFK(Actions_Model::COLUMN_ID_CAT, array('curlkey' => Model_Category::COLUMN_URLKEY));
+
+      $m->where( ( !empty($idc) ? self::COLUMN_ID_CAT." IN(".$m->getWhereINPlaceholders($idc).") AND " : null )
+         ." (".self::COLUMN_PUBLIC." = 1) "
+         . " AND ( (".Locales::getLang().")".self::COLUMN_URLKEY." IS NOT NULL)"
+         ." AND ( "
+               ." (".self::COLUMN_DATE_START." >= :dateFrom AND ".self::COLUMN_DATE_START." <= :dateTo )" // kace začínají v rozsahu
+               ." OR (".self::COLUMN_DATE_START." < :dateFrom AND ".self::COLUMN_DATE_STOP." IS NOT NULL AND ".self::COLUMN_DATE_STOP." > :dateTo )" // akce které právě probíhají
+               ." OR (".self::COLUMN_DATE_STOP." >= :dateFrom AND ".self::COLUMN_DATE_STOP." <= :dateTo )" // akce které končí v rozsahu
+               ." )"
+         ,  array_merge(array(
+              'dateFrom' => $from->format(DATE_ISO8601),
+              'dateTo' => $to->format(DATE_ISO8601),
+            ), !empty($idc) ? $m->getWhereINValues($idc) : array() )
+         );
+      
+      
+      return $m
+          ->order(array(self::COLUMN_DATE_START => Model_ORM::ORDER_ASC, self::COLUMN_TIME => Model_ORM::ORDER_ASC))
+          ->records();
+   }
+   
+   public static function getActionsByLimit($idc, DateTime $from, $limit = 10, $restrictUser = true, $fromRow = 0)
+   {
+      if(!is_array($idc)){
+         $idc = array($idc);
+      }
+      $m = new self();
+      $m->joinFK(Actions_Model::COLUMN_ID_CAT, array('curlkey' => Model_Category::COLUMN_URLKEY));
+      $m->where( ( !empty($idc) ? self::COLUMN_ID_CAT." IN(".$m->getWhereINPlaceholders($idc).") AND " : null )
+         ." (".self::COLUMN_PUBLIC." = 1) "
+         . " AND ( (".Locales::getLang().")".self::COLUMN_URLKEY." IS NOT NULL)"
+         ." AND ( "
+               ." (".self::COLUMN_DATE_START." >= :dateFrom)" // kace začínají v rozsahu
+               ." OR (".self::COLUMN_DATE_START." < :dateFrom AND ".self::COLUMN_DATE_STOP." IS NOT NULL AND ".self::COLUMN_DATE_STOP." > :dateFrom )" // akce které právě probíhají
+               ." )"
+         ,  array_merge(array(
+              'dateFrom' => $from->format(DATE_ISO8601),
+            ), !empty($idc) ? $m->getWhereINValues($idc) : array() )
+         );
+      
+      
+      return $m
+          ->order(array(self::COLUMN_DATE_START => Model_ORM::ORDER_ASC, self::COLUMN_TIME => Model_ORM::ORDER_ASC))
+          ->limit($fromRow, $limit)
+          ->records();
+   }
+}

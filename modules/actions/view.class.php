@@ -93,17 +93,6 @@ class Actions_View extends View {
       Template_Navigation::addItem($this->tr('Archiv'), $this->link());
    }
 
-   private function addTinyMCE() {
-      if($this->form->haveElement('text')){
-         $this->form->text->html()->addClass("mceEditor");
-      }
-      $this->tinyMCE = new Component_TinyMCE();
-      $settings = new Component_TinyMCE_Settings_Advanced();
-      $settings->setSetting('height', '600');
-      $this->tinyMCE->setEditorSettings($settings);
-      $this->tinyMCE->mainView();
-   }
-
    protected function addMetaTags($action)
    {
 //      if ((string) $action->{Actions_Model_Detail::COLUMN_KEYWORDS} != null) {
@@ -136,7 +125,8 @@ class Actions_View extends View {
    /**
     * Viewer pro přidání novinky
     */
-   public function addView() {
+   public function addView() 
+   {
       $this->editView();
       Template_Navigation::addItem($this->tr('Přidání události'), $this->link());
    }
@@ -268,9 +258,9 @@ class Actions_View extends View {
     * Viewer pro editaci 
     */
    public function editView() {
+      Template::setFullWidth(true);
       $this->setTinyMCE($this->form->text, 'advanced');
       $this->template()->addFile('tpl://actions:edit.phtml');
-      Template_Module::setEdit(true);
       if($this->action != null){
          Template_Navigation::addItem($this->action->{Actions_Model::COLUMN_NAME}, $this->link()->route('detail'));
          Template_Navigation::addItem($this->tr('Úprava události'), $this->link());
@@ -318,9 +308,8 @@ class Actions_View extends View {
    }
 
    public function editLabelView() {
+      Template::setFullWidth(true);
       $this->setTinyMCE($this->form->text, 'advanced');
       $this->template()->addFile('tpl://actions:editlabel.phtml');
    }
 }
-
-?>

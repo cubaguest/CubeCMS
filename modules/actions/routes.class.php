@@ -8,7 +8,11 @@ class Actions_Routes extends Routes {
       // preview
       $this->addRoute('preview', "(?P<id>[0-9]+)/preview", 'preview', "{id}/preview/");
       // akce podle datumů
-      $this->addRoute('normaldate',  "(?:(?P<day>[0-3]?[0-9]{1})/(?P<month>[0-1]?[0-9]{1})/(?P<year>[0-9]{4}))?", 'main','{day}/{month}/{year}/');
+      $this->addRoute('list',  
+          "(?P<fromyear>[0-9]{4})(?:-(?P<frommonth>[0-1]?[0-9]))?(?:-(?P<fromday>[0-3]?[0-9]{1}))?" // OD
+          ."(?:/(?P<toyear>[0-9]{4})(?:-(?P<tomonth>[0-1]?[0-9]))?(?:-(?P<today>[0-3]?[0-9]{1}))?)?/?", // DO
+          'main'//,
+          );
       // editace akce
       $this->addRoute('edit', "::urlkey::/edit", 'edit','{urlkey}/edit/');
 
@@ -24,6 +28,34 @@ class Actions_Routes extends Routes {
       $this->addRoute('detailExport', "::urlkey::\.(?P<output>(?:pdf)|(?:xml))", 'showData','{urlkey}.{output}');
       
    }
+   
+   /**
+    * Generuje url část pro zadaná data akce list
+    * @param array $params
+    * @return string
+    */
+   protected function listRouteParams($params)
+   {
+      $str = null;
+      if(isset($params['fromyear'])){
+         $str  .= $params['fromyear'];
+         if(isset($params['frommonth'])){
+            $str  .= '-'.$params['frommonth'];
+            if(isset($params['fromday'])){
+               $str  .= '-'.$params['fromday'];
+            }
+         }
+         if(isset($params['toyear'])){
+            $str  .= '/'.$params['toyear'];
+            if(isset($params['tomonth'])){
+               $str  .= '-'.$params['tomonth'];
+               if(isset($params['today'])){
+                  $str  .= '-'.$params['today'];
+               }
+            }
+         }
+         $str .= '/';
+      }
+      return $str;
+   }
 }
-
-?>

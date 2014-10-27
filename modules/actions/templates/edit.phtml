@@ -1,5 +1,4 @@
 <?php 
-$this->addCssFile("style.css");
 // do titulku
 if($this->edit) {
    $this->addPageTitle($this->tr('úprava události'));
@@ -35,7 +34,6 @@ $this->addJsPlugin($jQuery);
       ?></div>
    <?php }
    echo($this->form);
-   $this->includeFile('tpl://engine:parts/seltitleimage.phtml');
    ?>
    <script type="text/javascript">
       /* <![CDATA[ */

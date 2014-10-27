@@ -1,6 +1,7 @@
 <?php
-/*
- * Třída modelu s listem Novinek
+/**
+ * Třída modelu akcí
+ * @deprecated since version 8.0.0 use Actions_Model
 */
 class Actions_Model_Detail extends Model_PDO {
    /**

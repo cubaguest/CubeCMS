@@ -1,6 +1,7 @@
 <?php
-/*
+/**
  * Třída modelu s listem akcí
+ * @deprecated since version 8.0.0 use Actions_Model
 */
 class Actions_Model_List extends Model_PDO {
    private $usersTable = null;
