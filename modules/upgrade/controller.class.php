@@ -16,20 +16,15 @@ class Upgrade_Controller extends Controller {
       $model = new Model_Module();
 
       $modules = $model->getInstalledModules();
-
       $mList = array();
-      foreach ($modules as $module) {
-         $m['name'] = $module->{Model_Module::COLUMN_NAME};
-         $m['version'] = $module->{Model_Module::COLUMN_VERSION};
-
+      foreach ($modules as $name => $version) {
          // kontrola aktuálnosti
-         $mClass = ucfirst($module->{Model_Module::COLUMN_NAME}) . '_Module';
-         if(!class_exists($mClass)){
-            $mClass = 'Module';
+         $mClass = ucfirst($name) . '_Module';
+         if(class_exists($mClass)){
+            $inst = new $mClass($name);
          }
-         $inst = new $mClass($module->{Model_Module::COLUMN_NAME});
+         array_push($mList, array('name' => $name, 'version' => $version));
 
-         array_push($mList, $m);
       }
 
       $this->view()->modules = $mList;
