@@ -85,6 +85,7 @@ class Model_ORM extends Model implements ArrayAccess {
     */
    protected $currentSql = null;
    protected $bindValues = array();
+   protected $fetchingDbst = false;
    
    /**
     * Název třídy s objektem záznamu
@@ -108,6 +109,7 @@ class Model_ORM extends Model implements ArrayAccess {
       $this->having = array();
       $this->havingBindValues = array();
       $this->bindValues = array();
+      $this->fetchingDbst = false;
 
       $this->_initTable();
       if($this->rowClass == 'Model_ORM_Record' && class_exists(get_class($this).'_Record')){
@@ -554,10 +556,7 @@ class Model_ORM extends Model implements ArrayAccess {
 
    /**
     * Metoda vrací záznamy z db
-    * @param int $fromRow -- od záznamu
-    * @param int $rows -- počet záznamů
-    * @param string/array $conds -- podmínky
-    * @param array $orders -- řazení
+    * @param int -- typ výstupu PDO::FETCH_XXX nebo Model_ORM::FETCH_XXX
     * @return Model_ORM_Record[]|false
     */
    public function records($fetchParams = self::FETCH_LANG_CLASS)
@@ -615,6 +614,61 @@ class Model_ORM extends Model implements ArrayAccess {
       return $r;
    }
 
+   /**
+    * Provede načtení přepřipraveného dotazu na db. V parametru můžou být změny proměnných pro where klauzuli
+    * @param array $whereBarams -- parametry where v assoc. poli
+    * @param type $fetchParams
+    * @return Model_ORM_Record[]|false
+    */
+   public function fetchRecords($whereBarams = array(), $fetchParams = self::FETCH_LANG_CLASS)
+   {
+      if(!$this->fetchingDbst){
+         $sql = 'SELECT ' . $this->createSQLSelectColumns() . ' FROM `' . $this->getDbName() . '`.`' . $this->getTableName() . '` AS ' . $this->getTableShortName();
+         $this->createSQLJoins($sql);
+         $this->createSQLWhere($sql, $this->getTableShortName()); // where
+         $this->createSQLGroupBy($sql); // group by
+         $this->createSQLHaving($sql); // having
+         $this->createSQLOrder($sql); // order
+         $this->createSQLLimi($sql); // limit
+         $this->fetchingDbst = $this->getDb()->prepare($sql);
+      }
+      $this->whereBindValues = array_merge($this->whereBindValues, $whereBarams);
+      
+      $this->bindSQLWhere($this->fetchingDbst); // where values
+      $this->bindSQLHaving($this->fetchingDbst); // having values
+      $this->bindSQLLimit($this->fetchingDbst); // limit values
+      $this->bindValues($this->fetchingDbst); // limit values
+      $r = false;
+      try {
+//         $timer = Debug_Timer::getInstance()->timerStart('SQL_records');
+         if ($fetchParams == self::FETCH_LANG_CLASS OR $fetchParams == self::FETCH_PKEY_AS_ARR_KEY) {
+            $this->fetchingDbst->setFetchMode(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, $this->rowClass, array($this->tableStructure, true, $this));
+            $this->fetchingDbst->execute();
+            $r = $this->fetchingDbst->fetchAll(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, $this->rowClass, array($this->tableStructure, true, $this));
+         } else {
+            $this->fetchingDbst->setFetchMode($fetchParams);
+            $this->fetchingDbst->execute();
+            $r = $this->fetchingDbst->fetchAll($fetchParams);
+         }
+//         $timer->timerStop('SQL_records', $sql != null ? $sql : $this->currentSql);
+         if ($fetchParams == self::FETCH_PKEY_AS_ARR_KEY AND $r != false) {
+            $newR = array();
+            foreach ($r as $record) {
+               $newR[$record->getPK()] = $record;
+            }
+            $r = $newR;
+         }
+      } catch (PDOException $exc) {
+         $this->unLock();
+         CoreErrors::addException($exc);
+         if (AppCore::getUserErrors() instanceof Messages AND VVE_DEBUG_LEVEL > 0) {
+            AppCore::getUserErrors()->addMessage('ERROR SQL: ' . $sql);
+         }
+      }
+
+      return $r;
+   }
+   
    /**
     * Metoda vrací počet záznamů z db podle daného nastavení modelu
     * @return int
@@ -924,12 +978,10 @@ class Model_ORM extends Model implements ArrayAccess {
          $dbst->bindValue(':pkey', $record->getPK(), $this->tableStructure[$this->pKey]['pdoparam']); // bind pk
          // bind values
          foreach ($record->getColumns() as $colname => $params) {
-            if ($params['extern'] == true OR $params['changed'] < 1){
+            if ($params['extern'] == true OR $params['changed'] < 1)
                continue;
-            }
-            if (!isset($params['lang'])){
+            if (!isset($params['lang']))
                $params['lang'] = false;
-            }
             $value = $params['value'];
             if ($params['lang'] == true) {
                foreach (Locales::getAppLangs() as $lang) {
@@ -966,12 +1018,10 @@ class Model_ORM extends Model implements ArrayAccess {
          $bindParamStr = array();
          // create query
          foreach ($record->getColumns() as $colname => $params) {
-            if (!isset($params['lang'])){
+            if (!isset($params['lang']))
                $params['lang'] = false;
-            }
-            if ($params['extern'] == true OR $params['changed'] != 1){
+            if ($params['extern'] == true OR $params['changed'] != 1)
                continue;
-            }
             if ($params['lang'] === true) {
                foreach (Locales::getAppLangs() as $lang) {
                   if ($params['aliasFor'] === null) {
@@ -2114,7 +2164,8 @@ class Model_ORM extends Model implements ArrayAccess {
                throw new UnexpectedValueException(sprintf($this->tr('Nepovolená hodnota "%s" v předanám paramteru'), $varType));
             }
             $nameParam = $name[0] != ":" ? ':'.$name : $name;
-            if (!$mustBeBindValue && $stmt->bindParam($nameParam, $this->whereBindValues[$name], $pdoParam) !== false) { // nefunguje při některých where, ale proč??
+            // bindParam use references http://php.net/manual/en/pdostatement.bindvalue.php#80285
+            if (!$mustBeBindValue && $stmt->bindParam($nameParam, $this->whereBindValues[$name], $pdoParam) !== false) { 
             } else {
                $stmt->bindValue(':' . $name, $val, $pdoParam);
             }
