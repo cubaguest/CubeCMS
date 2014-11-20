@@ -56,9 +56,8 @@ class Articles_Controller extends Controller {
       // načtení článků
       $artModel = new Articles_Model();
       
-      
       $externalCats = explode(';', $this->category()->getParam(self::PARAM_MOUNTED_CATS, "") );
-      if(!empty($externalCats )) {
+      if( $this->category()->getParam(self::PARAM_MOUNTED_CATS, false) && !empty($externalCats )) {
          $wCatPl = array(':pl_'.$this->category()->getId() => $this->category()->getId() );
          foreach ($externalCats as $externalCatID) {
             $wCatPl[':pl_'.$externalCatID] = $externalCatID;
@@ -1019,7 +1018,7 @@ class Articles_Controller extends Controller {
          $eCreatedDate->setSubLabel($this->tr('Pokud bude datum v budoucnosti, dojde k zveřejnění až v toto datum.'));
          $eCreatedDate->addValidation(new Form_Validator_NotEmpty());
          $eCreatedDate->addValidation(new Form_Validator_Date());
-         $eCreatedDate->setAdvanced(true);
+//         $eCreatedDate->setAdvanced(true);
          $form->addElement($eCreatedDate, $fGrpPublic);
 
          $eCreatedTime = new Form_Element_Text('created_time', $this->tr('Čas vytvoření'));
@@ -1385,7 +1384,13 @@ class Articles_Controller extends Controller {
       }
       
       $form->addElement($eSubmit);
-      
+
+      if($form->isSend() && $form->save->getValues() == false){
+         $this->link(true)
+               ->route('detail')
+               ->reload();
+      }
+
       if($form->isValid()){
          $cat = new Category((int)$form->newcat->getValues());
          

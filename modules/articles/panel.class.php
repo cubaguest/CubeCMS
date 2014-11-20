@@ -26,15 +26,7 @@ class Articles_Panel extends Panel {
    }
 
    public function panelView() {
-//      $tplFile = $this->panel()->getParam(self::PARAM_TPL_PANEL, 'panel.phtml');
-//      $tplFilePanel = str_replace('.phtml', '_'.$this->panel()->getPosition().'.phtml', $tplFile);
-//      if($this->template()->existTpl($tplFilePanel, $this->category()->getModule()->getName())){
-//         $this->template()->addFile('tpl://'.$tplFilePanel);
-//      } else {
-//         $this->template()->addFile('tpl://'.$tplFile);
-//      }
       $this->template()->addFile($this->getTemplate());
-      
       $this->template()->rssLink = $this->link()->clear()->route().Url_Request::URL_FILE_RSS;
    }
 
@@ -69,4 +61,3 @@ class Articles_Panel extends Panel {
       }
    }
 }
-?>

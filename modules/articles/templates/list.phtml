@@ -67,7 +67,7 @@ echo $this->toolbox;
          }
       }
       
-      $link = $this->link()->category($article->curlkey)
+      $link = $this->link()->category($article->curlkey != null ? $article->curlkey : $this->category()->getUrlKey())
                ->route('detail', array('urlkey' => $article->{Articles_Model::COLUMN_URLKEY}));
       ?>
    <div class="post <?php echo $showClass?>">
