@@ -94,9 +94,9 @@ class Component_Captcha extends Component {
       $image = @imagecreatefromjpeg($this->getConfig('baseimage'));  
       
       $rand = $this->getConfig('salt'); 
-      imagestring($image, 5, 2, 2, $rand[0]." ".$rand[1]." ".$rand[2]." ", imagecolorallocate($image, 0, 0, 0)); 
+      imagestring($image, 6, 2, 2, $rand[0]." ".$rand[1]." ".$rand[2]." ", imagecolorallocate($image, 0, 0, 0)); 
       $rand = $this->getConfig('rand'); 
-      imagestring($image, 5, 2, 2, " ".$rand[0]." ".$rand[1]." ".$rand[2], imagecolorallocate($image, 255, 0, 0)); 
+      imagestring($image, 6, 2, 2, " ".$rand[0]." ".$rand[1]." ".$rand[2], imagecolorallocate($image, 255, 0, 0)); 
       Template_Output::setOutputType('jpeg');
       Template_Output::sendHeaders();
       imagejpeg($image);
