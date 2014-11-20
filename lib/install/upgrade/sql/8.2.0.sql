@@ -10,13 +10,10 @@ CREATE TABLE IF NOT EXISTS `cubecms_global_ipblock` (
   UNIQUE INDEX `ip_address_UNIQUE` (`ip_address` ASC)
 );
 
---   `id_login_attempt` int(10) NOT NULL AUTO_INCREMENT,  AUTO_INCREMENT=1
-CREATE TABLE `cubecms_global_login_attempts` (
+CREATE TABLE IF NOT EXISTS `cubecms_global_login_attempts` (
   `id_user` int(11) NOT NULL,
   `time_login` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id_login_attempt`)
-) ENGINE=InnoDB;
-
-
+  `login_ip` varbinary(16) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 /* END_UPDATE */
