@@ -39,6 +39,9 @@ if($c != 0){?>
    <div class="admin-info-text">
       <?php 
       echo $this->tr('Galerie neobsahuje žádný obrázek.');
+      if($this->linkEditImages){
+         printf($this->tr('<a class="" href="%s">Nahrát</a>.'), $this->link()->route($this->linkEditImages));
+      }
       echo $this->toolboxImages;
       ?>
    </div>
