@@ -1,0 +1,4 @@
+NEW:
+- Implementace metody v ORM modelu pro výběr řádku pomocí fetch a bindování parametrů
+- Přidání globální proměnné s hlavní doménou
+
