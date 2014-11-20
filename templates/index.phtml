@@ -66,7 +66,7 @@ $this->addFile('js://base.js');
                   $this->includeTpl("messages.phtml", true);
                   $navTpl = new Template_Navigation();
                   echo $navTpl;
-
+                  
                   if(Template::isTitlePage()){
                      echo HPSlideShow_View::getSlideshow();
                   }
