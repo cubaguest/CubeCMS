@@ -38,6 +38,16 @@ class Model_Sites extends Model_ORM {
       $this->setPk(self::COLUMN_ID);
       $this->addRelatioOneToMany(self::COLUMN_ID, 'Model_SitesGroups', Model_SitesGroups::COLUMN_ID_SITE);
    }
+   
+   /**
+    * Metoda vrací všechny site aplikace
+    * @return Model_ORM_Record[]
+    */
+   public static function getMainSite()
+   {
+      $m = new self();
+      return $m->where(self::COLUMN_IS_MAIN." = 1", array())->record();
+   }
 }
 
 class Model_Sites_Record extends Model_ORM_Record {
