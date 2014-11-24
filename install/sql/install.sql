@@ -92,7 +92,6 @@ INSERT INTO `cubecms_global_config` (`id_config`, `key`, `label`, `value`, `valu
 (54, 'FEED_TTL', 'Počet minut kešování kanálu', '30', NULL, 0, 'number', 5, NULL, 0),
 (55, 'WEB_COPYRIGHT', 'Copyright poznámka k webu ({Y} - nahrazeno rokem)', 'Obsah toho webu je licencován podle ... Žádná s jeho částí nesmí být použita bez vědomí webmastera. Copyrigth {Y}', NULL, 0, 'string', 2, NULL, 0),
 (56, 'SEARCH_ARTICLE_REL_MULTIPLIER', 'Násobič pro relevanci nadpisu článku (1 - nekonečno)', '5', NULL, 0, 'number', 9, NULL, 0),
-(57, 'ADMIN_MENU_STRUCTURE', 'Administrační menu', '', NULL, 1, 'ser_object', 1, NULL, 0),
 (62, 'MAIN_PAGE_TITLE', 'Nadpis hlavní stránky', 'Main Title Page', NULL, 0, 'string', 2, NULL, 0),
 (63, 'ALLOW_EXTERNAL_JS', 'Povolení externích JavaScript souborů', 'true', NULL, 0, 'bool', 3, NULL, 0),
 (74, 'CM_SITEMAP_MAX_ITEMS', 'Maximální počet položek v mapě stránek (pro vyhledávače)', '50', NULL, 0, 'number', 5, NULL, 0),
@@ -386,7 +385,6 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}config` (
 
 INSERT INTO `{PREFIX}config` (`id_config`, `key`, `label`, `value`, `values`, `protected`, `type`, `id_group`, `callback_func`, `hidden_value`) VALUES
 (1, 'CATEGORIES_STRUCTURE', NULL, 'O:18:"Category_Structure":7:{s:25:"\0Category_Structure\0level";i:0;s:22:"\0Category_Structure\0id";i:0;s:28:"\0Category_Structure\0idParent";N;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:1:{i:0;O:18:"Category_Structure":7:{s:25:"\0Category_Structure\0level";i:1;s:22:"\0Category_Structure\0id";s:1:"1";s:28:"\0Category_Structure\0idParent";i:0;s:26:"\0Category_Structure\0catObj";N;s:29:"\0Category_Structure\0childrens";a:0:{}s:30:"\0Category_Structure\0withHidden";b:0;s:4:"type";s:4:"main";}}s:30:"\0Category_Structure\0withHidden";b:0;s:4:"type";s:4:"main";}', NULL, 1, 'ser_object', 1, NULL, 0),
-(2, 'ADMIN_MENU_STRUCTURE', 'Administrační menu', '', NULL, 1, 'ser_object', 1, NULL, 0),
 (3, 'VERSION', 'Verze jádra', '8.2.2', NULL, 1, 'string', 1, NULL, 0),
 (5, 'FCB_ACCESS_TOKEN', 'Access token pro přístup k Facebooku', NULL, NULL, 0, 'string', 11, NULL, 1);
 
