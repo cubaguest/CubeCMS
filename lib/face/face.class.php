@@ -1,6 +1,7 @@
 <?php
 class Face {
    const BASE_DIR = "faces";
+   const FACE_CONF_FILE = "face.php";
    
    protected static $current = null;
 
@@ -30,7 +31,7 @@ class Face {
    
    protected function loadParams() {
       if($this->params == null){
-         $file = AppCore::getAppWebDir().Template::FACES_DIR.DIRECTORY_SEPARATOR.$this->name.DIRECTORY_SEPARATOR."face.php";
+         $file = AppCore::getAppWebDir().Template::FACES_DIR.DIRECTORY_SEPARATOR.$this->name.DIRECTORY_SEPARATOR.self::FACE_CONF_FILE;
          if(is_file($file)){
             $face = $modules = array();
             include_once $file;
@@ -123,5 +124,21 @@ class Face {
    {
       return AppCore::getAppWebDir().self::BASE_DIR.DIRECTORY_SEPARATOR.$this->getName().DIRECTORY_SEPARATOR;
    }
-   
+ 
+   /**
+    * Vrací pole se všemi vzhledy aplikace
+    * @return array
+    */
+   public static function getFaces()
+   {
+      $faces = array();
+      foreach (new DirectoryIterator(AppCore::getAppLibDir().Face::BASE_DIR) as $fileInfo) {
+         if($fileInfo->isDir() && !$fileInfo->isDot()) {
+            $face = array('name' => null, 'desc' => null, 'version' => null);
+            include $fileInfo->getPathname().DIRECTORY_SEPARATOR.self::FACE_CONF_FILE;
+            $faces[$fileInfo->getBasename()] = $face;
+         }
+      }
+      return $faces;
+   }
 }
