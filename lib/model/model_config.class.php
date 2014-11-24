@@ -20,10 +20,10 @@ class Model_Config extends Model_ConfigGlobal {
    
    public static function setSiteConfigValue($dbPrefix, $name, $value, $idGroup = 1, $type = self::TYPE_STRING)
    {
-      $db = $this->getDb();
+      $db = Db_PDO::getInstance();
       
-      $stmt = $db->prepare('INSERT INTO `'.$dbPrefix.'_config` '
-          . '('.self::COLUMN_ID_GROUP.', '.self::COLUMN_KEY.', '.self::COLUMN_VALUE.', '.self::COLUMN_TYPE.') '
+      $stmt = $db->prepare('INSERT INTO `'.$dbPrefix.'config` '
+          . '(`'.self::COLUMN_ID_GROUP.'`, `'.self::COLUMN_KEY.'`, `'.self::COLUMN_VALUE.'`, `'.self::COLUMN_TYPE.'`) '
           . 'VALUES (:idg, :key, :value, :type) ON DUPLICATE KEY UPDATE '
           . '`'.self::COLUMN_VALUE.'`= :valueu;');
       
