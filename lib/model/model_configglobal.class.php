@@ -36,6 +36,7 @@ class Model_ConfigGlobal extends Model_ORM {
    const TYPE_LIST = 'list';
    const TYPE_LIST_MULTI = 'listmulti';
    const TYPE_SER_DATA = 'ser_object';
+   const TYPE_INT = 'int';
       
    private $globalTable = 'cubecms_global_config';
    private $mainTable = null;

@@ -17,4 +17,24 @@ class Model_Config extends Model_ConfigGlobal {
       $this->mainTable = $this->getTableName();
       $this->setTableName(self::DB_TABLE);
    }
+   
+   public static function setSiteConfigValue($dbPrefix, $name, $value, $idGroup = 1, $type = self::TYPE_STRING)
+   {
+      $db = $this->getDb();
+      
+      $stmt = $db->prepare('INSERT INTO `'.$dbPrefix.'_config` '
+          . '('.self::COLUMN_ID_GROUP.', '.self::COLUMN_KEY.', '.self::COLUMN_VALUE.', '.self::COLUMN_TYPE.') '
+          . 'VALUES (:idg, :key, :value, :type) ON DUPLICATE KEY UPDATE '
+          . '`'.self::COLUMN_VALUE.'`= :valueu;');
+      
+      // bind insert parametrů
+      $stmt->bindValue(':idg', $idGroup, PDO::PARAM_INT);
+      $stmt->bindValue(':key', $name, PDO::PARAM_STR);
+      $stmt->bindValue(':value', $value, $type == self::TYPE_INT ? PDO::PARAM_INT : PDO::PARAM_STR);
+      $stmt->bindValue(':type', $type, PDO::PARAM_STR);
+      
+      $stmt->bindValue(':valueu', $value, $type == self::TYPE_INT ? PDO::PARAM_INT : PDO::PARAM_STR);
+      // bind update
+      return $stmt->execute();
+   }
 }
