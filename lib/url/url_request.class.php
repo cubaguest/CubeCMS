@@ -377,7 +377,7 @@ class Url_Request {
     */
    private function parseCoreModuleUrl() {
       $return = false;
-      $regexp = '/((?:sitemap|rss|autorun)).((xml|txt|html|php)+)/i';
+      $regexp = '/((?:sitemap|rss|autorun|logincheck)).((xml|txt|html|php)+)/i';
       $matches = array();
       if(preg_match($regexp, self::$fullUrl, $matches) != 0) {
          $this->pageFull = false;
