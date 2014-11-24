@@ -265,4 +265,27 @@ class FS_Dir extends TrObject {
           }
       }
    }
+   
+   /**
+    * Kopíruje adresář
+    * @param string/FS_Dir $targetDir
+    */
+   public function copyContent($targetDir)
+   {
+      if(!($targetDir instanceof FS_Dir)){
+         $targetDir = new FS_Dir($targetDir);
+      }
+      $targetDir->check();
+      foreach (
+         $iterator = new RecursiveIteratorIterator(
+          new RecursiveDirectoryIterator((string)$this, RecursiveDirectoryIterator::SKIP_DOTS),
+          RecursiveIteratorIterator::SELF_FIRST) as $item
+        ) {
+          if ($item->isDir()) {
+            mkdir((string)$targetDir . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
+          } else {
+            copy($item, (string)$targetDir . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
+          }
+      }
+   }
 }
