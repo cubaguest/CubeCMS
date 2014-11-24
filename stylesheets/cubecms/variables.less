@@ -3,10 +3,12 @@
  */
 
 @color-primary: #0080FF;
+@color-primary-light: lighten(@color-primary, 15%);
 @color-border: #ccc;
 @color-border-hover: #999;
 @color-border-important: #fc4949;
 @color-text: #666;
+@color-text-invert: #fff;
 @color-text-hover: #fff;
 @color-text-hover-alt: darken(@color-text, 50);
 @color-text-gray: #333;
@@ -14,7 +16,7 @@
 @color-bg: #fff;
 @color-bg-header: #fff;
 @color-bg-content: #fff;
-@color-bg-hover: lighten(@color-primary, 15%);
+@color-bg-hover: @color-primary-light;
 @color-bg-hover-light: lighten(@color-bg-hover, 30%);
 @color-bg-important: #FF3323;
 @color-bg-gray: #efefef;
@@ -34,6 +36,7 @@
 
 @padding-base: 10px;
 @padding-small: 5px;
+@padding-large: 20px;
 @padding-base-vertical: @padding-base;
 
 .rounded-corners(@radius: @border-radius) {
@@ -62,5 +65,16 @@
    -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
    -moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
+}
+
+.cube-gradient() { 
+   background: @color-primary; /* Old browsers */
+   background: -moz-linear-gradient(top, @color-primary-light 0%, @color-primary 100%); /* FF3.6+ */
+   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,@color-primary-light), color-stop(100%,@color-primary)); /* Chrome,Safari4+ */
+   background: -webkit-linear-gradient(top, @color-primary-light 0%,@color-primary 100%); /* Chrome10+,Safari5.1+ */
+   background: -o-linear-gradient(top, @color-primary-light 0%,@color-primary 100%); /* Opera 11.10+ */
+   background: -ms-linear-gradient(top, @color-primary-light 0%,@color-primary 100%); /* IE10+ */
+   background: linear-gradient(to bottom, @color-primary-light 0%,@color-primary 100%); /* W3C */
+   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='@color-primary-light', endColorstr='@color-primary',GradientType=0 ); /* IE6-9 */
 }
 

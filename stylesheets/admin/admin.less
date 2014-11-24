@@ -761,13 +761,34 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
 
 /* UI widget adminstrace */
 .cubecms-widget {
+   a, a:visited {
+      color: @color-primary;
+   }
    &.cubecms-table {
+      .cubecms-header {
+         .cube-gradient();
+         border: 1px solid @color-primary;
+         td, th {
+            color: @color-text-invert;
+         }
+      }
+      .cubecms-row {
+         &:hover {
+            background-color: @color-bg-hover-light;
+         }
+         td {
+            border: 1px solid @color-border;
+         }
+      }
       th, td {
          padding: @padding-widget;
+         color: @color-text;
       }
       th {
          font-weight: bold;
       }
+      width: 100%;
+      margin-bottom: @padding-large;
    }
    &.cubecms-list {
       .cubecms-list-row {
