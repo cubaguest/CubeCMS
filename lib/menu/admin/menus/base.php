@@ -1,5 +1,5 @@
 <?php
-$lastID = 32796;
+$lastID = 32797;
 /* 
  * Základní sekce menu
  */
@@ -90,7 +90,7 @@ $this->addItem(Menu_Admin::SECTION_CONTENT, new Menu_Admin_Item(
 ));
 $this->addItem(Menu_Admin::SECTION_CONTENT, new Menu_Admin_Item(
     32784, array( 'cs' => 'Formuláře', 'en' => 'Forms'),
-   'content/forms', 'templates', 'application_form.png'
+   'content/forms', 'forms', 'application_form.png'
 ));
 $this->addItem(Menu_Admin::SECTION_CONTENT, new Menu_Admin_Item(
     32794, array( 'cs' => 'Banner na úvodní stránce', 'en' => 'Homepage SlideShow'),
@@ -149,6 +149,11 @@ $this->addItem(Menu_Admin::SECTION_SETTINGS, new Menu_Admin_Item(
     32795, array( 'cs' => 'Úprava htaccess', 'en' => 'Htaccess edit'),
    'system/htaccess', 'adminhtaccess', 'server_link.png'
 ));
+$this->addItem(Menu_Admin::SECTION_SETTINGS, new Menu_Admin_Item(
+    32797, array( 'cs' => 'Podweby', 'en' => 'Subsites'),
+   'system/subsites', 'adminsites', 'world.png'
+));
+
 
 /* 
  * Informace
