@@ -1,0 +1,62 @@
+RewriteEngine On
+#CUBECMS
+
+#CUBECMS
+
+RewriteCond $1 ^jscripts/
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_URI} \.(js)$
+Rewriterule (.*) /index.php?internalApp=proxyjs&path=$1 [R=301,L,QSA]
+
+RewriteCond $1 ^faces/[a-z]+/jscripts/
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_URI} \.(js)$
+Rewriterule (.*) /index.php?internalApp=proxyjs&path=$1 [R=301,L,QSA]       
+
+RewriteCond $1 ^modules/[a-z]+/jscripts/
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_URI} \.(js)$
+Rewriterule (.*) /index.php?internalApp=proxyjs&path=$1 [R=301,L,QSA]       
+
+RewriteCond $1 ^jscripts/      
+RewriteCond %{REQUEST_FILENAME} !-f
+Rewriterule (.*) http://www.cube-cms.com/$1 [L]
+RewriteCond $1 ^images/
+RewriteCond %{REQUEST_FILENAME} !-f
+Rewriterule (.*) http://www.cube-cms.com/$1 [L]
+RewriteCond $1 ^fonts/
+RewriteCond %{REQUEST_FILENAME} !-f
+Rewriterule (.*) http://www.cube-cms.com/$1 [L]
+RewriteCond $1 ^data/
+RewriteCond %{REQUEST_FILENAME} !-f
+Rewriterule (.*) http://www.cube-cms.com/$1 [L]
+RewriteCond $1 ^stylesheets/
+RewriteCond %{REQUEST_FILENAME} !-f
+Rewriterule (.*) http://www.cube-cms.com/$1 [L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+Rewriterule modules/([a-z]+)/stylesheets/(.*) http://www.cube-cms.com/modules/$1/stylesheets/$2 [L,R=303]
+RewriteCond %{REQUEST_FILENAME} !-f
+Rewriterule modules/([a-z]+)/jscripts/(.*) http://www.cube-cms.com/modules/$1/jscripts/$2 [L,R=303]
+RewriteCond %{REQUEST_FILENAME} !-f
+Rewriterule modules/([a-z]+)/images/(.*) http://www.cube-cms.com/modules/$1/images/$2 [L,R=303]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^cache/imgc/([a-z0-9]+)/([x0-9]+c?(?:-f_[0-9]*(?:_[0-9]*)?(?:_[0-9]*)?(?:_[0-9]*)?(?:_[0-9]*)?)?)/(.+)$ index.php?internalApp=imagecacher&s=$3&tf=$1&is=$2 [L,R=302,QSA]
+
+
+RewriteRule ^config/config\.php$ / [R=permanent,L]
+RewriteCond %{REQUEST_URI} !\.[[:alnum:]]+$
+RewriteRule ^(.+[^/])$ /$1/ [L,R=301,QSA]
+
+RewriteRule ^admin/$ /ucet/ [L,R=301,QSA]
+#RewriteRule ^login/$ /ucet/ [L,R=301,QSA]
+
+RewriteCond %{REQUEST_FILENAME} -s [OR]
+RewriteCond %{REQUEST_FILENAME} -l [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^.*$ - [NC,L]
+RewriteRule ^.*$ /index.php [NC,L]
+
