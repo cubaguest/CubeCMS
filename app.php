@@ -24,7 +24,7 @@ class AppCore extends TrObject {
    /**
     * Verze enginu
     */
-   const ENGINE_VERSION = '8.2.1';
+   const ENGINE_VERSION = '8.2.2';
 
    /**
     * Obsahuje hlavní soubor aplikace
