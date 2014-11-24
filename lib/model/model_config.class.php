@@ -37,4 +37,20 @@ class Model_Config extends Model_ConfigGlobal {
       // bind update
       return $stmt->execute();
    }
+   
+   public static function getSiteConfigValue($dbPrefix, $name)
+   {
+      $db = Db_PDO::getInstance();
+      
+      $stmt = $db->prepare('SELECT * FROM `'.$dbPrefix.'config` WHERE `'.self::COLUMN_KEY.'` = :key');
+      // bind insert parametrů
+      $stmt->bindValue(':key', $name, PDO::PARAM_STR);
+      // bind update
+      $stmt->execute();
+      $rec = $stmt->fetch(PDO::FETCH_OBJ);
+      if($rec){
+         return $rec->{self::COLUMN_VALUE};
+      }
+      return false;
+   }
 }
