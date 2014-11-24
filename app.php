@@ -49,7 +49,7 @@ class AppCore extends TrObject {
    /**
     * Adresář s logy enginu
     */
-   const ENGINE_LOGS_DIR = 'lib';
+   const ENGINE_LOGS_DIR = 'logs';
 
    /**
     * Adresář s engine-pluginy
