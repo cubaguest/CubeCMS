@@ -1,5 +1,5 @@
 NEW:
 - Implementace přidávání a podwebů
 
-REPAIR:
+OPRAVY:
 - opravy a drobné doplnění funkcí

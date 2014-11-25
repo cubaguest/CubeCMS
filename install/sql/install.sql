@@ -812,7 +812,8 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}sites` (
   `domain` varchar(50) DEFAULT NULL,
   `dir` varchar(50) DEFAULT NULL,
   `table_prefix` varchar(50) NOT NULL,
-  `is_main` tinyint(1) DEFAULT '0'
+  `is_main` tinyint(1) DEFAULT '0',
+  `is_alias` TINYINT(1) NULL DEFAULT 0
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
 
 --

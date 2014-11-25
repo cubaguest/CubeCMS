@@ -2,5 +2,6 @@
 ALTER TABLE `{PREFIX}sites` 
 CHANGE COLUMN `domain` `domain` VARCHAR(50) NULL DEFAULT NULL ,
 CHANGE COLUMN `dir` `dir` VARCHAR(50) NULL DEFAULT NULL ,
-CHANGE COLUMN `table_prefix` `table_prefix` VARCHAR(50) NOT NULL ;
+CHANGE COLUMN `table_prefix` `table_prefix` VARCHAR(50) NOT NULL ,
+ADD COLUMN `is_alias` TINYINT(1) NULL DEFAULT 0 AFTER `is_main`;
 /* END_UPDATE */
