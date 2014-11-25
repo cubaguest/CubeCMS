@@ -20,6 +20,7 @@ class Model_Sites extends Model_ORM {
    const COLUMN_DIR        = 'dir';
    const COLUMN_TB_PREFIX  = 'table_prefix';
    const COLUMN_IS_MAIN  = 'is_main';
+   const COLUMN_IS_ALIAS  = 'is_alias';
 
    protected function  _initTable() {
       if(VVE_GLOBAL_TABLES_PREFIX != null) {
@@ -33,7 +34,7 @@ class Model_Sites extends Model_ORM {
       $this->addColumn(self::COLUMN_DIR, array('datatype' => 'varchar(20)', 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_TB_PREFIX, array('datatype' => 'varchar(20)', 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_IS_MAIN, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => false));
-
+      $this->addColumn(self::COLUMN_IS_ALIAS, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => false));
 
       $this->setPk(self::COLUMN_ID);
       $this->addRelatioOneToMany(self::COLUMN_ID, 'Model_SitesGroups', Model_SitesGroups::COLUMN_ID_SITE);
