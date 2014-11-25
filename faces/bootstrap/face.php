@@ -12,10 +12,10 @@ $face['version'] = "1.0";
 $face['jquery_theme'] = "base";
 
 $face['panels'] = array(
-//   'left' => 'Levý',
+   'left' => 'Levý',
 //   'left-hp' => 'Levý na HomePage',
    'right' => 'Pravý',
-//   'bottom' => 'Spodní',
+   'bottom' => 'Spodní',
 );
 
 /*
