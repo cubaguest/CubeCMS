@@ -16,9 +16,6 @@ class Panels_View extends View {
 
    protected function createPanelsToolboxes($panels)
    {
-      if(empty($panels)){
-         return;
-      }
       $toolboxPanel = new Template_Toolbox2();
       $toolboxPanel->setTemplate(Template_Toolbox2::TEMPLATE_INLINE);
 
@@ -37,8 +34,8 @@ class Panels_View extends View {
       $toolboxPanel->addTool($toolRemove);
 
       foreach ($panels as $panel) {
-         $toolboxPanel->settings->setAction($this->link()->route('settings', array('id' => $panel->{Model_Panel::COLUMN_ID})));
-         $toolboxPanel->edit->setAction($this->link()->route('edit', array('id' => $panel->{Model_Panel::COLUMN_ID})));
+         $toolboxPanel->settings->setAction($this->link()->clear()->route('settings', array('id' => $panel->{Model_Panel::COLUMN_ID})));
+         $toolboxPanel->edit->setAction($this->link()->clear()->route('edit', array('id' => $panel->{Model_Panel::COLUMN_ID})));
          $toolboxPanel->panelDelete->getForm()->id->setValues($panel->{Model_Panel::COLUMN_ID});
 
          $panel->toolbox = clone $toolboxPanel;

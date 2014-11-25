@@ -454,7 +454,6 @@ class Panels_Controller extends Controller {
          ->records();
       
       $this->view()->formRemove = $this->createRemoveForm();
-      $this->view()->formRemove->setAction($this->link()->clear()->route('main'));
    }
 
    public function panelSettingsController()
