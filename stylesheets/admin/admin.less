@@ -773,11 +773,32 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
          }
       }
       .cubecms-row {
+         &.state-hightlight {
+            
+         }
+         &.state-warning {
+            
+         }
+         &.state-disabled {
+            &:hover {
+               background-color: @color-bg-gray;
+            }
+            td {
+               color: @color-text-light;
+               text-decoration: line-through;
+            }
+         }
+      
          &:hover {
             background-color: @color-bg-hover-light;
          }
          td {
             border: 1px solid @color-border;
+         }
+      }
+      .cubecms-row-separator {
+         td {
+            padding: @padding-small;
          }
       }
       th, td {
