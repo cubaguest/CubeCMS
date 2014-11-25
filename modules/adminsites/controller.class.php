@@ -38,18 +38,30 @@ class AdminSites_Controller extends Controller {
             $this->infoMsg()->addMessage($this->tr('Alias byl smazán'));
          } else {
             $db = new Model_DbSupport();
-            $tables = $db->getTablesByPrefix($site->{Model_Sites::COLUMN_TB_PREFIX});
-            
-            foreach ($tables as $table) {
-//               Model_DbSupport::dropTable($table);
+            if($site->{Model_Sites::COLUMN_TB_PREFIX} == null){
+               throw new UnexpectedValueException('Pokus o smazání celé db');
             }
-            
+            $tables = $db->getTablesByPrefix($site->{Model_Sites::COLUMN_TB_PREFIX});
+            if(!empty($tables)){
+               foreach ($tables as $table) {
+                  Model_DbSupport::dropTable($table);
+               }
+            }
+            // dir
+            if($site->{Model_Sites::COLUMN_DIR} == null){
+               throw new UnexpectedValueException('Pokus o smazání kořene webu');
+            }
             $dir = new FS_Dir($site->{Model_Sites::COLUMN_DIR}, AppCore::getAppLibDir());
             if($dir->exist()){
-//               $dir->delete();
+               $dir->delete();
             }
+            
+            // mazání aliasu
+            $model
+                ->where(Model_Sites::COLUMN_IS_ALIAS." = 1 AND ".Model_Sites::COLUMN_DIR." = :dir", array('dir' => $site->{Model_Sites::COLUMN_DIR}))
+                ->delete();
             $model->delete($site);
-            $this->infoMsg()->addMessage($this->tr('Web byl smazán'));
+            $this->infoMsg()->addMessage($this->tr('Web včetně aliasů byl smazán'));
          }
          $this->link()->route()->redirect();
       }
@@ -57,6 +69,7 @@ class AdminSites_Controller extends Controller {
       
       $sites = $model
           ->where(Model_Sites::COLUMN_IS_MAIN." = 0", array())
+          ->order(Model_Sites::COLUMN_DOMAIN)
           ->records();
       
       $this->view()->sites = $sites;
@@ -166,7 +179,6 @@ class AdminSites_Controller extends Controller {
    {
       $model = new Model_Sites();
       $record = $model->record($id);
-      
       if(!$record){
          throw new UnexpectedPageException();
       }
@@ -296,7 +308,9 @@ class AdminSites_Controller extends Controller {
    protected function createWebsiteDir($newdir)
    {
       $tplDir = new FS_Dir(self::SITES_TPL_DIR, AppCore::getAppLibDir());
-      $tplDir->copyContent(AppCore::getAppLibDir().$newdir);
+      if(!is_dir(AppCore::getAppLibDir().$newdir)){
+         $tplDir->copyContent(AppCore::getAppLibDir().$newdir);
+      }
       
    }
    

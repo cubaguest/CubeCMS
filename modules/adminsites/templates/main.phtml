@@ -22,6 +22,16 @@ $this->addCssFile("style.less");
    ?>
    <?php 
    if(!empty($this->sites)){
+      $lastGroupId = 1;
+      $groups = array();
+      foreach ($this->sites as $site) {
+         if(!isset($groups[$site->{Model_Sites::COLUMN_DIR}])){
+            $groups[$site->{Model_Sites::COLUMN_DIR}] = $lastGroupId;
+            $lastGroupId++;
+         }
+         $site->_grpID = $groups[$site->{Model_Sites::COLUMN_DIR}];
+      }
+      
       ?>
    <table class="cubecms-widget cubecms-table">
       <thead class="cubecms-header">
@@ -36,7 +46,10 @@ $this->addCssFile("style.less");
       <?php foreach ($this->sites as $site) {?>
          <tr class="cubecms-row">
             <td><a href="http://<?php ps($site->getFullDomain()) ?>" class="link-external"><?php ps($site->getFullDomain()) ?></a></td>
-            <td><?php ps($site->{Model_Sites::COLUMN_DIR}) ?></td>
+            <td>
+               <?php ps($site->{Model_Sites::COLUMN_DIR}) ?>
+               <span class="icon icon-circle site-group-color-<?php echo $site->_grpID?> "></span>
+            </td>
             <td><?php ps($site->{Model_Sites::COLUMN_IS_ALIAS} ? $this->tr('Ano') : $this->tr('Ne')) ?></td>
             <td><?php echo $site->toolbox;?></td>
          </tr>

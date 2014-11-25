@@ -9,6 +9,6 @@ class AdminSites_Routes extends Routes {
       $this->addRoute('addSite', "add", 'addSite', "add/");
       $this->addRoute('addAlias', "add-alias", 'addAlias', "add-alias/");
       $this->addRoute('editSite', "edit-(?P<id>[0-9]+)/", 'editSite', 'edit-{id}/');
-      $this->addRoute('editAlias', "edit-(?P<id>[0-9]+)/", 'editAlias', 'edit-alias-{id}/');
+      $this->addRoute('editAlias', "edit-alias-(?P<id>[0-9]+)/", 'editAlias', 'edit-alias-{id}/');
    }
 }
