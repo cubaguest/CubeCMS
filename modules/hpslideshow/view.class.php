@@ -25,7 +25,7 @@ class HPSlideShow_View extends View {
 
       if($images){
          $tpl->images = $images;
-         $tpl->imagesUrl = Url_Link::getWebURL().VVE_DATA_DIR."/hpslideshow/";
+         $tpl->imagesUrl = Url_Link::getWebURL().VVE_DATA_DIR."/".HPSlideShow_Controller::DATA_DIR."/";
          $tpl->addFile('tpl://hpslideshow:slideshow.phtml');
          $tpl->addFile('js://hpslideshow:slider.js');
          if($assignCss){

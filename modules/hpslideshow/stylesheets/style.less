@@ -1,11 +1,12 @@
 #hp-slideshow {
    .slide {
-      .label {
+      .text-content {
          position: absolute;
          bottom: 0;
          background-color: white;
          margin: 5px;
          padding: 5px;
+         color: #000;
       }
       >a, img {
          display: block;
@@ -16,7 +17,7 @@
    }
    margin: 10px 0;
    position: relative;
-   height: 150px;
+   height: 250px;
 }
 
 #images-list {
@@ -44,6 +45,7 @@
    .ui-tabs-panel {
       img.image-slide {
 //         width: 100%;
+         max-width: 100%;
       }
       .image-label {
          >* {

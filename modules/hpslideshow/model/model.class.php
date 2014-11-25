@@ -2,7 +2,7 @@
 /*
  * Třída modelu s detailem galerie
 */
-class HPSlideShow_Model extends Model_ORM {
+class HPSlideShow_Model extends Model_ORM_Ordered {
    const DB_TABLE = 'hpslideshow_images';
    /**
     * Názvy sloupců v databázi pro tabulku s obrázky
@@ -30,47 +30,8 @@ class HPSlideShow_Model extends Model_ORM {
       $this->addColumn(self::COLUMN_FILE, array('datatype' => 'varchar(40)', 'pdoparam' => PDO::PARAM_STR, 'nn' => true));
 
       $this->setPk(self::COLUMN_ID);
+      $this->setOrderColumn(self::COLUMN_ORDER);
       
       $this->addForeignKey(self::COLUMN_ID_CAT, 'Model_Category', Model_Category::COLUMN_CAT_ID);
-   }
-
-   protected function beforeSave(Model_ORM_Record $record, $type = 'U')
-   {
-      // kontrola jestli je zadána pozice
-      if($record->{self::COLUMN_ORDER} < 1){
-         $counter = $this->count();
-         $record->{self::COLUMN_ORDER} = $counter+1;
-      }
-   }
-
-   protected function beforeDelete($pk)
-   {
-      $m = new self();
-      $record = $m->record($pk);
-
-      // reorganizovat pořadí
-      $m->where(self::COLUMN_ORDER." > :ord", array( 'ord' => $record->{self::COLUMN_ORDER} ))
-         ->update(array( self::COLUMN_ORDER => array('stmt' => self::COLUMN_ORDER." - 1" )) );
-   }
-
-   public static function changeOrder($id, $newPos)
-   {
-      $m = new self();
-      $rec = $m->record($id);
-
-      if($newPos > $rec->{self::COLUMN_ORDER}){
-         // move down
-         $m->where(self::COLUMN_ORDER." > :oldOrder AND ".self::COLUMN_ORDER." <= :newOrder",
-            array('oldOrder' => $rec->{self::COLUMN_ORDER}, 'newOrder' => $newPos))
-            ->update(array(self::COLUMN_ORDER => array('stmt' => self::COLUMN_ORDER.' - 1')));
-      } else {
-         // move up
-         $m->where(self::COLUMN_ORDER." < :oldOrder AND ".self::COLUMN_ORDER." >= :newOrder",
-            array('oldOrder' => $rec->{self::COLUMN_ORDER}, 'newOrder' => $newPos))
-            ->update(array(self::COLUMN_ORDER => array('stmt' => self::COLUMN_ORDER.' + 1')));
-      }
-      // update row
-      $rec->{self::COLUMN_ORDER} = $newPos;
-      $rec->save();
    }
 }

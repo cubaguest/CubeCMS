@@ -26,10 +26,10 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
                <li><a class="tab-link" href="<?php echo $this->link()?>#edit-<?php echo $img->getPK()?>"><?php ps($this->tr('Úprava'))?></a></li>
             </ul>
             <div class="tab tab-preview" id="preview-<?php echo $img->getPK()?>">
-               <img class="image-slide" src="<?php echo vve_image_cacher($this->imagesUrl.$img->{HPSlideShow_Model::COLUMN_FILE}, 700, 400)?>" />
-               <?php if((string)$img->{HPSlideShow_Model::COLUMN_LABEL} != null){?>
-                  <div class="image-label"><?php ps(vve_get_lang_string($img->{HPSlideShow_Model::COLUMN_LABEL}))?></div>
-               <?php }?>
+               <img class="image-slide" src="<?php echo $this->imagesUrl.$img->{HPSlideShow_Model::COLUMN_FILE}?>" />
+               <?if((string)$img->{HPSlideShow_Model::COLUMN_LABEL} != null){?>
+                  <div class="image-label"><?echo vve_get_lang_string($img->{HPSlideShow_Model::COLUMN_LABEL})?></div>
+               <?}?>
                <div class="link-info">
                <?php if((string)$img->{HPSlideShow_Model::COLUMN_LINK} != null){?>
                   <?php ps($this->tr('Odkaz na'))?>:

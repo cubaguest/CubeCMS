@@ -12,10 +12,13 @@
 
 class HPSlideShow_Controller extends Controller {
 
+   const DATA_DIR = 'hpslideshow';
+
+
    public function init() 
    {
       $this->checkControllRights();
-      $this->module()->setDataDir('hpslideshow');
+      $this->module()->setDataDir(self::DATA_DIR);
    }
 
    public function mainController()
@@ -151,7 +154,7 @@ class HPSlideShow_Controller extends Controller {
          $this->infoMsg()->addMessage($this->tr('Obrázek byl smazán'));
          $this->link()->redirect();
       } else if($action == 'changepos' && $this->getRequestParam('id', false) && $this->getRequestParam('pos', false)){
-         HPSlideShow_Model::changeOrder($this->getRequestParam('id'), $this->getRequestParam('pos'));
+         HPSlideShow_Model::setRecordPosition($this->getRequestParam('id'), $this->getRequestParam('pos'));
          $this->infoMsg()->addMessage($this->tr('Změna pozice byla uložena'));
          $this->link()->redirect();
       } else if($action == 'changestate' && $this->getRequestParam('id', false)){
