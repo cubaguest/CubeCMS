@@ -640,7 +640,8 @@ class Template_Core extends Template {
       $params = array(
          'domain' => Url_Request::getDomain(),
          'lang' => Locales::getLang(),
-         'primaryLang' => Locales::getDefaultLang()
+         'primaryLang' => Locales::getDefaultLang(),
+         'userIsLoged' => Auth::isLogin()
       );
       echo 'CubeCMS.init('.json_encode($params).');'."\n";
    }
