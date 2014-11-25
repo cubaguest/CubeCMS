@@ -35,6 +35,27 @@ class Model_DbSupport extends Model_PDO {
       $dbst->setFetchMode(PDO::FETCH_OBJ);
       return $dbst;
    }
+   
+   public function getTablesByPrefix($prefix) {
+      $dbc = Db_PDO::getInstance();
+
+      $dbst = $dbc->prepare('SELECT '.self::COL_TB_TABLE_NAMES.' FROM '.self::DB_NAME_WITH_SCHEMAS.'.'.self::DB_TABLE_TABLES
+         .' WHERE '.self::COL_TB_TABLE_SCHEMA.' = :dbname AND '.self::COL_TB_TABLE_NAMES.' LIKE :tblname');// AND table_name != :thistabel');
+      
+      $dbst->bindValue(':dbname', VVE_DB_NAME, PDO::PARAM_STR);
+      $dbst->bindValue(':tblname', ''.$prefix.'%', PDO::PARAM_STR);
+      $dbst->execute();
+      $dbst->setFetchMode(PDO::FETCH_OBJ);
+      $tablesTMP = $dbst->fetchAll();
+      $tables = array();
+      if($tablesTMP){
+         foreach ($tablesTMP as $t) {
+            $tables[] = $t->table_name;
+         }
+      }
+      
+      return $tables;
+   }
 
    /**
     * Metoda načte obsah tabulky v db
@@ -43,7 +64,7 @@ class Model_DbSupport extends Model_PDO {
     */
    public function getTableContent($tableName) {
       $dbc = Db_PDO::getInstance();
-      $dbst = $dbc->prepare('SELECT * FROM '.$tableName);// AND table_name != :thistabel');
+      $dbst = $dbc->prepare('SELECT * FROM '.$tableName);
       $dbst->setFetchMode(PDO::FETCH_OBJ);
       $dbst->execute();
       return $dbst;
@@ -58,6 +79,12 @@ class Model_DbSupport extends Model_PDO {
       $pdo = Db_PDO::getInstance();
       return $pdo->query($sql);
    }
+   
+   public static function dropTable($table)
+   {
+      $pdo = Db_PDO::getInstance();
+      $stmt = $pdo->prepare('DROP TABLE IF EXISTS `'.$table.'`');
+      Log::msg('Smazána tabluka: '.$table, null, Auth::getUserId());
+      return $stmt->execute();
+   }
 }
-
-?>
