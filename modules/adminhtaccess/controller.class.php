@@ -206,9 +206,9 @@ RewriteRule ^cache/imgc/([a-z0-9]+)/([x0-9]+c?(?:-f_[0-9]*(?:_[0-9]*)?(?:_[0-9]*
    protected static function createHtaccessSubDomainStatic()
    {
       $m = new Model_Sites();
-      
-      $mainsSite = $m->where(Model_Sites::COLUMN_IS_MAIN." = 1", array())->record();
-      $domain = $mainsSite->getFullDomain();
+//      $mainsSite = $m->where(Model_Sites::COLUMN_IS_MAIN." = 1", array())->record();
+//      $domain = $mainsSite->getFullDomain();
+      $domain = CUBE_CMS_PRIMARY_DOMAIN;
       
       $str = "
 RewriteCond $1 ^jscripts/
@@ -219,7 +219,12 @@ Rewriterule (.*) /index.php?internalApp=proxyjs&path=$1 [R=301,L,QSA]
 RewriteCond $1 ^faces/[a-z]+/jscripts/
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_URI} \.(js)$
-Rewriterule (.*) /index.php?internalApp=proxyjs&path=$1 [R=301,L,QSA]       
+Rewriterule (.*) /index.php?internalApp=proxyjs&path=$1 [R=301,L,QSA]    
+
+RewriteCond $1 ^modules/[a-z]+/jscripts/
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_URI} \.(js)$
+Rewriterule (.*) /index.php?internalApp=proxyjs&path=$1 [R=301,L,QSA]  
 
 RewriteCond $1 ^jscripts/      
 RewriteCond %{REQUEST_FILENAME} !-f
@@ -236,6 +241,13 @@ Rewriterule (.*) http://$domain/$1 [L]
 RewriteCond $1 ^stylesheets/
 RewriteCond %{REQUEST_FILENAME} !-f
 Rewriterule (.*) http://$domain/$1 [L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+Rewriterule modules/([a-z]+)/stylesheets/(.*) http://$domain/modules/$1/stylesheets/$2 [L,R=303]
+RewriteCond %{REQUEST_FILENAME} !-f
+Rewriterule modules/([a-z]+)/jscripts/(.*) http://$domain/modules/$1/jscripts/$2 [L,R=303]
+RewriteCond %{REQUEST_FILENAME} !-f
+Rewriterule modules/([a-z]+)/images/(.*) http://$domain/modules/$1/images/$2 [L,R=303]
 \n";
       return $str;
 
@@ -243,11 +255,17 @@ Rewriterule (.*) http://$domain/$1 [L]
    
 
    public static function generateMainHtaccess(
-       $enableCaching = true,
-       $wwwRedirect = true,
+       $enableCaching = null,
+       $wwwRedirect = null,
        $customCnt = false
        )
    {
+      if($enableCaching === null){
+         $enableCaching = Model_ConfigGlobal::getValue('HTACCESS_USE_CACHE', false);
+      }
+      if($wwwRedirect === null){
+         $wwwRedirect = Model_ConfigGlobal::getValue('HTACCESS_WWW_REDIRECT', true);
+      }
       $content = "RewriteEngine On\n";
       if($enableCaching){
          $content .= self::createHtaccessExpires();
