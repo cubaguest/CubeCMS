@@ -21,9 +21,9 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
    );
    $this->includeTpl('modules/buttons.phtml', true);
    ?>
-   <table class="panels-list">
-      <thead>
-         <tr class="ui-widget-header">
+   <table class="panels-list cubecms-widget cubecms-table">
+      <thead class="cubecms-header">
+         <tr class="">
             <th scope="col" class="panel-tb-category"><?php echo $this->tr('kategorie')?></th>
             <th scope="col" class="panel-tb-box"><?php echo $this->tr('box')?></th>
             <th scope="col" class="panel-tb-order"><?php echo $this->tr('priorita')?></th>
@@ -31,8 +31,9 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
          </tr>
       </thead>
       <tbody>
-      <?php $this->panels = $this->gobalpanels;
-      $this->includeTpl('listtpl.phtml', false, array('panels' => $this->gobalpanels));?>
+      <?php 
+      $this->includeFile('tpl://listtpl.phtml');
+      ?>
       </tbody>
    </table>
    <br />
@@ -63,8 +64,8 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
    <button name="selectCatPanels"><?php echo $this->tr('Vybrat')?></button>
    </div>
    <div><!-- kvuli loadboxu-->
-      <table class="panels-list" id="indCatPanelsList">
-         <thead class="ui-widget-header" id="indCatPanelsListHeader">
+      <table class="panels-list cubecms-widget cubecms-table" id="indCatPanelsList">
+         <thead class="cubecms-header" id="indCatPanelsListHeader">
             <tr>
                <th scope="col" class="panel-tb-category"><?php echo $this->tr('kategorie')?></th>
                <th scope="col" class="panel-tb-box"><?php echo $this->tr('box')?></th>

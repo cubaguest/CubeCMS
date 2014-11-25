@@ -3,11 +3,11 @@ if(!empty ($this->panels)){
 $previousPos = null;
 foreach ($this->panels as $key => $panel) {
    if($previousPos != $panel->{Model_Panel::COLUMN_POSITION} AND $previousPos != null) {?>
-<tr>
-   <td colspan="5"><hr/></td>
+<tr class="cubecms-row-separator">
+   <td colspan="5"><span></span></td>
 </tr>
       <?php }?>
-<tr class="ui-widget-content ui-state-default">
+<tr class="cubecms-row <?php echo !isset($this->facePanels[$panel->{Model_Panel::COLUMN_POSITION}]) ? 'state-disabled' : ''?>">
    <td>
          <?php 
          if((string)$panel->{Model_Panel::COLUMN_NAME} != null) {
@@ -21,7 +21,7 @@ foreach ($this->panels as $key => $panel) {
          ?>
    </td>
    <td><?php 
-      if(!empty($this->facePanels)){
+      if(!empty($this->facePanels) && isset($this->facePanels[$panel->{Model_Panel::COLUMN_POSITION}])){
          ps($this->facePanels[$panel->{Model_Panel::COLUMN_POSITION}]);
       } else {
          ps($panel->{Model_Panel::COLUMN_POSITION});
@@ -36,7 +36,8 @@ foreach ($this->panels as $key => $panel) {
       </form>
    </td>
    <td>
-      <form method="post" action="<?php echo $this->link()->route('settings', array('id' => $panel->{Model_Panel::COLUMN_ID}))?>" style="display:inline;">
+            <?php echo $panel->toolbox?>
+<!--      <form method="post" action="<?php echo $this->link()->route('settings', array('id' => $panel->{Model_Panel::COLUMN_ID}))?>" style="display:inline;">
          <input type="image" src="<?php echo vve_get_tpl_file('icons/cog_edit.png', VVE_TPL_FILE_IMAGE)?>"
                 value="edit" name="panel_edit" title="<?php echo $this->tr('Nastavení panelu')?>" />
       </form>
@@ -48,14 +49,14 @@ foreach ($this->panels as $key => $panel) {
          <input type="hidden" name="panel_id" value="<?php echo $panel->{Model_Panel::COLUMN_ID}?>" />
          <input type="image" src="<?php echo vve_get_tpl_file('icons/page_delete.png', VVE_TPL_FILE_IMAGE)?>"
                 value="edit" name="panel_delete" title="<?php echo $this->tr('Smazat')?>" />
-      </form>
+      </form>-->
    </td>
 </tr>
    <?php 
    $previousPos = $panel->{Model_Panel::COLUMN_POSITION};
 }
 } else {?>
-<tr class="ui-widget-content ui-state-disabled">
+<tr class="cubecms-row">
    <td colspan="4"><?php echo $this->tr('Není uložen žádný panel');?></td>
 </tr>
 <?php }

@@ -28,13 +28,7 @@ class Panels_Controller extends Controller {
 
       $model = new Model_Panel();
 
-      $formRemove = new Form('panel_');
-      $elemId = new Form_Element_Hidden('id');
-      $formRemove->addElement($elemId);
-
-      $elemSubmit = new Form_Element_SubmitImage('delete');
-      $formRemove->addElement($elemSubmit);
-
+      $formRemove = $this->createRemoveForm();
       if($formRemove->isValid()){
          $panel = $model->record($formRemove->id->getValues());
 
@@ -57,6 +51,8 @@ class Panels_Controller extends Controller {
          $this->infoMsg()->addMessage($this->tr('Panel byl odstraněn'));
          $this->link()->reload();
       }
+      $this->view()->formRemove = $formRemove;
+      
       $formPriority = new Form('panel_');
 
       $elemId = new Form_Element_Hidden('id');
@@ -76,7 +72,7 @@ class Panels_Controller extends Controller {
          $this->link()->reload();
       }
       // view
-      $this->view()->gobalpanels = $model->getPanelsList(0,false);;
+      $this->view()->panels = $model->getPanelsList(0,false);
 
       // načtení individuálních panelů
       $modelCat = new Model_Category();
@@ -344,6 +340,17 @@ class Panels_Controller extends Controller {
       $this->editForm = $form;
    }
 
+   protected function createRemoveForm()
+   {
+      $formRemove = new Form('panelDelete');
+      $elemId = new Form_Element_Hidden('id');
+      $formRemove->addElement($elemId);
+
+      $elemSubmit = new Form_Element_Submit('delete', $this->tr('Smazat'));
+      $formRemove->addElement($elemSubmit);
+      return $formRemove;
+   }
+   
    protected function createArray(Category_Structure $struct, $onlyIndividual = false, $level = 0)
    {
       $a = array();
@@ -445,6 +452,9 @@ class Panels_Controller extends Controller {
          ->where(Model_Panel::COLUMN_ID_SHOW_CAT." = :idc OR ".Model_Panel::COLUMN_FORCE_GLOBAL." = 1", array('idc' => $idc))
          ->order(array(Model_Panel::COLUMN_POSITION => Model_ORM::ORDER_ASC, Model_Panel::COLUMN_ORDER => Model_ORM::ORDER_DESC))
          ->records();
+      
+      $this->view()->formRemove = $this->createRemoveForm();
+      $this->view()->formRemove->setAction($this->link()->clear()->route('main'));
    }
 
    public function panelSettingsController()
