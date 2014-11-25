@@ -13,7 +13,7 @@
  */
 class JsPlugin_JQuery extends JsPlugin {
    const BASE_THEME = 'base';
-   const JQUERY_VERSION = '1.8.2';
+   const JQUERY_VERSION = '2.1.1';
    const JQUERY_UI_VERSION = '1.9.1';
 
    const FACE_THEME_DIR = 'jqueryui';
@@ -79,15 +79,19 @@ class JsPlugin_JQuery extends JsPlugin {
 //      if(defined('VVE_ALLOW_EXTERNAL_JS') AND VVE_ALLOW_EXTERNAL_JS == true AND VVE_DEBUG_LEVEL <= 1 AND in_array($this->getCfgParam('theme'), self::$GoogleCDNThemes)){
 //         $this->addFile("http://ajax.googleapis.com/ajax/libs/jqueryui/" . self::JQUERY_UI_VERSION . "/themes/".$this->getCfgParam('theme')."/jquery-ui.css");
 //      } else {
-         $this->addFile(new JsPlugin_CssFile("jquery.ui.$css.css", false, self::getThemeDir($this->getCfgParam('theme'))));
+//         $this->addFile(new JsPlugin_CssFile("jquery.ui.$css.css", false, self::getThemeDir($this->getCfgParam('theme'))));
 //      }
+      $this->addFile(new JsPlugin_CssFile("jquery-ui.min.css", false, 'ui/themes/'));
+      $this->addFile(new JsPlugin_CssFile("theme.css", false, self::getThemeDir($this->getCfgParam('theme'))));
    }
 
    protected function addJs($name) {
       if (defined('VVE_ALLOW_EXTERNAL_JS') AND VVE_ALLOW_EXTERNAL_JS == true AND VVE_DEBUG_LEVEL <= 1 AND !in_array($name, $this->plugins)) {
-         $this->addFile("http://ajax.googleapis.com/ajax/libs/jqueryui/" . self::JQUERY_UI_VERSION . "/jquery-ui.min.js");
+//         $this->addFile("http://ajax.googleapis.com/ajax/libs/jqueryui/" . self::JQUERY_UI_VERSION . "/jquery-ui.min.js");
+         $this->addFile("http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js");
       } else {
-         $this->addFile(new JsPlugin_JsFile("jquery.$name.min.js"));
+//         $this->addFile(new JsPlugin_JsFile("jquery.$name.min.js"));
+         $this->addFile(new JsPlugin_JsFile("jquery-ui.min.js"));
       }
    }
 
@@ -99,6 +103,7 @@ class JsPlugin_JQuery extends JsPlugin {
       } else {
          $this->addFile(new JsPlugin_JsFile("jquery-" . self::JQUERY_VERSION . ".min.js"));
       }
+      $this->addFile(new JsPlugin_JsFile("jquery-migrate-1.2.1.min.js"));
    }
 
    /**
@@ -352,7 +357,7 @@ class JsPlugin_JQuery extends JsPlugin {
        */
       $this->addJs("ui.datepicker");
       if(Locales::getLang() != "en"){
-         $this->addFile(new JsPlugin_JsFile("jquery.ui.datepicker-" . Locales::getLang() . ".min.js", false, 'ui/i18n/'));
+         $this->addFile(new JsPlugin_JsFile("datepicker-" . Locales::getLang() . ".js", false, 'ui/i18n/'));
       }
       $this->addCss('datepicker');
       return $this;
