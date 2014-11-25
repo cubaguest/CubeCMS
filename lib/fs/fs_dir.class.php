@@ -27,7 +27,7 @@ class FS_Dir extends TrObject {
     * @param string $name -- (option) název adresáře
     * @param string $path -- (option) cesta k adresáři (pokud není zadána pokusí se rozparsovat mízev adresáře)
     */
-   public function __construct($name = null, $path = null)
+   public function __construct($name, $path = null)
    {
       // kontrola správnosti adresáře
       $this->name = $name;
@@ -115,32 +115,25 @@ class FS_Dir extends TrObject {
    public static function deleteStatic($dir)
    {
       if (is_dir($dir) && !is_link($dir)){
-         $files = glob($dir . '/*');
-         if($files){
-            foreach($files as $file) {
-               if(is_dir($file))
-                  self::deleteContentStatic($file);
-               else
-                  unlink($file);
-            }
-         }
-         @rmdir($dir);
+         self::deleteContentStatic($dir);
+         rmdir(realpath($dir));
       }
-
-      self::deleteContentStatic($dir);
    }
 
    /**
     * Metoda maže rekjurzivně obsah zadaného adresáře
     * @return FS_Dir
     */
-   public static function deleteContentStatic($path){
-      if (is_dir($path) && !is_link($path)){
-         foreach(glob($path . '/*') as $file) {
-            if(is_dir($file))
-               self::deleteContentStatic($file);
-            else
-               unlink($file);
+   public static function deleteContentStatic($path)
+   {
+      $iterator = new RecursiveDirectoryIterator($path);
+      foreach (new RecursiveIteratorIterator($iterator, RecursiveIteratorIterator::CHILD_FIRST) as $file) {
+         if (in_array($file->getBasename(), array('.', '..'))) {
+            continue;
+        } else if ($file->isDir()) {
+            rmdir($file->getPathname());
+         } else {
+            unlink($file->getPathname());
          }
       }
    }
@@ -281,11 +274,11 @@ class FS_Dir extends TrObject {
           new RecursiveDirectoryIterator((string)$this, RecursiveDirectoryIterator::SKIP_DOTS),
           RecursiveIteratorIterator::SELF_FIRST) as $item
         ) {
-          if ($item->isDir()) {
+         if ($item->isDir()) {
             mkdir((string)$targetDir . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
-          } else {
+         } else {
             copy($item, (string)$targetDir . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
-          }
+         }
       }
    }
 }
