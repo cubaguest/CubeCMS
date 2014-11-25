@@ -1,0 +1,152 @@
+<?php 
+if(Template::browser()->isMobile() && ( !isset($_COOKIE['mobile'] ) || $_COOKIE['mobile'] == false ) ){
+   $this->includeFile("tpl://index_handle.phtml");
+   return;
+}
+// base metatags
+Template_Core::setMetaTag('Robots', 'index,follow');
+Template_Core::setMetaTag('generator', AppCore::ENGINE_NAME.' '.AppCore::ENGINE_VERSION);
+if(VVE_FCB_APP_ID != null){
+   Template_Core::setMetaTag('fb:app_id', VVE_FCB_APP_ID);
+}
+// detekce IE
+Template::setPVar('IE',false);
+$matches = array();
+if(preg_match('/(?i)msie ([1-9])/i',$_SERVER['HTTP_USER_AGENT'], $matches)) {
+   Template::setPVar('IE_WARN',false);
+   if((strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE 6.') !==  FALSE) AND !isset ($_COOKIE['show_ie_warning'])){
+      Template::setPVar('IE_WARN',true);
+   }
+   Template::setPVar('IE',true);
+}
+// base styles
+$this->addFile('css://style.less');
+// DEBUG
+Template::addJsPlugin(new JsPlugin_JQuery());
+if(VVE_DEBUG_LEVEL > 1){ $this->addFile('js://enginehelpers.js');
+} else { $this->addFile('js://enginehelpers.min.js');}
+
+$this->addFile('js://base.js');
+$this->addFile('js://bootstrap.min.js');
+/* START PAGE */ 
+?><!DOCTYPE html>
+<html>
+   <head>
+      <?php $this->renderHeaderBase();?>
+      <?php $this->renderHeaderRSS();?>
+      <!--[if lte IE 6]>
+      <link rel="stylesheet" type="text/css" href="<?php echo $this->style('style_ie6.css')?>" />
+      <script type="text/javascript" src="./jscripts/fix_eolas.js" defer="defer"></script>
+      <![endif]-->
+      <?php $this->renderHeaderCSSJS()?>
+      <script type="text/javascript">/* <![CDATA[ */<?php $this->renderHeaderScripts()?>/* ]]> */</script>
+   </head>
+   <body id="pageTop" class="<?php  echo $this->getBodyClasses(true);?>" >
+      <?php  $this->renderBodyBegin();?>
+      <?php  //NavigationMenu_View::listView(); ?>
+      <header>
+         <nav class="navbar navbar-default" role="navigation">
+            <div class="container">
+               <!-- Brand and toggle get grouped for better mobile display -->
+               <div class="navbar-header">
+                  <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main-nav">
+                     <span class="sr-only">Toggle navigation</span>
+                     <span class="icon-bar"></span>
+                     <span class="icon-bar"></span>
+                     <span class="icon-bar"></span>
+                  </button>
+                  <a class="navbar-brand" href="<?php echo Url_Link::getMainWebDir()?>"><?php ps(CUBE_CMS_WEB_NAME) ?></a>
+               </div>
+               <?php  $this->includeTplObj($this->menuObj); ?> <!-- render menu-->
+            </div>
+         </nav>
+         <?php if(Template::isTitlePage()){?>
+         <div class="container">
+               <?php echo HPSlideShow_View::getSlideshow();?>
+         </div>
+         <?php }?>
+      </header>
+      
+      <?
+      $fullscreen = false;
+      if(Template::isFullWidth() || Category::getSelectedCategory() instanceof Category_Admin){
+         $fullscreen = true;
+      }
+      ?>
+      <section class="container">
+         <div class="row">
+            <?php if(!$fullscreen){?>
+            <aside class="col-md-3">
+               <div id="langs">
+                  <?php foreach (Template::pVar('appLangs') as $lang) {
+                     $class = null;
+                     if($lang['name'] == Locales::getLang()) $class = 'selected';
+                     ?><a href="<?php echo $lang['link'];?>" title="<?php echo $lang['label'];?>" class="<?php echo $class?>"><?php echo $lang['name'];?></a>&nbsp;<?php 
+                  }?>
+               </div>
+               <?php echo CustomMenu_View::getMenu('left');?>
+               <?php 
+               if(!empty($this->panels['left'])) {
+                  foreach ($this->panels['left'] as $panelL) {?>
+               <div class="panel panel-left panel-<?php echo $panelL->category()->getModule()->getName()?>">
+                        <?php $this->includeTplObj($panelL);?>
+               </div>
+                  <?php }
+               }?>
+            </aside>
+            <?php }?>
+            <div class="<?php echo $fullscreen ? 'col-md-12' : 'col-md-6' ?>">
+               <?php 
+               $this->includeTpl("messages.phtml", true);
+               $navTpl = new Template_Navigation();
+               echo $navTpl;
+               if(VVE_DEBUG_LEVEL > 0){ echo Debug::printDebug(); echo Debug_Timer::printTimers(); }
+               ?>
+               <div class="main-content module-<?php echo   Category::getSelectedCategory()->getModule()->getName()?> clearfix">
+                  <?php  $this->includeTpl("modules.phtml", true); ?>
+               </div>
+            </div>
+            <?php if(!$fullscreen){?>
+            <aside class="col-md-3">
+               <?php echo Banners_View::getBanners('right')?>
+               <?php 
+               if(!empty($this->panels['right'])) {
+                  foreach ($this->panels['right'] as $panelR) {?>
+               <div class="panel panel-right panel-<?php echo $panelR->category()->getModule()->getName()?>">
+                        <?php $this->includeTplObj($panelR);?>
+               </div>
+                  <?php }
+               }?>
+            </aside>
+            <?php }?>
+         </div>
+      </section>
+      <?php if(!$fullscreen){?>
+      <div class="container">
+         <?php echo Banners_View::getBanners('bottom')?>
+      </div>
+      <?php }?>
+      <footer class="container">
+         <?php if(!$fullscreen){?>
+         <div class="clearfix">
+            <?php 
+            if(!empty($this->panels['bottom'])) {
+               foreach ($this->panels['bottom'] as $panelB) {?>
+            <div class="panel" style="float:left; width: 200px;">
+                     <?php $this->includeTplObj($panelB);?>
+            </div>
+               <?php }
+            }?>
+         </div>
+         <?php }?>
+         <?php echo CustomMenu_View::getMenu('bottom');?>
+         <div>
+            <a href="<?php echo $this->link()->clear(true)->file('sitemap.html');?>" title="<?php echo $this->tr("Mapa stránek")?>"><?php echo $this->tr("Mapa stránek")?></a>&nbsp;
+            <a href="<?php echo $this->link()->clear(true)->file('rss.html');?>" title="<?php echo $this->tr("Přehled rss zdrojů")?>"><?php echo $this->tr("Rss kanály")?></a>
+         </div>
+      </footer>
+      <?php 
+      $this->renderBodyEnd();
+      ?>
+   </body>
+</html>

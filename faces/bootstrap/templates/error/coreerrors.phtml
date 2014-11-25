@@ -1,0 +1,17 @@
+<div class="alert alert-danger" id="coreErrMessage" style="">
+      <?php 
+      $errors = CoreErrors::getErrors();
+      foreach ($errors as $error) {?>
+   <p>
+            <?php echo $error["name"]?>: (<i><?php echo $error["code"]?></i>) <b><?php echo $error["message"]?></b>
+            <?php echo $this->tr("soubor")?>: <?php echo $error["file"]?>, <?php echo $this->tr("řádek")?>: <?php echo $error["line"]?><br />
+            <?php  if(VVE_DEBUG_LEVEL > 1) {
+               foreach ($error["trace"] as $err) {?>
+                  <?php echo $err["class"].$err["type"].$err["function"]."&nbsp;&nbsp;";
+                  echo $this->tr("soubor").": <i>".$err["file"] ."</i>&nbsp;&nbsp;&nbsp;".$this->tr("řádek").": ".$err["line"];?>
+      <br />
+               <?php }
+            }?>
+   </p>
+      <?php }?>
+</div>

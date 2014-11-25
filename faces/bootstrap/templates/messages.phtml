@@ -1,0 +1,20 @@
+<div class="alert alert-info <?php if(empty ($this->messages)){ echo "hidden";}?>" id="infoMessages" role="alert">
+     <?php // Vypis hlasek
+     if(!empty ($this->messages)) {
+        foreach ($this->messages as $message) {
+           echo '<p>'.$message . '</p>';
+        }
+     }?>
+</div>
+<!--{*-CORE_ERRORS-*}-->
+<?php  // chyby modulu?>
+<div class="alert alert-danger <?php if(empty ($this->moduleErrors) AND Template::pVar('IE_WARN') == false) { echo "hidden";}?>" id="errMessages" role="alert">
+   <?php 
+   if(Template::pVar('IE_WARN') == true){ $this->includeTpl('ie6browser.phtml',true); }
+   if(!empty ($this->moduleErrors)) {
+      echo("<strong>".$this->tr("Chyba:")."</strong>");
+      foreach ($this->moduleErrors as $error) {
+         echo '<p>'.$error . '</p>';
+      }
+   }?>
+</div>
