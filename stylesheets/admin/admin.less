@@ -765,14 +765,14 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
       color: @color-primary;
    }
    &.cubecms-table {
-      .cubecms-header {
+      th, .cubecms-header {
          .cube-gradient();
          border: 1px solid @color-primary;
-         td, th {
+         &, td, th {
             color: @color-text-invert;
          }
       }
-      .cubecms-row {
+      td, .cubecms-row {
          &.state-hightlight {
             
          }
@@ -781,7 +781,7 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
          }
          &.state-disabled {
             &:hover {
-               background-color: @color-bg-gray;
+               background-color: lighten(@color-bg-gray, 5%);
             }
             td {
                color: @color-text-light;
@@ -807,6 +807,7 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
       }
       th {
          font-weight: bold;
+         color: @color-text-invert;
       }
       width: 100%;
       margin-bottom: @padding-large;
