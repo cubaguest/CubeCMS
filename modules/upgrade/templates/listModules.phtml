@@ -1,18 +1,16 @@
 <?php 
-$this->addJsPlugin(new JsPlugin_JQueryCSS());
-$this->addCssFile('style.css');
 ?>
 <h2><?php echo $this->tr('Seznam instalovaných modulů')?></h2>
-<table class="modules-list">
-   <thead>
-      <tr class="ui-widget-header">
+<table class="cubecms-widget cubecms-table">
+   <thead class="cubecms-header">
+      <tr class="">
          <th scope="col" class="modules-tb-name"><?php echo $this->tr('Název modulu')?></th>
          <th scope="col" class="modules-tb-version"><?php echo $this->tr('instalovaná verze')?></th>
       </tr>
    </thead>
    <tbody>
       <?php foreach ($this->modules as $module) {?>
-      <tr class="ui-widget-content ui-state-default">
+      <tr class="cubecms-row">
          <td><?php echo $module['name']?></td>
          <td><?php echo $module['version']?></td>
       </tr>
