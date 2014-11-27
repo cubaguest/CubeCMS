@@ -8,11 +8,16 @@ class Projects_Controller extends Controller {
    const PARAM_BIG_W = 'bw';
    const PARAM_BIG_H = 'bh';
 
+   protected $useSection = true;
+
+
    protected function init()
    {
       parent::init();
       // registrace modulu fotogalerie pro obsluhu galerie
       $this->registerModule('photogalery');
+      $this->loadSections();
+      $this->processCheckDeleteSetion();
    }
 
    /**
@@ -22,8 +27,35 @@ class Projects_Controller extends Controller {
    {
       //        Kontrola práv
       $this->checkReadableRights();
+      
+      $this->view()->imagesPath = $this->module()->getDataDir(true);
+      $this->view()->dataDir = $this->module()->getDataDir(false);
+      
+      // načtení textu
+      $textM = new Text_Model();
+      $textRecord = $textM->where(Text_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Text_Model::COLUMN_SUBKEY.' = :subkey', 
+         array('idc' => $this->category()->getId(), 'subkey' => Text_Controller::TEXT_MAIN_KEY) )->record();
+      $this->view()->text = $textRecord;
+   }
+   
+   protected function loadSections()
+   {
       $modelSec = new Projects_Model_Sections();
       
+      $modelSec->join(Projects_Model_Sections::COLUMN_ID, 'Projects_Model_Projects', Projects_Model_Projects::COLUMN_ID_SECTION)
+         ->where(Projects_Model_Sections::COLUMN_ID_CATEGORY.' = :idc', array('idc' => $this->category()->getId()))
+            // ordery atd
+         ->order(array(
+            Projects_Model_Sections::COLUMN_ORDER => Model_ORM::ORDER_ASC,
+            Projects_Model_Projects::COLUMN_ORDER => Model_ORM::ORDER_ASC,
+            ))
+         ->groupBy(Projects_Model_Sections::COLUMN_ID);
+//      Debug::log($modelSec->getSQLQuery());
+      $this->view()->sections = $modelSec->records();
+   }
+   
+   protected function processCheckDeleteSetion()
+   {
       if($this->rights()->isControll()){
          $formDelete = new Form('section_del', true);
          $elemId = new Form_Element_Hidden('id');
@@ -40,41 +72,9 @@ class Projects_Controller extends Controller {
          }
          $this->view()->formDelete = $formDelete;
       }
-      
-      $secs = $modelSec->join(Projects_Model_Sections::COLUMN_ID, 'Projects_Model_Projects', 
-         Projects_Model_Projects::COLUMN_ID_SECTION, null, Model_ORM::JOIN_OUTER)
-         ->where(Projects_Model_Sections::COLUMN_ID_CATEGORY.' = :idc', array('idc' => $this->category()->getId()))
-            // ordery atd
-         ->order(array(Projects_Model_Sections::COLUMN_WEIGHT => Model_ORM::ORDER_DESC,
-            Projects_Model_Sections::COLUMN_NAME => Model_ORM::ORDER_ASC,
-            Projects_Model_Projects::COLUMN_ORDER => Model_ORM::ORDER_ASC
-            ))
-         ->records();
-      
-      $sectionsData = array();
-      foreach ($secs as $sec) {
-         $sid = $sec->{Projects_Model_Sections::COLUMN_ID};
-         if(!isset ($sectionsData[$sid])){
-            $sectionsData[$sid] = new Object();
-            $sectionsData[$sid]->data = $sec;
-            $sectionsData[$sid]->projects = array();
-         }
-         if($sec->{Projects_Model_Projects::COLUMN_ID} != null){
-            array_push($sectionsData[$sid]->projects, $sec);
-         }
-      }
-      
-      $this->view()->sections = $sectionsData;
-      $this->view()->dataDir = $this->module()->getDataDir(true);
-      
-      // načtení textu
-      $textM = new Text_Model();
-      $textRecord = $textM->where(Text_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Text_Model::COLUMN_SUBKEY.' = :subkey', 
-         array('idc' => $this->category()->getId(), 'subkey' => Text_Controller::TEXT_MAIN_KEY) )->record();
-      $this->view()->text = $textRecord;
    }
-
-   public function projectController() 
+   
+   public function projectController($prkey) 
    {
       $this->checkReadableRights();
 
@@ -87,7 +87,7 @@ class Projects_Controller extends Controller {
             Projects_Model_Projects::COLUMN_URLKEY.' = :prkey '
             .' AND '.Projects_Model_Sections::COLUMN_ID_CATEGORY.' = :idcat'
             , array(
-            'prkey' => $this->getRequest('prkey'),
+            'prkey' => $prkey,
             'idcat' => $this->category()->getId()
          ))->record();
       
@@ -139,27 +139,29 @@ class Projects_Controller extends Controller {
       
    }
    
-   public function sectionController() 
+   public function sectionController($seckey) 
    {
       $this->checkReadableRights();
       $modelSec = new Projects_Model_Sections();
+      
+      $this->processCheckDeleteSetion();
       
       $sec = $modelSec->where(
          Projects_Model_Sections::COLUMN_URLKEY.' = :seckey'
          .' AND '.Projects_Model_Sections::COLUMN_ID_CATEGORY.' = :idcat', 
          array(
-         'seckey' => $this->getRequest('seckey'),
+         'seckey' => $seckey,
          'idcat' => $this->category()->getId()
          ))->record();
       
       if($sec == false){ return false; }
       
-      // form for remove
-      if($this->rights()->isControll()){
-         
-      }
-      
       $this->view()->section = $sec;
+      
+      // vyčistit projekty, rptože jsou načteny všechny
+      $this->view()->projects = $sec->getProjects();
+      $this->view()->imagesPath = $this->module()->getDataDir(true);
+      $this->view()->dataDir = $this->module()->getDataDir(false);
    }
 
    
@@ -188,7 +190,7 @@ class Projects_Controller extends Controller {
          } else {
             $rec->{Projects_Model_Sections::COLUMN_URLKEY} = $form->url->getValues();
          }
-         $rec->{Projects_Model_Sections::COLUMN_WEIGHT} = $form->weight->getValues();
+//         $rec->{Projects_Model_Sections::COLUMN_WEIGHT} = $form->weight->getValues();
          
          $model->save($rec);
          
@@ -229,13 +231,13 @@ class Projects_Controller extends Controller {
          } else {
             $sec->{Projects_Model_Sections::COLUMN_URLKEY} = $form->url->getValues();
          }
-         $sec->{Projects_Model_Sections::COLUMN_WEIGHT} = $form->weight->getValues();
+//         $sec->{Projects_Model_Sections::COLUMN_WEIGHT} = $form->weight->getValues();
          
          $model->save($sec);
          
          $this->infoMsg()->addMessage($this->tr('Sekce byla uložena'));
          $this->log('Upravena sekce projektů');
-         $this->link()->route()->reload();
+      $this->link()->route('section', array('seckey' => $sec->{Projects_Model_Sections::COLUMN_URLKEY}))->reload();
       }
       $this->view()->section = $sec;
       $this->view()->form = $form;
@@ -249,24 +251,19 @@ class Projects_Controller extends Controller {
    protected function createEditSectionForm($sectionRecord = null)
    {
       $form = new Form('edit_section');
+      $grp = $form->addGroup('base', $this->tr('Popis sekce'));
       
       $elemName = new Form_Element_Text('name', $this->tr('Název'));
       $elemName->addValidation(new Form_Validator_NotEmpty());
-      $form->addElement($elemName);
+      $form->addElement($elemName, $grp);
       
       $elemText = new Form_Element_TextArea('text', $this->tr('Popis'));
-      $form->addElement($elemText);
-      
-      $elemWeight = new Form_Element_Text('weight', $this->tr('Váha'));
-      $elemWeight->setSubLabel($this->tr("Větší váha umístí sekci výše."));
-      $elemWeight->addValidation(new Form_Validator_NotEmpty());
-      $elemWeight->addValidation(new Form_Validator_IsNumber(null, Form_Validator_IsNumber::TYPE_INT));
-      $elemWeight->setValues(0);
-      $form->addElement($elemWeight);
+      $form->addElement($elemText, $grp);
       
       $elemUrl = new Form_Element_Text('url', $this->tr('URL klíč'));
       $elemUrl->addFilter(new Form_Filter_UrlKey());
-      $form->addElement($elemUrl);
+      $elemUrl->setAdvanced(true);
+      $form->addElement($elemUrl, $grp);
       
       $elemSave = new Form_Element_SaveCancel('save');
       $form->addElement($elemSave);
@@ -275,7 +272,6 @@ class Projects_Controller extends Controller {
          $form->name->setValues($sectionRecord->{Projects_Model_Sections::COLUMN_NAME});
          $form->text->setValues($sectionRecord->{Projects_Model_Sections::COLUMN_TEXT});
          $form->url->setValues($sectionRecord->{Projects_Model_Sections::COLUMN_URLKEY});
-         $form->weight->setValues($sectionRecord->{Projects_Model_Sections::COLUMN_WEIGHT});
       }
       
       return $form;
@@ -306,6 +302,10 @@ class Projects_Controller extends Controller {
          $rec->{Projects_Model_Projects::COLUMN_TEXT} = $form->text->getValues();
          $rec->{Projects_Model_Projects::COLUMN_TEXT_CLEAR} = strip_tags($rec->{Projects_Model_Projects::COLUMN_TEXT});
          $rec->{Projects_Model_Projects::COLUMN_TPL_PARAMS} = htmlentities($form->tplParams->getValues());
+         $rec->{Projects_Model_Projects::COLUMN_PLACE} = $form->place->getValues();
+         $date = $form->dateadd->getValues();
+         $date->setTime(date("H"), date("i"), date("s"));
+         $rec->{Projects_Model_Projects::COLUMN_TIME_ADD} = $date;
          if($form->related->getValues() != null){
             $rec->{Projects_Model_Projects::COLUMN_RELATED} = implode(';', $form->related->getValues());
          }
@@ -412,6 +412,13 @@ class Projects_Controller extends Controller {
          $rec->{Projects_Model_Projects::COLUMN_TEXT} = $form->text->getValues();
          $rec->{Projects_Model_Projects::COLUMN_TEXT_CLEAR} = strip_tags($rec->{Projects_Model_Projects::COLUMN_TEXT});
          $rec->{Projects_Model_Projects::COLUMN_TPL_PARAMS} = htmlentities($form->tplParams->getValues());
+         $rec->{Projects_Model_Projects::COLUMN_PLACE} = $form->place->getValues();
+         
+         $date = $form->dateadd->getValues();
+         $dateOld = new DateTime($rec->{Projects_Model_Projects::COLUMN_TIME_ADD});
+         $date->setTime($dateOld->format("H"), $dateOld->format("i"), $dateOld->format("s"));
+         
+         $rec->{Projects_Model_Projects::COLUMN_TIME_ADD} = $form->dateadd->getValues();
          $relProjects = $form->related->getValues();
          if(is_array($relProjects) && !empty ($relProjects)){
             $rec->{Projects_Model_Projects::COLUMN_RELATED} = implode(';', $relProjects);
@@ -541,7 +548,7 @@ class Projects_Controller extends Controller {
       $form->addElement($eSave);
 
       if($form->isSend() && $form->save->getValues() == false){
-         $this->link()->route()->reload();
+         $this->link()->route('section')->reload();
       }
       
       if($form->isValid()){
@@ -552,10 +559,44 @@ class Projects_Controller extends Controller {
             $project->setRecordPosition($index + 1);
          }
          $this->infoMsg()->addMessage($this->tr('Pořadí bylo uloženo'));
-         $this->link()->route()->reload();
+         $this->link()->route('section')->reload();
       }
       
       $this->view()->projects = $projects;
+      $this->view()->form = $form;
+   }
+   
+   public function sortSectionsController()
+   {
+      $this->checkWritebleRights();
+      
+      $form = new Form('section_order_');
+      
+      $eId = new Form_Element_Hidden('id');
+      $eId->setDimensional();
+      
+      $form->addElement($eId);
+      
+      $eSave = new Form_Element_SaveCancel('save');
+      $form->addElement($eSave);
+
+      if($form->isSend() && $form->save->getValues() == false){
+         $this->link()->route()->reload();
+      }
+      
+      if($form->isValid()){
+         $ids = $form->id->getValues();
+         foreach ($ids as $index => $id) {
+            /* @var $project Model_ORM_Ordered_Record */
+            $section = Projects_Model_Sections::getRecord($id);
+            $section->setRecordPosition($index + 1);
+         }
+         $this->infoMsg()->addMessage($this->tr('Pořadí bylo uloženo'));
+         $this->link()->route()->reload();
+      }
+      
+      $model = new Projects_Model_Sections();
+      $this->view()->sections = $model->where(Projects_Model_Sections::COLUMN_ID_CATEGORY." = :idc", array('idc' => $this->category()->getId()))->records();;
       $this->view()->form = $form;
    }
    
@@ -619,9 +660,12 @@ class Projects_Controller extends Controller {
       $elemName->addValidation(new Form_Validator_NotEmpty());
       $form->addElement($elemName, $fGrpBase);
       
-      $elemShortName = new Form_Element_Text('shortName', $this->tr('Zkrácený název'));
-      $elemShortName->setSubLabel($this->tr('Bývá využit při výpis seznamu projektů. Pokud není definován použije se celý název.'));
+      $elemShortName = new Form_Element_Text('shortName', $this->tr('Zkrácený název / popisek'));
+      $elemShortName->setSubLabel($this->tr('Bývá využit při výpis seznamu projektů. znak "\" nahrazen zalomením řádku'));
       $form->addElement($elemShortName, $fGrpBase);
+      
+      $elemPlace = new Form_Element_Text('place', $this->tr('Místo/umístění'));
+      $form->addElement($elemPlace, $fGrpBase);
       
       $elemText = new Form_Element_TextArea('text', $this->tr('Popis'));
       $form->addElement($elemText, $fGrpBase);
@@ -641,7 +685,7 @@ class Projects_Controller extends Controller {
       $secs = $modelSec->where(Projects_Model_Sections::COLUMN_ID_CATEGORY.' = :idc', array('idc' => $this->category()->getId()))->records();
       
       $elemSec = new Form_Element_Select('section', $this->tr('Sekce'));
-      $elemSec->setAdvanced(get_class($this) == 'Projects_Controller' ? false : true);
+      $elemSec->setAdvanced($this->useSection ? false : true);
           
       foreach ($secs as $s) {
          $elemSec->setOptions(array($s->{Projects_Model_Sections::COLUMN_ID} => $s->{Projects_Model_Sections::COLUMN_NAME}), true);
@@ -670,6 +714,12 @@ class Projects_Controller extends Controller {
       }
       $form->addElement($elemRealted, $fGrpInclusion);
       
+      $elemDateAdd = new Form_Element_Text('dateadd', $this->tr('Datum přidání'));
+      $elemDateAdd->setValues(strftime("%x"));
+      $elemDateAdd->addFilter(new Form_Filter_DateTimeObj());
+      $elemDateAdd->addValidation(new Form_Validator_NotEmpty());
+      $elemDateAdd->setAdvanced(true);
+      $form->addElement($elemDateAdd, $fGrpInclusion);
       
       $elemUrl = new Form_Element_UrlKey('url', $this->tr('URL klíč'));
       $elemUrl->setAdvanced(true);
@@ -703,6 +753,9 @@ class Projects_Controller extends Controller {
          $form->desc->setValues($prRecord->{Projects_Model_Projects::COLUMN_DESCRIPTION});
          $form->section->setValues($prRecord->{Projects_Model_Projects::COLUMN_ID_SECTION});
          $form->tplParams->setValues($prRecord->{Projects_Model_Projects::COLUMN_TPL_PARAMS});
+         $form->place->setValues($prRecord->{Projects_Model_Projects::COLUMN_PLACE});
+         $date = new DateTime($prRecord->{Projects_Model_Projects::COLUMN_TIME_ADD});
+         $form->dateadd->setValues(Utils_DateTime::fdate("%x", $date));
          
          if($prRecord->{Projects_Model_Projects::COLUMN_IMAGE} != null){
             $elemDelImgTitle = new Form_Element_Checkbox('delimgtitle', $this->tr('Smazat titulní obrázek'));
@@ -710,6 +763,7 @@ class Projects_Controller extends Controller {
          }
          if($prRecord->{Projects_Model_Projects::COLUMN_THUMB} != null){
             $elemDelImgTitleThumb = new Form_Element_Checkbox('delimgthumb', $this->tr('Smazat miniaturu titulního obrázeku'));
+            $elemDelImgTitleThumb->setAdvanced(true);
             $form->addElement($elemDelImgTitleThumb, $fGrpAppearance, $prRecord->{Projects_Model_Projects::COLUMN_IMAGE} != null ? 3 : 2);
          }
          if($prRecord->{Projects_Model_Projects::COLUMN_RELATED} != null){

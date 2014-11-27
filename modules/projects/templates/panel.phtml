@@ -10,19 +10,9 @@ if($this->panelObj()->getBackImage() != null){
 if($this->rssLink != null){?>
 <a style="float: right" href="<?php echo $this->rssLink?>" title="rss"><img src="<?php echo vve_get_tpl_file('icons/rss-icon.png', VVE_TPL_FILE_IMAGE)?>" alt="rss" /></a>
 <?php }?>
-<div class="panel-box-label"><?php echo $icon?><a href="<?php echo $this->link()?>" title="<?php echo htmlspecialchars($this->panelObj()->getName())?>"><?php echo $this->panelObj()->getName()?></a></div>
-   <?php foreach ($this->articles as $article) {?>
-   <div class="panel-box-content">
-   <div class="panel-box-label-article"><a href="<?php echo $this->link()->route('detail', array('urlkey' => $article->{Articles_Model::COLUMN_URLKEY}))?>"
-                                            title="<?php echo htmlspecialchars($article->{Articles_Model::COLUMN_NAME})?>"
-                                            ><?php echo vve_tpl_truncate($article->{Articles_Model::COLUMN_NAME},25)?></a></div>
-   <?php echo   vve_tpl_xhtml_cut(strip_tags($article->{Articles_Model::COLUMN_TEXT},VVE_SHORT_TEXT_TAGS),150)?>
-   <div class="panel-box-link-more"><a href="<?php echo $this->link()->route('detail', array('urlkey'=> $article->{Articles_Model::COLUMN_URLKEY}));?>"
-      title="<?php echo htmlspecialchars($article->{Articles_Model::COLUMN_NAME})?>"><?php echo $this->tr('Více')?></a>
-   </div>
-   </div>
-   <?php }?>
-<p class="panel-box-link-more">
+<div class="name"><?php echo $icon?><a href="<?php echo $this->link()?>" title="<?php echo htmlspecialchars($this->panelObj()->getName())?>"><?php echo $this->panelObj()->getName()?></a></div>
+   
+<div class="link-more">
    <a href="<?php echo $this->link()?>"
       title="<?php echo htmlspecialchars($this->category()->getLabel())?>"><?php echo $this->tr('Více')?></a>
-</p>
+</div>

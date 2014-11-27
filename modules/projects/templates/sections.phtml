@@ -7,12 +7,12 @@ echo $this->toolbox;
 <div class="main-content">
    <?php if(!empty ($this->sections)) {
       foreach ($this->sections as $section) {
-         $link = $this->link()->route('section', array('seckey' => $section->data->{Projects_Model_Sections::COLUMN_URLKEY}));
+         $link = $this->link()->route('section', array('seckey' => $section->{Projects_Model_Sections::COLUMN_URLKEY}));
 /*         <h2><a href="<?php echo $link?>" title="<?php echo $section->data->{Projects_Model_Sections::COLUMN_NAME}?>"><?php echo $section->data->{Projects_Model_Sections::COLUMN_NAME}?></a></h2>*/
          ?>
          <div class="main-content-text">
-         <h2><?php echo $section->data->{Projects_Model_Sections::COLUMN_NAME}?></h2>
-         <p><?php echo $section->data->{Projects_Model_Sections::COLUMN_TEXT}?></p>
+         <h2><?php echo $section->{Projects_Model_Sections::COLUMN_NAME}?></h2>
+         <p><?php echo $section->{Projects_Model_Sections::COLUMN_TEXT}?></p>
          <?php  // projekty
          if(!empty ($section->projects)){
          ?>

@@ -2,7 +2,7 @@
 /*
  * Třída modelu detailem článku
  */
-class Projects_Model_Sections extends Model_ORM {
+class Projects_Model_Sections extends Model_ORM_Ordered {
    const DB_TABLE = 'projects_sections';
 
    const COLUMN_ID = 'id_project_section';
@@ -13,6 +13,7 @@ class Projects_Model_Sections extends Model_ORM {
    const COLUMN_TEXT_CLEAR = 'section_text_clear';
    const COLUMN_TIME_ADD = 'section_time_add';
    const COLUMN_WEIGHT = 'section_weight';
+   const COLUMN_ORDER = 'section_order';
 
    protected function  _initTable() {
       $this->setTableName(self::DB_TABLE, 't_pr_sec');
@@ -25,8 +26,11 @@ class Projects_Model_Sections extends Model_ORM {
       $this->addColumn(self::COLUMN_TEXT_CLEAR, array('datatype' => 'text', 'pdoparam' => PDO::PARAM_STR, 'fulltext' => true));
       $this->addColumn(self::COLUMN_TIME_ADD, array('datatype' => 'timestamp', 'pdoparam' => PDO::PARAM_STR, 'default' => 'CURRENT_TIMESTAMP'));
       $this->addColumn(self::COLUMN_WEIGHT, array('datatype' => 'smallint', 'default' => 0));
+      $this->addColumn(self::COLUMN_ORDER, array('datatype' => 'int', 'default' => 0));
 
       $this->setPk(self::COLUMN_ID);
+      $this->setOrderColumn(self::COLUMN_ORDER);
+      $this->setLimitedColumns(array(self::COLUMN_ID_CATEGORY));
       
       $this->addForeignKey(self::COLUMN_ID_CATEGORY, 'Model_Categories', Model_Category::COLUMN_CAT_ID);
       
@@ -34,4 +38,10 @@ class Projects_Model_Sections extends Model_ORM {
    }
 }
 
-?>
+class Projects_Model_Sections_Record extends Model_ORM_Ordered_Record {
+   public function getProjects()
+   {
+      $m = new Projects_Model_Projects();
+      return $m->where(Projects_Model_Projects::COLUMN_ID_SECTION." = :ids", array('ids' => $this->getPK()))->records();
+   }
+}

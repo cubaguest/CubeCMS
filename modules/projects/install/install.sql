@@ -43,8 +43,9 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}projects_sections` (
   `section_text_clear` text CHARACTER SET utf8 COLLATE utf8_czech_ci,
   `section_time_add` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `section_weight` smallint(6) DEFAULT '0',
+  `section_order` int(11) DEFAULT '0',
   PRIMARY KEY (`id_project_section`),
-  KEY `base` (`id_category`,`section_urlkey`),
-  KEY `id_category` (`id_category`,`id_project_section`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+  KEY `id_category` (`id_category`),
+  KEY `base` (`id_category`,`section_urlkey`,`section_order`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 

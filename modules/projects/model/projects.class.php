@@ -24,6 +24,7 @@ class Projects_Model_Projects extends Model_ORM_Ordered {
    const COLUMN_KEYWORDS = 'project_keywords';
    const COLUMN_DESCRIPTION = 'project_desc';
    const COLUMN_ORDER = 'project_order';
+   const COLUMN_PLACE = 'project_place';
 
    protected function  _initTable() {
       $this->setTableName(self::DB_TABLE, 't_proj');
@@ -39,6 +40,7 @@ class Projects_Model_Projects extends Model_ORM_Ordered {
       $this->addColumn(self::COLUMN_URLKEY, array('datatype' => 'varchar(200)', 'nn' => true, 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_TEXT, array('datatype' => 'text', 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_TEXT_CLEAR, array('datatype' => 'text', 'pdoparam' => PDO::PARAM_STR, 'fulltext' => true));
+      $this->addColumn(self::COLUMN_PLACE, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR, 'fulltext' => true));
       
       $this->addColumn(self::COLUMN_IMAGE, array('datatype' => 'varchar(50)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
       $this->addColumn(self::COLUMN_THUMB, array('datatype' => 'varchar(50)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));

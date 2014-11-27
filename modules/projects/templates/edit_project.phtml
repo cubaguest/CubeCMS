@@ -20,10 +20,18 @@ if($this->project != false) {
    $h = $this->tr('Přidání projektu');
 }
 $this->addPageTitle($h);
-
-
+$jq = new JsPlugin_JQuery();
+$jq->addUIDatepicker();
+$this->addJsPlugin($jq);
 ?>
 <h1><?php echo $h;?></h1>
 <div class="main-content-form-edit" id="edit-form-project">
-   <?php echo($this->form);?>
+   <?php 
+   $this->form->dateadd->html()->addClass('datepicker');
+   echo($this->form);
+   ?>
 </div>
+<script type="text/javascript">
+   $.datepicker.setDefaults(['<?php echo  Locales::getLang() ?>'] ) ;
+   $("input.datepicker").datepicker();
+</script>

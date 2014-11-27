@@ -32,17 +32,18 @@ class Projects_View extends View {
    public function sectionView() 
    {
       $this->template()->addFile('tpl://section.phtml');
-      $this->createSectionToolbox($this->template()->section);
+      $this->toolbox = $this->createSectionToolbox($this->template()->section);
    }
 
    public function addSectionView($isEdit = false)
    {
-      $this->template()->addFile('tpl://edit_section.phtml');
+      $this->template()->addFile('tpl://projects:edit_section.phtml');
       $this->setTinyMCE($this->form->text, 
          $this->category()->getParam(Photogalery_Controller::PARAM_EDITOR_TYPE, 'advanced'));
       if(!$isEdit){
          Template_Navigation::addItem($this->tr('Přidání sekce'), $this->link());
       }
+      Template::setFullWidth(true);
    }
    
    public function editSectionView()
@@ -54,9 +55,10 @@ class Projects_View extends View {
 
    public function addProjectView()
    {
-      $this->template()->addFile('tpl://edit_project.phtml');
+      $this->template()->addFile('tpl://projects:edit_project.phtml');
       $this->setTinyMCE($this->form->text, 
          $this->category()->getParam(Photogalery_Controller::PARAM_EDITOR_TYPE, 'advanced'));
+      Template::setFullWidth(true);
    }
    
    public function editProjectView()
@@ -67,6 +69,7 @@ class Projects_View extends View {
    public function editTextView() {
       $this->setTinyMCE($this->form->text, 'advanced');
       $this->template()->addFile('tpl://projects:edittext.phtml');
+      Template::setFullWidth(true);
    }
 
    protected function createSectionsToolbox()
@@ -78,18 +81,15 @@ class Projects_View extends View {
                $this->link()->route('addSection'));
          $toolAdd->setIcon('page_add.png')->setTitle($this->tr('Přidat novou sekci projektů'));
          $this->toolbox->addTool($toolAdd);
-      }
-      if ($this->rights()->isWritable()) {
-         foreach ($this->template()->sections as $key => $sec) {
-            $this->template()->sections[$key]->toolbox = clone $this->createSectionToolbox($sec->data);
-         }
+         $this->toolbox->addTool($this->getSectionsSortToolbox());
       }
    }
    
    protected function createProjectToolbox()
    {
-      if ($this->rights()->isControll() OR 
-         Auth::getUserId() == $this->project->{Projects_Model_Projects::COLUMN_ID_USER}) {
+      if ($this->rights()->isControll() 
+//          OR  Auth::getUserId() == $this->project->{Projects_Model_Projects::COLUMN_ID_USER}
+          ) {
          $this->toolbox = new Template_Toolbox2();
          $this->toolbox->setIcon(Template_Toolbox2::ICON_WRENCH);
          // edit
@@ -101,7 +101,8 @@ class Projects_View extends View {
          if(isset ($this->formDelete)){
             $toolDel = new Template_Toolbox2_Tool_Form($this->formDelete);
             $toolDel->setIcon('page_delete.png')->setTitle($this->tr('Smazat projekt'))
-               ->setConfirmMeassage($this->tr('Opravdu smazat tento projekt?'));
+               ->setConfirmMeassage($this->tr('Opravdu smazat tento projekt?'))
+               ->setImportant(true);
             $this->toolbox->addTool($toolDel);
          }
       }
@@ -109,32 +110,36 @@ class Projects_View extends View {
 
    protected function createSectionToolbox($section)
    {
-      $toolbox = new Template_Toolbox2();
-      $toolbox->setIcon(Template_Toolbox2::ICON_WRENCH);
-      // add project
-      $toolAdd = new Template_Toolbox2_Tool_PostRedirect('add_project', $this->tr("Přidat projekt"),
-            $this->link()->route('addProject', array('seckey' => $section->{Projects_Model_Sections::COLUMN_URLKEY})));
-      $toolAdd->setIcon('page_add.png')->setTitle($this->tr('Přidat nový projekt'));
-      $toolbox->addTool($toolAdd);
+      if ($this->rights()->isWritable()) {
+         $toolbox = new Template_Toolbox2();
+         $toolbox->setIcon(Template_Toolbox2::ICON_WRENCH);
+         // add project
+         $toolAdd = new Template_Toolbox2_Tool_PostRedirect('add_project', $this->tr("Přidat projekt"),
+               $this->link()->route('addProject', array('seckey' => $section->{Projects_Model_Sections::COLUMN_URLKEY})));
+         $toolAdd->setIcon('page_add.png')->setTitle($this->tr('Přidat nový projekt'));
+         $toolbox->addTool($toolAdd);
 
-      $toolbox->addTool($this->getSortToolbox($section));
-      
-      if ($this->rights()->isControll()) {
-         // edit
-         $toolEdit = new Template_Toolbox2_Tool_PostRedirect('edit_section', $this->tr("Upravit sekci"),
-               $this->link()->route('editSection', array('seckey' => $section->{Projects_Model_Sections::COLUMN_URLKEY})));
-         $toolEdit->setIcon('page_edit.png')->setTitle($this->tr('Upravit text sekce'));
-         $toolbox->addTool($toolEdit);
-         // delete
-         if(isset ($this->formDelete)){
-            $toolDel = new Template_Toolbox2_Tool_Form($this->formDelete);
-            $toolDel->setIcon('page_delete.png')->setTitle($this->tr('Smazat sekci'))
-               ->setConfirmMeassage($this->tr('Opravdu smazat sekci i s projekty?'));
-            $toolDel->getForm()->id->setValues($section->{Projects_Model_Sections::COLUMN_ID});
-            $toolbox->addTool($toolDel);
+         $toolbox->addTool($this->getSortToolbox($section));
+
+         if ($this->rights()->isControll()) {
+            // edit
+            $toolEdit = new Template_Toolbox2_Tool_PostRedirect('edit_section', $this->tr("Upravit sekci"),
+                  $this->link()->route('editSection', array('seckey' => $section->{Projects_Model_Sections::COLUMN_URLKEY})));
+            $toolEdit->setIcon('page_edit.png')->setTitle($this->tr('Upravit text sekce'));
+            $toolbox->addTool($toolEdit);
+            // delete
+            if(isset ($this->formDelete)){
+               $toolDel = new Template_Toolbox2_Tool_Form($this->formDelete);
+               $toolDel->setIcon('page_delete.png')->setTitle($this->tr('Smazat sekci'))
+                  ->setConfirmMeassage($this->tr('Opravdu smazat sekci i s projekty?'))
+                  ->setImportant(true);
+               $toolDel->getForm()->id->setValues($section->{Projects_Model_Sections::COLUMN_ID});
+               $toolbox->addTool($toolDel);
+            }
          }
+         return $toolbox;
       }
-      return $toolbox;
+      return null;
    }
    
    protected function getSortToolbox(Model_ORM_Record $section = null)
@@ -145,9 +150,23 @@ class Projects_View extends View {
       return $toolSort;
    }
    
+   protected function getSectionsSortToolbox()
+   {
+      $toolSort = new Template_Toolbox2_Tool_PostRedirect('sort_sections', $this->tr("Řadit sekce"),
+               $this->link()->route('sortSections'));
+      $toolSort->setIcon(Template_Toolbox2::ICON_MOVE_UP_DOWN)->setTitle($this->tr('Řadit sekce'));
+      return $toolSort;
+   }
+   
    public function sortProjectsView()
    {
       Template_Module::setEdit(true);
       $this->template()->addFile('tpl://projects:edit_order.phtml');
+   }
+   
+   public function sortSectionsView()
+   {
+      Template_Module::setEdit(true);
+      $this->template()->addFile('tpl://projects:edit_sorder.phtml');
    }
 }

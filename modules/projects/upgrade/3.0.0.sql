@@ -5,6 +5,7 @@ ADD INDEX `base` (`id_project_section` ASC, `project_order` ASC);
 
 
 ALTER TABLE `{PREFIX}projects_sections` 
+ADD COLUMN `section_order` INT NULL DEFAULT 0,
 DROP INDEX `id_category` ,
 ADD INDEX `id_category` (`id_category` ASC),
 ADD INDEX `base` (`id_category` ASC, `section_urlkey` ASC);
