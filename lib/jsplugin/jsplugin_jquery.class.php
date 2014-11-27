@@ -81,7 +81,7 @@ class JsPlugin_JQuery extends JsPlugin {
 //      } else {
 //         $this->addFile(new JsPlugin_CssFile("jquery.ui.$css.css", false, self::getThemeDir($this->getCfgParam('theme'))));
 //      }
-      $this->addFile(new JsPlugin_CssFile("jquery-ui.min.css", false, 'ui/themes/'));
+      $this->addFile(new JsPlugin_CssFile("ui/themes/jquery-ui.min.css", false));
       $this->addFile(new JsPlugin_CssFile("theme.css", false, self::getThemeDir($this->getCfgParam('theme'))));
    }
 
