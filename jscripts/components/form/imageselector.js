@@ -14,10 +14,11 @@ $(document).ready(function(){
    $container.find('input[type="file"]').change();
    if (!!window.FileReader) {
       $container.on('change', 'input[type="file"]', function(){
+         var $that = $(this);
          var reader = new FileReader();
          reader.readAsDataURL(this.files[0]);
          reader.onload = function (oFREvent) {
-            $container.find('.image-selector-img-box img').prop('src', oFREvent.target.result) ;
+            $that.closest('.image-selector').find('.image-selector-img-box img').prop('src', oFREvent.target.result) ;
          };
       });
    }
