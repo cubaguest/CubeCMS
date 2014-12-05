@@ -12,7 +12,7 @@
 @color-text-hover: #fff;
 @color-text-hover-alt: darken(@color-text, 50);
 @color-text-gray: #333;
-@color-text-light: lighten(@color-text, 40%);
+@color-text-light: lighten(@color-text, 20%);
 @color-text-important: #FF3323;
 @color-bg: #fff;
 @color-bg-header: #fff;
@@ -39,6 +39,28 @@
 @padding-small: 5px;
 @padding-large: 20px;
 @padding-base-vertical: @padding-base;
+
+@imgdir: @dirCoreImages;
+
+@form-font-size: 14px;
+@form-font-size-small: @form-font-size - 4;
+@form-color-border: #aaa;
+@form-color-border-hover: #999;
+@form-color-border-important: #fc4949;
+@form-color-text: #444;
+@form-color-text-hover: #fff;
+@form-color-text-hover-alt: darken(@form-color-text, 50);
+@form-color-text-gray: lighten(@form-color-text, 20%);
+@form-color-bg: #fff;
+@form-color-bg-hover: #428bca;
+@form-color-bg-red: #d9534f;
+@form-color-bg-green: #5cb85c;
+@form-color-bg-disabled: #eee;
+@form-color-bg-warning: #FFABAB;
+
+/*
+ * Mixins
+ */
 
 .rounded-corners(@radius: @border-radius) {
    border-radius: @radius;
@@ -79,3 +101,6 @@
    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='@color-primary-light', endColorstr='@color-primary',GradientType=0 ); /* IE6-9 */
 }
 
+.full-width() {
+   width: 100%;
+}
