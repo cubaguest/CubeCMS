@@ -1,0 +1,34 @@
+<?php 
+echo $this->toolbox;// TOOLBOXY
+$this->addFile('css://style.less');
+?>
+<h1 class=""><?php echo $this->category()->getName()?></h1>
+<div class="posts-list text-blocks-list">
+<?php 
+   if(!empty ($this->blocks)) {
+      foreach ($this->blocks as $block) {
+         ?>
+         <div class="row clearfix" id="text-block-<?php echo $block->getPK()?>">
+            <div class="block-image col-md-4">
+               <?php 
+               $src = Utils_Image::cache($this->category()->getModule()->getDataDir().$block->{TextBlocks_Model::COLUMN_IMAGE},
+                   275, 275, true);
+               ?>
+               <img class="img-responsive" src="<?php echo $src?>" alt="<?php ps($block->{TextBlocks_Model::COLUMN_NAME})?>" />
+            </div>
+         
+            <div class="block-content text col-md-6">
+               <h2><?php ps($block->{TextBlocks_Model::COLUMN_NAME});?></h2>
+               <?php 
+               echo $block->{TextBlocks_Model::COLUMN_TEXT};
+               ?>
+            </div>
+            <?php 
+            echo $block->toolbox;
+            ?>
+         </div>
+      <?php }
+   } else {
+      echo ($this->tr('Není vložen žádný blok'));
+   }?>
+</div>

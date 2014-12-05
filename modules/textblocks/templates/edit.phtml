@@ -1,0 +1,16 @@
+<?php 
+// do titulku
+if($this->block) {
+   $h = sprintf($this->tr('úprava bloku "%s"'),$this->block->{TextBlocks_Model::COLUMN_NAME});
+} else {
+   $h = $this->tr('přidání bloku');
+}
+$this->addPageTitle($h);
+// donastavení formuláře
+?>
+<h1><?php echo $h?></h1>
+<div class="content-edit-form">
+   <?php 
+   echo($this->form);
+   ?>
+</div>

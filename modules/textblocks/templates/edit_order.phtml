@@ -1,0 +1,54 @@
+<?php 
+// do titulku
+$h = $this->tr('úprava pořadí bloků');
+$this->addPageTitle($h);
+
+$jq = new JsPlugin_JQuery();
+$jq->addUISortable();
+$this->addJsPlugin($jq);
+$this->addFile('css://style.less');
+?>
+<h1><?php echo  $h ?></h1>
+<div class="content-form-edit">
+   <?php  echo $this->form->renderStart(); ?>
+   <fieldset class="fieldset-alt"><legend><span class="form-legend-name">Pořadí bloků</span>
+         <span class="form-legend-text"></span>
+      </legend>
+      <table class="form-table">
+         <tr>
+            <th class="form-labels"><label for="person_degreeAfter_1" class="person_degreeAfter_label_class">Bloky:</label></th>
+            <td class="form-controlls">
+               <ul id="textblock-list" class="cubecms-widget cubecms-list">
+               <?php 
+               foreach ($this->blocks as $block) {?>
+                  <li class="cubecms-list-row cubecms-list-row-movable"><?php 
+                  echo $block->{TextBlocks_Model::COLUMN_NAME};
+                  $this->form->id->setValues($block->getPK());
+                  echo $this->form->id;
+                  ?></li>
+               <?php }?>
+            </ul>
+            </td>
+         </tr>
+         <tr>
+            <td class="form-labels"></td>
+            <td class="form-controlls font-small"><?php echo $this->tr('Pro změnu pořadí stačí blok uchopit a přesunout.')?></td>
+         </tr>
+         <tr>
+            <th class="form-labels"><?php echo $this->form->save->label()?></th>
+            <td class="form-controlls"><?php echo $this->form->save->controllAll()?></td>
+         </tr>
+      </table>
+   </fieldset>   
+   <?php  echo $this->form->renderEnd(); ?>
+   <script>
+	$(function() {
+		$( "#textblock-list" ).sortable({
+			placeholder: "cubecms-state-highlight",
+         forcePlaceholderSize : true,
+         cursor: 'move'
+		});
+		$( "#textblock-list" ).disableSelection();
+	});
+	</script>
+</div>
