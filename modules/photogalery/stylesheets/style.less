@@ -1,4 +1,4 @@
-@import "admin/variables.less";
+@import "cubecms/variables.less";
 
 // tpl edit photos
 #image-uplaod-component {
@@ -46,11 +46,18 @@
 
 /* uplaod queue */
 #upload-queue {
+   &,li {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      clear: both;
+   }
    li {
       .col-left {
          .thumbnail {
             text-align: center;
             display: block;
+            margin: 0;
          }
          img {
             max-width: 50px;
@@ -59,14 +66,18 @@
          }
          float: left;
          width: 70px;
+         margin-right: 10px;
       }
       .col-right {
          span {
             &.name {
                font-weight: bold;
-               margin: 10px 0 3px 0;
+               margin: 5px 0 3px 0;
             }
             display: block;
+         }
+         .progress {
+            margin: 0;
          }
          padding-top: @padding-base-vertical;
       }

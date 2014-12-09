@@ -26,7 +26,7 @@ CubeImagesEditor = {
       this.$dialogLabels = $('#dialog-image-labels');
       
       // reset selected
-      this.$imagesList.find('.image-checkbox').removeProp('checked');
+      this.$imagesList.find('.image-checkbox').prop('checked', false);
       this.$imagesActions.find('#images-action-select,#buttons-process-images').prop('disabled', 'disabled');
       that.$imagesActions.removeClass('fixed-box');
       // eventy
@@ -43,18 +43,18 @@ CubeImagesEditor = {
             $(this).closest('li').removeClass('selected');
          }
          if(that.$imagesList.find('.image-checkbox:checked').length > 0 ){
-            that.$imagesActions.find('#images-action-select,#buttons-process-images').removeProp('disabled');
+            that.$imagesActions.find('#images-action-select,#buttons-process-images').prop('disabled', false);
             that.$imagesActions.addClass('fixed-box');
          } else {
-            that.$imagesActions.find('#images-action-select,#buttons-process-images').prop('disabled', 'disabled');
+            that.$imagesActions.find('#images-action-select,#buttons-process-images').prop('disabled', true);
             that.$imagesActions.removeClass('fixed-box');
          }
       });
       this.$imagesActions.on('click', '#button-select-all-images', function(){
          if(that.$imagesList.find('.image-checkbox:checked').length > 0 ){
-            that.$imagesList.find('.image-checkbox').removeProp('checked').change();
+            that.$imagesList.find('.image-checkbox').prop('checked', false).change();
          } else {
-            that.$imagesList.find('.image-checkbox').prop('checked', 'checked').change();
+            that.$imagesList.find('.image-checkbox').prop('checked', true).change();
          }
       });
       this.$imagesActions.on('click', '#buttons-process-images', function(){
@@ -256,11 +256,8 @@ CubeImagesEditor = {
          $('.drop-area-label').hide();
          $('#images-upload-form').prop('target', 'upload-target');
          // standart upload
-         
 //         $('#upload_file_1').on('change', function(){
-//            $('input[name="upload_path"]').val(CubeBrowser.getCurrentPath());
 //            $(this).closest('form').submit();
-//            CubeBrowserProgressBarWidget.setProgress(10);
 //         });
          // upload kompletní
          $('#upload_target').load(function(){
@@ -268,14 +265,10 @@ CubeImagesEditor = {
                var error = $('#upload_target').get(0).contentWindow.error;
                var info = $('#upload_target').get(0).contentWindow.info;
 //               $.each(error, function(index, cnt){
-//                  CubeBrowserLogsWidget.add(cnt, 'err');
 //               });
 //               $.each(info, function(index, cnt){
-//                  CubeBrowserLogsWidget.add(cnt, 'info');
 //               });
-//               CubeBrowserListWidget.refreshPath();
                that.updateImages();
-//               CubeBrowserProgressBarWidget.setProgress(100);
             } else {
                that.iframeinicialized = true;
             }
@@ -344,9 +337,6 @@ CubeImagesEditor = {
       // create row
       var $item = this._createUploadItem(file);
       this.$queueList.append($item);
-      // assign events
-      
-      
       var uploadXHR = $.ajax({
          xhr: function() {
             var xhrobj = $.ajaxSettings.xhr();
@@ -370,14 +360,9 @@ CubeImagesEditor = {
          data: formData,
          success: function(data) {
             // remove item
-            
-//            CubeBrowserProgressBarWidget.setProgress(100);
             $.each(data.errmsg, function(index, cnt){
-//               CubeBrowserLogsWidget.add(cnt, 'err');
-               // mark item with error
             });
             $.each(data.infomsg, function(index, cnt){
-//               CubeBrowserLogsWidget.add(cnt, 'info');
             });
             // je hláška ok
             if(data.allOk){
@@ -391,8 +376,6 @@ CubeImagesEditor = {
                   that._createImage(image);
                });
             }
-            
-//            CubeBrowserListWidget.refreshPath(true);
          }
       });
       $item.on('click', '.button-cancel-upload',function(e){
