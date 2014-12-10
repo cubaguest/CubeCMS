@@ -123,7 +123,7 @@ class Model_ORM_Ordered extends Model_ORM {
     */
    public static function setRecordPosition($idRecord, $newPos)
    {
-      $m = new self();
+      $m = new static();
       $record = $m->record($idRecord);
       if(!$record || $record->isNew()){
          throw new UnexpectedValueException(sprintf('Záznam s ID: %s se nepodařilo najít, nelze jej tedy přesunout', $idRecord));
