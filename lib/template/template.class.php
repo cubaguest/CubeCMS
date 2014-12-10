@@ -881,20 +881,22 @@ class Template extends TrObject {
          @mkdir($dir, 0777, true);
       }
       try {
-        $options = array( 
+         $compiledFileUrl = null;
+         $options = array( 
             'relativeUrls' => false,
             'sourceMap' => (VVE_DEBUG_LEVEL != 0),
             'sourceMapWriteTo'  => AppCore::getAppCacheDir().Template::STYLESHEETS_DIR.'/'.$rpFile.'.map',
             'sourceMapURL'      => Url_Link::getWebURL().'cache/'.Template::STYLESHEETS_DIR.'/'.$rpFile.'.map',
             'import_dirs' => array( 
                Face::getCurrent()->getDir().'stylesheets/' => '/faces/'.Face::getCurrent()->getName()."/stylesheets/", // face styles 
+               AppCore::getAppLibDir().'faces/'.Face::getCurrent()->getName()."/stylesheets/" => '/faces/'.Face::getCurrent()->getName()."/stylesheets/", // face styles 
                AppCore::getAppWebDir().'stylesheets/' => '/stylesheets/', // base styles 
                AppCore::getAppLibDir().'stylesheets/' => '/stylesheets/', // base styles 
             ),
             'compress' => (VVE_DEBUG_LEVEL == 0),
             'cache_dir'=> AppCore::getAppCacheDir().Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR,
          );
-         
+            
          $css_file_name = Less_Cache::Get( 
              array( $path.$rpFile => '/cache/'.Template::STYLESHEETS_DIR.'/' ), 
              $options, $this->getLessVariables() );
@@ -939,6 +941,7 @@ class Template extends TrObject {
       }
       $url = Url_Request::getBaseWebDir(false).AppCore::ENGINE_CACHE_DIR."/".self::STYLESHEETS_DIR."/";
       try {
+         $compiledFileUrl = null;
          $options = array( 
             'relativeUrls' => false,
             'sourceMap' => (VVE_DEBUG_LEVEL != 0),
@@ -946,7 +949,9 @@ class Template extends TrObject {
             'sourceMapURL'      => Url_Link::getWebURL().'cache/'.Template::STYLESHEETS_DIR.'/'.$rpFile.'.map',
             'import_dirs' => array( 
                Face::getCurrent()->getDir().'stylesheets/' => '/faces/'.Face::getCurrent()->getName()."/stylesheets/", // face styles 
+               AppCore::getAppLibDir().'faces/'.Face::getCurrent()->getName()."/stylesheets/" => '/faces/'.Face::getCurrent()->getName()."/stylesheets/", // face styles 
                AppCore::getAppWebDir().'stylesheets/' => '/stylesheets/', // base styles 
+               AppCore::getAppLibDir().'stylesheets/' => '/stylesheets/', // base styles 
             ),
             'compress' => (VVE_DEBUG_LEVEL == 0),
             'cache_dir'=> AppCore::getAppCacheDir().Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR,
