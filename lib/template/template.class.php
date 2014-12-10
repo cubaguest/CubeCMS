@@ -796,7 +796,8 @@ class Template extends TrObject {
 
       if($original == false AND is_file($rpFaceDir.$rpFile)){ // soubor z face webu
          $path = Template::face(false).$type.'/'.$file;
-      } else if($original == false AND VVE_SUB_SITE_DOMAIN != null AND is_file($rpParentFaceDir.$rpFile)) { // soubor z nadřazeného face (subdomains)
+//      } else if($original == false AND VVE_SUB_SITE_DOMAIN != null AND is_file($rpParentFaceDir.$rpFile)) { // soubor z nadřazeného face (subdomains)
+      } else if($original == false AND VVE_SUB_SITE_DIR != null AND is_file($rpParentFaceDir.$rpFile)) { // soubor z nadřazeného face (subdomains)
          $path = str_replace(Url_Request::getBaseWebDir(), Url_Request::getBaseWebDir(true), Template::face(false)).$type.'/'.$file;
       } else if(is_file($rpMainDir.str_replace('/', DIRECTORY_SEPARATOR, $file))) { // soubor v knihovnách
          if(VVE_SUB_SITE_DOMAIN == null){
@@ -858,13 +859,10 @@ class Template extends TrObject {
       $path = $url = null;
       if($original == false AND is_file($rpFaceDir.$rpFile)){ // soubor z face webu
          $path = $rpFaceDir;
-//         $url = Template::face(false).self::STYLESHEETS_DIR."/";
-      } else if($original == false AND VVE_SUB_SITE_DOMAIN != null AND is_file($rpParentFaceDir.$rpFile)) { // soubor z nadřazeného face (subdomains)
+      } else if($original == false AND VVE_SUB_SITE_DIR != null AND is_file($rpParentFaceDir.$rpFile)) { // soubor z nadřazeného face (subdomains)
          $path = $rpParentFaceDir;
-//         $url = str_replace(Url_Request::getBaseWebDir(), Url_Request::getBaseWebDir(true), Template::face(false)).self::STYLESHEETS_DIR."/";
       } else if(is_file($rpMainDir.$rpFile)) { // soubor v knihovnách
          $path = $rpMainDir;
-//         $url = Url_Request::getBaseWebDir(true).self::STYLESHEETS_DIR."/";
       } else {
          throw new Template_Exception(sprintf($this->tr('Soubor "%s%s" nebyl nalezen'), $rpMainDir, $file));
       }
@@ -922,7 +920,7 @@ class Template extends TrObject {
 
       if($original == false AND is_file($rpFaceDir.$rpFile)){ // soubor z face webu
          $path = $rpFaceDir;
-      } else if($original == false AND VVE_SUB_SITE_DOMAIN != null AND is_file($rpParentFaceDir.$rpFile)) { // soubor z nadřazeného face (subdomains)
+      } else if($original == false AND VVE_SUB_SITE_DIR != null AND is_file($rpParentFaceDir.$rpFile)) { // soubor z nadřazeného face (subdomains)
          $path = $rpParentFaceDir;
       } else if(is_file($rpMainDir.$file)) { // soubor v knihovnách
          $path = $rpMainDir;
