@@ -12,51 +12,51 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
       );
    }
    ?></div>
-   <table>
-      <tr>
-         <th class="ui-widget-header" width="200"><?php echo $this->tr('Uživatelké jméno')?></th>
-         <td class="ui-widget-content" width="300"><?php echo $this->user->{Model_Users::COLUMN_USERNAME}?></td>
+   <table class="cubecms-widget cubecms-table">
+      <tr class="cubecms-row">
+         <th class="" width="200"><?php echo $this->tr('Uživatelké jméno')?></th>
+         <td class="" width="300"><?php echo $this->user->{Model_Users::COLUMN_USERNAME}?></td>
       </tr>
-      <tr>
-         <th class="ui-widget-header"><?php echo $this->tr('Jméno')?></th>
-         <td class="ui-widget-content"><?php echo $this->user->{Model_Users::COLUMN_NAME}?></td>
+      <tr class="cubecms-row">
+         <th class=""><?php echo $this->tr('Jméno')?></th>
+         <td class=""><?php echo $this->user->{Model_Users::COLUMN_NAME}?></td>
       </tr>
-      <tr>
-         <th class="ui-widget-header"><?php echo $this->tr('Přijmení')?></th>
-         <td class="ui-widget-content"><?php echo $this->user->{Model_Users::COLUMN_SURNAME}?></td>
+      <tr class="cubecms-row">
+         <th class=""><?php echo $this->tr('Přijmení')?></th>
+         <td class=""><?php echo $this->user->{Model_Users::COLUMN_SURNAME}?></td>
       </tr>
-      <tr>
-         <th class="ui-widget-header"><?php echo $this->tr('Skupina')?></th>
-         <td class="ui-widget-content"><?php echo $this->user->{Model_Users::COLUMN_GROUP_NAME}?></td>
+      <tr class="cubecms-row">
+         <th class=""><?php echo $this->tr('Skupina')?></th>
+         <td class=""><?php echo $this->user->{Model_Users::COLUMN_GROUP_NAME}?></td>
       </tr>
-      <tr>
-         <th class="ui-widget-header"><?php echo $this->tr('E-maily')?></th>
-         <td class="ui-widget-content"><?php echo $this->user->{Model_Users::COLUMN_MAIL}?></td>
+      <tr class="cubecms-row">
+         <th class=""><?php echo $this->tr('E-maily')?></th>
+         <td class=""><?php echo $this->user->{Model_Users::COLUMN_MAIL}?></td>
       </tr>
       <?php if($this->user->{Model_Users::COLUMN_PHONE}){?>
-      <tr>
-         <th class="ui-widget-header"><?php echo $this->tr('Telefon')?></th>
-         <td class="ui-widget-content"><?php echo $this->user->{Model_Users::COLUMN_PHONE}?></td>
+      <tr class="cubecms-row">
+         <th class=""><?php echo $this->tr('Telefon')?></th>
+         <td class=""><?php echo $this->user->{Model_Users::COLUMN_PHONE}?></td>
       </tr>
       <?php }?>
       <?php if($this->user->{Model_Users::COLUMN_ADDRESS}){?>
-      <tr>
-         <th class="ui-widget-header"><?php echo $this->tr('Adresa')?></th>
-         <td class="ui-widget-content"><?php echo $this->user->{Model_Users::COLUMN_ADDRESS}?></td>
+      <tr class="cubecms-row">
+         <th class=""><?php echo $this->tr('Adresa')?></th>
+         <td class=""><?php echo $this->user->{Model_Users::COLUMN_ADDRESS}?></td>
       </tr>
       <?php }?>
-      <tr>
-         <th class="ui-widget-header"><?php echo $this->tr('Informace jsou veřejné')?></th>
-         <td class="ui-widget-content"><?php echo ($this->user->{Model_Users::COLUMN_INFO_IS_PRIVATE} ? $this->tr('Ne') : $this->tr('Ano'))?></td>
+      <tr class="cubecms-row">
+         <th class=""><?php echo $this->tr('Informace jsou veřejné')?></th>
+         <td class=""><?php echo ($this->user->{Model_Users::COLUMN_INFO_IS_PRIVATE} ? $this->tr('Ne') : $this->tr('Ano'))?></td>
       </tr>
-      <tr>
-         <th class="ui-widget-header"><?php echo $this->tr('Poznámka / popis')?></th>
-         <td class="ui-widget-content"><?php echo $this->user->{Model_Users::COLUMN_NOTE}?></td>
+      <tr class="cubecms-row">
+         <th class=""><?php echo $this->tr('Poznámka / popis')?></th>
+         <td class=""><?php echo $this->user->{Model_Users::COLUMN_NOTE}?></td>
       </tr>
       <?php if(count(Locales::getAppLangs()) > 1 && Auth::isAdmin()){?>
-      <tr>
-         <th class="ui-widget-header"><?php echo $this->tr('Preferovaný jazyk')?></th>
-         <td class="ui-widget-content">
+      <tr class="cubecms-row">
+         <th class=""><?php echo $this->tr('Preferovaný jazyk')?></th>
+         <td class="">
             <?php 
             $arr = Locales::getLangLabel(Locales::getUserLang());
             echo is_array($arr) ? reset($arr) : null; 
@@ -65,6 +65,5 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
       </tr>
       <?php }?>
    </table>
-   <br />
    <?php echo $this->includeFile('tpl://login:buttons.phtml')?>
 </div>

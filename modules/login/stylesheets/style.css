@@ -19,6 +19,9 @@
    display: inline;
    padding-right: 5px;
 }
+#user-dateil table {
+   width: auto;
+}
 #user-dateil table th, #user-dateil table td {
    padding: 2px 4px;
 }
