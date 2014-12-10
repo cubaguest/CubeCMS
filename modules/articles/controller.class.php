@@ -823,6 +823,7 @@ class Articles_Controller extends Controller {
       
       $artRecord->{Articles_Model::COLUMN_CONCEPT} = $form->concept->getValues();
       $artRecord->{Articles_Model::COLUMN_AUTHOR} = $form->creatorOther->getValues();
+      $artRecord->{Articles_Model::COLUMN_PLACE} = $form->place->getValues();
       if(isset($form->priority)){
          $artRecord->{Articles_Model::COLUMN_PRIORITY} = $form->priority->getValues();
          if((int)$form->priority->getValues() != 0){
@@ -1004,8 +1005,13 @@ class Articles_Controller extends Controller {
          
       $eCreatorOther = new Form_Element_Text('creatorOther', $this->tr('Autor'));
       $eCreatorOther->setSubLabel($this->tr('Autor položky, pokud není zařazen v systému.'));
-      $eCreatorOther->setAdvanced(true);
+//      $eCreatorOther->setAdvanced(true);
       $form->addElement($eCreatorOther, $fGrpPublic);
+      
+      $ePlace = new Form_Element_Text('place', $this->tr('Místo'));
+      $ePlace->setSubLabel($this->tr('Např.: místo odkud článek pochází (Praha, Brno, Londýn, ...).'));
+//      $ePlace->setAdvanced(true);
+      $form->addElement($ePlace, $fGrpPublic);
 
       $iConcept = new Form_Element_Checkbox('concept', $this->tr('Koncept'));
       $iConcept->setSubLabel($this->tr('Pokud je položka koncept, je viditelná pouze autorovi a administrátorům.'));
@@ -1075,6 +1081,7 @@ class Articles_Controller extends Controller {
             $form->creatorId->setValues($article->{Articles_Model::COLUMN_ID_USER});
          }
          $form->creatorOther->setValues($article->{Articles_Model::COLUMN_AUTHOR});
+         $form->place->setValues($article->{Articles_Model::COLUMN_PLACE});
          $form->concept->setValues($article->{Articles_Model::COLUMN_CONCEPT});
          if(isset($form->priority)){
             $form->priority->setValues($article->{Articles_Model::COLUMN_PRIORITY});

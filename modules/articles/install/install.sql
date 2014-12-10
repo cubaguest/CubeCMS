@@ -96,3 +96,7 @@ CREATE  TABLE IF NOT EXISTS `{PREFIX}articles_tags_has_articles` (
   INDEX `fk_articles_tags_has_articles_arti` (`articles_tags_id_article_tag` ASC) 
 ) ENGINE = MyISAM DEFAULT CHARACTER SET = utf8 COLLATE = utf8_general_ci;
 
+INSERT INTO `{PREFIX}autorun` (`autorun_module_name`, `autorun_period`, `autorun_url`) 
+VALUES ('articles', 'hourly', NULL);
+INSERT INTO `{PREFIX}autorun` (`autorun_module_name`, `autorun_period`, `autorun_url`) 
+VALUES ('articles', 'daily', NULL);
