@@ -21,14 +21,14 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE IF NOT EXISTS `cubecms_global_config` (
-`id_config` smallint(5) unsigned NOT NULL,
+`id_config` int(11) unsigned NOT NULL,
   `key` varchar(50) NOT NULL,
   `label` varchar(1000) DEFAULT NULL,
   `value` text,
   `values` varchar(200) DEFAULT NULL,
   `protected` tinyint(1) NOT NULL DEFAULT '0',
   `type` enum('string','number','bool','list','listmulti','ser_object') NOT NULL DEFAULT 'string',
-  `id_group` smallint(6) NOT NULL DEFAULT '0',
+  `id_group` int(11) NOT NULL DEFAULT '0',
   `callback_func` varchar(100) DEFAULT NULL,
   `hidden_value` tinyint(1) DEFAULT '0'
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=134 ;
@@ -271,7 +271,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}banners_clicks` (
 --
 
 CREATE TABLE IF NOT EXISTS `{PREFIX}categories` (
-`id_category` smallint(3) NOT NULL,
+`id_category` int(11) NOT NULL,
   `module` varchar(30) DEFAULT NULL,
   `data_dir` varchar(100) DEFAULT NULL,
   `urlkey_cs` varchar(100) CHARACTER SET utf8 COLLATE utf8_czech_ci DEFAULT NULL,
@@ -312,7 +312,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}categories` (
   `feeds` tinyint(1) NOT NULL DEFAULT '0',
   `icon` varchar(100) DEFAULT NULL,
   `background` varchar(100) DEFAULT NULL,
-  `id_owner_user` smallint(6) DEFAULT '0',
+  `id_owner_user` int(11) DEFAULT '0',
   `allow_handle_access` tinyint(1) DEFAULT '0'
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
 
@@ -343,16 +343,16 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}category_redirect` (
 --
 
 CREATE TABLE IF NOT EXISTS `{PREFIX}comments` (
-`id_comment` smallint(6) NOT NULL,
-  `id_category` smallint(6) NOT NULL,
-  `id_article` smallint(6) NOT NULL,
-  `id_parent` smallint(6) DEFAULT '0',
+`id_comment` int(11) NOT NULL,
+  `id_category` int(11) NOT NULL,
+  `id_article` int(11) NOT NULL,
+  `id_parent` int(11) DEFAULT '0',
   `comment_nick` varchar(100) NOT NULL,
   `comment_comment` varchar(500) NOT NULL,
   `comment_public` tinyint(1) NOT NULL DEFAULT '1',
   `comment_censored` tinyint(1) NOT NULL DEFAULT '0',
-  `comment_corder` smallint(6) NOT NULL DEFAULT '1',
-  `comment_level` smallint(6) NOT NULL DEFAULT '0',
+  `comment_corder` int(11) NOT NULL DEFAULT '1',
+  `comment_level` int(11) NOT NULL DEFAULT '0',
   `comment_time_add` datetime NOT NULL,
   `comment_ip_address` varchar(15) DEFAULT NULL,
   `comment_confirmed` tinyint(1) DEFAULT NULL,
@@ -367,14 +367,14 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}comments` (
 --
 
 CREATE TABLE IF NOT EXISTS `{PREFIX}config` (
-`id_config` smallint(5) unsigned NOT NULL,
+`id_config` int(11) NOT NULL,
   `key` varchar(50) NOT NULL,
   `label` varchar(1000) DEFAULT NULL,
   `value` text,
   `values` varchar(200) DEFAULT NULL,
   `protected` tinyint(1) NOT NULL DEFAULT '0',
   `type` enum('string','number','bool','list','listmulti','ser_object') NOT NULL DEFAULT 'string',
-  `id_group` smallint(6) NOT NULL DEFAULT '0',
+  `id_group` int(11) NOT NULL DEFAULT '0',
   `callback_func` varchar(100) DEFAULT NULL,
   `hidden_value` tinyint(1) DEFAULT '0'
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=6 ;
@@ -485,7 +485,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}forms_elements` (
 --
 
 CREATE TABLE IF NOT EXISTS `{PREFIX}groups` (
-`id_group` smallint(3) unsigned NOT NULL COMMENT 'ID skupiny',
+`id_group` int(11) unsigned NOT NULL COMMENT 'ID skupiny',
   `name` varchar(15) DEFAULT NULL COMMENT 'Nazev skupiny',
   `label` varchar(100) DEFAULT NULL,
   `used` tinyint(1) NOT NULL DEFAULT '1',
@@ -509,7 +509,7 @@ INSERT INTO `{PREFIX}groups` (`id_group`, `name`, `label`, `used`, `default_righ
 
 CREATE TABLE IF NOT EXISTS `{PREFIX}hpslideshow_images` (
 `id_image` int(11) NOT NULL,
-  `id_category` smallint(6) DEFAULT '0',
+  `id_category` int(11) DEFAULT '0',
   `image_label_cs` varchar(400) CHARACTER SET utf8 COLLATE utf8_czech_ci DEFAULT NULL,
   `image_label_en` varchar(400) DEFAULT NULL,
   `image_label_de` varchar(400) DEFAULT NULL,
@@ -530,8 +530,8 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}hpslideshow_images` (
 --
 
 CREATE TABLE IF NOT EXISTS `{PREFIX}mails_addressbook` (
-`id_addressbook_mail` smallint(6) NOT NULL,
-  `id_addressbook_group` smallint(6) NOT NULL DEFAULT '1',
+`id_addressbook_mail` int(11) NOT NULL,
+  `id_addressbook_group` int(11) NOT NULL DEFAULT '1',
   `addressbook_name` varchar(30) CHARACTER SET utf8 COLLATE utf8_czech_ci DEFAULT NULL,
   `addressbook_surname` varchar(30) CHARACTER SET utf8 COLLATE utf8_czech_ci DEFAULT NULL,
   `addressbook_mail` varchar(100) CHARACTER SET utf8 COLLATE utf8_czech_ci NOT NULL,
@@ -611,8 +611,8 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}mails_newsletters_templates` (
 --
 
 CREATE TABLE IF NOT EXISTS `{PREFIX}mails_sends` (
-`id_mail` smallint(6) NOT NULL,
-  `id_user` smallint(6) NOT NULL,
+`id_mail` int(11) NOT NULL,
+  `id_user` int(11) NOT NULL,
   `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `recipients` text,
   `subject` varchar(500) DEFAULT NULL,
@@ -628,7 +628,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}mails_sends` (
 
 CREATE TABLE IF NOT EXISTS `{PREFIX}mails_send_queue` (
 `id_mail` int(11) NOT NULL,
-  `id_user` smallint(6) NOT NULL,
+  `id_user` int(11) NOT NULL,
   `mail` varchar(100) NOT NULL,
   `name` varchar(100) DEFAULT NULL,
   `undeliverable` tinyint(1) DEFAULT '0',
@@ -642,7 +642,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}mails_send_queue` (
 --
 
 CREATE TABLE IF NOT EXISTS `{PREFIX}modules_instaled` (
-`id_module` smallint(6) NOT NULL,
+`id_module` int(11) NOT NULL,
   `name` varchar(30) NOT NULL,
   `version_major` tinyint(3) unsigned NOT NULL DEFAULT '1',
   `version_minor` tinyint(3) unsigned NOT NULL DEFAULT '0',
@@ -686,14 +686,14 @@ INSERT INTO `{PREFIX}modules_instaled` (`id_module`, `name`, `version_major`, `v
 --
 
 CREATE TABLE IF NOT EXISTS `{PREFIX}navigation_panel` (
-`id_link` smallint(5) unsigned NOT NULL,
+`id_link` int(11) unsigned NOT NULL,
   `url` varchar(200) NOT NULL,
   `name` varchar(50) NOT NULL,
   `icon` varchar(100) DEFAULT NULL,
   `type` enum('subdomain','project','group','partner') NOT NULL DEFAULT 'subdomain',
   `follow` tinyint(1) NOT NULL DEFAULT '1',
   `params` varchar(200) DEFAULT NULL,
-  `ord` smallint(3) NOT NULL DEFAULT '100',
+  `ord` smallint(6) NOT NULL DEFAULT '100',
   `newwin` tinyint(1) NOT NULL DEFAULT '0'
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
@@ -704,9 +704,9 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}navigation_panel` (
 --
 
 CREATE TABLE IF NOT EXISTS `{PREFIX}panels` (
-`id_panel` smallint(3) NOT NULL,
-  `id_cat` smallint(5) NOT NULL DEFAULT '0' COMMENT 'id kategorie panelu',
-  `id_show_cat` smallint(5) unsigned DEFAULT '0' COMMENT 'id kategorie ve které se má daný panel zobrazit',
+`id_panel` int(11) NOT NULL,
+  `id_cat` int(11) NOT NULL DEFAULT '0' COMMENT 'id kategorie panelu',
+  `id_show_cat` int(11) unsigned DEFAULT '0' COMMENT 'id kategorie ve které se má daný panel zobrazit',
   `position` varchar(20) NOT NULL DEFAULT '' COMMENT 'Název boxu do kterého panel patří',
   `porder` smallint(5) NOT NULL DEFAULT '0' COMMENT 'Řazení panelu',
   `pparams` varchar(1000) DEFAULT NULL,
@@ -727,7 +727,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}panels` (
 
 CREATE TABLE IF NOT EXISTS `{PREFIX}quicktools` (
   `id_tool` int(11) NOT NULL,
-  `id_user` smallint(6) NOT NULL,
+  `id_user` int(11) NOT NULL,
   `name` varchar(100) DEFAULT NULL,
   `url` varchar(300) DEFAULT NULL,
   `icon` varchar(45) DEFAULT NULL,
@@ -741,9 +741,9 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}quicktools` (
 --
 
 CREATE TABLE IF NOT EXISTS `{PREFIX}rights` (
-`id_right` smallint(6) NOT NULL,
-  `id_category` smallint(6) NOT NULL,
-  `id_group` smallint(6) NOT NULL,
+`id_right` int(11) NOT NULL,
+  `id_category` int(11) NOT NULL,
+  `id_group` int(11) NOT NULL,
   `right` enum('---','r--','-w-','--c','rw-','-wc','r-c','rwc') NOT NULL DEFAULT 'r--'
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
 
@@ -763,7 +763,7 @@ INSERT INTO `{PREFIX}rights` (`id_right`, `id_category`, `id_group`, `right`) VA
 
 CREATE TABLE IF NOT EXISTS `{PREFIX}search_apis` (
 `id_api` int unsigned NOT NULL,
-  `id_category` smallint(5) unsigned NOT NULL,
+  `id_category` int(11) unsigned NOT NULL,
   `url` varchar(200) NOT NULL,
   `api` varchar(20) NOT NULL,
   `name` varchar(200) DEFAULT NULL
@@ -808,7 +808,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}sessions` (
 --
 
 CREATE TABLE IF NOT EXISTS `{PREFIX}sites` (
-`id_site` smallint(6) NOT NULL,
+`id_site` int(11) NOT NULL,
   `domain` varchar(50) DEFAULT NULL,
   `dir` varchar(50) DEFAULT NULL,
   `table_prefix` varchar(50) NOT NULL,
@@ -830,7 +830,7 @@ INSERT INTO `{PREFIX}sites` (`id_site`, `domain`, `dir`, `table_prefix`, `is_mai
 --
 
 CREATE TABLE IF NOT EXISTS `{PREFIX}sites_groups` (
-  `id_site` smallint(6) NOT NULL,
+  `id_site` int(11) NOT NULL,
   `id_group` int(11) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='tabulka propojení webů se skupinami adminů';
 
@@ -841,7 +841,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}sites_groups` (
 --
 
 CREATE TABLE IF NOT EXISTS `{PREFIX}templates` (
-`id_template` smallint(5) unsigned NOT NULL,
+`id_template` int(11) unsigned NOT NULL,
   `name` varchar(400) DEFAULT NULL,
   `description` varchar(200) DEFAULT NULL,
   `content` text,
@@ -856,8 +856,8 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}templates` (
 --
 
 CREATE TABLE IF NOT EXISTS `{PREFIX}texts` (
-`id_text` smallint(4) unsigned NOT NULL,
-  `id_item` smallint(5) unsigned NOT NULL,
+`id_text` int(11) unsigned NOT NULL,
+  `id_item` int(11) unsigned NOT NULL,
   `id_user` int(11) DEFAULT '0',
   `subkey` varchar(30) NOT NULL DEFAULT 'nokey',
   `changed` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -883,8 +883,8 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}texts` (
 --
 
 CREATE TABLE IF NOT EXISTS `{PREFIX}texts_has_private_groups` (
-  `id_group` smallint(6) NOT NULL,
-  `id_text` smallint(6) NOT NULL
+  `id_group` int(11) NOT NULL,
+  `id_text` int(11) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -894,8 +894,8 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}texts_has_private_groups` (
 --
 
 CREATE TABLE IF NOT EXISTS `{PREFIX}texts_has_private_users` (
-  `id_user` smallint(6) NOT NULL,
-  `id_text` smallint(6) NOT NULL
+  `id_user` int(11) NOT NULL,
+  `id_text` int(11) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -905,11 +905,11 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}texts_has_private_users` (
 --
 
 CREATE TABLE IF NOT EXISTS `{PREFIX}users` (
-`id_user` smallint(5) unsigned NOT NULL COMMENT 'ID uzivatele',
+`id_user` int(11) unsigned NOT NULL COMMENT 'ID uzivatele',
   `username` varchar(20) NOT NULL COMMENT 'Uzivatelske jmeno',
   `password` varchar(100) DEFAULT NULL COMMENT 'Heslo',
   `password_restore` varchar(100) DEFAULT NULL,
-  `id_group` smallint(3) unsigned DEFAULT '3',
+  `id_group` int(11) unsigned DEFAULT '3',
   `name` varchar(30) NOT NULL,
   `surname` varchar(30) NOT NULL,
   `mail` varchar(50) NOT NULL,
@@ -1213,7 +1213,7 @@ ALTER TABLE `{PREFIX}users_settings`
 -- AUTO_INCREMENT pro tabulku `cubecms_global_config`
 --
 ALTER TABLE `cubecms_global_config`
-MODIFY `id_config` smallint(5) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=134;
+MODIFY `id_config` int(11) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=134;
 --
 -- AUTO_INCREMENT pro tabulku `cubecms_global_config_groups`
 --
@@ -1238,7 +1238,7 @@ MODIFY `id_banner_click` int(11) NOT NULL AUTO_INCREMENT;
 -- AUTO_INCREMENT pro tabulku `{PREFIX}categories`
 --
 ALTER TABLE `{PREFIX}categories`
-MODIFY `id_category` smallint(3) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
+MODIFY `id_category` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
 --
 -- AUTO_INCREMENT pro tabulku `{PREFIX}category_redirect`
 --
@@ -1248,12 +1248,12 @@ MODIFY `id_category_redirect` int(11) NOT NULL AUTO_INCREMENT;
 -- AUTO_INCREMENT pro tabulku `{PREFIX}comments`
 --
 ALTER TABLE `{PREFIX}comments`
-MODIFY `id_comment` smallint(6) NOT NULL AUTO_INCREMENT;
+MODIFY `id_comment` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT pro tabulku `{PREFIX}config`
 --
 ALTER TABLE `{PREFIX}config`
-MODIFY `id_config` smallint(5) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=6;
+MODIFY `id_config` int(11) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=6;
 --
 -- AUTO_INCREMENT pro tabulku `{PREFIX}config_groups`
 --
@@ -1278,7 +1278,7 @@ MODIFY `id_form_element` int(11) NOT NULL AUTO_INCREMENT;
 -- AUTO_INCREMENT pro tabulku `{PREFIX}groups`
 --
 ALTER TABLE `{PREFIX}groups`
-MODIFY `id_group` smallint(3) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID skupiny',AUTO_INCREMENT=3;
+MODIFY `id_group` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID skupiny',AUTO_INCREMENT=3;
 --
 -- AUTO_INCREMENT pro tabulku `{PREFIX}hpslideshow_images`
 --
@@ -1288,7 +1288,7 @@ MODIFY `id_image` int(11) NOT NULL AUTO_INCREMENT;
 -- AUTO_INCREMENT pro tabulku `{PREFIX}mails_addressbook`
 --
 ALTER TABLE `{PREFIX}mails_addressbook`
-MODIFY `id_addressbook_mail` smallint(6) NOT NULL AUTO_INCREMENT;
+MODIFY `id_addressbook_mail` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT pro tabulku `{PREFIX}mails_addressbook_groups`
 --
@@ -1313,7 +1313,7 @@ MODIFY `id_newsletter_template` int(11) NOT NULL AUTO_INCREMENT;
 -- AUTO_INCREMENT pro tabulku `{PREFIX}mails_sends`
 --
 ALTER TABLE `{PREFIX}mails_sends`
-MODIFY `id_mail` smallint(6) NOT NULL AUTO_INCREMENT;
+MODIFY `id_mail` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT pro tabulku `{PREFIX}mails_send_queue`
 --
@@ -1323,27 +1323,27 @@ MODIFY `id_mail` int(11) NOT NULL AUTO_INCREMENT;
 -- AUTO_INCREMENT pro tabulku `{PREFIX}modules_instaled`
 --
 ALTER TABLE `{PREFIX}modules_instaled`
-MODIFY `id_module` smallint(6) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=25;
+MODIFY `id_module` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=25;
 --
 -- AUTO_INCREMENT pro tabulku `{PREFIX}navigation_panel`
 --
 ALTER TABLE `{PREFIX}navigation_panel`
-MODIFY `id_link` smallint(5) unsigned NOT NULL AUTO_INCREMENT;
+MODIFY `id_link` int(11) unsigned NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT pro tabulku `{PREFIX}panels`
 --
 ALTER TABLE `{PREFIX}panels`
-MODIFY `id_panel` smallint(3) NOT NULL AUTO_INCREMENT;
+MODIFY `id_panel` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT pro tabulku `{PREFIX}rights`
 --
 ALTER TABLE `{PREFIX}rights`
-MODIFY `id_right` smallint(6) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=3;
+MODIFY `id_right` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=3;
 --
 -- AUTO_INCREMENT pro tabulku `{PREFIX}search_apis`
 --
 ALTER TABLE `{PREFIX}search_apis`
-MODIFY `id_api` smallint(5) unsigned NOT NULL AUTO_INCREMENT;
+MODIFY `id_api` int(11) unsigned NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT pro tabulku `{PREFIX}secure_tokens`
 --
@@ -1353,22 +1353,22 @@ MODIFY `id_secure_token` int(11) NOT NULL AUTO_INCREMENT;
 -- AUTO_INCREMENT pro tabulku `{PREFIX}sites`
 --
 ALTER TABLE `{PREFIX}sites`
-MODIFY `id_site` smallint(6) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
+MODIFY `id_site` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
 --
 -- AUTO_INCREMENT pro tabulku `{PREFIX}templates`
 --
 ALTER TABLE `{PREFIX}templates`
-MODIFY `id_template` smallint(5) unsigned NOT NULL AUTO_INCREMENT;
+MODIFY `id_template` int(11) unsigned NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT pro tabulku `{PREFIX}texts`
 --
 ALTER TABLE `{PREFIX}texts`
-MODIFY `id_text` smallint(4) unsigned NOT NULL AUTO_INCREMENT;
+MODIFY `id_text` int(11) unsigned NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT pro tabulku `{PREFIX}users`
 --
 ALTER TABLE `{PREFIX}users`
-MODIFY `id_user` smallint(5) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID uzivatele',AUTO_INCREMENT=3;
+MODIFY `id_user` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID uzivatele',AUTO_INCREMENT=3;
 --
 -- AUTO_INCREMENT pro tabulku `{PREFIX}users_logins`
 --
