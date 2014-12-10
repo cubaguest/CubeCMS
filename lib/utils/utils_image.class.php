@@ -76,4 +76,15 @@ class Utils_Image {
       }
       return true;
    }
+   
+   /**
+    * 
+    * @param string|File $image
+    * @return float
+    */
+   public static function getRatio($image)
+   {
+      $size = getimagesize((string)$image); 
+      return $size[0] / $size[1]; 
+   }
 }
