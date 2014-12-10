@@ -57,8 +57,8 @@ $this->addFile('js://bootstrap.min.js');
                   </button>
                   <a class="navbar-brand" href="<?php echo Url_Link::getMainWebDir()?>"><?php ps(CUBE_CMS_WEB_NAME) ?></a>
                </div>
-               <?php  $this->includeTplObj($this->menuObj); ?> <!-- render menu-->
-            </div>
+                  <?php  $this->includeTplObj($this->menuObj); ?> <!-- render menu-->
+               </div>
          </nav>
          <?php if(Template::isTitlePage()){?>
          <div class="container">
@@ -67,7 +67,7 @@ $this->addFile('js://bootstrap.min.js');
          <?php }?>
       </header>
       
-      <?
+      <?php
       $fullscreen = false;
       if(Template::isFullWidth() || Category::getSelectedCategory() instanceof Category_Admin){
          $fullscreen = true;
@@ -76,7 +76,7 @@ $this->addFile('js://bootstrap.min.js');
       <section class="container">
          <div class="row">
             <?php if(!$fullscreen){?>
-            <aside class="col-md-3">
+            <aside class="col-md-2">
                <div id="langs">
                   <?php foreach (Template::pVar('appLangs') as $lang) {
                      $class = null;
@@ -95,7 +95,7 @@ $this->addFile('js://bootstrap.min.js');
                }?>
             </aside>
             <?php }?>
-            <div class="<?php echo $fullscreen ? 'col-md-12' : 'col-md-6' ?>">
+            <div class="<?php echo $fullscreen ? 'col-md-12' : 'col-md-8' ?>">
                <?php 
                $this->includeTpl("messages.phtml", true);
                $navTpl = new Template_Navigation();
@@ -107,7 +107,7 @@ $this->addFile('js://bootstrap.min.js');
                </div>
             </div>
             <?php if(!$fullscreen){?>
-            <aside class="col-md-3">
+            <aside class="col-md-2">
                <?php echo Banners_View::getBanners('right')?>
                <?php 
                if(!empty($this->panels['right'])) {
