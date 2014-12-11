@@ -371,9 +371,11 @@ class Text_Controller extends Controller {
          $textRec->save();
          if($subkey == Text_Model::TEXT_MAIN_KEY){
             $cat = $this->category()->getDataObj();
-            $cat->{Model_Category::COLUMN_DESCRIPTION} = $textRec->catdesc;
-            $cat->{Model_Category::COLUMN_IMAGE} = $textRec->catimage;
-            $cat->save();
+            if($cat instanceof Model_ORM_Record){
+               $cat->{Model_Category::COLUMN_DESCRIPTION} = $textRec->catdesc;
+               $cat->{Model_Category::COLUMN_IMAGE} = $textRec->catimage;
+               $cat->save();
+            }
          }
       }
       return $textRec;
@@ -385,9 +387,11 @@ class Text_Controller extends Controller {
       $this->clearTempRecord($record->{Text_Model::COLUMN_SUBKEY});
       if($record->{Text_Model::COLUMN_SUBKEY} == Text_Model::TEXT_MAIN_KEY){
          $cat = $this->category()->getDataObj();
-         $cat->{Model_Category::COLUMN_DESCRIPTION} = $record->catdesc;
-         $cat->{Model_Category::COLUMN_IMAGE} = $record->catimage;
-         $cat->save();
+         if($cat instanceof Model_ORM_Record){
+            $cat->{Model_Category::COLUMN_DESCRIPTION} = $record->catdesc;
+            $cat->{Model_Category::COLUMN_IMAGE} = $record->catimage;
+            $cat->save();
+         }
       }
    }
    

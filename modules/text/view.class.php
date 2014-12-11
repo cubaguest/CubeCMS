@@ -109,7 +109,9 @@ class Text_View extends View {
          $filedsEditor = $this->getCurrentTemplateParam('customFieldsEditor', array(), 'main');
          foreach($this->fields as $field){
             $element = 'filed_'.$field;
-            $this->setTinyMCE($this->form->$element, isset($filedsEditor[$field]) ? $filedsEditor[$field] : 'simple');
+            if($this->form->$element instanceof Form_Element_Text || $this->form->$element instanceof Form_Element_TextArea ){
+               $this->setTinyMCE($this->form->$element, isset($filedsEditor[$field]) ? $filedsEditor[$field] : 'simple');
+            }
          }
       }
    }
