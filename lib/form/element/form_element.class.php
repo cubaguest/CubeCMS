@@ -727,6 +727,7 @@ class Form_Element extends TrObject implements Form_Element_Interface {
       if($this->isMultiLang()) {
          $cnt = null;
          foreach ($this->getLangs() as $langKey => $langLabel) {
+            $this->html()->setAttrib('value', null);
             $container = clone $this->containerElement;
             $container->addClass('input-group');
             if($this->isMultiple()) {
