@@ -336,6 +336,12 @@ class AdminSites_Controller extends Controller {
       $sqlCnt = file_get_contents($this->getSitesTplDir().'_install'.DIRECTORY_SEPARATOR. $datasetName .DIRECTORY_SEPARATOR.'data.sql');
       $cntForRun = str_replace('{PREFIX}', $dbPrefix, $sqlCnt);
       $dbConnection->exec($cntForRun);
+      
+      // kopírování dat
+      $dataDir = new FS_Dir('data', $this->getSitesTplDir().'_install'.DIRECTORY_SEPARATOR. $datasetName);
+      if($dataDir->exist()){
+         $dataDir->copyContent(AppCore::getAppLibDir().$siteDir.DIRECTORY_SEPARATOR.CUBE_CMS_DATA_DIR);
+      }
    }
    
    protected function installSiteScript($dbPrefix, $datasetName, $newDir)
