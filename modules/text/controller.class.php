@@ -274,6 +274,23 @@ class Text_Controller extends Controller {
       $textarea->addValidation(new Form_Validator_NotEmpty(null, Locales::getDefaultLang(true)));
       $form->addElement($textarea, $grpText);
       
+      // custom fileds
+      if($fields = $this->customFields){
+         foreach($fields as $field => $label){
+            if(isset($this->customFieldsTypes[$field]) && $this->customFieldsTypes[$field] == 'text'){
+               $elem = new Form_Element_Text('filed_'.$field, $label);
+            } else {
+               $elem = new Form_Element_TextArea('filed_'.$field, $label);
+            }
+            $elem->setLangs();
+            if(isset($customFields[$field])){
+               $elem->setValues($customFields[$field]->{Text_Model::COLUMN_TEXT});
+            }
+            $form->addElement($elem, $grpText);
+         }
+         $this->view()->fields = array_keys($this->customFields);
+      }
+      
       if($mainText){
          $perex = new Form_Element_TextArea('desc', $this->tr("Popis"));
          $perex->setLangs();
@@ -293,23 +310,6 @@ class Text_Controller extends Controller {
             $form->desc->setValues( isset($rec->catdesc) ? $rec->catdesc : $this->category()->getDataObj()->{Model_Category::COLUMN_DESCRIPTION});
             $form->image->setValues( isset($rec->catimg) ? $rec->catimg : $this->category()->getDataObj()->{Model_Category::COLUMN_IMAGE});
          }
-      }
-
-      // custom fileds
-      if($fields = $this->customFields){
-         foreach($fields as $field => $label){
-            if(isset($this->customFieldsTypes[$field]) && $this->customFieldsTypes[$field] == 'text'){
-               $elem = new Form_Element_Text('filed_'.$field, $label);
-            } else {
-               $elem = new Form_Element_TextArea('filed_'.$field, $label);
-            }
-            $elem->setLangs();
-            if(isset($customFields[$field])){
-               $elem->setValues($customFields[$field]->{Text_Model::COLUMN_TEXT});
-            }
-            $form->addElement($elem, $grpText);
-         }
-         $this->view()->fields = array_keys($this->customFields);
       }
 
       $submits = new Form_Element_Multi_Submit('send');
