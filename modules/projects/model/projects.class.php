@@ -70,10 +70,10 @@ class Projects_Model_Projects extends Model_ORM_Ordered {
 
 class Projects_Model_Projects_Record extends Model_ORM_Ordered_Record {
    
-   public function getImageSrc(Module $module)
+   public function getImageSrc(Module $module, $thumb = false)
    {
       return $module->getDataDir(true)
                 . $this[Projects_Model_Projects::COLUMN_URLKEY].DIRECTORY_SEPARATOR
-                . $this->{Projects_Model_Projects::COLUMN_IMAGE};
+                . ($thumb == true ? $this->{Projects_Model_Projects::COLUMN_THUMB} : $this->{Projects_Model_Projects::COLUMN_IMAGE} );
    }
 }

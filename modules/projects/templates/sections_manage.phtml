@@ -1,0 +1,73 @@
+<?php 
+// do titulku
+$h = $this->tr('Správa sekcí');
+$this->addPageTitle($h);
+
+$jq = new JsPlugin_JQuery();
+$jq->addUISortable();
+$this->addJsPlugin($jq);
+$this->addFile('css://projects:style.less');
+?>
+<h1><?php ps($h)?></h1>
+<div class="content-admin">
+   <?php
+   $this->moduleButtons = array(
+      array(
+         'link' => $this->link()->route('addSection')->param('backlink', (string)$this->link()),
+         'title' => $this->tr('Vytvořit novou sekci'),
+         'icon' => Template_Toolbox2::ICON_ADD,
+         'name' => $this->tr('Vytvořit sekci'),
+      ),
+   );
+   $this->includeTpl('modules/buttons.phtml', true);
+   
+   if(!empty($this->sections)){
+   ?>
+   <div id="projects-sections-list">
+      <div id="sections-sortable-list" class="cubecms-widget cubecms-list ">
+         <?php foreach ($this->sections as $sec) { ?>
+         <div class="cubecms-list-row" data-id="<?php echo $sec->getPK()?>">
+            <span class="sorting-mouse-area">
+               <span class="icon icon-arrows-v"></span>
+               <?php ps($sec->{Projects_Model_Sections::COLUMN_NAME}) ?>
+            </span>
+            <?php echo $sec->toolbox;?>
+         </div>
+         <?php } ?>
+      </div>
+   </div>
+   <script>
+	$(function() {
+		$( "#sections-sortable-list" ).sortable({
+			placeholder: "cubecms-state-highlight",
+         forcePlaceholderSize : true,
+         cursor: 'move',
+         handle : '.sorting-mouse-area',
+         axis : "y",
+         update: function(event, ui) { 
+			   if (this === ui.item.parent()[0]) {
+				   var index = ui.item.index();
+			      $.ajax({
+			    	   url : '<?php echo $this->link()?>',
+			    	   data : {action : 'sort', id : ui.item.data('id'),  pos : index+1},
+			    	   type : 'POST',
+			    	   success : function(data){
+				    	   if(data.errmsg.lenght > 0){
+				    		   $( "#sections-sortable-list" ).sortable('cancel');
+				    	   }
+			         }
+				   });
+			   }
+			}
+		});
+	});
+	</script>
+   <?php 
+   } else {
+   ?>
+   <div class="admin-info-text"><?php ps($this->tr('Není vložena žádná sekce')); ?></div>
+   <?php
+   }
+   ?>
+   
+</div>

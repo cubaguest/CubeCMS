@@ -81,7 +81,7 @@ class Projects_View extends View {
                $this->link()->route('addSection'));
          $toolAdd->setIcon('page_add.png')->setTitle($this->tr('Přidat novou sekci projektů'));
          $this->toolbox->addTool($toolAdd);
-         $this->toolbox->addTool($this->getSectionsSortToolbox());
+         $this->toolbox->addTool($this->getSectionsManageToolbox());
       }
    }
    
@@ -115,7 +115,7 @@ class Projects_View extends View {
          $toolbox->setIcon(Template_Toolbox2::ICON_WRENCH);
          // add project
          $toolAdd = new Template_Toolbox2_Tool_PostRedirect('add_project', $this->tr("Přidat projekt"),
-               $this->link()->route('addProject', array('seckey' => $section->{Projects_Model_Sections::COLUMN_URLKEY})));
+               $this->link()->route('addProject', array('seckey' => $section->{Projects_Model_Sections::COLUMN_URLKEY}))->param('backlink', (string)$this->link()));
          $toolAdd->setIcon('page_add.png')->setTitle($this->tr('Přidat nový projekt'));
          $toolbox->addTool($toolAdd);
 
@@ -124,7 +124,7 @@ class Projects_View extends View {
          if ($this->rights()->isControll()) {
             // edit
             $toolEdit = new Template_Toolbox2_Tool_PostRedirect('edit_section', $this->tr("Upravit sekci"),
-                  $this->link()->route('editSection', array('seckey' => $section->{Projects_Model_Sections::COLUMN_URLKEY})));
+                  $this->link()->route('editSection', array('seckey' => $section->{Projects_Model_Sections::COLUMN_URLKEY}))->param('backlink', (string)$this->link()));
             $toolEdit->setIcon('page_edit.png')->setTitle($this->tr('Upravit text sekce'));
             $toolbox->addTool($toolEdit);
             // delete
@@ -145,16 +145,17 @@ class Projects_View extends View {
    protected function getSortToolbox(Model_ORM_Record $section = null)
    {
       $toolSort = new Template_Toolbox2_Tool_PostRedirect('sort_projects', $this->tr("Řadit projekty"),
-               $this->link()->route('sortProjects', array('seckey' => $section ? $section->{Projects_Model_Sections::COLUMN_URLKEY} : null )));
+               $this->link()->route('sortProjects', array('seckey' => $section ? $section->{Projects_Model_Sections::COLUMN_URLKEY} : null ))
+                   ->param('backlink', (string)$this->link()));
       $toolSort->setIcon(Template_Toolbox2::ICON_MOVE_UP_DOWN)->setTitle($this->tr('Řadit projekty'));
       return $toolSort;
    }
    
-   protected function getSectionsSortToolbox()
+   protected function getSectionsManageToolbox()
    {
-      $toolSort = new Template_Toolbox2_Tool_PostRedirect('sort_sections', $this->tr("Řadit sekce"),
-               $this->link()->route('sortSections'));
-      $toolSort->setIcon(Template_Toolbox2::ICON_MOVE_UP_DOWN)->setTitle($this->tr('Řadit sekce'));
+      $toolSort = new Template_Toolbox2_Tool_PostRedirect('manage_sections', $this->tr("Spravovat sekce"),
+               $this->link()->route('manageSections'));
+      $toolSort->setIcon(Template_Toolbox2::ICON_COG)->setTitle($this->tr('Spravovat sekce'));
       return $toolSort;
    }
    
@@ -168,5 +169,19 @@ class Projects_View extends View {
    {
       Template_Module::setEdit(true);
       $this->template()->addFile('tpl://projects:edit_sorder.phtml');
+   }
+   
+   public function manageSectionsView()
+   {
+      if(!empty($this->sections)){
+         foreach ($this->sections as $sec) {
+            $sec->toolbox = $this->createSectionToolbox($sec);
+            if($sec->toolbox instanceof Template_Toolbox2){
+               $sec->toolbox->setTemplate(Template_Toolbox2::TEMPLATE_INLINE);
+            }
+         }
+      }
+      Template_Module::setEdit(true);
+      $this->template()->addFile('tpl://projects:sections_manage.phtml');
    }
 }

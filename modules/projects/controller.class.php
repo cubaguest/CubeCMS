@@ -68,7 +68,11 @@ class Projects_Controller extends Controller {
             $this->deleteSection($formDelete->id->getValues());
             $this->infoMsg()->addMessage($this->tr('Sekce byla smazána i sprojekty'));
             $this->log(sprintf('Smazána sekce id: "%s"', $formDelete->id->getValues()));
-            $this->link()->route()->reload();
+            if($this->getRequestParam('backlink')){
+               $this->link()->redirect($this->getRequestParam('backlink'));
+            } else {
+               $this->link()->route()->redirect();
+            }
          }
          $this->view()->formDelete = $formDelete;
       }
@@ -132,7 +136,7 @@ class Projects_Controller extends Controller {
             $this->deleteProject($pr);
             $this->infoMsg()->addMessage($this->tr('Projekt byl smazán'));
             $this->log(sprintf('Smazán projekt "%s"', $pr->{Projects_Model_Projects::COLUMN_NAME}));
-            $this->link()->route()->reload();
+            $this->link()->route()->redirect();
          }
          $this->view()->formDelete = $formDelete;
       }
@@ -173,7 +177,11 @@ class Projects_Controller extends Controller {
       
       if($form->isSend() && $form->save->getValues() == false){
          $this->infoMsg()->addMessage($this->tr('Změny byly zrušeny'));
-         $this->link()->route()->reload();
+         if($this->getRequestParam('backlink')){
+            $this->link()->redirect($this->getRequestParam('backlink'));
+         } else {
+            $this->link()->route()->redirect();
+         }
       }
       
       if($form->isValid()){
@@ -196,7 +204,11 @@ class Projects_Controller extends Controller {
          
          $this->infoMsg()->addMessage($this->tr('Sekce byla uložena'));
          $this->log('Přidána sekce do projektů');
-         $this->link()->route()->reload();
+         if($this->getRequestParam('backlink')){
+            $this->link()->redirect($this->getRequestParam('backlink'));
+         } else {
+            $this->link()->route()->redirect();
+         }
       }
       
       $this->view()->form = $form;
@@ -220,7 +232,11 @@ class Projects_Controller extends Controller {
 
       if($form->isSend() && $form->save->getValues() == false){
          $this->infoMsg()->addMessage($this->tr('Změny byly zrušeny'));
-         $this->link()->route()->reload();
+         if($this->getRequestParam('backlink')){
+            $this->link()->redirect($this->getRequestParam('backlink'));
+         } else {
+            $this->link()->route('section')->redirect();
+         }
       }
       if($form->isValid()){
          $sec->{Projects_Model_Sections::COLUMN_NAME} = $form->name->getValues();
@@ -237,7 +253,11 @@ class Projects_Controller extends Controller {
          
          $this->infoMsg()->addMessage($this->tr('Sekce byla uložena'));
          $this->log('Upravena sekce projektů');
-      $this->link()->route('section', array('seckey' => $sec->{Projects_Model_Sections::COLUMN_URLKEY}))->reload();
+         if($this->getRequestParam('backlink')){
+            $this->link()->redirect($this->getRequestParam('backlink'));
+         } else {
+            $this->link()->route('section', array('seckey' => $sec->{Projects_Model_Sections::COLUMN_URLKEY}))->redirect();
+         }
       }
       $this->view()->section = $sec;
       $this->view()->form = $form;
@@ -286,7 +306,11 @@ class Projects_Controller extends Controller {
       
       if($form->isSend() && $form->save->getValues() == false){
          $this->infoMsg()->addMessage($this->tr('Změny byly zrušeny'));
-         $this->link()->route()->reload();
+         if($this->getRequestParam('backlink')){
+            $this->link()->redirect($this->getRequestParam('backlink'));
+         } else {
+            $this->link()->route()->redirect();
+         }
       }
       
       if($form->isValid()){
@@ -325,14 +349,14 @@ class Projects_Controller extends Controller {
             $thumb = new File_Image($form->imageThumb);
             $thumb->move($dir);
             
-            $thumb->getData()->resize(
-                  $this->category()->getParam(self::PARAM_THUM_W, VVE_IMAGE_THUMB_W), 
-                  $this->category()->getParam(self::PARAM_THUM_H, VVE_IMAGE_THUMB_H),
-                  $this->category()->getParam(self::PARAM_THUM_C, true) == true 
-                  ? File_Image_Base::RESIZE_CROP : File_Image_Base::RESIZE_AUTO
-                  );
-            
-            $thumb->save();
+//            $thumb->getData()->resize(
+//                  $this->category()->getParam(self::PARAM_THUM_W, VVE_IMAGE_THUMB_W), 
+//                  $this->category()->getParam(self::PARAM_THUM_H, VVE_IMAGE_THUMB_H),
+//                  $this->category()->getParam(self::PARAM_THUM_C, true) == true 
+//                  ? File_Image_Base::RESIZE_CROP : File_Image_Base::RESIZE_AUTO
+//                  );
+//            
+//            $thumb->save();
             $rec->{Projects_Model_Projects::COLUMN_THUMB} = $thumb->getName();
          }
             
@@ -348,22 +372,22 @@ class Projects_Controller extends Controller {
                
                $thumb = $image->copy($dir, true, $thumbName);
                
-               $thumb->getData()->resize(
-                     $this->category()->getParam(self::PARAM_THUM_W, VVE_IMAGE_THUMB_W),
-                     $this->category()->getParam(self::PARAM_THUM_H, VVE_IMAGE_THUMB_H),
-                     $this->category()->getParam(self::PARAM_THUM_C, true) == true
-                     ? File_Image_Base::RESIZE_CROP : File_Image_Base::RESIZE_AUTO
-               );
-               
-               $thumb->save();
+//               $thumb->getData()->resize(
+//                     $this->category()->getParam(self::PARAM_THUM_W, VVE_IMAGE_THUMB_W),
+//                     $this->category()->getParam(self::PARAM_THUM_H, VVE_IMAGE_THUMB_H),
+//                     $this->category()->getParam(self::PARAM_THUM_C, true) == true
+//                     ? File_Image_Base::RESIZE_CROP : File_Image_Base::RESIZE_AUTO
+//               );
+//               
+//               $thumb->save();
                $rec->{Projects_Model_Projects::COLUMN_THUMB} = $thumb->getName();
             }
             
-            $image->getData()->resize(
-                  $this->category()->getParam(self::PARAM_BIG_W, VVE_DEFAULT_PHOTO_W),
-                  $this->category()->getParam(self::PARAM_BIG_H, VVE_DEFAULT_PHOTO_H), File_Image_Base::RESIZE_AUTO );
-            
-            $image->save();
+//            $image->getData()->resize(
+//                  $this->category()->getParam(self::PARAM_BIG_W, VVE_DEFAULT_PHOTO_W),
+//                  $this->category()->getParam(self::PARAM_BIG_H, VVE_DEFAULT_PHOTO_H), File_Image_Base::RESIZE_AUTO );
+//            
+//            $image->save();
             $rec->{Projects_Model_Projects::COLUMN_IMAGE} = $image->getName();
          }
          
@@ -371,7 +395,7 @@ class Projects_Controller extends Controller {
          
          $this->infoMsg()->addMessage($this->tr('Projekt byl uložen'));
          $this->log('Přidán projekt '. $rec->{Projects_Model_Projects::COLUMN_NAME});
-         $this->link()->route('project', array('prkey' => $rec->{Projects_Model_Projects::COLUMN_URLKEY}))->reload();
+         $this->link()->route('project', array('prkey' => $rec->{Projects_Model_Projects::COLUMN_URLKEY}))->redirect();
       }
       
       $this->view()->form = $form;
@@ -400,7 +424,11 @@ class Projects_Controller extends Controller {
       
       if($form->isSend() && $form->save->getValues() == false){
          $this->infoMsg()->addMessage($this->tr('Změny byly zrušeny'));
-         $this->link()->route('project')->reload();
+         if($this->getRequestParam('backlink')){
+            $this->link()->redirect($this->getRequestParam('backlink'));
+         } else {
+            $this->link()->route('project')->redirect();
+         }
       }
       
       
@@ -452,14 +480,14 @@ class Projects_Controller extends Controller {
             // zadaná miniatura
             $thumb = new File_Image($form->imageThumb);
             $thumb->move($dir);
-            $thumb->getData()->resize(
-                  $this->category()->getParam(self::PARAM_THUM_W, VVE_IMAGE_THUMB_W),
-                  $this->category()->getParam(self::PARAM_THUM_H, VVE_IMAGE_THUMB_H),
-                  $this->category()->getParam(self::PARAM_THUM_C, true) == true
-                  ? File_Image_Base::RESIZE_CROP : File_Image_Base::RESIZE_AUTO
-            );
-            
-            $thumb->save();
+//            $thumb->getData()->resize(
+//                  $this->category()->getParam(self::PARAM_THUM_W, VVE_IMAGE_THUMB_W),
+//                  $this->category()->getParam(self::PARAM_THUM_H, VVE_IMAGE_THUMB_H),
+//                  $this->category()->getParam(self::PARAM_THUM_C, true) == true
+//                  ? File_Image_Base::RESIZE_CROP : File_Image_Base::RESIZE_AUTO
+//            );
+//            
+//            $thumb->save();
             $rec->{Projects_Model_Projects::COLUMN_THUMB} = $thumb->getName();
          }
          
@@ -476,21 +504,21 @@ class Projects_Controller extends Controller {
                
                $thumb = $image->copy($dir, true, $thumbName);
                
-               $thumb->getData()->resize(
-                     $this->category()->getParam(self::PARAM_THUM_W, VVE_IMAGE_THUMB_W),
-                     $this->category()->getParam(self::PARAM_THUM_H, VVE_IMAGE_THUMB_H),
-                     $this->category()->getParam(self::PARAM_THUM_C, true) == true
-                     ? File_Image_Base::RESIZE_CROP : File_Image_Base::RESIZE_AUTO
-               );
+//               $thumb->getData()->resize(
+//                     $this->category()->getParam(self::PARAM_THUM_W, VVE_IMAGE_THUMB_W),
+//                     $this->category()->getParam(self::PARAM_THUM_H, VVE_IMAGE_THUMB_H),
+//                     $this->category()->getParam(self::PARAM_THUM_C, true) == true
+//                     ? File_Image_Base::RESIZE_CROP : File_Image_Base::RESIZE_AUTO
+//               );
                $thumb->save();
                
                $rec->{Projects_Model_Projects::COLUMN_THUMB} = $thumb->getName();
             }
-            $image->getData()->resize(
-                  $this->category()->getParam(self::PARAM_BIG_W, VVE_DEFAULT_PHOTO_W),
-                  $this->category()->getParam(self::PARAM_BIG_H, VVE_DEFAULT_PHOTO_H), File_Image_Base::RESIZE_AUTO );
-            
-            $image->save();
+//            $image->getData()->resize(
+//                  $this->category()->getParam(self::PARAM_BIG_W, VVE_DEFAULT_PHOTO_W),
+//                  $this->category()->getParam(self::PARAM_BIG_H, VVE_DEFAULT_PHOTO_H), File_Image_Base::RESIZE_AUTO );
+//            
+//            $image->save();
             $rec->{Projects_Model_Projects::COLUMN_IMAGE} = $image->getName();
          }
          
@@ -505,7 +533,11 @@ class Projects_Controller extends Controller {
          
          $this->infoMsg()->addMessage($this->tr('Projekt byl uložen'));
          $this->log('Upraven projekt '. $rec->{Projects_Model_Projects::COLUMN_NAME});
-         $this->link()->route('project', array('prkey' => $rec->{Projects_Model_Projects::COLUMN_URLKEY}))->reload();
+         if($this->getRequestParam('backlink')){
+            $this->link()->redirect($this->getRequestParam('backlink'));
+         } else {
+            $this->link()->route('project', array('prkey' => $rec->{Projects_Model_Projects::COLUMN_URLKEY}))->redirect();
+         }
       }
       
       $this->view()->project = $rec;
@@ -548,7 +580,11 @@ class Projects_Controller extends Controller {
       $form->addElement($eSave);
 
       if($form->isSend() && $form->save->getValues() == false){
-         $this->link()->route('section')->reload();
+         if($this->getRequestParam('backlink')){
+            $this->link()->redirect($this->getRequestParam('backlink'));
+         } else {
+            $this->link()->route('section')->redirect();
+         }
       }
       
       if($form->isValid()){
@@ -559,7 +595,11 @@ class Projects_Controller extends Controller {
             $project->setRecordPosition($index + 1);
          }
          $this->infoMsg()->addMessage($this->tr('Pořadí bylo uloženo'));
-         $this->link()->route('section')->reload();
+         if($this->getRequestParam('backlink')){
+            $this->link()->redirect($this->getRequestParam('backlink'));
+         } else {
+            $this->link()->route('section')->redirect();
+         }
       }
       
       $this->view()->projects = $projects;
@@ -581,7 +621,7 @@ class Projects_Controller extends Controller {
       $form->addElement($eSave);
 
       if($form->isSend() && $form->save->getValues() == false){
-         $this->link()->route()->reload();
+         $this->link()->route()->redirect();
       }
       
       if($form->isValid()){
@@ -592,12 +632,33 @@ class Projects_Controller extends Controller {
             $section->setRecordPosition($index + 1);
          }
          $this->infoMsg()->addMessage($this->tr('Pořadí bylo uloženo'));
-         $this->link()->route()->reload();
+         $this->link()->route()->redirect();
       }
       
       $model = new Projects_Model_Sections();
       $this->view()->sections = $model->where(Projects_Model_Sections::COLUMN_ID_CATEGORY." = :idc", array('idc' => $this->category()->getId()))->records();;
       $this->view()->form = $form;
+   }
+   
+   public function manageSectionsController()
+   {
+      $this->checkWritebleRights();
+      
+      if(isset($_POST['action']) && $_POST['action'] == 'sort'){
+         if(!isset($_POST['id']) || !isset($_POST['pos'])){
+            throw new InvalidArgumentException($this->tr('Nebyly předány všechny aprametry'));
+         }
+         $id = (int)$_POST['id'];
+         $pos = (int)$_POST['pos'];
+         Projects_Model_Sections::setRecordPosition($id, $pos);
+//         $this->infoMsg()->addMessage($this->tr('Pozice byla změněna'));
+         return;
+      }
+      
+      $model = new Projects_Model_Sections();
+      $this->view()->sections = $model
+          ->where(Projects_Model_Sections::COLUMN_ID_CATEGORY." = :idc", array('idc' => $this->category()->getId()))
+          ->records();
    }
    
    public function editTextController() {
@@ -620,7 +681,7 @@ class Projects_Controller extends Controller {
 
       if($form->isSend() AND $form->save->getValues() == false){
          $this->infoMsg()->addMessage($this->tr('Úpravy úvodního textu byly zrušeny'));
-         $this->link()->route()->reload();
+         $this->link()->route()->redirect();
       }
 
       if($form->isValid()) {
@@ -636,7 +697,7 @@ class Projects_Controller extends Controller {
          $textM->save($textRecord);
 
          $this->infoMsg()->addMessage($this->tr('Úvodní text byl uložen'));
-         $this->link()->route()->reload();
+         $this->link()->route()->redirect();
       }
 
       $this->view()->form = $form;
@@ -678,7 +739,7 @@ class Projects_Controller extends Controller {
       $elemImageThumb = new Form_Element_File('imageThumb', $this->tr('Titulní obrázek - miniatura'));
       $elemImageThumb->addValidation(new Form_Validator_FileExtension(array('jpg', 'jpeg', 'png', 'gif')));
       $elemImageThumb->setSubLabel($this->tr('Pokud není zadán, je vytvořena miniatura z titulního.'));
-      $elemImageThumb->setAdvanced(true);
+//      $elemImageThumb->setAdvanced(true);
       $form->addElement($elemImageThumb, $fGrpAppearance);
       
       $modelSec = new Projects_Model_Sections();
@@ -763,7 +824,7 @@ class Projects_Controller extends Controller {
          }
          if($prRecord->{Projects_Model_Projects::COLUMN_THUMB} != null){
             $elemDelImgTitleThumb = new Form_Element_Checkbox('delimgthumb', $this->tr('Smazat miniaturu titulního obrázeku'));
-            $elemDelImgTitleThumb->setAdvanced(true);
+//            $elemDelImgTitleThumb->setAdvanced(true);
             $form->addElement($elemDelImgTitleThumb, $fGrpAppearance, $prRecord->{Projects_Model_Projects::COLUMN_IMAGE} != null ? 3 : 2);
          }
          if($prRecord->{Projects_Model_Projects::COLUMN_RELATED} != null){
@@ -845,7 +906,7 @@ class Projects_Controller extends Controller {
       return $keys['ukey'];
    }
 
-         /**
+   /**
     * Metoda pro přípravu spuštění registrovaného modulu
     * @param Controller $ctrl -- kontroler modulu
     * @param string $module -- název modulu
