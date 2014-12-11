@@ -84,18 +84,32 @@ class Model_Module extends Model_ORM {
     * ke kategoriím a přiřazovat to s tama. Rychlá by byla potom asi i aktulaizace 
     * nazpět do objektu kategorie.
     */
-   public static function getVersion($name)
+   public static function getVersion($name, $dbPrefix = null)
    {
-      self::loadModulesData();
+      if($dbPrefix){
+         // kontrola nad jinou tabulkou
+         $dbc = Db_PDO::getInstance();
 
+         $dbst = $dbc->prepare('SELECT `'.self::COLUMN_VERSION.'` FROM ' . Db_PDO::table(self::DB_TABLE, $dbPrefix) . " "
+          . " WHERE `".self::COLUMN_NAME."` = :name");
+
+         $dbst->execute(array(':name' => $name));
+         $obj = $dbst->fetchObject();
+         if(is_object($obj) ){
+            return $obj->{self::COLUMN_VERSION};
+         }
+         return false;
+      }
+      
+      self::loadModulesData();
       return isset(self::$modules[$name]) ? self::$modules[$name] : null;
    }
 
-   public function registerInstaledModule($name, $version)
+   public function registerInstaledModule($name, $version, $dbPrefix = false)
    {
       $dbc = Db_PDO::getInstance();
 
-      $dbst = $dbc->prepare('INSERT INTO ' . Db_PDO::table(self::DB_TABLE) . " "
+      $dbst = $dbc->prepare('INSERT INTO ' . ( Db_PDO::table(self::DB_TABLE, $dbPrefix) ) . " "
           . "(" . self::COLUMN_NAME . ", " . self::COLUMN_VERSION . ")"
           . " VALUES (:name, :version)");
 
@@ -113,8 +127,22 @@ class Model_Module extends Model_ORM {
     * @param $module
     * @return bool
     */
-   public static function isInstalled($module)
+   public static function isInstalled($module, $dbPrefix = null)
    {
+      if($dbPrefix){
+         // kontrola nad jinou tabulkou
+         $dbc = Db_PDO::getInstance();
+
+         $dbst = $dbc->prepare('SELECT COUNT(*) AS counter FROM ' . Db_PDO::table(self::DB_TABLE, $dbPrefix) . " "
+          . " WHERE `".self::COLUMN_NAME."` = :name");
+
+         $dbst->execute(array(':name' => $module));
+         $obj = $dbst->fetchObject();
+         if(is_object($obj) ){
+            return (bool)$obj->counter;
+         }
+         return false;
+      }
       self::loadModulesData();
       return isset(self::$modules[$module]);
    }

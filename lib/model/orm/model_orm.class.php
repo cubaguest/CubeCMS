@@ -36,6 +36,7 @@ class Model_ORM extends Model implements ArrayAccess {
    protected $tableShortName = null;
    protected $dbName = VVE_DB_NAME;
    protected $dbEngine = 'MyISAM';
+   public $dbPrefix = VVE_DB_PREFIX;
    private $tableStructure = array();
    private $pKey = null;
    private $foreignKeys = array();

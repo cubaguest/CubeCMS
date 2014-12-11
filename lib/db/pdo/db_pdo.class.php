@@ -121,8 +121,8 @@ class Db_PDO extends PDO {
     * @param string $name -- název tabulky (nejčastěji konstanta)
     * @return string -- upravený název tabulky
     */
-   public static function table($name) {
-      return self::$tablePrefix.$name;
+   public static function table($name, $dbPrefix = null) {
+      return ($dbPrefix ? $dbPrefix : self::$tablePrefix).$name;
    }
 
    /**

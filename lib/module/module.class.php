@@ -27,6 +27,7 @@ class Module
 
    private $currentModule = null;
 
+   private $dbPrefix = false;
 
    /**
     * Šablony modulu
@@ -44,7 +45,7 @@ class Module
     * @param array $params
     * @param null $version - verze instalovaného modulu
     */
-   public function  __construct($name = null, $params = array(), $version = null)
+   public function  __construct($name = null, $params = array(), $version = null, $dbPrefix = false)
    {
       if(!$name){
          $name = strtolower(str_replace('_Module', '', get_class($this)));
@@ -52,6 +53,7 @@ class Module
       $this->name = $name;
       $this->params = $params;
       $this->dataDir = $name;
+      $this->dbPrefix = $dbPrefix;
       $this->checkVersion($version);
    }
 
@@ -145,7 +147,7 @@ class Module
    {
       $this->updateDependModules();
       if($currentVersion == null){
-         if(!Model_Module::isInstalled($this->getName())){
+         if(!Model_Module::isInstalled($this->getName(), $this->dbPrefix)){
             $this->install();
          }
       } else if(version_compare($this->version, $currentVersion) == 1){
@@ -178,7 +180,7 @@ class Module
       }
       // register module
       $model = new Model_Module();
-      $model->registerInstaledModule($this->name, $this->version);
+      $model->registerInstaledModule($this->name, $this->version, $this->dbPrefix);
    }
 
    /**
@@ -187,7 +189,7 @@ class Module
    protected function installDependentModules()
    {
       foreach ($this->depModules as $module) {
-         if(!Model_Module::isInstalled($module)){
+         if(!Model_Module::isInstalled($module, $this->dbPrefix)){
             $mClass = ucfirst($module) . '_Module';
             /**
              * @todo dodělat dinamické generování třídy modulu
@@ -195,7 +197,7 @@ class Module
             if(!class_exists($mClass)){
                $mClass = 'Module';
             }
-            $inst = new $mClass($module);
+            $inst = new $mClass($module, array(), null, $this->dbPrefix);
          }
       }
    }
@@ -275,13 +277,13 @@ class Module
       }
       foreach ($this->depModules as $moduleName) {
          $class = $moduleName.'_Module';
-         $module = new $class($moduleName, array(), self::getModuleVersion($moduleName));
+         $module = new $class($moduleName, array(), self::getModuleVersion($moduleName, $this->dbPrefix), $this->dbPrefix);
       }
    }
    
-   protected static function getModuleVersion($moduleName)
+   protected static function getModuleVersion($moduleName, $dbPrefix = null)
    {
-      return Model_Module::getVersion($moduleName);
+      return Model_Module::getVersion($moduleName, $dbPrefix);
    }
    
    /**
@@ -325,7 +327,7 @@ class Module
 
    protected function replaceDBPrefix($cnt)
    {
-      return str_replace(Install_Core::SQL_TABLE_PREFIX_REPLACEMENT, VVE_DB_PREFIX, $cnt);
+      return str_replace(Install_Core::SQL_TABLE_PREFIX_REPLACEMENT, $this->dbPrefix ? $this->dbPrefix : VVE_DB_PREFIX, $cnt);
    }
 
    /**

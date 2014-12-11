@@ -89,13 +89,18 @@ class AdminSites_Controller extends Controller {
          $this->createWebsiteDir($newDir);
          
          $this->createNewSiteDb($dbPrefix);
-         
+         if(isset($form->dataset) && $form->dataset->getValues() != null){
+            $this->installSiteScript($dbPrefix, $form->dataset->getValues(), $newDir);
+            $this->createNewSiteData($dbPrefix, $form->dataset->getValues(), $newDir);
+         }
+//         die;
          $this->processNewSiteConfig($newDir, $dbPrefix);
          
          // donasatvení konfigurací
          Model_Config::setSiteConfigValue($dbPrefix, 'WEB_NAME', $form->name->getValues());
          Model_Config::setSiteConfigValue($dbPrefix, 'MAIN_PAGE_TITLE', $form->name->getValues());
          Model_Config::setSiteConfigValue($dbPrefix, 'TEMPLATE_FACE', $form->face->getValues());
+         Model_Config::setSiteConfigValue($dbPrefix, 'SUB_SITE_DIR', $newDir);
          
          $newDomain = $model->newRecord();
          $newDomain->{Model_Sites::COLUMN_DIR} = $newDir;
@@ -227,15 +232,34 @@ class AdminSites_Controller extends Controller {
       }
       $f->addElement($eFace);
       
-      $eSave = new Form_Element_SaveCancel('save');
-      $f->addElement($eSave);
-      
       if($site){
          $f->name->setValues(Model_Config::getSiteConfigValue($site->{Model_Sites::COLUMN_TB_PREFIX}, 'WEB_NAME'));
          $f->face->setValues(Model_Config::getSiteConfigValue($site->{Model_Sites::COLUMN_TB_PREFIX}, 'TEMPLATE_FACE'));
          $f->domain->setValues($site->{Model_Sites::COLUMN_DOMAIN});
          $f->domain->setSubLabel($this->tr('Změna domény neupraví složku s daty.'));
+      } else {
+         $datasets = new DirectoryIterator($this->getSitesTplDir().'_install');
+         
+         if(!empty($datasets)){
+            $elemBaseData = new Form_Element_Select('dataset', $this->tr('Naplnit daty'));
+            $elemBaseData->addOption($this->tr('Žádná data'), false);
+            
+            foreach ($datasets as $dir) {
+               if($dir->isDot()){
+                  continue;
+               }
+               $desc = $dir->getBasename();
+               if(is_file($dir->getRealPath().DIRECTORY_SEPARATOR.'name.txt')){
+                  $desc = file_get_contents($dir->getRealPath().DIRECTORY_SEPARATOR.'name.txt');
+               }
+               $elemBaseData->addOption($desc, $dir->getBasename());
+            }
+            $f->addElement($elemBaseData);
+         }
       }
+      
+      $eSave = new Form_Element_SaveCancel('save');
+      $f->addElement($eSave);
       
       if($f->isSend() && $f->save->getValues() == false){
          $this->link()->route()->redirect();
@@ -305,11 +329,55 @@ class AdminSites_Controller extends Controller {
       $dbConnection->exec($cntForRun);
    }
    
+   protected function createNewSiteData($dbPrefix, $datasetName, $siteDir)
+   {
+      $dbConnection = Db_PDO::getInstance();
+      
+      $sqlCnt = file_get_contents($this->getSitesTplDir().'_install'.DIRECTORY_SEPARATOR. $datasetName .DIRECTORY_SEPARATOR.'data.sql');
+      $cntForRun = str_replace('{PREFIX}', $dbPrefix, $sqlCnt);
+      $dbConnection->exec($cntForRun);
+   }
+   
+   protected function installSiteScript($dbPrefix, $datasetName, $newDir)
+   {
+      // moduly
+      if(is_file($this->getSitesTplDir().'_install'.DIRECTORY_SEPARATOR. $datasetName .DIRECTORY_SEPARATOR.'modules.txt')){
+         $modules = file($this->getSitesTplDir().'_install'.DIRECTORY_SEPARATOR. $datasetName .DIRECTORY_SEPARATOR.'modules.txt', FILE_IGNORE_NEW_LINES);
+         if(!empty($modules)){
+//            $dbConnection = Db_PDO::getInstance();
+            
+            foreach ($modules as $module) {
+               $class = ucfirst($module).'_Module';
+               if(class_exists($class)){
+                  $mObj = new $class($module, array(), null, $dbPrefix);
+               } else {
+                  $mObj = new Module($module, array(), null, $dbPrefix);
+               }    
+            }
+         }
+      }
+//      die;
+      
+//      $modulesFile = str_replace('data.sql', 'modules.txt', $file);
+//      $phpFile = str_replace('data.sql', 'install.php', $file);
+//      
+//      if(is_file($this->getSitesTplDir().$modulesFile)){
+//         
+//      }
+//      
+//      if(is_file($this->getSitesTplDir().$phpFile)){
+//         include_once $this->getSitesTplDir().$phpFile;
+//      }
+   }
+   
    protected function createWebsiteDir($newdir)
    {
       $tplDir = new FS_Dir(self::SITES_TPL_DIR, AppCore::getAppLibDir());
       if(!is_dir(AppCore::getAppLibDir().$newdir)){
          $tplDir->copyContent(AppCore::getAppLibDir().$newdir);
+      }
+      if(is_dir(AppCore::getAppLibDir().$newdir.DIRECTORY_SEPARATOR.'_install')){
+         FS_Dir::deleteStatic(AppCore::getAppLibDir().$newdir.DIRECTORY_SEPARATOR.'_install');
       }
       
    }
