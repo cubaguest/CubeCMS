@@ -3,6 +3,25 @@
 @import "cubecms/variables.less";
 @import "cubecms/form.less";
 
+.clearfix:after, .form-group:after {
+   clear: both;
+   content: ".";
+   display: block;
+   height: 0;
+   line-height: 0;
+   visibility: hidden;
+}
+.clear {
+   clear: both;
+}
+.hidden {
+   display:none;
+}
+.font-small { font-size: 82%; }
+.full-width { width: 100%;}
+.left-box { float: left; }
+.right-box { float: right; }
+
 body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
 /* fonty */
 .admin-font, .toolbox, #adminMenuWrapper ul.dropdown li a {
