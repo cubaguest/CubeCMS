@@ -58,7 +58,7 @@ $this->addItem(Menu_Admin::SECTION_STRUCT, new Menu_Admin_Item(
 ));
 $this->addItem(Menu_Admin::SECTION_STRUCT, new Menu_Admin_Item(
     32791, array( 'cs' => 'Hromadná úprava kategorií', 'en' => 'Bulk Edit of categories'),
-   'structure/categories-bulk-edit', 'catsbulkedit', 'table_edit.png'
+   'structure/cats-bulk-edit', 'catsbulkedit', 'table_edit.png'
 ));
 $this->addItem(Menu_Admin::SECTION_STRUCT, new Menu_Admin_Item(
     32786, array( 'cs' => 'Panely', 'en' => 'Panels'),
