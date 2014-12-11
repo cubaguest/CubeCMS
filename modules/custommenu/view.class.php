@@ -23,7 +23,7 @@ class CustomMenu_View extends View {
             array('box' => $name))
          ->order(CustomMenu_Model_Items::COLUMN_ORDER);
       if(!Auth::isAdmin()){
-         $model->where(" AND ".Model_Category::COLUMN_DISABLE.'_'.Locales::getLang(). " = 0", array(), true);
+         $model->where(" AND ( ".Model_Category::COLUMN_DISABLE.'_'.Locales::getLang(). " = 0 OR ".CustomMenu_Model_Items::COLUMN_ID_CATEGORY." = 0 )", array(), true);
       }
       
       $items = $model->records();
