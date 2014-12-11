@@ -413,6 +413,12 @@ class Photogalery_Controller extends Controller {
    
    protected function processSavePhotoForm(Form $form)
    {
+      // kontrola adresířů
+      FS_Dir::checkStatic($this->module()->getDataDir().$this->subDir);
+      FS_Dir::checkStatic($this->module()->getDataDir().$this->subDir.self::DIR_SMALL);
+      FS_Dir::checkStatic($this->module()->getDataDir().$this->subDir.self::DIR_MEDIUM);
+      FS_Dir::checkStatic($this->module()->getDataDir().$this->subDir.self::DIR_ORIGINAL);
+      
       $procesedImages = array();
       foreach ($form->image->getValues() as $file) {
          $image = new File_Image($file);
