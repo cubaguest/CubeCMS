@@ -12,7 +12,7 @@ class CatsBulkEdit_Controller extends Controller {
    
    protected function init() 
    {
-      $this->modelCat = new Model_Category();   
+      $this->modelCat = new Model_Category();  
    }
    
    public function mainController()
@@ -221,7 +221,7 @@ class CatsBulkEdit_Controller extends Controller {
             $cat = $model->record($id);
             
             if($param == Model_Category::COLUMN_URLKEY){
-               $value = vve_cr_url_key($value, false);
+               $value = Utils_Url::toUrlKey($value, false);
             }
             // assign value
             $cat->$param = $value;

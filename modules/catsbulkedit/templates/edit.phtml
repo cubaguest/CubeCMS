@@ -4,11 +4,6 @@ $this->addFile('css://style.css');
 $h = sprintf( $this->tr('Úprava parametru "%s"'), $this->paramName );
 $this->addPageTitle($h);
 
-$jq = new JsPlugin_JQuery();
-
-$this->addJsPlugin( new JsPlugin_JQueryCSS());
-
-
 function renderCatsList($childs, $form, $link, $param) 
 {
    foreach ($childs as $child) {
@@ -18,19 +13,22 @@ function renderCatsList($childs, $form, $link, $param)
       $value = $obj->{$param};
       $form->param->setValues($value);
    ?>
-      <li>
-         <div class="name ui-widget-header">
+      <li class="cubecms-list-row">
+         <div class="name cubecms-header">
             <?php ps($obj->{Model_Category::COLUMN_NAME}); ?> 
             <a href="<?php echo $link->category($obj->{Model_Category::COLUMN_URLKEY})?>"
                title="<?php ps($obj->{Model_Category::COLUMN_ALT})?>"
                class="link-external"><em>(URL: <?php ps($obj->{Model_Category::COLUMN_URLKEY})?>)</em></a>
          </div>
-         <div class="form ui-widget-content">
-            <?php  
-//             echo $form->param->label();
-            echo $form->param->labelLangs();
-            echo $form->param->controllAll();
-            ?>
+         <div class="form-group">
+            <div class="form-controls">
+               <?php  
+   //             echo $form->param->label();
+               echo $form->param->labelLangs();
+               $form->param->html()->addClass('form-control');
+               echo $form->param->controllAll();
+               ?>
+            </div>
          </div>
          <?php  if(!$child->isEmpty()){?>
          <ul>
@@ -43,16 +41,14 @@ function renderCatsList($childs, $form, $link, $param)
 }
 ?>
 <h1><?php ps($h) ?></h1>
-<div class="main-content-detail main-content-form-edit">
+<div class="content-admin">
    <?php echo $this->form->renderStart();?>
-   <fieldset>
-   <ul id="categories-list" class="ui-widget form-table">
+   <ul id="categories-list" class="cubecms-widget cubecms-list">
       <?php  
       renderCatsList($this->struct, $this->form, $this->link()->clear(), $this->param);
       ?>
       <li><?php echo $this->form->save->controllAll();?></li>
    </ul>
-   </fieldset>
    <?php echo $this->form->renderEnd();?>
    <?php  
    ?>
