@@ -622,15 +622,19 @@ abstract class Controller extends TrObject {
       }
       
       // ostatní nastavení
-      $elemImage = new Form_Element_ImageSelector('image', $this->tr('Titulní obrázek'));
-      $elemImage->setUploadDir(Category::getImageDir(Category::DIR_IMAGE, true));
-      $elemImage->setValues($this->category()->getCatDataObj()->{Model_Category::COLUMN_IMAGE});
-      $form->addElement($elemImage, $grpImages);
+      if(Face::getCurrent()->getParam('category_title_image', null, true)){
+         $elemImage = new Form_Element_ImageSelector('image', $this->tr('Titulní obrázek'));
+         $elemImage->setUploadDir(Category::getImageDir(Category::DIR_IMAGE, true));
+         $elemImage->setValues($this->category()->getCatDataObj()->{Model_Category::COLUMN_IMAGE});
+         $form->addElement($elemImage, $grpImages);
+      }
       
-      $elemBg = new Form_Element_ImageSelector('background', $this->tr('Přiřazené pozadí'));
-      $elemBg->setUploadDir(Category::getImageDir(Category::DIR_BACKGROUND, true));
-      $elemBg->setValues($this->category()->getCatDataObj()->{Model_Category::COLUMN_BACKGROUND});
-      $form->addElement($elemBg, $grpImages);
+      if(Face::getCurrent()->getParam('category_bg_image', null, true)){
+         $elemBg = new Form_Element_ImageSelector('background', $this->tr('Přiřazené pozadí'));
+         $elemBg->setUploadDir(Category::getImageDir(Category::DIR_BACKGROUND, true));
+         $elemBg->setValues($this->category()->getCatDataObj()->{Model_Category::COLUMN_BACKGROUND});
+         $form->addElement($elemBg, $grpImages);
+      }
       
       /* nástroje pro sdílení */
       $elemShareTools = new Form_Element_Checkbox('shareTools', $this->tr('Nástroje pro sdílení obsahu'));
@@ -666,15 +670,19 @@ abstract class Controller extends TrObject {
 
          $categoryM = new Model_Category();
          $catRec = $categoryM->record($this->category()->getId());
-
+         
          // titulní obrázek
-         $image = $form->image->getValues();
-         $catRec->{Model_Category::COLUMN_IMAGE} = $image ? $image['name'] : "";
+         if(isset($form->image)){
+            $image = $form->image->getValues();
+            $catRec->{Model_Category::COLUMN_IMAGE} = $image ? $image['name'] : "";
+         }
 
          // background
-         $bg = $form->background->getValues();
-         $catRec->{Model_Category::COLUMN_BACKGROUND} = $bg ? $bg['name'] : "";
-
+         if(isset($form->background)){
+            $bg = $form->background->getValues();
+            $catRec->{Model_Category::COLUMN_BACKGROUND} = $bg ? $bg['name'] : "";
+         }
+         
          // uložení šablon
          foreach ($tplElements as $eName) {
             if(isset($form->$eName)){

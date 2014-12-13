@@ -8,6 +8,9 @@ $face['name'] = "Bootstrap default template";
 $face['desc'] = "Default Bootstrap CubeCMS tepmlate";
 $face['version'] = "1.0";
 
+$face['category_bg_image'] = false;
+$face['category_title_image'] = true;
+
 // jquery theme
 $face['jquery_theme'] = "base";
 

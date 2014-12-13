@@ -32,8 +32,7 @@ class Text_Controller extends Controller {
       $fieldsTypes = $this->view()->getCurrentTemplateParam('customFieldsType', false);
       if($fields){
          foreach($fields as $tpl => $labels){
-            $this->customFields[$tpl] = $labels[Locales::getLang()];
-            $this->customFields[$tpl] = $labels[Locales::getLang()];
+            $this->customFields[$tpl] = isset($labels[Locales::getLang()]) ? $labels[Locales::getLang()] : $labels[Locales::getDefaultLang()];
          }
       }
       if($fieldsTypes){
@@ -297,10 +296,12 @@ class Text_Controller extends Controller {
          $perex->setSubLabel($this->tr('Krátký popisek. Bývá uveden v přehledech a pro vyhledávače.'));
          $form->addElement($perex, $grpText);
          /* titulní obrázek */
-         $elemImage = new Form_Element_ImageSelector('image', $this->tr('Titulní obrázek'));
-         $elemImage->setUploadDir(Category::getImageDir(Category::DIR_IMAGE, true));
-         $elemImage->setValues($this->category()->getCatDataObj()->{Model_Category::COLUMN_ICON});
-         $form->addElement($elemImage, $grpView);
+         if(Face::getCurrent()->getParam('category_title_image', null, true)){
+            $elemImage = new Form_Element_ImageSelector('image', $this->tr('Titulní obrázek'));
+            $elemImage->setUploadDir(Category::getImageDir(Category::DIR_IMAGE, true));
+            $elemImage->setValues($this->category()->getCatDataObj()->{Model_Category::COLUMN_ICON});
+            $form->addElement($elemImage, $grpView);
+         }
       }
       
       if($rec instanceof Model_ORM_Record){
@@ -308,7 +309,9 @@ class Text_Controller extends Controller {
          $form->label->setValues($rec->{Text_Model::COLUMN_LABEL});
          if($mainText){
             $form->desc->setValues( isset($rec->catdesc) ? $rec->catdesc : $this->category()->getDataObj()->{Model_Category::COLUMN_DESCRIPTION});
-            $form->image->setValues( isset($rec->catimg) ? $rec->catimg : $this->category()->getDataObj()->{Model_Category::COLUMN_IMAGE});
+            if(isset($form->image)){
+               $form->image->setValues( isset($rec->catimg) ? $rec->catimg : $this->category()->getDataObj()->{Model_Category::COLUMN_IMAGE});
+            }
          }
       }
 
@@ -358,7 +361,7 @@ class Text_Controller extends Controller {
          $textRec->{Text_Model::COLUMN_LABEL} = $form->label->getValues();
       }
       $textRec->{Text_Model::COLUMN_ID_USER_EDIT} = Auth::getUserId();
-      if($subkey == Text_Model::TEXT_MAIN_KEY){
+      if($subkey == Text_Model::TEXT_MAIN_KEY && isset($form->image)){
          $textRec->catdesc = $form->desc->getValues();
          $img = $form->image->getValues();
          $textRec->catimage = $img ? $img['name'] : null;
