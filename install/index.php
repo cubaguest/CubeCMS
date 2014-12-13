@@ -81,7 +81,7 @@ if (isset($_POST['next'])) {
                }
             } catch (Exception $exc) {
                $allowNextStep = false;
-               $errMsg = $exc->getTraceAsString();
+               $errMsg = $exc->getMessage();
             }
 
             if($allowNextStep){
