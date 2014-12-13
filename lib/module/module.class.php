@@ -54,6 +54,9 @@ class Module
       $this->params = $params;
       $this->dataDir = $name;
       $this->dbPrefix = $dbPrefix;
+      if(!$version){
+         $version = self::getModuleVersion($name, $dbPrefix);
+      }
       $this->checkVersion($version);
    }
 
@@ -197,7 +200,7 @@ class Module
             if(!class_exists($mClass)){
                $mClass = 'Module';
             }
-            $inst = new $mClass($module, array(), null, $this->dbPrefix);
+            $inst = new $mClass($module, array(), self::getModuleVersion($moduleName, $this->dbPrefix), $this->dbPrefix);
          }
       }
    }

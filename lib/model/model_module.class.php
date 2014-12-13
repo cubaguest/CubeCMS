@@ -98,7 +98,7 @@ class Model_Module extends Model_ORM {
          if(is_object($obj) ){
             return $obj->{self::COLUMN_VERSION};
          }
-         return false;
+         return null;
       }
       
       self::loadModulesData();
@@ -112,8 +112,10 @@ class Model_Module extends Model_ORM {
       $dbst = $dbc->prepare('INSERT INTO ' . ( Db_PDO::table(self::DB_TABLE, $dbPrefix) ) . " "
           . "(" . self::COLUMN_NAME . ", " . self::COLUMN_VERSION . ")"
           . " VALUES (:name, :version)");
-
-      return $dbst->execute(array(':name' => $name, ':version' => $version));
+      
+      $ret = $dbst->execute(array(':name' => $name, ':version' => $version));
+      self::loadModulesData(true);
+      return $ret;
    }
 
    public function getInstalledModules()
@@ -147,9 +149,9 @@ class Model_Module extends Model_ORM {
       return isset(self::$modules[$module]);
    }
 
-   protected static function loadModulesData()
+   protected static function loadModulesData($force = false)
    {
-      if (!self::$modules) {
+      if (!self::$modules || $force) {
          self::$modules = array();
          $m = new self();
          $list = $m->records();
