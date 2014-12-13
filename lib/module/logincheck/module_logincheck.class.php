@@ -13,16 +13,25 @@ class Module_LoginCheck extends Module_Core {
    
    public function runController() {
       if(isset($_GET['getsid']) && ( isset($_GET['back']) || isset($_SERVER['HTTP_REFERER']) )){
-         // redirect zpět s 
          $backUrl = isset($_GET['back']) ? $_GET['back'] : $_SERVER['HTTP_REFERER'];
          $urlBack = new Url($backUrl);
-         $urlBack
-             ->param('sessionid', session_id())
-             ->param('hidesid', 1)
-             ->redirect();
-         die;
+         $urlBack->param('sessionid', session_id())
+                  ->param('hidesid', 1);
+         
+         if(Auth::isLogin()){
+            // redirect zpět pokud je uživatel přihlášen
+            $urlBack->redirect();
+            die;
+         } else {
+            // redirect na login modul
+            $tmp = Url_Link::getCategoryLinkByModule('login');
+            $link = reset($tmp);
+            
+            $link->param('redirect', (string)$urlBack)
+                ->redirect();
+            
+         }
       }
-      
       
       Template_Output::setOutputType('json');
       Template_Output::sendHeaders();

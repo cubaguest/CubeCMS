@@ -16,7 +16,7 @@ class Login_Controller extends Controller {
    
    public function mainController() {
       $model = new Model_Users();
-      $modelLogins = new Model_UsersLogins;
+      $modelLogins = new Model_UsersLogins();
 
       $this->view()->user = $model->joinFK(Model_Users::COLUMN_GROUP_ID)->record(Auth::getUserId());
       
@@ -25,6 +25,19 @@ class Login_Controller extends Controller {
          ->order(array( Model_UsersLogins::COLUMN_TIME => Model_ORM::ORDER_DESC ) )
          ->limit(1, 1)
          ->record(); 
+      
+      if($this->getRequestParam('sessionid')){
+         $this->link()->rmParam('sessionid')->redirect();
+      }
+      
+      if(!Auth::isLogin() && AppCore::getAppLibDir() != AppCore::getAppWebDir()){
+         $url = new Url(isset($_SERVER['HTTPS']) ? 'https://' : 'http://'.CUBE_CMS_PRIMARY_DOMAIN.'/logincheck.php');
+         $url->param('getsid', 1)
+             ->param('back', (string)$this->link());
+         $url->redirect();
+//         $this->view()->redirUrl = (string)$url;
+         
+      }
 	}
 	
 	/**

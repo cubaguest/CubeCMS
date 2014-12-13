@@ -44,6 +44,13 @@
          </div>
       <?php
       echo $loginForm->renderEnd();
+      
+      if($this->redirUrl != null){
+         ?>
+         <a href="<?php echo $this->redirUrl?>">Přihlášení přes kořenový web</a>
+         <?php
+      }
+      
       ?>
       <p class="login-lost-password">
          <a href="<?php echo  $this->link()->route('newPassword') ?>" title="<?php echo  $this->tr('Obnovit zapomenuté heslo') ?>"><?php echo  $this->tr('Zapomenuté heslo') ?></a>

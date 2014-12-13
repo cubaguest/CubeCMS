@@ -35,3 +35,4 @@ class Module_LoginCheck_Category extends Category_Core {
       return $category;
    }
 }
+?>
