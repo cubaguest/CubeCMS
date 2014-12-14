@@ -6,22 +6,20 @@ $this->addPageTitle($h);
 $jq = new JsPlugin_JQuery();
 $jq->addUISortable();
 $this->addJsPlugin($jq);
-$this->addFile('css://style.css');
+$this->addFile('css://style.less');
 ?>
 <h1><?php echo  $h ?></h1>
 <div class="content-form-edit">
    <?php  echo $this->form->renderStart(); ?>
-   <fieldset class="fieldset-alt"><legend><span class="form-legend-name">Základní informace o osobě</span>
-         <span class="form-legend-text"></span>
-      </legend>
+   <fieldset class="fieldset-alt">
       <table class="form-table">
          <tr>
             <th class="form-labels"><label for="person_degreeAfter_1" class="person_degreeAfter_label_class">Osoby:</label></th>
             <td class="form-controlls">
-            <ul id="people-list">
+               <ul id="people-list" class="cubecms-widget cubecms-list">
                <?php 
                foreach ($this->people as $person) {?>
-                  <li class="ui-state-default"><?php 
+                  <li class="cubecms-list-row cubecms-list-row-movable "><?php 
                   echo $person->{People_Model::COLUMN_SURNAME}.' '.$person->{People_Model::COLUMN_NAME};
                   $this->form->id->setValues($person->{People_Model::COLUMN_ID});
                   echo $this->form->id;
@@ -44,7 +42,8 @@ $this->addFile('css://style.css');
    <script>
 	$(function() {
 		$( "#people-list" ).sortable({
-			placeholder: "ui-state-highlight",
+			placeholder: "cubecms-state-highlight",
+         forcePlaceholderSize : true,
          cursor: 'move'
 		});
 		$( "#people-list" ).disableSelection();
