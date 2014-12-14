@@ -77,6 +77,7 @@ if( ( $HASH != null && $expectedHash != $HASH )
 
 
 // load file lib and create obj
+include_once $libDir.'lib'.DIRECTORY_SEPARATOR.'defines.php';
 include_once $libDir.'lib'.DIRECTORY_SEPARATOR.'trobject.class.php';
 include_once $libDir.'lib'.DIRECTORY_SEPARATOR.'file'.DIRECTORY_SEPARATOR.'file_interface.class.php';
 include_once $libDir.'lib'.DIRECTORY_SEPARATOR.'file'.DIRECTORY_SEPARATOR.'file.class.php';

@@ -174,7 +174,6 @@ class File_Image_Gd extends File_Image_Base {
       $this->loadImageData();
       if($args[0] == IMG_FILTER_BLUR){
          $loops = isset($args[1]) ? $args[1] : 10;
-         $args[0] = IMG_FILTER_GAUSSIAN_BLUR;
          // adv anced blur
          for ($x = 1; $x <= $loops; $x++) {
             imagefilter($this->imageData, IMG_FILTER_GAUSSIAN_BLUR);
