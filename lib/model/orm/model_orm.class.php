@@ -2087,6 +2087,9 @@ class Model_ORM extends Model implements ArrayAccess {
                   break;
                case 'lv':
                   $collate = 'utf8_latvian_ci';
+                  break; 
+               case 'no':
+                  $collate = 'utf8_danish_ci';
                   break;
                default:
                   $collate = 'utf8_general_ci';
@@ -2099,7 +2102,11 @@ class Model_ORM extends Model implements ArrayAccess {
       // výchozí parametry a nulová hodnota
       $sql .= ' '.($params['nn'] ? 'NOT NULL' : 'NULL');
       if($params['default'] !== null){
-         $sql .= ' DEFAULT '.$params['default'];
+         $def = $params['default'];
+         if(is_bool($def)){
+            $def = (int)$def;
+         }
+         $sql .= ' DEFAULT '.$def;
       }
       
       // fulltext
@@ -2109,7 +2116,6 @@ class Model_ORM extends Model implements ArrayAccess {
       
       $sql .= ';';
       $this->getDb()->exec($sql);
-//      var_dump($sql);
    }
 
    /* vložení hodnot so sql částí */
