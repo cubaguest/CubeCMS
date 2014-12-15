@@ -11,33 +11,24 @@ $this->addFile('css://style.less');
 <h1><?php echo  $h ?></h1>
 <div class="content-form-edit">
    <?php  echo $this->form->renderStart(); ?>
-   <fieldset class="fieldset-alt">
-      <table class="form-table">
-         <tr>
-            <th class="form-labels"><label for="person_degreeAfter_1" class="person_degreeAfter_label_class">Osoby:</label></th>
-            <td class="form-controlls">
-               <ul id="people-list" class="cubecms-widget cubecms-list">
-               <?php 
-               foreach ($this->people as $person) {?>
-                  <li class="cubecms-list-row cubecms-list-row-movable "><?php 
-                  echo $person->{People_Model::COLUMN_SURNAME}.' '.$person->{People_Model::COLUMN_NAME};
-                  $this->form->id->setValues($person->{People_Model::COLUMN_ID});
-                  echo $this->form->id;
-                  ?></li>
-               <?php }?>
-            </ul>
-            </td>
-         </tr>
-         <tr>
-            <td class="form-labels"></td>
-            <td class="form-controlls font-small"><?php echo $this->tr('Pro změnu pořadí stačí osobu uchopit a přesunout.')?></td>
-         </tr>
-         <tr>
-            <th class="form-labels"><?php echo $this->form->save->label()?></th>
-            <td class="form-controlls"><?php echo $this->form->save->controllAll()?></td>
-         </tr>
-      </table>
-   </fieldset>   
+      <div class="cubecms-widget cubecms-widget-sorting">      
+         <ul id="people-list" class="cubecms-widget cubecms-list">
+            <?php 
+            foreach ($this->people as $person) {?>
+               <li class="cubecms-list-row cubecms-list-row-movable "><span class="icon icon-arrows-v icon-fw"></span><?php 
+               echo $person->{People_Model::COLUMN_SURNAME}.' '.$person->{People_Model::COLUMN_NAME};
+               $this->form->id->setValues($person->{People_Model::COLUMN_ID});
+               echo $this->form->id;
+               ?></li>
+            <?php }?>
+         </ul>
+         <div class="cubecms-widget-footer">
+            <div class="cubecms-widget-note"><?php ps($this->tr('Pro změnu pořadí stačí osobu uchopit a přesunout.'))?></div>
+            <div class="cubecms-widget-buttons">
+               <?php echo $this->form->save->controllAll()?>
+            </div>
+         </div>
+      </div>
    <?php  echo $this->form->renderEnd(); ?>
    <script>
 	$(function() {

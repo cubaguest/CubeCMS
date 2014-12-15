@@ -11,32 +11,24 @@ $this->addFile('css://projects:style.less');
 <h1><?php ps($h)?></h1>
 <div class="content-form-edit">
    <?php  echo $this->form->renderStart(); ?>
-      <table class="form-table">
-         <tr>
-            <th class="form-labels"><label class="">Projekty:</label></th>
-            <td class="form-controlls">
-            <ul id="projects-sort-list">
-               <?php 
-               foreach ($this->projects as $pr) {?>
-                  <li class="ui-state-default"><?php 
-                  echo $pr->{Projects_Model_Projects::COLUMN_NAME};
-                  $this->form->id->setValues($pr->getPK());
-                  echo $this->form->id;
-                  ?></li>
-               <?php }?>
-            </ul>
-            </td>
-         </tr>
-         <tr>
-            <td class="form-labels"></td>
-            <td class="form-controlls font-small"><?php echo $this->tr('Pro změnu pořadí stačí uchopit a přesunout.')?></td>
-         </tr>
-         <tr>
-            <th class="form-labels"><?php echo $this->form->save->label()?></th>
-            <td class="form-controlls"><?php echo $this->form->save->controllAll()?></td>
-         </tr>
-      </table>
-   </fieldset>   
+      <div class="cubecms-widget cubecms-widget-sorting">      
+         <ul id="projects-sort-list" class="cubecms-widget cubecms-list">
+            <?php 
+            foreach ($this->projects as $pr) {?>
+               <li class="cubecms-list-row cubecms-list-row-movable "><span class="icon icon-arrows-v icon-fw"></span><?php 
+               echo $pr->{Projects_Model_Projects::COLUMN_NAME};
+               $this->form->id->setValues($pr->getPK());
+               echo $this->form->id;
+               ?></li>
+            <?php }?>
+         </ul>
+         <div class="cubecms-widget-footer">
+            <div class="cubecms-widget-note"><?php ps($this->tr('Pro změnu pořadí stačí uchopit a přesunout.'))?></div>
+            <div class="cubecms-widget-buttons">
+               <?php echo $this->form->save->controllAll()?>
+            </div>
+         </div>
+      </div>
    <?php  echo $this->form->renderEnd(); ?>
    <script>
 	$(function() {

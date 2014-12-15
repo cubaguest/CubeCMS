@@ -13,6 +13,12 @@ $this->addFile('css://projects:style.less');
    <?php
    $this->moduleButtons = array(
       array(
+         'link' => $this->link()->route(),
+         'title' => $this->tr('Zpět na přehled'),
+         'icon' => 'arrow-left',
+         'name' => $this->tr('Zpět'),
+      ),
+      array(
          'link' => $this->link()->route('addSection')->param('backlink', (string)$this->link()),
          'title' => $this->tr('Vytvořit novou sekci'),
          'icon' => Template_Toolbox2::ICON_ADD,
@@ -23,17 +29,20 @@ $this->addFile('css://projects:style.less');
    
    if(!empty($this->sections)){
    ?>
-   <div id="projects-sections-list">
+   <div id="projects-sections-list" class="cubecms-widget cubecms-widget-sorting">
       <div id="sections-sortable-list" class="cubecms-widget cubecms-list ">
          <?php foreach ($this->sections as $sec) { ?>
-         <div class="cubecms-list-row" data-id="<?php echo $sec->getPK()?>">
-            <span class="sorting-mouse-area">
-               <span class="icon icon-arrows-v"></span>
-               <?php ps($sec->{Projects_Model_Sections::COLUMN_NAME}) ?>
+         <div class="cubecms-list-row" data-id="<?php echo $sec->getPK()?>"
+            ><span class="sorting-mouse-area cubecms-list-row-movable"><span class="icon icon-arrows-v icon-fw"></span><?php 
+              ps($sec->{Projects_Model_Sections::COLUMN_NAME}) ?>
             </span>
             <?php echo $sec->toolbox;?>
          </div>
          <?php } ?>
+         
+         <div class="cubecms-widget-footer">
+            <div class="cubecms-widget-note"><?php ps($this->tr('Pro změnu pořadí stačí osobu uchopit a přesunout.'))?></div>
+         </div>
       </div>
    </div>
    <script>
