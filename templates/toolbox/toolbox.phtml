@@ -35,7 +35,7 @@ $rTime = rand(1, time());
                   <div>
                      <button type="submit" name="<?php echo $tool->getName() ?>_button"
                              class="toolbox-tool-button" title="<?php echo $tool->getTitle() ?>"
-                             ><span class="icon icon-<?php echo $tool->getIcon()?>"></span><?php echo $tool->getLabel() ?></button>
+                             ><span class="icon icon-<?php echo $tool->getIcon()?> icon-fw"></span><?php echo $tool->getLabel() ?></button>
                   <?php 
                   $addVal = $tool->getSubmitValues();
                   foreach ($addVal as $key => $value) {
@@ -55,7 +55,7 @@ $rTime = rand(1, time());
                ?><a href="<?php echo $link ?>" title="<?php echo $tool->getTitle() ?>"
                     onclick="<?php echo $formOnSubmit?>" 
                     class="toolbox-tool-button toolbox-button-<?php echo $name?>"
-                    ><span class="icon icon-<?php echo $tool->getIcon()?>"></span><?php echo htmlspecialchars($tool->getLabel())?></a>
+                    ><span class="icon icon-<?php echo $tool->getIcon()?> icon-fw"></span><?php echo htmlspecialchars($tool->getLabel())?></a>
                 <?php 
                break;
             case 'Template_Toolbox2_Tool_Form':
@@ -67,7 +67,7 @@ $rTime = rand(1, time());
                      if($element instanceof Form_Element_Submit OR $element instanceof Form_Element_SubmitImage){
                         ?><button class="toolbox-tool-button" type="submit" name="<?php echo $element->getName()?>"
                              title="<?php echo $element->getLabel() ?>"
-                        ><span class="icon icon-<?php echo $tool->getIcon()?>"></span><?php echo $element->getLabel()?></button>
+                        ><span class="icon icon-<?php echo $tool->getIcon()?> icon-fw"></span><?php echo $element->getLabel()?></button>
                         <?php 
                      } else if($element instanceof Form_Element_Hidden) {
                         ?><input type="hidden" name="<?php echo $element->getName();?>" value="<?php echo $element->getValues() ?>" /><?php 
@@ -84,7 +84,7 @@ $rTime = rand(1, time());
                   foreach ($tool->getForm() as $element) {
                      if($element instanceof Form_Element_Select){
                         ?>
-                        <span class="icon icon-<?php echo $tool->getIcon()?>"></span><?php echo $element->getLabel()?>
+                        <span class="icon icon-<?php echo $tool->getIcon()?> icon-fw"></span><?php echo $element->getLabel()?>
                         <?php 
                         $element->setAttrib('onchange', 'this.form.submit');
                         echo $element->control();
@@ -97,8 +97,7 @@ $rTime = rand(1, time());
                break;
             case 'Template_Toolbox2_Tool_LangLoader':
                ?>
-               <div><span class="icon icon-<?php echo $tool->getIcon()?>"></span>
-               <?php 
+               <div><span class="icon icon-<?php echo $tool->getIcon()?>"></span><?php 
                echo $this->tr('Ukaž');
                $link = new Url_Link();
                   foreach($tool->getLangs() as $key => $lang){?>
@@ -112,7 +111,7 @@ $rTime = rand(1, time());
             case 'Template_Toolbox2_Tool_Button':
                ?>
                <button class="toolbox-button toolbox-button-<?php ps($name)?>" title="<?php ps($tool->getTitle())?>"
-                       onclick="<?php echo $formOnSubmit?>"><span class="icon icon-<?php echo $tool->getIcon()?>"></span><?php echo $tool->getLabel()?></button>
+                       onclick="<?php echo $formOnSubmit?>"><span class="icon icon-<?php echo $tool->getIcon()?> icon-fw"></span><?php echo $tool->getLabel()?></button>
                <?php 
                break;
             case 'Template_Toolbox2':

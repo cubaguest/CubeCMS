@@ -28,7 +28,7 @@ $this->addFile('css://engine:admin/admin.less');// need for buttons style
             <div>
                <button class="toolbox-tool-inline-button" type="submit" 
                        title="<?php echo $tool->getTitle() ?>" name="<?php echo $tool->getName() ?>_button" value="<?php echo $tool->getLabel() ?>"
-                       ><span class="icon icon-<?php echo $tool->getIcon()?>"></span></button>
+                       ><span class="icon icon-<?php echo $tool->getIcon()?> icon-fw"></span></button>
                   <?php
                   $addVal = $tool->getSubmitValues();
                   foreach ($addVal as $key => $value) {
@@ -48,7 +48,7 @@ $this->addFile('css://engine:admin/admin.less');// need for buttons style
                ?><a href="<?php echo $link ?>" title="<?php ps($tool->getTitle())?>"
                   id="toolbox-button-<?php echo substr(md5($link), 0,8)?>" onclick="<?php echo $formOnSubmit?>" 
                   class="toolbox-tool-inline-button toolbox-button-<?php echo $name?>"
-                  ><span class="icon icon-<?php echo $tool->getIcon()?>"></span></a>
+                  ><span class="icon icon-<?php echo $tool->getIcon()?> icon-fw"></span></a>
                <?php 
                break;
             case 'Template_Toolbox2_Tool_Form':
@@ -59,7 +59,7 @@ $this->addFile('css://engine:admin/admin.less');// need for buttons style
                      ?>
                      <button class="toolbox-tool-inline-button" type="submit" 
                        title="<?php echo $element->getLabel() ?>" name="<?php echo $element->getName() ?>_button" value="<?php echo $element->getLabel() ?>"
-                       ><span class="icon icon-<?php echo $tool->getIcon()?>"></span></button>
+                       ><span class="icon icon-<?php echo $tool->getIcon()?> icon-fw"></span></button>
                      <?php 
                   } else if($element instanceof Form_Element_Hidden) {
                      ?><input type="hidden" name="<?php echo $element->getName();?>" value="<?php echo $element->getValues() ?>" /><?php 
@@ -84,7 +84,7 @@ $this->addFile('css://engine:admin/admin.less');// need for buttons style
             case 'Template_Toolbox2_Tool_Button':
                ?>
                <button class="toolbox-button toolbox-button-<?php ps($name)?>" title="<?php ps($tool->getTitle())?>"
-                       onclick="<?php echo $formOnSubmit?>"><span class="icon icon-<?php echo $tool->getIcon()?>"></span></button>
+                       onclick="<?php echo $formOnSubmit?>"><span class="icon icon-<?php echo $tool->getIcon()?> icon-fw"></span></button>
                <?php 
                break;
             default:
