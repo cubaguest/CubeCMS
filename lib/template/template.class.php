@@ -979,6 +979,7 @@ class Template extends TrObject {
          'dirCore' => "'".Url_Request::getBaseWebDir()."'",
          'dirCoreImages' => "'".Url_Request::getBaseWebDir()."images/'",
          'dirCoreCss' => "'".Url_Request::getBaseWebDir().self::STYLESHEETS_DIR."/'",
+         'dirData' => "'".Url_Request::getBaseWebDir().CUBE_CMS_DATA_DIR."/'",
       );
    }
 
