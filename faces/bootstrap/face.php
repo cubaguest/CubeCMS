@@ -41,3 +41,49 @@ $modules['hpslideshow']['dimensions'] = array(
    'width' => 1140,
    'height' => 250,
 );
+
+// základní nasatvení vzhledu
+if(!function_exists('getFaceEnviromentItems')){
+   function getFaceEnviromentItems()
+   {
+      $items = array();
+      
+//      $imageHeader = new Form_Element_File('headerImage', 'Oprázek v hlavičce');
+//      $imageHeader->addValidation(new Form_Validator_FileExtension('jpg'));
+//      $imageHeader->setUploadDir(AppCore::getAppDataDir());
+      $items[] = $imageHeader;
+      
+      
+      return $items;
+   }
+   function processFaceEnviroment(Form $form)
+   {
+//      if(isset($form->headerImage) && $form->headerImage->getValues() != null){
+//         $img = $form->headerImage->createFileObject();
+//         $img->rename('header.jpg');
+//      }
+   }
+}
+
+// nastavení kateogrie
+if(!function_exists('extendCategorySettings')){
+   function extendCategorySettings(Category $category, Form $form, &$settings, Translator $translator)
+   {
+//      // lev� menu
+//      if($category->getModule()->getName() == 'text'){
+//         $elemSubName = new Form_Element_Text('subname', $translator->tr('Drobn� nadpis v klaimu'));
+//         $elemSubName->setSubLabel($translator->tr('Nadpis se zobraz� ne hlavn�m nadpisem str�nky'));
+//         $elemSubName->setLangs();
+//         $form->addElement($elemSubName, Categories_Controller::SETTINGS_GROUP_VIEW);
+//
+//         if(isset($settings[EADV_PARAM_SUBNAME])){
+//            $form->subname->setValues($settings[EADV_PARAM_SUBNAME]);
+//         }
+//      }
+//      if($form->isValid()){
+//         if(isset($form->subname)){
+//            $settings[EADV_PARAM_SUBNAME] = $form->subname->getValues();
+//         }
+//      }
+   }
+}
