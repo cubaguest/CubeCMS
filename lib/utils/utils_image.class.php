@@ -67,8 +67,11 @@ class Utils_Image {
     * @param string|File $image
     * @return boolean
     */
-   public static function isLandscape($image)
+    public static function isLandscape($image)
    {
+      if((string)strpos($image, 'http') === 0){
+         $image = str_replace(array(Url_Link::getWebURL(), '/'), array(AppCore::getAppWebDir(), DIRECTORY_SEPARATOR), (string)$image);
+      }
       $size = getimagesize((string)$image); 
       $aspect = $size[1] / $size[0]; 
       if ($aspect >= 1) {
@@ -80,10 +83,13 @@ class Utils_Image {
    /**
     * 
     * @param string|File $image
-    * @return float
+    * @return boolean
     */
    public static function getRatio($image)
    {
+      if(strpos((string)$image, 'http') === 0){
+         $image = str_replace(array(Url_Link::getWebURL(), '/'), array(AppCore::getAppWebDir(), DIRECTORY_SEPARATOR), (string)$image);
+      }
       $size = getimagesize((string)$image); 
       return $size[0] / $size[1]; 
    }
