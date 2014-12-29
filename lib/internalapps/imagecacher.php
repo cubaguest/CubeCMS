@@ -99,7 +99,7 @@ try {
    }
 
    // create thum in cache
-   $image->getData()->resize($SIZES['w'], $SIZES['h'], $resizeType );
+   $image->getData()->resize($SIZES['w'], $SIZES['h'], $resizeType , true);
 
    if(!empty($filterParams)){
       $image->getData()->filter($filterParams);

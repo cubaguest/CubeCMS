@@ -40,7 +40,7 @@ class File_Image_Imagick extends File_Image_Base {
     * @param type $option -- Konstanta třídy RESIZE_XXX
     * @return File_Image_Base 
     */
-   public function resize($w, $h, $option = self::RESIZE_AUTO, $resizeUp = false)
+   public function resize($w, $h, $option = self::RESIZE_AUTO, $resizeUp = false, $interlace = false)
    {
       $this->loadImageData();
       return $this;
@@ -163,4 +163,3 @@ class File_Image_Imagick extends File_Image_Base {
       $this->height = $this->imageData->getimageheight();
    }
 }
-?>

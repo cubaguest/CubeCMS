@@ -116,7 +116,7 @@ abstract class File_Image_Base extends TrObject {
     * @param type $option -- Konstanta třídy RESIZE_XXX
     * @return File_Image_Base 
     */
-   public function resize($w, $h, $option = self::RESIZE_AUTO, $resizeUp = false)
+   public function resize($w, $h, $option = self::RESIZE_AUTO, $resizeUp = false, $interlace = false)
    {
       return $this;
    }

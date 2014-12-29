@@ -36,7 +36,7 @@ class File_Image_Gd extends File_Image_Base {
       return $this;
    }
 
-   public function resize($w, $h, $option = self::RESIZE_AUTO, $resizeUp = false)
+   public function resize($w, $h, $option = self::RESIZE_AUTO, $resizeUp = false, $interlace = false)
    {
       $this->loadImageData();
       // obrázek je stejný
@@ -77,6 +77,9 @@ class File_Image_Gd extends File_Image_Base {
 
          imagecopyresampled($imageCroped, $this->imageData , 0, 0, $cropStartX, $cropStartY, $w, $h , $w, $h);
          $this->imageData = $imageCroped;
+      }
+      if($interlace){
+         imageinterlace($this->imageData, true);
       }
       // úprava rozměrů
       $this->width  = imagesx($this->imageData);
