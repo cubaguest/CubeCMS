@@ -266,6 +266,14 @@ class Locales extends TrObject {
                                   "no" => $tr->tr('Norsk'),
           );
    }
+   
+   public static function getSupportedLangs()
+   {
+      if(empty(self::$localesNames)){
+         self::_setLangTranslations();
+      }
+      return self::$localesNames;
+   }
 
    /**
     * Metoda nastaví locales na daný jazyk
