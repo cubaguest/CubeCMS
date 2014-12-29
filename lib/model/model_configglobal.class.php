@@ -73,8 +73,9 @@ class Model_ConfigGlobal extends Model_ORM {
       $rec = $model->where(self::COLUMN_KEY." = :name", array('name' => $name))->record();
       if($type == self::TYPE_BOOL){
          $value = $value ? 'true' : 'false';
+      } else if($type == self::TYPE_LIST_MULTI && is_array($value)){
+         $value = implode(';', $value);
       }
-      Debug::log($model);
       if(!$rec){
          $rec = $model->newRecord();
          $rec->{self::COLUMN_ID_GROUP} = $grpId;
