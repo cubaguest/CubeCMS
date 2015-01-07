@@ -11,11 +11,11 @@ if(!defined('VVE_APP_IS_RUN')){
 //$libDir = dirname(__FILE__).DIRECTORY_SEPARATOR;
 //}
 if(isset($siteFile)){
-   $libDir = str_replace(basename(dirname($siteFile)), "", dirname($_SERVER['SCRIPT_FILENAME']));
+   $libDir = realpath(str_replace(basename(dirname($siteFile)), "", dirname($_SERVER['SCRIPT_FILENAME']))).DIRECTORY_SEPARATOR;
    $webDir = realpath(dirname($siteFile)).DIRECTORY_SEPARATOR;
 //   var_dump($libDir, $webDir);die;
 } else {
-   $libDir = dirname($_SERVER['SCRIPT_FILENAME']).DIRECTORY_SEPARATOR;
+   $libDir = realpath(dirname($_SERVER['SCRIPT_FILENAME']).DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
    $webDir = getcwd().DIRECTORY_SEPARATOR;
 }
 
