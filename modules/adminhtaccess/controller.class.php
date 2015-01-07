@@ -129,16 +129,26 @@ RewriteRule ^(.*)$ http://www.%{HTTP_HOST}/$1 [R=301,L]
       return $str;
    }
 
-   protected static function createHtaccessSubDomains()
+   protected static function createHtaccessSubDomains($wwwRedirect = false)
    {
       $model = new Model_Sites();
       $sites = $model->where(Model_Sites::COLUMN_IS_MAIN." = 0", array())->records();
+      
+      $primaryDomainsParts = explode('.', CUBE_CMS_PRIMARY_DOMAIN);
+      $basePrimaryDomain = $primaryDomainsParts[count($primaryDomainsParts)-2].'.'.$primaryDomainsParts[count($primaryDomainsParts)-1];
+      
       $str = null;
       foreach ($sites as $site) {
-         $str .= "
-RewriteCond %{HTTP_HOST} ^".$site->getFullDomain()."$
-RewriteRule ^(.*)$ /".$site->{Model_Sites::COLUMN_DIR}."/$1 [L,QSA]
-\n";
+         // jestli je zapnut www redirect a primární doména se neshoduje z doménou webu, přidej www redirect
+         if($basePrimaryDomain != $site->getBaseDomain() && strpos($site->getFullDomain(), 'www.') === 0){
+             $str .=
+                  "RewriteCond %{HTTP_HOST} ^".str_replace('www.', '', $site->getFullDomain())."$\n"
+                  ."RewriteRule ^(.*)$ http://".$site->getFullDomain()."/$1 [R=301,L]\n";  
+         }
+         
+         $str .= "RewriteCond %{HTTP_HOST} ^".$site->getFullDomain()."$\n"
+             ."RewriteRule ^(.*)$ /".$site->{Model_Sites::COLUMN_DIR}."/$1 [L,QSA]\n";
+
       }
       return $str;
    }
@@ -200,7 +210,8 @@ RewriteRule ^cache/imgc/([a-z0-9]+)/([x0-9]+c?(?:-f_[0-9]*(?:_[0-9]*)?(?:_[0-9]*
       if(!$cnt){
          $cnt = self::getHtaccessCustomContent($dir);
       }
-      return "#CUBECMS\n$cnt\n#CUBECMS\n";
+      $cnt = rtrim($cnt);
+      return "#CUBECMS\n$cnt\n#CUBECMS\n\n";
    }
    
    protected static function createHtaccessSubDomainStatic()
@@ -248,6 +259,8 @@ RewriteCond %{REQUEST_FILENAME} !-f
 Rewriterule modules/([a-z]+)/jscripts/(.*) http://$domain/modules/$1/jscripts/$2 [L,R=303]
 RewriteCond %{REQUEST_FILENAME} !-f
 Rewriterule modules/([a-z]+)/images/(.*) http://$domain/modules/$1/images/$2 [L,R=303]
+RewriteCond %{REQUEST_FILENAME} !-f
+Rewriterule faces/([A-Za-z0-1]+)/images/(.*) http://$domain/faces/$1/images/$2 [L,R=303]   
 \n";
       return $str;
 
@@ -275,7 +288,7 @@ Rewriterule modules/([a-z]+)/images/(.*) http://$domain/modules/$1/images/$2 [L,
       }
       $content .= self::createHtaccessCustom($customCnt);
       
-      $content .= self::createHtaccessSubDomains();
+      $content .= self::createHtaccessSubDomains($wwwRedirect);
       $content .= self::createHtaccessInternalApps();
       $content .= self::createHtaccessBase();
       if(is_writable(AppCore::getAppLibDir().'.htaccess')){

@@ -72,7 +72,15 @@ class AdminSites_Controller extends Controller {
           ->order(Model_Sites::COLUMN_DOMAIN)
           ->records();
       
+      $dirsToDomians = array();
+      foreach ($sites as $s) {
+         if(!$s->{Model_Sites::COLUMN_IS_ALIAS}){
+            $dirsToDomians[$s->{Model_Sites::COLUMN_DIR}] = $s->getFullDomain();
+         }
+      }
+      
       $this->view()->sites = $sites;
+      $this->view()->dirsAlisses = $dirsToDomians;
    }
    
    public function addSiteController()
@@ -80,20 +88,32 @@ class AdminSites_Controller extends Controller {
       $form = $this->createSiteEditForm();
       
       if($form->isValid()){
-         $model = new Model_Sites();
-         $domain = $form->domain->getValues();
+         $domain = $this->prepairDomain($form->domain->getValues());
          $newDir = str_replace(array('.', '/', '-', '_'), array('','','',''), $domain);
+         
+         $model = new Model_Sites();
          $dbPrefix = $newDir.'_';
          
          // create face
          $this->createWebsiteDir($newDir);
          
-         $this->createNewSiteDb($dbPrefix);
-         if(isset($form->dataset) && $form->dataset->getValues() != null){
+         $type = $form->dataset->getValues();
+         if(strpos($type, 'webcopy_') !== false){
+            $siteId = str_replace('webcopy_', '', $type);
+            $siteObj = Model_Sites::getRecord($siteId);
+            if(!$siteObj){
+               throw new InvalidArgumentException($this->tr('Zdrojový podweb neexistuje'));
+            }
+            // kopie webu
+            $this->copyNewSiteDb($dbPrefix, $siteObj);
+            $this->copyNewSiteData($newDir, $siteObj);
+
+         } else {
+            // použít nový dataset
+            $this->createNewSiteDb($dbPrefix);
             $this->installSiteScript($dbPrefix, $form->dataset->getValues(), $newDir);
             $this->createNewSiteData($dbPrefix, $form->dataset->getValues(), $newDir);
          }
-//         die;
          $this->processNewSiteConfig($newDir, $dbPrefix);
          
          // donasatvení konfigurací
@@ -132,7 +152,7 @@ class AdminSites_Controller extends Controller {
       
       if($form->isValid()){
          $model = new Model_Sites();
-         $domain = $form->domain->getValues();
+         $domain = $this->prepairDomain($form->domain->getValues());
          
          // donasatvení konfigurací
          Model_Config::setSiteConfigValue($record->{Model_Sites::COLUMN_TB_PREFIX}, 'WEB_NAME', $form->name->getValues());
@@ -238,11 +258,11 @@ class AdminSites_Controller extends Controller {
          $f->domain->setValues($site->{Model_Sites::COLUMN_DOMAIN});
          $f->domain->setSubLabel($this->tr('Změna domény neupraví složku s daty.'));
       } else {
-         $datasets = new DirectoryIterator($this->getSitesTplDir().'_install');
+         $elemBaseData = new Form_Element_Select('dataset', $this->tr('Naplnit daty'));
+         $elemBaseData->addOption($this->tr('Výchozí - prázdná apliakce bez kategorií'), false);
          
+         $datasets = new DirectoryIterator($this->getSitesTplDir().'_install');
          if(!empty($datasets)){
-            $elemBaseData = new Form_Element_Select('dataset', $this->tr('Naplnit daty'));
-            $elemBaseData->addOption($this->tr('Žádná data'), false);
             
             foreach ($datasets as $dir) {
                if($dir->isDot()){
@@ -254,15 +274,28 @@ class AdminSites_Controller extends Controller {
                }
                $elemBaseData->addOption($desc, $dir->getBasename());
             }
-            $f->addElement($elemBaseData);
+            $mSites = new Model_Sites();
+            $sites = $mSites->where(Model_Sites::COLUMN_IS_MAIN .' = 0 AND '.Model_Sites::COLUMN_IS_ALIAS." = 0")->records();
+            if(!empty($sites)){
+               foreach ($sites as $s) {
+                  $elemBaseData->addOption($this->tr('Kopírovat data z domény: ').$s->getFullDomain(), 'webcopy_'.$s->getPK());
+               }
+            }
+            
          }
+         $f->addElement($elemBaseData);
       }
       
       $eSave = new Form_Element_SaveCancel('save');
       $f->addElement($eSave);
       
-      if($f->isSend() && $f->save->getValues() == false){
-         $this->link()->route()->redirect();
+      if($f->isSend()){
+         if($f->save->getValues() == false){
+            $this->link()->route()->redirect();
+         }
+         if (!filter_var('http://'.$f->domain->getValues(), FILTER_VALIDATE_URL)) {
+            $eDomain->setError($this->tr('Nebyla zadána korektní doména. Např.: www.domena.cz'));
+         }
       }
       
       return $f;
@@ -388,4 +421,59 @@ class AdminSites_Controller extends Controller {
       
    }
    
+   protected function copyNewSiteDb($dbPrefix, Model_ORM_Record $site)
+   {
+      $dbc = Db_PDO::getInstance();
+      //get all of the tables
+      $stmt = $dbc->prepare('SHOW TABLES');
+      $stmt->execute();
+      $tables = $stmt->fetchAll(PDO::FETCH_COLUMN);
+      //cycle through table
+      foreach($tables as $table) {
+         if(strpos($table, $site->{Model_Sites::COLUMN_TB_PREFIX}) !== 0){
+            continue;
+         }
+         $tableSufix = str_replace($site->{Model_Sites::COLUMN_TB_PREFIX}, '', $table);
+         $newTableName = $dbPrefix.$tableSufix;
+         
+         // sopy table
+         $created = $dbc->exec('CREATE TABLE '.$newTableName.' LIKE `'.$table.'`; ');
+         // sopy data
+         $copied = $dbc->exec('INSERT `'.$newTableName.'` SELECT * FROM `'.$table.'`;');
+      }
+   }
+   
+   protected function copyNewSiteData($newDir, Model_ORM_Record $site)
+   {
+      $sourceDir = new FS_Dir(CUBE_CMS_DATA_DIR, AppCore::getAppLibDir().$site->{Model_Sites::COLUMN_DIR}.DIRECTORY_SEPARATOR);
+      $targetDir = new FS_Dir(CUBE_CMS_DATA_DIR, AppCore::getAppLibDir().$newDir.DIRECTORY_SEPARATOR);
+      $targetDir->check();
+      $sourceDir->copyContent((string)$targetDir);
+   }
+   
+   /**
+    * Provede opravu domény, tak aby seděla do systému
+    * @param string $domain
+    * @return string opravená doména
+    */
+   protected function prepairDomain($domain)
+   {
+      $domain = str_replace(array(' ', '/'), array("",""), $domain);
+         
+      $domainParts = explode('.', $domain);
+      $primaryDomainsParts = explode('.', CUBE_CMS_PRIMARY_DOMAIN);
+      $basePrimaryDomain = $primaryDomainsParts[count($primaryDomainsParts)-2].'.'.$primaryDomainsParts[count($primaryDomainsParts)-1];
+
+      // kontrola délky domény
+      if(count($domainParts) <= 2){
+         if($basePrimaryDomain == $domain){
+            // náhodne číslo
+            $domain = 'sub'.rand(100, 999).'.'.$domain;
+         } else {
+            // doplnit www
+            $domain = 'www.'.$domain;
+         }
+      }
+      return $domain;
+   }
 }

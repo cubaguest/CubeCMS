@@ -45,7 +45,12 @@ $this->addCssFile("style.less");
       <tbody>
       <?php foreach ($this->sites as $site) {?>
          <tr class="cubecms-row">
-            <td><a href="http://<?php ps($site->getFullDomain()) ?>" class="link-external"><?php ps($site->getFullDomain()) ?></a></td>
+            <td>
+               <a href="http://<?php ps($site->getFullDomain()) ?>" class="link-external"><?php ps($site->getFullDomain()) ?></a>
+               <?php if ($site->{Model_Sites::COLUMN_IS_ALIAS}) {?>
+               <span class="icon icon-arrow-right"></span> <a href="http://<?php echo $this->dirsAlisses[$site->{Model_Sites::COLUMN_DIR}] ?>" class="link-external"><?php echo $this->dirsAlisses[$site->{Model_Sites::COLUMN_DIR}]?></a>
+               <?php }?>
+            </td>
             <td>
                <?php ps($site->{Model_Sites::COLUMN_DIR}) ?>
                <span class="icon icon-circle site-group-color-<?php echo $site->_grpID?> "></span>
