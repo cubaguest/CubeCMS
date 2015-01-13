@@ -7,9 +7,9 @@ class Templates_View extends View {
 
       if($this->rights()->isControll()) {
          $toolbox = new Template_Toolbox2();
-         $toolAdd = new Template_Toolbox2_Tool_PostRedirect('add_template', $this->_("Přidat šablonu"),
+         $toolAdd = new Template_Toolbox2_Tool_PostRedirect('add_template', $this->tr("Přidat šablonu"),
          $this->link()->route('add'));
-         $toolAdd->setIcon('page_add.png')->setTitle($this->_('Přidat novou šablonu'));
+         $toolAdd->setIcon('page_add.png')->setTitle($this->tr('Přidat novou šablonu'));
          $toolbox->addTool($toolAdd);
 
          $this->toolbox = $toolbox;

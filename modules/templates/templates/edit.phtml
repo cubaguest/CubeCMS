@@ -1,15 +1,15 @@
 <?php 
 // do titulku
 if($this->edit) {
-   $h = $this->_('úprava šablony');
+   $h = $this->tr('úprava šablony');
 } else {
-   $h = $this->_('přidání šablony');
+   $h = $this->tr('přidání šablony');
 }
 $this->addPageTitle($h);
 // donastavení formuláře
 $this->form->content->html()->setAttrib('cols', 80)->setAttrib('rows', 30);
 
-$linkDisableEdit = '<a href="javascript:toggleEditor(\'template_content_1\');" id="template-disable-editor-button">'.$this->_('Vvpnout / zapnout editor').'</a>';
+$linkDisableEdit = '<a href="javascript:toggleEditor(\'template_content_1\');" id="template-disable-editor-button">'.$this->tr('Vvpnout / zapnout editor').'</a>';
 $this->form->content->setSubLabel($linkDisableEdit);
 
 ?>

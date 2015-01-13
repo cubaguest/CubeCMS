@@ -19,7 +19,7 @@ class Templates_Controller extends Controller {
 
       if($formDel->isValid()){
          $model->deleteTemplate($formDel->id->getValues());
-         $this->infoMsg()->addMessage($this->_('Šablona byla smazána'));
+         $this->infoMsg()->addMessage($this->tr('Šablona byla smazána'));
          $this->link()->reload();
       }
 
@@ -40,7 +40,7 @@ class Templates_Controller extends Controller {
       $addForm = $this->createForm();
 
       if($addForm->isSend() AND $addForm->send->getValues() == false){
-         $this->infoMsg()->addMessage($this->_('Změny byly zrušeny'));
+         $this->infoMsg()->addMessage($this->tr('Změny byly zrušeny'));
          $this->link()->route()->reload();
       }
 
@@ -54,7 +54,7 @@ class Templates_Controller extends Controller {
 
          $model->save($tpl);
 
-         $this->infoMsg()->addMessage($this->_('Uloženo'));
+         $this->infoMsg()->addMessage($this->tr('Uloženo'));
          $this->link()->route()->reload();
       }
 
@@ -81,7 +81,7 @@ class Templates_Controller extends Controller {
       $form->desc->setValues($tpl->{Templates_Model::COLUMN_DESC});
 
       if($form->isSend() AND $form->send->getValues() == false){
-         $this->infoMsg()->addMessage($this->_('Změny byly zrušeny'));
+         $this->infoMsg()->addMessage($this->tr('Změny byly zrušeny'));
          $this->link()->route()->reload();
       }
 
@@ -93,7 +93,7 @@ class Templates_Controller extends Controller {
 
          $model->save($tpl);
 
-         $this->infoMsg()->addMessage($this->_('Uloženo'));
+         $this->infoMsg()->addMessage($this->tr('Uloženo'));
          if($form->goback->getValues() == true){
             $this->link()->route()->reload();
          } else {
@@ -112,14 +112,14 @@ class Templates_Controller extends Controller {
    protected function createForm() {
       $form = new Form('template_', true);
 
-      $iName = new Form_Element_Text('name', $this->_('Název'));
+      $iName = new Form_Element_Text('name', $this->tr('Název'));
       $iName->addValidation(New Form_Validator_NotEmpty());
       $form->addElement($iName);
 
-      $iDesc = new Form_Element_TextArea('desc', $this->_('Popis'));
+      $iDesc = new Form_Element_TextArea('desc', $this->tr('Popis'));
       $form->addElement($iDesc);
 
-      $iCnt = new Form_Element_TextArea('content', $this->_('Obsah'));
+      $iCnt = new Form_Element_TextArea('content', $this->tr('Obsah'));
       $iCnt->addValidation(New Form_Validator_NotEmpty());
       $form->addElement($iCnt);
 
@@ -128,11 +128,11 @@ class Templates_Controller extends Controller {
          $t[$type] = $type;
       }
 
-      $iType = new Form_Element_Select('type', $this->_('Typ šablony'));
+      $iType = new Form_Element_Select('type', $this->tr('Typ šablony'));
       $iType->setOptions($t);
       $form->addElement($iType);
 
-      $redirElem = new Form_Element_Checkbox('goback', $this->_('Přejít zpět na seznam'));
+      $redirElem = new Form_Element_Checkbox('goback', $this->tr('Přejít zpět na seznam'));
       $form->addElement($redirElem);
 
       $submitButton = new Form_Element_SaveCancel('send');
@@ -165,4 +165,3 @@ class Templates_Controller extends Controller {
       if(Templates_View::$tpl == false) return false;
    }
 }
-?>

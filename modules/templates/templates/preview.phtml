@@ -1,12 +1,12 @@
 <?php 
-$h = $this->_('Náhled šablony').' '.$this->tpl->{Templates_Model::COLUMN_NAME};
+$h = $this->tr('Náhled šablony').' '.$this->tpl->{Templates_Model::COLUMN_NAME};
 $this->addPageTitle($h);
 ?>
 <h1><?php echo $h;?></h1>
 <div class="main-content-detail">
-   <a href="<?php echo $this->link()->param('time', time())?>" title="<?php echo $this->_('Obnovit náhled')?>"
+   <a href="<?php echo $this->link()->param('time', time())?>" title="<?php echo $this->tr('Obnovit náhled')?>"
       ><img src="<?php echo Template::getFileDir('icons/page_refresh.png', Template::IMAGES_DIR, false,true)?>"
-        alt="icon reload" />&nbsp;<?php echo $this->_('Obnovit náhled')?></a>
+        alt="icon reload" />&nbsp;<?php echo $this->tr('Obnovit náhled')?></a>
 </div>
 <?php 
 switch ($this->previewType) {
