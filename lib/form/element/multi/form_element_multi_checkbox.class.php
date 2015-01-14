@@ -33,6 +33,15 @@ class Form_Element_Multi_Checkbox extends Form_Element_Checkbox {
    {
       $this->options = $merge ? array_merge($this->options, $options) : $options;
    }
+   
+   /**
+    * metoda přidá hodnotu do voleb
+    * @param string/int $name -- název volby
+    * @param string/int $value -- hodnota volby
+    */
+   public function addOption($name, $value){
+      $this->options[(string)$name] = $value;
+   }
 
    /**
     * Metoda nastaví počet sloupců do kterých se budou elementy vykreslovat
@@ -66,7 +75,9 @@ class Form_Element_Multi_Checkbox extends Form_Element_Checkbox {
    public function control($renderKey = null) {
       $rKey = $renderKey != null ? $renderKey : $this->renderedId;
       $values = $this->getUnfilteredValues();
-      $this->html()->addClass($this->getName()."_class");
+      $this->html()
+          ->addClass($this->getName()."_class");
+      
 
       // rozdělení na dva sloupce
       $opts = count($this->options);
@@ -93,13 +104,14 @@ class Form_Element_Multi_Checkbox extends Form_Element_Checkbox {
             $this->renderedId++;
          }
          $wrapper = clone $this->containerElement;
-         $wrapper->addClass('checkbox');
+         $wrapper
+             ->addClass('checkbox');
          $wrapper->addContent($this->html().$l);
          $elements[] = $wrapper;
       }
       $parts = array_chunk($elements, $rows, true);
 
-      $ret = '<table class="'.$this->cssClasses['wrapperClass'].'"><tr>';
+      $ret = '<table class="multicheckbox multicheckbox_col_'.$this->renderCols.' '.$this->cssClasses['wrapperClass'].'"><tr>';
 
       foreach($parts as $part) {
          $ret .= '<td>'.implode('', $part).'</td>';
