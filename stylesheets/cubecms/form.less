@@ -180,6 +180,23 @@ form {
          -moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
          box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
       }
+      
+      .multicheckbox {
+         &.multicheckbox_col_3,
+         &.multicheckbox_col_4,
+         &.multicheckbox_col_5,
+         &.multicheckbox_col_6
+         {
+            width: 100%;
+         }
+         .checkbox {
+            input {
+               margin-left: 2px;
+               position: absolute;
+            }
+         }
+         width: auto;
+      }
    } 
    input[lang], textarea[lang] {
       border-top-left-radius: 0 !important;
