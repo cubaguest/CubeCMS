@@ -1,5 +1,5 @@
 <?php
-$lastID = 32797;
+$lastID = 32798;
 /* 
  * Základní sekce menu
  */
@@ -126,7 +126,11 @@ $this->addItem(Menu_Admin::SECTION_EMAIL, new Menu_Admin_Item(
  * Systém
  */
 $this->addItem(Menu_Admin::SECTION_SETTINGS, new Menu_Admin_Item(
-    32772, array( 'cs' => 'Nastavení systému', 'en' => 'System settings'),
+    32798, array( 'cs' => 'Základní nastavení', 'en' => 'Base settings'),
+   'system/base-settings', 'adminenviroment', 'wrench.png'
+));
+$this->addItem(Menu_Admin::SECTION_SETTINGS, new Menu_Admin_Item(
+    32772, array( 'cs' => 'Pokročilé nastavení systému', 'en' => 'Advanced system settings'),
    'system/system-settings', 'configuration', 'wrench.png'
 ));
 $this->addItem(Menu_Admin::SECTION_SETTINGS, new Menu_Admin_Item(
