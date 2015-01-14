@@ -51,7 +51,7 @@ if(!function_exists('getFaceEnviromentItems')){
 //      $imageHeader = new Form_Element_File('headerImage', 'Oprázek v hlavičce');
 //      $imageHeader->addValidation(new Form_Validator_FileExtension('jpg'));
 //      $imageHeader->setUploadDir(AppCore::getAppDataDir());
-      $items[] = $imageHeader;
+//      $items[] = $imageHeader;
       
       
       return $items;
