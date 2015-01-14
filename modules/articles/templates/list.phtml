@@ -1,9 +1,4 @@
 <?php 
-if(Template::browser()->isMobile()){
-   $this->includeFile("tpl://list_mobile.phtml");
-   return;
-}
-
 $this->addCssFile("style.css");
 $this->includeFile('tpl://articles:sortLabel.phtml');
 $h1 = $this->category()->getName().$this->sortText;
@@ -32,6 +27,39 @@ echo $this->toolbox;
    <hr class="reseter" />
 </div>   
 <?php }?>
+
+<div class="posts-filter">
+   <label for="">Filtr:</label>
+   <div class="labels-list">
+      <?php 
+      if(!empty($this->allTags)){
+         foreach ($this->allTags as $tag) {
+            ?>
+            <a href="<?php echo $this->link()->param('tag', $tag->tag)?>" class="label label-primary"
+               ><?php ps($tag->tag)?> (<?php ps($tag->count) ?>)</a>
+            <?php
+         }
+      }
+      ?>
+   </div>
+   <?php
+   if(count($this->artsYears) > 1){
+      ?>
+      <label for="">Dle roku:</label>
+      <div class="labels-list">
+         <?php 
+         foreach ($this->artsYears as $year) {
+            ?>
+            <a href="<?php echo $this->link()->param('year', $year)?>" class="label label-info"><?php ps($year)?></a>
+            <?php
+         }
+         ?>
+      </div>   
+      <?php
+   }
+   ?>
+</div>
+
 <div class="posts-list">
 <?php if(!empty ($this->articles)) {
    $step = 1;
@@ -105,7 +133,7 @@ echo $this->toolbox;
          $printArray = array();
          foreach ($this->articlesTags[$idA] as $tag) {
             $printArray[] = '<a href="'.($this->link()->clear()->param(Articles_Controller::GET_TAG_PARAM, $tag) )
-               .'" title="'.sprintf( $this->tr('zobrazit položky se štítkem %s'), $tag ).'">'.$tag.'</a>';
+               .'" class="label label-default" title="'.sprintf( $this->tr('zobrazit položky se štítkem %s'), $tag ).'">'.$tag.'</a>';
          }
          echo implode(', ', $printArray);
          ?>

@@ -318,5 +318,35 @@ class Articles_Model extends Model_ORM {
       }
       return false;
    }
+   
+   /**
+    * Metoda vrací seznam let, ve kterých byly vloženy stránky
+    * @param array $idCats
+    * @return array
+    */
+   public static function getArticlesYears($idCats, $forceLoad = false)
+   {
+      $cache = new Cache();
+      $cacheKey = implode(';', $idCats).'_artyears';
+      if( ($artsYears = $cache->get($cacheKey)) != false && $forceLoad == false){
+         return $artsYears;
+      }
+      
+      $model = new self();
+      $records =  $model
+         ->columns(array('art_year' => 'YEAR('.Articles_Model::COLUMN_ADD_TIME.')'))
+          ->where(self::COLUMN_ID_CATEGORY." IN (".$model->getWhereINPlaceholders($idCats).")", $model->getWhereINValues($idCats))
+          ->groupBy('art_year')
+          ->order('art_year')
+          ->records(PDO::FETCH_OBJ)
+         ;
+      
+      $artsYears = array();
+      foreach ($records as $item) {
+         $artsYears[] = (int)$item->art_year;
+      }
+      $cache->set($cacheKey, $artsYears);
+      return $artsYears;
+   }
 }
 

@@ -55,7 +55,7 @@ class Articles_Controller extends Controller {
       $this->checkReadableRights();
       // načtení článků
       $artModel = new Articles_Model();
-      
+      $catsIds = array($this->category()->getId());
       $externalCats = explode(';', $this->category()->getParam(self::PARAM_MOUNTED_CATS, "") );
       if( $this->category()->getParam(self::PARAM_MOUNTED_CATS, false) && !empty($externalCats )) {
          $wCatPl = array(':pl_'.$this->category()->getId() => $this->category()->getId() );
@@ -77,6 +77,7 @@ class Articles_Controller extends Controller {
          $allowedCatsIDSPL = array();
          foreach ($cats as $c) {
             $allowedCatsIDSPL[':pl_'.$c->{Model_Category::COLUMN_ID}] = $c->{Model_Category::COLUMN_ID};
+            $catsIds[] = $c->getPK();
          }
          
          $mWhereString = Articles_Model::COLUMN_ID_CATEGORY.' IN ('.implode(',',array_keys($allowedCatsIDSPL)).')';
@@ -115,6 +116,9 @@ class Articles_Controller extends Controller {
             .'AND '.Articles_Model::COLUMN_URLKEY.' IS NOT NULL '
             .")";
       }
+      // duplikace, potřebujeme niže pro další dotazy nad články
+      $mWhereTagsString = $mWhereString;
+      $mWhereTagsBinds = $mWhereBinds; 
       
       /* pokud je vybrán tag */
       if($this->getRequestParam('tag') != null){
@@ -127,6 +131,13 @@ class Articles_Controller extends Controller {
          $mWhereString .= " AND ".Articles_Model_Tags::COLUMN_NAME." = :tagname";
          $mWhereBinds['tagname'] = $this->getRequestParam('tag'); 
       }
+      /* only specific year */
+      if($this->getRequestParam('year') != null){
+         $mWhereString .= 
+            " AND YEAR(".Articles_Model::COLUMN_ADD_TIME.") = :year";
+         $mWhereBinds[':year'] = $this->getRequestParam('year');
+      }
+      
       $artModel->where($mWhereString, $mWhereBinds);
 
       $numRows = 0;
@@ -170,7 +181,7 @@ class Articles_Controller extends Controller {
       $cacheKey = md5($mWhereString.serialize($mWhereBinds).Locales::getLang());
       
       $cache = new Cache();
-      if( ($articles = $cache->get($cacheKey)) == false ){
+      if( ($articles = $cache->get($cacheKey)) == false || $this->category()->getRights()->isWritable()){
          $articles = $artModel->records();
          $cache->set($cacheKey, $articles);
       }
@@ -190,8 +201,7 @@ class Articles_Controller extends Controller {
 
       // načtení tagů
       if($this->view()->articles != false){
-         
-         if( ($articlesTags = $cache->get($cacheKey."_tags")) == false ){
+         if( ($articlesTags = $cache->get($cacheKey."_tags")) == false || $this->category()->getRights()->isWritable()){
             $articlesTags = array();
             $placeholders = array();
             foreach ($this->view()->articles as $article) {
@@ -219,6 +229,11 @@ class Articles_Controller extends Controller {
          
          $this->view()->articlesTags = $articlesTags ;
       }
+      // laod all tags
+      $this->view()->allTags = Articles_Model_Tags::getTagsByCategory($catsIds) ;
+      
+      // load other years
+      $this->view()->artsYears = Articles_Model::getArticlesYears($catsIds, $this->category()->getRights()->isWritable());
       
       $this->checkDateFirstArticle();
       

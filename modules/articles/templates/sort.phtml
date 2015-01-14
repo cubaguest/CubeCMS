@@ -1,5 +1,5 @@
 <div class="main-content-tools">
-   <?php echo $this->tr('Řadit podle')?>:&nbsp;<a href="<?php echo $this->link()->route()->param(Articles_Routes::URL_PARAM_SORT, Articles_Controller::SORT_DATE)?>"
+   <label for=""><?php echo $this->tr('Řadit podle')?>:</label> <a href="<?php echo $this->link()->route()->param(Articles_Routes::URL_PARAM_SORT, Articles_Controller::SORT_DATE)?>"
    title="<?php echo $this->tr('Nejnovější články')?>"><?php echo $this->tr('Nejnovějších')?></a
    >&nbsp;<a href="<?php echo $this->link()->route()->param(Articles_Routes::URL_PARAM_SORT, Articles_Controller::SORT_TOP)?>" title="<?php echo $this->tr('Nejčtenější články')?>"><?php echo $this->tr('Nejčtenějších')?></a
    >&nbsp;<a href="<?php echo $this->link()->route()->param(Articles_Routes::URL_PARAM_SORT, Articles_Controller::SORT_ALPHABET)?>" title="<?php echo $this->tr('Články podle abecedy')?>"><?php echo $this->tr('Abecedně')?></a

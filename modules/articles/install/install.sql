@@ -47,7 +47,6 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}articles` (
   `author` varchar(100) DEFAULT NULL,
   `article_priority` int(11) DEFAULT '0',
   `article_priority_end_date` date DEFAULT NULL,
-  `article_place` VARCHAR(50) NULL DEFAULT NULL
   PRIMARY KEY (`id_article`),
   KEY `urlkey_cs` (`urlkey_cs`),
   KEY `urlkey_en` (`urlkey_en`),
@@ -97,7 +96,3 @@ CREATE  TABLE IF NOT EXISTS `{PREFIX}articles_tags_has_articles` (
   INDEX `fk_articles_tags_has_articles_arti` (`articles_tags_id_article_tag` ASC) 
 ) ENGINE = MyISAM DEFAULT CHARACTER SET = utf8 COLLATE = utf8_general_ci;
 
-INSERT INTO `{PREFIX}autorun` (`autorun_module_name`, `autorun_period`, `autorun_url`) 
-VALUES ('articles', 'hourly', NULL);
-INSERT INTO `{PREFIX}autorun` (`autorun_module_name`, `autorun_period`, `autorun_url`) 
-VALUES ('articles', 'daily', NULL);
