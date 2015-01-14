@@ -1660,7 +1660,7 @@ class Model_ORM extends Model implements ArrayAccess {
                } else if (is_int($alias)) {
                   array_push($columns, '' . str_replace('{THIS}', $this->getTableName(), $columnName) . '');
                } else {
-                  array_push($columns, '' . str_replace('{THIS}', $this->getTableName(), $columnName) . ' AS ' . $alias);
+                  array_push($columns, '' . str_replace('{THIS}', $this->getTableName(), $columnName) . ' AS `'.$alias.'`');
                }
             }
          }
