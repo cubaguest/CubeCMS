@@ -77,10 +77,25 @@ class Model_ConfigGlobal extends Model_ORM {
          $value = implode(';', $value);
       }
       if(!$rec){
+         // načti záznam z global 
+         $modelGlobal = new Model_ConfigGlobal();
+         $globalRec = $modelGlobal->where(self::COLUMN_KEY." = :ckey", array('ckey' => $name))->record();
+         
          $rec = $model->newRecord();
          $rec->{self::COLUMN_ID_GROUP} = $grpId;
          $rec->{self::COLUMN_TYPE} = $type;
          $rec->{self::COLUMN_KEY} = $name;
+         
+         if($globalRec){
+            $rec->{self::COLUMN_ID_GROUP} = $globalRec->{self::COLUMN_ID_GROUP};
+            $rec->{self::COLUMN_TYPE} = $globalRec->{self::COLUMN_TYPE};
+            $rec->{self::COLUMN_HIDDEN} = $globalRec->{self::COLUMN_HIDDEN};
+            $rec->{self::COLUMN_CALLBACK} = $globalRec->{self::COLUMN_CALLBACK};
+            $rec->{self::COLUMN_LABEL} = $globalRec->{self::COLUMN_LABEL};
+            $rec->{self::COLUMN_PROTECTED} = $globalRec->{self::COLUMN_PROTECTED};
+            $rec->{self::COLUMN_VALUES} = $globalRec->{self::COLUMN_VALUES};
+         }
+         
       }
       $rec->{self::COLUMN_VALUE} = $value;
       $rec->save();
