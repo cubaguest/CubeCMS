@@ -1,0 +1,6 @@
+NEW:
+- Podpora google reCaptcha
+- Konstanta s twitter url
+
+OPRAVY:
+- opravy a drobné doplnění funkcí
