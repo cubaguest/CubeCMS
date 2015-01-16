@@ -118,6 +118,7 @@ class Translator {
     */
    protected function loadTranslations()
    {
+      $this->loadFile(AppCore::getAppWebDir().'locale'.DIRECTORY_SEPARATOR, Template::faceDir(true).'locale'.DIRECTORY_SEPARATOR);
       $this->loadFile(AppCore::getAppWebDir().'locale'.DIRECTORY_SEPARATOR, Template::faceDir().'locale'.DIRECTORY_SEPARATOR);
    }
 
@@ -172,4 +173,3 @@ class Translator {
       return $this->translationsP;
    }
 }
-?>

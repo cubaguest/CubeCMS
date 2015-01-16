@@ -60,12 +60,6 @@ class Template extends TrObject {
    const JSPLUGINS_DIR = 'templates';
 
    /**
-    * Název faces (vzhledu)
-    * @var string
-    */
-   protected static $face = 'default';
-
-   /**
     * Pole s veřejnýma proměnnýma
     * @var array
     */
@@ -515,7 +509,7 @@ class Template extends TrObject {
     */
    public static function getFileDir($file, $dir = self::TEMPLATES_DIR, $realpath = false, $withFile = false) {
       $faceDir =  AppCore::getAppWebDir().self::FACES_DIR.DIRECTORY_SEPARATOR
-         .self::$face.DIRECTORY_SEPARATOR.$dir.DIRECTORY_SEPARATOR;
+         .Face::getCurrent()->getName().DIRECTORY_SEPARATOR.$dir.DIRECTORY_SEPARATOR;
       $mainDir = AppCore::getAppLibDir().$dir.DIRECTORY_SEPARATOR;
       $return = null;
       // pokud existuje soubor ve vzhledu
@@ -523,7 +517,7 @@ class Template extends TrObject {
          if($realpath) {
             $return = $faceDir;
          } else {
-            $return = Url_Request::getBaseWebDir().self::FACES_DIR.URL_SEPARATOR.self::$face.URL_SEPARATOR.$dir.URL_SEPARATOR;
+            $return = Url_Request::getBaseWebDir().self::FACES_DIR.URL_SEPARATOR.Face::getCurrent()->getName().URL_SEPARATOR.$dir.URL_SEPARATOR;
          }
       } // pokud se šablona loaduje z jiného faces (např nadřazeného webu)
       else if(VVE_SUB_SITE_DIR != null AND $dir == self::TEMPLATES_DIR AND is_file(str_replace(AppCore::getAppWebDir(), AppCore::getAppLibDir(), $faceDir).$file)) {
@@ -547,17 +541,8 @@ class Template extends TrObject {
     * Metoda pro základní nasatvení šablonovacího systému
     */
    public static function factory() {
-      self::setFace(VVE_TEMPLATE_FACE);
       self::$browser = new Browser();
       self::$currentFace = new Face();
-   }
-
-   /**
-    * Metoda nastaví název vzhledu webu (faces)
-    * @param string $face -- název vzhledu
-    */
-   final public static function setFace($face) {
-      self::$face = $face;
    }
 
    /**
@@ -567,9 +552,9 @@ class Template extends TrObject {
     */
    final public static function face($onlyName = true) {
       if($onlyName) {
-         return self::$face;
+         return Face::getCurrent()->getName();
       } else {
-         return Url_Request::getBaseWebDir().self::FACES_DIR.'/'.self::$face.'/';
+         return Url_Request::getBaseWebDir().self::FACES_DIR.'/'.Face::getCurrent()->getName().'/';
       }
    }
 
