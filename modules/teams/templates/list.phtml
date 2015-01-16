@@ -24,7 +24,7 @@ $this->addFile('css://style.css');
             $name .= $person->{Teams_Model_Persons::COLUMN_NAME}." ".$person->{Teams_Model_Persons::COLUMN_SURNAME}." ".$person->{Teams_Model_Persons::COLUMN_DEGREE_AFTER};
             
             ?>
-         <li class="person">
+         <li class="person clearfix">
             <img src="<?php echo $this->category()->getModule()->getDataDir(true).$person->{Teams_Model_Persons::COLUMN_IMAGE}?>" 
                  alt="<?php ps($person->{Teams_Model_Persons::COLUMN_NAME}." ".$person->{Teams_Model_Persons::COLUMN_SURNAME})?>" class="person-image"/>
             <h3 id="team-person-<?php echo $person->{Teams_Model_Persons::COLUMN_ID}?>"><?php 
@@ -40,16 +40,10 @@ $this->addFile('css://style.css');
                <?php if($person->{Teams_Model_Persons::COLUMN_WORK} != null){?>
                   <h4><?php ps($person->{Teams_Model_Persons::COLUMN_WORK})?></h4>
                <?php }?>
-               <?php echo $person->{Teams_Model_Persons::COLUMN_TEXT}?>
+               <?php echo vve_get_lang_string($person->{Teams_Model_Persons::COLUMN_TEXT})?>
             </div>
             
-            <?php if($this->toolboxEdit != null){
-               $this->toolboxEdit->person_edit->setAction($this->link()->route('edit', array('id' => $person->{Teams_Model_Persons::COLUMN_ID})));
-               $this->toolboxEdit->person_edit_photo->setAction($this->link()->route('editPhoto', array('id' => $person->{Teams_Model_Persons::COLUMN_ID})));
-               $this->toolboxEdit->person_del_->getForm()->id->setValues($person->{Teams_Model_Persons::COLUMN_ID});
-               echo $this->toolboxEdit;
-            }?>
-            <hr class="reseter" />
+            <?php echo $person->toolbox; ?>
          </li>   
          <?php 
          } ?>

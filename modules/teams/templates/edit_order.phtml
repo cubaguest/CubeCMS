@@ -6,18 +6,18 @@ $this->addPageTitle($h);
 $jq = new JsPlugin_JQuery();
 $jq->addUISortable();
 $this->addJsPlugin($jq);
-$this->addFile('css://style.css');
+$this->addFile('css://style.less');
 ?>
 <h1><?php echo  $h ?></h1>
 <div class="main-content-form-edit" id="orderform">
    <?php  echo $this->form->renderStart(); ?>
-      <div id="teams-list">
+      <div id="teams-list" class="cubecms-widget cubecms-list ">
          <?php 
          $curGroup = -1;
          foreach ($this->teams as $id => $team) {
             ?>
-            <div id="team-id-<?php echo $id?>" class="team ui-widget ui-widget-content">
-               <h2 class="ui-widget-header" title="<?php ps($team['name'])?>"><?php ps( $team['name'])?></h2>
+            <div id="team-id-<?php echo $id?>" class="team cubecms-list-row clearfix ">
+               <h2 class="header" title="<?php ps($team['name'])?>"><span class="icon icon-arrows"></span> <?php ps( $team['name'])?></h2>
                <?php  // form 
                $this->form->teamId->setDimensional($id);
                $this->form->teamId->setValues($id);
@@ -28,9 +28,9 @@ $this->addFile('css://style.css');
                echo $this->form->teamOrder;
                ?>
                
-               <div class="persons-list">
+               <div class="cubecms-widget cubecms-list persons-list">
             <?php   foreach ($team['persons'] as $person){?>
-                  <div class="ui-state-default person">
+                  <div class="cubecms-list-row person">
                      <img src="<?php echo $this->category()->getModule()->getDataDir(true).$person->{Teams_Model_Persons::COLUMN_IMAGE}?>" 
                           alt="<?php ps($person->{Teams_Model_Persons::COLUMN_NAME}." ".$person->{Teams_Model_Persons::COLUMN_SURNAME})?>" /><br />
                      <?php 
@@ -46,22 +46,18 @@ $this->addFile('css://style.css');
                   </div>
             <?php }?>
                </div>
-               <hr class="reseter" />
             </div>
          <?php }?>
       </div>
-      <p><?php echo $this->form->removeEmptyTeams->label()?><?php echo $this->form->removeEmptyTeams->controllAll()?></p>
-      <p><?php echo $this->form->save->label()?><?php echo $this->form->save->controllAll()?></p>
+      <div>
+         <?php echo $this->form->save->label()?><?php echo $this->form->save->controllAll()?>
+         <?php echo $this->form->removeEmptyTeams->label()?><?php echo $this->form->removeEmptyTeams->controllAll()?>
+      </div>
    <?php  echo $this->form->renderEnd(); ?>
-      <ul class="text">
-         <li><?php echo $this->tr("Pro změnu pořadí stačí osobu uchopit a přesunout.")?></li>
-         <li><?php echo $this->tr("Pro přesun skupiny je nutné skupinu uchopit za její nadpis.")?></li>
-         <li><?php echo $this->tr("Pokud bude skupina při ukládání prázdná, dojde k jejímu smazání.")?></li>
-      </ul>
    <script>
-	   $(function() {
+      $(function() {
          $( "#teams-list" ).sortable({ 
-            placeholder: "ui-state-highlight", 
+            placeholder: "cubecms-state-highlight", 
             cursor: 'move', forcePlaceholderSize: true, 
             handle: 'h2',
             update: function(event, ui) {
@@ -73,7 +69,7 @@ $this->addFile('css://style.css');
          $( "#teams-list" ).disableSelection();
          // persons
          $( ".persons-list" ).sortable({
-            placeholder: "ui-state-highlight", cursor: 'move', forcePlaceholderSize: true,
+            placeholder: "cubecms-state-highlight", cursor: 'move', forcePlaceholderSize: true,
             connectWith: ".persons-list", items : "div.person",
             update: function(event, ui) {
                $(this).find('.person').each(function(index){
@@ -86,6 +82,6 @@ $this->addFile('css://style.css');
             }
          });
          $( ".persons-list" ).disableSelection();
-   	});
-	</script>
+      });
+   </script>
 </div>

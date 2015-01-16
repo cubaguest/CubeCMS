@@ -13,7 +13,7 @@ class Teams_Controller extends Controller {
     * Kontroler pro zobrazení novinek
     */
    public function mainController() {
-      //		Kontrola práv
+      //    Kontrola práv
       $this->checkReadableRights();
       
       $model = new Teams_Model_Persons();
@@ -77,18 +77,8 @@ class Teams_Controller extends Controller {
          if ($addForm->image->getValues() != null) {
             $image = new File_Image($addForm->image);
             // store original
-            $name = vve_cr_safe_file_name($addForm->name->getValues()." ".$addForm->surname->getValues());
-            $image->copy($this->module()->getDataDir(), false, $name.".".$image->getExtension());
-            // store resized
-            $resized = $image->copy($this->module()->getDataDir(), true, $name."-resized.".$image->getExtension());
-            
-            $resized->getData()->resize(
-               $this->category()->getParam('imgw', self::DEFAULT_IMAGE_WIDTH), 
-               $this->category()->getParam('imgh', self::DEFAULT_IMAGE_HEIGHT), 
-               $this->category()->getParam('cropimg', self::DEFAULT_IMAGE_CROP) == true ? File_Image_Base::RESIZE_CROP : File_Image_Base::RESIZE_AUTO);
-            $resized->save();
-            $record->{Teams_Model_Persons::COLUMN_IMAGE} = $resized->getName();
-            $image->delete();
+            $image->move($this->module()->getDataDir());
+            $record->{Teams_Model_Persons::COLUMN_IMAGE} = $image->getName();
          }
          
          $record->{Teams_Model_Persons::COLUMN_NAME} = $addForm->name->getValues();
@@ -97,7 +87,6 @@ class Teams_Controller extends Controller {
          $record->{Teams_Model_Persons::COLUMN_DEGREE} = $addForm->degree->getValues();
          $record->{Teams_Model_Persons::COLUMN_DEGREE_AFTER} = $addForm->degreeAfter->getValues();
          $record->{Teams_Model_Persons::COLUMN_TEXT} = $addForm->text->getValues();
-         $record->{Teams_Model_Persons::COLUMN_TEXT_CLEAR} = strip_tags($addForm->text->getValues());
          $record->{Teams_Model_Persons::COLUMN_LINK} = $addForm->link->getValues();
          
          // zařadit na konec kupiny
@@ -110,11 +99,11 @@ class Teams_Controller extends Controller {
          $model->save($record);
          
          $this->infoMsg()->addMessage($this->tr('Osoba byla uložena'));
-         if($editForm->gotoEdit->getValues() == true){
-            $this->link()->route("editPhoto", array('id' => $person->getPK()))->reload();
-         } else {
+//         if($addForm->gotoEdit->getValues() == true){
+//            $this->link()->route("editPhoto", array('id' => $record->getPK()))->reload();
+//         } else {
             $this->link()->route()->reload();
-         }
+//         }
       }
       $this->view()->form = $addForm;
    }
@@ -140,8 +129,9 @@ class Teams_Controller extends Controller {
       }
 
       if ($editForm->isValid()) {
-         
-         if($editForm->groupNewName->getValues() != null){
+
+         $grpName = $editForm->groupNewName->getValues();
+         if($grpName[Locales::getDefaultLang()] != null){
             // nová skupina
             $modelGrp = new Teams_Model();
             $newGrp = $modelGrp->newRecord();
@@ -174,18 +164,8 @@ class Teams_Controller extends Controller {
          if ($editForm->image->getValues() != null) {
             $image = new File_Image($editForm->image);
             // store original
-            $name = vve_cr_safe_file_name($editForm->name->getValues()." ".$editForm->surname->getValues());
-            $image->copy($this->module()->getDataDir(), false, $name.".".$image->getExtension());
-            // store resized
-            $resized = $image->copy($this->module()->getDataDir(), true, $name."-resized.".$image->getExtension());
-            
-            $resized->getData()->resize(
-               $this->category()->getParam('imgw', self::DEFAULT_IMAGE_WIDTH), 
-               $this->category()->getParam('imgh', self::DEFAULT_IMAGE_HEIGHT), 
-               $this->category()->getParam('cropimg', self::DEFAULT_IMAGE_CROP) == true ? File_Image_Base::RESIZE_CROP : File_Image_Base::RESIZE_AUTO);
-            $resized->save();
-            $person->{Teams_Model_Persons::COLUMN_IMAGE} = $resized->getName();
-            $image->delete();
+            $image->move($this->module()->getDataDir());
+            $person->{Teams_Model_Persons::COLUMN_IMAGE} = $image->getName();
          }
          
          $person->{Teams_Model_Persons::COLUMN_NAME} = $editForm->name->getValues();
@@ -194,7 +174,6 @@ class Teams_Controller extends Controller {
          $person->{Teams_Model_Persons::COLUMN_DEGREE} = $editForm->degree->getValues();
          $person->{Teams_Model_Persons::COLUMN_DEGREE_AFTER} = $editForm->degreeAfter->getValues();
          $person->{Teams_Model_Persons::COLUMN_TEXT} = $editForm->text->getValues();
-         $person->{Teams_Model_Persons::COLUMN_TEXT_CLEAR} = strip_tags($editForm->text->getValues());
          $person->{Teams_Model_Persons::COLUMN_ID_TEAM} = $idTeam;
          $person->{Teams_Model_Persons::COLUMN_LINK} = $editForm->link->getValues();
          
@@ -204,11 +183,7 @@ class Teams_Controller extends Controller {
          $model->save($person);
 
          $this->infoMsg()->addMessage($this->tr('Osoba byla uložena'));
-         if($editForm->gotoEdit->getValues() == true){
-            $this->link()->route("editPhoto", array('id' => $person->getPK()))->reload();
-         } else {
-            $this->link()->route()->reload();
-         }
+         $this->link()->route()->reload();
       }
       $this->view()->form = $editForm;
       $this->view()->person = $person;
@@ -304,7 +279,8 @@ class Teams_Controller extends Controller {
       $form->addElement($iWork, $gbase);
 
       $iText = new Form_Element_TextArea('text', $this->tr('Popis'));
-      $iText->addValidation(New Form_Validator_NotEmpty());
+      $iText->setLangs();
+      $iText->addValidation(New Form_Validator_NotEmpty(null, Locales::getDefaultLang()));
       $form->addElement($iText, $gbase);
 
       $iGroup = new Form_Element_Select('groupId', $this->tr('Skupina'));
@@ -315,20 +291,23 @@ class Teams_Controller extends Controller {
       $groups = $model
          ->where(Teams_Model::COLUMN_ID_CATEGORY." = :idc", array('idc' => $this->category()->getId()))
          ->order(array(Teams_Model::COLUMN_ORDER => Model_ORM::ORDER_ASC))
-         ->records(PDO::FETCH_OBJ);
+         ->records();
       
       if($groups != false){
          foreach ($groups as $grp) {
-            $iGroup->addOption($grp->{Teams_Model::COLUMN_NAME}, $grp->{Teams_Model::COLUMN_ID});
+            if((string)$grp->{Teams_Model::COLUMN_NAME} != null){
+               $iGroup->addOption((string)Utils_String::getLangString($grp->{Teams_Model::COLUMN_NAME}), $grp->{Teams_Model::COLUMN_ID});
+            }
          }
          $form->addElement($iGroup, $gothr);
       }
       
       $iNewGroup = new Form_Element_Text('groupNewName', $this->tr('Nový název skupiny'));
+      $iNewGroup->setLangs();
       if($groups != false){
          $iNewGroup->setSubLabel($this->tr('Pokud není zadán, použije se skupina z předchozího výběru.'));
       } else {
-         $iNewGroup->addValidation(new Form_Validator_NotEmpty());
+         $iNewGroup->addValidation(new Form_Validator_NotEmpty(null, Locales::getDefaultLang()));
       }
       
       $form->addElement($iNewGroup, $gothr);
@@ -339,9 +318,9 @@ class Teams_Controller extends Controller {
       $iImage->setUploadDir(AppCore::getAppCacheDir());
       $form->addElement($iImage, $gothr);
       
-      $iImageGoToPhotoEdit = new Form_Element_Checkbox('gotoEdit', $this->tr('Upravit portrét'));
-      $iImageGoToPhotoEdit->setSubLabel($this->tr('Při zaškrtnutí přejde na stránku úpravy portrétu'));
-      $form->addElement($iImageGoToPhotoEdit, $gothr);
+//      $iImageGoToPhotoEdit = new Form_Element_Checkbox('gotoEdit', $this->tr('Upravit portrét'));
+//      $iImageGoToPhotoEdit->setSubLabel($this->tr('Při zaškrtnutí přejde na stránku úpravy portrétu'));
+//      $form->addElement($iImageGoToPhotoEdit, $gothr);
       
       $iLink = new Form_Element_Text('link', $this->tr('Prolink'));
       $iLink->addValidation(New Form_Validator_Url());
@@ -436,6 +415,7 @@ class Teams_Controller extends Controller {
                ))
                ->groupBy(array(Teams_Model::COLUMN_ID))
                ->where(Teams_Model::COLUMN_ID_CATEGORY." = :idc", array('idc' => $this->category()->getId()))->records();
+            $modelTeams = new Teams_Model();
             foreach ($teams as $id => $team) {
                if($team->{Teams_Model_Persons::COLUMN_ID} == null){
                   $modelTeams->delete($team);
@@ -473,7 +453,7 @@ class Teams_Controller extends Controller {
          $idt = $item->{Teams_Model::COLUMN_ID};
          if(!isset ($teams[$idt])){
             $teams[$idt] = array(
-               'name' => $item->{Teams_Model::COLUMN_NAME},
+               'name' => vve_get_lang_string($item->{Teams_Model::COLUMN_NAME}),
                'order' => $item->{Teams_Model::COLUMN_ORDER},
                'persons' => array(),
             );
@@ -546,4 +526,3 @@ class Teams_Controller extends Controller {
    }
 
 }
-?>

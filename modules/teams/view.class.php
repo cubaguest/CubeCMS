@@ -24,25 +24,42 @@ class Teams_View extends View {
          }
 
          $this->toolbox = $toolbox;
-
-         $toolboxEdit = new Template_Toolbox2();
-         $toolboxEdit->setIcon('user_edit.png');
-
-         $toolEdit = new Template_Toolbox2_Tool_PostRedirect('person_edit', $this->tr("Upravit osobu"));
-         $toolEdit->setIcon('user_edit.png')->setTitle($this->tr('Upravit osobu'));
-         $toolboxEdit->addTool($toolEdit);
-         
-         $toolEditPhoto = new Template_Toolbox2_Tool_PostRedirect('person_edit_photo', $this->tr("Upravit portrét"));
-         $toolEditPhoto->setIcon('image_edit.png')->setTitle($this->tr('Upravit portrét osoby'));
-         $toolboxEdit->addTool($toolEditPhoto);
-
-         $toolDelete = new Template_Toolbox2_Tool_Form($this->formDelete);
-         $toolDelete->setIcon('user_delete.png');
-         $toolDelete->setConfirmMeassage($this->tr('Opravdu smazat osobu?'));
-         $toolboxEdit->addTool($toolDelete);
-         
-         $this->toolboxEdit = $toolboxEdit;
+         if(!empty($this->teams)){
+            foreach($this->teams as $team){
+               if(!empty($team['persons'])){
+                  foreach($team['persons'] as $person){
+                     $this->createPersonToolbox($person);
+                  }
+               }
+            }
+         }
       }
+   }
+   
+   protected function createPersonToolbox(Model_ORM_Record $person)
+   {
+      $toolboxEdit = new Template_Toolbox2();
+      $toolboxEdit->setIcon('user_edit.png');
+
+      $toolEdit = new Template_Toolbox2_Tool_PostRedirect('person_edit', $this->tr("Upravit osobu"));
+      $toolEdit->setIcon('user_edit.png')->setTitle($this->tr('Upravit osobu'));
+      $toolEdit->setAction($this->link()->route('edit', array('id' => $person->{Teams_Model_Persons::COLUMN_ID})));
+      $toolboxEdit->addTool($toolEdit);
+
+//      $toolEditPhoto = new Template_Toolbox2_Tool_PostRedirect('person_edit_photo', $this->tr("Upravit portrét"));
+//      $toolEditPhoto->setIcon(Template_Toolbox2::ICON_USER)->setTitle($this->tr('Upravit portrét osoby'));
+//      $toolEditPhoto->setAction($this->link()->route('editPhoto', array('id' => $person->{Teams_Model_Persons::COLUMN_ID})));
+//      $toolboxEdit->addTool($toolEditPhoto);
+
+      $this->formDelete->id->setValues($person->{Teams_Model_Persons::COLUMN_ID});
+      $toolDelete = new Template_Toolbox2_Tool_Form( $this->formDelete);
+      $toolDelete->setIcon('user_delete.png');
+      $toolDelete->setConfirmMeassage($this->tr('Opravdu smazat osobu?'));
+      $toolboxEdit->addTool($toolDelete);
+
+      $person->toolbox = clone $toolboxEdit;
+      
+      return $person;
    }
 
    /**
