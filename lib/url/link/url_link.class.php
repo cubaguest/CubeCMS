@@ -102,6 +102,19 @@ class Url_Link extends Url {
    public static function getWebURL() {
       return Url_Request::getBaseWebDir();
    }
+   
+    /**
+    * Metoda vrací základní odkaz na web (včetně jazyka)
+    * @return Url_Link -- adresa aplikace
+    */
+   public static function getBaseLink() {
+      $l = new Url_Link(true);
+      $l->clear(true);
+      if(Locales::getLang() != Locales::getDefaultLang()){
+         $l->lang(Locales::getLang());
+      }
+      return $l;
+   }
 
    /*
     * VEŘEJNÉ METODY
