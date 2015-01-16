@@ -150,9 +150,8 @@ class Contact_Controller extends Controller {
          $email->addAddress($adminMails);
          try {
             $email->send();
-            // $mail->sendMail();
             $this->infoMsg()->addMessage($this->tr('Váš dotaz byl úspěšně odeslán. Co nejdříve Vám odpovíme.'));
-//            $this->link()->reload();
+            $this->link()->reload();
          } catch (Exception $e){
             new CoreErrors($e);
          }
