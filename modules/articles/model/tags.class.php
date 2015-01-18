@@ -10,7 +10,8 @@ class Articles_Model_Tags extends Model_ORM {
 
    protected function  _initTable() {
       $this->setTableName(self::DB_TABLE, 't_art_tags');
-
+      $this->setPk(self::COLUMN_ID);
+      
       $this->addColumn(self::COLUMN_ID, array('datatype' => 'int', 'nn' => true, 'ai' => true, 'pk' => true, 'pdoparam' => PDO::PARAM_INT));
       $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(30)', 'nn' => true, 'pdoparam' => PDO::PARAM_STR));
       
