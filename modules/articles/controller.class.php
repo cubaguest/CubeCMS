@@ -1350,7 +1350,7 @@ class Articles_Controller extends Controller {
          case Component_JqGrid_FormRequest::REQUEST_TYPE_DELETE:
             $model = new Articles_Model_Tags();
             foreach ($jqGridReq->getIds() as $id) {
-               $model->delete($id);
+               $model->where(Articles_Model_Tags::COLUMN_ID." = :id", array('id' => $id))->delete();
             }
             $this->infoMsg()->addMessage($this->tr('Vybrané štítky byly smazány'));
             break;
