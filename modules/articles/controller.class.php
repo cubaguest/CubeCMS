@@ -873,9 +873,9 @@ class Articles_Controller extends Controller {
          ->where(Articles_Model_TagsConnection::COLUMN_ID_ARTICLE." = :ida", array('ida' => $artRecord->getPK()))
          ->delete();
       
-      $tags = array();
-      if($form->tags->getValues() != null){
-         $tags = explode(',', $form->tags->getValues());
+      $tags = $form->tags->getValues();
+      if(!empty($tags) && is_array($tags)){
+         $tags = array_unique($tags);
          // projít tagy jestli existují
          $modelTags = new Articles_Model_Tags();
          foreach ($tags as $tag) {
@@ -948,7 +948,10 @@ class Articles_Controller extends Controller {
       }
       $form->addElement($iText, $fGrpTexts);
       
-      $iTags = new Form_Element_Text('tags', $this->tr('Štítky'));
+      $iTags = new Form_Element_Tags('tags', $this->tr('Štítky'));
+      $iTags->setItemsUrl($this->link()->route('getTags'));
+      // load available tags
+      
       $form->addElement($iTags, $fGrpTexts);
 
       $fGrpParams = $form->addGroup('params', $this->tr('Parametry'));
@@ -1220,22 +1223,18 @@ class Articles_Controller extends Controller {
    public function getTagsController() 
    {
       // get parametr 'term' s písmeny tagu
-      $term = $this->getRequestParam('term');
+      $term = $this->getRequestParam('q');
       $modelTags = new Articles_Model_Tags();
       
       if($term != null ){
-         $modelTags->where(Articles_Model_Tags::COLUMN_NAME." LIKE :term", array('term' => $term.'%'));
+//         $modelTags->where(Articles_Model_Tags::COLUMN_NAME." LIKE :term", array('term' => $term.'%'));
       }
       
       $tags = $modelTags->records();
       $respond = array();
       if ($tags){
          foreach ($tags as $tag) {
-            $respond[] = array(
-               'id' => $tag->{Articles_Model_Tags::COLUMN_ID}, 
-               'label' => $tag->{Articles_Model_Tags::COLUMN_NAME}." (id: ".$tag->{Articles_Model_Tags::COLUMN_ID}.")", 
-               'value' => $tag->{Articles_Model_Tags::COLUMN_NAME}
-            );
+            $respond[] = $tag->{Articles_Model_Tags::COLUMN_NAME};
          }
       }
       $this->view()->tags = $respond;

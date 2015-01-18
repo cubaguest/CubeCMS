@@ -1,8 +1,8 @@
 <?php 
 $this->addFile("css://articles:style.css?original");
 $jq = new JsPlugin_JQuery();
-$jq->addUIDialog();
-$this->addJsPlugin(new JsPlugin_JQueryTagsInput());
+//$jq->addUIDialog();
+//$this->addJsPlugin(new JsPlugin_JQueryTagsInput());
 
 // do titulku
 if($this->edit) {
@@ -20,8 +20,10 @@ $this->form->metaKeywords->html()->setAttrib('size', 60)->addClass('form-element
 $this->form->annotation->html()->setAttrib('cols', 58)->setAttrib('rows', 5);
 $this->form->metaDesc->html()->setAttrib('cols', 58)->setAttrib('rows', 3);
 $this->form->text->html()->setAttrib('cols', 58)->setAttrib('rows', 30);
-$this->form->tags->html()->setAttrib('rows', 1);
-$this->form->tags->setSubLabel($this->tr('Štítek se potvrzuje klávesou <em>ENTER</em>'));
+
+//$this->form->tags->html()->setAttrib('rows', 1);
+//$this->form->tags->setSubLabel($this->tr('Štítek se potvrzuje klávesou <em>ENTER</em>'));
+
 if( isset( $this->form->textPrivate) ){
    $this->form->textPrivate->html()->setAttrib('cols', 70)->setAttrib('rows', 30);
 }
@@ -53,13 +55,20 @@ $this->addJsPlugin($jq);
       $("input.datepicker").datepicker();
 	   <?php }?>
 
-      $('.article_tags_class').tagsInput({
-    	  'autocomplete_url': '<?php echo $this->link()->route('getTags')?>',
-    	  'defaultText':'<?php echo $this->tr('přidat štítek') ?>'
-      });
+//      $('.article_tags_class').tagsInput({
+//    	  'autocomplete_url': '<?php echo $this->link()->route('getTags')?>',
+//    	  'defaultText':'<?php echo $this->tr('přidat štítek') ?>'
+//      });
       
+      // přidak kontrolu změny -- chybí tinymce
+      var someChanged = false;
+      $('input, select, textarea').on('changed', function(){
+         someChanged = true;
+      });
       $(window).bind('beforeunload', function(){
-    	    return ("<?php echo $this->tr('Neuložené změny budou ztraceny!')?>");
+         if(someChanges){
+            return ("<?php echo $this->tr('Neuložené změny budou ztraceny!')?>");
+         }
     	});
       $('form[name="form-article"]').submit(function(){
           $(window).unbind('beforeunload');
