@@ -1342,7 +1342,7 @@ class Articles_Controller extends Controller {
                $record = $model->record($jqGridReq->id);
             }
             
-            $record->{Articles_Model_Tags::COLUMN_NAME} = $jqGridReq->{Articles_Model_Tags::COLUMN_NAME};
+            $record->{Articles_Model_Tags::COLUMN_NAME} = strtolower($jqGridReq->{Articles_Model_Tags::COLUMN_NAME});
             
             $model->save($record);
             $this->infoMsg()->addMessage($this->tr('Štítek byl uložen'));
