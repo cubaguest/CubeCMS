@@ -192,7 +192,13 @@ form {
          .checkbox {
             input {
                margin-left: 2px;
+               margin-top: 3px;
                position: absolute;
+            }
+            label {
+               padding-left: 20px;
+               position: relative;
+               display: inline-block;
             }
          }
          width: auto;
@@ -217,6 +223,11 @@ form {
             float: none;
          }
          margin-right: -15px;
+      }
+   }
+   &.form-inline {
+      .form-group {
+         margin-left: 0;
       }
    }
    .form-group {
@@ -410,9 +421,6 @@ input.captcha + img + .help-block {
 .form-row-action-icon {
    height: 16px;
 }
-
-.placeholder { color: #aaa; }
-
 
 /*
  * Komponenty formulářů
