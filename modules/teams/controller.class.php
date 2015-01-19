@@ -48,27 +48,19 @@ class Teams_Controller extends Controller {
 
       if ($addForm->isValid()) {
          $idTeam = 0;
-         
-         if($addForm->groupNewName->getValues() != null){
+         $newGrpName = $addForm->groupNewName->getValues();
+         if($newGrpName[Locales::getDefaultLang()] != null){
             // nová skupina
             $modelGrp = new Teams_Model();
             $newGrp = $modelGrp->newRecord();
             $newGrp->{Teams_Model::COLUMN_ID_CATEGORY} = $this->category()->getId();
             $newGrp->{Teams_Model::COLUMN_NAME} = $addForm->groupNewName->getValues();
-            
-            $c = $modelGrp->columns(array('m' => 'MAX(`'.  Teams_Model::COLUMN_ORDER.'`)'))
-            ->where(Teams_Model::COLUMN_ID_CATEGORY.' = :idc', 
-               array('idc' => $this->category()->getId() ))->record()->m;
-            
-            $newGrp->{Teams_Model::COLUMN_ORDER} = $c+1;
-            
             $idTeam = $modelGrp->save($newGrp);
          } else if(isset ($addForm->groupId)){
             $idTeam = (int)$addForm->groupId->getValues();
          } else {
             throw new UnexpectedValueException($this->tr('Vloženo neočekávané id týmu'), 1);
          }
-         
          
          $model = new Teams_Model_Persons();
          $record = $model->newRecord();
@@ -88,14 +80,6 @@ class Teams_Controller extends Controller {
          $record->{Teams_Model_Persons::COLUMN_DEGREE_AFTER} = $addForm->degreeAfter->getValues();
          $record->{Teams_Model_Persons::COLUMN_TEXT} = $addForm->text->getValues();
          $record->{Teams_Model_Persons::COLUMN_LINK} = $addForm->link->getValues();
-         
-         // zařadit na konec kupiny
-         $c = $model->columns(array('m' => 'MAX(`'.Teams_Model_Persons::COLUMN_ORDER.'`)'))
-            ->where(Teams_Model_Persons::COLUMN_DELETED.' = 0 AND '.Teams_Model_Persons::COLUMN_ID_TEAM.' = :idt', 
-               array('idt' => $idTeam ))->record()->m;
-            
-         $record->{Teams_Model_Persons::COLUMN_ORDER} = $c + 1;
-         
          $model->save($record);
          
          $this->infoMsg()->addMessage($this->tr('Osoba byla uložena'));
@@ -386,12 +370,8 @@ class Teams_Controller extends Controller {
          $personTeamId = $form->personTeamId->getValues();
          
          // update teams
-         $modelTeams = new Teams_Model();
-         $stmt = $modelTeams->query("UPDATE {THIS} SET `".Teams_Model::COLUMN_ORDER."` = :ord WHERE ".Teams_Model::COLUMN_ID." = :id");
          foreach ($teamOrders as $id => $order) {
-            $stmt->bindValue('id', $id);
-            $stmt->bindValue('ord', $order);
-            $stmt->execute();
+            Teams_Model::setRecordPosition($id, $order);
          }
          
          // update persons
@@ -405,6 +385,7 @@ class Teams_Controller extends Controller {
             $stmt->execute();
          }
          
+         $modelTeams = new Teams_Model();
          if($form->removeEmptyTeams->getValues() == true){
             $teams = $modelTeams->join(Teams_Model::COLUMN_ID, "Teams_Model_Persons", Teams_Model_Persons::COLUMN_ID_TEAM)
                ->order(array(

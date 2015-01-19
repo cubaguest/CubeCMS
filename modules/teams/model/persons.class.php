@@ -2,7 +2,7 @@
 /*
  * Třída modelu lidí
 */
-class Teams_Model_Persons extends Model_ORM {
+class Teams_Model_Persons extends Model_ORM_Ordered {
    const DB_TABLE = 'teams_persons';
 
    /**
@@ -24,6 +24,8 @@ class Teams_Model_Persons extends Model_ORM {
 
    protected function  _initTable() {
       $this->setTableName(self::DB_TABLE, 't_people');
+      $this->setOrderColumn(self::COLUMN_ORDER);
+      $this->setLimitedColumns(array(self::COLUMN_ID_TEAM));
 
       $this->addColumn(self::COLUMN_ID, array('datatype' => 'smallint', 'ai' => true, 'nn' => true, 'pk' => true));
       $this->addColumn(self::COLUMN_ID_TEAM, array('datatype' => 'smallint', 'nn' => true, 'index' => true, 'pdoparam' => PDO::PARAM_INT));
