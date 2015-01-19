@@ -35,6 +35,8 @@ $modules['custommenu']['positions'] = array(
    'bottom' => 'Spodní menu',
 );
 
+$modules['articles']['connectPhotogallery'] = true;
+
 $modules['hpslideshow']['enabled'] = true;
 $modules['hpslideshow']['wysiwyg'] = true;
 $modules['hpslideshow']['dimensions'] = array(
