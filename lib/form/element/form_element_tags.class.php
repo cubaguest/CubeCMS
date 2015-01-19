@@ -43,8 +43,8 @@ class Form_Element_Tags extends Form_Element_TextArea {
       // tagy jsou odděleny čárkou, tak se rozdělí do pole
       if($this->getUnfilteredValues() != null){
          $values = explode(',', $this->getUnfilteredValues());
+         $this->unfilteredValues = $values;
       }
-      $this->unfilteredValues = $values;
       
    }
    
