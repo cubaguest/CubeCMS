@@ -1,5 +1,6 @@
 <br />
-<h2><?php echo $this->tr('Výsledky hledání')?>:&nbsp;<span class="font-small"><?php printf($this->tr('Nalezeno %s výsledků'),$this->countAllResults)?></span></h2>
+<h2><?php echo $this->tr('Výsledky hledání')?>:
+   <span class="font-small"><?php ps($this->tr(array('Nalezen %s výsledek', 'Nalezeny %s výsledky', 'Nalezeno %s výsledků'), $this->countAllResults)) ?></span></h2>
 <div class="main-content-list">
 <?php 
 $i = 1;
