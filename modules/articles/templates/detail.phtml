@@ -53,6 +53,15 @@ $editTime = new DateTime($this->article->{Articles_Model::COLUMN_EDIT_TIME});
    </div>
    <?php }?>
 
+   <?php 
+   if($this->images){
+      ?>
+      <h2><a href="<?php echo $this->photoGalleryLink?>"><?php ps($this->tr('Fotogalerie')); ?></a></h2>
+      <?php
+      $this->includeFile('tpl://engine:photogalery.phtml');
+   }
+   ?>
+   
    <?php if(!empty($this->similar)){?>
    <h3><?php ps('Podobné články')?></h3>
    <ul class="related-posts">

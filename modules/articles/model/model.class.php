@@ -23,6 +23,7 @@ class Articles_Model extends Model_ORM {
    const COLUMN_ID_USER_LAST_EDIT = 'is_user_last_edit';
    const COLUMN_ID_CATEGORY = 'id_cat';
    const COLUMN_ID = 'id_article';
+   const COLUMN_ID_PHOTOGALLERY = 'id_photogallery';
    const COLUMN_SHOWED = 'viewed';
    const COLUMN_CONCEPT = 'concept';
    const COLUMN_TITLE_IMAGE = 'title_image';
@@ -30,6 +31,7 @@ class Articles_Model extends Model_ORM {
    const COLUMN_PRIORITY = 'article_priority';
    const COLUMN_PRIORITY_END_DATE = 'article_priority_end_date';
    const COLUMN_PLACE = 'article_place';
+   const COLUMN_DATADIR = 'article_datadir';
 
    const COLUMN_A_H_U_ID_ARTICLE = 'id_article';
    const COLUMN_A_H_U_ID_USER = 'id_user';
@@ -37,10 +39,11 @@ class Articles_Model extends Model_ORM {
    protected function  _initTable() {
       $this->setTableName(self::DB_TABLE, 't_art');
 
-      $this->addColumn(self::COLUMN_ID, array('datatype' => 'smallint', 'ai' => true, 'nn' => true, 'pk' => true));
-      $this->addColumn(self::COLUMN_ID_USER, array('datatype' => 'smallint', 'nn' => true, 'pdoparam' => PDO::PARAM_INT));
-      $this->addColumn(self::COLUMN_ID_USER_LAST_EDIT, array('datatype' => 'smallint', 'pdoparam' => PDO::PARAM_INT, 'default' => 1));
-      $this->addColumn(self::COLUMN_ID_CATEGORY, array('datatype' => 'smallint', 'nn' => true, 'pdoparam' => PDO::PARAM_INT));
+      $this->addColumn(self::COLUMN_ID, array('datatype' => 'int', 'ai' => true, 'nn' => true, 'pk' => true));
+      $this->addColumn(self::COLUMN_ID_USER, array('datatype' => 'int', 'nn' => true, 'pdoparam' => PDO::PARAM_INT));
+      $this->addColumn(self::COLUMN_ID_USER_LAST_EDIT, array('datatype' => 'int', 'pdoparam' => PDO::PARAM_INT, 'default' => 1));
+      $this->addColumn(self::COLUMN_ID_CATEGORY, array('datatype' => 'int', 'nn' => true, 'pdoparam' => PDO::PARAM_INT));
+      $this->addColumn(self::COLUMN_ID_PHOTOGALLERY, array('datatype' => 'int', 'default' => 0, 'pdoparam' => PDO::PARAM_INT));
       $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(200)', 'nn' => true, 'lang' => true, 'pdoparam' => PDO::PARAM_STR, 'fulltext' => true, 'fulltextRel' => VVE_SEARCH_ARTICLE_REL_MULTIPLIER));
       $this->addColumn(self::COLUMN_URLKEY, array('datatype' => 'varchar(200)', 'nn' => true, 'lang' => true, 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_TEXT, array('datatype' => 'text', 'lang' => true, 'pdoparam' => PDO::PARAM_STR));
@@ -61,6 +64,7 @@ class Articles_Model extends Model_ORM {
       $this->addColumn(self::COLUMN_PRIORITY, array('datatype' => 'smallint', 'pdoparam' => PDO::PARAM_INT, 'default' => 0));
       $this->addColumn(self::COLUMN_PRIORITY_END_DATE, array('datatype' => 'date', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
       $this->addColumn(self::COLUMN_PLACE, array('datatype' => 'varchar(50)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
+      $this->addColumn(self::COLUMN_DATADIR, array('datatype' => 'varchar(50)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
 
       $this->setPk(self::COLUMN_ID);
       
@@ -107,6 +111,9 @@ class Articles_Model extends Model_ORM {
          }
       }
       $record->{self::COLUMN_URLKEY} = $urlkeys;
+      if($record->{self::COLUMN_DATADIR} == null){
+         $record->{self::COLUMN_DATADIR} = $urlkeys[Locales::getDefaultLang()];
+      }
    }
 
    /**
@@ -350,3 +357,19 @@ class Articles_Model extends Model_ORM {
    }
 }
 
+
+class Articles_Model_Record extends Model_ORM_Record {
+
+   public function getDataPath()
+   {
+      $cat = new Category($this->{Articles_Model::COLUMN_ID_CATEGORY});
+      return $cat->module()->getDataDir().$this->{Articles_Model::COLUMN_DATADIR}.DIRECTORY_SEPARATOR;
+   }
+   
+   public function getDataUrl()
+   {
+      $cat = new Category($this->{Articles_Model::COLUMN_ID_CATEGORY});
+      return $cat->module()->getDataDir(true).$this->{Articles_Model::COLUMN_DATADIR}."/";
+   }
+
+}

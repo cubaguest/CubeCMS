@@ -315,7 +315,7 @@ class Articles_Controller extends Controller {
       $this->view()->firstArticleDate = new DateTime($firstRec ? $firstRec->{Articles_Model::COLUMN_ADD_TIME} : null);
    }
 
-      /**
+   /**
     * @deprecated - není potřeba
     */
    public function contentController(){
@@ -555,6 +555,17 @@ class Articles_Controller extends Controller {
          $this->view()->editor = $this->view()->creator;
       } else {
          $this->view()->editor = $modelUsers->record($article->{Articles_Model::COLUMN_ID_USER_LAST_EDIT});
+      }
+      
+      if($article->{Articles_Model::COLUMN_ID_PHOTOGALLERY}){
+         // images from connected photogalery
+         $gallery = Articles_Model::getRecord($article->{Articles_Model::COLUMN_ID_PHOTOGALLERY});
+         $this->view()->images = PhotoGalery_Model_Images::getImages($gallery->{Articles_Model::COLUMN_ID_CATEGORY}, $gallery->getPK());
+         
+         $cat = new Category((int)$gallery->{Articles_Model::COLUMN_ID_CATEGORY});
+         $this->view()->imagesBaseDir = $gallery->getDataUrl();
+         $this->view()->photoGalleryLink = $this->link(true)->category($cat->getUrlKey())->route('detail', 
+             array('urlkey' => $gallery->{Articles_Model::COLUMN_URLKEY}));
       }
       
       $this->checkDateFirstArticle();
@@ -830,6 +841,10 @@ class Articles_Controller extends Controller {
       $artRecord->{Articles_Model::COLUMN_DESCRIPTION} = $form->metaDesc->getValues();
       $artRecord->{Articles_Model::COLUMN_ID_CATEGORY} = $this->category()->getId();
       
+      if(isset($form->id_gallery)){
+         $artRecord->{Articles_Model::COLUMN_ID_PHOTOGALLERY} = $form->id_gallery->getValues();
+      }
+      
       if($form->haveElement('creatorId')){
          $artRecord->{Articles_Model::COLUMN_ID_USER} = $form->creatorId->getValues();
       } else {
@@ -954,6 +969,28 @@ class Articles_Controller extends Controller {
       
       $form->addElement($iTags, $fGrpTexts);
 
+      // připojení fotogalerie
+      if(in_array($this->module()->getName(), array('articles', 'news')) && Face::getCurrent()->getParam('connectPhotogallery', 'articles')){
+         $modelGalleries = new Articles_Model();
+         
+         $galeries = $modelGalleries
+             ->joinFK(Articles_Model::COLUMN_ID_CATEGORY, array(Model_Category::COLUMN_NAME))
+             ->where(Model_Category::COLUMN_MODULE." = :module", array('module' => 'photogalerymed'))
+             ->order(Articles_Model::COLUMN_NAME)
+             ->records();
+         
+         if(!empty($galeries)){
+            $eGal = new Form_Element_Select('id_gallery', $this->tr('Připojení fotogalerie'));
+            
+            $eGal->addOption($this->tr('Bez propojení'), null);
+            foreach ($galeries as $gal) {
+               $eGal->addOption($gal->{Articles_Model::COLUMN_NAME}.' - ('.Utils_DateTime::fdate('%x', $gal->{Articles_Model::COLUMN_ADD_TIME}).')'
+                   , (int)$gal->getPK(), (string)$gal->{Model_Category::COLUMN_NAME});
+            }
+            $form->addElement($eGal, $fGrpTexts);
+         }
+      }
+      
       $fGrpParams = $form->addGroup('params', $this->tr('Parametry'));
 
       // $iUrlKey = new Form_Element_Text('urlkey', $this->tr('Url klíč'));
@@ -1080,13 +1117,16 @@ class Articles_Controller extends Controller {
           */
       }
 
-      if($article != null){
+      if($article instanceof Model_ORM_Record){
          $form->name->setValues($article->{Articles_Model::COLUMN_NAME});
          $form->text->setValues($article->{Articles_Model::COLUMN_TEXT});
          $form->metaKeywords->setValues($article->{Articles_Model::COLUMN_KEYWORDS});
          $form->metaDesc->setValues($article->{Articles_Model::COLUMN_DESCRIPTION});
          $form->annotation->setValues($article->{Articles_Model::COLUMN_ANNOTATION});
          $form->urlkey->setValues($article->{Articles_Model::COLUMN_URLKEY});
+         if(isset($form->id_gallery)){
+            $form->id_gallery->setValues($article->{Articles_Model::COLUMN_ID_PHOTOGALLERY});
+         }
          if( isset($form->created_date) ){
             $addTime = new DateTime($article->{Articles_Model::COLUMN_ADD_TIME});
             $form->created_date->setValues(vve_date('%x',$addTime));
