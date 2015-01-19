@@ -164,7 +164,7 @@ class Model_Category extends Model_ORM {
                Model_Category::COLUMN_INDIVIDUAL_PANELS, Model_Category::COLUMN_MODULE, Model_Category::COLUMN_URLKEY,
                Model_Category::COLUMN_VISIBILITY, Model_Category::COLUMN_ICON,  Model_Category::COLUMN_BACKGROUND,
                Model_Category::COLUMN_PRIORITY, Model_Category::COLUMN_DISABLE,
-               Model_Category::COLUMN_PARAMS
+               Model_Category::COLUMN_PARAMS, Model_Category::COLUMN_DATADIR
    //            , 'uk_l' => 'LENGTH( '.self::COLUMN_URLKEY.'_'.Locales::getLang().' )'
             ));
             $this->setSelectAllLangs($allLangs)
