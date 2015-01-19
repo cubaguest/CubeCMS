@@ -62,7 +62,17 @@ class Form_Element_Select extends Form_Element {
       }
       // kontrola odeslaných hodnot jestli jsou v povolených volbách
       if($this->checkAllowedOptions){
-         $this->addValidation(new Form_Validator_InArray($this->options, 
+         $allowedValues = array();
+         foreach ($this->options as $opt) {
+            if(is_array($opt)){
+               foreach ($opt as $val) {
+                  $allowedValues[] = $val;
+               }
+            } else {
+               $allowedValues[] = $opt;
+            }
+         }
+         $this->addValidation(new Form_Validator_InArray($allowedValues, 
             $this->tr('Ve výběru "%s" byla odeslána hodnota "%s", která není v povolených hodnotách. Povolené hodnoty: ')."(".  implode(", ", array_keys($this->options) ).")"));
       }
       parent::validate();
@@ -184,4 +194,3 @@ class Form_Element_Select extends Form_Element {
       return $this->html();
    }
 }
-?>
