@@ -73,8 +73,15 @@ class Form_Element_Select extends Form_Element {
     * @param string/int $name -- název volby
     * @param string/int $value -- hodnota volby
     */
-   public function addOption($name, $value){
-      $this->options[(string)$name] = $value;
+   public function addOption($name, $value, $group = null){
+      if($group){
+         if(!isset($this->options[$group])){
+            $this->options[$group] = array();
+         }
+         $this->options[$group][(string)$name] = $value;
+      } else {
+         $this->options[(string)$name] = $value;
+      }
    }
 
       /**
