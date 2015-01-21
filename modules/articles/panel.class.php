@@ -7,9 +7,17 @@ class Articles_Panel extends Panel {
 
    public function panelController() {
       $artM = new Articles_Model();
-      $artM->where(Articles_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Articles_Model::COLUMN_CONCEPT.' = 0 AND '
+      $idCats = array($this->category()->getId());
+      $mountedCatsStr = $this->category()->getParam(Articles_Controller::PARAM_MOUNTED_CATS);
+      
+      if($mountedCatsStr != null){
+         $idCats = array_merge($idCats, explode(';', $mountedCatsStr));
+      }
+      
+      $artM->where(Articles_Model::COLUMN_ID_CATEGORY.' IN ('.$artM->getWhereINPlaceholders($idCats).') AND '.Articles_Model::COLUMN_CONCEPT.' = 0 AND '
          .Articles_Model::COLUMN_ADD_TIME.' <= NOW()  AND '.Articles_Model::COLUMN_URLKEY.' IS NOT NULL ',
-         array('idc' => $this->category()->getId()));
+         array_merge(array(), $artM->getWhereINValues($idCats)));
+      
       switch ($this->panelObj()->getParam('type', self::DEFAULT_TYPE)) {
          case 'top':
             $artM->order(array(Articles_Model::COLUMN_SHOWED => Model_ORM::ORDER_ASC));

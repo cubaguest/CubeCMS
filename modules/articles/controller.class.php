@@ -9,6 +9,7 @@ class Articles_Controller extends Controller {
    const PARAM_DISABLE_LIST = 'dislist';
    const PARAM_SHOW_CATS = 'shc';
    const PARAM_NOTIFY_RECIPIENTS = 'nfrecid';
+   const PARAM_USERS_ONLY_CONCEPT = 'uonlyc';
 
    const PARAM_MOUNTED_CATS = 'moc';
 
@@ -621,8 +622,10 @@ class Articles_Controller extends Controller {
          if(!$this->category()->getRights()->isControll()){
             $this->sendNotify($art);
          }
-         
-         $this->infoMsg()->addMessage($this->tr('Uloženo'));
+         $this->infoMsg()->addMessage($this->tr('Položka byla uložena'));
+         if($this->category()->getParam(self::PARAM_USERS_ONLY_CONCEPT) == true && !$this->rights()->isControll()){
+            $this->infoMsg()->addMessage($this->tr('Položka byla uložena jako koncept. Počkejte, než ji adminitrátor zveřejní.'));
+         }
          $this->link()->route($this->getOption('actionAfterAdd', 'detail'),
                  array('urlkey' => $art->{Articles_Model::COLUMN_URLKEY}))->rmParam()->reload();
       }
@@ -674,6 +677,10 @@ class Articles_Controller extends Controller {
          $article = $model->getArticleById($editForm->art_id->getValues());
          if(isset($editForm->socNetPublish) && $editForm->socNetPublish->getValues() == true){
             $this->sendToSocialNetworks($article, $editForm->socNetMessage->getValues());
+         }
+         $this->infoMsg()->addMessage($this->tr('Položka byla uložena'));
+         if($this->category()->getParam(self::PARAM_USERS_ONLY_CONCEPT) == true && !$this->rights()->isControll()){
+            $this->infoMsg()->addMessage($this->tr('Položka byla uložena jako koncept. Počkejte, než ji adminitrátor zveřejní.'));
          }
          $this->link()->route('detail',array('urlkey' => $article->{Articles_Model::COLUMN_URLKEY}))->reload();
       }
@@ -851,7 +858,12 @@ class Articles_Controller extends Controller {
          $artRecord->{Articles_Model::COLUMN_ID_USER} = Auth::getUserId();
       }
       
-      $artRecord->{Articles_Model::COLUMN_CONCEPT} = $form->concept->getValues();
+      $artRecord->{Articles_Model::COLUMN_CONCEPT} = true;
+      if(isset($form->concept)){
+         if($this->rights()->isControll() || $this->category()->getParam(self::PARAM_USERS_ONLY_CONCEPT) == false){
+            $artRecord->{Articles_Model::COLUMN_CONCEPT} = $form->concept->getValues();
+         }
+      }
       $artRecord->{Articles_Model::COLUMN_AUTHOR} = $form->creatorOther->getValues();
       $artRecord->{Articles_Model::COLUMN_PLACE} = $form->place->getValues();
       if(isset($form->priority)){
@@ -1068,10 +1080,13 @@ class Articles_Controller extends Controller {
 //      $ePlace->setAdvanced(true);
       $form->addElement($ePlace, $fGrpPublic);
 
-      $iConcept = new Form_Element_Checkbox('concept', $this->tr('Koncept'));
-      $iConcept->setSubLabel($this->tr('Pokud je položka koncept, je viditelná pouze autorovi a administrátorům.'));
-      $iConcept->setValues(false);
-      $form->addElement($iConcept, $fGrpPublic);
+      if($this->rights()->isControll() ||
+          $this->category()->getParam(self::PARAM_USERS_ONLY_CONCEPT) != true){
+         $iConcept = new Form_Element_Checkbox('concept', $this->tr('Koncept'));
+         $iConcept->setSubLabel($this->tr('Pokud je položka koncept, je viditelná pouze autorovi a administrátorům.'));
+         $iConcept->setValues(false);
+         $form->addElement($iConcept, $fGrpPublic);
+      }
 
       if($this->getRights()->isControll()){
          $eCreatedDate = new Form_Element_Text('created_date', $this->tr('Datum vytvoření'));
@@ -1650,6 +1665,14 @@ class Articles_Controller extends Controller {
 
       $form->addElement($elemNotify, $fGrpEditSet);
 
+      $elemUserOnlyConcept = new Form_Element_Checkbox('uonlyc', $this->tr('Uživatelé vkládají pouze koncept'));
+      $elemUserOnlyConcept->setAdvanced(true);
+      if(isset($settings[self::PARAM_USERS_ONLY_CONCEPT])) {
+         $elemUserOnlyConcept->setValues($settings[self::PARAM_USERS_ONLY_CONCEPT]);
+      }
+      $form->addElement($elemUserOnlyConcept, $fGrpEditSet);
+      
+      
       $fGrpEMail = $form->addGroup('emailLoad', $this->tr('Načítání z e-mailu'),
          $this->tr("Pokud je nastaven přístup k e-malové schránce, stránka automaticky načítá z tét schránky nové
          e-maily a vytváří z nich položky. Název e-mailové schránky nastavte tak, aby nebyla odhadnutelná
@@ -1707,6 +1730,7 @@ class Articles_Controller extends Controller {
 
          $settings[self::PARAM_MOUNTED_CATS] = is_array($mCats) ? implode(';', $mCats) : null;
          $settings[self::PARAM_NOTIFY_RECIPIENTS] = is_array($form->sendNotify->getValues()) ? implode(';', $form->sendNotify->getValues()) : null;
+         $settings[self::PARAM_USERS_ONLY_CONCEPT] = $form->uonlyc->getValues();
 
          $settings[self::PARAM_MAIL_NAME] = $form->mailName->getValues();
          if($form->mailPass->getValues() != null){
