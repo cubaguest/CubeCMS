@@ -27,8 +27,8 @@ class Component_Dropzone extends Component {
    {
       $jsPlugin = new Component_DropZone_JsPlugin();
       Template::addJsPlugin($jsPlugin);
-      
-      if(empty($this->getConfig('images')) && is_dir($this->getConfig('path'))){
+      $images = $this->getConfig('images');
+      if(empty($images) && is_dir($this->getConfig('path'))){
          // load dirs
          $images = array();
          $finfo = finfo_open(FILEINFO_MIME_TYPE);
