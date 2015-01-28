@@ -92,7 +92,8 @@ class AdminSites_Controller extends Controller {
          $newDir = str_replace(array('.', '/', '-', '_'), array('','','',''), $domain);
          
          $model = new Model_Sites();
-         $dbPrefix = $newDir.'_';
+         // dbprefix max 16 chars
+         $dbPrefix = substr($newDir, 0, 12).'_';
          
          // create face
          $this->createWebsiteDir($newDir);
