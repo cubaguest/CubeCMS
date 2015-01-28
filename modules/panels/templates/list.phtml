@@ -79,7 +79,7 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
       $(document).ready(function(){
     	   var idc = decodeURIComponent((new RegExp('[?|&]idc=([0-9]+)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null;
     	   if(idc != null){
-    		   $('select#catsList').val(idc)
+    		   $('select#catsList').val(idc);
         	}
          loadPanels();
          $('button[name=selectCatPanels]').click(function(){loadPanels();return false;});
