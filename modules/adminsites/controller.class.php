@@ -100,7 +100,14 @@ class AdminSites_Controller extends Controller {
          $type = $form->dataset->getValues();
          if(strpos($type, 'webcopy_') !== false){
             $siteId = str_replace('webcopy_', '', $type);
-            $siteObj = Model_Sites::getRecord($siteId);
+            if($siteId == "root"){
+               // kopie hlavního webu
+               $m = new Model_Sites();
+               $siteObj = $m->where(Model_Sites::COLUMN_IS_MAIN." = 1", array())->record();
+            } else {
+               // kopie podwebu
+               $siteObj = Model_Sites::getRecord($siteId);
+            }
             if(!$siteObj){
                throw new InvalidArgumentException($this->tr('Zdrojový podweb neexistuje'));
             }
@@ -274,14 +281,14 @@ class AdminSites_Controller extends Controller {
                }
                $elemBaseData->addOption($desc, $dir->getBasename());
             }
-            $mSites = new Model_Sites();
-            $sites = $mSites->where(Model_Sites::COLUMN_IS_MAIN .' = 0 AND '.Model_Sites::COLUMN_IS_ALIAS." = 0")->records();
-            if(!empty($sites)){
-               foreach ($sites as $s) {
-                  $elemBaseData->addOption($this->tr('Kopírovat data z domény: ').$s->getFullDomain(), 'webcopy_'.$s->getPK());
-               }
+         }
+         $elemBaseData->addOption($this->tr('Kopírovat data z hlavní domény: ').CUBE_CMS_PRIMARY_DOMAIN, 'webcopy_root');
+         $mSites = new Model_Sites();
+         $sites = $mSites->where(Model_Sites::COLUMN_IS_MAIN .' = 0 AND '.Model_Sites::COLUMN_IS_ALIAS." = 0")->records();
+         if(!empty($sites)){
+            foreach ($sites as $s) {
+               $elemBaseData->addOption($this->tr('Kopírovat data z domény: ').$s->getFullDomain(), 'webcopy_'.$s->getPK());
             }
-            
          }
          $f->addElement($elemBaseData);
       }
@@ -425,20 +432,35 @@ class AdminSites_Controller extends Controller {
    {
       $dbc = Db_PDO::getInstance();
       //get all of the tables
-      $stmt = $dbc->prepare('SHOW TABLES');
-      $stmt->execute();
+      $stmt = $dbc->prepare('SHOW TABLES LIKE :prefix');
+      $stmt->execute(array('prefix' => $site->{Model_Sites::COLUMN_TB_PREFIX}.'%'));
       $tables = $stmt->fetchAll(PDO::FETCH_COLUMN);
+      // load other sites 
+      $mSites = new Model_Sites();
+      $otherSites = $mSites->where(Model_Sites::COLUMN_ID." != :idcurrent", array('idcurrent' => $site->getPK()))->records();
+      $ignorePrefixes = array();
+      foreach ($otherSites as $osite) {
+         $ignorePrefixes[] = $osite->{Model_Sites::COLUMN_TB_PREFIX};
+      }
       //cycle through table
       foreach($tables as $table) {
-         if(strpos($table, $site->{Model_Sites::COLUMN_TB_PREFIX}) !== 0){
+         $wrongTable = false;
+         foreach ($ignorePrefixes as $iprefix) {
+            if(strpos($table, $iprefix) !== FALSE){
+               $wrongTable = true;
+               break;
+            }
+         }
+         
+         if($wrongTable){
             continue;
          }
+         
          $tableSufix = str_replace($site->{Model_Sites::COLUMN_TB_PREFIX}, '', $table);
          $newTableName = $dbPrefix.$tableSufix;
-         
-         // sopy table
+         // copy table
          $created = $dbc->exec('CREATE TABLE '.$newTableName.' LIKE `'.$table.'`; ');
-         // sopy data
+         // copy data
          $copied = $dbc->exec('INSERT `'.$newTableName.'` SELECT * FROM `'.$table.'`;');
       }
    }
