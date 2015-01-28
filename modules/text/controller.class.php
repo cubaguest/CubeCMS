@@ -361,8 +361,10 @@ class Text_Controller extends Controller {
          $textRec->{Text_Model::COLUMN_LABEL} = $form->label->getValues();
       }
       $textRec->{Text_Model::COLUMN_ID_USER_EDIT} = Auth::getUserId();
-      if($subkey == Text_Model::TEXT_MAIN_KEY && isset($form->image)){
+      if(isset($form->desc)){
          $textRec->catdesc = $form->desc->getValues();
+      }
+      if($subkey == Text_Model::TEXT_MAIN_KEY && isset($form->image)){
          $img = $form->image->getValues();
          $textRec->catimage = $img ? $img['name'] : null;
       }
