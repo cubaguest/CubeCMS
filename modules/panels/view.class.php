@@ -36,6 +36,7 @@ class Panels_View extends View {
       foreach ($panels as $panel) {
          $toolboxPanel->settings->setAction($this->link()->clear()->route('settings', array('id' => $panel->{Model_Panel::COLUMN_ID})));
          $toolboxPanel->edit->setAction($this->link()->clear()->route('edit', array('id' => $panel->{Model_Panel::COLUMN_ID})));
+         $toolboxPanel->panelDelete->getForm()->setAction($this->link()->clear()->route());
          $toolboxPanel->panelDelete->getForm()->id->setValues($panel->{Model_Panel::COLUMN_ID});
 
          $panel->toolbox = clone $toolboxPanel;
