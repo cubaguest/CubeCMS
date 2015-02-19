@@ -371,7 +371,6 @@
 					setVal('media_type', data.type);
 				}
 
-
 				if (data.type == 'video') {
 					if (!data.video.sources)
 						data.video.sources = [];
