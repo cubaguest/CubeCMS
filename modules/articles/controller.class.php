@@ -988,7 +988,7 @@ class Articles_Controller extends Controller {
          $galeries = $modelGalleries
              ->joinFK(Articles_Model::COLUMN_ID_CATEGORY, array(Model_Category::COLUMN_NAME))
              ->where(Model_Category::COLUMN_MODULE." = :module", array('module' => 'photogalerymed'))
-             ->order(Articles_Model::COLUMN_NAME)
+             ->order(array(Articles_Model::COLUMN_ADD_TIME => Model_ORM::ORDER_DESC))
              ->records();
          
          if(!empty($galeries)){
