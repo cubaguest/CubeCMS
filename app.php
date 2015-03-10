@@ -1080,8 +1080,16 @@ class AppCore extends TrObject {
       } else {
          $reqUrl = Url_Request::getInstance()->getRequestUrl();
       }
+      // odstranění parametrů a kotev kvůli testům
+      $reqUrl = preg_replace(array('/\?.*/', '/#.*/'), array('', ''), $reqUrl);
       $catUrl = Url_Request::getInstance()->getCategory();
 
+      // není předána kategortie
+      if($catUrl == null && $reqUrl == null){
+         // bude vybrána výchozí kategorie
+         AppCore::setErrorPage(false);
+      }
+      
       $className = 'Module_'.ucfirst(Url_Request::getInstance()->getCategory()).'_Category';
       // načtení kategorie
       if(Url_Request::getInstance()->getUrlType() == Url_Request::URL_TYPE_CORE_MODULE AND class_exists($className)){ // Core Module
