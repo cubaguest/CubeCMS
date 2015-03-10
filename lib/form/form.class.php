@@ -182,6 +182,14 @@ class Form extends TrObject implements ArrayAccess, Iterator {
          unset ($this->elementsGroups[$key]['elements'][$name]);
       }
    }
+   
+   public function __clone()
+   {
+      // elementy se musí klonovat, jinak se používá jedna refence na element
+      foreach ($this->elements as $key => $element) {
+         $this->elements[$key] = clone $element;
+      }
+   }
 
       /**
     * Metoda vykreslí začáteční tag pro formulář (tag <form>)
