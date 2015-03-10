@@ -269,11 +269,10 @@ abstract class View extends TrObject {
       
       $this->tinyMCE = new Component_TinyMCE();
       if($theme instanceof Component_TinyMCE_Settings){
-         $formElement->html()->addClass("mceEditor_".$theme->getThemeName().'_'.$formElement->getName());
-         $theme->setSetting('editor_selector', 'mceEditor_'.$theme->getThemeName().'_'.$formElement->getName());
+         $formElement->html()->addClass("mceEditor_".$theme->getThemeName().'_'.$formElement->getName().'_'.$theme['height']);
+         $theme->setSetting('editor_selector', 'mceEditor_'.$theme->getThemeName().'_'.$formElement->getName().'_'.$theme['height']);
          $this->tinyMCE->setEditorSettings($theme);
       } else {
-         $formElement->html()->addClass("mceEditor_".$theme.'_'.$formElement->getName());
          switch ($theme) {
             case 'simple':
                $settings = new Component_TinyMCE_Settings_AdvSimple();
@@ -292,12 +291,13 @@ abstract class View extends TrObject {
                $settings->setSetting('height', '600');
                break;
          }
-         $settings->setSetting('editor_selector', 'mceEditor_'.$theme.'_'.$formElement->getName());
          if(!empty ($editorSettings)){
             foreach ($editorSettings as $name => $value) {
                $settings->setSetting($name, $value);
             }
          }
+         $formElement->html()->addClass("mceEditor_".$theme.'_'.$settings['height']);
+         $settings->setSetting('editor_selector', 'mceEditor_'.$theme.'_'.$settings['height']);
          if(!$this->category()->getRights()->isControll() OR !Auth::isLogin()){
             $this->tinyMCE->setConfig(Component_TinyMCE::CFG_ALLOW_INTERNAL_SOURCES, false);
             $this->tinyMCE->setConfig(Component_TinyMCE::CFG_ALLOW_INTERNAL_TPLS, false);
