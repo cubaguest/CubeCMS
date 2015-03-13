@@ -67,8 +67,8 @@ class File_Image_Gd extends File_Image_Base {
       // *** if option is 'crop', then crop too
       if ($option == self::RESIZE_CROP) {
          // *** Find center - this will be used for the crop
-         $cropStartX = ( $optimalWidth  / 2) - ( $w / 2 );
-         $cropStartY = ( $optimalHeight / 2) - ( $h / 2 );
+         $cropStartX = round(( $optimalWidth  / 2) - ( $w / 2 ));
+         $cropStartY = round(( $optimalHeight / 2) - ( $h / 2 ));
 
          // *** Now crop from center to exact requested size
          $imageCroped = imagecreatetruecolor($w , $h);
@@ -473,7 +473,7 @@ class File_Image_Gd extends File_Image_Base {
             $optimalHeight = $optionArray['optimalHeight'];
             break;
       }
-      return array('optimalWidth' => $optimalWidth, 'optimalHeight' => $optimalHeight);
+      return array('optimalWidth' => (int)round($optimalWidth), 'optimalHeight' => (int)round($optimalHeight));
    }
 
    private function getSizeByFixedHeight($newHeight)
