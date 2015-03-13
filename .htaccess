@@ -1,21 +1,67 @@
-#php_value memory_limit 48M
-
 RewriteEngine On
-# www redirect
-RewriteCond %{HTTP_HOST} !^www\.
-RewriteRule ^(.*)$ http://www.%{HTTP_HOST}/$1 [R=301,L]
+
+<IfModule mod_expires.c>
+   ExpiresActive On
+   ExpiresDefault A300
+   ExpiresByType image/x-icon A2592000
+   ExpiresByType application/x-javascript A3600
+   ExpiresByType text/css A604800
+   ExpiresByType image/gif A604800
+   ExpiresByType image/png A604800
+   ExpiresByType image/jpeg A604800
+   ExpiresByType text/plain A300
+   ExpiresByType application/x-shockwave-flash A604800
+   ExpiresByType video/x-flv A604800
+   ExpiresByType application/pdf A604800
+   ExpiresByType text/html A300
+</IfModule>
+
+<ifModule mod_headers.c>
+   <FilesMatch ".(eot|ttf|otf|woff)">
+      Header set Access-Control-Allow-Origin "*"
+   </FilesMatch>
+   <filesMatch "\.(css)$">
+      Header set Cache-Control "public"
+      Header set Cache-Control "max-age=604800"
+   </filesMatch>
+   <filesMatch "\.(ico|jpe?g|png|gif|swf|css|flv|pdf|eot|ttf|otf|woff)$">
+      Header set Cache-Control "public"
+      Header set Cache-Control "max-age=2592000"
+   </filesMatch>
+   <filesMatch "\.(js|json)$">
+      Header set Cache-Control "private"
+   </filesMatch>
+   <filesMatch "\.(x?html?|php|phtml)$">
+      Header set Cache-Control "private, max-age=60, must-revalidate"
+   </filesMatch>
+</ifModule>
+
+#CUBECMS
+
+#CUBECMS
+
+RewriteCond %{HTTP_HOST} ^sub.cube-cms.com$
+RewriteRule ^(.*)$ /subdomain/$1 [L,QSA]
+RewriteCond %{HTTP_HOST} ^pokus.com$
+RewriteRule ^(.*)$ http://www.pokus.com/$1 [R=301,L]
+RewriteCond %{HTTP_HOST} ^www.pokus.com$
+RewriteRule ^(.*)$ /wwwpokuscom/$1 [L,QSA]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^cache/imgc/([a-z0-9]+)/([x0-9]+c?(?:-f_[0-9]*(?:_[0-9]*)?(?:_[0-9]*)?(?:_[0-9]*)?(?:_[0-9]*)?)?)/(.+)$ index.php?internalApp=imagecacher&s=$3&tf=$1&is=$2 [L,R=302,QSA]
+
 
 RewriteRule ^config/config\.php$ / [R=permanent,L]
 RewriteCond %{REQUEST_URI} !\.[[:alnum:]]+$
 RewriteRule ^(.+[^/])$ /$1/ [L,R=301,QSA]
 
-# image cacher
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^cache/imgc/([a-z0-9]+)/([x0-9]+c?(?:-f_[0-9]*(?:_[0-9]*)?(?:_[0-9]*)?(?:_[0-9]*)?(?:_[0-9]*)?)?)/(.+)$ index.php?internalApp=imagecacher&s=$3&tf=$1&is=$2 [L,R=302,QSA]
+RewriteRule ^admin/$ /ucet/ [L,R=301,QSA]
+#RewriteRule ^login/$ /ucet/ [L,R=301,QSA]
 
 RewriteCond %{REQUEST_FILENAME} -s [OR]
 RewriteCond %{REQUEST_FILENAME} -l [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^.*$ - [NC,L]
-RewriteRule ^.*$ ./index.php [NC,L]
+RewriteRule ^.*$ /index.php [NC,L]
+
