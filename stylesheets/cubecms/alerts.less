@@ -1,0 +1,18 @@
+/* Hlášky */
+.message, .alert {
+   color: #fff;
+   font-size: 12px;
+   padding: 5px 5px 5px 40px;
+   background-repeat: no-repeat;
+   background-position: 11px 50%;
+   border-bottom: 2px transparent solid;
+   border-top: 2px transparent solid;
+   margin-bottom: 5px;
+   p { margin-bottom:3px; border-top: 1px solid gray;}
+   p:first-child { border: none;}
+}
+#infoMessages, .message-info, .alert-info { border-color: darken(@brand-success, 20%); background-color: @brand-success; background-image: url('@{dirCore}images/icons/accept.png');}
+#errMessages, .message-err, .alert-error { border-color: darken(@brand-danger, 20); background-color: @brand-danger; background-image: url('@{dirCore}images/icons/error.png');}
+.message-warning, .alert-warning { border-color: darken(@brand-warning, 20); background-color: @brand-warning; background-image: url('@{dirCore}images/icons/error.png');}
+#coreErrMessage { border-color: darken(@brand-danger, 40); background-color: darken(@brand-danger, 20); background-image: url('@{dirCore}images/icons/error.png');}
+
