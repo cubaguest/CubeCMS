@@ -63,7 +63,9 @@ class Forum_Controller extends Controller {
 //      }
       $model->columns(array('*','messages_count' => 'COUNT(`'.Forum_Model_Messages::COLUMN_ID.'`)'))
          ->groupBy(array(Forum_Model_Topics::COLUMN_ID))
-         ->join(Forum_Model_Topics::COLUMN_ID, 'Forum_Model_Messages', Forum_Model_Messages::COLUMN_ID_TOPIC,
+         //->join(Forum_Model_Topics::COLUMN_ID, 'Forum_Model_Messages', Forum_Model_Messages::COLUMN_ID_TOPIC,
+         ->join(Forum_Model_Topics::COLUMN_ID, 
+             array('fm' => 'SELECT * FROM '.$modelmessages->getTableName().' ORDER BY `message_date_add` DESC') , 'id_topic',
          array(Forum_Model_Messages::COLUMN_CREATED_BY,
             'sort_date' => 'IFNULL(MAX(`'.Forum_Model_Messages::COLUMN_DATE_ADD.'`), `'.Forum_Model_Topics::COLUMN_DATE_ADD.'`)',
             'last_message_date' => 'MAX(`'.Forum_Model_Messages::COLUMN_DATE_ADD.'`)' ))
