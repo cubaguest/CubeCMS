@@ -93,4 +93,21 @@ class Utils_Image {
       $size = getimagesize((string)$image); 
       return $size[0] / $size[1]; 
    }
+   
+   /**
+    * Vrací velikost obrázku. Stejně jako getimagesize()
+    * @param string|File $image
+    * @return array|bool
+    */
+   public static function getSize($image)
+   {
+      if(strpos((string)$image, 'http') === 0){
+         $image = str_replace(array(Url_Link::getWebURL(), '/'), array(AppCore::getAppWebDir(), DIRECTORY_SEPARATOR), (string)$image);
+      }
+      var_dump((string)$image);
+      if(is_file((string)$image)){
+         return getimagesize((string)$image); 
+      }
+      return false; 
+   }
 }
