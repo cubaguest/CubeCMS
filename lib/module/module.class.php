@@ -307,6 +307,10 @@ class Module
       $models = $this->getModels();
       if(!empty($models)){
          foreach ($models as $modelName) {
+            $class = new ReflectionClass($modelName);
+            if($class->isAbstract()){
+               continue;
+            }
             $model = new $modelName();
             if($model instanceof Model_ORM){
                $model->updateLangColumns($lang);
