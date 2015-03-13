@@ -170,6 +170,7 @@ class Url_Request {
    //		Vytvoření url
       $fullUrl = $_SERVER['REQUEST_URI'];
       $scriptName = $_SERVER["SCRIPT_NAME"];
+      $scriptName = '/'.pathinfo($scriptName, PATHINFO_BASENAME);
       self::$serverName = $_SERVER["HTTP_HOST"];
       if(isset($_SERVER["HTTPS"])){
          self::$transferProtocol = "https://";
