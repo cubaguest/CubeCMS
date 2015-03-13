@@ -119,6 +119,8 @@ try {
    header('Location: '.$cache_file_url.'?new');
 } catch (Exception $e) {
    // send original image? or resize in memory and send
-   $image->send();
+   if($image->exist()){
+      $image->send();
+   }
 }
 
