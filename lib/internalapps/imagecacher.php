@@ -88,6 +88,9 @@ include_once $libDir.'lib'.DIRECTORY_SEPARATOR.'fs'.DIRECTORY_SEPARATOR.'fs_dir.
 define('VVE_USE_IMAGEMAGICK', false);
 try {
    $image = new File_Image($webDir.$SOURCE);
+   if(!$image->exist()){
+      $image = new File_Image($libDir.$SOURCE);
+   }
 
    $resizeType = File_Image_Base::RESIZE_AUTO;
    if($SIZES['c'] == true){
