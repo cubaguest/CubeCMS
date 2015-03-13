@@ -610,6 +610,9 @@ class Template extends TrObject {
                   $filePath = $this->getTplPathFromModule($matches['filepath'], $matches['module'], $original);
                }
                if($directInclude == true){
+                  if(is_array($vars)){
+                     extract($vars);
+                  }
                   include $filePath;
                } else {
                   $this->templateFiles[$matches['file']] = $filePath;
@@ -656,7 +659,7 @@ class Template extends TrObject {
          }
 
       } else {
-         throw new UnexpectedValueException($this->tr('Nepodporovaný typ zdroje'));
+         throw new UnexpectedValueException($this->tr('Nepodporovaný typ zdroje: "'.$resource.'"'));
       }
    }
 
@@ -870,6 +873,8 @@ class Template extends TrObject {
             'sourceMap' => (VVE_DEBUG_LEVEL != 0),
             'sourceMapWriteTo'  => AppCore::getAppCacheDir().Template::STYLESHEETS_DIR.'/'.$rpFile.'.map',
             'sourceMapURL'      => Url_Link::getWebURL().'cache/'.Template::STYLESHEETS_DIR.'/'.$rpFile.'.map',
+            'sourceMapRootpath' => Url_Link::getWebURL(),
+            'sourceMapBasepath' => AppCore::getAppWebDir(),
             'import_dirs' => array( 
                Face::getCurrent()->getDir().'stylesheets/' => '/faces/'.Face::getCurrent()->getName()."/stylesheets/", // face styles 
                AppCore::getAppLibDir().'faces/'.Face::getCurrent()->getName()."/stylesheets/" => '/faces/'.Face::getCurrent()->getName()."/stylesheets/", // face styles 
@@ -930,6 +935,8 @@ class Template extends TrObject {
             'sourceMap' => (VVE_DEBUG_LEVEL != 0),
             'sourceMapWriteTo'  => AppCore::getAppCacheDir().$rpFile.'.map',
             'sourceMapURL'      => Url_Link::getWebURL().'cache/'.Template::STYLESHEETS_DIR.'/'.$rpFile.'.map',
+            'sourceMapRootpath' => Url_Link::getWebURL(),
+            'sourceMapBasepath' => AppCore::getAppWebDir(),
             'import_dirs' => array( 
                Face::getCurrent()->getDir().'stylesheets/' => '/faces/'.Face::getCurrent()->getName()."/stylesheets/", // face styles 
                AppCore::getAppLibDir().'faces/'.Face::getCurrent()->getName()."/stylesheets/" => '/faces/'.Face::getCurrent()->getName()."/stylesheets/", // face styles 
