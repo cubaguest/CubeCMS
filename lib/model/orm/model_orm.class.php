@@ -10,7 +10,7 @@
  * 						$LastChangedBy: $ $LastChangedDate: $
  * @abstract 		Třída pro práci s modelem v databázi (ORM)
  */
-class Model_ORM extends Model implements ArrayAccess {
+abstract class Model_ORM extends Model implements ArrayAccess {
    const DB_TABLE = null;
 
    const ORDER_ASC = 'ASC';
@@ -96,7 +96,13 @@ class Model_ORM extends Model implements ArrayAccess {
 
    protected static $tablesLocked = array();
 
-   public function __construct()
+   protected $params = array();
+
+   /**
+    * 
+    * @param array $params - nepovinné parametry modelu, např datový adresář a podobně
+    */
+   public function __construct($params = array())
    {
       parent::__construct();
       $this->selectedColumns = array();
@@ -112,6 +118,8 @@ class Model_ORM extends Model implements ArrayAccess {
       $this->bindValues = array();
       $this->fetchingDbst = false;
 
+      $this->params = $params;
+      
       $this->_initTable();
       if($this->rowClass == 'Model_ORM_Record' && class_exists(get_class($this).'_Record')){
          $this->rowClass = get_class($this).'_Record';
