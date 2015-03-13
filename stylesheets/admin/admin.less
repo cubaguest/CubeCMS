@@ -871,6 +871,58 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
       margin: 0;
       padding: 0;
    }
+   /*
+   Blokový vidget - něco jako dlaždice
+   */
+   &.cubecms-list-blocks { 
+      .cubecms-list-block {
+         .header {
+            a {
+               text-decoration: none;
+            }
+            > h2, > h3, > h4 {
+               margin: 0;
+               font-size: @font-size;
+            }
+            .sort {
+               float: left;
+               margin: 0 @padding-widget;
+               cursor: move;
+            }
+            .name {
+               font-weight: bold;
+            }
+            .tools {
+
+            }
+            padding: 0;
+            margin: 0;
+            width: 100% !important;
+            /*background-color: @color-bg-header;*/
+            border-bottom: 1px solid @color-border;
+            padding: @padding-widget;
+         }
+         .content {
+            padding: @padding-widget;
+         }
+         .footer {
+            padding: @padding-widget;
+            border-top: 1px solid @color-border;
+         }
+         .header + .footer {
+            border-top: 0px none transparent;
+         }
+         &:hover {
+            border-color: @color-border-hover;
+            background-color: @color-bg-hover-light;
+            /*color: @color-text-hover;*/
+         }
+         background-color: @color-bg;
+         border: 1px solid @color-border;
+         margin-bottom: @padding-widget;
+         .rounded-corners();
+      }
+   }
    &.cubecms-widget-sorting {
       .rounded-corners();
       border: 1px solid @color-border;
