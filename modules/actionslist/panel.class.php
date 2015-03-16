@@ -35,12 +35,11 @@ class ActionsList_Panel extends Panel {
 
    public static function settingsController(&$settings,Form &$form) {
       // kategorie
-      $catM = new Model_Category();
       $modules = array('actions', 'actionswgal');
       $results = array();
       foreach ($modules as $module){
-         $cats = $catM->getCategoryListByModule($module);
-         while($cat = $cats->fetch()){
+         $cats = Model_Category::getCategoryListByModule($module);
+         foreach($cats as $cat) {
             $results[(string)$cat->{Model_Category::COLUMN_CAT_LABEL}] = $cat->{Model_Category::COLUMN_CAT_ID};
          }
       }
