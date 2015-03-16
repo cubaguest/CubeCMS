@@ -371,7 +371,7 @@ class JsPlugin_JQuery extends JsPlugin {
       $this->addUICore();
       $this->addUISlider();
       $this->addUIDatepicker();
-      $this->addJs("ui.timepicker");
+      $this->addJQPlugin("timepicker");
       if(Locales::getLang() != "en"){
          $this->addFile(new JsPlugin_JsFile("jquery.ui.timepicker-" . Locales::getLang() . ".js", false, 'ui/i18n/'));
       }
