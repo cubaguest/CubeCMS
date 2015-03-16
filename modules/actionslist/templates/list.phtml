@@ -1,125 +1,132 @@
 <?php 
-$this->addPageTitle(vve_date("%x", $this->dateFrom).' - '.vve_date("%x", $this->dateTo));
+$dateRangeStr = null;
+$dateRangeStr = vve_date("%x", $this->dateStart);
+if($this->dateStart->format('Y-m-d') != $this->dateEnd->format('Y-m-d')){
+   $dateRangeStr .= ' - '.vve_date("%x", $this->dateEnd);
+}
 
-if($this->category()->getRights()->isWritable()) {?>
-<div id="gotoAddList" style="display: none"></div>
-   <?php }?>
-<h1><?php echo $this->category->getName().' - '.vve_date("%x", $this->dateFrom).' - '.vve_date("%x", $this->dateTo);?></h1>
-<div>
-   <?php if($this->text != false){?>
-   <div>
-      <?php echo $this->text->{Text_Model_Detail::COLUMN_TEXT}?>
-   </div>
-   <?php }?>
-
-   <?php while ($row = $this->actions->fetch()) {
-      if($row->{Actions_Model_Detail::COLUMN_PUBLIC}) $class = "";
-      else $class = 'nonPublicAction';
-      $subLabel = $row->{Actions_Model_Detail::COLUMN_NAME};
-      if($row->{Actions_Model_Detail::COLUMN_SUBANME} != null) {
-         $subLabel = '<span class="articleSubLabel">'.$row->{Actions_Model_Detail::COLUMN_SUBANME}.'</span><br />'.$subLabel;
-      }
-      if($row->{Model_Category::COLUMN_DATADIR} != null) {
-         $dataDir = AppCore::getAppWebDir().VVE_DATA_DIR.URL_SEPARATOR
-                 .$row->{Model_Category::COLUMN_DATADIR}.URL_SEPARATOR;
-      } else {
-         $dataDir = AppCore::getAppWebDir().VVE_DATA_DIR.URL_SEPARATOR
-                 .$row->{Model_Category::COLUMN_MODULE}.URL_SEPARATOR;
-      }
-
-      ?>
-   <div class="<?php echo $class?>">
-      <h2><a href="<?php echo $this->link()->category($row->curlkey)
-                        ->route('detail', array('urlkey' => $row->{Actions_Model_Detail::COLUMN_URLKEY}))?>"
-             title="<?php echo $row->{Actions_Model_Detail::COLUMN_NAME}?>"
-             ><?php echo $subLabel?></a></h2>
-            <?php if($row->{Actions_Model_Detail::COLUMN_AUTHOR} != null) {?>
-      <p>
-               <?php echo $row->{Actions_Model_Detail::COLUMN_AUTHOR}?>
-      </p>
-            <?php }?>
-      <p>
-            <?php 
-            $startDate = vve_date("%x", new DateTime($row->{Actions_Model_Detail::COLUMN_DATE_START}));
-            $stopDate = vve_date("%x", new DateTime($row->{Actions_Model_Detail::COLUMN_DATE_STOP}));
-            print ($startDate);
-            if($startDate != $stopDate AND $row->{Actions_Model_Detail::COLUMN_DATE_STOP} != null) {
-               print ("&nbsp;&mdash;&nbsp;");
-               print ($stopDate);
-            }
-            if($row->{Actions_Model_Detail::COLUMN_TIME} != '00:00:00'|null) {
-               $time = new DateTime($row->{Actions_Model_Detail::COLUMN_TIME});
-               print (",&nbsp;".$time->format("G:i"));
-            }
-            if($row->{Actions_Model_Detail::COLUMN_PLACE} != null) {
-               print ',&nbsp;'.$row->{Actions_Model_Detail::COLUMN_PLACE};
-            }
-            if((int)$row->{Actions_Model_Detail::COLUMN_PRICE} != null|0) {
-               printf(',&nbsp;'.strtolower($this->_('Vstupné: %d Kč')),$row->{Actions_Model_Detail::COLUMN_PRICE});
-            }
-            if((int)$row->{Actions_Model_Detail::COLUMN_PREPRICE} != null|0) {
-               printf(',&nbsp;'.strtolower($this->_('V předprodeji: %d Kč')),$row->{Actions_Model_Detail::COLUMN_PREPRICE});
-            }
-            ?>
-      </p>
-      <?php if($row->{Actions_Model_Detail::COLUMN_NOTE} != null) {?>
-      <p><?php echo $row->{Actions_Model_Detail::COLUMN_NOTE}?></p>
-            <?php }?>
-      <p>
-            <?php 
-            if($row->{Actions_Model_Detail::COLUMN_IMAGE} != null) {
-               print (vve_tpl_image_tag($dataDir.$row[Actions_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]
-                       .DIRECTORY_SEPARATOR.$row->{Actions_Model_Detail::COLUMN_IMAGE}, 'image', 50,50, 'actionImage'));
-            }
-            ?>
-            <?php echo vve_tpl_xhtml_cut(strip_tags($row->{Actions_Model_Detail::COLUMN_TEXT},'<br><a><b><strong><em><i>'), 600);?>
-      </p>
-      <p style="text-align: right">
-         <a href="<?php echo $this->link()->route('detail',
-                       array('urlkey' => $row->{Actions_Model_Detail::COLUMN_URLKEY}))?>"
-            title="<?php echo $this->_('Více')?>"><?php echo $this->_('Více')?></a>
-      </p>
-   </div>
-
-      <?php }?>
-
-   &laquo;<a href="<?php echo $this->linkBack?>" title="<?php echo $this->linkBackLabel?>"><?php echo $this->linkBackLabel?></a>&nbsp;&brvbar;&nbsp;
-   <a href="<?php echo $this->linkNext?>" title="<?php echo $this->linkNextLabel?>"><?php echo $this->linkNextLabel?></a>&raquo;
-
+$this->addPageTitle($dateRangeStr);
+?>
+<div class="">
+   <?php
+   echo $this->toolbox; // tolbox pro přidání
+   ?>
+   <h1><?ps($this->category->getName().', '.$dateRangeStr)?></h1>
    <?php 
-   if($this->category()->getRights()->isWritable()) {
-      $toolbox = new Template_Toolbox();
-      if($this->category()->getRights()->isControll()) {
-         $toolbox->addTool('edit_action_text', $this->_("Upravit úvodní text"),
-                 $this->link()->route('editlabel'),
-                 $this->_("Upravit úvodní text"), "page_edit.png");
+   if($this->text != false) {?>
+   <div class="text">
+         <?php 
+         echo $this->text->{Text_Model_Detail::COLUMN_TEXT};
+         echo $this->toolboxText; // toolbox pro úpravu úvodního textu
+         ?>
+   </div>
+   <?}?>
+   <?php if(!empty ($this->actions)){?>
+   <div class="post-list events-list">
+   <?php 
+   foreach ($this->actions as $row) {
+      if($row->{Actions_Model::COLUMN_PUBLIC}) {
+         $class = "";
+      } else {
+         $class = 'main-content-no-public';
       }
-      $toolbox->addTool('add_action', $this->_("Přidat akci"),
-              $this->link()->route('add'),
-              $this->_("Přidat novou akci"), "page_add.png");
-      $this->includeTplObj($toolbox);
+      $subLabel = $row->{Actions_Model::COLUMN_NAME};
+      if($row->{Actions_Model::COLUMN_SUBANME} != null) {
+         $subLabel = '<span class="">'.$row->{Actions_Model::COLUMN_SUBANME}.'</span><br />'.$subLabel;
+      }
+      
+      $image = null;
+      if ($row->{Actions_Model::COLUMN_IMAGE} != null) {
+         $imgSrc = vve_image_cacher(vve_tpl_art_title_image($row->{Actions_Model::COLUMN_IMAGE}), 300, 225);
+         $imgAlt = htmlspecialchars($row->{Actions_Model::COLUMN_NAME});
+         $image = "<img src=\"$imgSrc\" alt=\"$imgAlt\" class=\"img_inner fleft\" />";
+      }
+      // vars
+      $startDate = new DateTime($row->{Actions_Model::COLUMN_DATE_START});
+      $stopDate = new DateTime($row->{Actions_Model::COLUMN_DATE_STOP});
+      $link = $this->link()->category($row->curlkey)->route('detail', array('urlkey' => $row->{Actions_Model::COLUMN_URLKEY}));
       ?>
-
-   <script type="text/javascript">
-      /* <![CDATA[ */
-      $('input[name=add_action]').click(function(){
-         var jParent = $(this).parents('div.toolbox');
-         if(jParent.data('isSelect') != true){
-            var $selectBox = $('<div></div>').attr('id', 'toolSelAddCat');
-            $selectBox.load('<?php echo $this->link()->route('listCatAdd')?>',null,function(){
-               $selectBox.find('select').bind('change', function(){
-                  $(this).parent('form').attr('action', $(this).val()).submit();
-               });
-            });
-            jParent.data('isSelect', true).append($selectBox);
-         } else {
-            $('#toolSelAddCat').remove();
-            jParent.data('isSelect', false);
+      <div class="blog">
+         <time class="time1" datetime="<?=$startDate->format('Y-m-d')?>"><?=$startDate->format('d')?><span>/<?=$startDate->format('m')?></span></time>
+         <?
+         if($row->{Actions_Model::COLUMN_DATE_STOP} != null && $startDate != $stopDate){
+            ?>
+         <time class="time1" datetime="<?=$stopDate->format('Y-m-d')?>">&mdash; <?=$stopDate->format('d')?><span>/<?=$stopDate->format('m')?></span></time>
+            <?php 
          }
-         return false;
-      });
-      /* ]]> */
-   </script>
-
-      <?php }?>
+         ?>
+         <div class="extra_wrapper">
+            <p class="p1 col1"><strong><a href="<?=$link?>"><?=$row->{Actions_Model::COLUMN_NAME}?></a></strong></p>
+            <?
+            if($row->{Actions_Model::COLUMN_TIME} != null) {
+               $time = new DateTime($row->{Actions_Model::COLUMN_TIME});
+               ?>
+               <span class="time">
+                  <?ps($this->tr('Začátek:').' '.$time->format("G:i").', ');?>
+               </span>
+               <?
+            }
+            if($row->{Actions_Model::COLUMN_AUTHOR} != null) {?>
+               <span class="author">
+                  <?php ps($this->tr('Účinkují:')); ?> <?=$row->{Actions_Model::COLUMN_AUTHOR}?>
+               </span>
+            <?}?>
+         </div>
+         <div class="clear cl1"></div>
+         <?=$image?>
+         <div class="extra_wrapper">
+            <?=  vve_tpl_truncate(strip_tags($row->{Actions_Model::COLUMN_TEXT}), 200);?><br/>
+            <a href="<?=$link?>" class="btn"><?php ps($this->tr('Číst více')); ?></a>
+         </div>
+         <div class="clear"></div>
+      </div>
+      <?php }
+      ?>
+   </div>
+   <?php 
+   } else if(!$this->category()->getParam(Actions_Controller::PARAM_SHOW_EVENT_DIRECTLY, false)) {?>
+      <div class="text"><?php echo $this->tr('Není žádná aktuální nebo nadcházející událost')?></div> 
+   <?php } 
+   
+   if(!$this->category()->getParam(Actions_Controller::PARAM_SHOW_EVENT_DIRECTLY, false)
+      && !$this->category()->getParam(Actions_Controller::PARAM_SHOW_ALL_EVENTS, false)){
+      
+      $labelNext = $this->tr('Následující');
+      $labelPrev = $this->tr('Předchozí');
+//      if($this->windowType == 'month') {
+         $labelNextMonth = $this->tr('Následující měsíc');
+         $dateNextStart = clone $this->dateEnd;
+         $dateNextEnd = clone $dateNextStart;
+         $dateNextEnd->modify('+1 month');
+         
+         $linkNextMonth = $this->link()->route('list', array(
+             'fromyear' => $dateNextStart->format('Y'),
+             'frommonth' => $dateNextStart->format('m'),
+             'fromday' => $dateNextStart->format('d'),
+             'toyear' => $dateNextEnd->format('Y'),
+             'tomonth' => $dateNextEnd->format('m'),
+             'today' => $dateNextEnd->format('d'),
+             ));
+         $datePrevStart = clone $this->dateStart;
+         $datePrevStart->modify('-1 month');
+         $datePrevEnd = clone $this->dateStart;
+         
+         $labelPrevMonth = $this->tr('Předchozí měsíc');
+         $linkPrevMonth = $this->link()->route('list', array(
+             'fromyear' => $datePrevStart->format('Y'),
+             'frommonth' => $datePrevStart->format('m'),
+             'fromday' => $datePrevStart->format('d'),
+             'toyear' => $datePrevEnd->format('Y'),
+             'tomonth' => $datePrevEnd->format('m'),
+             'today' => $datePrevEnd->format('d'),
+             ));
+//      }
+      ?>
+      <div class="scroll-links">
+         <a class="left-link" href="<?=$linkPrevMonth?>" title="<?=$labelPrevMonth?>"><span class="icon icon-chevron-left"></span> <?=$labelPrevMonth?></a>
+         <a class="right-link" href="<?=$linkNextMonth?>" title="<?=$labelNextMonth?>"><?=$labelNextMonth?> <span class="icon icon-chevron-right"></span></a>
+      </div>
+   <?
+   
+   }?>
 </div>
