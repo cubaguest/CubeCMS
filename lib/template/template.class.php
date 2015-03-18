@@ -933,8 +933,8 @@ class Template extends TrObject {
          $options = array( 
             'relativeUrls' => false,
             'sourceMap' => (VVE_DEBUG_LEVEL != 0),
-            'sourceMapWriteTo'  => AppCore::getAppCacheDir().$rpFile.'.map',
-            'sourceMapURL'      => Url_Link::getWebURL().'cache/'.Template::STYLESHEETS_DIR.'/'.$rpFile.'.map',
+            'sourceMapWriteTo'  => AppCore::getAppCacheDir().Template::STYLESHEETS_DIR.'/'.$module.'-'.$rpFile.'.map',
+            'sourceMapURL'      => Url_Link::getWebURL().'cache/'.Template::STYLESHEETS_DIR.'/'.$module.'-'.$rpFile.'.map',
             'sourceMapRootpath' => Url_Link::getWebURL(),
             'sourceMapBasepath' => AppCore::getAppWebDir(),
             'import_dirs' => array( 
