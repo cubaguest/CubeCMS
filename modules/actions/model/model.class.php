@@ -168,4 +168,15 @@ class Actions_Model extends Model_ORM {
           ->limit($fromRow, $limit)
           ->records();
    }
+   
+   /**
+    * Vrací akci podle klíče v url
+    * @param string $urlkey
+    * @return Model_ORM_Record
+    */
+   public static function getByUrlkey($urlkey)
+   {
+      $model = new self();
+      return $model->where(self::COLUMN_URLKEY." = :ukey", array('ukey' => $urlkey))->record();
+   }
 }

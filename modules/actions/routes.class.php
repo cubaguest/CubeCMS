@@ -15,6 +15,8 @@ class Actions_Routes extends Routes {
           );
       // editace akce
       $this->addRoute('edit', "::urlkey::/edit", 'edit','{urlkey}/edit/');
+      // přesun akce
+      $this->addRoute('move', "::urlkey::/move", 'move','{urlkey}/move/');
 
       // editace akce
       $this->addRoute('editlabel', "editlabel", 'editLabel','editlabel/');

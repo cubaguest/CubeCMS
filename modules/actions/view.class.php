@@ -44,6 +44,11 @@ class Actions_View extends View {
       $this->template()->addFile("tpl://detail.phtml");
       Template_Navigation::addItem($this->action->{Actions_Model::COLUMN_NAME}, $this->link());
    }
+   
+   public function moveView() {
+      $this->template()->addFile("tpl://actions:move.phtml");
+      Template_Navigation::addItem($this->action->{Actions_Model::COLUMN_NAME}, $this->link(), true);
+   }
 
    public function previewView() {
       $this->addMetaTags($this->action);
@@ -78,6 +83,11 @@ class Actions_View extends View {
          $this->link()->route('edit'));
          $toolEdit->setIcon('page_edit.png')->setTitle($this->tr('Upravit akci'));
          $this->toolbox->addTool($toolEdit);
+         
+         $toolMove = new Template_Toolbox2_Tool_PostRedirect('move_action', $this->tr("Přesunout"),
+         $this->link()->route('move'));
+         $toolMove->setIcon(Template_Toolbox2::ICON_MOVE)->setTitle($this->tr('Přesunout akci do jiné kateogrie'));
+         $this->toolbox->addTool($toolMove);
 
          $tooldel = new Template_Toolbox2_Tool_Form($this->formDelete);
          $tooldel->setIcon('page_delete.png')->setTitle($this->tr('Smazat'))

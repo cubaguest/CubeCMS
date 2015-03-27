@@ -36,6 +36,24 @@ class ActionsWGal_Controller extends Actions_Controller {
       $this->infoMsg()->addMessage(sprintf($this->tr('Akce "%s" byla smazána'), $action->{Actions_Model::COLUMN_NAME}));
       $this->link()->reload($this->view()->linkBack);
    }
+   
+   protected function moveEvent(Model_ORM_Record $event, $targetCatID)
+   {
+      parent::moveEvent($event, $targetCatID);
+      $dir = new FS_Dir(self::getActionImgDir($event), $this->category()->getModule()->getDataDir());
+      if($dir->exist()){
+         $newCat = Category_Structure::getStructure(Category_Structure::ALL)->getCategory($targetCatID)->getCatObj();
+         FS_Dir::checkStatic($newCat->getModule()->getDataDir());
+         $newDir = $newCat->getModule()->getDataDir();
+         $dir->move($newDir);
+         
+         $model = new PhotoGalery_Model_Images();
+         $model
+             ->where(PhotoGalery_Model_Images::COLUMN_ID_CAT." = :idc", array('idc' => $this->category()->getId()))
+             ->update(array(PhotoGalery_Model_Images::COLUMN_ID_CAT => $newCat->getId()));
+         
+      }
+   }
 
    /**
     * Metoda pro přípravu spuštění registrovaného modulu

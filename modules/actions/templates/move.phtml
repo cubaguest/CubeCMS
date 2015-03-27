@@ -1,0 +1,12 @@
+<?php 
+// do titulku
+$this->addPageTitle($this->tr('Přesun'));
+$this->addPageTitle($this->action->{Actions_Model::COLUMN_NAME});
+$h1 = sprintf( $this->tr('Přesun události "%s"'), $this->action->{Actions_Model::COLUMN_NAME});
+?>
+<h1><?php echo $h1?></h1>
+<div class="main-content-form-edit" id="editArticleForm">
+   <?php
+   echo($this->form);
+   ?>
+</div>

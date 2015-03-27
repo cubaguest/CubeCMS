@@ -145,7 +145,7 @@ class Actions_Model_List extends Model_PDO {
               ." AS curlkey, cat.".Model_Category::COLUMN_DATADIR.", cat.".Model_Category::COLUMN_MODULE.","
               ." user.".Model_Users::COLUMN_USERNAME.","
               ." ABS(DATEDIFF( IF(".Actions_Model_Detail::COLUMN_DATE_STOP." = NULL, ".Actions_Model_Detail::COLUMN_DATE_START.", ".Actions_Model_Detail::COLUMN_DATE_STOP."), :dateStart)) AS delta_days,"
-              ." IF(actions.`time`,actions.`time`, '23:59:59') AS timeord"
+              ." IF(actions.`".Actions_Model_Detail::COLUMN_TIME."`,actions.`".Actions_Model_Detail::COLUMN_TIME."`, '23:59:59') AS timeord"
               ." FROM ".Db_PDO::table(Actions_Model_Detail::DB_TABLE)." AS actions"
               ." JOIN ".$this->usersTable." AS user ON actions.".Actions_Model_Detail::COLUMN_ID_USER
               ." = user.".Model_Users::COLUMN_ID
@@ -159,7 +159,7 @@ class Actions_Model_List extends Model_PDO {
 //      OR (ISNULL(`stop_date`) = 1 AND start_date > '2010-03-10' AND start_date < '2010-09-10'))
               ." AND ( (ISNULL(`".Actions_Model_Detail::COLUMN_DATE_STOP."`) = 0 AND ".Actions_Model_Detail::COLUMN_DATE_START." <= :dateStart AND ".Actions_Model_Detail::COLUMN_DATE_STOP." >= :dateStart)"
               ." OR (ISNULL(`".Actions_Model_Detail::COLUMN_DATE_STOP."`) = 0 AND ".Actions_Model_Detail::COLUMN_DATE_START." >= :dateStart AND ".Actions_Model_Detail::COLUMN_DATE_START." <= :dateStop)"
-              ." OR (ISNULL(`".Actions_Model_Detail::COLUMN_DATE_STOP."`) = 1 AND ".Actions_Model_Detail::COLUMN_DATE_START." = :dateStart AND `time` >= CURTIME())"
+              ." OR (ISNULL(`".Actions_Model_Detail::COLUMN_DATE_STOP."`) = 1 AND ".Actions_Model_Detail::COLUMN_DATE_START." = :dateStart AND `".Actions_Model_Detail::COLUMN_TIME."` >= CURTIME())"
               ." OR (ISNULL(`".Actions_Model_Detail::COLUMN_DATE_STOP."`) = 1 AND ".Actions_Model_Detail::COLUMN_DATE_START." > :dateStart AND ".Actions_Model_Detail::COLUMN_DATE_START." < :dateStop) )"
 //              ." AND ( (ISNULL(`".Actions_Model_Detail::COLUMN_TIME."`) AND ".Actions_Model_Detail::COLUMN_DATE_START." >= :dateStart AND ".Actions_Model_Detail::COLUMN_DATE_START." <= :dateStop)"
 //              ." OR (".Actions_Model_Detail::COLUMN_DATE_START." = :dateStart AND `".Actions_Model_Detail::COLUMN_TIME."` >= CURTIME())"

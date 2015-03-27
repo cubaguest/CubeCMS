@@ -3,7 +3,7 @@
  * Třída modelu akcí
  * @deprecated since version 8.0.0 use Actions_Model
 */
-class Actions_Model_Detail extends Model_PDO {
+class Actions_Model_Detail extends Actions_Model {
    /**
     * Tabulka s detaily
     */
@@ -163,47 +163,4 @@ class Actions_Model_Detail extends Model_PDO {
       $dbst->bindParam(':id', $idAction, PDO::PARAM_INT);
       return $dbst->execute();
    }
-
-   /**
-    * Metoda vyhledává články -- je tu kvůli zbytečnému nenačítání modelu List
-    * @param integer $idCat
-    * @param string $string
-    * @param bool $publicOnly
-    * @return PDOStatement
-    */
-   public function search($idCat, $string, $publicOnly = true) {
-      $dbc = Db_PDO::getInstance();
-      $clabel = self::COLUMN_NAME.'_'.Locales::getLang();
-      $sublabel = self::COLUMN_SUBANME.'_'.Locales::getLang();
-      $author = self::COLUMN_AUTHOR;
-      $ctext = self::COLUMN_TEXT_CLEAR.'_'.Locales::getLang();
-      $cplace = self::COLUMN_PLACE;
-
-      $wherePub = null;
-      if($publicOnly) {
-         $wherePub = ' AND '.self::COLUMN_PUBLIC.' = 1';
-      }
-
-      $dbst = $dbc->prepare('SELECT *, ('.round(VVE_SEARCH_ARTICLE_REL_MULTIPLIER)
-              .' * (MATCH('.$clabel.') AGAINST (:sstring) + MATCH('.$sublabel.') AGAINST (:sstring))'
-              .' + MATCH('.$ctext.') AGAINST (:sstring) + MATCH('.$cplace.') AGAINST (:sstring))'
-              .' + MATCH('.$author.') AGAINST (:sstring) AS '.Search::COLUMN_RELEVATION
-              .' FROM '.Db_PDO::table(self::DB_TABLE)
-              .' WHERE MATCH('.$clabel.', '.$sublabel.', '.$author.', '.$ctext.', '.$cplace.') AGAINST (:sstring IN BOOLEAN MODE)'
-              .' AND `'.self::COLUMN_ID_CAT.'` = :idCat'
-              .$wherePub // Public articles
-              .' ORDER BY '.round(VVE_SEARCH_ARTICLE_REL_MULTIPLIER)
-              .' * (MATCH('.$clabel.') AGAINST (:sstring) + MATCH('.$sublabel.') AGAINST (:sstring))'
-              .' + MATCH('.$author.') AGAINST (:sstring)'
-              .' + MATCH('.$ctext.') AGAINST (:sstring)'
-              .' + MATCH('.$cplace.') AGAINST (:sstring) DESC');
-
-      $dbst->bindValue(':idCat', $idCat, PDO::PARAM_INT);
-      $dbst->bindValue(':sstring', $string, PDO::PARAM_STR);
-      $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
-      $dbst->execute();
-      return $dbst;
-   }
 }
-
-?>

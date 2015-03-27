@@ -375,7 +375,73 @@ class Actions_Controller extends Controller {
       $this->view()->form = $form;
       $this->view()->edit = false;
    }
+   
+   /**
+    * Kontroler pro přesun akce mezi kategoriemi
+    */
+   public function moveController($urlkey)
+   {
+      $this->checkWritebleRights();
 
+      $event = Actions_Model::getByUrlkey($urlkey);
+      
+      if(!$event){
+         throw new UnexpectedPageException();
+      }
+      
+      $form = new Form('action_move_');
+      $elemId = new Form_Element_Hidden('id');
+      $elemId->setValues($event->{Actions_Model::COLUMN_ID});
+      $form->addElement($elemId);
+      
+//      $cats = Model_Category::getCategoryListByModule(array('actions', 'actionswgal'));
+      $eNewCat = new Form_Element_Select('idcat', $this->tr('Nová kateogrie'));
+      $struct = Category_Structure::getStructure();
+      $ret = $this->getSimilarCats($struct);
+      $eNewCat->setOptions($ret);
+      
+      $eNewCat->setValues($this->category()->getId());
+      $form->addElement($eNewCat);
+      
+      $eSave = new Form_Element_SaveCancel('save');
+      $form->addElement($eSave);
+          
+      if($form->isSend() && $form->save->getValues() == false){
+         $this->link()->route('show')->redirect();
+      }
+
+      if($form->isValid()) {
+         $this->moveEvent($event, $form->idcat->getValues());
+         $catkey = Category_Structure::getStructure()->getCategory($form->idcat->getValues())->getCatObj()->getUrlKey();
+         $this->infoMsg()->addMessage($this->tr('Akce byla přesunuta'));
+         $this->log(sprintf('Přesun akce %s id: %s mezi kategoriemi', $event->{Actions_Model::COLUMN_NAME}, $event->getPK()));
+         $this->link()->category($catkey)->route('detail')->redirect();
+      }
+      $this->view()->form = $form;
+      $this->view()->action = $event;
+   }
+   
+   protected function moveEvent(Model_ORM_Record $event, $targetCatID)
+   {
+      $event->{Actions_Model::COLUMN_ID_CAT} = $targetCatID;
+      $event->save();
+   }
+   
+   protected function getSimilarCats($struct, &$ret = array(), $level = 0) 
+   {
+      foreach ($struct as $item) {
+         /* @var $item Category_Structure */
+         if(in_array($item->getCatObj()->getModule()->getName(), array('actions', 'actionswgal')) && $item->getId() != $this->category()->getId()){
+            $ret[$item->getId()] = str_repeat('...', $level).$item->getCatObj()->getName()." (ID: ".$item->getId().')';
+         }
+         if(!$item->isEmpty()){
+            $this->getSimilarCats($item, $ret, $level+1);
+         }
+      }
+      return $ret;
+   }
+
+   
    /**
     * controller pro úpravu akce
     */
