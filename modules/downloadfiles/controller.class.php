@@ -152,6 +152,69 @@ class DownloadFiles_Controller extends Controller {
       $this->view()->file = $fileRec;
    }
 
+   public function moveController($id)
+   {
+      $this->checkWritebleRights();
+
+      $file = DownloadFiles_Model::getRecord($id);
+      
+      if(!$file){
+         throw new UnexpectedPageException();
+      }
+      
+      $form = new Form('action_move_');
+      $elemId = new Form_Element_Hidden('id');
+      $elemId->setValues($file->{DownloadFiles_Model::COLUMN_ID});
+      $form->addElement($elemId);
+      
+//      $cats = Model_Category::getCategoryListByModule(array('actions', 'actionswgal'));
+      $eNewCat = new Form_Element_Select('idcat', $this->tr('Nová kateogrie'));
+      $struct = Category_Structure::getStructure();
+      $ret = $this->getSimilarCats($struct);
+      $eNewCat->setOptions($ret);
+      
+      $eNewCat->setValues($this->category()->getId());
+      $form->addElement($eNewCat);
+      
+      $eSave = new Form_Element_SaveCancel('save');
+      $form->addElement($eSave);
+          
+      if($form->isSend() && $form->save->getValues() == false){
+         $this->link()->route()->redirect();
+      }
+
+      if($form->isValid()) {
+         $newCat = Category_Structure::getStructure()->getCategory($form->idcat->getValues())->getCatObj();
+         
+         $fileObj = new File($file->{DownloadFiles_Model::COLUMN_FILE}, $this->category()->getModule()->getDataDir());
+         $fileObj->move($newCat->getModule()->getDataDir());
+         
+         $file->{DownloadFiles_Model::COLUMN_ID_CATEGORY} = $form->idcat->getValues();
+         $file->{DownloadFiles_Model::COLUMN_FILE} = $fileObj->getName(); // kvůli duplicitním souborům
+         $file->save();
+         
+         $this->infoMsg()->addMessage($this->tr('Soubor byl přesunut'));
+         $this->log(sprintf('Přesun souboru %s id: %s mezi kategoriemi', $file->{DownloadFiles_Model::COLUMN_NAME}, $file->getPK()));
+         $this->link()->category($newCat->getUrlKey())->route()->redirect();
+      }
+      $this->view()->form = $form;
+      $this->view()->file = $file;
+   }
+   
+   protected function getSimilarCats($struct, &$ret = array(), $level = 0) 
+   {
+      foreach ($struct as $item) {
+         /* @var $item Category_Structure */
+         if(in_array($item->getCatObj()->getModule()->getName(), array('downloadfiles'))){
+            $ret[$item->getId()] = str_repeat('...', $level).$item->getCatObj()->getName()." (ID: ".$item->getId().')';
+         }
+         if(!$item->isEmpty()){
+            $this->getSimilarCats($item, $ret, $level+1);
+         }
+      }
+      return $ret;
+   }
+   
    private function createForm(Model_ORM_Record $fileObj = null)
    {
       $form = new Form('dwfile_');
