@@ -245,11 +245,31 @@ CubeCMS.ToolBox = {
    enablePageTracking : true,
    toolboxTop : 30,
    init : function() {
+      var that = this;
+      // pokud je ajax, reinicializovat znovu toolboxy, které nejsou
+      $( document ).ajaxComplete(function( event, xhr, settings ) {
+         that.initHtml();
+         that.initEvents();
+         that.initLangLoader();
+         that.initFixedBoxs();
+      });
+      
+      
+      this.initHtml();
+      this.initEvents();
+      this.initLangLoader();
+      this.initFixedBoxs();
+   },
+   initHtml : function() {
       // rodiče musí mít relativní pozici kvůli posunu
       $("div.toolbox").parent('div').css({position: 'relative'});
 
       // přesun toolboxu přímo do body kvůli overflow
       $('.toolbox').each(function(){
+         if($(this).data('_ccms_loaded')){
+            return;
+         }
+         $(this).data('_ccms_loaded', true);
          var id = CubeCMS.Tools.uniqID.get('toolbox');
          // move to body
          $(this).prop('id', id);
@@ -257,10 +277,6 @@ CubeCMS.ToolBox = {
          $(this).children('.toolbox-tools').prop('id', id+'-tools');
       });
       $('.toolbox>.toolbox-tools').appendTo('body');
-      
-      this.initEvents();
-      this.initLangLoader();
-      this.initFixedBoxs();
    },
    initEvents : function() {
       var _this = this;
