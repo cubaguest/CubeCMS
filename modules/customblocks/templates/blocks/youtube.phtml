@@ -1,0 +1,12 @@
+<div class="block block-video">
+   <?php 
+   $url = $block->block_items[1]->{CustomBlocks_Model_Videos::COLUMN_URL};
+   if(strpos($url, 'youtube') !== false){
+      ?>
+      <iframe width="420" height="315" src="<?php echo str_replace('/watch?v=', '/embed/', $url);?>" 
+              frameborder="0" allowfullscreen></iframe>
+      <?php
+   }
+//   echo $block->block_items[1]->{CustomBlocks_Model_Texts::COLUMN_CONTENT};
+   ?>
+</div>

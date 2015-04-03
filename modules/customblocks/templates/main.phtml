@@ -1,0 +1,21 @@
+<?php 
+$this->addCssFile("style.less");
+echo $this->toolbox;
+?>
+<h1>CustomBlocks</h1>
+<div class="content customblocks">
+   <?php 
+   if($this->blocks){
+      foreach ($this->blocks as $block) {
+         ?>
+         <div id="customblock-<?php echo $block->getPK()?>">
+         <?php 
+         $this->includeFile('tpl://blocks/'.$block->block_tpl, array("block" => $block)); 
+         echo $block->toolbox;
+         ?>
+         </div>
+         <?php
+      }
+   }
+   ?>
+</div>

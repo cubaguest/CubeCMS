@@ -1,0 +1,9 @@
+<?php 
+$this->addCssFile("style.less");
+?>
+<h1><?php ps( ($this->isEdit ? $this->tr('Úprava bloku "%s"') : $this->tr('Přidání bloku "%s"')), $this->blockName); ?></h1>
+<div class="content">
+   <?php 
+   echo $this->form;
+   ?>
+</div>

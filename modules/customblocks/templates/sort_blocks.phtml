@@ -1,0 +1,43 @@
+<?php 
+
+$jq = new JsPlugin_JQuery();
+$jq->addUISortable();
+$this->addJsPlugin($jq);
+
+$this->addCssFile("style.less");
+?>
+<h1><?php ps( $this->tr('Úprava pořadí bloků')); ?></h1>
+<div class="content">
+   <?php  echo $this->form->renderStart(); ?>
+   <div class="cubecms-widget cubecms-widget-sorting">
+         <ul id="textblock-list" class="cubecms-widget cubecms-list">
+            <?php 
+            foreach ($this->blocks as $block) {?>
+            <li class="cubecms-list-row cubecms-list-row-movable" id="customblock-<?php echo $block->getPK()?>"><span class="icon icon-arrows-v icon-fw"></span><?php 
+                  echo $block->{CustomBlocks_Model_Blocks::COLUMN_NAME};
+                  $this->form->id->setValues($block->getPK());
+                  echo $this->form->id;
+                  ?>
+               </li>
+            <?php }?>
+         </ul>
+      <div class="cubecms-widget-footer">
+         <div class="cubecms-widget-note"><?php ps($this->tr('Pro změnu pořadí stačí blok uchopit a přesunout.'))?></div>
+         <div class="cubecms-widget-buttons">
+            <?php echo $this->form->save->controllAll()?>
+         </div>
+      </div>
+   </div>
+   <?php  echo $this->form->renderEnd(); ?>
+   
+   <script>
+	$(function() {
+		$( "#textblock-list" ).sortable({
+			placeholder: "cubecms-state-highlight",
+         forcePlaceholderSize : true,
+         cursor: 'move'
+		});
+		$( "#textblock-list" ).disableSelection();
+	});
+	</script>
+</div>

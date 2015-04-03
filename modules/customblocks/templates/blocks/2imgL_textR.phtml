@@ -1,0 +1,24 @@
+<?php 
+if(!isset($block->block_items[1]) 
+    || !isset($block->block_items[2]) 
+    || !isset($block->block_items[3])){
+   return;
+}
+?>
+<div class="block">
+   <div class="row">
+      <div class="col-md-4">
+         <img src="<?php echo $block->block_items[1]->getUrl($this->category()->getModule());?>" 
+              class="img-responsive" alt="" />
+      </div>
+      <div class="col-md-4">
+         <img src="<?php echo $block->block_items[2]->getUrl($this->category()->getModule());?>" 
+              class="img-responsive" alt="" />
+      </div>
+      <div class="col-md-4">
+         <?php 
+         echo $block->block_items[3]->{CustomBlocks_Model_Texts::COLUMN_CONTENT};
+         ?>
+      </div>
+   </div>
+</div>
