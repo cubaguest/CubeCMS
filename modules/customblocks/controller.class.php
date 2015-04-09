@@ -119,9 +119,20 @@ class CustomBlocks_Controller extends Controller {
       
       $blocksData = array();
       foreach ($blocks as $type => $block) {
+         // obrázek ve face ?
+         $img = false;
+         if(!isset($block['img'])){
+            $block['img'] = pathinfo($block['template'], PATHINFO_FILENAME).'.jpg';
+         }
+         if(is_file(Face::getCurrent()->getDir().'modules/'.$this->module()->getName().'/images/'.$block['img'])){
+            $img = Face::getCurrent()->getDir().'modules/'.$this->module()->getName().'/images/'.$block['img'];
+         } else if(is_file($this->module()->getLibDir().'images'.DIRECTORY_SEPARATOR.$block['img'])){
+            $img = $this->module()->getLibDir().'images'.DIRECTORY_SEPARATOR.$block['img'];
+         }
+         
          $blocksData[] = array(
              'name' => isset($block['name'][Locales::getLang()]) ? $block['name'][Locales::getLang()] : reset($block['name']),
-             'img' => isset($block['img']) ? $this->module()->getLibDir().'images'.DIRECTORY_SEPARATOR.$block['img'] : false,
+             'img' =>  $img,
              'url' => $this->link()->route('addBlock', array('type' => $type)),
          );
       }

@@ -95,7 +95,7 @@ class CustomBlocks_View extends View {
          return;
       }
       foreach ($this->block['items'] as $index => $item) {
-         if($item['model'] == 'CustomBlocks_Model_Texts' && isset($item['tinymce'])){
+         if($item['model'] == 'CustomBlocks_Model_Texts' && isset($item['tinymce']) && $item['tinymce'] == true){
             $elementName = 'txt_'.$index;
             if(is_bool($item['tinymce'])){
                $this->setTinyMCE($this->form->$elementName);
