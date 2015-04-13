@@ -296,8 +296,8 @@ abstract class View extends TrObject {
                $settings->setSetting($name, $value);
             }
          }
-         $formElement->html()->addClass("mceEditor_".$theme.'_'.$settings['height']);
-         $settings->setSetting('editor_selector', 'mceEditor_'.$theme.'_'.$settings['height']);
+         $formElement->html()->addClass("mceEditor_".$theme.'_'.$formElement->getName().'_'.$settings['height']);
+         $settings->setSetting('editor_selector', 'mceEditor_'.$theme.'_'.$formElement->getName().'_'.$settings['height']);
          if(!$this->category()->getRights()->isControll() OR !Auth::isLogin()){
             $this->tinyMCE->setConfig(Component_TinyMCE::CFG_ALLOW_INTERNAL_SOURCES, false);
             $this->tinyMCE->setConfig(Component_TinyMCE::CFG_ALLOW_INTERNAL_TPLS, false);
