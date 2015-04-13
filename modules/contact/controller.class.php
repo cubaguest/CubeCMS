@@ -11,8 +11,7 @@ class Contact_Controller extends Controller {
    const PARAM_ADMIN_RECIPIENTS = 'admin_rec';
    const PARAM_OTHER_RECIPIENTS = 'other_rec';
 
-   const TEXT_KEY_MAIN = 'main';
-   const TEXT_KEY_PANEL = 'panel';
+   const TEXT_KEY_FOOTER = 'footer';
 
    /**
     * Kontroler pro zobrazení novinek
@@ -24,7 +23,7 @@ class Contact_Controller extends Controller {
       // načtení textů
       $modelText = new Text_Model();
       $text = $modelText->where(Text_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Text_Model::COLUMN_SUBKEY.' = :subkey',
-         array('idc' => $this->category()->getId(), 'subkey' => self::TEXT_KEY_MAIN))
+         array('idc' => $this->category()->getId(), 'subkey' => Text_Model::TEXT_MAIN_KEY))
          ->record();
       if($text != false){
          $this->view()->text = $text->{Text_Model::COLUMN_TEXT};
@@ -174,7 +173,7 @@ class Contact_Controller extends Controller {
 
       // naplníme pokud je čím
       $textRecord = $modelText->where(Text_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Text_Model::COLUMN_SUBKEY.' = :subkey',
-         array('idc' => $this->category()->getId(), 'subkey' => self::TEXT_KEY_MAIN))
+         array('idc' => $this->category()->getId(), 'subkey' => Text_Model::TEXT_MAIN_KEY))
          ->record();
       if($textRecord != false){
          $elemText->setValues($textRecord->{Text_Model::COLUMN_TEXT});
@@ -186,12 +185,27 @@ class Contact_Controller extends Controller {
       $elemTextPanel->setSubLabel($this->tr('Pokud není vyplněn, zkusí se použít první odstavec typu adresa z hlavního textu.'));
       // naplníme pokud je čím
       $textRecordPanel = $modelText->where(Text_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Text_Model::COLUMN_SUBKEY.' = :subkey',
-         array('idc' => $this->category()->getId(), 'subkey' => self::TEXT_KEY_PANEL))
+         array('idc' => $this->category()->getId(), 'subkey' => Text_Model::TEXT_PANEL_KEY))
          ->record();
       if($textRecordPanel != false){
          $elemTextPanel->setValues($textRecordPanel->{Text_Model::COLUMN_TEXT});
       }
       $formEdit->addElement($elemTextPanel);
+      
+      $textRecordFooter = false;
+      if(Face::getParamStatic('footer', 'contact', false)){
+         $elemTextFooter = new Form_Element_TextArea('textFooter', $this->tr('Text zápatí'));
+         $elemTextFooter->setLangs();
+         $elemTextFooter->setSubLabel($this->tr('Pokud není vyplněn, zkusí se použít první odstavec typu adresa z hlavního textu.'));
+         // naplníme pokud je čím
+         $textRecordFooter = $modelText->where(Text_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Text_Model::COLUMN_SUBKEY.' = :subkey',
+            array('idc' => $this->category()->getId(), 'subkey' => self::TEXT_KEY_FOOTER))
+            ->record();
+         if($textRecordFooter != false){
+            $elemTextFooter->setValues($textRecordFooter->{Text_Model::COLUMN_TEXT});
+         }
+         $formEdit->addElement($elemTextFooter);
+      }
 
       $submitButton = new Form_Element_SaveCancel('send');
       $formEdit->addElement($submitButton);
@@ -205,14 +219,20 @@ class Contact_Controller extends Controller {
          $matches = array();
          $texts = $formEdit->text->getValues();
          $textsPanels = $formEdit->textPanel->getValues();
+         
+         $textsFooter = false;
+         if(isset($formEdit->textFooter)){
+            $textsFooter = $formEdit->textFooter->getValues();
+         }
 
          if($textRecord == false){
             $textRecord = $modelText->newRecord();
             $textRecord->{Text_Model::COLUMN_ID_CATEGORY} = $this->category()->getId();
-            $textRecord->{Text_Model::COLUMN_SUBKEY} = self::TEXT_KEY_MAIN;
+            $textRecord->{Text_Model::COLUMN_SUBKEY} = Text_Model::TEXT_MAIN_KEY;
          }
          $textRecord->{Text_Model::COLUMN_TEXT} = $texts;
          $textRecord->{Text_Model::COLUMN_TEXT_CLEAR} = vve_strip_tags($texts);
+         $textRecord->{Text_Model::COLUMN_ID_USER_EDIT} = Auth::getUserId();
          $modelText->save($textRecord);
 
          $textsPSave = array();
@@ -228,12 +248,37 @@ class Contact_Controller extends Controller {
             if($textRecordPanel == false){
                $textRecordPanel = $modelText->newRecord();
                $textRecordPanel->{Text_Model::COLUMN_ID_CATEGORY} = $this->category()->getId();
-               $textRecordPanel->{Text_Model::COLUMN_SUBKEY} = self::TEXT_KEY_PANEL;
+               $textRecordPanel->{Text_Model::COLUMN_SUBKEY} = Text_Model::TEXT_PANEL_KEY;
             }
             $textRecordPanel->{Text_Model::COLUMN_TEXT} = $textsPSave;
-            $textRecordPanel->{Text_Model::COLUMN_TEXT_CLEAR} = vve_strip_tags($textsPSave);
+            $textRecordPanel->{Text_Model::COLUMN_ID_USER_EDIT} = Auth::getUserId();
+            $textRecordPanel->{Text_Model::COLUMN_TEXT_CLEAR} = Utils_Html::stripTags($textsPSave);
             $modelText->save($textRecordPanel);
          }
+         
+          if($textsFooter){
+            $textsFooterSave = array();
+            foreach ($texts as $lang => $text) {
+               $matches = array();
+               if($textsFooter[$lang] != null){ // pokud je vyplněn panel
+                  $textsFooterSave[$lang] = $textsFooter[$lang];
+               } else if(preg_match('/<address>(.*?)<\/address>/',$text, $matches) == 1){
+                  $textsFooterSave[$lang] = $matches[1];
+               }
+            }
+            if(!empty ($textsFooterSave)){
+               if($textRecordFooter == false){
+                  $textRecordFooter = $modelText->newRecord();
+                  $textRecordFooter->{Text_Model::COLUMN_ID_CATEGORY} = $this->category()->getId();
+                  $textRecordFooter->{Text_Model::COLUMN_SUBKEY} = self::TEXT_KEY_FOOTER;
+               }
+               $textRecordFooter->{Text_Model::COLUMN_TEXT} = $textsFooterSave;
+               $textRecordFooter->{Text_Model::COLUMN_ID_USER_EDIT} = Auth::getUserId();
+               $textRecordFooter->{Text_Model::COLUMN_TEXT_CLEAR} = Utils_Html::stripTags($textsFooterSave);
+               $modelText->save($textRecordFooter);
+            }
+         }
+         
          $this->infoMsg()->addMessage($this->tr('Text kontaktu byl uložen'));
          $this->link()->route()->reload();
       }

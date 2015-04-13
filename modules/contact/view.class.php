@@ -30,6 +30,48 @@ class Contact_View extends View {
       $this->template()->addTplFile('edit.phtml');
       $this->setTinyMCE($this->formEdit->text, 'advanced');
       $this->setTinyMCE($this->formEdit->textPanel, 'advanced', array('height' => 300));
+      if(isset($this->formEdit->textFooter)){
+         $this->setTinyMCE($this->formEdit->textFooter, 'advanced', array('height' => 300));
+      }
       Template_Module::setEdit(true);
+   }
+   
+   public static function getFooter($idCat = false)
+   {
+      // je zadáno id kategorie - vybej jej
+      if($idCat){
+         $category = Category_Structure::getStructure(Category_Structure::ALL)->getCategory($idCat)->getCatObj();
+         $link = Url_Link::getCategoryLink($idCat);
+         
+         $text = $modelText
+             ->where(Text_Model::COLUMN_SUBKEY." = :subkey AND ".Text_Model::COLUMN_ID_CATEGORY." = :idc",
+                 array('subkey' => Contact_Controller::TEXT_KEY_FOOTER, 'idc' => $idCat))
+             ->record();
+         
+      } 
+      // není zadáno id, použij první nalezený zýznam pro kontakt
+      else {
+         $modelText = new Text_Model();
+         
+         $text = $modelText
+             ->where(Text_Model::COLUMN_SUBKEY." = :subkey "
+                 . " AND ".Text_Model::COLUMN_TEXT_CLEAR." != ''"
+                 . " AND ".Model_Category::COLUMN_MODULE.' = \'contact\'',
+                 array('subkey' => Contact_Controller::TEXT_KEY_FOOTER))
+             ->joinFK(Text_Model::COLUMN_ID_CATEGORY)
+             ->record();
+         if($text){
+            $category = Category_Structure::getStructure(Category_Structure::ALL)->getCategory($text->{Text_Model::COLUMN_ID_CATEGORY})->getCatObj();
+            $link = Url_Link::getCategoryLink($text->{Text_Model::COLUMN_ID_CATEGORY});
+         }
+      }
+      if($text && $category){
+         
+         $template = new Template_Module($link, $category);
+         $template->addFile('tpl://footer.phtml');
+         $template->text = $text;
+         return $template;
+      }
+      return null;
    }
 }

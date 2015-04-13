@@ -44,6 +44,8 @@ $modules['hpslideshow']['dimensions'] = array(
    'height' => 250,
 );
 
+$modules['contact']['footer'] = true;
+
 // základní nasatvení vzhledu
 if(!function_exists('getFaceEnviromentItems')){
    function getFaceEnviromentItems()
