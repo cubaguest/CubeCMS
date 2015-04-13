@@ -1,6 +1,6 @@
 <?php 
 // do titulku
-$h = $this->tr('úprava pořadí partnerů');
+$h = $this->tr('úprava pořadí položek');
 $this->addPageTitle($h);
 
 $jq = new JsPlugin_JQuery();
@@ -11,7 +11,7 @@ $this->addFile('css://style.css');
 <h1><?php echo  $h ?></h1>
 <div class="main-content-form-edit">
    <?php  echo $this->form->renderStart(); ?>
-   <fieldset class="fieldset-alt"><legend><span class="form-legend-name"><?php echo $this->tr('Pořadí partnerů v zobrazení')?></span>
+   <fieldset class="fieldset-alt"><legend><span class="form-legend-name"><?php echo $this->tr('Pořadí položek v zobrazení')?></span>
          <span class="form-legend-text"></span>
       </legend>
       <table class="form-table">
@@ -43,7 +43,7 @@ $this->addFile('css://style.css');
          </tr>
          <tr>
             <td class="form-labels"></td>
-            <td class="form-controlls font-small"><?php echo $this->tr('Pro změnu pořadí stačí partnera uchopit myší a přesunout.')?></td>
+            <td class="form-controlls font-small"><?php echo $this->tr('Pro změnu pořadí stačí položku uchopit myší a přesunout.')?></td>
          </tr>
          <tr>
             <th class="form-labels"><?php echo $this->form->save->label()?></th>

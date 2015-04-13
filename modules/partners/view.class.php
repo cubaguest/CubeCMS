@@ -7,30 +7,34 @@ class Partners_View extends View {
          $toolbox = new Template_Toolbox2();
 
          $toolAdd = new Template_Toolbox2_Tool_PostRedirect('partner_add', $this->tr('Přidat partnera'), $this->link()->route('add'));
-         $toolAdd->setIcon('user_add.png')->setTitle($this->tr("Přidat nového partnera"));
+         $toolAdd->setIcon(Template_Toolbox2::ICON_ADD)->setTitle($this->tr("Přidat nového partnera"));
          $toolbox->addTool($toolAdd);
          
          if($this->partners != false && count($this->partners) > 1){
             $toolOrder = new Template_Toolbox2_Tool_PostRedirect('partners_edit_order', $this->tr('Upravit pořadí'), $this->link()->route('editOrder'));
-            $toolOrder->setIcon('arrow_up_down.png')->setTitle($this->tr("Upravit pořadí partnerů"));
+            $toolOrder->setIcon(Template_Toolbox2::ICON_MOVE_UP_DOWN)->setTitle($this->tr("Upravit pořadí partnerů"));
             $toolbox->addTool($toolOrder);
          }
+         
+         $toolEditText = new Template_Toolbox2_Tool_PostRedirect('partner_edittext', $this->tr('Upravit úvodní text'), $this->link()->route('editText'));
+         $toolEditText->setIcon(Template_Toolbox2::ICON_PAGE_EDIT)->setTitle($this->tr("Upravit úvodní text"));
+         $toolbox->addTool($toolEditText);
 
          $this->toolbox = $toolbox;
 
          $toolboxEdit = new Template_Toolbox2();
-         $toolboxEdit->setIcon('user_edit.png');
+         $toolboxEdit->setIcon(Template_Toolbox2::ICON_WRENCH);
 
          $toolEdit = new Template_Toolbox2_Tool_PostRedirect('partner_edit', $this->tr("Upravit partnera"));
-         $toolEdit->setIcon('user_edit.png')->setTitle($this->tr('Upravit partnera'));
+         $toolEdit->setIcon(Template_Toolbox2::ICON_PEN)->setTitle($this->tr('Upravit partnera'));
          $toolboxEdit->addTool($toolEdit);
          
          $toolChangeVis = new Template_Toolbox2_Tool_Form($this->formVisibility);
-         $toolChangeVis->setIcon('user_eye.png');
+         $toolChangeVis->setIcon(Template_Toolbox2::ICON_PREVIEW);
          $toolboxEdit->addTool($toolChangeVis);
 
          $toolDelete = new Template_Toolbox2_Tool_Form($this->formDelete);
-         $toolDelete->setIcon('user_delete.png');
+         $toolDelete->setIcon(Template_Toolbox2::ICON_DELETE);
          $toolDelete->setConfirmMeassage($this->tr('Opravdu smazat partnera?'));
          $toolboxEdit->addTool($toolDelete);
          
@@ -44,6 +48,7 @@ class Partners_View extends View {
     * Viewer pro přidání článku
     */
    public function addView() {
+      Template_Module::setEdit(true);
       $this->template()->addFile("tpl://edit.phtml");
 //      $this->setTinyMCE($formElement);
    }
@@ -52,6 +57,7 @@ class Partners_View extends View {
     * Viewer pro editaci novinky
     */
    public function editView() {
+      Template_Module::setEdit(true);
       $this->edit = true;
       $this->addView();
       // cestak obrázků
@@ -60,8 +66,14 @@ class Partners_View extends View {
 
    public function editOrderView()
    {
+      Template_Module::setEdit(true);
       $this->template()->addFile('tpl://edit_order.phtml');
    }
+   
+   public function editTextView()
+   {
+      Template_Module::setEdit(true);
+      $this->template()->addFile('tpl://edit_text.phtml');
+      $this->setTinyMCE($this->form->text, 'advanced');
+   }
 }
-
-?>
