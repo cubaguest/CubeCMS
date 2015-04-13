@@ -1,9 +1,9 @@
 <?php 
 // do titulku
 if($this->partner != null) {
-   $h = sprintf($this->tr('Úprava partnera "%s"'),$this->partner->{Partners_Model::COLUMN_NAME});
+   $h = sprintf($this->tr('Úprava položky "%s"'),$this->partner->{Partners_Model::COLUMN_NAME});
 } else {
-   $h = $this->tr('Přidání partnera');
+   $h = $this->tr('Přidání položky');
 }
 $this->addPageTitle($h);
 // donastavení formuláře

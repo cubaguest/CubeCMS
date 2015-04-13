@@ -54,6 +54,12 @@ class Partners_Controller extends Controller {
          ->order(array(Partners_Model::COLUMN_ORDER => Model_ORM::ORDER_ASC, Partners_Model::COLUMN_NAME => Model_ORM::ORDER_ASC))
          ->where($where, $whereValues)
          ->records();
+      
+      $modelT = new Text_Model();
+      $text = $modelT->getText($this->category()->getId(), Text_Model::TEXT_MAIN_KEY);
+      if($text != false){
+         $this->view()->text = (string)$text->{Text_Model::COLUMN_TEXT};
+      }
    }
 
    /**
@@ -223,6 +229,49 @@ class Partners_Controller extends Controller {
       $this->view()->form = $form;
    }
 
+   /**
+    * Kontroler pro editaci textu
+    */
+   public function editTextController()
+   {
+      $this->checkWritebleRights();
+
+      $form = new Form("text_");
+
+      $textarea = new Form_Element_TextArea('text', $this->tr("Text"));
+      $textarea->setLangs();
+      $form->addElement($textarea);
+
+      $model = new Text_Model();
+      $text = $model->getText($this->category()->getId(), Text_Model::TEXT_MAIN_KEY);
+      if ($text != false) {
+         $form->text->setValues($text->{Text_Model_Detail::COLUMN_TEXT});
+      }
+
+      $submit = new Form_Element_SaveCancel('send');
+      $form->addElement($submit);
+
+      if ($form->isSend() AND $form->send->getValues() == false) {
+         $this->infoMsg()->addMessage($this->tr('Změny byly zrušeny'));
+         $this->link()->route()->reload();
+      }
+
+      if ($form->isValid()) {
+         // odtranění script, nebezpečných tagů a komentřů
+         $text = vve_strip_html_comment($form->text->getValues());
+         foreach ($text as $lang => $t) {
+            $text[$lang] = preg_replace(array('@<script[^>]*?.*?</script>@siu'), array(''), $t);
+         }
+
+         $model->saveText($text, null, $this->category()->getId(), Text_Model::TEXT_MAIN_KEY);
+         $this->log('úprava textu');
+         $this->infoMsg()->addMessage($this->tr('Text byl uložen'));
+         $this->link()->route()->reload();
+      }
+      // view
+      $this->view()->template()->form = $form;
+   }
+   
 
    /**
     * Smazání článků při odstranění kategorie
