@@ -124,12 +124,12 @@ class Model_ORM_Db {
          $str .= ' AUTO_INCREMENT';
       }
    
-      if(!$params['nn'] && $params['default'] === null){
+      if(!$params['nn'] && isset($params['default']) && $params['default'] === null){
          $str .= ' DEFAULT NULL';
-      } else if($params['default'] !== null &&
+      } else if(isset($params['default']) && $params['default'] !== null &&
             ( $params['datatype'] == 'timestamp' ) ){
          $str .= ' DEFAULT '.$params['default'];
-      } else if($params['default'] !== null){
+      } else if(isset($params['default']) && $params['default'] !== null){
          $str .= ' DEFAULT '.$pdo->quote($params['default'], $params['pdoparam']);
       }
       return $str;
