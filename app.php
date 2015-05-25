@@ -1095,13 +1095,18 @@ class AppCore extends TrObject {
       if(Url_Request::getInstance()->getUrlType() == Url_Request::URL_TYPE_CORE_MODULE AND class_exists($className)){ // Core Module
          self::$category = new $className(Url_Request::getInstance()->getCategory(),true);
       } else if( ( ($reqUrl == '' AND $catUrl == null) OR ($reqUrl != '' AND $catUrl != null)) ) {
-         if(!Url_Request::getInstance()->isAdminCategory()){
+         if(!Url_Request::getInstance()->isAdminCategory() && (int)Url_Request::getInstance()->getCategory() < 32798){
             self::$category = new Category(Url_Request::getInstance()->getCategory(),true);
          } else {
             self::$category = new Category_Admin(Url_Request::getInstance()->getCategory(),true);
          }
          Url_Link::setCategory(Url_Request::getInstance()->getCategoryUrlKey(self::$category->getUrlKey(), self::$category->getId()));
       } 
+      
+      if(Auth::isAdmin() && !self::$category->isValid() && ctype_digit(Url_Request::getInstance()->getCategory())){
+         self::$category = new Category_Admin(Url_Request::getInstance()->getCategory(),true);
+      } 
+      
       if( ((self::$category instanceof Category_Core == false) OR !self::$category->isValid()) 
             AND Url_Request::getInstance()->getUrlType() != Url_Request::URL_TYPE_MODULE_STATIC_REQUEST
          /*OR !self::$category->getRights()->isReadable()*/){ // Chyba stránky
