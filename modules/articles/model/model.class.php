@@ -362,13 +362,21 @@ class Articles_Model_Record extends Model_ORM_Record {
 
    public function getDataPath()
    {
-      $cat = new Category($this->{Articles_Model::COLUMN_ID_CATEGORY});
+      if($this->{Articles_Model::COLUMN_ID_CATEGORY} < 34000){
+         $cat = new Category($this->{Articles_Model::COLUMN_ID_CATEGORY});
+      } else {
+         $cat = new Category_Admin($this->{Articles_Model::COLUMN_ID_CATEGORY});
+      }
       return $cat->module()->getDataDir().$this->{Articles_Model::COLUMN_DATADIR}.DIRECTORY_SEPARATOR;
    }
    
    public function getDataUrl()
    {
-      $cat = new Category($this->{Articles_Model::COLUMN_ID_CATEGORY});
+      if($this->{Articles_Model::COLUMN_ID_CATEGORY} < 34000){
+         $cat = new Category($this->{Articles_Model::COLUMN_ID_CATEGORY});
+      } else {
+         $cat = new Category_Admin($this->{Articles_Model::COLUMN_ID_CATEGORY});
+      }
       return $cat->module()->getDataDir(true).$this->{Articles_Model::COLUMN_DATADIR}."/";
    }
 

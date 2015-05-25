@@ -3,13 +3,14 @@
 --
 
 CREATE TABLE IF NOT EXISTS `{PREFIX}articles` (
-  `id_article` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
-  `id_cat` smallint(5) unsigned NOT NULL,
-  `id_user` smallint(5) unsigned DEFAULT '1',
+  `id_article` int unsigned NOT NULL AUTO_INCREMENT,
+  `id_cat` int unsigned NOT NULL,
+  `id_user` int unsigned DEFAULT '1',
+  `id_photogallery` int unsigned DEFAULT '1',
   `add_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `edit_time` datetime DEFAULT NULL,
-  `is_user_last_edit` smallint(6) DEFAULT NULL,
-  `viewed` smallint(6) NOT NULL DEFAULT '0',
+  `is_user_last_edit` int DEFAULT NULL,
+  `viewed` int NOT NULL DEFAULT '0',
   `name_cs` varchar(400) CHARACTER SET utf8 COLLATE utf8_czech_ci DEFAULT NULL,
   `text_cs` text CHARACTER SET utf8 COLLATE utf8_czech_ci,
   `annotation_cs` varchar(1000) DEFAULT NULL,
@@ -47,6 +48,8 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}articles` (
   `author` varchar(100) DEFAULT NULL,
   `article_priority` int(11) DEFAULT '0',
   `article_priority_end_date` date DEFAULT NULL,
+  `article_place` VARCHAR(50) NULL DEFAULT NULL,
+  `article_datadir` VARCHAR(50) NULL DEFAULT NULL,
   PRIMARY KEY (`id_article`),
   KEY `urlkey_cs` (`urlkey_cs`),
   KEY `urlkey_en` (`urlkey_en`),
@@ -96,3 +99,5 @@ CREATE  TABLE IF NOT EXISTS `{PREFIX}articles_tags_has_articles` (
   INDEX `fk_articles_tags_has_articles_arti` (`articles_tags_id_article_tag` ASC) 
 ) ENGINE = MyISAM DEFAULT CHARACTER SET = utf8 COLLATE = utf8_general_ci;
 
+INSERT INTO `{PREFIX}autorun` (`autorun_module_name`, `autorun_period`, `autorun_url`) 
+VALUES ('articles', 'daily', NULL);

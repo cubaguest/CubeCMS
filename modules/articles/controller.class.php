@@ -563,7 +563,11 @@ class Articles_Controller extends Controller {
          $gallery = Articles_Model::getRecord($article->{Articles_Model::COLUMN_ID_PHOTOGALLERY});
          $this->view()->images = PhotoGalery_Model_Images::getImages($gallery->{Articles_Model::COLUMN_ID_CATEGORY}, $gallery->getPK());
          
-         $cat = new Category((int)$gallery->{Articles_Model::COLUMN_ID_CATEGORY});
+         if($gallery->{Articles_Model::COLUMN_ID_CATEGORY} < 34000){
+            $cat = new Category((int)$gallery->{Articles_Model::COLUMN_ID_CATEGORY});
+         } else {
+            $cat = new Category_Admin((int)$gallery->{Articles_Model::COLUMN_ID_CATEGORY});
+         }
          $this->view()->imagesBaseDir = $gallery->getDataUrl();
          $this->view()->photoGalleryLink = $this->link(true)->category($cat->getUrlKey())->route('detail', 
              array('urlkey' => $gallery->{Articles_Model::COLUMN_URLKEY}));
