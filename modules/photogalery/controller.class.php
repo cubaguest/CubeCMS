@@ -144,106 +144,7 @@ class Photogalery_Controller extends Controller {
          $this->link()->reload();
       }
 
-//      $editForm = new Form('editimage_');
-//      $imgName = new Form_Element_Text('name', $this->tr('Název'));
-//      $imgName->setLangs();
-//      $editForm->addElement($imgName);
-//      $imgOrd = new Form_Element_Text('ord', $this->tr('Pořadí'));
-//      $editForm->addElement($imgOrd);
-//      $imgRotation = new Form_Element_Select('rotate', $this->tr('Otočit'));
-//      $imgRotation->setOptions(array('0°' => 0, '90°' => 90, '180°' => 180, '270°' => 270));
-//      $imgRotation->setValues(0);
-//      $editForm->addElement($imgRotation);
-//
-//      $imgDesc = new Form_Element_TextArea('desc', $this->tr('Popis'));
-//      $imgDesc->setLangs();
-//      $editForm->addElement($imgDesc);
-//      $imgDel = new Form_Element_Checkbox('delete', $this->tr('Smazat'));
-//      $editForm->addElement($imgDel);
-//      $imgId = new Form_Element_Hidden('id');
-//      $editForm->addElement($imgId);
-//
-//      $eGoBack = new Form_Element_Checkbox('goBack', $this->tr('Zavřít po uložení'));
-//      $eGoBack->setValues(false);
-//      $editForm->addElement($eGoBack);
-//
-//      $submit = new Form_Element_SaveCancel('save', array($this->tr('Uložit'), $this->tr('Zavřít')));
-//      $submit->setCancelConfirm(false);
-//      $editForm->addElement($submit);
-//
-//      if($editForm->isSend() AND $editForm->save->getValues() == false){
-//         if($this->linkBack instanceof Url_Link){
-//            $this->linkBack->reload();
-//         } else if($backLink === null){
-//            $this->link()->route()->reload();
-//         } else {
-//            $backLink->reload();
-//         }
-//      }
-//
-//      if($editForm->isValid()) {
-//         $names = $editForm->name->getValues();
-//         $descs = $editForm->desc->getValues();
-//         $orders = $editForm->ord->getValues();
-//         $ids = $editForm->id->getValues();
-//
-//         foreach ($ids as $id) {
-//            try {
-//               if ($editForm->delete->getValues($id) === true) {
-//                  $this->deleteImage($id);
-//               } else {
-//                  // ukládají změny
-//                  $imagesM->saveImage($this->category()->getId(), $this->idItem, null,
-//                     $names[$id], $descs[$id], $orders[$id], $id);
-//                  // rotace pokud je
-//                  if ($editForm->rotate->getValues($id) != 0) {
-//                     $file = $imagesM->getImage($id)->{PhotoGalery_Model_Images::COLUMN_FILE};
-//                     /**
-//                      * Otočí se original a znovu se vytvoří miniatury
-//                   */
-//                     $image = new Filesystem_File_Image($file, $this->module()->getDataDir(false)
-//                           . $this->subDir . Photogalery_Controller::DIR_ORIGINAL);
-//                     $image->rotateImage($editForm->rotate->getValues($id));
-//                     $image->save();
-//
-//                     $image = new Filesystem_File_Image($file, $this->module()->getDataDir() .
-//                           $this->subDir . self::DIR_ORIGINAL);
-//                     $image->saveAs($this->module()->getDataDir() . $this->subDir . self::DIR_SMALL,
-//                        $this->category()->getParam('small_width', VVE_IMAGE_THUMB_W),
-//                        $this->category()->getParam('small_height', VVE_IMAGE_THUMB_H),
-//                        $this->category()->getParam('small_crop', true));
-//                     $image->saveAs($this->module()->getDataDir() . $this->subDir . self::DIR_MEDIUM,
-//                        $this->category()->getParam('medium_width', self::MEDIUM_WIDTH),
-//                        $this->category()->getParam('medium_height', self::MEDIUM_HEIGHT),
-//                        $this->category()->getParam('medium_crop', false));
-//
-//                     unset($image);
-//                  }
-//               }
-//            } catch (Exception $exc) {
-//               new CoreErrors($exc);
-//            }
-//         }
-//
-//         $this->infoMsg()->addMessage($this->tr('Obrázky byly uloženy'));
-//         if($editForm->goBack->getValues() == true){
-//            if($this->linkBack instanceof Url_Link){
-//               $this->linkBack->reload();
-//            } else if($backLink === null){
-//               $this->link()->route()->reload();
-//            } else {
-//               $backLink->reload();
-//            }
-//         } else {
-//            $this->link()->reload();
-//         }
-//      }
-//
-//      // odkaz na editaci obrázku
-//      $this->view()->template()->linkImageCrop = $this->link()->route('editphoto',
-//              array('id' => '%s'));
-
-      $this->view()->images = PhotoGalery_Model_Images::getImages($this->category()->getId(), $this->idItem);
+      $this->view()->images = PhotoGalery_Model_Images::getImages($this->category()->getId(), $this->idItem, 100000, false);
       if(($this->linkBack instanceof Url_Link) == false){
          $this->linkBack = $this->link()->route();
       }
@@ -320,6 +221,24 @@ class Photogalery_Controller extends Controller {
       if(isset ($_POST['id'])){
          $this->deleteImage((int)$_POST['id']);
          $this->infoMsg()->addMessage($this->tr('Obrázek byl smazán'));
+      }
+   }
+   
+   public function imageChangeStateController()
+   {
+      $this->checkWritebleRights();
+      if(isset ($_POST['id'])){
+         $image = PhotoGalery_Model_Images::getRecord((int)$_POST['id']);
+         if($image){
+            if($image->{PhotoGalery_Model_Images::COLUMN_ACTIVE} == 1){
+               $this->infoMsg()->addMessage($this->tr('Obrázek byl deaktivován'));
+            } else {
+               $this->infoMsg()->addMessage($this->tr('Obrázek byl aktivován'));
+            }
+            $image->{PhotoGalery_Model_Images::COLUMN_ACTIVE} = !$image->{PhotoGalery_Model_Images::COLUMN_ACTIVE};
+            $image->save();
+            $this->view()->newState = $image->{PhotoGalery_Model_Images::COLUMN_ACTIVE};
+         }
       }
    }
 

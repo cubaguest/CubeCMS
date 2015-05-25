@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS `{PREFIX}photogalery_images` (
-  `id_photo` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
-  `id_article` smallint(5) unsigned DEFAULT NULL,
-  `id_category` smallint(5) unsigned NOT NULL,
+  `id_photo` int unsigned NOT NULL AUTO_INCREMENT,
+  `id_article` int unsigned DEFAULT NULL,
+  `id_category` int unsigned NOT NULL,
   `file` varchar(200) NOT NULL,
   `name_cs` varchar(300) CHARACTER SET utf8 COLLATE utf8_czech_ci DEFAULT NULL,
   `desc_cs` varchar(1000) CHARACTER SET utf8 COLLATE utf8_czech_ci DEFAULT NULL,
@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}photogalery_images` (
   `name_de` varchar(300) DEFAULT NULL,
   `desc_de` varchar(1000) DEFAULT NULL,
   `ord` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `image_active` TINYINT(1) NULL DEFAULT 1,
   `edit_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id_photo`),
   KEY `id_category` (`id_category`),

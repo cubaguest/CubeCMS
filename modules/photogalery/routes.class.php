@@ -28,6 +28,7 @@ class Photogalery_Routes extends Routes {
       
       $this->addRoute('imageDelete', $reg."delete.php", 'imageDelete', $replace.'delete.php', "XHR_Respond_VVEAPI");
       $this->addRoute('imageRotate', $reg."rotate.php", 'imageRotate', $replace.'rotate.php', "XHR_Respond_VVEAPI");
+      $this->addRoute('imageChangeState', $reg."changestate.php", 'imageChangeState', $replace.'changestate.php', "XHR_Respond_VVEAPI");
       $this->addRoute('imageMove', $reg."move.php", 'imageMove', $replace.'move.php', "XHR_Respond_VVEAPI");
       $this->addRoute('imageEditLabels', $reg."edit-labels.php", 'imageEditLabels', $replace.'edit-labels.php', "XHR_Respond_VVEAPI");
       // zatím neimplementována

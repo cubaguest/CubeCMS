@@ -80,6 +80,14 @@ class Photogalery_View extends View {
       $toolRotateRight->setIcon('rotate-right')->setTitle($this->tr('Otočit doleva'));
       $toolbox->addTool($toolRotateRight);
       
+      $toolState = new Template_Toolbox2_Tool_Button('changeState', $this->tr("Změnit stav"));
+      $toolState->setIcon('eye')->setTitle($this->tr('Změnit stav'));
+      $toolbox->addTool($toolState);
+      
+//      $toolInActive = new Template_Toolbox2_Tool_Button('inactiveState', $this->tr("Deaktivovat"));
+//      $toolInActive->setIcon('eye')->setTitle($this->tr('Deaktivovat'));
+//      $toolbox->addTool($toolInActive);
+      
       
       $toolDelete = new Template_Toolbox2_Tool_Button('delete', $this->tr("Smazat"));
       $toolDelete->setIcon('delete')->setTitle($this->tr('Smazat'));

@@ -76,6 +76,7 @@ $this->addFile("js://photogalery:editphotos.js");
                   <option value="" selected="selected"><?php ps($this->tr('Vyberte akci')); ?></option>
                   <option value="rotate-left"><?php ps($this->tr('Otočit do leva')); ?></option>
                   <option value="rotate-right"><?php ps($this->tr('Otočit do prava')); ?></option>
+                  <option value="changeState"><?php ps($this->tr('Změnit stav')); ?></option>
                   <option value="remove"><?php ps($this->tr('Smazat')); ?></option>
                </select>
                <button id="buttons-process-images" class="btn btn-success" type="button" disabled="disabled"><span class="icon icon-check"></span> <?php ps($this->tr('Provést')); ?></button>
@@ -98,37 +99,41 @@ $this->addFile("js://photogalery:editphotos.js");
          data-name='<?php echo json_encode($image->{PhotoGalery_Model_Images::COLUMN_NAME}->toArray())?>'
          data-desc='<?php echo json_encode($image->{PhotoGalery_Model_Images::COLUMN_DESC}->toArray())?>'
          data-src="<?php echo $src?>"
-         class="image-box"
+         class="image-box <?php echo $image->{PhotoGalery_Model_Images::COLUMN_ACTIVE} ? '' : 'inactive'?> "
          >
-         <span class="image-title" title="<?php   ps($image->{PhotoGalery_Model_Images::COLUMN_NAME})?>"><?php   ps($image->{PhotoGalery_Model_Images::COLUMN_NAME})?></span>
-         <input type="checkbox" name="imagesSelect" class="image-checkbox" />
-         <span class="image-thumb">
-            <img src="<?php echo $srcThumb?>" alt="" />
-         </span>
-         <span class="image-tools clearfix">
-            <?php 
-            /* @var $this->imageToolbox Template_Toolbox2 */
-            $this->imageToolbox->setTemplate(Template_Toolbox2::TEMPLATE_INLINE);
-            echo $this->imageToolbox;
-            ?>
-         </span>
+         <div class="image-item">
+            <input type="checkbox" name="imagesSelect" class="image-checkbox" />
+            <span class="image-title" title="<?php   ps($image->{PhotoGalery_Model_Images::COLUMN_NAME})?>"><?php   ps($image->{PhotoGalery_Model_Images::COLUMN_NAME})?></span>
+            <span class="image-thumb">
+               <img src="<?php echo $srcThumb?>" alt="" />
+            </span>
+            <span class="image-tools clearfix">
+               <?php 
+               /* @var $this->imageToolbox Template_Toolbox2 */
+               $this->imageToolbox->setTemplate(Template_Toolbox2::TEMPLATE_INLINE);
+               echo $this->imageToolbox;
+               ?>
+            </span>
+         </div>
       </li>
       <?php }?>
    </ul>
    <ul class="hidden" id="image-tpl">
       <li data-id="" data-name="" data-desc="" data-src="" class="image-box" >
-         <span class="image-title" title=""></span>
-         <input type="checkbox" name="imagesSelect" class="image-checkbox" />
-         <span class="image-thumb">
-            <img src="" alt="" />
-         </span>
-         <span class="image-tools clearfix">
-            <?php 
-            /* @var $this->imageToolbox Template_Toolbox2 */
-            $this->imageToolbox->setTemplate(Template_Toolbox2::TEMPLATE_INLINE);
-            echo $this->imageToolbox;
-            ?>
-         </span>
+         <div class="image-item">
+            <span class="image-title" title=""></span>
+            <input type="checkbox" name="imagesSelect" class="image-checkbox" />
+            <span class="image-thumb">
+               <img src="" alt="" />
+            </span>
+            <span class="image-tools clearfix">
+               <?php 
+               /* @var $this->imageToolbox Template_Toolbox2 */
+               $this->imageToolbox->setTemplate(Template_Toolbox2::TEMPLATE_INLINE);
+               echo $this->imageToolbox;
+               ?>
+            </span>
+         </div>
       </li>
    </ul>
    <?php /*
@@ -191,6 +196,7 @@ $this->addFile("js://photogalery:editphotos.js");
          CubeImagesEditor.init({
             uploadImageUrl : '<?php echo $this->link()->route('imageUploadAjax')?>',
             imageDeleteUrl : '<?php echo $this->link()->route('imageDelete')?>',
+            imageChangeStateUrl : '<?php echo $this->link()->route('imageChangeState')?>',
             imageMoveUrl : '<?php echo $this->link()->route('imageMove')?>',
             imageRotateUrl : '<?php echo $this->link()->route('imageRotate')?>',
             editLabelsUrl : '<?php echo $this->link()->route('imageEditLabels')?>',

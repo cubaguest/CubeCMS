@@ -16,6 +16,7 @@ class PhotoGalery_Model_Images extends Model_ORM_Ordered {
    const COLUMN_TIME_EDIT 			= 'edit_time';
    const COLUMN_FILE 				= 'file';
    const COLUMN_ORDER 				= 'ord';
+   const COLUMN_ACTIVE 				= 'image_active';
 
    protected function  _initTable() {
       $this->setTableName(self::DB_TABLE, 't_ph_imgs');
@@ -31,6 +32,7 @@ class PhotoGalery_Model_Images extends Model_ORM_Ordered {
 
       $this->addColumn(self::COLUMN_TIME_EDIT, array('datatype' => 'timestamp', 'pdoparam' => PDO::PARAM_STR, 'default' => 'CURRENT_TIMESTAMP'));
       $this->addColumn(self::COLUMN_ORDER, array('datatype' => 'smallint', 'pdoparam' => PDO::PARAM_INT, 'default' => 0));
+      $this->addColumn(self::COLUMN_ACTIVE, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => true));
 
       $this->setPk(self::COLUMN_ID);
       $this->setOrderColumn(self::COLUMN_ORDER);
@@ -56,10 +58,10 @@ class PhotoGalery_Model_Images extends Model_ORM_Ordered {
     * @param <type> $num
     * @return PDOStatement
     */
-   public static function getImages($idCat, $idArt = 0, $num = 0) {
+   public static function getImages($idCat, $idArt = 0, $num = 0, $activeOnly = true) {
       $model = new self();
 
-      $model->where(self::COLUMN_ID_CAT." = :idc AND ".self::COLUMN_ID_ART." = :ida",
+      $model->where(self::COLUMN_ID_CAT." = :idc AND ".self::COLUMN_ID_ART." = :ida ".($activeOnly ? ' AND '.self::COLUMN_ACTIVE.' = 1' : null),
          array('idc' => $idCat, 'ida' => $idArt))
          ->order(self::COLUMN_ORDER);
 
@@ -91,7 +93,7 @@ class PhotoGalery_Model_Images extends Model_ORM_Ordered {
    public function getRandImage($idCat, $idArt) {
       $dbc = Db_PDO::getInstance();
       $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
-              ." WHERE (".self::COLUMN_ID_ART." = :idart) AND (".self::COLUMN_ID_CAT." = :idcat)"
+              ." WHERE (".self::COLUMN_ID_ART." = :idart) AND (".self::COLUMN_ID_CAT." = :idcat) AND (".self::COLUMN_ACTIVE." = 1)"
               ." ORDER BY RAND() LIMIT 1");
 
       $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');

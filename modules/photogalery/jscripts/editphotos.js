@@ -2,6 +2,7 @@ CubeImagesEditor = {
    options : {
       uploadImageUrl : null,
       imageDeleteUrl : null,
+      imageChangeStateUrl : null,
       imageMoveUrl : null,
       imageRotateUrl : null,
       editLabelsUrl : null,
@@ -59,6 +60,7 @@ CubeImagesEditor = {
       });
       this.$imagesActions.on('click', '#buttons-process-images', function(){
          var val = that.$imagesActions.find('#images-action-select').val();
+         console.log(val);
          if(val === "rotate-left"){
             $('li', that.$imagesList).each(function(){
                if($(this).has('.image-checkbox:checked').length){
@@ -90,6 +92,21 @@ CubeImagesEditor = {
                   }
                });
             }
+         } else if(val === "changeState"){
+            $('li', that.$imagesList).each(function(){
+               var $li = $(this);
+               if($li.has('.image-checkbox:checked').length){
+                  $.ajax({
+                     url: that.options.imageChangeStateUrl,
+                     type: "POST",
+                     cache: false,
+                     data: {id : $li.data('id')},
+                     success : function(data){
+                       data.newState == true ? $li.removeClass('inactive') : $li.addClass('inactive');
+                     }
+                  });   
+               }
+            });
          }
          that.$imagesActions.find('#images-action-select').val(that.$imagesActions.find('#images-action-select option:first').val());
       });
@@ -109,6 +126,19 @@ CubeImagesEditor = {
                }
             });
          }
+      });
+      // změna stavu
+      this.$imagesList.on('click', '.toolbox-button-changeState', function(){
+         var $li = $(this).closest('li');
+         $.ajax({
+            url: that.options.imageChangeStateUrl,
+            type: "POST",
+            cache: false,
+            data: {id : $li.data('id')},
+            success : function(data){
+               data.newState == true ? $li.removeClass('inactive') : $li.addClass('inactive');
+            }
+         });
       });
       // řazení
       this.$imagesList.sortable({
