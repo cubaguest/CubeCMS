@@ -115,6 +115,11 @@
 
 /* images list */
 #images-list {
+   &,li {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+   }
    li {
       &.selected {
          .image-item {
@@ -203,11 +208,6 @@
       float: left;
       margin: 0 0 10px 0;
       /*overflow: hidden;*/
-   }
-   &,li {
-      list-style: none;
-      margin: 0;
-      padding: 0;
    }
    /*margin: 0 -10px;*/
 }
