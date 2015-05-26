@@ -168,11 +168,6 @@ echo $this->toolbox;
    <?php //sekce
    $typeClass = 'mainStruct';
    $id = 'categories-table';
-   if($this->isMainMenu != true) {
-      $id = 'admin-categories-table';
-      $typeClass = 'adminStruct';
-      echo '<p><strong>'.$this->tr("Pozor úprava administračního menu může ovlivnit chování celých stránek!").'</strong></p>';
-   }
    ?>
    <hr />
    <div id="sections" class="<?php echo $typeClass?>">
