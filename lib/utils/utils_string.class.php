@@ -41,12 +41,19 @@ class Utils_String {
    {
       if (is_array($string)) {
          foreach ($string as $key => $variable) {
-            $string[$key] = vve_cr_safe_file_name($variable);
+            $string[$key] = self::toSafeFileName($variable);
          }
       } else {
          $string = vve_to_ascii($string);
-         $string = preg_replace("/[ +]{1,}/", "-", $string);
-         $string = preg_replace("/[\/()\"\'!?,]?/", "", $string);
+         $string = preg_replace(array(
+               "/[ +]{1,}/",
+               "/[\/\()\"\'!?,&]?/",
+               "/[-]{2,}/",
+             ), array(
+                 "-",
+                 "",
+                 "-",
+            ), $string);
       }
       return $string;
    }
