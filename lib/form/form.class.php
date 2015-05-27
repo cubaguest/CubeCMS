@@ -95,7 +95,7 @@ class Form extends TrObject implements ArrayAccess, Iterator {
       $this->elementCheckForm = new Form_Element_Hidden('_'.$prefix.'_check');
       $this->elementCheckForm->setValues('send');
       $this->elementFormID = new Form_Element_Hidden('_'.$prefix.'_formid');
-      $this->elementFormID->setValues(md5(microtime(true).$_SERVER['HTTP_USER_AGENT']));
+      $this->elementFormID->setValues(md5(microtime(true). (isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : $_SERVER['SERVER_NAME']) ));
       $this->protectForm = $protectForm;
       $this->setProtected($protectForm);
    }
