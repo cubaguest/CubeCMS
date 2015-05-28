@@ -5,11 +5,11 @@
  * Třída umožňuje základní přístu k vlastnostem kategorie a volbu jejího
  * obsahu podle práv uživatele. Načítá také kategorii, která je výchozí nebo zvolená.
  *
- * @copyright  	Copyright (c) 2008-2009 Jakub Matas
- * @version    	$Id: category.class.php 1390 2010-08-09 06:40:37Z jakub $ VVE3.9.4 $Revision: 1390 $
+ * @copyright     Copyright (c) 2008-2009 Jakub Matas
+ * @version       $Id: category.class.php 1390 2010-08-09 06:40:37Z jakub $ VVE3.9.4 $Revision: 1390 $
  * @author        $Author: jakub $ $Date: 2010-08-09 08:40:37 +0200 (Po, 09 srp 2010) $
  *                $LastChangedBy: jakub $ $LastChangedDate: 2010-08-09 08:40:37 +0200 (Po, 09 srp 2010) $
- * @abstract 		Třída pro obsluhu zvolené kategorie
+ * @abstract      Třída pro obsluhu zvolené kategorie
  */
 class Category_Admin extends Category {
    /**
@@ -34,7 +34,7 @@ class Category_Admin extends Category {
 
       $this->categoryRights = new Rights();
       $this->loadRights();
-
+      
       if($this->getDataObj()->{Model_Category::COLUMN_PARAMS} != null){
          $this->catParams = array_merge($this->catParams, unserialize($this->getDataObj()->{Model_Category::COLUMN_PARAMS}));
       }
