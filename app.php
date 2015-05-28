@@ -1103,7 +1103,7 @@ class AppCore extends TrObject {
          Url_Link::setCategory(Url_Request::getInstance()->getCategoryUrlKey(self::$category->getUrlKey(), self::$category->getId()));
       } 
       
-      if(Auth::isAdmin() && !self::$category->isValid() && ctype_digit(Url_Request::getInstance()->getCategory())){
+      if(Auth::isAdmin() && self::$category && !self::$category->isValid() && ctype_digit(Url_Request::getInstance()->getCategory())){
          self::$category = new Category_Admin(Url_Request::getInstance()->getCategory(),true);
       } 
       
