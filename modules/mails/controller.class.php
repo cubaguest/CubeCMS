@@ -11,6 +11,8 @@ class Mails_Controller extends Controller {
 
    const MSG_FILE_NAME = 'mmails_msg.cache';
    const NUM_MAIL_IN_LIST = 20;
+   
+   const ATTACHEMENTS_DIR = 'mail_attach';
 
    public function mainController()
    {
@@ -36,7 +38,8 @@ class Mails_Controller extends Controller {
       $formSendMail->addElement($elemText);
 
       $elemFile = new Form_Element_File('file', $this->tr('Příloha'));
-      $elemFile->setUploadDir(AppCore::getAppCacheDir());
+      $elemFile->setUploadDir(AppCore::getAppCacheDir().self::ATTACHEMENTS_DIR);
+      $elemFile->setMultiple(true);
       $formSendMail->addElement($elemFile);
 
       $elemSendBatch = new Form_Element_Checkbox('sendBatch', $this->tr('Odeslat každému příjemci zvlášť'));
@@ -55,8 +58,9 @@ class Mails_Controller extends Controller {
          $formSendMail->recipients->setValues(implode(self::RECIPIENTS_MAILS_SEPARATOR, $_SESSION[self::SESSION_MAIL_RECIPIENTS]));
       } else if (isset($_GET['mail'])) {
          $recipients = $_GET['mail'];
-         if (is_array($recipients))
+         if (is_array($recipients)){
             $recipients = implode(self::RECIPIENTS_MAILS_SEPARATOR, $recipients);
+         }
          $formSendMail->recipients->setValues($recipients);
       } else if ($this->getRequestParam('sendmail') != null) {
          // z uložených emailů
@@ -76,12 +80,16 @@ class Mails_Controller extends Controller {
 
          // pokud je soubor bude připojen
          $attachments = array();
-         $attachFile = null;
+//         $attachFile = null;
          if ($formSendMail->file->getValues() != null) {
-            $file = $formSendMail->file->createFileObject("Filesystem_File");
-            array_push($attachments, $file->getName());
-            $attachFile = $file->getName();
-            unset ($file);
+            $files = $formSendMail->file->getValues();
+            foreach ($files as $recvFile) {
+               /* @var $file File */
+               $file = new File($recvFile);
+               array_push($attachments, (string)$file);
+               $attachFile = $file;
+               unset ($file);
+            }
          }
 
          // adresy
@@ -104,7 +112,9 @@ class Mails_Controller extends Controller {
             $mailObj->setSubject($formSendMail->subject->getValues());
             $mailObj->setContent($formSendMail->text->getValues());
 
-            $mailObj->addAttachment(AppCore::getAppCacheDir().$attachFile);
+            foreach ($attachments as $attach) {
+               $mailObj->addAttachment($attach);
+            }
 
             if($formSendMail->sendBatch->getValues() == true){
                $mailObj->batchSend(); // UNCOMMENT
@@ -118,7 +128,7 @@ class Mails_Controller extends Controller {
                'message' => $formSendMail->text->getValues(),
                'subject' => $formSendMail->subject->getValues(),
                'ishtml' => $isHtmlMail,
-               'attachment' => $attachFile,
+               'attachment' => $attachments,
                'sendbatch' => $formSendMail->sendBatch->getValues(),
             );
             $mailDataSer = serialize($mailData);
@@ -260,7 +270,7 @@ class Mails_Controller extends Controller {
       $modelQ = new Mails_Model_SendQueue();
 
       $mailItem = $modelQ->record($this->getRequestParam('id')); 
-      
+
       if($mailItem == false || $mailItem->{Mails_Model_SendQueue::COLUMN_DATA} == null){
          $this->view()->msg = $this->tr('Odeslání neexistujícího mailu z fronty');
          $this->view()->status = 'ERR';
@@ -273,8 +283,10 @@ class Mails_Controller extends Controller {
       $mailObj->setContent($sData['message']);
       $mailObj->setSubject($sData['subject']);
 
-      if($sData['attachment'] != null){
-         $mailObj->addAttachment(AppCore::getAppCacheDir().$sData['attachment']);
+      if($sData['attachment'] != null && is_array($sData['attachment']) && sizeof($sData['attachment']) > 0){
+         foreach ($sData['attachment'] as $file) {
+            $mailObj->addAttachment($file);
+         }
       }
 
       $mailObj->addAddress($mailItem->{Mails_Model_SendQueue::COLUMN_MAIL}, $mailItem->{Mails_Model_SendQueue::COLUMN_NAME});
