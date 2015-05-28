@@ -1,0 +1,2 @@
+ALTER TABLE `{PREFIX}contact_questions` 
+ADD COLUMN `phone` VARCHAR(20) NULL DEFAULT NULL;
