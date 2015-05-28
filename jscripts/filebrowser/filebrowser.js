@@ -580,7 +580,7 @@ var CubeBrowserListWidget = {
             that.request = xhr;
          },
          success: function(data){
-            if(data.errmsg.length === 0){
+            if(data.items){
                $.each(data.items, function(index, item){
                   that.createRow(item);
                });

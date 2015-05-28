@@ -99,7 +99,7 @@ class Component_TinyMCE_Browser extends Component_TinyMCE {
    public function getItemsController()
    {
       $this->checkRights();
-
+      
       $reqDir = $this->getDir();
       $this->template()->request = $reqDir;
       $dataDir = substr(AppCore::getAppDataDir(),0,-1);
@@ -187,11 +187,17 @@ class Component_TinyMCE_Browser extends Component_TinyMCE {
          else {
             $it['type'] = self::TYPE_FILE;
             // typ listu
-            if($_REQUEST['type'] == 'image' AND (($info = @getimagesize($item->getRealPath())) == false OR $info[2] == IMAGETYPE_SWF OR $info[2] == IMAGETYPE_SWC)){
-               continue;
-            } else if($_REQUEST['type'] == 'media' AND !in_array(pathinfo($item->getRealPath(), PATHINFO_EXTENSION), self::$mediaExtensions)){
-               continue;
+            try {
+               if($_REQUEST['type'] == 'image' && is_file($item->getRealPath()) && filesize( $item->getRealPath() )
+                   && ( ($info = @getimagesize($item->getRealPath())) == false || $info[2] == IMAGETYPE_SWF OR $info[2] == IMAGETYPE_SWC) ){
+                  continue;
+               } else if($_REQUEST['type'] == 'media' AND !in_array(pathinfo($item->getRealPath(), PATHINFO_EXTENSION), self::$mediaExtensions)){
+                  continue;
+               }
+            } catch (Exception $exc) {
+               CoreErrors::addException($exc);
             }
+
             if(($info = @getimagesize($item->getRealPath())) != false){ // img + flash
                switch ($info[2]) {
                   case IMAGETYPE_SWF:
