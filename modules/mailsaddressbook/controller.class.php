@@ -317,6 +317,7 @@ class MailsAddressBook_Controller extends Controller {
             if($mail == ''){
                continue;
             }
+            $mail = trim(preg_replace('/\s\s+/', ' ', $mail));
             $csv = str_getcsv($mail);
             
             $rec = $modelMails->newRecord();
