@@ -256,9 +256,6 @@ CubeCMS.ToolBox = {
       
       
       this.initHtml();
-      this.initEvents();
-      this.initLangLoader();
-      this.initFixedBoxs();
    },
    initHtml : function() {
       // rodiče musí mít relativní pozici kvůli posunu
@@ -277,6 +274,10 @@ CubeCMS.ToolBox = {
          $(this).children('.toolbox-tools').prop('id', id+'-tools');
       });
       $('.toolbox>.toolbox-tools').appendTo('body');
+      
+      this.initEvents();
+      this.initLangLoader();
+      this.initFixedBoxs();
    },
    initEvents : function() {
       var _this = this;
