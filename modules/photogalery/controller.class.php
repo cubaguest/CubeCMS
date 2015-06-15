@@ -364,7 +364,14 @@ class Photogalery_Controller extends Controller {
             $imageRec->{PhotoGalery_Model_Images::COLUMN_FILE} = $image->getName();
             $imageRec->{PhotoGalery_Model_Images::COLUMN_ID_ART} = $form->idItem->getValues();
             $imageRec->{PhotoGalery_Model_Images::COLUMN_ID_CAT} = $this->category()->getId();
-            $imageRec->{PhotoGalery_Model_Images::COLUMN_NAME} = $image->getName();
+            $name = preg_replace(array(
+                '/\.[a-z]{3,4}$/', // přípona pryč
+                '/[_-]/', // přípona pryč
+            ), array(
+                '',
+                ' '
+            ), $image->getName());
+            $imageRec->{PhotoGalery_Model_Images::COLUMN_NAME} = $name;
             $imageRec->save();
             
             $img = new Object();
