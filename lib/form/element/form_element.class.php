@@ -802,7 +802,7 @@ class Form_Element extends TrObject implements Form_Element_Interface {
                 */
                $this->html()->setAttrib('name', $this->getName()."[".$this->dimensional."]");
                $this->html()->setAttrib('id', $this->getName().'_'.$rKey."_".$this->dimensional);
-               if(is_array($values) AND isset($values[$this->dimensional])) {
+               if(is_array($values) AND key_exists($this->dimensional, $values)) {
                   $this->html()->setAttrib('value', htmlspecialchars((string)$values[$this->dimensional]));
                } else {
                   $this->html()->setAttrib('value', htmlspecialchars((string)$values));
