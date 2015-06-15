@@ -279,7 +279,10 @@ CubeImagesEditor = {
          // html5 upload
          $('#images-upload-form').on('submit', function(e){
             e.preventDefault();
-            that.handleFileUpload($(this).find('#addimage_image_1')[0].files);
+            console.log($("input[id^='addimage_image_']", this));
+            $("input[id^='addimage_image_']", this).each(function(){
+               that.handleFileUpload(this.files);
+            });
             return false;
          });
       } else {
