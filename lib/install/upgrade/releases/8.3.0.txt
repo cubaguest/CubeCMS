@@ -1,0 +1,7 @@
+NEW:
+- Podpora pro vzdálené vypnutí webu
+- Přidání validací v modelech
+- Odesílání chyb na email
+
+OPRAVY:
+- různé drobné orpavy

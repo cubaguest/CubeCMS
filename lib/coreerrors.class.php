@@ -38,6 +38,10 @@ class CoreErrors {
     * @param Exception $exception -- zachycená vyjímka
     */
    public static function addException(Exception $exception) {
+      if(CUBE_CMS_DEBUG_LEVEL == 0){
+         self::logError($exception->getCode(), $exception->getMessage(), $exception->getFile(), $exception->getLine());
+         self::sendErrorToMail($exception->getCode(), $exception->getMessage(), $exception->getFile(), $exception->getLine(), $exception->getTraceAsString());
+      }
       array_push(self::$exceptionsArray, $exception);
    }
 
@@ -131,8 +135,80 @@ class CoreErrors {
       }
       if(!empty($error)){
          array_push(self::$errorsArray, $error);
+         // send to mail
+         
+      }
+      if(CUBE_CMS_DEBUG_LEVEL == 0){
+         self::logError($errno, $errstr, $errfile, $errline);
+         self::sendErrorToMail($errno, $errstr, $errfile, $errline);
       }
       return true;
+   }
+   
+   public static function sendErrorToMail($errno, $errstr, $errfile, $errline, $str = null)
+   {
+      if(CUBE_CMS_ERRORS_MAIL != null){
+         
+         $mail = new Email(true);
+         $mail->setSubject('[ERROR]: '.CUBE_CMS_WEB_NAME);
+         $mail->addAddress(CUBE_CMS_ERRORS_MAIL);
+
+         switch ($errno) {
+            case E_ERROR:
+            case E_USER_ERROR:
+               $type = "ERROR";
+               break;
+            case E_WARNING:
+            case E_USER_WARNING:
+               $type = "WARNING";
+               break;
+            case E_NOTICE:
+            case E_USER_NOTICE:
+               $type = "NOTICE";
+               break;
+            default:
+               $type = "UNKNOWN ERROR";
+               break;
+         }
+         
+         $tpl = '<p><strong>'.$type.': in file '.$errfile.' on line: '.$errline.'</strong></p>';
+         $tpl .= '<p>'.$errstr.'</p>';
+         
+         if($str){
+            $tpl .= '<p style="color: red;">'.nl2br($str).'</p>';
+         }
+         
+         $mail->setContent(Email::getBaseHtmlMail($tpl));
+         
+         try {
+            $mail->send();
+         } catch (Exception $exc) {
+            echo $exc->getTraceAsString();
+         }
+      }
+   }
+   
+   protected static function logError($errno, $errstr, $errfile, $errline)
+   {
+      switch ($errno) {
+         case E_ERROR:
+         case E_USER_ERROR:
+            $type = "ERROR";
+            break;
+         case E_WARNING:
+         case E_USER_WARNING:
+            $type = "WARNING";
+            break;
+         case E_NOTICE:
+         case E_USER_NOTICE:
+            $type = "NOTICE";
+            break;
+         default:
+            $type = "UNKNOWN ERROR";
+            break;
+      }
+      $str = '['.date('Y-m-d H:i:s').'] '.$type.': in file '.$errfile.' on line: '.$errline.', MSG: '.$errstr."\n";
+      file_put_contents(AppCore::getAppLogDir().'error-'.date('Y-m-d').'.log', $str, FILE_APPEND);
    }
    
    /**
