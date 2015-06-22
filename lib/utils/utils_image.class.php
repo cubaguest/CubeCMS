@@ -104,7 +104,6 @@ class Utils_Image {
       if(strpos((string)$image, 'http') === 0){
          $image = str_replace(array(Url_Link::getWebURL(), '/'), array(AppCore::getAppWebDir(), DIRECTORY_SEPARATOR), (string)$image);
       }
-      var_dump((string)$image);
       if(is_file((string)$image)){
          return getimagesize((string)$image); 
       }
