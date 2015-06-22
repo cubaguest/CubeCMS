@@ -4,8 +4,8 @@
  * @author Jakub Matas
  * @copyright 2014 Cube-Studio
  *
- * Example activate path: http://www.cube-cms.com/?internalApp=maintenance&action=active
- * Example deactivate path: http://www.cube-cms.com/?internalApp=maintenance&action=active
+ * Example activate path: http://www.cube-cms.com/?internalApp=maintenance&action=activate
+ * Example deactivate path: http://www.cube-cms.com/?internalApp=maintenance&action=deactivate
  * Example add IP path: http://www.cube-cms.com/?internalApp=maintenance&action=add
  */
 
@@ -34,15 +34,16 @@ if($action == 'activate'){
 } else if($action == 'add'){
    $ips = array($_SERVER['REMOTE_ADDR']);
    if(is_file(DIR.FILE_MAINTENANCE)){
-      $ips = file(DIR.FILE_IP, FILE_IGNORE_NEW_LINES|FILE_SKIP_EMPTY_LINES);
+      $ips = array_merge($ips, file(DIR.FILE_IP, FILE_IGNORE_NEW_LINES|FILE_SKIP_EMPTY_LINES));
    }
+   
    $ips = array_unique($ips);
    $fp = fopen(DIR.FILE_IP, 'w');
    foreach($ips as $ip){
       fwrite($fp, $ip.PHP_EOL);
+      echo 'IP '.$ip.' přidána<br />';
    }
-   echo 'IP přidána<br />';
-   var_dump($ips);
+   
 } else {
    echo 'Unsuportet arg';
 }
