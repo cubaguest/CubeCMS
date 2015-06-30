@@ -68,6 +68,9 @@ abstract class Model_ORM extends Model implements ArrayAccess {
       'value' => false,
       'valueLoaded' => false,
       'fulltextRel' => 1, // relevance sloupce FULLTEXTu
+       
+      'validation' => false, // validační funkce
+      'maxlen' => false, // maximální délka řetězce
    );
    protected $limit = array('from' => null, 'rows' => null);
    protected $orders = array();
@@ -947,6 +950,9 @@ abstract class Model_ORM extends Model implements ArrayAccess {
    public function save(Model_ORM_Record $record)
    {
       $returnPk = $record->getPK();
+      
+      // validace 
+      
       if (!$record->isNew()) {
          $this->beforeSave($record, 'U');
          // @TODO - použít metodu update !!!!

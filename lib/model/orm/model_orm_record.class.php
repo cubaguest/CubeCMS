@@ -67,6 +67,13 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
     */
    public function __set($collName, $value)
    {
+      if(is_string($value) 
+          && isset($this->model[$collName]) 
+          && $this->model[$collName]['maxlen'] 
+          && mb_strlen($value) > $this->model[$collName]['maxlen']){
+         throw new Model_ORM_Validation_Exception('The string passed to the field '.$collName.' is too long');
+      }
+      
       // kontrola jestli byla provedena změna
       if (isset($this->columns[$collName]) AND $this->columns[$collName]['changed'] != 0) {
          if ((is_object($value) AND is_object($this->columns[$collName]['value']) 
