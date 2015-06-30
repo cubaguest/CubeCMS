@@ -1955,7 +1955,7 @@ abstract class Model_ORM extends Model implements ArrayAccess {
             $retype = null;
             if (strpos($coll, '(') == 0) { // musí být na začátku před řetězcem
                $retype = array();
-               preg_match('/^\(([a-z]+)\)(.*)$/i', $coll, $retype);
+               preg_match('/^\(([a-z]+(?:_[A-Z]{2})?)\)(.*)$/i', $coll, $retype);
                if (isset($retype[1])) {
                   $coll = $retype[2];
                   $retype = $retype[1];

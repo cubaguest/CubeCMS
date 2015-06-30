@@ -14,7 +14,7 @@ class AdminEnviroment_Controller extends Controller {
    public function mainController()
    {
       $form = new Form('enviroment');
-      
+
       $grpNames = $form->addGroup('labels', $this->tr('Jména a popisky'));
       $grpEmails = $form->addGroup('emails', $this->tr('E-maily'));
 
@@ -36,17 +36,22 @@ class AdminEnviroment_Controller extends Controller {
       $eCopy->setSubLabel($this->tr('Řetězec "{Y}" je v zápatí nahrazen aktuálním rokem.'));
       $form->addElement($eCopy, $grpNames);
       
-      $eLangs = new Form_Element_Multi_Checkbox('langs', $this->tr('Jazykové mutace'));
+      $eLangs = new Form_Element_Select('langs', $this->tr('Jazykové mutace'));
       $eLangs->addValidation(new Form_Validator_NotEmpty($this->tr('Musíte vybrat alespoň jednu jazykovou mutaci')));
-      $eLangs->setRenderedCols(4);
+      $eLangs->setMultiple(true);
+//      $eLangs->setRenderedCols(4);
       $enabledLangsStored = explode(';', CUBE_CMS_APP_LANGS);
       $enabledLangs = array();
       $eLangPrimary = new Form_Element_Select('langprimary', $this->tr('Výchozí jazyk'));
-      foreach (Locales::getSupportedLangs() as $code => $name) {
-         $eLangs->addOption($code, $name);
+      
+      $availableLangs = Locales::getSupportedLangs();
+      asort($availableLangs);
+      foreach ($availableLangs as $code => $name) {
+         $eLangs->addOption($name, $code);
          $eLangPrimary->addOption($name, $code);
-         $enabledLangs[$code] = in_array($code, $enabledLangsStored) ? true : false;
+         in_array($code, $enabledLangsStored) ? $enabledLangs[] = $code : '';
       }
+      Debug::log($enabledLangs);
       $eLangs->setValues($enabledLangs);
       $form->addElement($eLangs, $grpNames);
       
@@ -92,7 +97,6 @@ class AdminEnviroment_Controller extends Controller {
       $eEmailSMTPConn->setValues(CUBE_CMS_SMTP_SERVER_ENCRYPT);
       $form->addElement($eEmailSMTPConn, $grpEmails);
       
-      
       if(function_exists('getFaceEnviromentItems')){
          $items = getFaceEnviromentItems();
          
@@ -104,29 +108,21 @@ class AdminEnviroment_Controller extends Controller {
          }
       }
       
-      
       $eSave = new Form_Element_Submit('save', $this->tr('Uložit'));
       $form->addElement($eSave);
       
-      $langsForStore = array();
       if($form->isSend()){
-         foreach ($form->langs->getValues() as $lang => $enabled) {
-            if($enabled){
-               $langsForStore[] = $lang;
-            }
-         }
-         if(!in_array($form->langprimary->getValues(), $langsForStore)){
+         if(!in_array($form->langprimary->getValues(), $form->langs->getValues())){
             $form->langprimary->setError($this->tr('Výchozí jazyk musí být jeden z vybraných jazykových mutací'));
          }
       }
-      
       
       if($form->isValid()){
          Model_Config::setValue('WEB_NAME', $form->webname->getValues(), Model_Config::TYPE_STRING);
          Model_Config::setValue('MAIN_PAGE_TITLE', $form->webhpname->getValues(), Model_Config::TYPE_STRING);
          Model_Config::setValue('WEB_COPYRIGHT', $form->webcopyright->getValues(), Model_Config::TYPE_STRING);
          
-         Model_Config::setValue('APP_LANGS',$langsForStore, Model_Config::TYPE_LIST_MULTI);
+         Model_Config::setValue('APP_LANGS', $form->langs->getValues(), Model_Config::TYPE_LIST_MULTI);
          Model_Config::setValue('DEFAULT_APP_LANG', $form->langprimary->getValues(), Model_Config::TYPE_LIST);
          
          Model_Config::setValue('NOREPLAY_MAIL', $form->emailnoreplay->getValues(), Model_Config::TYPE_STRING);
@@ -136,18 +132,13 @@ class AdminEnviroment_Controller extends Controller {
          Model_Config::setValue('SMTP_SERVER_PASSWORD', $form->emailsmtppassword->getValues(), Model_Config::TYPE_STRING);
          Model_Config::setValue('SMTP_SERVER_ENCRYPT', $form->emailsmtpconn->getValues(), Model_Config::TYPE_STRING);
          
-         
-         
-         
          if(function_exists('processFaceEnviroment')){
             processFaceEnviroment($form);
          }
          
-         
          $this->infoMsg()->addMessage($this->tr('Nastavení bylo uloženo'));
          $this->link()->redirect();
       }
-      
       
       $this->view()->form = $form;
    }

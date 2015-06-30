@@ -1050,6 +1050,8 @@ class AppCore extends TrObject {
          //inicializace lokalizace
          Locales::factory();
          Url_Request::detectLang();
+         // tohle je tady kvůli základní inicializaci překladače
+         $tr = new Translator();
          // provedení autorizace
          Auth::authenticate();
          $adm = Menu_Admin::getInstance();

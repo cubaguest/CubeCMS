@@ -99,6 +99,12 @@ class Model_ConfigGlobal extends Model_ORM {
       }
       $rec->{self::COLUMN_VALUE} = $value;
       $rec->save();
+      
+      // callback function
+      if($rec->{self::COLUMN_CALLBACK} != null){
+         call_user_func($rec->{self::COLUMN_CALLBACK});
+      }
+      
       return $rec;
    }
    

@@ -441,11 +441,16 @@ class Install_Core {
     * Metoda pro aktualizaci jazyků
     * @param array $langs pole s jazyky
     */
-   public static function updateInstalledLangs($langs)
+   public static function updateInstalledLangs($langs = null)
    {
       $modelCat = new Model_Category();
       $modelPanels = new Model_Panel();
       $modelCfgGroups = new Model_ConfigGroups();
+      // load langs from db
+      if($langs == null){
+         $langs = explode(';', Model_Config::getValue('APP_LANGS', array()));
+      }
+      
       foreach ($langs as $lang) {
          $modelCat->updateLangColumns($lang);
          $modelPanels->updateLangColumns($lang);

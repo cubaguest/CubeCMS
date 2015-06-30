@@ -126,9 +126,14 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
       } else {
          // tady detekce jazyka
          $collLen = strlen($collName);
-         if ($collLen > 3 && $collName[$collLen - 3] == '_') {
-            $lang = substr($collName, -2);
-            $collName = substr($collName, 0, $collLen-3);
+         if ($collLen > 3 && ($collName[$collLen - 3] == '_') || ($collName[$collLen - 3] == '_' && $collName[$collLen - 6] == '_') ) {
+            if($collName[$collLen - 6] == '_'){
+               $lang = substr($collName, -5);
+               $collName = substr($collName, 0, $collLen-6);
+            } else {
+               $lang = substr($collName, -2);
+               $collName = substr($collName, 0, $collLen-3);
+            }
             
             if(!isset ($this->columns[$collName])){ // není sloupce z této tabulky
                $this->columns[$collName] = Model_ORM::getDefaultColumnParams();
