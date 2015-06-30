@@ -18,11 +18,15 @@ class Form_Element_ImagesUploader extends Form_Element_File {
    {
       parent::populate();
       $this->inputDir->populate();
+      
+      $componentDZ = new Component_Dropzone();
+      $componentDZ->setConfig('path', $this->inputDir->getValues());
+      $this->setValues($componentDZ->getFiles());
    }
    
    public function setMaxFileSize($sizeBytes)
    {
-      $this->maxFileSize = $size;
+      $this->maxFileSize = $sizeBytes;
    }
    
    public function setUploadDir($dir)

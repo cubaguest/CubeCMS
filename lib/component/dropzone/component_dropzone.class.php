@@ -85,7 +85,22 @@ class Component_Dropzone extends Component {
     */
    public function getFiles()
    {
-      return array();
+      if(is_dir($this->getConfig('path'))){
+         // load dirs
+         $images = array();
+         $finfo = finfo_open(FILEINFO_MIME_TYPE);
+         foreach(glob($this->getConfig('path').'/*.*') as $filename){
+            $images[] = array(
+                'name' => basename($filename),
+                'size' => filesize($filename),
+                'mime' => finfo_file($finfo, $filename),
+                'url' => Utils_Url::pathToSystemUrl($filename),
+                'path' => dirname($filename),
+                'id' => 0,
+            );
+         }
+      }
+      return $images;
    }
    
    public function deleteFileController()
