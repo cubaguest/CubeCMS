@@ -61,126 +61,151 @@ class Locales extends TrObject {
        array(
            'name' => 'Afar (Djibouti)',
            'locale' => 'aa_DJ.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'aa_ER' =>
        array(
            'name' => 'Afar (Eritrea)',
            'locale' => 'aa_ER.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'aa_ET' =>
        array(
            'name' => 'Afar (Ethiopia)',
            'locale' => 'aa_ET.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'af_ZA' =>
        array(
            'name' => 'Afrikaans (South Africa)',
            'locale' => 'af_ZA.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'am_ET' =>
        array(
            'name' => 'Amharic (Ethiopia)',
            'locale' => 'am_ET.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'an_ES' =>
        array(
            'name' => 'Aragonese (Spain)',
            'locale' => 'an_ES.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ar_AE' =>
        array(
            'name' => 'Arabic (United Arab Emirates)',
            'locale' => 'ar_AE.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ar_BH' =>
        array(
            'name' => 'Arabic (Bahrain)',
            'locale' => 'ar_BH.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ar_DZ' =>
        array(
            'name' => 'Arabic (Algeria)',
            'locale' => 'ar_DZ.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ar_EG' =>
        array(
            'name' => 'Arabic (Egypt)',
            'locale' => 'ar_EG.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ar_IN' =>
        array(
            'name' => 'Arabic (India)',
            'locale' => 'ar_IN.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ar_IQ' =>
        array(
            'name' => 'Arabic (Iraq)',
            'locale' => 'ar_IQ.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ar_JO' =>
        array(
            'name' => 'Arabic (Jordan)',
            'locale' => 'ar_JO.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ar_KW' =>
        array(
            'name' => 'Arabic (Kuwait)',
            'locale' => 'ar_KW.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ar_LB' =>
        array(
            'name' => 'Arabic (Lebanon)',
            'locale' => 'ar_LB.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ar_LY' =>
        array(
            'name' => 'Arabic (Libya)',
            'locale' => 'ar_LY.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ar_MA' =>
        array(
            'name' => 'Arabic (Morocco)',
            'locale' => 'ar_MA.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ar_OM' =>
        array(
            'name' => 'Arabic (Oman)',
            'locale' => 'ar_OM.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ar_QA' =>
        array(
            'name' => 'Arabic (Qatar)',
            'locale' => 'ar_QA.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ar_SA' =>
        array(
            'name' => 'Arabic (Saudi Arabia)',
            'locale' => 'ar_SA.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ar_SD' =>
        array(
            'name' => 'Arabic (Sudan)',
            'locale' => 'ar_SD.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ar_SY' =>
        array(
            'name' => 'Arabic (Syria)',
            'locale' => 'ar_SY.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ar_TN' =>
        array(
            'name' => 'Arabic (Tunisia)',
            'locale' => 'ar_TN.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ar_YE' =>
        array(
            'name' => 'Arabic (Yemen)',
            'locale' => 'ar_YE.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'as' =>
        array(
            'name' => 'Assamese (India)',
            'locale' => 'as_IN.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
 //       'ast_ES' =>
 //       array(
@@ -191,71 +216,85 @@ class Locales extends TrObject {
        array(
            'name' => 'Azerbaijani (Azerbaijan)',
            'locale' => 'az_AZ.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'az_TR' =>
        array(
            'name' => 'Azerbaijani (Turkey)',
            'locale' => 'az_TR.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'be' =>
        array(
            'name' => 'Belarusian (Belarus)',
            'locale' => 'be_BY.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'bg' =>
        array(
            'name' => 'Bulgarian (Bulgaria)',
            'locale' => 'bg_BG.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'bn' =>
        array(
            'name' => 'Bengali (Bangladesh)',
            'locale' => 'bn_BD.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'bn_IN' =>
        array(
            'name' => 'Bengali (India)',
            'locale' => 'bn_IN.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'bo_CN' =>
        array(
            'name' => 'Tibetan (China)',
            'locale' => 'bo_CN.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'bo_IN' =>
        array(
            'name' => 'Tibetan (India)',
            'locale' => 'bo_IN.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'br' =>
        array(
            'name' => 'Breton (France)',
            'locale' => 'br_FR.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'bs' =>
        array(
            'name' => 'Bosnian (Bosnia and Herzegovina)',
            'locale' => 'bs_BA.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ca_AD' =>
        array(
            'name' => 'Catalan (Andorra)',
            'locale' => 'ca_AD.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ca_ES' =>
        array(
            'name' => 'Catalan (Spain)',
            'locale' => 'ca_ES.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ca_FR' =>
        array(
            'name' => 'Catalan (France)',
            'locale' => 'ca_FR.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ca_IT' =>
        array(
            'name' => 'Catalan (Italy)',
            'locale' => 'ca_IT.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
 //       'crh_UA' =>
 //       array(
@@ -266,6 +305,7 @@ class Locales extends TrObject {
        array(
            'name' => 'Czech (Czech Republic)',
            'locale' => 'cs_CZ.UTF-8',
+           'collation' => array('mysql' => 'utf8_czech_ci'),
        ),
 //       'csb_PL' =>
 //       array(
@@ -276,101 +316,121 @@ class Locales extends TrObject {
        array(
            'name' => 'Chuvash (Russia)',
            'locale' => 'cv_RU.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'cy' =>
        array(
            'name' => 'Welsh (United Kingdom)',
            'locale' => 'cy_GB.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'da' =>
        array(
            'name' => 'Danish (Denmark)',
            'locale' => 'da_DK.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'de_AT' =>
        array(
            'name' => 'German (Austria)',
            'locale' => 'de_AT.UTF-8',
+           'collation' => array('mysql' => 'utf8_german2_ci'),
        ),
        'de_BE' =>
        array(
            'name' => 'German (Belgium)',
            'locale' => 'de_BE.UTF-8',
+           'collation' => array('mysql' => 'utf8_german2_ci'),
        ),
        'de_CH' =>
        array(
            'name' => 'German (Switzerland)',
            'locale' => 'de_CH.UTF-8',
+           'collation' => array('mysql' => 'utf8_german2_ci'),
        ),
        'de' =>
        array(
            'name' => 'German (Germany)',
            'locale' => 'de_DE.UTF-8',
+           'collation' => array('mysql' => 'utf8_german2_ci'),
        ),
        'de_LI' =>
        array(
            'name' => 'German (Liechtenstein)',
            'locale' => 'de_LI.UTF-8',
+           'collation' => array('mysql' => 'utf8_german2_ci'),
        ),
        'de_LU' =>
        array(
            'name' => 'German (Luxembourg)',
            'locale' => 'de_LU.UTF-8',
+           'collation' => array('mysql' => 'utf8_german2_ci'),
        ),
        'dv' =>
        array(
            'name' => 'Divehi (Maldives)',
            'locale' => 'dv_MV.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'dz' =>
        array(
            'name' => 'Dzongkha (Bhutan)',
            'locale' => 'dz_BT.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'el_CY' =>
        array(
            'name' => 'Greek (Cyprus)',
            'locale' => 'el_CY.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'el' =>
        array(
            'name' => 'Greek (Greece)',
            'locale' => 'el_GR.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'en_AG' =>
        array(
            'name' => 'English (Antigua and Barbuda)',
            'locale' => 'en_AG.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'en_AU' =>
        array(
            'name' => 'English (Australia)',
            'locale' => 'en_AU.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'en_BW' =>
        array(
            'name' => 'English (Botswana)',
            'locale' => 'en_BW.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'en_CA' =>
        array(
            'name' => 'English (Canada)',
            'locale' => 'en_CA.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'en_DK' =>
        array(
            'name' => 'English (Denmark)',
            'locale' => 'en_DK.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'en' =>
        array(
            'name' => 'English',
            'locale' => 'en_GB.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'en_HK' =>
        array(
            'name' => 'English (Hong Kong SAR China)',
            'locale' => 'en_HK.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'en_IE' =>
        array(
@@ -381,201 +441,241 @@ class Locales extends TrObject {
        array(
            'name' => 'English (India)',
            'locale' => 'en_IN.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'en_NG' =>
        array(
            'name' => 'English (Nigeria)',
            'locale' => 'en_NG.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'en_NZ' =>
        array(
            'name' => 'English (New Zealand)',
            'locale' => 'en_NZ.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'en_PH' =>
        array(
            'name' => 'English (Philippines)',
            'locale' => 'en_PH.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'en_SG' =>
        array(
            'name' => 'English (Singapore)',
            'locale' => 'en_SG.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'en_US' =>
        array(
            'name' => 'English (United States)',
            'locale' => 'en_US.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'en_ZA' =>
        array(
            'name' => 'English (South Africa)',
            'locale' => 'en_ZA.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'en_ZM' =>
        array(
            'name' => 'English (Zambia)',
            'locale' => 'en_ZM.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'en_ZW' =>
        array(
            'name' => 'English (Zimbabwe)',
            'locale' => 'en_ZW.UTF-8',
-       ),
-       'es_AR' =>
-       array(
-           'name' => 'Spanish (Argentina)',
-           'locale' => 'es_AR.UTF-8',
-       ),
-       'es_BO' =>
-       array(
-           'name' => 'Spanish (Bolivia)',
-           'locale' => 'es_BO.UTF-8',
-       ),
-       'es_CL' =>
-       array(
-           'name' => 'Spanish (Chile)',
-           'locale' => 'es_CL.UTF-8',
-       ),
-       'es_CO' =>
-       array(
-           'name' => 'Spanish (Colombia)',
-           'locale' => 'es_CO.UTF-8',
-       ),
-       'es_CR' =>
-       array(
-           'name' => 'Spanish (Costa Rica)',
-           'locale' => 'es_CR.UTF-8',
-       ),
-       'es_DO' =>
-       array(
-           'name' => 'Spanish (Dominican Republic)',
-           'locale' => 'es_DO.UTF-8',
-       ),
-       'es_EC' =>
-       array(
-           'name' => 'Spanish (Ecuador)',
-           'locale' => 'es_EC.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'es' =>
        array(
            'name' => 'Spanish (Spain)',
            'locale' => 'es_ES.UTF-8',
+           'collation' => array('mysql' => 'utf8_spanish_ci'),
+       ),
+       'es_AR' =>
+       array(
+           'name' => 'Spanish (Argentina)',
+           'locale' => 'es_AR.UTF-8',
+           'collation' => array('mysql' => 'utf8_spanish_ci'),
+       ),
+       'es_BO' =>
+       array(
+           'name' => 'Spanish (Bolivia)',
+           'locale' => 'es_BO.UTF-8',
+           'collation' => array('mysql' => 'utf8_spanish_ci'),
+       ),
+       'es_CL' =>
+       array(
+           'name' => 'Spanish (Chile)',
+           'locale' => 'es_CL.UTF-8',
+           'collation' => array('mysql' => 'utf8_spanish_ci'),
+       ),
+       'es_CO' =>
+       array(
+           'name' => 'Spanish (Colombia)',
+           'locale' => 'es_CO.UTF-8',
+           'collation' => array('mysql' => 'utf8_spanish_ci'),
+       ),
+       'es_CR' =>
+       array(
+           'name' => 'Spanish (Costa Rica)',
+           'locale' => 'es_CR.UTF-8',
+           'collation' => array('mysql' => 'utf8_spanish_ci'),
+       ),
+       'es_DO' =>
+       array(
+           'name' => 'Spanish (Dominican Republic)',
+           'locale' => 'es_DO.UTF-8',
+           'collation' => array('mysql' => 'utf8_spanish_ci'),
+       ),
+       'es_EC' =>
+       array(
+           'name' => 'Spanish (Ecuador)',
+           'locale' => 'es_EC.UTF-8',
+           'collation' => array('mysql' => 'utf8_spanish_ci'),
        ),
        'es_GT' =>
        array(
            'name' => 'Spanish (Guatemala)',
            'locale' => 'es_GT.UTF-8',
+           'collation' => array('mysql' => 'utf8_spanish_ci'),
        ),
        'es_HN' =>
        array(
            'name' => 'Spanish (Honduras)',
            'locale' => 'es_HN.UTF-8',
+           'collation' => array('mysql' => 'utf8_spanish_ci'),
        ),
        'es_MX' =>
        array(
            'name' => 'Spanish (Mexico)',
            'locale' => 'es_MX.UTF-8',
+           'collation' => array('mysql' => 'utf8_spanish_ci'),
        ),
        'es_NI' =>
        array(
            'name' => 'Spanish (Nicaragua)',
            'locale' => 'es_NI.UTF-8',
+           'collation' => array('mysql' => 'utf8_spanish_ci'),
        ),
        'es_PA' =>
        array(
            'name' => 'Spanish (Panama)',
            'locale' => 'es_PA.UTF-8',
+           'collation' => array('mysql' => 'utf8_spanish_ci'),
        ),
        'es_PE' =>
        array(
            'name' => 'Spanish (Peru)',
            'locale' => 'es_PE.UTF-8',
+           'collation' => array('mysql' => 'utf8_spanish_ci'),
        ),
        'es_PY' =>
        array(
            'name' => 'Spanish (Paraguay)',
            'locale' => 'es_PY.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'es_SV' =>
        array(
            'name' => 'Spanish (El Salvador)',
            'locale' => 'es_SV.UTF-8',
+           'collation' => array('mysql' => 'utf8_spanish_ci'),
        ),
        'es_US' =>
        array(
            'name' => 'Spanish (United States)',
            'locale' => 'es_US.UTF-8',
+           'collation' => array('mysql' => 'utf8_spanish_ci'),
        ),
        'es_UY' =>
        array(
            'name' => 'Spanish (Uruguay)',
            'locale' => 'es_UY.UTF-8',
+           'collation' => array('mysql' => 'utf8_spanish_ci'),
        ),
        'es_VE' =>
        array(
            'name' => 'Spanish (Venezuela)',
            'locale' => 'es_VE.UTF-8',
+           'collation' => array('mysql' => 'utf8_spanish_ci'),
        ),
        'et_EE' =>
        array(
            'name' => 'Estonian (Estonia)',
            'locale' => 'et_EE.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'eu_ES' =>
        array(
            'name' => 'Basque (Spain)',
            'locale' => 'eu_ES.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'eu_FR' =>
        array(
            'name' => 'Basque (France)',
            'locale' => 'eu_FR.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'fa' =>
        array(
            'name' => 'Persian (Iran)',
            'locale' => 'fa_IR.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ff' =>
        array(
            'name' => 'Fulah (Senegal)',
            'locale' => 'ff_SN.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'fi' =>
        array(
            'name' => 'Finnish (Finland)',
            'locale' => 'fi_FI.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'fo' =>
        array(
            'name' => 'Faroese (Faroe Islands)',
            'locale' => 'fo_FO.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'fr_BE' =>
        array(
            'name' => 'French (Belgium)',
            'locale' => 'fr_BE.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'fr_CA' =>
        array(
            'name' => 'French (Canada)',
            'locale' => 'fr_CA.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'fr_CH' =>
        array(
            'name' => 'French (Switzerland)',
            'locale' => 'fr_CH.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'fr' =>
        array(
            'name' => 'French (France)',
            'locale' => 'fr_FR.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'fr_LU' =>
        array(
            'name' => 'French (Luxembourg)',
            'locale' => 'fr_LU.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
 //       'fur_IT' =>
 //       array(
@@ -586,376 +686,451 @@ class Locales extends TrObject {
        array(
            'name' => 'Western Frisian (Germany)',
            'locale' => 'fy_DE.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'fy_NL' =>
        array(
            'name' => 'Western Frisian (Netherlands)',
            'locale' => 'fy_NL.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ga' =>
        array(
            'name' => 'Irish (Ireland)',
            'locale' => 'ga_IE.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'gd' =>
        array(
            'name' => 'Scottish Gaelic (United Kingdom)',
            'locale' => 'gd_GB.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'gl' =>
        array(
            'name' => 'Galician (Spain)',
            'locale' => 'gl_ES.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'gu' =>
        array(
            'name' => 'Gujarati (India)',
            'locale' => 'gu_IN.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'gv' =>
        array(
            'name' => 'Manx (United Kingdom)',
            'locale' => 'gv_GB.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ha' =>
        array(
            'name' => 'Hausa (Nigeria)',
            'locale' => 'ha_NG.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'he' =>
        array(
            'name' => 'Hebrew (Israel)',
            'locale' => 'he_IL.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'hi' =>
        array(
            'name' => 'Hindi (India)',
            'locale' => 'hi_IN.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'hr' =>
        array(
            'name' => 'Croatian (Croatia)',
            'locale' => 'hr_HR.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ht' =>
        array(
            'name' => 'Haitian (Haiti)',
            'locale' => 'ht_HT.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'hu' =>
        array(
            'name' => 'Hungarian (Hungary)',
            'locale' => 'hu_HU.UTF-8',
+           'collation' => array('mysql' => 'utf8_hungarian_ci'),
        ),
        'hy' =>
        array(
            'name' => 'Armenian (Armenia)',
            'locale' => 'hy_AM.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'id' =>
        array(
            'name' => 'Indonesian (Indonesia)',
            'locale' => 'id_ID.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ig' =>
        array(
            'name' => 'Igbo (Nigeria)',
            'locale' => 'ig_NG.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ik' =>
        array(
            'name' => 'Inupiaq (Canada)',
            'locale' => 'ik_CA.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'is' =>
        array(
            'name' => 'Icelandic (Iceland)',
            'locale' => 'is_IS.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'it_CH' =>
        array(
            'name' => 'Italian (Switzerland)',
            'locale' => 'it_CH.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'it' =>
        array(
            'name' => 'Italian (Italy)',
            'locale' => 'it_IT.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'iu' =>
        array(
            'name' => 'Inuktitut (Canada)',
            'locale' => 'iu_CA.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'iw' =>
        array(
            'name' => 'Hebrew (Israel)',
            'locale' => 'iw_IL.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ja' =>
        array(
            'name' => 'Japanese (Japan)',
            'locale' => 'ja_JP.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ka' =>
        array(
            'name' => 'Georgian (Georgia)',
            'locale' => 'ka_GE.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'kk' =>
        array(
            'name' => 'Kazakh (Kazakhstan)',
            'locale' => 'kk_KZ.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'kl' =>
        array(
            'name' => 'Kalaallisut (Greenland)',
            'locale' => 'kl_GL.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'km' =>
        array(
            'name' => 'Khmer (Cambodia)',
            'locale' => 'km_KH.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'kn' =>
        array(
            'name' => 'Kannada (India)',
            'locale' => 'kn_IN.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ko' =>
        array(
            'name' => 'Korean (South Korea)',
            'locale' => 'ko_KR.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ks' =>
        array(
            'name' => 'Kashmiri (India)',
            'locale' => 'ks_IN.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ku' =>
        array(
            'name' => 'Kurdish (Turkey)',
            'locale' => 'ku_TR.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'kw' =>
        array(
            'name' => 'Cornish (United Kingdom)',
            'locale' => 'kw_GB.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ky' =>
        array(
            'name' => 'Kirghiz (Kyrgyzstan)',
            'locale' => 'ky_KG.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'lg' =>
        array(
            'name' => 'Ganda (Uganda)',
            'locale' => 'lg_UG.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'li_BE' =>
        array(
            'name' => 'Limburgish (Belgium)',
            'locale' => 'li_BE.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'li_NL' =>
        array(
            'name' => 'Limburgish (Netherlands)',
            'locale' => 'li_NL.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'lo' =>
        array(
            'name' => 'Lao (Laos)',
            'locale' => 'lo_LA.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'lt' =>
        array(
            'name' => 'Lithuanian (Lithuania)',
            'locale' => 'lt_LT.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'lv' =>
        array(
            'name' => 'Latvian (Latvia)',
            'locale' => 'lv_LV.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'mg' =>
        array(
            'name' => 'Malagasy (Madagascar)',
            'locale' => 'mg_MG.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'mi' =>
        array(
            'name' => 'Maori (New Zealand)',
            'locale' => 'mi_NZ.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'mk' =>
        array(
            'name' => 'Macedonian (Macedonia)',
            'locale' => 'mk_MK.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ml' =>
        array(
            'name' => 'Malayalam (India)',
            'locale' => 'ml_IN.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'mn' =>
        array(
            'name' => 'Mongolian (Mongolia)',
            'locale' => 'mn_MN.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'mr' =>
        array(
            'name' => 'Marathi (India)',
            'locale' => 'mr_IN.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ms' =>
        array(
            'name' => 'Malay (Malaysia)',
            'locale' => 'ms_MY.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'mt' =>
        array(
            'name' => 'Maltese (Malta)',
            'locale' => 'mt_MT.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'my' =>
        array(
            'name' => 'Burmese (Myanmar [Burma])',
            'locale' => 'my_MM.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'nb' =>
        array(
            'name' => 'Norwegian Bokmål (Norway)',
            'locale' => 'nb_NO.UTF-8',
+           'collation' => array('mysql' => 'utf8_danich_ci'),
        ),
        'ne' =>
        array(
            'name' => 'Nepali (Nepal)',
            'locale' => 'ne_NP.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'nl_AW' =>
        array(
            'name' => 'Dutch (Aruba)',
            'locale' => 'nl_AW.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'nl_BE' =>
        array(
            'name' => 'Dutch (Belgium)',
            'locale' => 'nl_BE.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'nl' =>
        array(
            'name' => 'Dutch (Netherlands)',
            'locale' => 'nl_NL.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'nn' =>
        array(
            'name' => 'Norwegian Nynorsk (Norway)',
            'locale' => 'nn_NO.UTF-8',
+           'collation' => array('mysql' => 'utf8_danich_ci'),
        ),
        'nr' =>
        array(
            'name' => 'South Ndebele (South Africa)',
            'locale' => 'nr_ZA.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'oc' =>
        array(
            'name' => 'Occitan (France)',
            'locale' => 'oc_FR.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'om_ET' =>
        array(
            'name' => 'Oromo (Ethiopia)',
            'locale' => 'om_ET.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'om_KE' =>
        array(
            'name' => 'Oromo (Kenya)',
            'locale' => 'om_KE.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'or' =>
        array(
            'name' => 'Oriya (India)',
            'locale' => 'or_IN.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'os' =>
        array(
            'name' => 'Ossetic (Russia)',
            'locale' => 'os_RU.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'pa' =>
        array(
            'name' => 'Punjabi (India)',
            'locale' => 'pa_IN.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'pa_PK' =>
        array(
            'name' => 'Punjabi (Pakistan)',
            'locale' => 'pa_PK.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'pl' =>
        array(
            'name' => 'Polish (Poland)',
            'locale' => 'pl_PL.UTF-8',
+           'collation' => array('mysql' => 'utf8_polish_ci'),
        ),
        'ps' =>
        array(
            'name' => 'Pashto (Afghanistan)',
            'locale' => 'ps_AF.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'pt_BR' =>
        array(
            'name' => 'Portuguese (Brazil)',
            'locale' => 'pt_BR.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'pt' =>
        array(
            'name' => 'Portuguese (Portugal)',
            'locale' => 'pt_PT.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ro' =>
        array(
            'name' => 'Romanian (Romania)',
            'locale' => 'ro_RO.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ru' =>
        array(
            'name' => 'Russian (Russia)',
            'locale' => 'ru_RU.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ru_UA' =>
        array(
            'name' => 'Russian (Ukraine)',
            'locale' => 'ru_UA.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'rw' =>
        array(
            'name' => 'Kinyarwanda (Rwanda)',
            'locale' => 'rw_RW.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'sa' =>
        array(
            'name' => 'Sanskrit (India)',
            'locale' => 'sa_IN.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'sc' =>
        array(
            'name' => 'Sardinian (Italy)',
            'locale' => 'sc_IT.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'sd' =>
        array(
            'name' => 'Sindhi (India)',
            'locale' => 'sd_IN.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'se' =>
        array(
            'name' => 'Northern Sami (Norway)',
            'locale' => 'se_NO.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'si' =>
        array(
            'name' => 'Sinhala (Sri Lanka)',
            'locale' => 'si_LK.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
 //       'sid_ET' =>
 //       array(
@@ -966,226 +1141,271 @@ class Locales extends TrObject {
        array(
            'name' => 'Slovak (Slovakia)',
            'locale' => 'sk_SK.UTF-8',
+           'collation' => array('mysql' => 'utf8_slovak_ci'),
        ),
        'sl' =>
        array(
            'name' => 'Slovenian (Slovenia)',
            'locale' => 'sl_SI.UTF-8',
+           'collation' => array('mysql' => 'utf8_slovenian_ci'),
        ),
        'so_DJ' =>
        array(
            'name' => 'Somali (Djibouti)',
            'locale' => 'so_DJ.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'so_ET' =>
        array(
            'name' => 'Somali (Ethiopia)',
            'locale' => 'so_ET.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'so_KE' =>
        array(
            'name' => 'Somali (Kenya)',
            'locale' => 'so_KE.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'so' =>
        array(
            'name' => 'Somali (Somalia)',
            'locale' => 'so_SO.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'sq' =>
        array(
            'name' => 'Albanian (Albania)',
            'locale' => 'sq_AL.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'sq_MK' =>
        array(
            'name' => 'Albanian (Macedonia)',
            'locale' => 'sq_MK.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'sr_ME' =>
        array(
            'name' => 'Serbian (Montenegro)',
            'locale' => 'sr_ME.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'sr' =>
        array(
            'name' => 'Serbian (Serbia)',
            'locale' => 'sr_RS.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ss' =>
        array(
            'name' => 'Swati (South Africa)',
            'locale' => 'ss_ZA.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'st' =>
        array(
            'name' => 'Southern Sotho (South Africa)',
            'locale' => 'st_ZA.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'sv_FI' =>
        array(
            'name' => 'Swedish (Finland)',
            'locale' => 'sv_FI.UTF-8',
+           'collation' => array('mysql' => 'utf8_swedish_ci'),
        ),
        'sv' =>
        array(
            'name' => 'Swedish (Sweden)',
            'locale' => 'sv_SE.UTF-8',
+           'collation' => array('mysql' => 'utf8_swedish_ci'),
        ),
        'sw' =>
        array(
            'name' => 'Swahili (Kenya)',
            'locale' => 'sw_KE.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'sw_TZ' =>
        array(
            'name' => 'Swahili (Tanzania)',
            'locale' => 'sw_TZ.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ta' =>
        array(
            'name' => 'Tamil (India)',
            'locale' => 'ta_IN.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'te' =>
        array(
            'name' => 'Telugu (India)',
            'locale' => 'te_IN.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'tg' =>
        array(
            'name' => 'Tajik (Tajikistan)',
            'locale' => 'tg_TJ.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'th' =>
        array(
            'name' => 'Thai (Thailand)',
            'locale' => 'th_TH.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ti_ER' =>
        array(
            'name' => 'Tigrinya (Eritrea)',
            'locale' => 'ti_ER.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ti' =>
        array(
            'name' => 'Tigrinya (Ethiopia)',
            'locale' => 'ti_ET.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'tk' =>
        array(
            'name' => 'Turkmen (Turkmenistan)',
            'locale' => 'tk_TM.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'tl' =>
        array(
            'name' => 'Tagalog (Philippines)',
            'locale' => 'tl_PH.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'tn' =>
        array(
            'name' => 'Tswana (South Africa)',
            'locale' => 'tn_ZA.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'tr_CY' =>
        array(
            'name' => 'Turkish (Cyprus)',
            'locale' => 'tr_CY.UTF-8',
+           'collation' => array('mysql' => 'utf8_turkish_ci'),
        ),
        'tr' =>
        array(
            'name' => 'Turkish (Turkey)',
            'locale' => 'tr_TR.UTF-8',
+           'collation' => array('mysql' => 'utf8_turkish_ci'),
        ),
        'ts' =>
        array(
            'name' => 'Tsonga (South Africa)',
            'locale' => 'ts_ZA.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'tt' =>
        array(
            'name' => 'Tatar (Russia)',
            'locale' => 'tt_RU.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ug' =>
        array(
            'name' => 'Uighur (China)',
            'locale' => 'ug_CN.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'uk' =>
        array(
            'name' => 'Ukrainian (Ukraine)',
            'locale' => 'uk_UA.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'ur_PK' =>
        array(
            'name' => 'Urdu (Pakistan)',
            'locale' => 'ur_PK.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'uz' =>
        array(
            'name' => 'Uzbek (Uzbekistan)',
            'locale' => 'uz_UZ.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        've' =>
        array(
            'name' => 'Venda (South Africa)',
            'locale' => 've_ZA.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'vi' =>
        array(
            'name' => 'Vietnamese (Vietnam)',
            'locale' => 'vi_VN.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'wa' =>
        array(
            'name' => 'Walloon (Belgium)',
            'locale' => 'wa_BE.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'wo' =>
        array(
            'name' => 'Wolof (Senegal)',
            'locale' => 'wo_SN.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'xh' =>
        array(
            'name' => 'Xhosa (South Africa)',
            'locale' => 'xh_ZA.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'yi' =>
        array(
            'name' => 'Yiddish (United States)',
            'locale' => 'yi_US.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'yo' =>
        array(
            'name' => 'Yoruba (Nigeria)',
            'locale' => 'yo_NG.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'zh' =>
        array(
            'name' => 'Chinese (China)',
            'locale' => 'zh_CN.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'zh_HK' =>
        array(
            'name' => 'Chinese (Hong Kong SAR China)',
            'locale' => 'zh_HK.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'zh_SG' =>
        array(
            'name' => 'Chinese (Singapore)',
            'locale' => 'zh_SG.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'zh_TW' =>
        array(
            'name' => 'Chinese (Taiwan)',
            'locale' => 'zh_TW.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
        'zu_ZA' =>
        array(
            'name' => 'Zulu (South Africa)',
            'locale' => 'zu_ZA.UTF-8',
+           'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
    );
 
@@ -1654,6 +1874,12 @@ class Locales extends TrObject {
       return in_array($lang, self::$appLangs);
    }
 
+   
+   public static function getCollation($lang = 'cs', $driver = 'mysql')
+   {
+      if(isset(self::$locales[$lang]) && isset(self::$locales[$lang]['collation'])  && isset(self::$locales[$lang]['collation'][$driver])){
+         return self::$locales[$lang]['collation'][$driver];
+      }
+      return 'utf8_unicode_ci';
+   }
 }
-
-?>
