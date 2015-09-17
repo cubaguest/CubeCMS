@@ -5,6 +5,8 @@
 class MapLocations_Model extends Model_ORM {
    const DB_TABLE = 'map_locations';
 
+   const IMAGES_SEPARATOR = ';';
+   
 /**
  * Názvy sloupců v databázi
  */
@@ -20,6 +22,7 @@ class MapLocations_Model extends Model_ORM {
    
    protected function  _initTable() {
       $this->setTableName(self::DB_TABLE, 't_m_loc');
+//      $this->rowClass = '';
 
       $this->addColumn(self::COLUMN_ID, array('datatype' => 'smallint', 'ai' => true, 
           'nn' => true, 'pk' => true));
@@ -43,6 +46,26 @@ class MapLocations_Model extends Model_ORM {
       $this->addForeignKey(self::COLUMN_ID_CATEGORY, 'Model_Categories', Model_Category::COLUMN_CAT_ID);
    }
    
+   protected function beforeSave(\Model_ORM_Record $record, $type = 'U')
+   {
+      parent::beforeSave($record, $type);
+      
+      if(is_array($record->{self::COLUMN_IMAGE})){
+         $record->{self::COLUMN_IMAGE} = implode(self::IMAGES_SEPARATOR, $record->{self::COLUMN_IMAGE});
+      }
+   }
+   
 }
 
-?>
+class MapLocations_Model_Record extends Model_ORM_Record {
+   
+   public function getImages()
+   {
+      return explode(MapLocations_Model::IMAGES_SEPARATOR, $this->{MapLocations_Model::COLUMN_IMAGE});
+   }
+   
+   public function getDataDir()
+   {
+      return 'location-'.$this->getPK();
+   }
+}

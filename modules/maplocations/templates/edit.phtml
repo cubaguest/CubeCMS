@@ -12,7 +12,7 @@ $this->addPageTitle($h);
 <div class="main-content-form-edit" id="article-edit-form">
    <?php 
    $this->form->html()->setAttrib('name', 'form-address');
-   $this->form->address->setSubLabel('Slouží pouze pro vyhledání souřadnic. <a href="'.$this->link().'#location_address_1" onclick="searchPlace();">HLEDAT</a>.<br /><span id="adr-result"></span>');
+   $this->form->address->setSubLabel('Slouží pouze pro vyhledání souřadnic. <a href="'.$this->link().'#location_address_1" onclick="searchPlace();return false;">HLEDAT</a>.<br /><span id="adr-result"></span>');
    echo($this->form);
    ?>
    <script type="text/javascript">

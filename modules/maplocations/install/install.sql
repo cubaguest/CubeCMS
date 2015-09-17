@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}map_locations` (
 `text_clear` TEXT CHARACTER SET utf8 COLLATE utf8_czech_ci NULL DEFAULT NULL ,
 `coordinate_x` FLOAT NULL DEFAULT NULL ,
 `coordinate_y` FLOAT NULL DEFAULT NULL ,
-`image` VARCHAR( 50 ) NULL DEFAULT NULL ,
+`image` VARCHAR( 1000 ) NULL DEFAULT NULL ,
 `marker` VARCHAR( 30 ) NULL DEFAULT NULL ,
 INDEX (  `id_category` )
 ) ENGINE = MYISAM ;

@@ -1,0 +1,2 @@
+ALTER TABLE `{PREFIX}map_locations` 
+CHANGE COLUMN `image` `image` VARCHAR(1000) NULL DEFAULT NULL ;

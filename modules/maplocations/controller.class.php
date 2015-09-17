@@ -48,13 +48,12 @@ class MapLocations_Controller extends Controller {
          /* @TODO možná mazat i obrázky */
          $loc = $model->record($formDel->id->getValues());
          
-         if($loc != false && $loc->{MapLocations_Model::COLUMN_IMAGE} != null){
-            $file = $this->module()->getDataDir().$loc->{MapLocations_Model::COLUMN_IMAGE};
-            if(is_file($file) && !@unlink($file)){
-               $this->log(sprintf('Soubor "%s" se napodařilo vymazat'), $file);
-            }
-         }
          $model->delete($formDel->id->getValues());
+         $dir = new FS_Dir($this->module()->getDataDir().'location-'.$loc->getPK().DIRECTORY_SEPARATOR);
+         if($dir->exist()){
+            $dir->delete();
+         }
+         
          $this->infoMsg()->addMessage($this->tr('Místo bylo smazáno'));
          $this->link()->route('list')->reload();
       }
@@ -68,7 +67,8 @@ class MapLocations_Controller extends Controller {
    public function addController() {
       $this->checkWritebleRights();
       $form = $this->createForm();
-
+      $this->view()->form = $form;
+      
       if($form->isSend() AND $form->save->getValues() == false){
          $this->link()->route('list')->reload();
       }
@@ -80,22 +80,28 @@ class MapLocations_Controller extends Controller {
          $pos = explode(':', $form->position->getValues());
          
          $rec->{MapLocations_Model::COLUMN_ID_CATEGORY} = $this->category()->getId();
-         $rec->{MapLocations_Model::COLUMN_COORDINATE_X} = $pos[0];
-         $rec->{MapLocations_Model::COLUMN_COORDINATE_Y} = $pos[1];
+         $rec->{MapLocations_Model::COLUMN_COORDINATE_X} = trim($pos[0]);
+         $rec->{MapLocations_Model::COLUMN_COORDINATE_Y} = trim($pos[1]);
          $rec->{MapLocations_Model::COLUMN_NAME} = $form->name->getValues();
          $rec->{MapLocations_Model::COLUMN_TEXT} = $form->text->getValues();
          $rec->{MapLocations_Model::COLUMN_TEXT_CLEAR} = strip_tags($form->text->getValues());
-
+         $rec->save();
+         
          // image
          if($form->image->getValues() != null){
-            $image = $form->image->createFileObject('Filesystem_File_Image');
-            $image->resampleImage(VVE_IMAGE_THUMB_W, VVE_IMAGE_THUMB_H, VVE_IMAGE_THUMB_CROP);
-            $image->save();
-            $rec->{MapLocations_Model::COLUMN_IMAGE} = $image->getName();
-            unset ($image);
+            $imagesUploaded = $form->image->getValues();
+            $imagesPaths = array();
+            $dataDir = $this->module()->getDataDir().'location-'.$rec->getPK().DIRECTORY_SEPARATOR;
+            
+            foreach ($imagesUploaded as $file) {
+               $fObj = new File($file);
+               $fObj->move($dataDir);
+               $imagesPaths[] = $fObj->getName();
+            }
+            $rec->{MapLocations_Model::COLUMN_IMAGE} = $imagesPaths;
          }
          
-         $model->save($rec);
+         $rec->save();
          
          $this->infoMsg()->addMessage($this->tr('Místo bylo uloženo'));
          $this->link()->route('list')->reload();
@@ -115,20 +121,15 @@ class MapLocations_Controller extends Controller {
       $iIdElem = new Form_Element_Hidden('loc_id');
       $iIdElem->addValidation(new Form_Validator_IsNumber());
       $form->addElement($iIdElem,'place');
-
+      
       // načtení dat
       $model = new MapLocations_Model();
       $location = $model->where(MapLocations_Model::COLUMN_ID.' = :id',
             array('id' => $this->getRequest('id')))->record();
 
-      if($location == false){ return false; }
+      $form->image->setUploadDir($this->module()->getDataDir().'location-'.$location->getPK().DIRECTORY_SEPARATOR);
       
-      // checkbox pro smazání obrázku
-      if($location->{MapLocations_Model::COLUMN_IMAGE} != null){
-         $iImageDel = new Form_Element_Checkbox('delimg', $this->tr('Smazat přiřazený obrázek'));
-         $iImageDel->setSubLabel(sprintf($this->tr('Uložen soubor "%s"'), $location->{MapLocations_Model::COLUMN_IMAGE}));
-         $form->addElement($iImageDel,'place',3);
-      }
+      if($location == false){ return false; }
       
       $form->name->setValues($location->{MapLocations_Model::COLUMN_NAME});
       $form->text->setValues($location->{MapLocations_Model::COLUMN_TEXT});
@@ -147,24 +148,21 @@ class MapLocations_Controller extends Controller {
          $location->{MapLocations_Model::COLUMN_TEXT} = $form->text->getValues();
          $location->{MapLocations_Model::COLUMN_TEXT_CLEAR} = strip_tags($form->text->getValues());
 
-         if($form->haveElement('delimg') && $form->delimg->getValues() == true){
-            $location->{MapLocations_Model::COLUMN_IMAGE} = null;
-            $file = $this->module()->getDataDir().$location->{MapLocations_Model::COLUMN_IMAGE};
-            if(is_file($file) && !@unlink($file)){
-               $this->log(sprintf('Soubor "%s" se napodařilo vymazat'), $file);
-            }
-         }
-         
          // image
          if($form->image->getValues() != null){
-            $image = $form->image->createFileObject('Filesystem_File_Image');
-            $image->resampleImage(VVE_IMAGE_THUMB_W, VVE_IMAGE_THUMB_H, VVE_IMAGE_THUMB_CROP);
-            $image->save();
-            $location->{MapLocations_Model::COLUMN_IMAGE} = $image->getName();
-            unset ($image);
+            $imagesUploaded = $form->image->getValues();
+            $imagesPaths = array();
+            $dataDir = $this->module()->getDataDir().'location-'.$location->getPK().DIRECTORY_SEPARATOR;
+            
+            foreach ($imagesUploaded as $file) {
+               $fObj = new File($file);
+               $fObj->move($dataDir);
+               $imagesPaths[] = $fObj->getName();
+            }
+            $location->{MapLocations_Model::COLUMN_IMAGE} = $imagesPaths;
          }
          
-         $model->save($location);
+         $location->save();
          
          $this->infoMsg()->addMessage($this->tr('Místo bylo uloženo'));
          $this->link()->route('list')->reload();
@@ -194,7 +192,7 @@ class MapLocations_Controller extends Controller {
          
          $text = $this->loadText();
          $text->{Text_Model::COLUMN_TEXT} = $form->text->getValues(); 
-         $text->{Text_Model::COLUMN_TEXT_CLEAR} = strip_tags($form->text->getValues()); 
+         $text->{Text_Model::COLUMN_TEXT_CLEAR} = Utils_Html::stripTags($form->text->getValues());
          $text->{Text_Model::COLUMN_ID_CATEGORY} = $this->category()->getId(); 
          
          $textM->save($text);
@@ -211,7 +209,7 @@ class MapLocations_Controller extends Controller {
       $this->view()->form = $form;
    }
    
-   private function loadText() {
+   protected function loadText() {
       $textM = new Text_Model();
       $text = $textM->where(Text_Model::COLUMN_ID_CATEGORY.' = :idc', array('idc' =>  $this->category()->getId()))->record();
       if($text != false){
@@ -233,11 +231,14 @@ class MapLocations_Controller extends Controller {
       $form->addElement($iName, $fGrpBase);
 
       $iText = new Form_Element_TextArea('text', $this->tr('Text'));
+      $iText->setSubLabel($this->tr('Pokud mají být vloženy obrázky do textu, vložte na jejich místo řetězec <em>[images]</em>'));
       $form->addElement($iText, $fGrpBase);
 
-      $eImage = new Form_Element_File('image', $this->tr('Obrázek'));
-      $eImage->addValidation(new Form_Validator_FileExtension('jpg'));
-      $eImage->setUploadDir($this->category()->getModule()->getDataDir());
+//      $eImage = new Form_Element_File('image', $this->tr('Obrázek'));
+      $eImage = new Form_Element_ImagesUploader('image', $this->tr('Obrázky'));
+      $eImage->setImagesKey('mapplaces');
+//      $eImage->addValidation(new Form_Validator_FileExtension('jpg'));
+//      $eImage->setUploadDir($this->category()->getModule()->getDataDir());
       $form->addElement($eImage, $fGrpBase );
 
       $iaddress = new Form_Element_Text('address', $this->tr('Adresa'));

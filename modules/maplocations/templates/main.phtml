@@ -4,13 +4,13 @@ echo $this->toolbox;
 ?>
 <h1><?php  echo $this->category()->getName(); ?></h1>
 <div class="main-content-detail">
-   <div id="map_canvas" style="width:100%; height:400px"></div>   
+   <div id="map_canvas" style="width:100%; height:600px"></div>   
    <script type="text/javascript">
       var map = null;
       function initMap() {
          var latlng = new google.maps.LatLng(
-<?php echo $this->category()->getParam(MapLocations_Controller::PARAM_MAP_X, '') /* X */?>, 
-<?php echo $this->category()->getParam(MapLocations_Controller::PARAM_MAP_Y, '') /* Y */?>);
+         <?php echo $this->category()->getParam(MapLocations_Controller::PARAM_MAP_X, '') /* X */?>, 
+         <?php echo $this->category()->getParam(MapLocations_Controller::PARAM_MAP_Y, '') /* Y */?>);
          var myOptions = {
             zoom: <?php echo $this->category()->getParam(MapLocations_Controller::PARAM_MAP_ZOOM, 8)?>,
             center: latlng,
@@ -20,27 +20,42 @@ echo $this->toolbox;
       }
       initMap();
       // add markers
-      <?php if(!empty ($this->locations)) { foreach ($this->locations as $i => $loc) {
+      <?php if(!empty ($this->locations)) { 
+         foreach ($this->locations as $i => $loc) {
          // create content string
-         $cnt = '<h2>'.$loc->{MapLocations_Model::COLUMN_NAME}."</h2>";
-         if($loc->{MapLocations_Model::COLUMN_IMAGE} != null){
-            $cnt .= '<img src="'.$this->category()->getModule()->getDataDir(true).$loc->{MapLocations_Model::COLUMN_IMAGE}.'" 
-               alt="'.htmlspecialchars($loc->{MapLocations_Model::COLUMN_NAME}).'"
-               class="image-left" />';
+            $cnt = null;
+            $cnt .= '<span style="float: right; font-style: italic; color: gray;">'.$loc->{MapLocations_Model::COLUMN_COORDINATE_X}.":".$loc->{MapLocations_Model::COLUMN_COORDINATE_Y}."</span>";
+            $cnt .= '<h2>'.$loc->{MapLocations_Model::COLUMN_NAME}."</h2>";
+            $imagesCnt = null;
+            $images = $loc->getImages();
+            if(!empty($images)){
+               foreach ($images as $img) {
+                  $imagesCnt .= '<a href="'.Utils_Image::cache($this->category()->getModule()->getDataDir().$loc->getDataDir().DIRECTORY_SEPARATOR.$img, 800, 800).'" >';
+                  $imagesCnt .= '<img style="display: inline-block; margin-right: 5px;" src="'.
+                      Utils_Image::cache($this->category()->getModule()->getDataDir().$loc->getDataDir().DIRECTORY_SEPARATOR.$img, 100, 100, true).'" alt="" />';
+                  $imagesCnt .= '</a>';
+               }
+            }
+
+            if(strpos($loc->{MapLocations_Model::COLUMN_TEXT}, '[images]') !== false){
+               $cnt .= str_replace('[images]', $imagesCnt, $loc->{MapLocations_Model::COLUMN_TEXT});
+            } else {
+               $cnt .= $loc->{MapLocations_Model::COLUMN_TEXT}.$imagesCnt;
+            }
+
+
+            echo "
+            var point_$i = new google.maps.LatLng(
+            {$loc->{MapLocations_Model::COLUMN_COORDINATE_X}},{$loc->{MapLocations_Model::COLUMN_COORDINATE_Y}});
+            var infowindow_$i = new google.maps.InfoWindow({content: ".json_encode('<div style="wwidth: 450px; margin-right: 10px;">'.$cnt.'</div>').", maxWidth : 450});
+            var marker_$i = new google.maps.Marker({
+               position: point_$i, map: map, 
+               title: ".json_encode($loc->{MapLocations_Model::COLUMN_NAME})."
+            }); 
+            google.maps.event.addListener(marker_$i, 'click', function() {infowindow_$i.open(map,marker_$i);});
+            ";
          }
-         $cnt .= $loc->{MapLocations_Model::COLUMN_TEXT};
-         
-         echo "
-         var point_$i = new google.maps.LatLng(
-         {$loc->{MapLocations_Model::COLUMN_COORDINATE_X}},{$loc->{MapLocations_Model::COLUMN_COORDINATE_Y}});
-         var infowindow_$i = new google.maps.InfoWindow({content: ".json_encode('<div style="width: 450px;">'.$cnt.'</div>').", maxWidth : 450});
-         var marker_$i = new google.maps.Marker({
-            position: point_$i, map: map, 
-            title: ".json_encode($loc->{MapLocations_Model::COLUMN_NAME})."
-         }); 
-         google.maps.event.addListener(marker_$i, 'click', function() {infowindow_$i.open(map,marker_$i);});
-         ";
-      }}?>
+      }?>
       
    </script>
 </div>
