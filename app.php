@@ -452,6 +452,12 @@ class AppCore extends TrObject {
             throw new unexpectedValueException($this->tr("Nepodařilo se načíst konfiguraci. Chyba připojení k DB?"));
          }
       }
+      
+      if(isset($_REQUEST['testface'])){
+         define('VVE_TEMPLATE_FACE', $_REQUEST['testface']);
+         define('CUBE_CMS_TEMPLATE_FACE', $_REQUEST['testface']);
+      }
+      
       foreach ($recs as $record) {
          if(!defined('CUBE_CMS_'.$record->{Model_Config::COLUMN_KEY})) {
             if($record->{Model_Config::COLUMN_VALUE} == 'true') {
