@@ -51,7 +51,6 @@ class AdminEnviroment_Controller extends Controller {
          $eLangPrimary->addOption($name, $code);
          in_array($code, $enabledLangsStored) ? $enabledLangs[] = $code : '';
       }
-      Debug::log($enabledLangs);
       $eLangs->setValues($enabledLangs);
       $form->addElement($eLangs, $grpNames);
       
