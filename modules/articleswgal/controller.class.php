@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Kontroler pro obsluhu fotogalerie
  *
@@ -9,35 +10,36 @@
  * @author 		$Author: $ $Date:$
  *              $LastChangedBy: $ $LastChangedDate: $
  */
-
 class ArticlesWGal_Controller extends Articles_Controller {
+
    const DEFAULT_IMAGES_IN_LIST = 0;
-   
+
    protected function init()
    {
       parent::init();
       // registrace modulu fotogalerie pro obsluhu galerie
       $this->registerModule('photogalery');
    }
-   
+
    /**
     * Kontroler pro zobrazení fotogalerii
     */
-   public function mainController() 
+   public function mainController()
    {
       parent::mainController();
    }
 
-   public function showController($urlkey) 
+   public function showController($urlkey)
    {
       $this->checkReadableRights();
-      if(parent::showController($urlkey) === false) return false;
+      if (parent::showController($urlkey) === false)
+         return false;
 
       // fotogalerie
       $this->view()->pCtrl = new Photogalery_Controller($this);
       $this->view()->pCtrl->loadText = false;
       $this->view()->pCtrl->idItem = $this->view()->article->{Articles_Model_Detail::COLUMN_ID};
-      $this->view()->pCtrl->subDir = $this->view()->article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR;
+      $this->view()->pCtrl->subDir = $this->view()->article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()] . DIRECTORY_SEPARATOR;
       $this->view()->pCtrl->mainController();
 
       // adresáře k fotkám
@@ -49,17 +51,17 @@ class ArticlesWGal_Controller extends Articles_Controller {
     * Metoda smaže článek z dat - overriding
     * @param int $idArticle
     */
-   protected function deleteArticle($idArticle) 
+   protected function deleteArticle($idArticle)
    {
       $artM = new Articles_Model_Detail();
       // smazání fotek
       $photogalCtrl = new Photogalery_Controller($this->category(), $this->routes(), $this->view());
-      $photogalCtrl->subDir = $this->view()->article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR;
+      $photogalCtrl->subDir = $this->view()->article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()] . DIRECTORY_SEPARATOR;
       $photogalCtrl->deleteImages($idArticle);
-      unset ($photogalCtrl);
+      unset($photogalCtrl);
 
       //odstranění adresáře s fotkama
-      $dir = new Filesystem_Dir($this->category()->getModule()->getDataDir().$this->view()->article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]);
+      $dir = new Filesystem_Dir($this->category()->getModule()->getDataDir() . $this->view()->article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]);
       $dir->rmDir();
 
       $artM->deleteArticle($idArticle);
@@ -72,20 +74,19 @@ class ArticlesWGal_Controller extends Articles_Controller {
     * @param <type> $urlkeys
     * @param <type> $form
     */
-   protected function saveArticle($names, $urlkeys,Form $form, Model_ORM_Record $article=null) 
+   protected function saveArticle($names, $urlkeys, Form $form, Model_ORM_Record $article = null)
    {
       // přejmenování adresáře
       $id = parent::saveArticle($names, $urlkeys, $form, $article);
 
-      if($article !== null) {
+      if ($article !== null) {
          $model = new Articles_Model_Detail();
          $newArticle = $model->getArticleById($article->{Articles_Model_Detail::COLUMN_ID});
 
-         if($article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]
-                 != $newArticle[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]
-                 AND file_exists($this->category()->getModule()->getDataDir().$article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()])) {
+         if ($article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()] != $newArticle[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]
+             AND file_exists($this->category()->getModule()->getDataDir() . $article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()])) {
             $dir = new Filesystem_Dir($this->category()->getModule()->getDataDir()
-                            .$article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]);
+                . $article[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()]);
             $dir->rename($urlkeys[Locales::getDefaultLang()]);
          }
       }
@@ -124,18 +125,30 @@ class ArticlesWGal_Controller extends Articles_Controller {
    protected function callRegisteredModule(Controller $ctrl, $module, $action)
    {
       $artModel = new Articles_Model();
-      $art = $artModel->where(Articles_Model::COLUMN_URLKEY,$this->getRequest('urlkey'))->record();
-      if($art == false) return false;
+      $art = $artModel->where(Articles_Model::COLUMN_URLKEY, $this->getRequest('urlkey'))->record();
+      if ($art == false)
+         return false;
       // base setup variables
       $ctrl->idItem = $art->{Articles_Model_Detail::COLUMN_ID};
-      $ctrl->subDir = $art[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR;
+      $ctrl->subDir = $art[Articles_Model_Detail::COLUMN_URLKEY][Locales::getDefaultLang()] . DIRECTORY_SEPARATOR;
       $ctrl->linkBack = $this->link()->route('detail');
-      
+
       $ctrl->view()->name = $art->{Articles_Model_Detail::COLUMN_NAME};
       $ctrl->view()->link = $this->link()->route('detail');
    }
 
-   public function settings(&$settings,Form &$form) 
+   protected function processMoveArticle(Category $cat,Form $form, Model_ORM_Record $article)
+   {
+      parent::processMoveArticle($cat, $form, $article);
+      // change images category
+      $modelImages = new PhotoGalery_Model_Images();
+      $modelImages
+          ->where(PhotoGalery_Model_Images::COLUMN_ID_CAT." = :idc", array('idc' => $this->category()->getId()))
+          ->update(array(PhotoGalery_Model_Images::COLUMN_ID_CAT => $cat->getId()));
+      
+   }
+
+   public function settings(&$settings, Form &$form)
    {
       $phCtrl = new Photogalery_Controller($this);
       $phCtrl->settings($settings, $form);
@@ -144,17 +157,17 @@ class ArticlesWGal_Controller extends Articles_Controller {
       parent::settings($settings, $form);
 
       $elemImgList = new Form_Element_Text('imagesinlist', $this->tr('Počet obrázků v seznamu'));
-      $elemImgList->setSubLabel('Výchozí: '.self::DEFAULT_IMAGES_IN_LIST.' obrázků');
+      $elemImgList->setSubLabel('Výchozí: ' . self::DEFAULT_IMAGES_IN_LIST . ' obrázků');
       $elemImgList->addValidation(new Form_Validator_IsNumber());
-      $form->addElement($elemImgList,'view',2);
+      $form->addElement($elemImgList, 'view', 2);
 
-      if(isset($settings['imagesinlist'])) {
+      if (isset($settings['imagesinlist'])) {
          $form->imagesinlist->setValues($settings['imagesinlist']);
       }
 
-      if($form->isValid()){
+      if ($form->isValid()) {
          $settings['imagesinlist'] = $form->imagesinlist->getValues();
       }
    }
+
 }
-?>

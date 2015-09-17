@@ -1458,6 +1458,9 @@ class Articles_Controller extends Controller {
          ->records();
       
       foreach ($cats as $cat) {
+         if($cat->{Model_Category::COLUMN_ID} == $this->category()->getId()){
+            continue;
+         }
          $eNewCat->setOptions(array(
                $cat->{Model_Category::COLUMN_NAME}.' - '.$cat->{Model_Category::COLUMN_ID} => $cat->{Model_Category::COLUMN_ID}), 
             true);
@@ -1473,25 +1476,30 @@ class Articles_Controller extends Controller {
 
       if($form->isValid()){
          $cat = new Category((int)$form->newcat->getValues());
-         
-         // změna id kategorie
-         $article->{Articles_Model::COLUMN_ID_CATEGORY} = (int)$form->newcat->getValues();
-         $modelArt->save($article);
-         
-         // přesun datového adresáře
-         $dir = new FS_Dir($this->module()->getDataDir(false).$article->{Articles_Model::COLUMN_URLKEY}[Locales::getDefaultLang()]);
-         if($dir->exist()){
-            $dir->rename($cat->getModule()->getDataDir().$article->{Articles_Model::COLUMN_URLKEY}[Locales::getDefaultLang()]);
-         }
+         $this->processMoveArticle($cat, $form, $article);
          
          // přesměrování do nové kategorie
-         $this->link(true)
+         $this->link()->clear(true)
             ->category($cat->getUrlKey())->route('detail', array('urlkey' => $article->{Articles_Model::COLUMN_URLKEY}))
             ->reload();         
       }
       
       $this->view()->article = $article;
       $this->view()->form = $form;
+   }
+   
+   protected function processMoveArticle(Category $cat,Form $form, Model_ORM_Record $article)
+   {
+      // změna id kategorie
+      $article->{Articles_Model::COLUMN_ID_CATEGORY} = $cat->getId();
+      $modelArt = new Articles_Model();      
+      $modelArt->save($article);
+
+      // přesun datového adresáře
+      $dir = new FS_Dir($this->module()->getDataDir(false).$article->{Articles_Model::COLUMN_URLKEY}[Locales::getDefaultLang()]);
+      if($dir->exist()){
+         $dir->move($cat->getModule()->getDataDir(false));
+      }
    }
    
    /**
