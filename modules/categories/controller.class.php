@@ -424,6 +424,12 @@ class Categories_Controller extends Controller {
 
 
          $lastId = $record->save();
+         // pokud je adresář už obsazen
+         if(is_dir(AppCore::getAppDataDir().$dataDir)){
+            $record->{Model_Category::COLUMN_DATADIR} = $dataDir.'-'.$lastId;
+            $record->save();
+         }
+         
          // práva
          $this->assignRights($lastId, $form);
       
