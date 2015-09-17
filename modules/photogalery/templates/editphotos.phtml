@@ -66,7 +66,10 @@ $this->addFile("js://photogalery:editphotos.js");
    </div>
    
    <h2><?php echo $this->tr('Seznam uložených obrázků')?></h2>
-   <div id="images-actions" class="fixed-actions-box" data-container="#images-list">
+   <div id="images-actions" class="fixed-actions-box clearfix" data-container="#images-list">
+      <div class="right-box">
+         <a class="btn btn-danger" href="<?php echo $this->linkBack?>"><span class="icon icon-times"></span> <?php ps($this->tr('Zavřít úpravu')); ?></a>
+      </div>
       <form action="<?php echo $this->link()?>" class="form-vertical">
          <div class="form-group">
             <div class="form-controls">
@@ -80,9 +83,15 @@ $this->addFile("js://photogalery:editphotos.js");
                   <option value="remove"><?php ps($this->tr('Smazat')); ?></option>
                </select>
                <button id="buttons-process-images" class="btn btn-success" type="button" disabled="disabled"><span class="icon icon-check"></span> <?php ps($this->tr('Provést')); ?></button>
-               <div class="right-box">
-                  <a class="btn btn-danger" href="<?php echo $this->linkBack?>"><span class="icon icon-times"></span> <?php ps($this->tr('Zavřít úpravu')); ?></a>
-               </div>
+            </div>
+         </div>
+      </form>
+      <form action="<?php echo $this->link()?>" class="form-vertical">
+         <div class="form-group">
+            <div class="form-controls">
+               <label for="images-action-rename"><?php ps($this->tr('Přejmenuj na')); ?></label>:
+               <input name="rename_prefix" id="images-action-rename" value="" placeholder="<?php ps($this->tr('Předpona')); ?>" />
+               <button id="button-rename-images" class="btn btn-success" type="button" disabled="disabled"><span class="icon icon-check"></span> <?php ps($this->tr('Provést')); ?></button>
             </div>
          </div>
       </form>
@@ -99,6 +108,7 @@ $this->addFile("js://photogalery:editphotos.js");
          data-name='<?php echo json_encode($image->{PhotoGalery_Model_Images::COLUMN_NAME}->toArray())?>'
          data-desc='<?php echo json_encode($image->{PhotoGalery_Model_Images::COLUMN_DESC}->toArray())?>'
          data-src="<?php echo $src?>"
+         data-thumb="<?php echo $srcThumb?>"
          class="image-box <?php echo $image->{PhotoGalery_Model_Images::COLUMN_ACTIVE} ? '' : 'inactive'?> "
          >
          <div class="image-item">
@@ -136,90 +146,24 @@ $this->addFile("js://photogalery:editphotos.js");
          </div>
       </li>
    </ul>
-   <?php /*
-   <div class="form-group">
-      <div class="form-controls">
-         <div class="input-group">
-            <label for="images-oprtation"><?php ps($this->tr('Označené')); ?></label>
-            <select name="images-oprtation" class="form-control" id="select-images-oprtation">
-               <option value="delte"><?php ps($this->tr('Smazat'))?></option>
-            </select>
-            <button type="button" class="input-group-btn"><span class="icon icon-check"></span></button>
-         </div>
-      </div>
-   </div>
-    */?>
    <div id="dialog-image-labels">
       <?php 
       $this->editLabelsForm->text->html()->setAttrib('rows', 7);
       echo $this->editLabelsForm;
       ?>
    </div>
- <?php /*  
-<div class="modal fade">
-   <div class="modal-dialog">
-      <div class="modal-content">
-         <?php echo $this->editLabelsForm->renderStart();?>
-         <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-            <h4 class="modal-title">Modal title</h4>
-         </div>
-         <div class="modal-body">
-            <div class="form-group">
-               <div class="form-labels">
-                  <?php echo $this->editLabelsForm->name->label()?>
-               </div>
-               <div class="form-controls">
-                  <?php echo $this->editLabelsForm->name->controlAll()?>
-               </div>
-            </div>
-            <div class="form-group">
-               <div class="form-labels">
-                  <?php echo $this->editLabelsForm->text->label()?>
-               </div>
-               <div class="form-controls">
-                  <?php echo $this->editLabelsForm->text->controlAll()?>
-               </div>
-            </div>
-         </div>
-         <div class="modal-footer">
-            <?php echo $this->editLabelsForm->id->controlAll()?>
-            <?php echo $this->editLabelsForm->buttons->controlAll()?>
-         </div>
-         <?php echo $this->editLabelsForm->renderEnd();?>
-      </div><!-- /.modal-content -->
-   </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-   */?>
    <script type="text/javascript">
       $(document).ready(function(){
          CubeImagesEditor.init({
             uploadImageUrl : '<?php echo $this->link()->route('imageUploadAjax')?>',
             imageDeleteUrl : '<?php echo $this->link()->route('imageDelete')?>',
             imageChangeStateUrl : '<?php echo $this->link()->route('imageChangeState')?>',
+            imageRenameUrl : '<?php echo $this->link()->route('imageRename')?>',
             imageMoveUrl : '<?php echo $this->link()->route('imageMove')?>',
             imageRotateUrl : '<?php echo $this->link()->route('imageRotate')?>',
             editLabelsUrl : '<?php echo $this->link()->route('imageEditLabels')?>',
-            
             getImagesUrl : '<?php echo $this->link()->route('getImages')?>'
          });
-         
-         // fixace elenetu na strnce při posunu
-//         CubeCMS.ToolBox.createFixedBox('#images-actions');
-//         var $element = $('#images-actions').first();
-//         $element.after($('<div class="fixed-actions-box-palceholder hidden"></div>').height($element.height()).width($element.width()));
-//         var offseTop = $element.offset().top;
-//         var offseLeft = $element.offset().left;
-//         var width = $element.outerWidth();
-//         $(window).on('scroll', function(){
-//            if($(window).scrollTop()+40 > offseTop){
-//               if(!$element.hasClass('fixed-actions-box-helper')){
-//                  $element.addClass('fixed-actions-box-helper').css({left : offseLeft}).outerWidth(width);
-//               }
-//            } else {
-//               $element.removeClass('fixed-actions-box-helper').css({left : "auto", width : 'auto'});
-//            }
-//         });
       });
    </script>
 </div>

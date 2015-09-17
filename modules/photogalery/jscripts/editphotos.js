@@ -3,6 +3,7 @@ CubeImagesEditor = {
       uploadImageUrl : null,
       imageDeleteUrl : null,
       imageChangeStateUrl : null,
+      imageRenameUrl : null,
       imageMoveUrl : null,
       imageRotateUrl : null,
       editLabelsUrl : null,
@@ -28,7 +29,7 @@ CubeImagesEditor = {
       
       // reset selected
       this.$imagesList.find('.image-checkbox').prop('checked', false);
-      this.$imagesActions.find('#images-action-select,#buttons-process-images').prop('disabled', 'disabled');
+      this.$imagesActions.find('#images-action-select,#buttons-process-images,#button-rename-images').prop('disabled', 'disabled');
       that.$imagesActions.removeClass('fixed-box');
       // eventy
       $.fn.prettyPhoto();
@@ -44,10 +45,10 @@ CubeImagesEditor = {
             $(this).closest('li').removeClass('selected');
          }
          if(that.$imagesList.find('.image-checkbox:checked').length > 0 ){
-            that.$imagesActions.find('#images-action-select,#buttons-process-images').prop('disabled', false);
+            that.$imagesActions.find('#images-action-select,#buttons-process-images,#button-rename-images').prop('disabled', false);
             that.$imagesActions.addClass('fixed-box');
          } else {
-            that.$imagesActions.find('#images-action-select,#buttons-process-images').prop('disabled', true);
+            that.$imagesActions.find('#images-action-select,#buttons-process-images,#button-rename-images').prop('disabled', true);
             that.$imagesActions.removeClass('fixed-box');
          }
       });
@@ -60,7 +61,6 @@ CubeImagesEditor = {
       });
       this.$imagesActions.on('click', '#buttons-process-images', function(){
          var val = that.$imagesActions.find('#images-action-select').val();
-         console.log(val);
          if(val === "rotate-left"){
             $('li', that.$imagesList).each(function(){
                if($(this).has('.image-checkbox:checked').length){
@@ -109,6 +109,28 @@ CubeImagesEditor = {
             });
          }
          that.$imagesActions.find('#images-action-select').val(that.$imagesActions.find('#images-action-select option:first').val());
+      });
+      // přejmenování
+      this.$imagesActions.on('click', '#button-rename-images', function(){
+         var val = that.$imagesActions.find('#images-action-rename').val();
+         var num = 1;
+         $('li', that.$imagesList).each(function(){
+            var $li = $(this);
+            if($li.has('.image-checkbox:checked').length){
+               $.ajax({
+                  url: that.options.imageRenameUrl,
+                  type: "POST",
+                  cache: false,
+                  data: {id : $li.data('id'), num : num, prefix : val},
+                  success : function(data){
+                     $li.data('name', data.newName);
+                     $li.find('.image-title').text(data.newNameLang);
+                  }
+               }); 
+               num++;
+            }
+         });
+         
       });
       // mazani
       this.$imagesList.on('click', '.toolbox-button-delete', function(){
@@ -170,7 +192,7 @@ CubeImagesEditor = {
             that.$imagesList.find('li').removeClass('active-edit');
          },
          open : function(){
-            $(this).find('input.imglabels_name_class').first().select();
+            $(this).find('input.imglabels_name_class:visible').select();
          }
       });
       this.$imagesList.on('click', '.toolbox-button-edit_texts', function(){
@@ -182,6 +204,13 @@ CubeImagesEditor = {
             that.$dialogLabels.find('textarea.imglabels_text_class[lang="'+index+'"]').val(value);
          });
          that.$dialogLabels.find('input.imglabels_id_class').val($li.data('id'));
+         // add provies
+         var $prew = that.$dialogLabels.find('.preview');
+         if($prew.length === 0){
+            $prew = $('<img class="preview" />');
+            that.$dialogLabels.find('.imglabels_text_label_class').parent().append($prew);
+         }
+         $prew.prop('src', $li.data('thumb'));
          that.$dialogLabels.dialog( "open" );
       });
       this.$dialogLabels.on('submit', 'form', function(e){

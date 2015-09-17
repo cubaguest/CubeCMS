@@ -241,6 +241,22 @@ class Photogalery_Controller extends Controller {
          }
       }
    }
+   
+   public function imageRenameController()
+   {
+      $this->checkWritebleRights();
+      if(isset ($_POST['id']) && isset ($_POST['num']) && isset ($_POST['prefix'])){
+         $image = PhotoGalery_Model_Images::getRecord((int)$_POST['id']);
+         if($image){
+            $name = strip_tags($_POST['prefix']).' '.(int)$_POST['num'];
+            // tady přidat ohlídání proti xss
+            $image->{PhotoGalery_Model_Images::COLUMN_NAME} = $name;
+            $image->save();
+            $this->view()->newName = json_encode($image->{PhotoGalery_Model_Images::COLUMN_NAME}->toArray());
+            $this->view()->newNameLang = $image[PhotoGalery_Model_Images::COLUMN_NAME][Locales::getLang()];
+         }
+      }
+   }
 
    /**
     * Metoda vymaže obrázek
