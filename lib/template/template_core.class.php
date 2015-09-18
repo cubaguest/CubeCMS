@@ -233,7 +233,7 @@ class Template_Core extends Template {
          $jscripts,
          $errCnt,
       ), $contents);
-
+      $contents = $this->applyOutputfilters($contents);
 //      $contents = preg_replace(array(
          // basic
 //         '/(<!-- *)?\{\*-STYLESHEETS-\*\}( *-->)?/',

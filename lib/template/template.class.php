@@ -120,7 +120,9 @@ class Template extends TrObject {
    protected static $baseContentFilters = array(
        'anchors',
        'Forms_Controller::contentFilter',
-       
+   );
+   
+   protected static $baseOutputFilters = array(
    );
 
    /*
@@ -329,7 +331,8 @@ class Template extends TrObject {
             new CoreErrors($e);
          }
       }
-      $cnt = ob_get_clean();
+      // apply output filters
+      $cnt = $this->applyOutputfilters(ob_get_clean());
       return $cnt;
    }
 
@@ -884,7 +887,7 @@ class Template extends TrObject {
             'compress' => (VVE_DEBUG_LEVEL == 0),
             'cache_dir'=> AppCore::getAppCacheDir().Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR,
          );
-            
+         
          $css_file_name = Less_Cache::Get( 
              array( $path.$rpFile => '/cache/'.Template::STYLESHEETS_DIR.'/' ), 
              $options, $this->getLessVariables() );
@@ -1091,6 +1094,36 @@ class Template extends TrObject {
       }
       return $text;
    }
+   
+   protected function applyOutputfilters($text){
+      array_unique(self::$baseOutputFilters);
+      foreach (self::$baseOutputFilters as $filter) {
+         if(strpos($filter, '::') !== false){
+            $class = explode('::', $filter);
+            if(!method_exists($class[0], $class[1])){
+               throw new BadFunctionCallException($this->tr('Volán nedefinovaný výstupní filtr.'));
+            }
+            $text = call_user_func($filter, $text, $this->link, $this);
+         } else if(function_exists('vve_filter_'.$filter)){
+            $filter = 'vve_filter_'.$filter;
+            if(is_array($filter)){
+               $text = $filter[0]($text, $this->link, $this, $filter[1]);
+            } else {
+               $text = $filter($text, $this->link, $this);
+            }
+            
+         } else if(function_exists($filter)){
+            if(is_array($filter)){
+               $text = $filter[0]($text, $this->link, $this, $filter[1]);
+            } else {
+               $text = $filter($text, $this->link, $this);
+            }
+         } else {
+            throw new BadFunctionCallException($this->tr('Volán nedefinovaný výstupní filtr.'));
+         }
+      }
+      return $text;
+   }
 
    /**
     * Metoda vrací jestli je daná stránka na celou šířku
@@ -1114,11 +1147,17 @@ class Template extends TrObject {
       array_unique(self::$baseContentFilters);
    }
    
-   public static function unregisterContentFilter($name)
+   public static function registerOutputFilter($name)
    {
-      $index = array_search($name, self::$baseContentFilters);
+      self::$baseOutputFilters[] = $name;
+      array_unique(self::$baseOutputFilters);
+   }
+   
+   public static function unregisterOutputFilter($name)
+   {
+      $index = array_search($name, self::$baseOutputFilters);
       if($index){
-         unset(self::$baseContentFilters[$index]);
+         unset(self::$baseOutputFilters[$index]);
       }
    }
 }
