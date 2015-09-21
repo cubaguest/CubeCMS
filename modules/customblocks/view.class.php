@@ -53,13 +53,13 @@ class CustomBlocks_View extends View {
       }
    }
    
-   
    public function selectBlockView()
    {
        $this->template()->addFile('tpl://customblocks:select_block.phtml');
        Template_Navigation::addItem($this->tr('Výběr typu bloku'), $this->link(), true);
        Template::addPageTitle($this->category()->getName());
        Template::addPageTitle($this->tr('Výběr typu bloku'));
+       Template::setFullWidth(true);
       
    }
    public function addBlockView()
@@ -69,6 +69,7 @@ class CustomBlocks_View extends View {
        Template_Navigation::addItem(sprintf($this->tr('Přidání bloku %s'), $this->blockName), $this->link(), true);
        Template::addPageTitle($this->category()->getName());
        Template::addPageTitle(sprintf($this->tr('Přidání bloku %s'), $this->blockName));
+       Template::setFullWidth(true);
        $this->assignTinyMCE();
    }
    
@@ -80,6 +81,7 @@ class CustomBlocks_View extends View {
        Template_Navigation::addItem(sprintf($this->tr('Úprava bloku %s'), $this->blockName), $this->link(), true);
        Template::addPageTitle($this->category()->getName());
        Template::addPageTitle(sprintf($this->tr('Úprava bloku %s'), $this->blockName));
+       Template::setFullWidth(true);
        $this->assignTinyMCE();
    }
    
@@ -87,6 +89,7 @@ class CustomBlocks_View extends View {
    {
       $this->template()->addFile('tpl://customblocks:sort_blocks.phtml');
       Template_Navigation::addItem($this->tr('Úprava pořadí bloků'), $this->link(), true);
+      Template::setFullWidth(true);
    }
    
    protected function assignTinyMCE()
