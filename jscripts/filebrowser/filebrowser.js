@@ -221,10 +221,9 @@ var CubeBrowser = {
       });
    },
    renameItems : function(newname){
-      var $items = CubeBrowserListWidget.getSelectedItems().filter('.item-image');
+      var $items = CubeBrowserListWidget.getSelectedItems();
       var queue = $items.length;
       var that = this;
-      var $box = $('#image-flip');
       if(queue === 0){
          CubeBrowserLogsWidget.add('Nebyl vybrán žádný soubor', 'err');
          return;
