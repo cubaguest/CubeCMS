@@ -1,0 +1,51 @@
+<?php ?> 
+<?php
+echo $this->toolbox;
+?>   
+<h1><?php ps($this->category()->getName()) ?> <a href="<?php echo $this->link()->route('addQuestion') ?>" class="btn btn-success"><span class="icon icon-plus"></span> <?php ps($this->tr('Položit dotaz')); ?></a></h1>
+<div class="content">
+   <div class="row">
+      <div class="col-md-12">
+         <?php if (!empty($this->questions)) { ?>
+            <div class="user-questions">
+               <?php foreach ($this->questions as $q) { ?>
+                  <div class="user-question <?php echo $q->{UserQuestions_Model::COLUMN_APPROVED} ? '' : 'text-warning' ?> ">
+                     <strong><?php echo $q->{UserQuestions_Model::COLUMN_NAME} ?></strong> | 
+                     <?php
+                     echo Utils_DateTime::fdate('%x %X', $q->{UserQuestions_Model::COLUMN_TIME_ADD}) . ' | ';
+                     ?>
+                     <a href="mailto:<?php echo $q->{UserQuestions_Model::COLUMN_EMAIL} ?>"
+                        ><span class="icon icon-envelope"></span> <?php echo $q->{UserQuestions_Model::COLUMN_EMAIL} ?></a>
+                     <div class="row">
+                        <div class="col-md-2">
+                           <?php
+                           $size = 80;
+                           $default = Utils_Image::cache(tp() . 'images/person.jpg', $size);
+                           $grav_url = "http://www.gravatar.com/avatar/" . md5(strtolower(trim($q->{UserQuestions_Model::COLUMN_EMAIL})))
+                               . "?d=" . urlencode($default) . "&s=" . $size;
+                           ?>
+                           <img src="<?php echo $grav_url?>" alt="<?php ps($q->{UserQuestions_Model::COLUMN_NAME}) ?>" />
+                        </div>
+                        <div class="col-md-10">
+                           <p><?php echo $q->{UserQuestions_Model::COLUMN_QUESTION} ?></p>
+                        </div>
+                     </div>
+
+                     <?php if ($q->{UserQuestions_Model::COLUMN_ANSWER} != null) { ?>
+                        <div class="col-md-offset-2 answer">
+                           <p><?php echo $q->{UserQuestions_Model::COLUMN_ANSWER} ?></p>
+                        </div>
+                     <?php } ?>
+                     <?php
+                     echo $q->toolbox;
+                     ?>
+                  </div>
+               <?php } ?>
+            </div>
+            <?php
+            echo $this->scrollComponent;
+         }
+         ?>
+      </div>
+   </div>
+</div>

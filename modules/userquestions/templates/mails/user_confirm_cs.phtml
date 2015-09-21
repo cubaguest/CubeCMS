@@ -1,0 +1,29 @@
+<div>
+   <h2>Váš dotaz v <a href="<?php echo $this->link()->route()?>"><?php ps($this->category()->getName())?></a> 
+      na stránkách <?php ps(CUBE_CMS_WEB_NAME)?> byl přijat a zveřejněn</h2>   
+   <table class="styled">
+      <tr>
+         <th>Jméno</th>
+         <td><?php ps($this->question->{UserQuestions_Model::COLUMN_NAME}) ?></td>
+      </tr>
+      <tr>
+         <th>E-mail</th>
+         <td><?php ps($this->question->{UserQuestions_Model::COLUMN_EMAIL}) ?></td>
+      </tr>
+      <tr>
+         <th>Datum a čas</th>
+         <td><?php echo Utils_DateTime::fdate("%x %X", $this->question->{UserQuestions_Model::COLUMN_TIME_ADD})?></td>
+      </tr>
+      <tr>
+         <th>Odkaz pro smazání</th>
+         <td><a href="<?php echo $this->linkRemove?>">Smazat</a></td>
+      </tr>
+   </table>
+   <br />
+   <p><?php echo $this->question->{UserQuestions_Model::COLUMN_QUESTION}?></p>
+   <?php 
+   if($this->question->{UserQuestions_Model::COLUMN_ANSWER} != null){?>
+      <h2>Odpověď na Váš dotaz</h2>
+      <p><?php echo $this->question->{UserQuestions_Model::COLUMN_ANSWER}?></p>
+   <?php } ?>
+</div>
