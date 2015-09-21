@@ -36,10 +36,41 @@ class Utils_Html {
    {
       if (is_array($str)) {
          foreach ($str as $key => $s) {
-            $str[$key] = vve_strip_html_comment($s);
+            $str[$key] = self::stripHtmlComment($s);
          }
       } else {
          $str = preg_replace('/<!--(.|\s)*?-->/', '', $str);
+      }
+      return $str;
+   }
+   
+   
+   protected function removeElementsByTagName($tagName, $document) {
+      $nodeList = $document->getElementsByTagName($tagName);
+      for ($nodeIdx = $nodeList->length; --$nodeIdx >= 0; ) {
+        $node = $nodeList->item($nodeIdx);
+        $node->parentNode->removeChild($node);
+      }
+    }  
+    
+   /**
+    * Odstraní tagy bez informací
+    * @param type $str
+    * @return type
+    */
+   public static function stripHtml($str)
+   {
+      if (is_array($str)) {
+         foreach ($str as $key => $s) {
+            $str[$key] = self::stripHtml($s);
+         }
+      } else {
+         // script, link, style, atd.
+         $str = self::removeTag(array('style', 'head','link','script', 'head'), $str);
+         // komentáře
+         $str = self::stripHtmlComment($str);
+         // tagy
+         $str = strip_tags($str);
       }
       return $str;
    }
@@ -177,7 +208,7 @@ class Utils_Html {
          $tagName = array($tagName);
       }
       foreach ($tagName as $tag) {
-         $string = preg_replace('/<'.$tag.' [^<>]*>/i', '', $string);
+         $string = preg_replace('/(<('.$tag.')\b[^>]*>).*?(<\/\2>)/is', '', $string);
       }
       return $string;
    }
