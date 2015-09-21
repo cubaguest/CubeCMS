@@ -374,7 +374,7 @@ class Text_Controller extends Controller {
          $this->seveTempRecord($textRec, $subkey);
       } else {
          $textRec->save();
-         if($subkey == Text_Model::TEXT_MAIN_KEY){
+         if($subkey == Text_Model::TEXT_MAIN_KEY && !$this->category() instanceof Category_Admin){
             $cat = $this->category()->getDataObj();
             if($cat instanceof Model_ORM_Record){
                $cat->{Model_Category::COLUMN_DESCRIPTION} = $textRec->catdesc;
