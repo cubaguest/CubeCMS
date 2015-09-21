@@ -855,6 +855,17 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
          font-weight: bold;
          color: @color-text-invert;
       }
+      .scroll {
+         /*padding: 0;*/
+      }
+      .pagination {
+         li>a, li>span {
+            padding: 3px 12px;
+            font-size: @font-size-small;
+         }
+         margin: 0;
+         display: block;
+      }
       width: 100%;
       margin-bottom: @padding-large;
    }
@@ -982,7 +993,7 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
 /* used from Bootstrap 3.0 */
 .cubecms-modal {
    .cubecms-modal-dialog {
-      .cubecms-modal-content {
+      .cubecms-modal-wrap {
          .cubecms-modal-header {
             .close-modal {
                &, &:hover, &:active {
@@ -1011,7 +1022,7 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
             border-bottom: 1px solid @color-border;
          }
          .cubecms-modal-body {
-            .errors {
+            .cubecms-modal-errors {
                display: none;
             }
             padding: @padding-base;
@@ -1065,7 +1076,7 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
       .cubecms-modal-dialog {
          width: 600px;
       }
-      .cubecms-modal-content {
+      .cubecms-modal-wrap {
          .admin-box-sahadow();
          .rounded-corners();
       }
