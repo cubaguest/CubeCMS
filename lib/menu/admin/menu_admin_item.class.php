@@ -96,7 +96,7 @@ class Menu_Admin_Item {
    
    public function getUrl()
    {
-      return Url_Link::getMainWebDir().$this->getUrlKey()."/";
+      return Url_Link::getMainWebDir().Locales::getUserLang().'/'.$this->getUrlKey()."/";
    }
    
    public function getIcon()
