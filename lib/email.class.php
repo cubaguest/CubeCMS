@@ -117,7 +117,11 @@ class Email {
     */
    public function setSubject($subject)
    {
-      $this->message()->setSubject(iconv($this->iconvParams[0], $this->iconvParams[1], $subject));
+      if(!empty($this->iconvParams)){
+         $this->message()->setSubject(iconv($this->iconvParams[0], $this->iconvParams[1], $subject));
+      } else {
+         $this->message()->setSubject($subject);
+      }
       return $this;
    }
 
@@ -277,8 +281,12 @@ class Email {
             $this->message()->attach(Swift_Attachment::fromPath($file));
          }
       }
-      
-      $this->message()->setBody($this->sanitize($cnt), $this->isHtmlMail == true ? 'text/html' : 'text/plain');
+      if($this->isHtmlMail){
+         $this->message()->setBody($this->sanitize(Utils_Html::stripHtml($cnt), 'text/plain'));
+         $this->message()->addPart($this->sanitize($cnt), 'text/html');
+      } else {
+         $this->message()->setBody($this->sanitize($cnt), 'text/plain');
+      }
    }
 
    /**
@@ -311,9 +319,9 @@ class Email {
       $this->message = $message;
       $this->message()->setEncoder(Swift_Encoding::get8BitEncoding());
       switch (Locales::getLang()) {
-         case 'cs': // many czech people use very old mail interface
-            $this->message()->setCharset('iso-8859-2');
-            $this->iconvParams = array(0 => 'UTF-8', 1 => 'iso-8859-2//TRANSLIT');
+         case 'cs': // many czech people use very old mail interface, FUCK WITH IT!
+//            $this->message()->setCharset('iso-8859-2');
+//            $this->iconvParams = array(0 => 'UTF-8', 1 => 'iso-8859-2//TRANSLIT');
             break;
          default:
             break;
