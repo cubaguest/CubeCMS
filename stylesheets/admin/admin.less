@@ -519,11 +519,28 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
          &, label, a, a:visited, input[type="button"], input[type="submit"], input[type="reset"], button, select {
             color: @color-text-hover;
          }
-         select, input {
+         input[type="button"], input[type="submit"], input[type="reset"], button {
+            color: @color-text;
+         }
+         select, input, button {
             color: @color-text;
             background-color: @color-bg;
          }
          background-color: @color-bg-hover;
+         border-color: @color-bg-hover;
+      }
+      >form, >div {
+         input, button, select {
+            /*float: left;*/
+            margin-right: 3px;
+            display: inline-block;
+            font-size: 12px;
+         }
+         input[type="button"], input[type="submit"], input[type="reset"], button {
+            padding: 2px 5px;
+            font-size: 14px;
+         }
+         line-height: 1;
       }
       &.important {
          &:hover {
@@ -547,9 +564,10 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
       margin: 0;
       padding: 0;
       list-style: none;
+      line-height: 1.2;
       border: 1px solid @color-border;
       background-color: @color-bg;
-      padding: 6px 5px 4px 5px;
+      padding: 5px 5px 5px 5px;
       margin-right: 5px;
       float: left;
       .rounded-corners(@border-radius);
@@ -807,6 +825,15 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
                text-decoration: line-through;
             }
          }
+         &.state-disabled {
+            &:hover {
+               background-color: lighten(@color-bg-gray, 5%);
+            }
+            td {
+               color: @color-text-light;
+               text-decoration: none;
+            }
+         }
       
          &:hover {
             background-color: @color-bg-hover-light;
@@ -947,6 +974,10 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
    border-color: @color-border-hightlight !important;
    background-color: @color-bg-hightlight !important;
 }
+.cubecms-state-disable {
+   border-color: @color-border-gray !important;
+   background-color: @color-bg-gray !important;
+}
 /* modal */
 /* used from Bootstrap 3.0 */
 .cubecms-modal {
@@ -980,12 +1011,18 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
             border-bottom: 1px solid @color-border;
          }
          .cubecms-modal-body {
+            .errors {
+               display: none;
+            }
             padding: @padding-base;
          }
          .cubecms-modal-footer {
             padding: @padding-base;
             border-top: 1px solid @color-border;
             text-align: right;
+         }
+         .button-close {
+            float: right;
          }
          outline: 0;
          background-color: @color-bg;
