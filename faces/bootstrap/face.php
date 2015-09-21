@@ -12,7 +12,7 @@ $face['category_bg_image'] = false;
 $face['category_title_image'] = true;
 
 // jquery theme
-$face['jquery_theme'] = "base";
+$face['jquery_theme'] = "bootstrap";
 
 $face['panels'] = array(
    'left' => 'Levý',
