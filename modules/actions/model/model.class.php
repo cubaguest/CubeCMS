@@ -101,6 +101,7 @@ class Actions_Model extends Model_ORM {
          )", 
          array("idc" => $idc));
    }
+   
    public function actualOnly($idc)
    {
       return $this->where(self::COLUMN_ID_CAT." = :idc AND (".self::COLUMN_PUBLIC." = 1) 
@@ -121,7 +122,7 @@ class Actions_Model extends Model_ORM {
       }
       $m = new self();
 
-      $m->joinFK(Actions_Model::COLUMN_ID_CAT, array('curlkey' => Model_Category::COLUMN_URLKEY));
+      $m->joinFK(Actions_Model::COLUMN_ID_CAT, array('curlkey' => Model_Category::COLUMN_URLKEY, Model_Category::COLUMN_NAME));
 
       $m->where( ( !empty($idc) ? self::COLUMN_ID_CAT." IN(".$m->getWhereINPlaceholders($idc).") AND " : null )
          ." (".self::COLUMN_PUBLIC." = 1) "
@@ -149,7 +150,7 @@ class Actions_Model extends Model_ORM {
          $idc = array($idc);
       }
       $m = new self();
-      $m->joinFK(Actions_Model::COLUMN_ID_CAT, array('curlkey' => Model_Category::COLUMN_URLKEY));
+      $m->joinFK(Actions_Model::COLUMN_ID_CAT, array('curlkey' => Model_Category::COLUMN_URLKEY, Model_Category::COLUMN_NAME));
       $m->where( ( !empty($idc) ? self::COLUMN_ID_CAT." IN(".$m->getWhereINPlaceholders($idc).") AND " : null )
          ." (".self::COLUMN_PUBLIC." = 1) "
          . " AND ( (".Locales::getLang().")".self::COLUMN_URLKEY." IS NOT NULL)"
@@ -177,6 +178,37 @@ class Actions_Model extends Model_ORM {
    public static function getByUrlkey($urlkey)
    {
       $model = new self();
+      $model->joinFK(Actions_Model::COLUMN_ID_CAT, array('curlkey' => Model_Category::COLUMN_URLKEY, Model_Category::COLUMN_NAME));
       return $model->where(self::COLUMN_URLKEY." = :ukey", array('ukey' => $urlkey))->record();
+   }
+   
+   /**
+    * Metoda vrací akci podle zadaného klíče
+    *
+    * @param string -- url klíč článku
+    * @return PDOStatement -- pole s článkem
+    */
+   public static function getCurrentAction($idc, $from = 0) {
+      if(!is_array($idc)){
+         $idc = array($idc);
+      }
+      
+      $model = new self();
+      
+      $model->joinFK(Actions_Model::COLUMN_ID_CAT, array('curlkey' => Model_Category::COLUMN_URLKEY, Model_Category::COLUMN_NAME));
+      
+      $model->columns(array(
+              '*', 
+              'delta_days' => 'ABS(DATEDIFF('.self::COLUMN_DATE_START.',CURDATE()))' ))
+          ->where( ( !empty($idc) ? self::COLUMN_ID_CAT." IN(".$model->getWhereINPlaceholders($idc).") AND " : null )
+              . " (".self::COLUMN_PUBLIC." = 1) "
+              . " AND ((ISNULL(".self::COLUMN_DATE_STOP.") AND ".self::COLUMN_DATE_START." >= CURDATE()) "
+              . " OR (ISNULL(".self::COLUMN_DATE_STOP.") = 0 AND ".self::COLUMN_DATE_START." <= CURDATE() AND ".self::COLUMN_DATE_STOP." > CURDATE()))", 
+              !empty($idc) ? $model->getWhereINValues($idc) : array()
+             )
+          ->order(array('delta_days', self::COLUMN_TIME))
+          ->limit($from, 1);
+      $action = $model->record();
+      return $action;
    }
 }

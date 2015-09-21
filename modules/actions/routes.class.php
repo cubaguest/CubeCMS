@@ -21,13 +21,13 @@ class Actions_Routes extends Routes {
       // editace akce
       $this->addRoute('editlabel', "editlabel", 'editLabel','editlabel/');
       // list nadcházejiících akcí v xml
-      $this->addRoute('feturedlist', "featuredlist.(?P<output>(?:xml))", 'featuredList', 'featuredlist.{output}');
+      $this->addRoute('featuredlist', "featuredlist.(?P<output>(?:xml))", 'featuredList', 'featuredlist.{output}');
       // list s právě probíhající akcí
       $this->addRoute('current', "current.(?P<output>(?:xml))", 'currentAct', 'current.{output}');
       // detail akce
       $this->addRoute('detail', "::urlkey::", 'show','{urlkey}/');
       // export článku
-      $this->addRoute('detailExport', "::urlkey::\.(?P<output>(?:pdf)|(?:xml))", 'showData','{urlkey}.{output}');
+      $this->addRoute('detailExport', "::urlkey::\.(?P<output>(?:pdf)|(?:xml))", 'detailExport','{urlkey}.{output}');
       
    }
    

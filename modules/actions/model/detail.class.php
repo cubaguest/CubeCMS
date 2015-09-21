@@ -142,19 +142,19 @@ class Actions_Model_Detail extends Actions_Model {
     * @param string -- url klíč článku
     * @return PDOStatement -- pole s článkem
     */
-   public function getCurrentAction($idCat, $from = 0) {
-      $dbc = Db_PDO::getInstance();
-      $dbst = $dbc->prepare("SELECT *, ABS(DATEDIFF(".self::COLUMN_DATE_START.",CURDATE())) AS delta_days  FROM ".Db_PDO::table(self::DB_TABLE)
-              ." WHERE (".self::COLUMN_ID_CAT." = :idcat) AND (".self::COLUMN_PUBLIC." = 1)"
-              ." AND ((ISNULL(".self::COLUMN_DATE_STOP.") AND ".self::COLUMN_DATE_START." >= CURDATE())"
-              ." OR (ISNULL(".self::COLUMN_DATE_STOP.") = 0 AND ".self::COLUMN_DATE_START." <= CURDATE() AND ".self::COLUMN_DATE_STOP." > CURDATE()))"
-              ." ORDER BY delta_days, `".self::COLUMN_TIME."` LIMIT :from, 1");
-      $dbst->bindParam(':idcat', $idCat, PDO::PARAM_INT);
-      $dbst->bindParam(':from', $from, PDO::PARAM_INT);
-      $dbst->execute();
-      $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
-      return $dbst->fetch();
-   }
+//   public function getCurrentAction($idCat, $from = 0) {
+//      $dbc = Db_PDO::getInstance();
+//      $dbst = $dbc->prepare("SELECT *, ABS(DATEDIFF(".self::COLUMN_DATE_START.",CURDATE())) AS delta_days  FROM ".Db_PDO::table(self::DB_TABLE)
+//              ." WHERE (".self::COLUMN_ID_CAT." = :idcat) AND (".self::COLUMN_PUBLIC." = 1)"
+//              ." AND ((ISNULL(".self::COLUMN_DATE_STOP.") AND ".self::COLUMN_DATE_START." >= CURDATE())"
+//              ." OR (ISNULL(".self::COLUMN_DATE_STOP.") = 0 AND ".self::COLUMN_DATE_START." <= CURDATE() AND ".self::COLUMN_DATE_STOP." > CURDATE()))"
+//              ." ORDER BY delta_days, `".self::COLUMN_TIME."` LIMIT :from, 1");
+//      $dbst->bindParam(':idcat', $idCat, PDO::PARAM_INT);
+//      $dbst->bindParam(':from', $from, PDO::PARAM_INT);
+//      $dbst->execute();
+//      $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
+//      return $dbst->fetch();
+//   }
 
    public function deleteAction($idAction) {
       $dbc = Db_PDO::getInstance();

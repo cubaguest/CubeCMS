@@ -141,7 +141,7 @@ class Actions_View extends View {
       Template_Navigation::addItem($this->tr('Přidání události'), $this->link());
    }
 
-   public function showDataView() {
+   public function detailExportView() {
       switch ($this->output) {
          case 'pdf':
             $c = $this->createPdf($this->action);
@@ -242,18 +242,19 @@ class Actions_View extends View {
    protected function createActionXml($action) {
       $api = new Component_Api_VVEArticle();
 
-      $api->setCategory($this->category()->getName(), $this->link()->clear());
-
+//      $category = new Category($action->curlkey);
+      $api->setCategory($action->{Model_Category::COLUMN_NAME}, $this->link()->clear()->category($action->curlkey));
+      
       $img = null;
       if($action->{Actions_Model_Detail::COLUMN_IMAGE} != null){
-         $img = $this->category()->getModule()->getDataDir(true)
-                  .$action[Actions_Model_Detail::COLUMN_URLKEY][Locales::getLang()]
-                  .URL_SEPARATOR.$action->{Actions_Model_Detail::COLUMN_IMAGE};
+         $img = Utils_CMS::getArticleTitleImage($action->{Actions_Model_Detail::COLUMN_IMAGE});
       }
 
       $api->setArticle($action->{Actions_Model_Detail::COLUMN_NAME},
-              $this->link()->route('detail', array('urlkey'=>$action->{Actions_Model_Detail::COLUMN_URLKEY})),
-              vve_tpl_truncate(vve_strip_tags($action->{Actions_Model_Detail::COLUMN_TEXT}),400),$img);
+              $this->link()->clear()
+          ->route('detail', array('urlkey'=>$action->{Actions_Model_Detail::COLUMN_URLKEY}))
+          ->category($action->curlkey),
+          Utils_String::truncate(Utils_Html::stripTags($action->{Actions_Model_Detail::COLUMN_TEXT}),400),$img);
 
       if((int)$action->{Actions_Model_Detail::COLUMN_PRICE} != null|0) {
          $api->setData('price', $action->{Actions_Model_Detail::COLUMN_PRICE});
@@ -264,6 +265,7 @@ class Actions_View extends View {
 
       $api->flush();
    }
+   
    /**
     * Viewer pro editaci 
     */
@@ -281,25 +283,27 @@ class Actions_View extends View {
       switch ($this->type) {
          case 'xml':
          default:
+            Template_Output::setOutputType('xml');
+            Template_Output::sendHeaders();
+            // start xml writer
             $xml = new XMLWriter();
             $xml->openURI('php://output');
             // hlavička
             $xml->startDocument('1.0', 'UTF-8');
             $xml->setIndent(4);
-
             // rss hlavička
             $xml->startElement('articles'); // SOF article
             $xml->writeAttribute('xmlns','http://www.vveframework.eu/v6/featuredarticles');
             $xml->writeAttribute('xml:lang', Locales::getLang());
 
-            while ($row = $this->actions->fetch()) {
+            foreach ($this->actions as $row) {
                $xml->startElement('article'); // sof article
-               $xml->writeAttribute('date', $row->{Actions_Model_Detail::COLUMN_DATE_START});
-               $xml->writeElement('name', $row->{Actions_Model_Detail::COLUMN_NAME});
-               $xml->writeElement('url', $this->link()->route('detailExport',
-                       array('urlkey' => $row->{Actions_Model_Detail::COLUMN_URLKEY})));
+               $xml->writeAttribute('date', $row->{Actions_Model::COLUMN_DATE_START});
+               $xml->writeElement('name', $row->{Actions_Model::COLUMN_NAME});
+               $xml->writeElement('url', $this->link()->clear()
+                   ->category($row->curlkey)
+                   ->route('detailExport',array('urlkey' => $row->{Actions_Model::COLUMN_URLKEY})));
                $xml->endElement(); // eof article
-
             }
 
             $xml->endElement(); // eof article

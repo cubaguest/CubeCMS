@@ -11,6 +11,21 @@ class ActionsList_Controller extends Actions_Controller {
             );
    }
    
+   public function featuredListController() {
+      $model = new Actions_Model();
+
+      $to = new DateTime();
+      $to->modify('+1 year');
+      
+      $this->view()->actions = $model->getActions($this->category()->getParam(self::PARAM_CATEGORY_IDS), new DateTime(), $to);
+      if($this->view()->action === false) return false;
+   }
+   
+   public function currentActController() {
+      $this->view()->action = Actions_Model::getCurrentAction($this->category()->getParam(self::PARAM_CATEGORY_IDS), (int)$this->getRequestParam('from', 0));
+//      if($this->view()->action === false) return false;
+   }
+   
    public function settings(&$settings,Form &$form) 
    {
       parent::settings($settings, $form);
@@ -19,7 +34,7 @@ class ActionsList_Controller extends Actions_Controller {
       foreach ($modules as $module) {
          $cats = Model_Category::getCategoryListByModule($module);
          foreach($cats as $cat) {
-            $results[(string)$cat->{Model_Category::COLUMN_CAT_LABEL}] = $cat->{Model_Category::COLUMN_CAT_ID};
+            $results[(string)$cat->{Model_Category::COLUMN_CAT_LABEL}.'(ID: '.(string)$cat->getPK().')'] = $cat->{Model_Category::COLUMN_CAT_ID};
          }
       }
 

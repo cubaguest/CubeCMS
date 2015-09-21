@@ -280,12 +280,11 @@ class Actions_Controller extends Controller {
    /**
     * What is this ?
     */
-   public function showDataController()
+   public function detailExportController()
    {
       $this->checkReadableRights();
       // načtení článku
-      $model = new Actions_Model_Detail();
-      $this->view()->action = $model->getAction($this->getRequest('urlkey'), $this->category()->getId());
+      $this->view()->action = Actions_Model::getByUrlkey($this->getRequest('urlkey'));
       if($this->view()->action == false) return false;
 
       $this->view()->output = $this->getRequest('output');
@@ -341,31 +340,13 @@ class Actions_Controller extends Controller {
          $model = new Actions_Model();
          $event = $model->newRecord();
 
-         // vybrání exist. obrázku
-         if(isset ($form->titleImage)){
-            $event->{Actions_Model::COLUMN_IMAGE} = $form->titleImage->getValues();
-         }
-         // pokud je nový obr nahrajeme jej
-         if($form->image->getValues() != null) {
-            $imageObj = new File_Image($form->image);
-//            $crop = $this->category()->getParam('img_crop', VVE_ARTICLE_TITLE_IMG_C) == true
-//               ? File_Image_Base::RESIZE_CROP : File_Image_Base::RESIZE_AUTO;
-//            $imageObj->getData()->resize(
-//               $this->category()->getParam('img_width', VVE_ARTICLE_TITLE_IMG_W),
-//               $this->category()->getParam('img_height', VVE_ARTICLE_TITLE_IMG_H),
-//               $crop
-//               )->save();
-            $imageObj->move(AppCore::getAppDataDir().VVE_ARTICLE_TITLE_IMG_DIR);
-            $event->{Actions_Model::COLUMN_IMAGE} = $imageObj->getName();
-         }
          if($form->send->getValues() == 'save'){
             $this->storeEvent($event, $form);
-            $this->clearTempEvent(0);
             $this->infoMsg()->addMessage($this->tr('Událost byla uložena'));
             $this->link()->route('detail', array('urlkey' => $event->{Actions_Model_Detail::COLUMN_URLKEY}))->reload();
          } else if($form->send->getValues() == 'preview'){
             $this->storeEvent($event, $form, true);
-            $this->link()->route('preview', array('id' => 0))->reload();
+            $this->link()->route('preview', array('id' => $event->{Actions_Model::COLUMN_ID}) )->reload();
          }
       }
 
@@ -691,7 +672,7 @@ class Actions_Controller extends Controller {
       }
 
       if($asTmp){
-         $f = $this->getTempFileName($eventRec->getPK());
+         $f = $this->getTempFileName($eventRec->isNew() ? 0 : $eventRec->getPK());
          file_put_contents($f, serialize($eventRec));
       } else {
          $model = new Actions_Model();
@@ -712,7 +693,7 @@ class Actions_Controller extends Controller {
             }
          }
          $model->save($eventRec);
-         $this->clearTempEvent( $eventRec->getPK() );
+         $this->clearTempEvent( $eventRec->isNew() ? 0 : $eventRec->getPK() );
       }
    }
 
@@ -807,15 +788,18 @@ class Actions_Controller extends Controller {
    }
 
    public function featuredListController() {
-      $model = new Actions_Model_List();
-
-      $this->view()->actions = $model->getFeaturedActions($this->category()->getId());
+      $this->checkReadableRights();
+      $model = new Actions_Model();
+      $to = new DateTime();
+      $to->modify('+1 year');
+      
+      $this->view()->actions = $model->getActions($this->category()->getId(), new DateTime(), $to);
       if($this->view()->action === false) return false;
    }
 
    public function currentActController() {
-      $model = new Actions_Model_Detail();
-      $this->view()->action = $model->getCurrentAction($this->category()->getId(), (int)$this->getRequestParam('from', 0));
+      $this->checkReadableRights();
+      $this->view()->action = Actions_Model::getCurrentAction($this->category()->getId(), (int)$this->getRequestParam('from', 0));
 //      if($this->view()->action === false) return false;
    }
 
