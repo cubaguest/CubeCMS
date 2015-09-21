@@ -20,7 +20,7 @@ echo $this->toolbox;
       $this->includeFile('tpl://engine:components/titleimage.phtml'); 
       if($this->text && (string)$this->text->{Text_Model::COLUMN_TEXT_CLEAR} != null){
          echo ($this->filter($this->text->{Text_Model::COLUMN_TEXT},'emoticons'));
-      } else {
+      } else if($this->category()->getRights()->isWritable()) {
          ?>
       <div class="admin-info-text"><?php printf($this->tr('Źádný text nebyl vyplněn. <a class="" href="%s">Upravit</a>.'), $this->link()->route('edit'));?></div>
          <?php
