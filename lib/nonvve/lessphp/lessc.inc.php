@@ -62,25 +62,39 @@ class lessc{
 		unset( $this->registeredVars[$name] );
 	}
 
+	public function setOptions($options){
+		foreach( $options as $name => $value ){
+			$this->setOption( $name, $value);
+		}
+	}
+	
+	public function setOption($name, $value){
+		$this->options[$name] = $value;
+	}
+	
 	public function parse($buffer, $presets = array()){
-		$options = array();
+
 		$this->setVariables($presets);
 
+		$parser = new Less_Parser($this->getOptions());
+		$parser->setImportDirs($this->getImportDirs());
+		foreach ($this->libFunctions as $name => $func) {
+			$parser->registerFunction($name, $func);
+		}
+		$parser->parse($buffer);
+		if( count( $this->registeredVars ) ) $parser->ModifyVars( $this->registeredVars );
+
+		return $parser->getCss();
+	}
+
+	protected function getOptions(){
+		$options = array('relativeUrls'=>false);
 		switch($this->formatterName){
 			case 'compressed':
 				$options['compress'] = true;
 				break;
 		}
-
-		$parser = new Less_Parser($options);
-		$parser->setImportDirs($this->getImportDirs());
-		if( count( $this->registeredVars ) ) $parser->ModifyVars( $this->registeredVars );
-		foreach ($this->libFunctions as $name => $func) {
-			$parser->registerFunction($name, $func);
-		}
-		$parser->parse($buffer);
-
-		return $parser->getCss();
+		return $options;
 	}
 
 	protected function getImportDirs(){
@@ -99,7 +113,7 @@ class lessc{
 
 		$this->allParsedFiles = array();
 
-		$parser = new Less_Parser();
+		$parser = new Less_Parser($this->getOptions());
 		$parser->SetImportDirs($this->getImportDirs());
 		if( count( $this->registeredVars ) ){
 			$parser->ModifyVars( $this->registeredVars );
@@ -135,7 +149,7 @@ class lessc{
 		$this->allParsedFiles = array();
 		$this->addParsedFile($fname);
 
-		$parser = new Less_Parser();
+		$parser = new Less_Parser($this->getOptions());
 		$parser->SetImportDirs($this->getImportDirs());
 		if( count( $this->registeredVars ) ) $parser->ModifyVars( $this->registeredVars );
 		foreach ($this->libFunctions as $name => $func) {
