@@ -93,6 +93,13 @@ class Template_Core extends Template {
          self::setCoverImage(Category::getImageDir(Category::DIR_IMAGE)
             .Category::getSelectedCategory()->getDataObj()->{Model_Category::COLUMN_ICON} );
       }
+      if(Category::getSelectedCategory()->getRights()->isWritable()){
+         $this->addFile('css://admin/admin.less');
+         if(Auth::isAdmin()){
+            $this->addJsPlugin(new JsPlugin_JQuery());
+            $this->addFile('js://admin/menu.js');
+         }
+      }
    }
 
    /**
@@ -623,13 +630,6 @@ class Template_Core extends Template {
    {
       echo "<!--{*-STYLESHEETS-*}-->\n"
           ."<!--{*-JAVASCRIPTS-*}-->";
-
-      if(Category::getSelectedCategory()->getRights()->isWritable()){
-         $this->addFile('css://admin/admin.less');
-         if(Auth::isAdmin()){
-            $this->addFile('js://admin/menu.js');
-         }
-      }
    }
 
    /**
