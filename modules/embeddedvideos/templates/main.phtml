@@ -1,0 +1,28 @@
+<?php
+//$this->addCssFile("style.less");
+echo $this->toolbox;
+?>
+<h1><?php ps($this->category()->getName()) ?></h1>
+<div class="content">
+   <?php
+   if (!empty($this->videos)) {
+      ?>
+      <div class="videos-list row">
+         <?php foreach ($this->videos as $video) { ?>
+            <div class="col-md-3">
+               <h2><?php ps($video->{EmbeddedVideos_Model::COLUMN_NAME}) ?></h2>
+               <?php $this->includeFile('tpl://video.phtml', array('video' => $video))?>
+               <?php 
+               echo $video->toolbox;      
+               ?>
+            </div>
+         <?php } ?>
+      </div>
+      <?php
+   } else if ($this->category()->getRights()->isWritable()) {
+      ?>
+      <div class="admin-info-text">Není vloženo žádné video. <a href="<?= $this->link()->route('addVideo') ?>">Přidat video</a>.</div>
+      <?php
+   }
+   ?>
+</div>

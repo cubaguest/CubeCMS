@@ -1,0 +1,60 @@
+<?php
+$jq = new JsPlugin_JQuery();
+$jq->addUISortable();
+$this->addJsPlugin($jq);
+
+$this->addCssFile("style.less");
+?>
+<h1><?php ps($this->tr('Úprava pořadí videí')); ?></h1>
+<div class="content">
+   <?php echo $this->form->renderStart(); ?>
+   <div class="cubecms-widget cubecms-widget-sorting">
+      <ul id="embedvideos-list" class="cubecms-widget cubecms-list">
+         <?php foreach ($this->videos as $video) { ?>
+            <li class="cubecms-list-row cubecms-list-row-movable" id="customblock-<?php echo $video->getPK() ?>"><span class="icon icon-arrows-v icon-fw"></span><?php
+               echo $video->{EmbeddedVideos_Model::COLUMN_NAME};
+               $this->form->id->setValues($video->getPK());
+               echo $this->form->id;
+               ?>
+               <button class="buttons-show-video btn btn-small btn-default right-box"><span class="icon icon-eye"></span> <?php ps($this->tr('Ukázat')); ?></button>
+               <div class="hidden video-container">
+                  <?php $this->includeFile('tpl://video.phtml', array('video' => $video)) ?>
+               </div>
+            </li>
+         <?php } ?>
+      </ul>
+      <div class="cubecms-widget-footer">
+         <div class="cubecms-widget-note"><?php ps($this->tr('Pro změnu pořadí stačí video uchopit a přesunout.')) ?></div>
+         <div class="cubecms-widget-buttons">
+            <?php echo $this->form->save->controllAll() ?>
+         </div>
+      </div>
+   </div>
+   <?php echo $this->form->renderEnd(); ?>
+   <?php
+   $this->includeFile('tpl://engine:components/modal.phtml', array(
+       'id' => 'videoPreview',
+       'close' => true,
+       'header' => $this->tr('Náhled')
+   ));
+   ?>
+   <script>
+      $(function() {
+         $("#embedvideos-list").sortable({
+            placeholder: "cubecms-state-highlight",
+            forcePlaceholderSize: true,
+            cursor: 'move'
+         });
+         $("#embedvideos-list").disableSelection();
+
+         var $modal = $('#videoPreview');
+         $('.buttons-show-video').on('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            $modal.find('.cubecms-modal-content').html($(this).next('.video-container').html());
+            $modal.show();
+            return false;
+         });
+      });
+   </script>
+</div>

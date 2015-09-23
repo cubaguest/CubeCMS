@@ -1,0 +1,38 @@
+<?php
+$regexps = array(
+    '/\/watch\?v=([^&]*)&.*/',
+    '/\/watch\?v=([^&]*)&.*/',
+    '/(stream\.cz\/)([^\/]+)/'
+);
+$replaces = array(
+    '/embed/$1',
+    '/embed/$2?list=$1',
+    '$1object'
+);
+?>
+<div class="video-wrapper">
+   <div class="inner">
+      <?php
+      if ($video->{EmbeddedVideos_Model::COLUMN_URL} != null) {
+         if (strpos($video->{EmbeddedVideos_Model::COLUMN_URL}, 'stream.cz') !== false) {
+            ?>
+            <object height="382" width="624">
+               <param name="movie" value="<?php echo preg_replace($regexps, $replaces, $video->{EmbeddedVideos_Model::COLUMN_URL}); ?>">
+               <param name="allowfullscreen" value="true">
+               <param name="allowscriptaccess" value="always">
+               <embed id="VideoSpot" name="VideoSpot" src="<?php echo preg_replace($regexps, $replaces, $video->{EmbeddedVideos_Model::COLUMN_URL}); ?>" type="application/x-shockwave-flash" 
+                      allowfullscreen="true" allowscriptaccess="always" height="382" width="624"></object>
+            <?php
+         } else {
+            ?>
+            <iframe width="500" height="250" 
+                    src="<?php echo preg_replace($regexps, $replaces, $video->{EmbeddedVideos_Model::COLUMN_URL}); ?>" 
+                    frameborder="0" allowfullscreen=""></iframe>
+                    <?php
+                 }
+              } else if ($video->{EmbeddedVideos_Model::COLUMN_CODE} != null) {
+                 echo $video->{EmbeddedVideos_Model::COLUMN_CODE};
+              }
+              ?>
+   </div>
+</div>

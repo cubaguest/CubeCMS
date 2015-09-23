@@ -1,0 +1,10 @@
+<?php 
+//$this->addCssFile("style.less");
+echo $this->toolbox;
+?>
+<h1><?php ps( $this->videa ? sprintf('Úprava videa %s', $this->video->{EmbeddedVideos_Model::COLUMN_NAME}) : $this->tr('Přidání videa')) ?></h1>
+<div class="content content-admin">
+      <?php 
+      echo $this->form;
+      ?>
+</div>
