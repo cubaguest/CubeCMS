@@ -11,7 +11,8 @@ CREATE TABLE `{PREFIX}texts_blocks` (
   `block_text_de` TEXT NULL,
   `block_text_clear_de` TEXT NULL,
   `block_order` SMALLINT NOT NULL DEFAULT 0,
-  `block_image` VARCHAR(50) NULL DEFAULT NULL,
+  `block_image` VARCHAR(100) NULL DEFAULT NULL,
+  `block_file` VARCHAR(100) NULL DEFAULT NULL,
   PRIMARY KEY (`id_text_block`),
   INDEX `idc` (`id_category` ASC))
 ENGINE = MyISAM

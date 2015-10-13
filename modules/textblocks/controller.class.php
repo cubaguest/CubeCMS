@@ -92,6 +92,11 @@ class TextBlocks_Controller extends Controller {
          $block->{TextBlocks_Model::COLUMN_IMAGE} = $file->getName();
          unset ($file);
       }
+      if ($form->file->getValues() != null) {
+         $file = $form->file->createFileObject();
+         $block->{TextBlocks_Model::COLUMN_FILE} = $file->getName();
+         unset ($file);
+      }
       // pokud byla zadáno pořadí, zařadíme na pořadí. Jinak dáme na konec
       $block->save();
       
@@ -119,6 +124,12 @@ class TextBlocks_Controller extends Controller {
       $iImage->setUploadDir($this->module()->getDataDir());
       $iImage->setOverWrite(false);
       $form->addElement($iImage);
+      
+      $iFile = new Form_Element_File('file', $this->tr('Připojený soubor'));
+      $iFile->addValidation(new Form_Validator_FileExtension(Form_Validator_FileExtension::ALL));
+      $iFile->setUploadDir($this->module()->getDataDir());
+      $iFile->setOverWrite(false);
+      $form->addElement($iFile);
 
       $iSubmit = new Form_Element_SaveCancel('save');
       $form->addElement($iSubmit);

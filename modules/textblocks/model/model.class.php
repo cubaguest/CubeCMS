@@ -14,6 +14,7 @@ class TextBlocks_Model extends Model_ORM_Ordered {
    const COLUMN_TEXT = 'block_text';
    const COLUMN_TEXT_CLEAR = 'block_text_clear';
    const COLUMN_IMAGE = 'block_image';
+   const COLUMN_FILE = 'block_file';
    const COLUMN_ORDER = 'block_order';
 
    protected function  _initTable() {
@@ -25,6 +26,7 @@ class TextBlocks_Model extends Model_ORM_Ordered {
       $this->addColumn(self::COLUMN_TEXT, array('datatype' => 'text', 'pdoparam' => PDO::PARAM_STR, 'lang' => true));
       $this->addColumn(self::COLUMN_TEXT_CLEAR, array('datatype' => 'text', 'pdoparam' => PDO::PARAM_STR, 'fulltext' => true, 'lang' => true));
       $this->addColumn(self::COLUMN_IMAGE, array('datatype' => 'varchar(50)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_FILE, array('datatype' => 'varchar(50)', 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_ORDER, array('datatype' => 'smallint', 'default' => 0, 'pdoparam' => PDO::PARAM_INT));
       
       $this->setPk(self::COLUMN_ID);
