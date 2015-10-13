@@ -1,0 +1,62 @@
+<?php
+// base metatags
+Template_Core::setMetaTag('Robots', 'noindex,nofollow');
+Template_Core::setMetaTag('generator', AppCore::ENGINE_NAME . ' ' . AppCore::ENGINE_VERSION);
+// base styles
+$this->addFile('css://style.less');
+$this->addFile('css://admin/admin.less');
+// DEBUG
+Template::addJsPlugin(new JsPlugin_JQuery());
+if (VVE_DEBUG_LEVEL > 1) {
+   $this->addFile('js://enginehelpers.js');
+} else {
+   $this->addFile('js://enginehelpers.min.js');
+}
+
+$this->addFile('js://base.js');
+$this->addFile('js://bootstrap.min.js');
+/* START PAGE */
+?><!DOCTYPE html>
+<html>
+   <head>
+      <?php $this->renderHeaderBase(); ?>
+      <?php $this->renderHeaderRSS(); ?>
+      <?php $this->renderHeaderCSSJS() ?>
+      <script type="text/javascript">/* <![CDATA[ */<?php $this->renderHeaderScripts() ?>/* ]]> */</script>
+   </head>
+   <body id="pageTop" class="popup <?php echo $this->getBodyClasses(true); ?>" >
+      <header class="container">
+         <span class="brand"><?php
+            $title = Template_Core::getPageTitle();
+            $last = array_pop($title);
+            if (!empty($title)){
+               ps($last.' - '.reset($title));
+            } else {
+               ps($last);
+            }
+              
+            ?></span>
+      </header>
+
+      <section class="container">
+         <div class="row">
+            <div class="col-md-12">
+               <?php
+               $this->includeTpl("messages.phtml", true);
+               ?>
+               <div class="main-content module-<?php echo Category::getSelectedCategory()->getModule()->getName() ?> clearfix">
+                  <?php $this->includeTpl("modules.phtml", true); ?>
+               </div>
+            </div>
+         </div>
+      </section>
+      <?php if (isset($_GET['enableclose'])) { ?>
+         <footer class="container">
+            <button type="button"><?php ps($this->tr('Zavřít')); ?></button>
+         </footer>
+         <?php
+      }
+      $this->renderBodyEnd();
+      ?>
+   </body>
+</html>
