@@ -45,7 +45,7 @@ class UserQuestions_Controller extends Controller {
                break;
             
             default :
-               throw new InvalidArgumentException($this->tr('Nepodporovaná akce nad polžkou.'));
+               throw new InvalidArgumentException($this->tr('Nepodporovaná akce nad položkou.'));
          }
          
          
@@ -90,7 +90,7 @@ class UserQuestions_Controller extends Controller {
       $form->addElement($elemName);
       
       $elemEmail = new Form_Element_Text('email', $this->tr('Váš e-mail'));
-      $elemEmail->addValidation(new Form_Validator_NotEmpty());
+//      $elemEmail->addValidation(new Form_Validator_NotEmpty());
       $elemEmail->addValidation(new Form_Validator_Email());
       $elemEmail->addFilter(new Form_Filter_StripTags());
       $form->addElement($elemEmail);
@@ -139,7 +139,9 @@ class UserQuestions_Controller extends Controller {
          
          // mail uživateli a adminu, pokud nneí přihlášen
          if(!$this->category()->getRights()->isWritable()){
-            $this->sendUserMail($question);
+            if($question->{UserQuestions_Model::COLUMN_EMAIL} != null){
+               $this->sendUserMail($question);
+            }
             $this->sendAdminMail($question);
          }
          
@@ -169,7 +171,7 @@ class UserQuestions_Controller extends Controller {
       $form->addElement($elemName);
       
       $elemEmail = new Form_Element_Text('email', $this->tr('E-mail'));
-      $elemEmail->addValidation(new Form_Validator_NotEmpty());
+//      $elemEmail->addValidation(new Form_Validator_NotEmpty());
       $elemEmail->addValidation(new Form_Validator_Email());
       $elemEmail->addFilter(new Form_Filter_StripTags());
       $elemEmail->setValues($question->{UserQuestions_Model::COLUMN_EMAIL});
@@ -200,8 +202,9 @@ class UserQuestions_Controller extends Controller {
          if($this->category()->getParam(self::PARAM_NEED_APPROVE, true)
              && $form->approve->getValues() 
              && $question->{UserQuestions_Model::COLUMN_APPROVED_SEND} == 0){
-                
-            $this->sendUserConfirmMail($question);
+            if($question->{UserQuestions_Model::COLUMN_EMAIL} != null){
+               $this->sendUserConfirmMail($question);
+            }    
             $question->{UserQuestions_Model::COLUMN_APPROVED_SEND} = 1;
          }
          
@@ -355,7 +358,9 @@ class UserQuestions_Controller extends Controller {
       
       $mail = new Email(true);
       $mail->setSubject( sprintf( $this->tr('Přidána nová položka do stránek %s'), CUBE_CMS_WEB_NAME ) );
-      $mail->setFrom(array($question->{UserQuestions_Model::COLUMN_EMAIL} => $question->{UserQuestions_Model::COLUMN_NAME}));      
+      if($question->{UserQuestions_Model::COLUMN_EMAIL} != null){
+         $mail->setFrom(array($question->{UserQuestions_Model::COLUMN_EMAIL} => $question->{UserQuestions_Model::COLUMN_NAME}));      
+      }
       
       $mail->setContent(Email::getBaseHtmlMail((string)$cntTpl));
       
