@@ -41,7 +41,7 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
    ul {
       background-color: @color-bg;
    }
-   
+
    ul.dropdown {
       >li {
          >ul {
@@ -58,7 +58,7 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
                /*color: #000;*/
                float: none;
                opacity: 0.9;
-            /* IE 7 */
+               /* IE 7 */
             }
             width: 220px; 
             visibility: hidden; 
@@ -76,7 +76,7 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
             border: 1px solid @color-border;
             z-index: 4;
          }
-         
+
          &.hover, &:hover { 
             >a {
                color: @color-bg; 
@@ -133,9 +133,9 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
    z-index: 10002;
    text-align: left;
    border-bottom: 1px solid @color-border;
-   box-shadow:0px 0px 5px #000;
-   -webkit-box-shadow:0px 0px 3px #000;
-   -moz-box-shadow: 0px 0px 3px #000;
+   box-shadow:0px 0px 5px @color-text-gray;
+   -webkit-box-shadow:0px 0px 3px @color-text-gray;
+   -moz-box-shadow: 0px 0px 3px @color-text-gray;
 }
 
 /* ADMIN MENU LEVEL TWO */
@@ -513,8 +513,8 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
       line-height: 0;
       visibility: hidden;
    }
-   
-   li {
+
+   >li {
       &:hover {
          &, label, a, a:visited, input[type="button"], input[type="submit"], input[type="reset"], button, select {
             color: @color-text-hover;
@@ -526,8 +526,16 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
             color: @color-text;
             background-color: @color-bg;
          }
+         div div { // reset inner elements ex. datepicker colors
+                   &, label, a, a:visited, input[type="button"], input[type="submit"], input[type="reset"], button, select {
+                      color: @color-text;
+                   }
+         }
          background-color: @color-bg-hover;
          border-color: @color-bg-hover;
+      }
+      &.tools-inline {
+         padding-bottom: 0;
       }
       >form, >div {
          input, button, select {
@@ -535,10 +543,12 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
             margin-right: 3px;
             display: inline-block;
             font-size: 12px;
+            margin-bottom: 5px;
          }
          input[type="button"], input[type="submit"], input[type="reset"], button {
             padding: 2px 5px;
             font-size: 14px;
+            margin-bottom: 5px;
          }
          line-height: 1;
       }
@@ -547,11 +557,11 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
             background-color: @color-bg-important;
          }
          /*&, label, a, a:visited, input[type="button"], input[type="submit"], input[type="reset"], button, select {*/
-            /*color: @color-bg-important;*/
+         /*color: @color-bg-important;*/
          /*}*/
          border-color: @color-bg-important;
       }
-      
+
       /* inner */
       a {
          display: block;
@@ -569,11 +579,12 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
       background-color: @color-bg;
       padding: 5px 5px 5px 5px;
       margin-right: 5px;
+      margin-bottom: 5px;
       float: left;
       .rounded-corners(@border-radius);
       .tools-box-sahadow();
    }
-   
+
    background-color: @color-bg;
    margin: 0;
    padding: 0;
@@ -610,7 +621,7 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
 
 /* fixovaný box na stránce, většinou tlačítka k seznamu*/
 .fixed-actions-box {
-   
+
 }
 .fixed-actions-box-helper {
    position: fixed;
@@ -811,10 +822,10 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
       }
       td, .cubecms-row {
          &.state-hightlight {
-            
+
          }
          &.state-warning {
-            
+
          }
          &.state-disabled {
             &:hover {
@@ -834,7 +845,7 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
                text-decoration: none;
             }
          }
-      
+
          &:hover {
             background-color: @color-bg-hover-light;
          }
@@ -854,6 +865,11 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
       th {
          font-weight: bold;
          color: @color-text-invert;
+      }
+      td {
+      }
+      a.button-change-state > .icon {
+         color: @color-text;
       }
       .scroll {
          /*padding: 0;*/
@@ -889,7 +905,7 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
             /*background-color: @color-bg-header;*/
          }
          .content {
-            
+
          }
          &:hover {
             border-color: @color-border-hover;
@@ -1051,7 +1067,7 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
    right: 0;
    bottom: 0;
    left: 0;
-   z-index: 10101;
+   z-index: 9100;
    -webkit-overflow-scrolling: touch;
    outline: 0;
    opacity: 1;
@@ -1064,11 +1080,37 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
 
 /* support classes */
 .scrollbar-measure {
-	width: 100px;
-	height: 100px;
-	overflow: scroll;
-	position: absolute;
-	top: -9999px;
+   width: 100px;
+   height: 100px;
+   overflow: scroll;
+   position: absolute;
+   top: -9999px;
+}
+
+/* popup window */
+body.popup {
+   header {
+      padding-top: @padding-small;
+      padding-bottom: @padding-small;
+      box-shadow:0px 0px 5px @color-text-gray;
+      -webkit-box-shadow:0px 0px 3px @color-text-gray;
+      -moz-box-shadow: 0px 0px 3px @color-text-gray;
+      margin-bottom: 5px;
+   }
+   h1 {
+      font-size: @font-size-large;
+   }
+   h2 {
+      font-size: @font-size-large - 2;
+   }
+   .brand {
+      font-size: @font-size-large;
+      font-weight: bold;
+   }
+   footer {
+      text-align: right;
+   }
+   padding-top: 0;
 }
 
 @media (min-width: 768px) {
@@ -1079,6 +1121,15 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
       .cubecms-modal-wrap {
          .admin-box-sahadow();
          .rounded-corners();
+      }
+   }
+}
+@media (min-width: 1024px) {
+   .cubecms-modal {
+      &.cubecms-modal-large {
+         .cubecms-modal-dialog {
+            width: 900px;
+         }
       }
    }
 }
