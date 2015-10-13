@@ -226,19 +226,24 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
     * Metoda nastaví že záznam je nový
     * @return bool
     */
-   public function setNew()
+   public function setNew($isNew = true)
    {
-      $this->fromDb = false;
-      foreach ($this->columns as &$col) {
-         $col['changed'] = 1;
-         if($col['pk'] == true){
-            $col['value'] = null;
+      if($isNew){
+         $this->fromDb = false;
+         foreach ($this->columns as &$col) {
+            $col['changed'] = 1;
+            if($col['pk'] == true){
+               $col['value'] = null;
+            }
+         }
+      } else {
+         $this->fromDb = true;
+         foreach ($this->columns as &$col) {
+            $col['changed'] = self::COLUMN_IS_FROM_DB;
          }
       }
    }
    
-   
-
    public function mapArray($array)
    {
 //      var_dump($array);flush();
