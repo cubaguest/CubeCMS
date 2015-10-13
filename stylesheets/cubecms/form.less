@@ -1,7 +1,7 @@
 /* formulařové prvky */
 @import "cubecms/variables.less";
 
-input, button, textarea, select, a.form-button, .button, .btn, a.btn {
+input, button, textarea, select, a.form-button, .button, .btn {
    color: @form-color-text;
    &.disabled, &[disabled] {
       background-color: @form-color-bg-disabled !important;
@@ -24,7 +24,7 @@ input[type="image"],input[type="checkbox"],input[type="radio"] {
    border: 0;
    background-color:transparent;
 }
-input[type="submit"], input[type="reset"], input[type="button"], button, a.form-button, .button, .btn, a.btn, a.btn:visited {
+input[type="submit"], input[type="reset"], input[type="button"], button, a.form-button, .button, .btn {
    &:hover {
       color: @form-color-text-hover;
       border-color: @form-color-bg-hover;
@@ -53,17 +53,6 @@ input[type="submit"], input[type="reset"], input[type="button"], button, a.form-
    display: inline-block;
 }
 input.form-required, textarea.form-required {
-   &:after {
-/*    není podporováno v inputu  
-      content: "*";
-      position: absolute;
-      right: 3px;
-      top: 3px;
-      width: 5px;
-      height: 5px;
-      color: @form-color-bg-red;
-      display: block;*/
-   }
    position: relative;
    background-position: right top;
    background-image: url('@{imgdir}form_required.png');
