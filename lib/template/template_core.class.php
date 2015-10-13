@@ -33,6 +33,11 @@ class Template_Core extends Template {
    const INDEX_HANDLE_TEMPLATE = 'index_handle.phtml';
 
    /**
+    * Šablona pro popup okna
+    */
+   const INDEX_POPUP_TEMPLATE = 'index_popup.phtml';
+
+   /**
     * Nastavená šablony systému
     * @var string
     */
@@ -82,6 +87,10 @@ class Template_Core extends Template {
          } else {
             self::$pageTitle = array_merge(array(VVE_WEB_NAME), self::$pageTitle);
          }
+      }
+      
+      if(isset($_GET['popupwindow'])){
+         self::$indexFile = self::INDEX_POPUP_TEMPLATE;
       }
 
       // prepare base Tags
@@ -630,6 +639,13 @@ class Template_Core extends Template {
    {
       echo "<!--{*-STYLESHEETS-*}-->\n"
           ."<!--{*-JAVASCRIPTS-*}-->";
+
+      if(Category::getSelectedCategory()->getRights()->isWritable()){
+         $this->addFile('css://admin/admin.less');
+         if(Auth::isAdmin()){
+            $this->addFile('js://admin/menu.js');
+         }
+      }
    }
 
    /**
