@@ -20,6 +20,8 @@ CREATE  TABLE `{PREFIX}teams_persons` (
   `person_order` SMALLINT(6) DEFAULT '0',
   `person_deleted` TINYINT(1) DEFAULT '0',
   `person_image` VARCHAR(45) COLLATE utf8_czech_ci DEFAULT NULL,
+  `person_link` VARCHAR(300) NULL DEFAULT NULL,
+  `person_work` VARCHAR(50) NULL DEFAULT NULL,
   PRIMARY KEY (`id_person`),
   KEY `id_team` (`id_team`),
   FULLTEXT KEY `name` (`person_name`),
