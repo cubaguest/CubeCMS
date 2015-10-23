@@ -36,6 +36,7 @@ CubeCMS = {
       this.ToolBox.init();
       this.Form.init();
       this.Modal.init();
+      this.Popup.init();
    }
 };
 
@@ -686,6 +687,43 @@ CubeCMS.Modal = {
       }
    }
 };
+
+CubeCMS.Popup = {
+    init : function(){
+       var that = this;
+       $('.cubecms-link-popup').each(function(){
+          $(this).on('click', function (e){
+             if($(this).prop('href') === undefined|| $(this).prop('href') === ""){
+                return;
+             }
+             e.preventDefault();
+             var url = $(this).prop('href');
+             url = (url.indexOf("?") === -1 ? url+'?popupwindow=1': url+'?popupwindow=1');
+             url = url + ($(this).data('popup-callback') === undefined ? '' : '&callback='+$(this).data('popup-callback'));
+             that.openPopup(url, $(this).prop('title'), $(this).data('popup-width'),$(this).data('popup-height'));
+             return false;
+          });
+       });
+    },
+    openPopup : function(url, title, w, h){
+       // Fixes dual-screen position                         Most browsers      Firefox
+         var dualScreenLeft = window.screenLeft !== undefined ? window.screenLeft : screen.left;
+         var dualScreenTop = window.screenTop !== undefined ? window.screenTop : screen.top;
+
+         width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
+         height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
+
+         var left = ((width / 2) - (w / 2)) + dualScreenLeft;
+         var top = ((height / 2) - (h / 2)) + dualScreenTop;
+         var newWindow = window.open(url, title, 'scrollbars=yes, width=' 
+            + w + ', height=' + h + ', top=' + top + ', left=' + left);
+
+         // Puts focus on the newWindow
+         if (window.focus) {
+            newWindow.focus();
+         }
+    }
+}
 
 /* DEPRECATED */
 function vveShowMessages(dataObj){ CubeCMS.Msg.show(dataObj);}

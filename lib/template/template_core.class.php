@@ -64,6 +64,8 @@ class Template_Core extends Template {
    private static $instance = null;
 
    private static $canonical = null;
+   
+   protected static $closePopup = false;
 
    /**
     * Konstruktor
@@ -111,6 +113,26 @@ class Template_Core extends Template {
       }
    }
 
+   /**
+    * Metoda vrací jestli je daná stránka na celou šířku
+    * @return bool
+    */
+   public static function closePopupWindow($vars = array()) {
+      self::$closePopup = $vars;
+   }
+   
+   /**
+    * Metoda vrací jestli je daná stránka na celou šířku
+    * @return bool
+    */
+   public static function isClosePopupWindow() {
+      return (bool)self::$closePopup;
+   }
+   
+   public static function getClosePopupWindowParams() {
+      return self::$closePopup;
+   }
+   
    /**
     * Vrací instanci hlavní šablony
     * @return Template_Core

@@ -573,6 +573,17 @@ class Template extends TrObject {
       }
       return false;
    }
+   
+   /**
+    * Metoda vrací jestli je aktuální stránka vstupní - tedy bez adresy
+    * @return bool -- true pokud se jedná o vstupní stránku
+    */
+   final public static function isHomePage() {
+      if(AppCore::getUrlRequest()->getCategory() == null){
+         return true;
+      }
+      return false;
+   }
 
    /**
     * Metoda pro přímé vložení souvboru do šablony

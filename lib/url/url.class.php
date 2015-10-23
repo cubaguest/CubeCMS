@@ -350,7 +350,7 @@ class Url
     * @param string -- externí odkaz na který se má přesměrovat (option)
     */
    public function redirect($link = null, $code = 302) {
-      if(!Url_Request::isXHRRequest() && CoreErrors::isEmpty()){ // u XHR není nutný reload
+      if(!Url_Request::isXHRRequest() && CoreErrors::isEmpty() && !Url_Request::isPopupWindow()){ // u XHR a popup window není nutný reload
          if ($link == null) {
             Template_Output::addHeader("Location: " . (string)$this, true, $code);
          } else {

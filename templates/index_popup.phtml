@@ -25,38 +25,46 @@ $this->addFile('js://bootstrap.min.js');
       <script type="text/javascript">/* <![CDATA[ */<?php $this->renderHeaderScripts() ?>/* ]]> */</script>
    </head>
    <body id="pageTop" class="popup <?php echo $this->getBodyClasses(true); ?>" >
-      <header class="container">
-         <span class="brand"><?php
-            $title = Template_Core::getPageTitle();
-            $last = array_pop($title);
-            if (!empty($title)){
-               ps($last.' - '.reset($title));
-            } else {
-               ps($last);
-            }
-              
-            ?></span>
-      </header>
+      <?php if (!Template_Core::isClosePopupWindow()) { ?>
+         <header class="container">
+            <span class="brand"><?php
+               $title = Template_Core::getPageTitle();
+               $last = array_pop($title);
+               if (!empty($title)) {
+                  ps($last . ' - ' . reset($title));
+               } else {
+                  ps($last);
+               }
+               ?></span>
+         </header>
 
-      <section class="container">
-         <div class="row">
-            <div class="col-md-12">
-               <?php
-               $this->includeTpl("messages.phtml", true);
-               ?>
-               <div class="main-content module-<?php echo Category::getSelectedCategory()->getModule()->getName() ?> clearfix">
-                  <?php $this->includeTpl("modules.phtml", true); ?>
+         <section class="container">
+            <div class="row">
+               <div class="col-md-12">
+                  <?php
+                  $this->includeTpl("messages.phtml", true);
+                  ?>
+                  <div class="main-content module-<?php echo Category::getSelectedCategory()->getModule()->getName() ?> clearfix">
+                     <?php $this->includeTpl("modules.phtml", true); ?>
+                  </div>
                </div>
             </div>
-         </div>
-      </section>
-      <?php if (isset($_GET['enableclose'])) { ?>
-         <footer class="container">
-            <button type="button"><?php ps($this->tr('Zavřít')); ?></button>
-         </footer>
+         </section>
+         <?php if (isset($_GET['enableclose'])) { ?>
+            <footer class="container">
+               <button type="button"><?php ps($this->tr('Zavřít')); ?></button>
+            </footer>
+            <?php
+         }
+         $this->renderBodyEnd();
+         ?>
          <?php
-      }
-      $this->renderBodyEnd();
-      ?>
+      } else {
+         ?>
+         <script type="text/javascript">
+            window.opener.<?php echo Url_Request::getPopupWindowCallback() ?>(<?php echo json_encode(Template_Core::getClosePopupWindowParams()) ?>);
+            window.close();
+         </script>
+      <?php } ?>
    </body>
 </html>

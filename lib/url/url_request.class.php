@@ -26,6 +26,8 @@ class Url_Request {
 
    const URL_FILE_RSS = 'rss.xml';
    const URL_FILE_ATOM = 'atom.xml';
+   
+   const URL_POPUP_WINDOW = 'popupwindow';
 
 
    /**
@@ -523,6 +525,22 @@ class Url_Request {
    }
 
    /**
+    * Metoda vrací jestli je daná stránka popup okno
+    * @return bool
+    */
+   public static function isPopupWindow() {
+      return ( isset($_GET['popupwindow']) && $_GET['popupwindow'] == 1);
+   }
+   
+   /**
+    * Metoda vrací název callback funkce popup okna
+    * @return bool
+    */
+   public static function getPopupWindowCallback() {
+      return ( isset($_GET['callback']) ? $_GET['callback'] : null);
+   }
+   
+   /**
     * Metoda vrací jestli se zpracovává celá celá stránka, nebo jenom část
     * @return bool -- true pokud je zpracovávána stránka
     */
@@ -581,4 +599,3 @@ class Url_Request {
       return self::$isXHRRequest;
    }
 }
-?>
