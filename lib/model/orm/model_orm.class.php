@@ -1167,6 +1167,29 @@ abstract class Model_ORM extends Model implements ArrayAccess {
       }
       return $dbst->rowCount();
    }
+      
+   /**
+    * Metoda vymaže všechny záznamy z tabulky
+    * @return bool
+    */
+   public function truncate()
+   {
+      $dbc = Db_PDO::getInstance();
+//      $this->lock(self::LOCK_READ);
+      $sql = 'TRUNCATE ' . $this->getTableName();
+      $dbst = $dbc->prepare($sql);
+      Log::msg($sql, 'TRUNCATE', null, 'sql');
+      try {
+         $ret = $dbst->execute();
+      } catch (PDOException $exc) {
+//         $this->unLock();
+         CoreErrors::addException($exc);
+         if (AppCore::getUserErrors() instanceof Messages AND VVE_DEBUG_LEVEL > 0) {
+            AppCore::getUserErrors()->addMessage('ERROR SQL: ' . $sql);
+         }
+      }
+      return $ret;
+   }
 
    /**
     * Metoda provede update záznamů
