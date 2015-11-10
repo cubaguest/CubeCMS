@@ -21,7 +21,7 @@ class Form_Validator_Regexp extends Form_Validator implements Form_Validator_Int
       if( ($regexp == self::REGEXP_PHONE_CZSK || $regexp == self::PHONE) AND $errMsg == null) {
          $errMsg = $this->tr('Položka "%s" neobsahuje platné telefonní číslo');
       }
-      // v�choz� zpr�va
+      // výchozí zpráva
       if($errMsg == null) {
          $errMsg = $this->tr('Položka "%s" nevyhovuje zadanému regulérnímu výrazu');
       }
@@ -83,4 +83,3 @@ class Form_Validator_Regexp extends Form_Validator implements Form_Validator_Int
 
    }
 }
-?>
