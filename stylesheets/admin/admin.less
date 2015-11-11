@@ -1,7 +1,9 @@
 /* jen pro pořádek */
 @import "fontawesome/font-awesome.less";
+@import "bootstrap/bootstrap.less";
 @import "cubecms/variables.less";
 @import "cubecms/form.less";
+@import "cubecms/tabs.less";
 
 .clearfix:after, .form-group:after {
    clear: both;
@@ -462,6 +464,8 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
          .icon {
             display: inline-block;
             padding: 0;
+            font-size: 14px;
+            vertical-align: 1px;
          }
          .icon + .name {
             margin-left: 5px;
@@ -513,16 +517,15 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
       line-height: 0;
       visibility: hidden;
    }
-
    >li {
       &:hover {
-         &, label, a, a:visited, input[type="button"], input[type="submit"], input[type="reset"], button, select {
+/*         &, label, a, a:visited, input[type="button"], input[type="submit"], input[type="reset"], button, select {
             color: @color-text-hover;
          }
          input[type="button"], input[type="submit"], input[type="reset"], button {
             color: @color-text;
          }
-         select, input, button {
+         select, input, button, span {
             color: @color-text;
             background-color: @color-bg;
          }
@@ -532,7 +535,7 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
                    }
          }
          background-color: @color-bg-hover;
-         border-color: @color-bg-hover;
+         border-color: @color-bg-hover;*/
       }
       &.tools-inline {
          padding-bottom: 0;
@@ -549,8 +552,25 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
             padding: 2px 5px;
             font-size: 14px;
             margin-bottom: 5px;
+            line-height: 1;
+         }
+         span {
+            &.icon {
+               font-size: 14px;
+               vertical-align: 2px;
+               padding: 0;
+            }
+            font-size: 14px;
+            vertical-align: 2px;
+            color: @color-text-light;
+            .rounded-corners(@border-radius);
+            display: inline-block;
+            padding: 2px;
          }
          line-height: 1;
+      }
+      form {
+         display: inline-block;
       }
       &.important {
          &:hover {
@@ -584,7 +604,6 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
       .rounded-corners(@border-radius);
       .tools-box-sahadow();
    }
-
    background-color: @color-bg;
    margin: 0;
    padding: 0;

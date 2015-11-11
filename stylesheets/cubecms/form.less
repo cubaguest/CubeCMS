@@ -250,14 +250,18 @@ form {
             display: block;
          }
          float: left;
-         width: 25%;
          padding: 0 15px;
          min-height: 1px;
       }
       .form-controls {
-         width: 75%;
          float: left;
          padding: 0 15px;
+      }
+      .form-labels:not([class*="col-"]) {
+         width: 25%;
+      }
+      .form-controls:not([class*="col-"]) {
+         width: 75%;
       }
       margin-bottom: 15px;
       margin-left: -15px;

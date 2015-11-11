@@ -4,7 +4,7 @@ if( !empty($this->moduleButtons) ){
    ?>
    <ul class="module-tool-buttons clearfix">
    <?php foreach ($this->moduleButtons as $id => $button) {
-      if(is_array($button)){
+      if(is_array($button) && !isset($button['content'])){
          
          $button += array(
              'id' => null,
@@ -16,7 +16,7 @@ if( !empty($this->moduleButtons) ){
              'icon' => null,
              'type' => 'button',
              'state' => null, // warning, error, ok
-             'options' => array(), // hodnoty pro rozbalovací seznam a podobně
+             'options' => array(), // hodnoty pro rozbalovac� seznam a podobn
              'attributes' => array(
                  'id' => isset($button['id']) ? $button['id'] : ( !is_int($id) ? $id : null ),
                  'onclick' => isset($button['confirm']) ? 'return confirm(\''.htmlspecialchars($button['confirm']).'\')' : null
@@ -75,9 +75,13 @@ if( !empty($this->moduleButtons) ){
          ?>
          <li class="<?php echo $button['important'] ? 'important' : ''?>"><?php echo $cnt;?></li>
          <?php 
+      } else if(is_array($button) && isset($button['content'])){
+         ?>
+         <li class="tools-inline <?php echo isset($button['fullwidth']) && $button['fullwidth'] == true ? 'full-width' : ''?>"><div class="tool-content"><?php echo $button['content'];?></div></li>
+         <?php 
       } else if(is_string($button)) {
          ?>
-         <li><div><?php echo $button;?></div></li>
+         <li class="tools-inline"><div><?php echo $button;?></div></li>
          <?php 
       }
    }?>
