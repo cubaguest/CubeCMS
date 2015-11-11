@@ -1,6 +1,7 @@
 <?php
 $this->addPageTitle($this->tr('Vytvořit e-mail'));
-$this->addCssFile('style.less');
+$this->addFile('css://style.less');
+//$this->addFile('css://engine:cubecms/tabs.less');
 
 $fillterSnipshet = '<label class="font-small">' . $this->tr('filtr') . ':</label>
                   <input type="text" value="" class="input-filter-select"  />
@@ -11,245 +12,256 @@ $fillterSnipshet = '<label class="font-small">' . $this->tr('filtr') . ':</label
 <div class="main-content-form-edit" id="mails-send-mail-form">
    <?php
    $this->form->html()->setAttrib('id', 'mail-send-form');
+   $this->form->html()->addClass('form-horizontal');
    echo $this->form->renderStart();
+
+   $labelsColClass = 'col-lg-1';
+   $controlsColClass = 'col-lg-11';
    ?>
    <fieldset>
-      <table class="form-table">
-         <tr>
-            <th class="form-labels">
-               <?php echo $this->form->recipients->label() ?>
-            </th>
-            <td class="form-controlls">
-               <?php
-               $this->form->recipients->html()->setAttrib('cols', 80)->setAttrib('rows', 5)->addClass('full-width');
-               echo $this->form->recipients->controll();
-               $this->form->recipients->setSubLabel($this->form->recipients->getSubLabel() . '. <a href="' . $this->link() . '#delrec" id="recipients-reset">' . $this->tr('Vymazat příjemce') . '</a>');
-               echo $this->form->recipients->sublabel()
-               ?>
-            </td>
-         </tr>
-         <tr>
-            <th class="form-labels">
-               <?php echo $this->tr('Uložené Maily') ?>:
-            </th>
-            <td>
-               <div id="address-tabs">
-                  <ul class="nav nav-tabs" role="tablist">
-                     <li role="presentation" class="active"><a 
-                           href="<?php echo $this->link() ?>#tabs-mails-addressbook"
-                           aria-controls="tabs-mails-addressbook" role="tab" data-toggle="tab"
-                           ><?php echo $this->tr('Adresář') ?></a></li>
+      <div class="form-group">
+         <div class="<?= $labelsColClass ?> form-labels">
+            <?php echo $this->form->recipients->label() ?>
+         </div>
+         <div class="<?= $controlsColClass ?> form-controlls">
+            <?php
+            $this->form->recipients->html()->setAttrib('cols', 80)->setAttrib('rows', 5)->addClass('full-width');
+            echo $this->form->recipients->controll();
+            $this->form->recipients->setSubLabel($this->form->recipients->getSubLabel() . '. <a href="' . $this->link() . '#delrec" id="recipients-reset">' . $this->tr('Vymazat příjemce') . '</a>');
+            echo $this->form->recipients->sublabel()
+            ?>
+         </div>
+      </div>
+      <div class="form-group">
+         <div class="<?= $labelsColClass ?> form-labels"><?php echo $this->tr('Uložené Maily') ?>:</div>
+         <div class="<?= $controlsColClass ?> form-controlls">
+            <div id="address-tabs" class="cubecms-tabs">
+               <ul class="nav nav-tabs" role="tablist">
+                  <li role="presentation" class="active"><a 
+                        href="<?php echo $this->link() ?>#tabs-mails-addressbook"
+                        aria-controls="tabs-mails-addressbook" role="tab" data-toggle="tab"
+                        ><?php echo $this->tr('Adresář') ?></a></li>
+                  <li role="presentation"><a 
+                        href="#tabs-mails-users"
+                        aria-controls="tabs-mails-users" role="tab" data-toggle="tab"
+                        ><?php echo $this->tr('Uživatelé systému') ?></a></li>
+                     <?php if ($this->mailsNewsLetter !== null AND ! empty($this->mailsNewsLetter)) { ?>
                      <li role="presentation"><a 
-                           href="#tabs-mails-users"
-                           aria-controls="tabs-mails-users" role="tab" data-toggle="tab"
-                           ><?php echo $this->tr('Uživatelé systému') ?></a></li>
-                        <?php if ($this->mailsNewsLetter !== null AND ! empty($this->mailsNewsLetter)) { ?>
-                        <li role="presentation"><a 
-                              href="<?php echo $this->link() ?>#tabs-mails-newsletter"
-                              aria-controls="tabs-mails-newsletter" role="tab" data-toggle="tab"
-                              ><?php echo $this->tr('NewsLetter') ?></a></li>
+                           href="<?php echo $this->link() ?>#tabs-mails-newsletter"
+                           aria-controls="tabs-mails-newsletter" role="tab" data-toggle="tab"
+                           ><?php echo $this->tr('NewsLetter') ?></a></li>
+                     <?php } ?>
+                     <?php if ($this->mailsGuestbook !== null AND ! empty($this->mailsGuestbook)) { ?>
+                     <li role="presentation"><a 
+                           href="<?php echo $this->link() ?>#tabs-mails-guestbook"
+                           aria-controls="tabs-mails-guestbook" role="tab" data-toggle="tab"
+                           ><?php echo $this->tr('Kniha návštěv') ?></a></li>
+                     <?php } ?>
+                     <?php if ($this->mailsForum !== null AND ! empty($this->mailsForum)) { ?>
+                     <li role="presentation"><a 
+                           href="<?php echo $this->link() ?>#tabs-mails-forum"
+                           aria-controls="tabs-mails-forum" role="tab" data-toggle="tab"
+                           ><?php echo $this->tr('Fórum') ?></a></li>
+                     <?php } ?>
+               </ul>
+               <div class="tab-content">
+                  <div role="tabpanel" class="tab-pane active" id="tabs-mails-addressbook">
+                     <label for="mails-addressbook"><?php echo $this->tr('Všechny adresy v adresáři') ?>
+                        (<span class="counter"><?php echo count($this->mailsAddressBook) ?></span>):</label><br />
+                     <select name="mails-addressbook" class="mail-selected full-width" id="mails-addressbook"
+                             size="6" multiple="multiple">
+                                <?php
+                                foreach ($this->mailsAddressBook as $mail) {
+                                   $str = null;
+                                   if ($mail->{Mails_Model_Addressbook::COLUMN_SURNAME} != null) {
+                                      $str .= '"' . $mail->{Mails_Model_Addressbook::COLUMN_NAME}
+                                          . " " . $mail->{Mails_Model_Addressbook::COLUMN_SURNAME} . '" ';
+                                   }
+                                   $str .= '<' . $mail->{Mails_Model_Addressbook::COLUMN_MAIL} . '>';
+                                   $str = htmlspecialchars($str);
+                                   ?><option value="<?php echo $str ?>"><?php echo $str ?></option><?php }
+                                ?>
+                     </select><br />
+                     <input type="button" value="<?php echo $this->tr('Přidat') ?>" class="button-add" data-select="mails-addressbook" />
+                     <input type="button" value="<?php echo $this->tr('Přidat všechny') ?>" class="button-add-all" data-select="mails-addressbook" />
+                     <?php echo $fillterSnipshet ?>
+                     <br />
+                     <br />
+                     <label for="mails-addressbook-groups"><?php echo $this->tr('Adresy ze skupiny') ?>:</label><br />
+                     <select name="mails-addressbook-groups" id="mails-addressbook-groups">
+                        <?php foreach ($this->mailsGroups as $grp) {
+                           ?><option value="<?php echo $grp->{Mails_Model_Groups::COLUMN_ID} ?>"><?php echo $grp->{Mails_Model_Groups::COLUMN_NAME} ?></option><?php }
+                        ?>
+                     </select>
+                     <input type="button" value="<?php echo $this->tr('Přidat') ?>" name="button-add-group" /><br />
+                  </div>
+                  <div role="tabpanel" class="tab-pane " id="tabs-mails-users">
+                     <table style="width: 100%;">
+                        <?php
+                        foreach ($this->mailsUsers as $gname => $grp) {
+                           $gnameAscii = md5($gname);
+                           ?>
+                           <tr>
+                              <td colspan="2"><label for="mails-users-grp-<?php echo $gnameAscii ?>"><?php echo $this->tr('Skupina') . ':&nbsp;' . $gname ?></label></td>
+                           </tr>
+                           <tr>
+                              <td style="width: 60%;">
+                                 <select name="mails-users" class="mail-selected" id="mails-users-grp-<?php echo $gnameAscii ?>">
+                                    <?php
+                                    foreach ($grp as $mail) {
+                                       if ($mail->{Model_Users::COLUMN_MAIL} == null)
+                                          continue;
+                                       $m = explode(';', $mail->{Model_Users::COLUMN_MAIL});
+                                       $str = null;
+                                       if ($mail->{Model_Users::COLUMN_SURNAME} != null) {
+                                          $str .= '"' . $mail->{Model_Users::COLUMN_NAME}
+                                              . " " . $mail->{Model_Users::COLUMN_SURNAME} . '" ';
+                                       }
+                                       $str .= '<' . $m[0] . '>';
+                                       $str = htmlspecialchars($str);
+                                       ?><option value="<?php echo $str; ?>"><?php echo $str; ?></option><?php }
+                                    ?>
+                                 </select>
+                              </td>
+                              <td>
+                                 <input type="button" value="<?php echo $this->tr('Přidat') ?>" class="button-add" data-select="mails-users-grp-<?php echo $gnameAscii ?>" />
+                                 <input type="button" value="<?php echo $this->tr('Přidat všechny') ?>" class="button-add-all" data-select="mails-users-grp-<?php echo $gnameAscii ?>"  />
+                              </td>
+                           </tr>
                         <?php } ?>
-                        <?php if ($this->mailsGuestbook !== null AND ! empty($this->mailsGuestbook)) { ?>
-                        <li role="presentation"><a 
-                              href="<?php echo $this->link() ?>#tabs-mails-guestbook"
-                              aria-controls="tabs-mails-guestbook" role="tab" data-toggle="tab"
-                              ><?php echo $this->tr('Kniha návštěv') ?></a></li>
-                        <?php } ?>
-                        <?php if ($this->mailsForum !== null AND ! empty($this->mailsForum)) { ?>
-                        <li role="presentation"><a 
-                              href="<?php echo $this->link() ?>#tabs-mails-forum"
-                              aria-controls="tabs-mails-forum" role="tab" data-toggle="tab"
-                              ><?php echo $this->tr('Fórum') ?></a></li>
-                        <?php } ?>
-                  </ul>
-                  <div class="tab-content">
-                     <div role="tabpanel" class="tab-pane active" id="tabs-mails-addressbook">
-                        <label for="mails-addressbook"><?php echo $this->tr('Všechny adresy v adresáři') ?>
-                           (<span class="counter"><?php echo count($this->mailsAddressBook) ?></span>):</label><br />
-                        <select name="mails-addressbook" class="mail-selected full-width" id="mails-addressbook"
+                     </table>
+                  </div>
+                  <?php if ($this->mailsNewsLetter !== null AND ! empty($this->mailsNewsLetter)) { ?>
+                     <div role="tabpanel" class="tab-pane " id="tabs-mails-newsletter">
+                        <select name="mails-newsletters" class="mail-selected full-width" id="mails-newsletters"
                                 size="6" multiple="multiple">
                                    <?php
-                                   foreach ($this->mailsAddressBook as $mail) {
-                                      $str = null;
-                                      if ($mail->{Mails_Model_Addressbook::COLUMN_SURNAME} != null) {
-                                         $str .= '"' . $mail->{Mails_Model_Addressbook::COLUMN_NAME}
-                                             . " " . $mail->{Mails_Model_Addressbook::COLUMN_SURNAME} . '" ';
-                                      }
-                                      $str .= '<' . $mail->{Mails_Model_Addressbook::COLUMN_MAIL} . '>';
-                                      $str = htmlspecialchars($str);
-                                      ?><option value="<?php echo $str ?>"><?php echo $str ?></option><?php }
+                                   foreach ($this->mailsNewsLetter as $mail) {
+                                      $str = htmlspecialchars('<' . $mail->{NewsLetter_Model_Mails::COLUMN_MAIL} . '>');
+                                      ?><option value="<?php echo $str ?>"><?php echo $str; ?></option><?php }
                                    ?>
                         </select><br />
-                        <input type="button" value="<?php echo $this->tr('Přidat') ?>" class="button-add" data-select="mails-addressbook" />
-                        <input type="button" value="<?php echo $this->tr('Přidat všechny') ?>" class="button-add-all" data-select="mails-addressbook" />
+                        <input type="button" value="<?php echo $this->tr('Přidat') ?>" class="button-add" data-select="mails-newsletters" />
+                        <input type="button" value="<?php echo $this->tr('Přidat všechny') ?>" class="button-add-all" data-select="mails-newsletters" />
                         <?php echo $fillterSnipshet ?>
-                        <br />
-                        <br />
-                        <label for="mails-addressbook-groups"><?php echo $this->tr('Adresy ze skupiny') ?>:</label><br />
-                        <select name="mails-addressbook-groups" id="mails-addressbook-groups">
-                           <?php foreach ($this->mailsGroups as $grp) {
-                              ?><option value="<?php echo $grp->{Mails_Model_Groups::COLUMN_ID} ?>"><?php echo $grp->{Mails_Model_Groups::COLUMN_NAME} ?></option><?php }
-                           ?>
-                        </select>
-                        <input type="button" value="<?php echo $this->tr('Přidat') ?>" name="button-add-group" /><br />
                      </div>
-                     <div role="tabpanel" class="tab-pane" id="tabs-mails-users">
-                        <table style="width: 100%;">
-                           <?php
-                           foreach ($this->mailsUsers as $gname => $grp) {
-                              $gnameAscii = md5($gname);
-                              ?>
-                              <tr>
-                                 <td colspan="2"><label for="mails-users-grp-<?php echo $gnameAscii ?>"><?php echo $this->tr('Skupina') . ':&nbsp;' . $gname ?></label></td>
-                              </tr>
-                              <tr>
-                                 <td style="width: 60%;">
-                                    <select name="mails-users" class="mail-selected" id="mails-users-grp-<?php echo $gnameAscii ?>">
-                                       <?php
-                                       foreach ($grp as $mail) {
-                                          if ($mail->{Model_Users::COLUMN_MAIL} == null)
-                                             continue;
-                                          $m = explode(';', $mail->{Model_Users::COLUMN_MAIL});
-                                          $str = null;
-                                          if ($mail->{Model_Users::COLUMN_SURNAME} != null) {
-                                             $str .= '"' . $mail->{Model_Users::COLUMN_NAME}
-                                                 . " " . $mail->{Model_Users::COLUMN_SURNAME} . '" ';
-                                          }
-                                          $str .= '<' . $m[0] . '>';
-                                          $str = htmlspecialchars($str);
-                                          ?><option value="<?php echo $str; ?>"><?php echo $str; ?></option><?php }
-                                       ?>
-                                    </select>
-                                 </td>
-                                 <td>
-                                    <input type="button" value="<?php echo $this->tr('Přidat') ?>" class="button-add" data-select="mails-users-grp-<?php echo $gnameAscii ?>" />
-                                    <input type="button" value="<?php echo $this->tr('Přidat všechny') ?>" class="button-add-all" data-select="mails-users-grp-<?php echo $gnameAscii ?>"  />
-                                 </td>
-                              </tr>
-                           <?php } ?>
-                        </table>
-                     </div>
-                     <?php if ($this->mailsNewsLetter !== null AND ! empty($this->mailsNewsLetter)) { ?>
-                        <div role="tabpanel" class="tab-pane" id="tabs-mails-newsletter">
-                           <select name="mails-newsletters" class="mail-selected full-width" id="mails-newsletters"
-                                   size="6" multiple="multiple">
-                                      <?php
-                                      foreach ($this->mailsNewsLetter as $mail) {
-                                         $str = htmlspecialchars('<' . $mail->{NewsLetter_Model_Mails::COLUMN_MAIL} . '>');
-                                         ?><option value="<?php echo $str ?>"><?php echo $str; ?></option><?php }
-                                      ?>
-                           </select><br />
-                           <input type="button" value="<?php echo $this->tr('Přidat') ?>" class="button-add" data-select="mails-newsletters" />
-                           <input type="button" value="<?php echo $this->tr('Přidat všechny') ?>" class="button-add-all" data-select="mails-newsletters" />
-                           <?php echo $fillterSnipshet ?>
-                        </div>
-                     <?php } ?>
-                     <?php
+                  <?php } ?>
+                  <?php
 // guestbook mails
-                     if ($this->mailsGuestbook !== null AND ! empty($this->mailsGuestbook)) {
-                        ?>
-                        <div role="tabpanel" class="tab-pane" id="tabs-mails-guestbook">
-                           <select name="mails-guestbook" class="mail-selected full-width" id="mails-guestbook"
-                                   size="6" multiple="multiple">
-                                      <?php
-                                      foreach ($this->mailsGuestbook as $mail) {
-                                         $str = htmlspecialchars('"' . $mail->{GuestBook_Model_Detail::COL_NICK} . '" '
-                                             . '<' . $mail->{GuestBook_Model_Detail::COL_EMAIL} . '>');
-                                         ?><option value="<?php echo $str; ?>"><?php echo $str; ?></option>
-                              <?php } ?>
-                           </select><br />
-                           <input type="button" value="<?php echo $this->tr('Přidat') ?>" class="button-add" data-select="mails-guestbook" />
-                           <input type="button" value="<?php echo $this->tr('Přidat všechny') ?>" class="button-add-all" data-select="mails-guestbook" />
-                           <?php echo $fillterSnipshet ?>
-                        </div>
-                     <?php } ?>
-                     <?php
-                     // forum mails
-                     if ($this->mailsForum !== null AND ! empty($this->mailsForum)) {
-                        ?>
-                        <div role="tabpanel" class="tab-pane" id="tabs-mails-forum">
-                           <select name="mails-forum" class="mail-selected full-width" id="mails-forum" size="6" multiple="multiple">
-                              <?php
-                              foreach ($this->mailsForum as $mail) {
-                                 $str = htmlspecialchars('"' . $mail->{Forum_Model_Messages::COLUMN_CREATED_BY} . '" '
-                                     . '<' . $mail->{Forum_Model_Messages::COLUMN_EMAIL} . '>');
-                                 ?><option value="<?php echo $str; ?>"><?php echo $str; ?></option>
-                              <?php } ?>
-                           </select><br />
-                           <input type="button" value="<?php echo $this->tr('Přidat') ?>" class="button-add" data-select="mails-forum" />
-                           <input type="button" value="<?php echo $this->tr('Přidat všechny') ?>" class="button-add-all" data-select="mails-forum" />
-                           <?php echo $fillterSnipshet ?>
-                        </div>
-                     <?php } ?>
-                  </div>
+                  if ($this->mailsGuestbook !== null AND ! empty($this->mailsGuestbook)) {
+                     ?>
+                     <div role="tabpanel" class="tab-pane" id="tabs-mails-guestbook">
+                        <select name="mails-guestbook" class="mail-selected full-width" id="mails-guestbook"
+                                size="6" multiple="multiple">
+                                   <?php
+                                   foreach ($this->mailsGuestbook as $mail) {
+                                      $str = htmlspecialchars('"' . $mail->{GuestBook_Model_Detail::COL_NICK} . '" '
+                                          . '<' . $mail->{GuestBook_Model_Detail::COL_EMAIL} . '>');
+                                      ?><option value="<?php echo $str; ?>"><?php echo $str; ?></option>
+                           <?php } ?>
+                        </select><br />
+                        <input type="button" value="<?php echo $this->tr('Přidat') ?>" class="button-add" data-select="mails-guestbook" />
+                        <input type="button" value="<?php echo $this->tr('Přidat všechny') ?>" class="button-add-all" data-select="mails-guestbook" />
+                        <?php echo $fillterSnipshet ?>
+                     </div>
+                  <?php } ?>
+                  <?php
+                  // forum mails
+                  if ($this->mailsForum !== null AND ! empty($this->mailsForum)) {
+                     ?>
+                     <div role="tabpanel" class="tab-pane" id="tabs-mails-forum">
+                        <select name="mails-forum" class="mail-selected full-width" id="mails-forum" size="6" multiple="multiple">
+                           <?php
+                           foreach ($this->mailsForum as $mail) {
+                              $str = htmlspecialchars('"' . $mail->{Forum_Model_Messages::COLUMN_CREATED_BY} . '" '
+                                  . '<' . $mail->{Forum_Model_Messages::COLUMN_EMAIL} . '>');
+                              ?><option value="<?php echo $str; ?>"><?php echo $str; ?></option>
+                           <?php } ?>
+                        </select><br />
+                        <input type="button" value="<?php echo $this->tr('Přidat') ?>" class="button-add" data-select="mails-forum" />
+                        <input type="button" value="<?php echo $this->tr('Přidat všechny') ?>" class="button-add-all" data-select="mails-forum" />
+                        <?php echo $fillterSnipshet ?>
+                     </div>
+                  <?php } ?>
                </div>
-            </td>
-         </tr>
-         <tr>
-            <th class="form-labels">
-               <?php echo $this->form->subject->label() ?>
-            </th>
-            <td class="form-controlls">
-               <?php
-               $this->form->subject->html()->setAttrib('size', 60);
-               echo $this->form->subject->controll();
-               ?><br />
-            </td>
-         </tr>
-         <tr>
-            <th class="form-labels"><?php echo $this->form->text->label() ?></th>
-            <td class="form-controlls">
-               <?php echo $this->tr('editor') ?>:&nbsp;<a href="<?php echo $this->link() ?>#disableEditor"
-                         onclick="toggleEditor('sendmail_text_1');"
-                         title="<?php echo $this->tr('vypnout/zapnout editor') ?>"><?php echo $this->tr('OFF/ON') ?></a>
-               <br />
-               <?php
-               $this->form->text->html()
-                   ->setAttrib('cols', 90)->setAttrib('rows', 40)->addClass('full-width');
-               echo $this->form->text->controll();
-               ?>
-               <br />
-            </td>
-         </tr>
-         <tr>
-            <th class="form-labels"></th>
-            <td class="form-controlls">
-               <?php
-               echo $this->form->send->controll();
-               ?>
-            </td>
-         </tr>
-         <tr>
-            <th class="form-labels"></th>
-            <td class="form-controlls">
-               <?php
-               echo $this->form->sendQueue->label();
+            </div>
+         </div>
+      </div>
+      <div class="form-group">
+         <div class="<?= $labelsColClass ?> form-labels">
+            <?php echo $this->form->subject->label() ?>
+         </div>
+         <div class="<?= $controlsColClass ?> form-controlls">
+            <?php
+            $this->form->subject->html()->setAttrib('size', 60);
+            echo $this->form->subject->controll();
+            ?>
+         </div>
+      </div>
+      <div class="form-group">
+         <div class="<?= $labelsColClass ?> form-labels">
+            <?php echo $this->form->text->label() ?>
+         </div>
+         <div class="<?= $controlsColClass ?> form-controlls">
+            <?php echo $this->tr('editor') ?>:&nbsp;<a href="<?php echo $this->link() ?>#disableEditor"
+                      onclick="toggleEditor('sendmail_text_1');"
+                      title="<?php echo $this->tr('vypnout/zapnout editor') ?>"><?php echo $this->tr('OFF/ON') ?></a>
+            <br />
+            <?php
+            $this->form->text->html()
+                ->setAttrib('cols', 90)->setAttrib('rows', 40)->addClass('full-width');
+            echo $this->form->text->controll();
+            ?>
+         </div>
+      </div>
+      <div class="form-group">
+         <div class="<?= $labelsColClass ?> form-labels">
+         </div>
+         <div class="<?= $controlsColClass ?> form-controlls">
+            <?php
+            echo $this->form->send->controll();
+            ?>
+         </div>
+      </div>
+      <div class="form-group">
+         <div class="<?= $labelsColClass ?> form-labels">
+            <?php
+            echo $this->form->file->label();
+            ?>
+         </div>
+         <div class="<?= $controlsColClass ?> form-controlls">
+            <?php
+            echo $this->form->file->controll();
+            ?>
+         </div>
+      </div>
+      <div class="form-group">
+         <div class="<?= $labelsColClass ?> form-labels"></div>
+         <div class="<?= $controlsColClass ?> form-controlls">
+            <div class="checkbox">
+               <label><?php 
                echo $this->form->sendQueue->controll();
-               echo $this->form->sendQueue->subLabel();
-               ?>
-               <br />
-            </td>
-         </tr>
-         <tr>
-            <th class="form-labels"></th>
-            <td class="form-controlls">
+               echo $this->form->sendQueue->getLabel();
+               ?></label>
+            </div>
+            <?php
+            echo $this->form->sendQueue->subLabel();
+            ?>
+         </div>
+      </div>
+      <div class="form-group">
+         <div class="<?= $labelsColClass ?> form-labels"></div>
+         <div class="<?= $controlsColClass ?> form-controlls">
+            <div class="checkbox">
+               <label>
                <?php
-               echo $this->form->file->label();
-               echo $this->form->file->controll();
-               ?>
-               <br />
-            </td>
-         </tr>
-         <tr>
-            <th class="form-labels"></th>
-            <td class="form-controlls">
-               <?php
-               echo $this->form->sendBatch->label();
                echo $this->form->sendBatch->controll();
+               echo $this->form->sendBatch->getLabel();
                ?>
-            </td>
-         </tr>
-      </table>
+               </label>
+            </div>
+         </div>
+      </div>
    </fieldset>
    <?php echo $this->form->renderEnd(); ?>
 </div>
@@ -335,7 +347,7 @@ $this->addFile('css://engine:cubecms/textcomplete.less');
             search: function (term, callback) {
                console.log(term);
 //               callback(cache[term], true); // Show local cache immediately.
-               
+
                $.getJSON("<?php echo $this->link()->route('searchMail') ?>", {q: term})
                   .done(function (data) {
                      var list = [];
@@ -350,7 +362,7 @@ $this->addFile('css://engine:cubecms/textcomplete.less');
 //                     console.log(list);
                      callback(list);
                   })
-                  .fail(function(){
+                  .fail(function () {
                      callback([]);
                   });
             },
@@ -359,13 +371,13 @@ $this->addFile('css://engine:cubecms/textcomplete.less');
                return word.replace('&lt;', '<').replace('&gt;', '>') + ', ';
             },
             cache: true
-         }], { 
-         maxCount: 500, 
+         }], {
+         maxCount: 500,
          debounce: 500,
          header: function (data) {
-            return '<strong style="text-align: center; display: block;"><?php ps('Nalezeno:')?> ' + data.length + ' <?php ps('e-mailů')?></strong>';
+            return '<strong style="text-align: center; display: block;"><?php ps('Nalezeno:') ?> ' + data.length + ' <?php ps('e-mailů') ?></strong>';
          }
-         });
+      });
       // addressbook filter
       $('.input-filter-select').bind('change keyup', function () {
          var regex = new RegExp($.trim($(this).val()), "gi");

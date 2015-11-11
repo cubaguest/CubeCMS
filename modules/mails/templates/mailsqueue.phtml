@@ -1,136 +1,133 @@
-<?php 
+<?php
 $this->addPageTitle($this->tr('Fronta odesílání e-mailů'));
 $this->addCssFile('style.less');
 ?>
-<h1><?php echo $this->tr('Fronta odesílání e-mailů')?></h1>
-<?php echo $this->includeTpl('navigation.phtml');?>
+<h1><?php echo $this->tr('Fronta odesílání e-mailů') ?></h1>
+<?php echo $this->includeTpl('navigation.phtml'); ?>
 <div class="form-edit admin-content">
-<br />
-<div class="mails-queue-buttons">
-<?php 
-if($this->formSend != null){
-   $this->formSend->html()->setAttrib('name', 'form-send-queue');
-   echo $this->formSend->renderStart();
-   echo $this->formSend->send->controll();
-   echo $this->formSend->renderEnd();
+   <?php
+   if ($this->formSend != null) {
+      $this->formSend->html()->setAttrib('name', 'form-send-queue');
+      $this->formClear->html()->setAttrib('name', 'form-clear-queue');
+      $this->formClear->clear->html()->addClass('btn btn-danger');
 
-   echo $this->formClear->renderStart();
-   $this->formClear->html()->setAttrib('name', 'form-clear-queue');
-   $this->formClear->clear->html()->addClass('button-cancel');
-   echo $this->formClear->clear->controll();
-   echo $this->formClear->renderEnd();
-}
-?>
-</div>
-<br />
-<table id="mails-queue" class="ui-widget">
-   <thead class="ui-widget-header">
-      <tr id="mails-queue-table-header">
-         <th style="width: 80%">e-mail</th>
-         <th>status</th>
-      </tr>
-   </thead>
-   <?php 
-   if(!empty ($this->queue)){?>
-      <tbody class="ui-widget-content">
-      <?php foreach ($this->queue as $mail) {?>
-   <tr class="mail-row">
-      <td class="mail-row-data">
-         <?php 
-         if($mail->{Mails_Model_SendQueue::COLUMN_NAME} != null){
-            echo htmlspecialchars($mail->{Mails_Model_SendQueue::COLUMN_NAME}.' <'.$mail->{Mails_Model_SendQueue::COLUMN_MAIL}.'>');
-         } else {
-            echo htmlspecialchars($mail->{Mails_Model_SendQueue::COLUMN_MAIL});
-         }
-         ?>
-         <input type="hidden" value="<?php echo $mail->{Mails_Model_SendQueue::COLUMN_ID};?>" name="mail-id" />
-      </td>
-      <td class="mail-row-status"></td>
-   </tr>
-      <?php }?>
-      </tbody>
-   <?php } else {?>
-   <tr>
-      <td colspan="2"><?php echo $this->tr('Fronta je prázdná');?></td>
-   </tr>
-   <?php }?>
-</table>
-<br />
-<div class="mails-queue-buttons">
-<?php 
-if($this->formSend != null){
-   $this->formSend->html()->setAttrib('name', 'form-send-queue');
-   echo $this->formSend->renderStart();
-   echo $this->formSend->send->controll();
-   echo $this->formSend->renderEnd();
+      $this->moduleButtons = array(
+          array(
+              'content' => 
+              '<span class="icon icon-send"></span>'
+              .$this->formSend->renderStart()
+              . $this->formSend->send->controll()
+              . $this->formSend->renderEnd(),
+          ),
+          array(
+              'content' =>
+              '<span class="icon icon-remove"></span>'
+              . $this->formClear->renderStart()
+              . $this->formClear->clear->controll()
+              . $this->formClear->renderEnd(),
+          ),
+      );
+      if ($this->formRemUnedlivered != null) {
+         $this->formRemUnedlivered->html()->setAttrib('name', 'form-remove-undelivered');
+         $this->formRemUnedlivered->remove->html()->addClass('btn btn-danger');
+         $this->moduleButtons[] = array(
+             'content' =>
+             '<span>' . $this->tr('Odstranit z adresáře adresy, které se nepodařilo doručit') . '</span> '
+             . $this->formRemUnedlivered->renderStart()
+             . $this->formRemUnedlivered->remove->controll()
+             . $this->formRemUnedlivered->renderEnd(),
+         );
+      }
 
-   echo $this->formClear->renderStart();
-   $this->formClear->html()->setAttrib('name', 'form-clear-queue');
-   $this->formClear->clear->html()->addClass('button-cancel');
-   echo $this->formClear->clear->controll();
-   echo $this->formClear->renderEnd();
-}
-?>
-   <br />
-   <br />
-<?php 
-if($this->formRemUnedlivered != null){
-   echo '<label>'.$this->tr('Odstranit z adresáře adresy, které se nepodařilo doručit').'</label>';
-   $this->formRemUnedlivered->html()->setAttrib('name', 'form-remove-undelivered');
-   echo $this->formRemUnedlivered->renderStart();
-   $this->formRemUnedlivered->remove->html()->addClass('button-cancel');
-   echo $this->formRemUnedlivered->remove->controll();
-   echo $this->formRemUnedlivered->renderEnd();
-}?>
-</div>
+      $this->includeTpl('modules/buttons.phtml', true);
+   }
+   ?>
+   <table id="mails-queue" class="cubecms-widget cubecms-table">
+      <thead class="cubecms-header">
+         <tr id="mails-queue-table-header">
+            <th style="width: 80%">e-mail</th>
+            <th>status</th>
+         </tr>
+      </thead>
+      <?php if (!empty($this->queue)) { ?>
+         <tbody class="ui-widget-content">
+            <?php foreach ($this->queue as $mail) { ?>
+               <tr class="mail-row cubecms-row">
+                  <td class="mail-row-data">
+                     <?php
+                     if ($mail->{Mails_Model_SendQueue::COLUMN_NAME} != null) {
+                        echo htmlspecialchars($mail->{Mails_Model_SendQueue::COLUMN_NAME} . ' <' . $mail->{Mails_Model_SendQueue::COLUMN_MAIL} . '>');
+                     } else {
+                        echo htmlspecialchars($mail->{Mails_Model_SendQueue::COLUMN_MAIL});
+                     }
+                     ?>
+                     <input type="hidden" value="<?php echo $mail->{Mails_Model_SendQueue::COLUMN_ID}; ?>" name="mail-id" />
+                  </td>
+                  <td class="mail-row-status"></td>
+               </tr>
+            <?php } ?>
+         </tbody>
+      <?php } else { ?>
+         <tr class="cubecms-row">
+            <td colspan="2"><?php echo $this->tr('Fronta je prázdná'); ?></td>
+         </tr>
+      <?php } ?>
+   </table>
+   <div class="mails-queue-buttons">
+      <?php
+      $this->includeTpl('modules/buttons.phtml', true);
+      ?>
+   </div>
 
-<script type="text/javascript">
-   /* <![CDATA[ */
-   $(function() {
-      var $statusImg = $('<img />').attr({
-         src : 'images/progress_small.gif',
-         alt : 'zpracovávám'
-      });
-      // bind submit
-      $('form[name=form-send-queue]').submit(function(){
-         // remova all statuses
-         $('#mails-queue td.mail-row-status').html('');
-
-         $('#mails-queue tr.mail-row').each(function(){
-            var $thisrow = $(this);
-            $.ajax({
-               type: "POST",
-               context: $thisrow,
-               cache : false,
-               url:'<?php echo $this->link()->route('sendMail');?>',
-               data : ({
-                  id : $('input[name=mail-id]', $thisrow).val()
-               }),
-               beforeSend : function(){
-                  // obrázek pro zpracování
-                  $('td.mail-row-status', this).append($statusImg.clone());
-               },
-               success: function(data){
-                  if(data.status == 'OK'){
-                     $('td.mail-row-status', this).html('<span class="mail-send-result mail-send-result-ok">OK '+data.msg+'</span>');
-                     $(this).delay(1000).hide(500, function(){$(this).remove();});
-
-                  } else if(data.status == 'ERR'){
-                     $('td.mail-row-status', this).html('<span class="mail-send-result mail-send-result-err">Chyba '+data.msg+'</span>');
-                  }
-               }
-            });
-
+   <script type="text/javascript">
+      /* <![CDATA[ */
+      $(function () {
+         var $statusImg = $('<img />').attr({
+            src: 'images/progress_small.gif',
+            alt: 'zpracovávám'
          });
-         return false;
+         // bind submit
+         $('form[name=form-send-queue]').submit(function () {
+            // remova all statuses
+            $('#mails-queue td.mail-row-status').html('');
+
+            $('#mails-queue tr.mail-row').each(function () {
+               var $thisrow = $(this);
+               $.ajax({
+                  type: "POST",
+                  context: $thisrow,
+                  cache: false,
+                  url: '<?php echo $this->link()->route('sendMail'); ?>',
+                  data: ({
+                     id: $('input[name=mail-id]', $thisrow).val()
+                  }),
+                  beforeSend: function () {
+                     // obrázek pro zpracování
+                     $('td.mail-row-status', this).append($statusImg.clone());
+                  },
+                  success: function (data) {
+                     if (data.status == 'OK') {
+                        $('td.mail-row-status', this).html('<span class="mail-send-result mail-send-result-ok">OK ' + data.msg + '</span>');
+                        $(this).delay(1000).hide(500, function () {
+                           $(this).remove();
+                        });
+
+                     } else if (data.status == 'ERR') {
+                        $('td.mail-row-status', this).html('<span class="mail-send-result mail-send-result-err">Chyba ' + data.msg + '</span>');
+                     }
+                  }
+               });
+
+            });
+            return false;
+         });
+
+         $('form[name=form-remove-undelivered]').submit(function () {
+            return confirm('<?php echo $this->tr('Opravdu smazat ') ?>');
+         });
+
       });
 
-      $('form[name=form-remove-undelivered]').submit(function(){
-         return confirm('<?php echo $this->tr('Opravdu smazat ')?>');
-      });
-
-   });
-      
-   /* ]]> */
-</script>
+      /* ]]> */
+   </script>
 </div>
