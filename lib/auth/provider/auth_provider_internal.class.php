@@ -35,8 +35,10 @@ class Auth_Provider_Internal extends Auth_Provider implements Auth_Provider_Inte
       $form = $this->getLoginForm();
 
       if($form->isSend() && $form->isValid()){
-         // kontrola počtu přihlášení podle ip. je dvojnásobná oproti loginu
-         $attempts = Model_UsersLoginAttempts::getLogins(0, Utils_Net::getClientIP());
+         // kontrola počtu přihlášení podle ip. je dvojnásobná oproti loginu za poslední dvy dny
+         $fromTime = new DateTime();
+         $fromTime->modify('-2 days');
+         $attempts = Model_UsersLoginAttempts::getLogins(0, Utils_Net::getClientIP(), $fromTime);
          if( ( (CUBE_CMS_MAX_FAILED_LOGINS * 2) - $attempts - 1) <= 0){
             Model_IPBlocks::blockIP(Utils_Net::getClientIP());
             Log::msg(sprintf($this->tr('IP adresa %s byla blokována pro útok hrubou silou'), Utils_Net::getClientIP()));
