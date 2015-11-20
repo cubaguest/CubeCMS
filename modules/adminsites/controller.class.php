@@ -93,7 +93,8 @@ class AdminSites_Controller extends Controller {
          
          $model = new Model_Sites();
          // dbprefix max 16 chars
-         $dbPrefix = substr($newDir, 0, 12).'_';
+         $dbBase = str_replace('www', '', $newDir);
+         $dbPrefix = substr($dbBase, 0, 8).  substr(md5($dbBase), 0, 4).'_';
          
          // create face
          $this->createWebsiteDir($newDir);
