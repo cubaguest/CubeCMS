@@ -1026,7 +1026,9 @@ class AppCore extends TrObject {
       
       if(Model_IPBlocks::isBlocked(Utils_Net::getClientIP())){
          echo 'Yout IP address is blocekd. Please write email to: '.CUBE_CMS_WEB_MASTER_EMAIL;
-         http_response_code(503);
+         if(function_exists('http_response_code')){
+            http_response_code(503);
+         }
          die;
       }
    }
