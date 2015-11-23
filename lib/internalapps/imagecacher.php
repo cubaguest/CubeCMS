@@ -1,12 +1,12 @@
 <?php
 /**
- * Soubor pro kešování velikostí obrázků
+ * Soubor pro keaov�n� velikost� obr�zko
  * @author Jakub Matas
  * @copyright 2012 Cube-Studio
  *
  * Example cached path: http://www.cube-cms.com/cache/imgc/default/200x150/data/title-images/Mister-Monster.jpg
  */
-/* Potřebují se předdefinovat základní třídy aplikace */
+/* PotYebuj� se pYeddefinovat z�kladn� tY�dy aplikace */
 class File_Image_Exception extends Exception {}
 class CoreException extends Exception {}
 class Translator {
@@ -23,7 +23,7 @@ function sendError($msg = null){
 
 
 if(!isset($_GET['s']) || !isset($_GET['tf']) || !isset($_GET['is'])){
-   sendError('Nejsou předány všechny parametry');
+   sendError('Nejsou pYed�ny vaechny parametry');
 }
 if(isset($_GET['debug'])){
    echo "LIB dir:".$libDir."<br />";
@@ -33,7 +33,7 @@ if(isset($_GET['debug'])){
 define('VVE_IMAGE_COMPRESS_QUALITY', 97);
 
 // Base init urlencode atd here
-$SOURCE = $strSource = str_replace(" ", "+", $_GET['s']); // tohle chce opravit předávání + v url znamená při převodu mezeru
+$SOURCE = $strSource = str_replace(" ", "+", $_GET['s']); // tohle chce opravit pYed�v�n� + v url znamen� pYi pYevodu mezeru
 $FACE = $strFace = $_GET['tf'];
 $sizesTMP = $strSize = $_GET['is'];
 $HASH = isset($_GET['hash']) ? urldecode($_GET['hash']) : null;
@@ -50,15 +50,15 @@ $expectedHash = sha1($strSize.VVE_DB_PASSWD);
 // parse sizes
 $m = array();
 if(preg_match('/^([0-9]+)?x([0-9]+)?(c?)(?:-f_([0-9]+)?(?:_([0-9]+)?)?(?:_([0-9]+)?)?(?:_([0-9]+)?)?(?:_([0-9]+)?)?)?$/', $sizesTMP, $m) == false){
-   sendError('Vylikost nebyla zadána');
+   sendError('Vylikost nebyla zad�na');
 }
 $SIZES['w'] = (int)$m[1];
 $SIZES['h'] = (int)$m[2];
 $SIZES['c'] = $m[3] == "c" ? true : false;
 
 // 4 - typ filtru
-// první parametr filtru
-// druhý parametr filtru
+// prvn� parametr filtru
+// druh� parametr filtru
 $filterParams = array();
 if(isset($m[4])){
    $filterParams = array_slice($m, 4);
@@ -70,7 +70,7 @@ if( ( $HASH != null && $expectedHash != $HASH )
          || ( $SIZES['c'] == true && ( $SIZES['w'] == null || $SIZES['h'] == null ) )
        ) )
    ){
-      sendError('Nekorektní rozměry');
+      sendError('Nekorektn� rozmry');
 }
 
 // check file
@@ -86,6 +86,7 @@ include_once $libDir.'lib'.DIRECTORY_SEPARATOR.'file'.DIRECTORY_SEPARATOR.'image
 include_once $libDir.'lib'.DIRECTORY_SEPARATOR.'file'.DIRECTORY_SEPARATOR.'image'.DIRECTORY_SEPARATOR.'file_image_gd.class.php';
 include_once $libDir.'lib'.DIRECTORY_SEPARATOR.'fs'.DIRECTORY_SEPARATOR.'fs_dir.class.php';
 define('VVE_USE_IMAGEMAGICK', false);
+$image = null;
 try {
    $image = new File_Image($webDir.$SOURCE);
    if(!$image->exist()){
@@ -119,7 +120,7 @@ try {
    header('Location: '.$cache_file_url.'?new');
 } catch (Exception $e) {
    // send original image? or resize in memory and send
-   if($image->exist()){
+   if(is_object($image) && $image->exist()){
       $image->send();
    }
 }
