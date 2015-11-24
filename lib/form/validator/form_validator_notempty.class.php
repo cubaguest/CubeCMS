@@ -47,7 +47,7 @@ class Form_Validator_NotEmpty extends Form_Validator implements Form_Validator_I
    }
 
    public function validate(Form_Element $elemObj) {
-      if($elemObj instanceof Form_Element_Text){
+      if($elemObj instanceof Form_Element_Text || $elemObj instanceof Form_Element_Hidden){
          if($elemObj->isMultiLang()) {
             // pokud se kontrolují jen některé sloupce
             if(!empty ($this->columsNotEmpty)){
