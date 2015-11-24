@@ -9,15 +9,14 @@
  * @copyright  	Copyright (c) 2008-2009 Jakub Matas
  * @version    	$Id: $ VVE 5.2.0 $Revision: $
  * @author			$Author: $ $Date: $
- *						$LastChangedBy: $ $LastChangedDate: $
+ * 						$LastChangedBy: $ $LastChangedDate: $
  * @abstract 		Třída pro obsluhu html elementů a jejich vykreslení
  */
-
 class Html_Element {
-/**
- * Název samotného elementu
- * @var string
- */
+   /**
+    * Název samotného elementu
+    * @var string
+    */
    private $elementName = null;
 
    /**
@@ -54,16 +53,17 @@ class Html_Element {
     * Pole s elementy, které jsou inline (nepárové)
     * @var array
     */
-   private $inlineElements = array('br','hr', 'base', 'basefont', 'area',
-      'col', 'colgroup', 'frame', 'img', 'input', 'meta', 'param',
-      'spacer', 'link');
+   private $inlineElements = array('br', 'hr', 'base', 'basefont', 'area',
+       'col', 'colgroup', 'frame', 'img', 'input', 'meta', 'param',
+       'spacer', 'link');
 
    /**
     * Konstruktor pro vatvoření html tagu
     * @param string $name -- název tagu
     * @param string $content -- obsah elementu
     */
-   public function  __construct($name, $content = null) {
+   public function __construct($name, $content = null)
+   {
       $this->isInline = in_array($name, $this->inlineElements);
       $this->elementName = $name;
       $this->content = $content;
@@ -73,10 +73,11 @@ class Html_Element {
     * Magická metoda pro převod na řetězec
     * @return string -- tag určený pro výpis
     */
-   public function  __toString() {
+   public function __toString()
+   {
 //      if($this->isInline AND $this->isEmpty() AND empty($this->classes) AND empty ($this->attribs)){
-      if($this->isEmpty() AND empty($this->classes) AND empty ($this->attribs)){
-         return (string)null;
+      if ($this->isEmpty() AND empty($this->classes) AND empty($this->attribs)) {
+         return (string) null;
       }
       $elem = $this->__toStringBegin();
       $elem .= $this->__toStringContent();
@@ -87,22 +88,24 @@ class Html_Element {
    /**
     * Metoda vrátí začátek elementu
     */
-   public function __toStringBegin() {
-      $string = "<".$this->elementName;
+   public function __toStringBegin()
+   {
+      $string = "<" . $this->elementName;
       // render atributů
       foreach ($this->attribs as $name => $value) {
-         $string .= " ".$name."=\"$value\"";
+         $string .= " " . $name . "=\"$value\"";
       }
       // render tříd
-      if(!empty ($this->classes)) {
+      if (!empty($this->classes)) {
          $string .= " class=\"";
-         foreach ($this->classes as $class) {
-            $string .= $class." ";
+         $classes = array_unique($this->classes);
+         foreach ($classes as $class) {
+            $string .= $class . " ";
          }
-         $string = substr($string, 0, strlen($string)-1);
+         $string = substr($string, 0, strlen($string) - 1);
          $string .= "\"";
       }
-      if($this->isInline) {
+      if ($this->isInline) {
          $string .= " />\n";
       } else {
          $string .= ">";
@@ -116,19 +119,21 @@ class Html_Element {
    /**
     * Metoda vrátí obsah elementu
     */
-   public function __toStringContent() {
-      return $this->content.$this->contentEnd;
+   public function __toStringContent()
+   {
+      return $this->content . $this->contentEnd;
    }
 
    /**
     * Metoda vrátí konec elementu
     */
-   public function __toStringEnd() {
+   public function __toStringEnd()
+   {
       $string = null;
       // inline nebo block element
-      if(!$this->isInline) {
+      if (!$this->isInline) {
          // ukončovací tag
-         $string .= "</".$this->elementName.">\n";
+         $string .= "</" . $this->elementName . ">\n";
       }
       return $string;
    }
@@ -136,7 +141,8 @@ class Html_Element {
    /**
     * Metoda provede render prvku
     */
-   public function render() {
+   public function render()
+   {
       print ($this);
    }
 
@@ -147,9 +153,10 @@ class Html_Element {
     * @param mixed $value -- (option) hodnota atributu
     * @return Html_Element -- vrací sám sebe
     */
-   public function setAttrib($name, $value = null) {
-      if($value === null){
-         unset ($this->attribs[$name]);
+   public function setAttrib($name, $value = null)
+   {
+      if ($value === null) {
+         unset($this->attribs[$name]);
       } else {
          $this->attribs[$name] = $value;
       }
@@ -161,7 +168,8 @@ class Html_Element {
     * @param string $name -- název atributu
     * @return mixed -- hodnota atributu
     */
-   public function getAttrib($name) {
+   public function getAttrib($name)
+   {
       return $this->attribs[$name];
    }
 
@@ -170,19 +178,33 @@ class Html_Element {
     * @param string $name -- název atributu
     * @return Html_Element -- sám sebe
     */
-   public function removeAttrib($name) {
-      unset ($this->attribs[$name]);
+   public function removeAttrib($name)
+   {
+      unset($this->attribs[$name]);
       return $this;
    }
 
    /**
     * Metoda přidá zadanou třídu do elementu
     * @param string $class -- název třídy
-    * @return Form_Element
+    * @return Html_Element
     */
-   public function addClass($class) {
-      if(!in_array($class, $this->classes)){
-         array_push($this->classes, $class);
+   public function addClass($class)
+   {
+      $classes = explode(' ', $class);
+      $this->classes = array_merge($this->classes, $classes);
+      return $this;
+   }
+
+    /**
+    * Metoda odebere zadanou třídu z elementu
+    * @param string $class -- název třídy
+    * @return Html_Element
+    */
+   public function removeClass($class)
+   {
+      if (($key = array_search($class, $this->classes)) !== false) {
+         unset($this->classes[$key]);
       }
       return $this;
    }
@@ -191,18 +213,20 @@ class Html_Element {
     * Metoda přidá potomka elementu (objekt elemeentu)
     * @param Html_Element $content -- objekt elementu
     */
-   public function addContent($content, $end = false) {
-      if(!$end){
-         $this->content .= (string)$content;
+   public function addContent($content, $end = false)
+   {
+      if (!$end) {
+         $this->content .= (string) $content;
       } else {
-         $this->contentEnd .= (string)$content;
+         $this->contentEnd .= (string) $content;
       }
    }
 
    /**
     * Metoda vymaže obsah elementu
     */
-   public function clearContent() {
+   public function clearContent()
+   {
       $this->content = null;
       $this->contentEnd = null;
    }
@@ -210,7 +234,8 @@ class Html_Element {
    /**
     * Metoda vymaže třídy elementu
     */
-   public function clearClasses() {
+   public function clearClasses()
+   {
       $this->classes = array();
    }
 
@@ -218,13 +243,14 @@ class Html_Element {
     * Metoda vrací jestli je prvek prázdný - nemá žádný obsah
     * @return boolean
     */
-   public function isEmpty() {
-      if($this->content == null AND $this->contentEnd == null){
+   public function isEmpty()
+   {
+      if ($this->content == null AND $this->contentEnd == null) {
          return true;
       }
       return false;
    }
-   
+
    /**
     * Metoda nastaví obsah prvku
     * @param string $cnt -- řetězec obsahu
@@ -235,5 +261,7 @@ class Html_Element {
       $this->content = $cnt;
       return $this;
    }
+
 }
+
 ?>
