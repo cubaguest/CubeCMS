@@ -14,6 +14,7 @@ class Search_View extends View {
          
          $this->toolbox = $toolbox;
       }
+      Template_Navigation::addItem($this->tr('Hledání'), $this->link()->clear());
    }
 
    /**
@@ -24,5 +25,3 @@ class Search_View extends View {
       $this->template()->addTplFile("list.phtml");
    }
 }
-
-?>
