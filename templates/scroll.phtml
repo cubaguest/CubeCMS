@@ -1,61 +1,61 @@
 <!--Sipky pro posun stranek-->
 <?php 
 if($this->countAllPages > 1){?>
-<div class="scroll">
-   <div class="left-box">
-   <?php  //Sipka na předchozí
-   if($this->activeButtonPrevious){?>
-      <a href="<?php echo $this->pageLink()->param($this->pageParam, $this->selectedPage-1)?>" title="<?php echo $this->tr('Předchozí')?>">
-         <?php echo $this->tr('Předchozí')?>
-      </a>
-   <?php } else {?>
-      <span><?php echo $this->tr('Předchozí')?></span>
-   <?php }?>
-   </div>
-   
-   <div class="right-box">
-      <?php  //Sipka na další
-      if($this->activeButtonNext){?>
-      <a href="<?php echo $this->pageLink()->param($this->pageParam, $this->selectedPage+1)?>" title="<?php echo $this->tr('Další')?>">
-         <?php echo $this->tr('Další')?>
-      </a>
-   <?php } else {?>
-      <span><?php echo $this->tr('Další')?></span>
-   <?php }?>
-   </div>
-   
-   <div class="numbers">
-      <?php  if($this->selectedPage > 1 && !isset ($this->pagesLeftSideArray[1])){
+<nav class="scroll">
+   <ul class="pagination">
+      <?php  //Sipka na předchozí
+      if($this->activeButtonPrevious){?>
+      <li><a href="<?php echo $this->pageLink()->param($this->pageParam, $this->selectedPage-1)?>" 
+             data-page="<?php echo $this->selectedPage-1?>"
+             title="<?php echo $this->tr('Předchozí')?>"
+             ><span aria-hidden="true">&laquo;</span><span class="sr-only"><?php echo $this->tr('Předchozí')?></span></a></li>
+      <?php } else {?>
+      <li><span>&laquo;</span></li>
+      <?php }
+      
+      // tečky
+      if($this->selectedPage > 1 && !isset ($this->pagesLeftSideArray[1])){
          $link = $this->pageLink()->param($this->pageParam, 1);
-         echo "<a href=\"$link\" title=\"1\">1</a> ...";
+         echo "<li><a href=\"$link\" title=\"1\" data-page=\"1\">1...</a></li>";
       }
-      // left numbers
+      
+      // levá čísla
       foreach ($this->pagesLeftSideArray as $number) {
          if($number == 1){
             $link = $this->pageLink()->rmParam($this->pageParam);
          } else {
             $link = $this->pageLink()->param($this->pageParam, $number);
          }
-         echo "&nbsp;<a href=\"$link\" title=\"$number\">$number</a>";
+         echo '<li><a href="'.$link.'" title="'.$number.'" data-apge="'.$number.'">'.$number.'</a></li>';
       }
       
-      // center numbers
-      echo "&nbsp;[{$this->selectedPage}/{$this->countAllPages}]";
+      // aktuální stránka
+      echo '<li class="active"><span>'.$this->selectedPage.'/'.$this->countAllPages.'</span></li>';
    
-      // right numbers
+      // pravá čísla
       foreach ($this->pagesRightSideArray as $number) {
          if($number == 1){
             $link = $this->pageLink()->rmParam($this->pageParam);
          } else {
             $link = $this->pageLink()->param($this->pageParam, (int)$number);
          }
-         echo "&nbsp;<a href=\"$link\" title=\"$number\">$number</a>";
+         echo '<li><a href="'.$link.'" title="'.$number.'" data-apge="'.$number.'">'.$number.'</a></li>';
       }
+      
+      // tečky
       if($this->selectedPage < $this->countAllPages && !isset ($this->pagesRightSideArray[$this->countAllPages])){
          $link = $this->pageLink()->param($this->pageParam, $this->countAllPages);
-         echo "... <a href=\"$link\" title=\"{$this->countAllPages}\">{$this->countAllPages}</a>";
+         echo "<li><a href=\"$link\" title=\"{$this->countAllPages}\" data-apge=\"{$this->countAllPages}\">...{$this->countAllPages}</a></li>";
       }
-      ?>
-   </div>
-</div>
-<?php }?>
+      
+      //Sipka na další
+      if($this->activeButtonNext){?>
+         <li><a href="<?php echo $this->pageLink()->param($this->pageParam, $this->selectedPage+1)?>" title="<?php echo $this->tr('Další')?>"
+                data-page="<?php echo $this->selectedPage+1?>"
+                ><span aria-hidden="true">&raquo;</span><span class="sr-only"><?php echo $this->tr('Další')?></span></a></li>
+      <?php } else {?>
+         <li><span>&raquo;</span></li>
+      <?php }?>
+   </ul>
+</nav>
+<?php }
