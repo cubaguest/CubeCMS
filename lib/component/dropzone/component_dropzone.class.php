@@ -85,9 +85,9 @@ class Component_Dropzone extends Component {
     */
    public function getFiles()
    {
+      $images = array();
       if(is_dir($this->getConfig('path'))){
          // load dirs
-         $images = array();
          $finfo = finfo_open(FILEINFO_MIME_TYPE);
          foreach(glob($this->getConfig('path').'/*.*') as $filename){
             $images[] = array(
