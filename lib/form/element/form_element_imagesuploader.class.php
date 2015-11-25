@@ -1,8 +1,6 @@
 <?php
 class Form_Element_ImagesUploader extends Form_Element_File {
    
-   protected $maxFileSize = 2097152;
-   
    protected $inputDir;
    protected $imagesKey = null;
 
@@ -26,7 +24,11 @@ class Form_Element_ImagesUploader extends Form_Element_File {
    
    public function setMaxFileSize($sizeBytes)
    {
-      $this->maxFileSize = $sizeBytes;
+      if($sizeBytes > 0){
+         $this->addValidation(new Form_Validator_FileSize($sizeBytes));
+      } else {
+         $this->removeValidation('Form_Validator_FileSize');
+      }
    }
    
    public function setUploadDir($dir)
