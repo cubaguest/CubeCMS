@@ -252,6 +252,9 @@ Rewriterule (.*) http://$domain/$1 [L]
 RewriteCond $1 ^stylesheets/
 RewriteCond %{REQUEST_FILENAME} !-f
 Rewriterule (.*) http://$domain/$1 [L]
+RewriteCond $1 ^faces/
+RewriteCond %{REQUEST_FILENAME} !-f
+Rewriterule (.*) http://$domain/$1 [L]
 
 RewriteCond %{REQUEST_FILENAME} !-f
 Rewriterule modules/([a-z]+)/stylesheets/(.*) http://$domain/modules/$1/stylesheets/$2 [L,R=303]
