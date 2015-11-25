@@ -466,6 +466,7 @@ class File extends TrObject implements File_Interface {
     */
    public static function creatUniqueName($fn, $destinationDir)
    {
+      $fn = str_replace("&", "_", $fn);
       if(file_exists($destinationDir.$fn)){
          $file_suffix = substr($fn, (strrpos($fn, '.')+1));
          if  (!preg_match('/_\d+\.(?:\w{3}\.)?\w{3,4}$/', $fn)) {
