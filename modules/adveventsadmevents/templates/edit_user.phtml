@@ -1,0 +1,28 @@
+<table class="table table-bordered">
+   <tr>
+      <th><?php ps($this->tr('Jméno a přijmení')); ?></th>
+      <td><?php ps($this->eventUser->{AdvEventsBase_Model_UserAdds::COLUMN_NAME});?></td>
+   </tr>
+   <tr>
+      <th><?php ps($this->tr('E-mail')); ?></th>
+      <td><?php ps($this->eventUser->{AdvEventsBase_Model_UserAdds::COLUMN_EMAIL});?></td>
+   </tr>
+   <tr>
+      <th><?php ps($this->tr('Telefon')); ?></th>
+      <td><?php ps(
+          $this->eventUser->{AdvEventsBase_Model_UserAdds::COLUMN_PHONE} ? 
+          $this->eventUser->{AdvEventsBase_Model_UserAdds::COLUMN_PHONE} : $this->tr('Nezadáno')
+          );?></td>
+   </tr>
+   <tr>
+      <th><?php ps($this->tr('Poznámka')); ?></th>
+      <td><?php ps(
+          $this->eventUser->{AdvEventsBase_Model_UserAdds::COLUMN_NOTE} ? 
+          $this->eventUser->{AdvEventsBase_Model_UserAdds::COLUMN_NOTE} : $this->tr('Nezadáno')
+          );?></td>
+   </tr>
+   <tr>
+      <th><?php ps($this->tr('Přidáno')); ?></th>
+      <td><?php ps(Utils_DateTime::fdate('%x %X', $this->eventUser->{AdvEventsBase_Model_UserAdds::COLUMN_DATE}));?></td>
+   </tr>
+</table>

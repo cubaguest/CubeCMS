@@ -1,0 +1,13 @@
+<?php
+$this->addCssFile("style.less");
+?>
+<h1><?php ps($this->category()->getName()) ?></h1>
+<div class="content content-admin">
+   <div class="row">
+      <div class="col-md-12">
+         <?php 
+         echo $this->form;
+         ?>
+      </div>
+   </div>
+</div>

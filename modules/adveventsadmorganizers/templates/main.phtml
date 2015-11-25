@@ -1,0 +1,120 @@
+<?
+$this->addFile("css://adveventsbase:style-admin.less");
+?>
+<h1>Místa</h1>
+<div class="content-admin">
+   <?php
+   $this->moduleButtons = array(
+       array(
+           'link' => $this->link()->route('addOrganizer'),
+           'title' => $this->tr('Přidat nového organizátora'),
+           'icon' => 'plus',
+           'name' => $this->tr('Přidat organizátora')
+       ),
+       '<form method="get" action="' . $this->link() . '">
+         <input type="text" size="20" name="filter" value="' . ($this->get("filter")) . '" />
+         <input type="submit" value="' . $this->tr('filtrovat') . '" />
+        </form>'
+       ,
+   );
+   $this->includeTpl('modules/buttons.phtml', true);
+   ?>
+   <table class="table-advevent-organizers cubecms-widget cubecms-table">
+      <thead>
+         <tr class="cubecms-header">
+            <th class="id">ID</th>
+            <th><? ps($this->tr('Název')) ?></th>
+            <th><? ps($this->tr('Adresa')) ?></th>
+            <th></th>
+         </tr>
+      </thead>
+      <tbody class="cubecms-widget-content" id="organizers-scroll-area">
+         <?
+         if (!empty($this->organizers)) {
+            foreach ($this->organizers as $organizer) {
+               ?>
+               <tr id="<?= $organizer->getPK() ?>" class="cubecms-row">
+                  <td class="id"><? ps($organizer->getPK()) ?></td>
+                  <td class="base-info">
+                     <div class="name">
+                        <a class="button-show-organizator-detail" href="<?=$this->link()->route('detailOrganizer', array('id' => $organizer->getPK()))?>">
+                           <? ps($organizer->{AdvEventsBase_Model_Organizers::COLUMN_NAME}); ?>
+                        </a>
+                     </div>
+                  </td>
+                  <td class="">
+                     <span class="address"><? ps(str_replace("\n", ',', $organizer->{AdvEventsBase_Model_Organizers::COLUMN_ADDRESS})) ?></span>
+                  </td>
+                  <td>
+                     <?
+                     $this->toolboxItem->edit->setAction($this->link()->route('editOrganizer', array('id' => $organizer->getPK())));
+                     $this->toolboxItem->organizer_del->getForm()->id->setValues($organizer->getPK());
+                     echo $this->toolboxItem;
+                     ?>
+                  </td>
+               </tr>
+               <?
+            }
+         } else {
+            ?>
+            <tr class="cubecms-row state-inactive">
+               <td colspan="4"><? ps($this->tr('Nebyl přidán žádný organizátor')) ?></td>
+            </tr>
+            <?
+         }
+         ?>
+      </tbody>
+      <tfoot class="cubecms-widget-footer">
+         <tr class="cubecms-row"><td colspan="4" class="scroll ajax-scroll" data-scroll-target="#organizers-scroll-area" ><? echo $this->scroll ?></td></tr>
+      </tfoot>
+   </table>
+<?php
+$this->includeFile('tpl://engine:components/modal.phtml', array('content' => '', 'id' => 'modal-organizer-detail', 
+    'header' => 'Organizátor',
+    'close' => true,
+    'large' => true,
+    'footer' => '<button class="btn btn-default close-modal">Zavřít</button>'));
+
+?>
+   <script type="text/javascript">
+      $(document).ready(function() {
+         $('.ajax-scroll').on('click', 'a', function(){
+            var $that = $(this);
+            var selector = $(this).closest('.ajax-scroll').data('scroll-target');
+//            var $area = $(selector);
+            // load ajax
+            $.ajax({
+               url : $that.prop('href'),
+               success : function(data){
+                  var $cnt = $('<div></div>').html(data);
+                  
+                  $(selector).html($cnt.find(selector).html());
+                  $that.closest('.ajax-scroll').html($cnt.find('.ajax-scroll').html());
+               }
+            });
+            return false;
+         });
+         
+         
+         $('.button-show-organizator-detail').on('click', function(e){
+            e.preventDefault();
+            var $that = $(this);
+            // ajax load and place to modal
+            var $modal = $('#modal-organizer-detail');
+            
+            $.ajax({
+               url : $that.prop('href'),
+               success : function(data){
+                  console.log(data);
+                  var $html = $('<div></div>').html(data);
+                  $('.cubecms-modal-title', $modal).html($html.find('h1').text());
+                  $('.cubecms-modal-content', $modal).html($html.find('.organizator-content').html());
+               }
+            });
+            $modal.show();
+            return false;
+         });
+         
+      });
+   </script>
+</div>

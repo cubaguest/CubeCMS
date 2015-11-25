@@ -1,0 +1,107 @@
+<?php
+$this->addCssFile("style.less");
+?>
+<h1 class="hidden"><?php ps($this->category()->getName()) ?></h1>
+<div class="content" id="events-list-content">
+   <div class="row">
+      <div class="col-md-3 col-sm-6 advevents-list" id="advevents-list-1">
+         <h2><a href="<?= $this->linkToday ?>">Dnes</a></h2>
+         <?php
+         foreach ($this->eventsToday as $event) {
+            $this->includeFile('tpl://action.phtml', array('event' => $event, 'mode' => 'day'));
+         }
+         ?>
+         <div class="text-center">
+            <a id="button-load-advevents" class="btn btn-default" href="<?php echo $this->link()?>#loadnext"><?php ps($this->tr('Načíst další')); ?></a>
+         </div>
+      </div>
+      <div class="col-md-3 col-sm-6 advevents-list" id="advevents-list-2">
+         <h2><a href="<?= $this->linkTomorow ?>">Zítra</a></h2>
+         <?php
+         foreach ($this->eventsTomorow as $event) {
+            $this->includeFile('tpl://action.phtml', array('event' => $event, 'mode' => 'day'));
+         }
+         ?>
+         <div class="text-center">
+            <a id="button-load-advevents" class="btn btn-default" href="<?php echo $this->link()?>#loadnext"><?php ps($this->tr('Načíst další')); ?></a>
+         </div>
+      </div>
+      <div class="col-md-3 col-sm-6 advevents-list" id="advevents-list-3">
+         <h2><a href="<?= $this->linkThisWeek ?>">Tento týden</a></h2>
+         <?php
+         foreach ($this->eventsThisWeek as $event) {
+            $this->includeFile('tpl://action.phtml', array('event' => $event, 'mode' => 'week'));
+         }
+         ?>
+         <div class="text-center">
+            <a id="button-load-advevents" class="btn btn-default" href="<?php echo $this->link()?>#loadnext"><?php ps($this->tr('Načíst další')); ?></a>
+         </div>
+      </div>
+      <div class="col-md-3 col-sm-6 advevents-list" id="advevents-list-4">
+         <h2><a href="<?= $this->linkThisMonth ?>">Tento měsíc</a></h2>
+         <?php
+         foreach ($this->eventsThisMonth as $event) {
+            $this->includeFile('tpl://action.phtml', array('event' => $event, 'mode' => 'month'));
+         }
+         ?>
+         <div class="text-center">
+            <a id="button-load-advevents" class="btn btn-default" href="<?php echo $this->link()?>#loadnext"><?php ps($this->tr('Načíst další')); ?></a>
+         </div>
+      </div>
+   </div>
+<!--   <div class="row">
+      <div class="col-md-12 text-center">
+         <a id="button-load-advevents" class="btn btn-default" href="<?php echo $this->link()?>#loadnext"><?php ps($this->tr('Načíst další')); ?></a>
+      </div>
+   </div>-->
+</div>
+<div id="fixed-colums-names" class="navbar hidden-sm hidden-xs">
+   <div class="container">
+      <div class="row">
+         <div class="col-md-3 col-sm-6 events-list">
+            <h2><a href="<?= $this->linkToday ?>">Dnes</a></h2>
+         </div>
+         <div class="col-md-3 col-sm-6">
+            <h2><a href="<?= $this->linkTomorow ?>">Zítra</a></h2>
+         </div>
+         <div class="col-md-3 col-sm-6">
+            <h2><a href="<?= $this->linkThisWeek ?>">Tento týden</a></h2>
+         </div>
+         <div class="col-md-3 col-sm-6">
+            <h2><a href="<?= $this->linkThisMonth ?>">Tento měsíc</a></h2>
+         </div>
+      </div>
+   </div>
+</div>
+</div>
+
+
+<script type="text/javascript">
+   $(document).ready(function() {
+      var $element = $('#fixed-colums-names');
+      var elemHeight = $('#fixed-colums-names').outerHeight();
+      $element.css({height : 0, opacity : 0});
+      
+      var $container = $('#events-list-content');
+      var maxVPos = $element.offset().top + $container.offset().top;
+      $(window).on('scroll', function() {
+         var baseOffsetTop = $container.offset().top - $element.outerHeight() - $('header .navbar').outerHeight(); // 50 je výška nadpisu
+         var maxHeight = $container.offset().top + $container.outerHeight() - elemHeight - $('header .navbar').outerHeight();
+         if ( $(window).scrollTop() > baseOffsetTop && $(window).scrollTop() < maxHeight) {
+            $element
+               .stop(true)
+               .animate({height : elemHeight, opacity : 1}, 200)
+               .addClass('visible');
+         } else {
+            $element
+               .stop(true)
+               .animate({height : 0, opacity : 0}, 200)
+            ;
+         }
+      });
+      // načítání dalších
+      $('#button-load-advevents').on('click', function(){
+         
+      });
+   });
+</script>

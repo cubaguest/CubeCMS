@@ -1,0 +1,47 @@
+<?
+$this->addFile("css://adveventsbase:style-admin.less");
+Template::addJS('https://maps.googleapis.com/maps/api/js?key='.IC_GMAPS_KEY.'&signed_in=true');
+?>
+<h1>
+   <?php 
+   echo $this->place 
+       ? sprintf($this->tr('Úprava místa "%s"'), $this->place->{AdvEventsBase_Model_Places::COLUMN_NAME})
+      : $this->tr('Přidání nového místa')?>
+</h1>
+<div class="content-admin">
+   <?php
+   $this->formEdit->address->html()->setAttrib('rows', '7');
+//   $this->formEdit->openingHours->html()->setAttrib('rows', '7');
+   $this->formEdit->html()->setAttrib('id', 'form-edit-place');
+   echo $this->formEdit;
+   ?>
+   <script type="text/javascript">
+      $(document).ready(function() {
+         var $formAdd = $('#form-edit-place');
+         $('#place_mapLat_1').after('<div class="thumbnail"><div id="place-map"></div><p><em>Ukazatel přesuňte myší na požadovanou polohu.</em></p></div>');
+         var map;
+         function initializeMap() {
+            var mapOptions = {
+               zoom: 14,
+               center: {lat: parseFloat($('input[name="place_mapLat"]',$formAdd).val()), lng: parseFloat($('input[name="place_mapLng"]',$formAdd).val())}
+            };
+            map = new google.maps.Map(document.getElementById('place-map'),
+               mapOptions);
+
+            var marker = new google.maps.Marker({
+               position: {
+                  lat: parseFloat($('input[name="place_mapLat"]',$formAdd).val()), 
+                  lng: parseFloat($('input[name="place_mapLng"]',$formAdd).val())},
+               map: map,
+               draggable: true
+            });
+            google.maps.event.addListener(marker, 'dragend', function(event) {
+               $('input[name="place_mapLat"]',$formAdd).val(event.latLng.lat());
+               $('input[name="place_mapLng"]',$formAdd).val(event.latLng.lng());
+               $('input[name="place_mapEnabled"]',$formAdd).prop('checked', true);
+            });
+         }
+         initializeMap();
+      });
+   </script>
+</div>

@@ -1,0 +1,15 @@
+<?
+$this->addFile("css://adveventsbase:style-admin.less");
+?>
+<h1>
+   <?php 
+   echo $this->organizator 
+       ? sprintf($this->tr('Úprava organizátora "%s"'), $this->organizator->{AdvEventsBase_Model_Organizers::COLUMN_NAME})
+      : $this->tr('Přidání nového organizátora')?>
+</h1>
+<div class="content-admin">
+   <?php
+   $this->formEdit->address->html()->setAttrib('rows', '7');
+   echo $this->formEdit;
+   ?>
+</div>

@@ -1,0 +1,178 @@
+<?php
+$this->addCssFile("style.less");
+Template::addJS('https://maps.googleapis.com/maps/api/js?key=' . IC_GMAPS_KEY . '&signed_in=true');
+Template_Core::addPageTitle($this->event->{AdvEventsBase_Model_Events::COLUMN_NAME});
+?>
+<div class="content row">
+   <div class="col-md-9">
+      <div class="row">
+
+         <div class="col-md-8 advevent advevent-detail">
+            <h1 class="h2"><span><?php ps($this->event->{AdvEventsBase_Model_Events::COLUMN_NAME}) ?></span></h1>
+            <?php if ((string) $this->event->{AdvEventsBase_Model_Events::COLUMN_SUBNAME} != null) { ?>
+               <div class="subname"><?php ps($this->event->{AdvEventsBase_Model_Events::COLUMN_SUBNAME}) ?></div>
+            <?php } ?>
+            <?php if ((string) $this->event->{AdvEventsBase_Model_Events::COLUMN_SUBNAME} != null) { ?>
+               <div class="text perex">
+                  <?php echo $this->event->{AdvEventsBase_Model_Events::COLUMN_PEREX} ?>
+               </div>
+            <?php } ?>
+            <?php
+            if ($this->event->getTitleImage() != null) {
+               $src = Utils_Image::cache($this->event->getTitleImage(), 800, 600);
+               ?>
+               <div class="image">
+                  <a href="<?php echo $this->event->getTitleImage(); ?>" class="thumbnail" rel="lightbox"
+                     ><img class="img-responsive" 
+                        src="<?php echo $src ?>" 
+                        alt="<?php ps($this->event->{AdvEventsBase_Model_Events::COLUMN_NAME}) ?>"></a>
+               </div>
+               <?php
+            }
+            ?>
+            <div class="text">
+               <?php echo $this->event->{AdvEventsBase_Model_Events::COLUMN_TEXT} ?>
+            </div>
+            <?php
+            if ($this->event->{AdvEventsBase_Model_Events::COLUMN_URL_YOUTUBE}) {
+               $src = str_replace(array('watch?v='), array('embed/'), $this->event->{AdvEventsBase_Model_Events::COLUMN_URL_YOUTUBE});
+               ?>
+               <div class="video embed-responsive embed-responsive-16by9">
+                  <iframe width="560" height="315" src="<?php echo $src ?>" frameborder="0" allowfullscreen></iframe>
+               </div>
+            <?php } ?>
+
+         </div>
+         <div class="col-md-4 advevent advevent-detail">
+            <h2><span><?php ps($this->tr('Kdy')); ?></span></h2>
+            <ul class="fromto">
+               <?php
+               $times = $this->event->getTimesArray();
+               foreach ($times as $time) {
+                  echo '<li>';
+                  if ($time->{AdvEventsBase_Model_EventsTimes::COLUMN_TIME_BEGIN} != null) {
+                     echo Utils_DateTime::fdate('%x, %G:%i', new DateTime($time->{AdvEventsBase_Model_EventsTimes::COLUMN_DATE_BEGIN} . ' ' . $time->{AdvEventsBase_Model_EventsTimes::COLUMN_TIME_BEGIN}));
+                  } else {
+                     echo Utils_DateTime::fdate('%x', new DateTime($time->{AdvEventsBase_Model_EventsTimes::COLUMN_DATE_BEGIN}));
+                  }
+                  if ($time->{AdvEventsBase_Model_EventsTimes::COLUMN_DATE_END} != null) {
+                     echo Utils_DateTime::fdate(' &mdash; %x', new DateTime($time->{AdvEventsBase_Model_EventsTimes::COLUMN_DATE_END}));
+                  }
+                  if ($time->{AdvEventsBase_Model_EventsTimes::COLUMN_TIME_END} != null) {
+                     if ($time->{AdvEventsBase_Model_EventsTimes::COLUMN_DATE_END} != null) {
+                        echo ', ';
+                     } else {
+                        echo ' &mdash; ';
+                     }
+                     echo Utils_DateTime::fdate('%G:%i', new DateTime($time->{AdvEventsBase_Model_EventsTimes::COLUMN_TIME_END}));
+                  }
+                  if ($time->{AdvEventsBase_Model_EventsTimes::COLUMN_NOTE} != null) {
+                     echo ', <span class="note">' . $time->{AdvEventsBase_Model_EventsTimes::COLUMN_NOTE} . '</span>';
+                  }
+                  echo '</li>';
+               }
+               ?>
+            </ul> 
+            <?php if ($this->event->{AdvEventsBase_Model_Places::COLUMN_NAME} != null || $this->event->{AdvEventsBase_Model_Organizers::COLUMN_NAME} != null) {
+               ?>
+               <h2><span><?php ps($this->tr('Kde')); ?></span></h2>
+               <?php if ($this->event->{AdvEventsBase_Model_Organizers::COLUMN_NAME} != null) { ?>
+                  <strong class="h3"><?php ps($this->event->{AdvEventsBase_Model_Organizers::COLUMN_NAME}) ?></strong><br />
+
+               <?php } ?>
+               <address>
+                  <strong class="h3"><?php ps($this->event->{AdvEventsBase_Model_Places::COLUMN_NAME}) ?></strong><br />
+                  <?php
+                  if ($this->event->{AdvEventsBase_Model_Places::COLUMN_ADDRESS} != null) {
+                     echo nl2br($this->event->{AdvEventsBase_Model_Places::COLUMN_ADDRESS});
+                  }
+                  ?>
+               </address>
+               <?php
+               if ($this->event->{AdvEventsBase_Model_Places::COLUMN_LAT}) {
+                  ?>
+                  <div class="thumbnail">
+                     <div id="map-location"></div>
+                     <a href="https://www.google.com/maps/dir/<?= $this->event->{AdvEventsBase_Model_Places::COLUMN_LAT} ?>,<?= $this->event->{AdvEventsBase_Model_Places::COLUMN_LNG} ?>//"
+                        title="<?php ps($this->tr('Naplánovat trasu do tohoto místa')); ?>"
+                        class="link-external"
+                        ><?php ps($this->tr('Naplánovat trasu')); ?></a>
+                  </div>
+                  <script type="text/javascript">
+                     function initializeMap() {
+                        var mapOptions = {
+                           zoom: 14,
+                           center: {lat: <?= $this->event->{AdvEventsBase_Model_Places::COLUMN_LAT} ?>, lng: <?= $this->event->{AdvEventsBase_Model_Places::COLUMN_LNG} ?>}
+                        };
+                        map = new google.maps.Map(document.getElementById('map-location'),
+                           mapOptions);
+
+                        var marker = new google.maps.Marker({
+                           position: {
+                              lat: <?= $this->event->{AdvEventsBase_Model_Places::COLUMN_LAT} ?>,
+                              lng: <?= $this->event->{AdvEventsBase_Model_Places::COLUMN_LNG} ?>
+                           },
+                           map: map
+                        });
+                     }
+                     initializeMap();
+                  </script>
+                  <?php
+               }
+            }
+            ?>
+            <?php if ($this->event->{AdvEventsBase_Model_Events::COLUMN_WEBSITE} != null) { ?>
+               <a href="<?php echo $this->event->{AdvEventsBase_Model_Events::COLUMN_WEBSITE} ?>" 
+                  class="btn btn-default pull-right link-external"><span class="icon icon-chevron-right"></span> <?php ps('Chci vědět více') ?></a>
+               <?php } ?>
+         </div>
+
+         <?php
+         $images = $this->event->getImages();
+         if (!empty($images) && count($images) > 1) {
+            ?>
+            <div class="col-md-12">            
+               <h2><span><?php ps($this->tr('Obrázky')); ?></span></h2>
+
+               <div class="gallery row">
+                  <?php
+                  foreach ($images as $img) {
+                     $image = AdvEventsBase_Controller::getEventImagesUrl(
+                                 $this->event->getPK()) . $img->{AdvEventsBase_Model_EventsImages::COLUMN_FILE};
+                     // kontrola existence
+                     if(!is_file($image)){
+                        continue;
+                     }
+                     $srcThumb = Utils_Image::cache($image, 250, 187, true);
+                     $srcFull = AdvEventsBase_Controller::getEventImagesUrl(
+                             $this->event->getPK()) . $img->{AdvEventsBase_Model_EventsImages::COLUMN_FILE};
+                     ?>
+                     <div class="col-md-3">
+                        <a href="<?php echo $srcFull ?>" class="thumbnail" rel="lightbox"
+                           ><img src="<?php echo $srcThumb ?>" alt="<?php ps($img->{AdvEventsBase_Model_EventsImages::COLUMN_NAME}) ?>" class="img-responsive" /></a>
+                     </div>  
+                  <?php } ?>
+               </div>
+            </div>
+         <?php } ?>
+         <div class="col-md-12">            
+            <a href="<?php echo $this->link()->route('filter') ?>" class="btn btn-default"
+               ><span class="icon icon-chevron-left"></span> <?php ps('Zpět na přehled') ?></a>
+         </div>
+      </div>
+   </div>
+
+
+   <div class="col-md-3">
+      <?php
+      if (!empty($this->events)) {
+         ?>
+         <h2><a href="<?php echo $this->otherLink ?>"><span><?php ps($this->otherEventsName) ?></span></a></h2>
+         <?php
+         foreach ($this->events as $event) {
+            $this->includeFile('tpl://action.phtml', array('event' => $event));
+         }
+      }
+      ?>
+   </div>
+</div>

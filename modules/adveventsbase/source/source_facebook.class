@@ -1,0 +1,9 @@
+<?php
+/**
+ * Základní třída pro zdroje akcí
+ *
+ * @author cuba
+ */
+abstract class AdvEventsBase_Source {
+    
+}

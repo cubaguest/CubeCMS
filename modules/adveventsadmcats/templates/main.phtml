@@ -1,0 +1,91 @@
+<?
+$this->addFile("css://adveventsbase:style-admin.less");
+?>
+<h1><?php ps($this->category()->getName()); ?></h1>
+<div class="content-admin">
+   <?php
+   $this->moduleButtons = array(
+       array(
+           'link' => $this->link()->route('addCategory'),
+           'title' => $this->tr('Přidat novou kateogrii'),
+           'icon' => 'plus',
+           'name' => $this->tr('Přidat kateogrii')
+       ),
+       '<form method="get" action="' . $this->link() . '">
+         <input type="text" size="20" name="filter" value="' . ($this->get("filter")) . '" />
+         <input type="submit" value="' . $this->tr('filtrovat') . '" />
+        </form>'
+       ,
+   );
+   $this->includeTpl('modules/buttons.phtml', true);
+   ?>
+   <table class="table-advevent-categories cubecms-widget cubecms-table">
+      <thead>
+         <tr class="cubecms-header">
+            <th class="id">ID</th>
+            <th><? ps($this->tr('Název')) ?></th>
+            <th></th>
+         </tr>
+      </thead>
+      <tbody class="cubecms-widget-content" id="places-scroll-area">
+         <?
+         if (!empty($this->evcats)) {
+            foreach ($this->evcats as $evcat) {
+               ?>
+               <tr id="<?= $evcat->getPK() ?>" class="cubecms-row">
+                  <td class="id"><? ps($evcat->getPK()) ?></td>
+                  <td class="base-info">
+                     <div class="name">
+                        <? ps($evcat->{AdvEventsBase_Model_Categories::COLUMN_NAME}); ?>
+                     </div>
+                  </td>
+                  <td>
+                     <?
+                     $this->toolboxItem->edit->setAction($this->link()->route('editCategory', array('id' => $evcat->getPK())));
+                     $this->toolboxItem->cat_del->getForm()->id->setValues($evcat->getPK());
+                     echo $this->toolboxItem;
+                     ?>
+                  </td>
+               </tr>
+               <?
+            }
+         } else {
+            ?>
+            <tr class="cubecms-row state-inactive">
+               <td colspan="4"><? ps($this->tr('Nebyla přidána žádná kateogrie')) ?></td>
+            </tr>
+            <?
+         }
+         ?>
+      </tbody>
+      <tfoot class="cubecms-widget-footer">
+         <tr class="cubecms-row"><td colspan="4" class="scroll ajax-scroll" data-scroll-target="#places-scroll-area" ><? echo $this->scroll ?></td></tr>
+      </tfoot>
+   </table>
+   <?php
+   $this->includeFile('tpl://engine:components/modal.phtml', array('content' => '', 'id' => 'modal-place-detail',
+       'header' => 'Místo',
+       'close' => true,
+       'footer' => '<button class="btn btn-default close-modal">Zavřít</button>'));
+   ?>
+
+   <script type="text/javascript">
+      $(document).ready(function() {
+         $('.ajax-scroll').on('click', 'a', function() {
+            var $that = $(this);
+            var selector = $(this).closest('.ajax-scroll').data('scroll-target');
+            // load ajax
+            $.ajax({
+               url: $that.prop('href'),
+               success: function(data) {
+                  var $cnt = $('<div></div>').html(data);
+
+                  $(selector).html($cnt.find(selector).html());
+                  $that.closest('.ajax-scroll').html($cnt.find('.ajax-scroll').html());
+               }
+            });
+            return false;
+         });
+      });
+   </script>
+</div>

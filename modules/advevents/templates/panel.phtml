@@ -1,0 +1,10 @@
+<?php
+if (empty($this->events)) {
+   return;
+}
+?>
+<h2 class="h1"><a href="<?php echo $this->link() ?>" title="<?php psa($this->panelObj()->getName()) ?>"><?php ps($this->panelObj()->getName()) ?></a></h2>
+<?php
+foreach ($this->events as $event) {
+   $this->includeFile('tpl://action.phtml', array('event' => $event));
+}

@@ -1,0 +1,36 @@
+<?
+$this->addFile("css://svbbase:style-admin.less");
+$jq = new JsPlugin_JQuery();
+$jq->addUIDatepicker();
+$jq->addUIAutoComplete();
+$this->addJsPlugin($jq);
+$this->addFile("js://main.js");
+
+$h1 = $this->tr('Přidání nové události');
+if($this->event instanceof Model_ORM_Record){
+   $h1 = sprintf($this->tr('Úprava události "%s"'), $this->event->{SvbBase_Model_Events::COLUMN_NAME});
+}
+Template_Core::addToPageTitle($h1);
+
+?>
+<h1><?ps($h1)?></h1>
+<div class="content-admin" id="form_edit_dialog">
+   <div >
+      <?
+      $this->form->name->html()->addClass('form-element-long');
+      $this->form->place->html()->addClass('form-element-long');
+      $this->form->url->html()->addClass('form-element-long');
+      $this->form->mapUrl->html()->addClass('form-element-long');
+      $this->form->html()->setAttrib('id', 'form-event');
+      echo $this->form;
+      $this->titleImagesURL = SvbAdmEvents_Controller::getEventsDir(true);
+      $this->includeFile('tpl://engine:parts/seltitleimage.phtml');
+      ?>
+   </div>
+   <script type="text/javascript">
+      initSportEvents({
+         urlPlaces : '<?=$this->link()->route('getPlaces')?>',
+         urlSports : '<?=$this->link()->route('getSports')?>'
+      })
+   </script>
+</div>

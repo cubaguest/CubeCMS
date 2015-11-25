@@ -1,0 +1,74 @@
+<h2><?ps($this->event->{SvbBase_Model_Events::COLUMN_NAME})?></h2>
+<table class="full-width ui-widget ui-cube-widget ui-table-widget">
+   <tbody>
+      <tr>
+         <th class="ui-widget-header"><?ps($this->tr('Datum a čas'))?></th>
+         <td class="ui-widget-content">
+            <?
+            $date = vve_date('%x', $this->event->{SvbBase_Model_Events::COLUMN_DATE_BEGIN});
+            if($this->event->{SvbBase_Model_Events::COLUMN_DATE_END} != null){
+               $date .= ' - '.vve_date('%x', $this->event->{SvbBase_Model_Events::COLUMN_DATE_END});
+            }
+            if($this->event->{SvbBase_Model_Events::COLUMN_TIME_BEGIN} != null){
+               $date .= ', '.vve_date('%G:%i', $this->event->{SvbBase_Model_Events::COLUMN_TIME_BEGIN});
+            }
+            if($this->event->{SvbBase_Model_Events::COLUMN_TIME_END} != null){
+               $date .= ' - '.vve_date('%G:%i', $this->event->{SvbBase_Model_Events::COLUMN_TIME_END});
+            }
+            ?>
+            <div class="date"><?ps($date)?></div>
+         </td>
+      </tr>
+      <tr>
+         <th class="ui-widget-header"><?ps($this->tr('Oficiální stránky'))?></th>
+         <td class="ui-widget-content">
+            <?
+            if($this->event->{SvbBase_Model_Places::COLUMN_URL} != null){
+               ?>
+               <a href="<?=$this->event->{SvbBase_Model_Places::COLUMN_URL}?>" class="link-external"><?ps($this->tr('přejít'))?></a>
+               <?
+            } else {
+               ps($this->tr('Není zadáno'));
+            }
+            ?>
+         </td>
+      </tr>
+      <tr>
+         <th class="ui-widget-header"><?ps($this->tr('Místo konání'))?></th>
+         <td class="ui-widget-content">
+            <?ps( $this->event->{SvbBase_Model_Places::COLUMN_NAME})?>
+         </td>
+      </tr>
+      <tr>
+         <th class="ui-widget-header"><?ps($this->tr('Sporty'))?></th>
+         <td class="ui-widget-content">
+            <?ps(implode(', ', explode(';', $this->event->sports_string_merged)));?>
+         </td>
+      </tr>
+      <tr>
+         <th class="ui-widget-header"><?ps($this->tr('Aktivní'))?></th>
+         <td class="ui-widget-content">
+            <?ps( $this->event->{SvbBase_Model_Events::COLUMN_ACTIVE} ? $this->tr('Ano') : $this->tr('Ne') )?>
+         </td>
+      </tr>
+      <tr>
+         <th class="ui-widget-header"><?ps($this->tr('Doporučeno'))?></th>
+         <td class="ui-widget-content">
+            <?ps( $this->event->{SvbBase_Model_Events::COLUMN_RECOMMENDED} ? $this->tr('Ano') : $this->tr('Ne') )?>
+         </td>
+      </tr>
+      <tr>
+         <th class="ui-widget-header"><?ps($this->tr('Pouze sledování'))?></th>
+         <td class="ui-widget-content">
+            <?ps( $this->event->{SvbBase_Model_Events::COLUMN_CHEERING_ONLY} ? $this->tr('Ano') : $this->tr('Ne') )?>
+         </td>
+      </tr>
+   </tbody>
+</table>
+<br />
+<?if(strip_tags($this->event->{SvbBase_Model_Events::COLUMN_TEXT}) != null){?>
+   <h3><?ps($this->tr('Popis události'))?></h3>
+   <div class="text">
+      <?=$this->event->{SvbBase_Model_Events::COLUMN_TEXT}?>
+   </div>
+<?}?>

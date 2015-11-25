@@ -1,0 +1,110 @@
+<?php
+$this->addCssFile("style.less");
+?>
+<h1><?php ps($this->category()->getName()) ?></h1>
+<div class="content">
+   <div class="row">
+      <div class="col-md-12">
+         <h2>Napojená rozhraní</h2>
+         <?php
+         $this->moduleButtons = array(
+             array(
+                 'link' => $this->link()->route('addSource'),
+                 'title' => $this->tr('Přidat nový zdroj'),
+                 'icon' => Template_Toolbox2::ICON_ADD,
+                 'name' => $this->tr('Přidat nový zdroj'),
+             ),
+             (string)$this->formImportEvents,
+         );
+         $this->includeTpl('modules/buttons.phtml', true);
+         ?>
+         <table class="panels-list cubecms-widget cubecms-table">
+            <thead class="cubecms-header">
+               <tr class="">
+                  <th scope="col" class="panel-tb-category"><?php ps($this->tr('Satv')); ?></th>
+                  <th scope="col" class="panel-tb-category"><?php ps($this->tr('Název')); ?></th>
+                  <th scope="col" class="panel-tb-box"><?php ps($this->tr('Třída')); ?></th>
+                  <th scope="col" class="panel-tb-actions"><?php ps($this->tr('Akce')); ?></th>
+               </tr>
+            </thead>
+            <tbody>
+               <?php
+               if (!empty($this->advEventSources)) {
+                  foreach ($this->advEventSources as $source) {
+                     ?>
+                     <tr class="cubecms-row">
+                        <td><?php 
+                        if($source->{AdvEventsBase_Model_EventsSources::COLUMN_ENABLED}){
+                           ?><span class="icon icon-circle text-success"></span> <?php
+                        } else {
+                           ?><span class="icon icon-circle text-danger"></span> <?php
+                           
+                        }
+                        ?></td>
+                        <td><?php ps($source->{AdvEventsBase_Model_EventsSources::COLUMN_NAME}); ?></td>
+                        <td>
+                           <strong><?php ps($source->{AdvEventsBase_Model_EventsSources::COLUMN_CLASS}); ?></strong><br />
+                           <em><?php ps($source->{AdvEventsBase_Model_EventsSources::COLUMN_PARAMS}); ?></em>
+                        </td>
+                        <td><?php echo $source->toolbox; ?></td>
+                     </tr>
+                     <?php
+                  }
+               } else {
+                  ?>
+                  <tr class="cubecms-row ">
+                     <td colspan="3"><?php ps($this->tr('není vložen žádný zdroj')); ?></td>
+                  </tr>
+               <?php } ?>
+            </tbody>
+         </table>
+      </div>
+   </div>
+   <div class="row">
+      <div class="col-md-12">
+         <h2>Import událostí</h2>
+         <?php
+         $this->formImportEvents->setDecorator(new Form_Decorator_Clear());
+         echo $this->formImportEvents;
+         ?>
+      </div>
+   </div>
+   <?php /*
+     <div class="row">
+     <div class="col-md-12">
+     <h2>Import organizátorů</h2>
+     <?php
+     $this->formImportOrg->setDecorator(new Form_Decorator_Clear());
+     echo $this->formImportOrg;
+     ?>
+     </div>
+     </div>
+     <div class="row">
+     <div class="col-md-12">
+     <h2>Import kategorií</h2>
+     <?php
+     $this->formImportCat->setDecorator(new Form_Decorator_Clear());
+     echo $this->formImportCat;
+     ?>
+     </div>
+     </div>
+     <div class="row">
+     <div class="col-md-12">
+     <h2>Import míst</h2>
+     <?php
+     $this->formImportPalces->setDecorator(new Form_Decorator_Clear());
+     echo $this->formImportPalces;
+     ?>
+     </div>
+     </div>
+     <div class="row">
+     <div class="col-md-12">
+     <h2>Import lokací</h2>
+     <?php
+     $this->formImportLocations->setDecorator(new Form_Decorator_Clear());
+     echo $this->formImportLocations;
+     ?>
+     </div>
+     </div>
+    */ ?>
+</div>

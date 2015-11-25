@@ -1,0 +1,112 @@
+<?php
+$this->formEdit->html()->addClass('form-vertical');
+echo $this->formEdit->renderStart();
+
+foreach ($this->formEdit as $name => $element) {
+   if ($name == 'category') {
+      $link = Url_Link::getCategoryAdminLink(ADVEVENT_CAT_CATS);
+      ?>
+      <div class="form-group">
+         <div class="col-md-12 form-labels">
+            <?php
+            $element->html()->addClass('form-control');
+            echo $element->label();
+            ?>
+         </div>
+         <div class="col-md-12 form-controls">
+            <div class="input-group">
+               <?php echo $element->control(); ?>
+               <a href="<?= $link->route('addCategory')?>" 
+                  class="input-group-btn cubecms-link-popup" id="button-add-category"
+                  data-popup-callback="selectcat"
+                  data-popup-width="760"
+                  data-popup-height="500"
+                  ><span class="icon icon-plus"></span></a>
+            </div>
+         </div>
+      </div>
+      <?php
+   } else if ($name == 'place') {
+      $link = Url_Link::getCategoryAdminLink(ADVEVENT_CAT_PALCES);
+      ?>
+      <div class="form-group">
+         <div class="col-md-12 form-labels">
+            <?php
+            $element->html()->addClass('form-control');
+            echo $element->label();
+            ?>
+         </div>
+         <div class="col-md-12 form-controls">
+            <div class="input-group">
+               <?php echo $element->control(); ?>
+               <a href="<?= $link->route('addPlace') ?>" 
+                  class="input-group-btn cubecms-link-popup" 
+                  id="button-add-place"
+                  title="<?php ps($this->tr('Nové místo')); ?>"
+                  data-popup-callback="selectplace"
+                  data-popup-width="760"
+                  data-popup-height="500"
+                  ><span class="icon icon-plus"></span></a>
+            </div>
+         </div>
+      </div>
+      <?php
+   } else if ($element instanceof Form_Element_Checkbox) {
+      ?>
+      <div class="form-group">
+         <div class="col-md-12 form-controls">
+            <label>
+               <?php
+               echo $element->control() . ' ';
+               echo $element->getLabel();
+               ?>
+            </label>
+         </div>
+      </div>
+      <?php
+   } else if ($element instanceof Form_Element_Submit) {
+      ?>
+      <div class="form-group">
+         <div class="col-md-12 form-controls">
+            <?php
+            echo $element->control();
+            ?>
+         </div>
+      </div>
+      <?php
+   } else if ($element instanceof Form_Element_Hidden) {
+      echo $element->control();
+   } else {
+      ?>
+      <div class="form-group">
+         <div class="col-md-12 form-labels">
+            <?php
+            $element->html()->addClass('form-control');
+            echo $element->label();
+            ?>
+         </div>
+         <div class="col-md-12 form-controls">
+            <?php
+            echo $element->control();
+            ?>
+         </div>
+      </div>
+      <?php
+   }
+}
+echo $this->formEdit->renderEnd();
+?>
+<script type="text/javascript">
+   $(document).ready(function() {
+      window.selectplace = function(place){
+         $('#advevent_place_1').load(document.URL +  ' #advevent_place_1>*', function(){
+            $(this).val(place.<?php echo AdvEventsBase_Model_Places::COLUMN_ID?>);
+         });
+      }
+      window.selectcat = function(place){
+         $('#advevent_category_1').load(document.URL +  ' #advevent_category_1>*', function(){
+            $(this).val(place.<?php echo AdvEventsBase_Model_Categories::COLUMN_ID?>);
+         });
+      }
+   });
+</script>

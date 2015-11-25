@@ -1,0 +1,21 @@
+<?
+$this->addFile("css://adveventsbase:style-admin.less");
+?>
+<h1>
+   <?php 
+   echo $this->evcat 
+       ? sprintf($this->tr('Úprava kateogrie %s'), $this->evcat->{AdvEventsBase_Model_Categories::COLUMN_NAME})
+      : $this->tr('Přidání nové kateogrie')?>
+</h1>
+<div class="content-admin">
+   <?php
+//   $this->formEdit->address->html()->setAttrib('rows', '7');
+//   $this->formEdit->openingHours->html()->setAttrib('rows', '7');
+   $this->formEdit->html()->setAttrib('id', 'form-edit-evcat');
+   echo $this->formEdit;
+   ?>
+   <script type="text/javascript">
+      $(document).ready(function() {
+      });
+   </script>
+</div>

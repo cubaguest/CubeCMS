@@ -1,0 +1,78 @@
+<h2 class="h4">Obrázky události</h2>
+<div class="row">
+   <div class="col-md-8">
+      <div class="row advevent-images">
+         <?php
+         foreach ($this->imagesEvent as $image) {
+            $src = Utils_Image::cache(AdvEventsBase_Controller::getEventImagesUrl($this->event->getPK()) . $image->{AdvEventsBase_Model_EventsImages::COLUMN_FILE}, 200, 200, true);
+            ?>
+            <div class="col-md-3">
+               <div class="image-wrap">
+                  <img class="img-thumbnail" src="<?= $src ?>" />
+                  <?php
+                  echo $image->toolbox;
+                  ?>
+                  <?php if ($image->{AdvEventsBase_Model_EventsImages::COLUMN_IS_TITLE}) { ?>
+                     <span class="main-image"><span class="icon icon-check-circle icon-2x"></span></span>
+                  <?php } ?>
+
+               </div>
+            </div>
+            <?
+         }
+         ?>
+      </div>
+   </div>
+   <div class="col-md-4">
+      <?php
+      $this->formUplaod->setDecorator(new Form_Decorator_Vertical());
+      echo $this->formUplaod;
+      ?>
+
+   </div>
+
+</div>
+
+<h2 class="h4">Obrázek na titulní stránce</h2>
+<div class="row">
+   <div class="col-md-8">
+      <?php
+      if ($this->event->getHomePageImage()) {
+         ?> 
+         <div class="image-wrap">
+            <img class="img-thumbnail img-responsive" src="<?php echo Utils_Image::cache($this->event->getHomePageImage(), 1140, 350, true) ?>" 
+                 alt="<?php psa($this->event->{AdvEventsBase_Model_Events::COLUMN_NAME}) ?>" />
+         </div>
+         <?php
+      }
+      ?>
+   </div>
+   <div class="col-md-4">
+      <?php
+//      $this->formImageHP->setDecorator(new Form_Decorator_Vertical());
+      echo $this->formImageHP;
+      ?>
+
+   </div>
+
+</div>
+
+<h2 class="h4">Obrázky místa</h2>
+<div class="row">
+   <div class="col-md-8">
+      <div class="row advevent-images">
+         <?php
+         foreach ($this->imagesPlace as $image) {
+            $src = Utils_Image::cache($image, 200, 200, true);
+            ?>
+            <div class="col-md-3">
+               <div class="image-wrap">
+                  <img class="img-thumbnail" src="<?= $src ?>" />
+               </div>
+            </div>
+            <?
+         }
+         ?>
+      </div>
+   </div>
+</div>

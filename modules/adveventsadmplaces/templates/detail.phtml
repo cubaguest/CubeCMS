@@ -1,0 +1,65 @@
+<?php
+$this->addFile("css://adveventsbase:style-admin.less");
+Template::addJS('https://maps.googleapis.com/maps/api/js?key=' . IC_GMAPS_KEY . '&signed_in=true');
+?>
+<h1><?php ps($this->place->{AdvEventsBase_Model_Places::COLUMN_NAME}) ?></h1>
+<div class="content-admin place-content">
+   <div class="row">
+      <div class="col-md-7 col-sm-6">
+         <?php echo $this->place->{AdvEventsBase_Model_Places::COLUMN_DESC} ?>
+
+         <?php
+         $images = $this->place->getImagesUrl();
+
+         if (!empty($images)) {
+            ?>
+            <div class="place-images row">
+               <?php foreach ($images as $image) { ?>
+                  <div class="col-md-4">
+                     <a href="<?= $image ?>" class="thumbnail" rel="lightbox[pp_gal_<?=$this->place->getPK()?>]">
+                        <img src="<?= Utils_Image::cache($image, 380, 250, true) ?>" 
+                             alt="<?php ps($this->place->{AdvEventsBase_Model_Places::COLUMN_NAME}) ?>" 
+                             class="img-responsive" />
+                     </a>
+                  </div>
+               <?php }
+               ?>
+            </div>
+            <?php
+         }
+         ?>
+
+      </div>
+      <div class="col-md-5 col-sm-6">
+         <?php if ($this->place->{AdvEventsBase_Model_Places::COLUMN_LAT} != 0 && $this->place->{AdvEventsBase_Model_Places::COLUMN_LNG} != 0) { ?>
+            <div class="thumbnail">
+               <div id="map-location"></div>
+            </div>
+            <script type="text/javascript">
+               function initializeMap() {
+                  var mapOptions = {
+                     zoom: 14,
+                     center: {lat: <?= $this->place->{AdvEventsBase_Model_Places::COLUMN_LAT} ?>, lng: <?= $this->place->{AdvEventsBase_Model_Places::COLUMN_LNG} ?>}
+                  };
+                  map = new google.maps.Map(document.getElementById('map-location'),
+                     mapOptions);
+
+                  var marker = new google.maps.Marker({
+                     position: {
+                        lat: <?= $this->place->{AdvEventsBase_Model_Places::COLUMN_LAT} ?>,
+                        lng: <?= $this->place->{AdvEventsBase_Model_Places::COLUMN_LNG} ?>
+                     },
+                     map: map
+                  });
+               }
+               initializeMap();
+            </script>
+         <?php } ?>
+         <?php echo nl2br($this->place->{AdvEventsBase_Model_Places::COLUMN_ADDRESS}) ?>
+      </div>
+   </div>
+</div>
+<div class="content-admin edit-buttons">
+   <button class="btn btn-default">Upravit</button>
+   <button class="btn btn-danger">Smazat</button>
+</div>

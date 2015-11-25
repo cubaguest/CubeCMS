@@ -1,0 +1,228 @@
+<?
+$this->addFile("css://adveventsbase:style-admin.less");
+$this->addFile("js://list.js");
+$jq = new JsPlugin_JQuery();
+$jq->addUIDatepicker();
+$jq->addUIDialog();
+$this->addJsPlugin($jq);
+
+function vve_tpl_create_link($cnt, $link = null, $attributes = array()){
+   $returnLink = null;
+   if((bool)$link){
+      $returnLink = new Html_Element('a', $cnt);
+      $returnLink->setAttrib('href', $link);
+      foreach($attributes as $name => $value){
+         $returnLink->setAttrib($name, $value);
+      }
+      return $returnLink;
+   }
+   return $cnt;
+}
+?>
+<h1><?ps($this->tr('Přehled událostí'))?></h1>
+<div class="content-admin" id="sport-events-list">
+   <?php
+   $this->moduleButtons = array(
+      array(
+         'link' => $this->link()->route('addEvent'),
+         'title' => $this->tr('Přidat novou událost'),
+         'icon' => 'add.png',
+         'name' => $this->tr('Přidat událost'),
+         'id' => 'button-add-event',
+      ),
+      '<form method="get" action="'.$this->link().'">
+         <label for="event_date_filter">Od: </label>
+         <input type="text" size="20" id="event_date_filter" class="date" name="date" value="'.($this->get("date")).'" />
+         <select name="date_range">
+            <option value="week" '.($this->date_range == 'week' ? 'selected="selected"' : null).'>týden</option>
+            <option value="month" '.($this->date_range == 'month' ? 'selected="selected"' : null).'>měsíc</option>
+            <option value="year" '.($this->date_range == 'year' ? 'selected="selected"' : null).'>rok</option>
+         </select>
+         <input type="submit" value="'. $this->tr('nastavit datum').'" />
+      </form>',
+      '<form method="get" action="'.$this->link().'">
+         <label for="input-event-filter">'. $this->tr('Filtr').'</label>:
+         <input id="input-event-filter" type="text" size="20" name="filter" value="'.($this->get("filter")).'" />'
+         /*<input type="submit" value="'. $this->tr('filtrovat').'" />*/
+      .'</form>'
+   ,
+
+   );
+   $this->includeTpl('modules/buttons.phtml', true);
+   ?>
+   <table class="ui-widget ui-cube-widget ui-table-widget full-width table-sport-events">
+      <thead>
+         <tr class="ui-widget-header">
+            <th class="id">ID</th>
+            <th><?ps($this->tr('Název'))?></th>
+            <th><?ps($this->tr('Datum'))?></th>
+            <th></th>
+         </tr>
+      </thead>
+      <tbody class="ui-widget-content">
+      <?
+      if(!empty($this->events)){
+         foreach ($this->events as $event){
+            ?>
+         <tr id="<?=$event->getPK()?>" class="ui-state-default"
+             data-id="<?=$event->getPK()?>"
+             data-datebegin="<?=vve_date("%x", $event->{SvbBase_Model_Events::COLUMN_DATE_BEGIN})?>"
+             data-dateend="<?echo $event->{SvbBase_Model_Events::COLUMN_DATE_END} != null ? vve_date("%x", $event->{SvbBase_Model_Events::COLUMN_DATE_END}) : null?>"
+             data-timebegin="<?=$event->{SvbBase_Model_Events::COLUMN_TIME_BEGIN}?>"
+             data-timeend="<?=$event->{SvbBase_Model_Events::COLUMN_TIME_END}?>"
+                 >
+            <td class="id"><?ps($event->getPK())?></td>
+            <td class="base-info">
+               <div>
+                  <span class="name"><?ps($event->{SvbBase_Model_Events::COLUMN_NAME});?></span>
+                  <?
+                  if($event->{SvbBase_Model_Events::COLUMN_WEBSITE} != null){
+                     ?>
+                     <a href="<?=$event->{SvbBase_Model_Events::COLUMN_WEBSITE}?>" title="<?ps($event->{SvbBase_Model_Events::COLUMN_WEBSITE})?>" class="link-external event-link"
+                             ><img src="images/icons/world_link.png" alt="external" /></a>
+                     <?
+                  }
+                  ?>
+               </div>
+               <div class="sports-list">
+                  <?if($event->sports_string_merged){
+                     ps(implode(', ', explode(';', $event->sports_string_merged)));
+                  }?>
+               </div>
+            </td>
+            <td class="event-row">
+               <?
+               $date = vve_date('%x', $event->{SvbBase_Model_Events::COLUMN_DATE_BEGIN});
+               if($event->{SvbBase_Model_Events::COLUMN_DATE_END} != null){
+                  $date .= ' - '.vve_date('%x', $event->{SvbBase_Model_Events::COLUMN_DATE_END});
+               }
+               if($event->{SvbBase_Model_Events::COLUMN_TIME_BEGIN} != null){
+                  $date .= ', '.vve_date('%G:%i', $event->{SvbBase_Model_Events::COLUMN_TIME_BEGIN});
+               }
+               if($event->{SvbBase_Model_Events::COLUMN_TIME_END} != null){
+                  $date .= ' - '.vve_date('%G:%i', $event->{SvbBase_Model_Events::COLUMN_TIME_END});
+               }
+               ?>
+               <div class="date"><?ps($date)?></div>
+               <div class="place">
+                  <?ps($event->{SvbBase_Model_Places::COLUMN_NAME});
+                  if($event->{SvbBase_Model_Places::COLUMN_URL} != null){
+                     ?>
+                     <a href="<?=$event->{SvbBase_Model_Places::COLUMN_URL}?>" class="link-external event-link"
+                             ><img src="images/icons/external-link.png" alt="external" /></a>
+                     <?
+                  }
+                  ?>
+               </div>
+            </td>
+            <td>
+               <?
+//               $this->toolboxItem->info;
+               // active
+               $this->toolboxItem->event_changeState->getForm()->id->setValues($event->getPK());;
+               $this->toolboxItem->event_changeState->setIcon( $event->{SvbBase_Model_Events::COLUMN_ACTIVE} ? 'check-square-o' : 'fa-square-o');
+               // recommended
+               $this->toolboxItem->event_changeRecommended->getForm()->id->setValues($event->getPK());;
+               $this->toolboxItem->event_changeRecommended->setIcon( $event->{SvbBase_Model_Events::COLUMN_RECOMMENDED} ? 'star' : 'star-o');
+               // edit
+               $this->toolboxItem->edit->setAction($this->link()->route('editEvent', array('idEvent' => $event->getPK())));
+               // remove
+               $this->toolboxItem->event_del->getForm()->id->setValues($event->getPK());
+               echo $this->toolboxItem;
+               ?>
+            </td>
+         </tr>
+            <?
+         }
+      } else {
+         ?>
+      <tr class="ui-state-default ui-state-disabled">
+         <td colspan="4"><?ps($this->tr('V rozsahu není přidána žádná událost'))?></td>
+      </tr>
+         <?
+      }
+      ?>
+      </tbody>
+      <tfoot class="ui-widget-content">
+         <tr>
+            <td colspan="4">
+               <?
+               switch($this->date_range){
+                  case 'week':
+                     $string = $this->tr('týden');
+                     break;
+                  case 'year':
+                     $string = $this->tr('rok');
+                     break;
+                  case 'month':
+                  default:
+                     $string = $this->tr('měsíc');
+                     break;
+               }
+               ?>
+               <a id="button-prev-events" href="<?=$this->linkPrev?>">&lt; předchozí <?ps($string)?></a>
+               <a id="button-next-events" href="<?=$this->linkNext?>">následující <?ps($string)?> &gt;</a>
+            </td>
+         </tr>
+      </tfoot>
+   </table>
+   <div id="dialog-event-info"></div>
+   <div id="dialog-event-copy">
+      <?
+      $this->formCopy->html()->setAttrib('id', 'form-copy-event');
+      echo $this->formCopy;
+      ?>
+   </div>
+   <script type="text/javascript">
+      $(document).ready(function(){
+         $('input#event_date_filter, input[name="event_copydateBegin"], input[name="event_copydateEnd"]').datepicker({});
+         $('.table-sport-events tbody tr').hover(function(){
+            $(this).addClass('ui-state-hover');
+         }, function(){
+            $(this).removeClass('ui-state-hover');
+         });
+         // filtrace
+         $('input[name="filter"]').table_filter({'table':'.table-sport-events'});
+
+         var $eventInfo = $('#dialog-event-info').dialog({
+            autoOpen : false,
+            width : 500,
+//            maxHeight : 400
+            height : 400
+         });
+
+         var eventUrl = '<?=$this->link()->route('event')?>';
+//         $('.show-event-info').click(function(){
+         $('.toolbox-button-info').click(function(){
+            $eventInfo.load( eventUrl.replace('{idEvent}', $(this).closest('tr').attr('id')), function(){
+               $eventInfo.dialog('option', 'title', $eventInfo.find('h2').text());
+               $eventInfo.find('h2').hide();
+            } );
+            $eventInfo.dialog('open');
+            return false;
+         });
+
+         var $eventCopy = $('#dialog-event-copy').dialog({
+            autoOpen : false,
+            width : 500,
+//            maxHeight : 400
+            height : 320
+         });
+
+         $('.toolbox-button-copy').click(function(){
+            var $row = $(this).closest('tr');
+            var $form = $('#form-copy-event');
+            $('input[name="event_copyid"]').val($row.attr('id'));
+            $('input[name="event_copyname"]').val($row.find('.name').text());
+            $('input[name="event_copydateBegin"]').val($row.data('datebegin'));
+            $('input[name="event_copydateEnd"]').val($row.data('dateend'));
+            $('input[name="event_copytimeBegin"]').val($row.data('timebegin'));
+            $('input[name="event_copytimeEnd"]').val($row.data('timeend'));
+
+            // open dialog
+            $eventCopy.dialog("option", "title", 'Kopírování akce: '+$row.find('.name').text()).dialog('open');
+         });
+
+      });
+   </script>
+</div>

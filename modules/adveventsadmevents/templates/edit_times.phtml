@@ -1,0 +1,92 @@
+<?php
+$this->addJsPlugin(new JsPlugin_BootstrapDatepicker());
+?>
+<h2 class="h4">Uložení data a časy konání</h2>
+<div class="row">
+   <div class="col-md-12">
+      <table class="table table-responsive cubecms-widget cubecms-table advevent-times">
+         <thead>
+            <tr>
+               <th><?php ps($this->tr('Od')); ?></th>
+               <th><?php ps($this->tr('Do')); ?></th>
+               <th><?php ps($this->tr('Poznámka')); ?></th>
+               <th></th>
+            </tr>
+         </thead>
+         <tbody>
+            <?php foreach ($this->eventTimes as $time){?>
+            <tr class="cubecms-row">
+               <td class="col-time">
+                  <?php 
+//                  echo $time->{AdvEventsBase_Model_EventsTimes::COLUMN_DATE_BEGIN}.' '.$time->{AdvEventsBase_Model_EventsTimes::COLUMN_TIME_BEGIN} .'<br />';// Y-m-d\TH:i:s
+                  $date = new DateTime($time->{AdvEventsBase_Model_EventsTimes::COLUMN_DATE_BEGIN}.' '.$time->{AdvEventsBase_Model_EventsTimes::COLUMN_TIME_BEGIN} );   
+                  echo $time->{AdvEventsBase_Model_EventsTimes::COLUMN_TIME_BEGIN} != null 
+                     ? Utils_DateTime::fdate('%x, %G:%i', $date) : Utils_DateTime::fdate('%x', $date);
+                  ?>
+               </td>
+               <td class="col-time">
+                  <?php 
+                  if($time->{AdvEventsBase_Model_EventsTimes::COLUMN_DATE_END} != null){
+                     $date = new DateTime($time->{AdvEventsBase_Model_EventsTimes::COLUMN_DATE_END}.' '.$time->{AdvEventsBase_Model_EventsTimes::COLUMN_TIME_END} );   
+                     echo Utils_DateTime::fdate('%x', $date);
+                  }
+                  if($time->{AdvEventsBase_Model_EventsTimes::COLUMN_TIME_END} != null){
+                     if($time->{AdvEventsBase_Model_EventsTimes::COLUMN_DATE_END} != null){
+                        echo ', ';
+                     }
+                     $date = new DateTime($time->{AdvEventsBase_Model_EventsTimes::COLUMN_DATE_END}.' '.$time->{AdvEventsBase_Model_EventsTimes::COLUMN_TIME_END} );   
+                     echo Utils_DateTime::fdate('%G:%i', $date);
+                  }
+                  ?>
+               </td>
+               <td><?php ps($time->{AdvEventsBase_Model_EventsTimes::COLUMN_NOTE})?></td>
+               <td class="col-tools">
+                  <?php 
+                  $time->toolbox->setTemplate(Template_Toolbox2::TEMPLATE_INLINE);
+                  echo $time->toolbox;
+                  ?>
+               </td>
+            </tr>
+            <?php }
+            if(empty($this->eventTimes)){
+               ?>
+               <tr class="cubecms-row state-disabled">
+                  <td colspan="4">Není defoniváno žádné období</td>
+               </tr>
+               <?
+            }
+            ?>
+         </tbody>
+         
+      </table>
+   </div>
+</div>
+<h2 class="h4">Přidání období</h2>
+<div class="row">
+   <div class="col-md-12">
+      <?php
+      echo $this->formTimes;
+      ?>
+   </div>
+</div>
+<script type="text/javascript">
+   $(function() {
+      var dateOpts = {
+         locale : 'cs',
+         icons : {
+            time: 'icon icon-time',
+            date: 'icon icon-calendar',
+            up: 'icon icon-chevron-up',
+            down: 'icon icon-chevron-down',
+            previous: 'icon icon-chevron-left',
+            next: 'icon icon-chevron-right',
+            today: 'icon icon-screenshot',
+            clear: 'icon icon-trash',
+            close: 'icon icon-remove'
+         },
+         format: 'L'
+      };
+      $('input[name="advevent_times_date_from"]').datetimepicker(dateOpts);
+      $('input[name="advevent_times_date_to"]').datetimepicker(dateOpts);
+   });
+</script>

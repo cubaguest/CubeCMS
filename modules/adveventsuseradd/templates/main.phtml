@@ -1,0 +1,304 @@
+<?php
+$this->addFile("css://style.less");
+$this->addFile("js://jquery.editable-select.js");
+$this->addFile("css://jquery.editable-select.min.css");
+echo $this->toolbox;
+?>
+<h1 class="hidden"><?php ps($this->category()->getName()) ?></h1>
+<div class="content">
+   <div class="row">
+      <?php
+      $this->formEdit->html()->addClass('form-vertical')->setAttrib('id', 'form-useredit-advevet');
+      ?>
+      <?php
+      echo $this->formEdit->renderStart();
+      ?>
+
+      <div class="col-md-6">
+         <fieldset>
+            <legend>
+               <span class="legend-name"><?php ps($this->tr('Informace o události')) ?></span><span class="legend-text"></span>
+            </legend>
+            <?php
+            foreach ($this->formEdit as $item) {
+               if (in_array($item->getName(false), array('contactName', 'contactEmail', 'contactPhone', 'contactNote', 'contactCaptcha', 'save'))) {
+                  continue;
+               }
+               ?>
+               <div class="form-group">
+                  <div class="col-md-3 form-labels">
+                     <?php
+                     $item->html()->addClass('form-control');
+                     echo $item->label();
+                     ?>
+                  </div>
+                  <div class="col-md-9 form-controls">
+                     <?php echo $item->control() ?>
+                  </div>
+               </div>
+            <?php } ?>
+         </fieldset>
+      </div>
+      <div class="col-md-6">
+         <fieldset>
+            <legend>
+               <span class="legend-name"><?php ps($this->tr('Časy události')) ?></span><span class="legend-text"></span>
+            </legend>
+            <div class="alert alert-warning" id="alert-no-time"><span class="icon icon-info"></span> <?php ps($this->tr('Źádné datum není přidáno')); ?></div>
+            <div class="alert alert-danger" id="add-time-warning"><span class="icon icon-warning"></span> <span class="cnt"></span></div>
+            <div class="form-group" id="dates-list-wrap">
+               <div class="col-md-3 form-labels">
+                  <label ><?php ps($this->tr('Přidané časy')) ?></label>
+               </div>
+               <div class="col-md-9 form-controls">
+                  <ul class="unstyled" id="dates-list" style=""></ul>
+               </div>
+            </div>
+
+            <div class="form-group">
+               <div class="col-md-3 form-labels">
+                  <label for=""><?php ps($this->tr('Datum začátku')) ?></label>
+               </div>
+               <div class="col-md-9 form-controls">
+                  <input type="text" class="form-control" name="dateFrom" />
+               </div>
+            </div>
+            <div class="form-group">
+               <div class="col-md-3 form-labels">
+                  <label for=""><?php ps($this->tr('Čas začátku')) ?></label>
+               </div>
+               <div class="col-md-9 form-controls">
+                  <input type="text" class="form-control" name="timeFrom" />
+               </div>
+            </div>
+            <div class="form-group">
+               <div class="col-md-3 form-labels">
+                  <label for=""><?php ps($this->tr('Datum konce')) ?></label>
+               </div>
+               <div class="col-md-9 form-controls">
+                  <input type="text" class="form-control" name="dateTo"/>
+               </div>
+            </div>
+            <div class="form-group">
+               <div class="col-md-3 form-labels">
+                  <label for=""><?php ps($this->tr('Čas konce')) ?></label>
+               </div>
+               <div class="col-md-9 form-controls">
+                  <input type="text" class="form-control" name="timeTo"/>
+               </div>
+            </div>
+            <div class="form-group">
+               <div class="col-md-3 form-labels"></div>
+               <div class="col-md-9 form-controls">
+                  <button id="button-add-date" class="btn btn-success"><span class="icon icon-plus"></span> <?php ps($this->tr('Přidat')); ?></button>
+               </div>
+            </div>
+         </fieldset>
+         <?php if (isset($this->formEdit->contactName)) { ?>
+            <fieldset>
+               <legend>
+                  <span class="legend-name"><?php ps($this->tr('Kontaktní údaje')); ?></span><span class="legend-text"></span>
+               </legend>
+               <?php
+               foreach ($this->formEdit as $item) {
+                  if (!in_array($item->getName(false), array('contactName', 'contactEmail', 'contactPhone', 'contactNote', 'contactCaptcha'))) {
+                     continue;
+                  }
+                  ?>
+                  <div class="form-group">
+                     <div class="col-md-3 form-labels">
+                        <?php
+                        $item->html()->addClass('form-control');
+                        echo $item->label();
+                        ?>
+                     </div>
+                     <div class="col-md-9 form-controls">
+                        <?php echo $item->control() ?>
+                     </div>
+                  </div>
+               <?php } ?>
+            </fieldset>
+         <?php } ?>
+      </div>
+      <div class="col-md-12">
+         <div class="form-group">
+            <div class="col-md-12 text-right">
+               <?php
+               $this->formEdit->save->html()->addClass('btn')->addClass('btn-success');
+               echo $this->formEdit->save->control();
+               ?>
+            </div>
+         </div>
+      </div>
+      <?php
+      echo $this->formEdit->renderEnd();
+      ?>
+   </div>
+   <?php
+   $this->addJsPlugin(new JsPlugin_BootstrapDatepicker());
+   ?>
+   <script type="text/javascript">
+      $(document).ready(function () {
+
+         $('select[name="<?= $this->formEdit->category->getName(true) ?>"]').editableSelect();
+
+         $('select[name="<?= $this->formEdit->area->getName(true) ?>"]').closest('.form-group').hide();
+         var selPlace = $('select[name="<?= $this->formEdit->place->getName(true) ?>"]');
+         if (selPlace.val().match(/^[0-9]+$/) === null
+            || selPlace.val() === "0") {
+            $('select[name="<?= $this->formEdit->area->getName(true) ?>"]').closest('.form-group').show();
+         }
+
+         selPlace.editableSelect({
+            onChange: function ($select) {
+               if ($select.val().match(/^[0-9]+$/) !== null || $select.val() === "0") {
+                  $('select[name="<?= $this->formEdit->area->getName(true) ?>"]').closest('.form-group').slideUp();
+               } else {
+                  $('select[name="<?= $this->formEdit->area->getName(true) ?>"]').closest('.form-group').slideDown();
+               }
+            }
+         });
+
+         // data
+         var dateOpts = {
+            locale: 'cs',
+            icons: {
+               time: 'icon icon-time',
+               date: 'icon icon-calendar',
+               up: 'icon icon-chevron-up',
+               down: 'icon icon-chevron-down',
+               previous: 'icon icon-chevron-left',
+               next: 'icon icon-chevron-right',
+               today: 'icon icon-screenshot',
+               clear: 'icon icon-trash',
+               close: 'icon icon-remove'
+            },
+            format: 'L'
+         };
+         $('input[name="dateFrom"]').datetimepicker(dateOpts);
+         $('input[name="dateTo"]').datetimepicker(dateOpts);
+
+         // náhled obrázku
+         var $prevImgControl = $('input[name="advevent_guestadd_titleImage"]'), 
+         $prevImgDiv = $('<div class="title-image-preview"><span class="thumbnail"><img /><a href="#" class="text-danger"><span class="icon icon-remove"></span></a></span></div>').hide();
+         $prevImgControl.after($prevImgDiv);
+         
+         $prevImgDiv.find('a').on('click', function(e){
+            e.preventDefault();
+            var $newCtrl = $prevImgControl.val('').clone(true);
+            $prevImgControl.replaceWith($newCtrl);
+            $prevImgControl = $newCtrl;
+//            $('input[name="advevent_guestadd_titleImage"]').replaceWith($prevImgControl);
+            $('.title-image-preview').hide();
+            return false;
+         });
+         $prevImgControl.on('change', function () {
+            if (this.files && this.files[0]) {
+               var reader = new FileReader();
+               reader.onload = function (e) {
+                  $('img', $prevImgDiv)
+                     .attr('src', e.target.result).closest('.title-image-preview').show();
+               };
+               reader.readAsDataURL(this.files[0]);
+            }
+         });
+
+         // časy
+         var errorMsg = {
+            wrongDate: '<?php ps($this->tr('Vyplňte datum začátku akce')); ?>',
+            noDate: '<?php ps($this->tr('Nebylo přidání datum konání')); ?>'
+         };
+
+         // základní stav
+         $('#dates-list li').length > 0 ? $('#dates-list-wrap').show() : $('#dates-list-wrap').hide();
+         $('#add-time-warning').hide();
+
+         $('#form-useredit-advevet').submit(function () {
+            // kontrola časů
+            if ($('#dates-list li').length === 0) {
+               $('#add-time-warning .cnt').html(errorMsg.noDate);
+               $('#add-time-warning').show();
+               $('#alert-no-time').hide();
+               $('html,body').animate({scrollTop: $('#advevent-times-form').offset().top}, 400);
+               return false;
+            }
+            // serializace
+            var dates = new Array;
+            $('#dates-list li').each(function () {
+               dates.push($(this).data('dates'));
+            });
+            $('input[name="advevent_guestadd_dates"]').val(JSON.stringify(dates));
+//            return false;
+         });
+
+         function addDateRow(dateFrom, timeFrom, dateTo, timeTo) {
+            $('#add-time-warning').hide();
+            $('#dates-list-wrap').show()
+
+            // li
+            var $item = $('<li><span class="times"></span><a href="#" class="text-danger button-remove-time"><span class="icon icon-remove"></span></a></li>');
+
+            var cnt = dateFrom;
+            if (timeFrom !== "") {
+               cnt += ', ' + timeFrom;
+            }
+            var dateToAdded = false;
+            if (dateTo !== "") {
+               dateToAdded = true;
+               cnt += ' &mdash; ' + dateTo;
+            }
+            if (timeTo !== "") {
+               cnt += (dateToAdded ? ', ' : ' &mdash; ') + timeTo;
+            }
+            $item.data('dates', {
+               dateFrom: dateFrom,
+               timeFrom: timeFrom,
+               dateTo: dateTo,
+               timeTo: timeTo
+            });
+            $('.times', $item).html(cnt);
+            $('#alert-no-time').hide();
+            $('#dates-list-wrap').show();
+            $('#dates-list').append($item);
+         }
+
+         // přidání času
+         $('#button-add-date').on('click', function () {
+            // validace
+            if ($('input[name="dateFrom"]').val() === "") {
+               $('#add-time-warning .cnt').html(errorMsg.wrongDate);
+               $('#add-time-warning').show();
+               $('html,body').animate({scrollTop: $('#advevent-times-form').offset().top}, 400);
+               return false;
+            }
+            addDateRow(
+               $('input[name="dateFrom"]').val(),
+               $('input[name="timeFrom"]').val(),
+               $('input[name="dateTo"]').val(),
+               $('input[name="timeTo"]').val()
+               );
+
+            return false;
+         });
+         // odebrání času
+         $('#dates-list').on('click', 'a.button-remove-time', function (e) {
+            e.preventDefault();
+            $(this).closest('li').fadeOut(400, function () {
+               $(this).remove();
+               if ($('#dates-list-wrap').find('li').length === 0) {
+                  $('#dates-list-wrap').hide();
+                  $('#alert-no-time').show();
+               }
+            });
+            return false;
+         });
+
+         if ($('input[name="advevent_guestadd_dates"]').val() !== "") {
+            var times = JSON.parse($('input[name="advevent_guestadd_dates"]').val());
+            $.each(times, function (index, data) {
+               addDateRow(data.dateFrom, data.timeFrom, data.dateTo, data.timeTo);
+            });
+         }
+      });
+   </script>
+</div>

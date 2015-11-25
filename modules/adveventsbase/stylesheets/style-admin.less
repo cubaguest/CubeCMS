@@ -1,0 +1,75 @@
+@import "bootstrap/variables.less";
+.table-events, .table-events-places {
+   .id {
+      width: 50px;
+   }
+}
+
+.table-events-places {
+   .base-info {
+      width: 300px;
+   }
+   .name {
+      font-weight: bold;
+   }
+   .description {
+      display: none;
+      font-size: 80%;
+   }
+}
+
+
+/* události */
+.table-advevents {
+   .organizator {
+      font-size: @font-size-base - 2;
+   }
+   .event-dates {
+      .note {
+         font-weight: bold;
+      }
+      font-size: @font-size-base;
+      font-style: italic;
+   }
+}
+
+
+
+/* místa */
+#place-map {
+   width: 100%;
+   height: 400px;
+}
+
+#map-location {
+   height: 300px;
+}
+
+.cubecms-modal #map-location {
+   height: 250px;
+}
+
+
+/* obrázky  */
+.advevent-images {
+   .image-wrap {
+      .main-image {
+         position: absolute;
+         top: @thumbnail-padding * 2;
+         left: @thumbnail-padding * 2;
+         color: @brand-success;
+      }
+      position: relative;
+      margin-bottom: @grid-gutter-width;
+   }
+}
+
+/* časy */
+.advevent-times {
+   .col-time {
+      width: 15%;
+   }
+   .col-tools {
+      width: 80px;
+   }
+}

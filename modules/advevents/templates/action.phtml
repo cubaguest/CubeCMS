@@ -1,0 +1,93 @@
+<?php
+$mode = isset($mode) ? $mode : 'month';
+$eventLink = $this->link()->route('detail', array('id' => $event->getPK()));
+?>
+<div class="advevent">
+   <div class="info-thumbnail-link">
+      <div class="thumbnail  info-thumbnail background-clouds color-black with-icon color-text">
+         <div class="bordered ">
+            <?php if ($event->getTitleImage() != null) { ?>
+               <div class="event-image">
+                  <a href="<?= $eventLink ?>"
+                     ><img class="img-responsive" src="<?= Utils_Image::cache($event->getTitleImage(), 400, 800) ?>" alt="<?php ps($event->{AdvEventsBase_Model_Events::COLUMN_NAME}) ?>" /></a>
+               </div>
+            <?php } ?>
+
+            <?php if ($event->{AdvEventsBase_Model_Events::COLUMN_RECOMMENDED}) { ?>  
+               <!--doporuceni-->
+               <div class="icon">
+                  <span class="icon-stack">
+                     <i class="icon icon-circle icon-stack-2x color-lead"></i>
+                     <i class="icon icon-star icon-stack-1x color-white"></i>
+                  </span>
+               </div>
+            <?php } ?>
+
+            <div class="caption">                          
+               <h3><a href="<?= $eventLink ?>"><?php ps($event->{AdvEventsBase_Model_Events::COLUMN_NAME}) ?></a></h3>
+               <div class="subname"><?php ps($event->{AdvEventsBase_Model_Events::COLUMN_SUBNAME}) ?></div>
+               <ul class="fromto">
+                  <?php
+                  $times = $event->getTimesArray();
+                  $i = 0;
+                  $now = new DateTime;
+                  $now->setTime(0, 0, 0);
+                  foreach ($times as $time) {
+                     echo '<li class="' . ($i >= 3 ? 'inactive' : '') . '">';
+                     $dateBegin = new DateTime($time->{AdvEventsBase_Model_EventsTimes::COLUMN_DATE_BEGIN}
+                         . ($time->{AdvEventsBase_Model_EventsTimes::COLUMN_TIME_BEGIN} != null ?
+                             ' ' . $time->{AdvEventsBase_Model_EventsTimes::COLUMN_TIME_BEGIN} : null));
+                     if ($dateBegin < $now) {
+                        continue;
+                     }
+
+                     if ($time->{AdvEventsBase_Model_EventsTimes::COLUMN_TIME_BEGIN} != null) {
+                        echo Utils_DateTime::fdate('%x, %G:%i', $dateBegin);
+                     } else {
+                        echo Utils_DateTime::fdate('%x', new DateTime($time->{AdvEventsBase_Model_EventsTimes::COLUMN_DATE_BEGIN}));
+                     }
+                     if ($time->{AdvEventsBase_Model_EventsTimes::COLUMN_DATE_END} != null) {
+                        echo Utils_DateTime::fdate(' &mdash; %x', new DateTime($time->{AdvEventsBase_Model_EventsTimes::COLUMN_DATE_END}));
+                     }
+                     if ($time->{AdvEventsBase_Model_EventsTimes::COLUMN_TIME_END} != null) {
+                        if ($time->{AdvEventsBase_Model_EventsTimes::COLUMN_DATE_END} != null) {
+                           echo ', ';
+                        } else {
+                           echo ' &mdash; ';
+                        }
+                        echo Utils_DateTime::fdate('%G:%i', new DateTime($time->{AdvEventsBase_Model_EventsTimes::COLUMN_TIME_END}));
+                     }
+                     if ($time->{AdvEventsBase_Model_EventsTimes::COLUMN_NOTE} != null) {
+                        echo ', <span class="note">' . $time->{AdvEventsBase_Model_EventsTimes::COLUMN_NOTE} . '</span>';
+                     }
+                     echo '</li>';
+                     $i++;
+                  }
+                  ?>
+                  <?php if ($i > 3) { ?>
+                     <li><a href="" class="button-show-more-dates"><?php ps($this->tr('Zobrazit další termíny')); ?></a></li>
+                  <?php } ?>
+               </ul>
+               <div>
+                  <?php if ($event->{AdvEventsBase_Model_Events::COLUMN_ID_PLACE} != 0) { ?>
+                     <a href="<?php echo $this->link()->route('filter')->param(AdvEvents_Controller::FILTER_GET_PLACE, $event->{AdvEventsBase_Model_Events::COLUMN_ID_PLACE}) ?>"
+                        ><?php ps($event->{AdvEventsBase_Model_Places::COLUMN_NAME}) ?></a>
+                     <?php } ?>
+
+                  <?php
+                  if ($event->{AdvEventsBase_Model_Organizers::COLUMN_NAME}) {
+                     if ($event->{AdvEventsBase_Model_Events::COLUMN_ID_PLACE} != 0) {
+                        echo '&mdash; ';
+                     }
+                     ?>
+                     <a href="<?php echo $this->link()->route('filter')->param(AdvEvents_Controller::FILTER_GET_ORG, $event->{AdvEventsBase_Model_Events::COLUMN_ID_ORGANIZER}) ?>"
+                        ><?php ps($event->{AdvEventsBase_Model_Organizers::COLUMN_NAME}) ?></a>
+<?php } ?></div>
+               <p class="buttons">
+                  <a href="<?= $eventLink ?>" class="btn btn-lead">Chci vědět více <span class="icon icon-chevron-right"></span></a>
+               </p>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>

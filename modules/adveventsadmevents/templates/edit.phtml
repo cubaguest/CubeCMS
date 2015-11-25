@@ -1,0 +1,86 @@
+<?
+$this->addFile("css://adveventsbase:style-admin.less");
+?>
+<h1>
+   <?php
+   echo $this->event ? sprintf($this->tr('Úprava události "%s"'), $this->event->{AdvEventsBase_Model_Events::COLUMN_NAME}) : $this->tr('Přidání nové události');
+
+   ?>
+   
+   <form action="<?php echo $this->link()->route('eventAction')->param('back', (string)$this->link()) ?>" class="form-inline pull-right">
+   <?php
+   if ($this->event && $this->event->{AdvEventsBase_Model_Events::COLUMN_APPROVED} == false) {
+      ?>
+         <input type="hidden" name="action" value="approve" />
+         <button type="submit" class="btn btn-success"><span class="icon icon-check"></span> <?php ps($this->tr('Schválit')); ?></button>
+      <?php
+   }
+   if ($this->showClose !== false) {
+      ?>
+         <a href="<?= $this->link()->route()->param('tab') ?>" class="btn btn-danger"><psan class="icon icon-times"></psan> <?php ps($this->tr('Zavřít')); ?></a>
+      <?php
+   }
+   ?>
+   </form>
+</h1>
+<div class="content-admin cubecms-tabs" id="advevent-tabs">
+   <ul class="nav nav-tabs" role="tabslist">
+      <li role="presentation" data-toggle="tab" 
+          class="<?php echo!isset($_GET['tab']) || $_GET['tab'] == 'base' ? 'active' : ''; ?>"
+          ><a href="#base"><?php ps($this->tr('Základní')); ?></a></li>
+          <?php if ($this->event) { ?>
+         <li role="presentation" data-toggle="tab" 
+             class="<?php echo isset($_GET['tab']) && $_GET['tab'] == 'times' ? 'active' : ''; ?>"
+             ><a href="#dates"><?php ps($this->tr('Datum a čas')); ?></a></li>
+         <li role="presentation" data-toggle="tab" 
+             class="<?php echo isset($_GET['tab']) && $_GET['tab'] == 'images' ? 'active' : ''; ?>"
+             ><a href="#images"><?php ps($this->tr('Obrázky')); ?></a></li>
+          <?php } ?>
+         <?php if ($this->eventUser) { ?>
+         <li role="presentation" data-toggle="tab" 
+             class="<?php echo isset($_GET['tab']) && $_GET['tab'] == 'user' ? 'active' : ''; ?>"
+             ><a href="#user"><?php ps($this->tr('Událost vložil')); ?></a></li>
+         <?php } ?>
+   </ul>
+   <div class="tab-content">
+      <div id="base"  class="tab-pane <?php echo!isset($_GET['tab']) || $_GET['tab'] == 'base' ? 'active' : ''; ?>" aria-labelledby="base-tab">
+         <?php $this->includeFile('tpl://adveventsadmevents:edit_form.phtml'); ?>
+      </div>
+      <?php if ($this->event) { ?>
+         <div id="dates" class="tab-pane <?php echo isset($_GET['tab']) && $_GET['tab'] == 'times' ? 'active' : ''; ?>" aria-labelledby="dates-tab">
+            <?php $this->includeFile('tpl://adveventsadmevents:edit_times.phtml'); ?>
+         </div>
+         <div id="images" class="tab-pane <?php echo isset($_GET['tab']) && $_GET['tab'] == 'images' ? 'active' : ''; ?>" aria-labelledby="images-tab">
+            <?php $this->includeFile('tpl://adveventsadmevents:edit_images.phtml'); ?>
+         </div>
+      <?php } ?>
+      <?php if ($this->eventUser) { ?>
+         <div id="user" class="tab-pane <?php echo isset($_GET['tab']) && $_GET['tab'] == 'user' ? 'active' : ''; ?>" aria-labelledby="user-tab">
+            <?php $this->includeFile('tpl://adveventsadmevents:edit_user.phtml'); ?>
+         </div>
+      <?php } ?>
+   </div>
+</div>
+<script type="text/javascript">
+   $(document).ready(function () {
+      $('#advevent-tabs .nav-tabs a').click(function (e) {
+         e.preventDefault()
+         $(this).tab('show')
+      });
+
+      $('#button-add-category').on('click', function (e) {
+         e.preventDefault();
+         popitup($(this).prop('href'), '<?php ps($this->tr('Nová kategorie')) ?>');
+         return false;
+      });
+
+      function popitup(url, windowName) {
+         console.log(url);
+         var newwindow = window.open(url, windowName, 'height=300,width=600');
+         if (window.focus) {
+            newwindow.focus()
+         }
+         return false;
+      }
+   });
+</script>

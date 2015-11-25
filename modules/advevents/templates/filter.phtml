@@ -1,0 +1,317 @@
+<?php
+$this->addCssFile("style.less");
+$this->addJsPlugin(new JsPlugin_BootstrapDatepicker());
+Template_Core::addPageTitle($this->tr('Fitrace událostí'));
+?>
+<h1><?php ps($this->category()->getName()) ?> - Filtrace</h1>
+<div class="content row">
+   <div class="col-md-8 events-list" id="events-advanced">
+      <form action="" class="form-vertical" id="advevents-filter-form">
+         <div class="row">
+            <div class="col-md-6">
+               <div class="form-controls">
+                  <label for="input-datef">Od:</label>
+                  <input id="input-datef" type="text" name="<?= AdvEvents_Controller::FILTER_GET_DATE_FROM ?>" 
+                         value="<?php ps($this->get(AdvEvents_Controller::FILTER_GET_DATE_FROM, Utils_DateTime::fdate('%x', $this->dateFrom))) ?>" class="form-control" />
+               </div>
+            </div>
+            <div class="col-md-6">
+               <div class=" form-controls">
+                  <label for="input-datet">Od:</label>
+                  <input id="input-datet" type="text" name="<?= AdvEvents_Controller::FILTER_GET_DATE_TO ?>" 
+                         value="<?php ps($this->get(AdvEvents_Controller::FILTER_GET_DATE_TO, Utils_DateTime::fdate('%x', $this->dateTo))) ?>" class="form-control" />
+               </div>
+            </div>
+         </div>
+         <div class="row">
+            <div class="col-md-6">
+               <div class="form-controls">
+                  <label for="input-cat">Kategorie:</label>
+                  <select id="input-cat" name="<?= AdvEvents_Controller::FILTER_GET_CAT ?>" class="form-control">
+                     <option value=""><?php ps($this->tr('-- Nezáleží --')); ?></option> 
+                     <?php foreach ($this->categories as $c) { ?>
+                        <option <?php echo $c->getPK() == $this->get(AdvEvents_Controller::FILTER_GET_CAT) ? 'selected="selected"' : '' ?> 
+                           value="<?php echo $c->getPK() ?>"><?php ps($c->{AdvEventsBase_Model_Categories::COLUMN_NAME}) ?></option> 
+                        <?php } ?>
+                  </select>
+               </div>
+            </div>
+            <div class="col-md-6">
+               <div class=" form-controls">
+                  <label for="input-org">Pořadatel:</label>
+                  <select id="input-org" name="<?= AdvEvents_Controller::FILTER_GET_ORG ?>" class="form-control">
+                     <option value=""><?php ps($this->tr('-- Nezáleží --')); ?></option> 
+                     <?php foreach ($this->organizers as $o) { ?>
+                        <option 
+                        <?php echo $o->getPK() == $this->get(AdvEvents_Controller::FILTER_GET_ORG) ? 'selected="selected"' : '' ?> 
+                           value="<?php echo $o->getPK() ?>"><?php ps($o->{AdvEventsBase_Model_Organizers::COLUMN_NAME}) ?></option> 
+                        <?php } ?>
+                  </select>
+               </div>
+            </div>
+         </div>
+         <div class="row">
+            <div class="col-md-6">
+               <div class="form-controls">
+                  <label for="input-area">Oblast:</label>
+                  <select id="input-area" name="<?= AdvEvents_Controller::FILTER_GET_AREA ?>" class="form-control">
+                     <option value=""><?php ps($this->tr('-- Nezáleží --')); ?></option> 
+                     <?php foreach ($this->areas as $a) { ?>
+                        <option <?php echo $a->getPK() == $this->get(AdvEvents_Controller::FILTER_GET_AREA) ? 'selected="selected"' : '' ?> 
+                           value="<?php echo $a->getPK() ?>"><?php ps($a->{AdvEventsBase_Model_Locations::COLUMN_NAME}) ?></option> 
+                        <?php } ?>
+                  </select>
+               </div>
+            </div>
+            <div class="col-md-6">
+               <div class=" form-controls">
+                  <label for="input-palce">Místo:</label>
+                  <select id="input-palce" name="<?= AdvEvents_Controller::FILTER_GET_PLACE ?>" class="form-control">
+                     <option value=""><?php ps($this->tr('-- Nezáleží --')); ?></option> 
+                     <?php foreach ($this->places as $p) { ?>
+                        <option <?php echo $p->getPK() == $this->get(AdvEvents_Controller::FILTER_GET_PLACE) ? 'selected="selected"' : '' ?> 
+                           value="<?php echo $p->getPK() ?>"><?php ps($p->{AdvEventsBase_Model_Places::COLUMN_NAME}) ?></option> 
+                        <?php } ?>
+                  </select>
+               </div>
+            </div>
+         </div>
+         <div class="row">
+            <div class="col-md-6">
+               <div class="form-controls">
+                  <label for="input-fulltext">Obsah:</label>
+                  <input id="input-fulltext" type="text" name="<?= AdvEvents_Controller::FILTER_GET_FULLTEXT ?>" 
+                         value="<?php ps($this->get(AdvEvents_Controller::FILTER_GET_FULLTEXT)) ?>" class="form-control" />
+               </div>
+            </div>
+            <div class="col-md-6">
+               <div class="checkbox">
+                  <br />
+                  <label for="input-recommended">
+                     <input id="input-recommended" type="checkbox" name="<?= AdvEvents_Controller::FILTER_GET_RECOMMENDED ?>" 
+                            value="1" <?php echo $this->get(AdvEvents_Controller::FILTER_GET_RECOMMENDED) == 1 ? 'checked="checked"' : ''?> />
+                     Pouze doporučené</label>
+               </div>
+            </div>
+         </div>
+         <div class="row">
+            <div class="col-md-12 text-right">
+               <a href="<?php echo $this->link()->clear()->route('filter') ?>" class="btn btn-danger"><span class="icon icon-remove"></span>  Vymazat</a>
+               <button type="submit" class="btn btn-primary"><span class="icon icon-search"></span>  Filtruj</button>
+            </div>
+         </div>
+      </form>
+
+      <?php if (!empty($this->events)) { ?>
+         <div class="advevents-list">
+            <?php
+            foreach ($this->events as $event) {
+               $this->includeFile('tpl://action_full.phtml', array('event' => $event));
+            }
+            ?>
+         </div>
+         <?php if (count($this->events) >= 10) { ?>
+            <div class="text-center">
+               <button name="load-events" type="button" id="button-load-advevents"
+                       href="<?php echo $this->link() ?>" class="btn btn-default btn-ajax-load"
+                       ><span class="name"><?php ps($this->tr('Načíst další')); ?></span><span style="display: none;" class="icon icon-circle-o-notch icon-spin"></span></button>
+            </div>
+            <?php
+         }
+      } else {
+         ?>
+         <div class="alert alert-warning">
+            <?php ps($this->tr('Hledání nevyhovuje žádná akce. Zkuste změnit nastavení filtru.')); ?>
+         </div>
+      <?php }
+      ?>
+   </div>
+   <div class="col-md-4">
+      <!-- Responsive calendar - START -->
+      <div class="responsive-calendar background-lead color-white">
+         <div class="controls">
+            <a class="btn btn-lead darken pull-left" data-go="prev"><i class="icon icon-chevron-left"></i></a>
+            <a class="btn btn-lead darken pull-right" data-go="next"><i class="icon icon-chevron-right"></i></a>
+            <h4><span data-head-year>&nbsp;</span> <a><span data-head-month>&nbsp;</span></a></h4>
+         </div>
+         <div class="day-headers">
+            <div class="day header"></div>
+            <div class="day header"><?php ps(Utils_String::ucFirst(strftime('%a', strtotime('next Monday +0 days')))) ?></div>
+            <div class="day header"><?php ps(Utils_String::ucFirst(strftime('%a', strtotime('next Monday +1 days')))) ?></div>
+            <div class="day header"><?php ps(Utils_String::ucFirst(strftime('%a', strtotime('next Monday +2 days')))) ?></div>
+            <div class="day header"><?php ps(Utils_String::ucFirst(strftime('%a', strtotime('next Monday +3 days')))) ?></div>
+            <div class="day header"><?php ps(Utils_String::ucFirst(strftime('%a', strtotime('next Monday +4 days')))) ?></div>
+            <div class="day header"><?php ps(Utils_String::ucFirst(strftime('%a', strtotime('next Monday +5 days')))) ?></div>
+            <div class="day header"><?php ps(Utils_String::ucFirst(strftime('%a', strtotime('next Monday +6 days')))) ?></div>
+         </div>
+         <div class="days color-white" data-group="days">
+            <!-- the place where days will be generated -->
+         </div>
+      </div>
+      <!-- Responsive calendar - END -->
+      <?php
+      ?>
+      <script type="text/javascript">
+         $(document).ready(function () {
+            var eventsUrl = '<?php echo $this->link()->route('listAjax', array('year' => '[YEAR]', 'month' => '[MONTH]')) ?>';
+            var curDate = new Date().toISOString().slice(0, 10);
+
+            var $calendar = $('.responsive-calendar').responsiveCalendar({
+               time: '<?php echo Utils_DateTime::fdate('%Y-%M', $this->dateFrom) ?>',
+               translateMonths: [
+                  "<?php ps(Utils_String::ucFirst(strftime('%B', mktime(0, 0, 0, 1)))) ?>",
+                  "<?php ps(Utils_String::ucFirst(strftime('%B', mktime(0, 0, 0, 2)))) ?>",
+                  "<?php ps(Utils_String::ucFirst(strftime('%B', mktime(0, 0, 0, 3)))) ?>",
+                  "<?php ps(Utils_String::ucFirst(strftime('%B', mktime(0, 0, 0, 4)))) ?>",
+                  "<?php ps(Utils_String::ucFirst(strftime('%B', mktime(0, 0, 0, 5)))) ?>",
+                  "<?php ps(Utils_String::ucFirst(strftime('%B', mktime(0, 0, 0, 6)))) ?>",
+                  "<?php ps(Utils_String::ucFirst(strftime('%B', mktime(0, 0, 0, 7)))) ?>",
+                  "<?php ps(Utils_String::ucFirst(strftime('%B', mktime(0, 0, 0, 8)))) ?>",
+                  "<?php ps(Utils_String::ucFirst(strftime('%B', mktime(0, 0, 0, 9)))) ?>",
+                  "<?php ps(Utils_String::ucFirst(strftime('%B', mktime(0, 0, 0, 10)))) ?>",
+                  "<?php ps(Utils_String::ucFirst(strftime('%B', mktime(0, 0, 0, 11)))) ?>",
+                  "<?php ps(Utils_String::ucFirst(strftime('%B', mktime(0, 0, 0, 12)))) ?>"
+               ],
+               onMonthChange: function () {
+                  loadCalendarEvents(this.currentYear, this.currentMonth + 1);
+               },
+               onInit: function () {
+                  loadCalendarEvents(<?php echo Utils_DateTime::fdate('%Y', $this->dateFrom) ?>, <?php echo Utils_DateTime::fdate('%M', $this->dateFrom) ?>);
+               }
+            });
+
+            function loadCalendarEvents(year, month) {
+               $.ajax({
+                  url: eventsUrl.replace('[YEAR]', year).replace('[MONTH]', month),
+                  success: function (data) {
+                     if (data.hasOwnProperty(events) && data.events.lenght === 0) {
+                        return;
+                     }
+
+                     var events = {};
+                     $.each(data.events, function (index, value) {
+                        if (value.count > 0) {
+                           events[index] = {};
+                           events[index].number = value.count;
+                           events[index].url = value.url;
+                           if (value.recommended) {
+                              events[index].badgeClass = 'badge-warning';
+                           }
+                           if (index === curDate) {
+//                              events[index].badgeClass = 'badge-warning';
+                              events[index].badgeClass = 'badge-danger';
+                           }
+
+                        }
+                     });
+                     $calendar.responsiveCalendar('clearAll');
+                     $calendar.responsiveCalendar('edit', {events: events, weeks: data.weeks, monthUrl: data.monthUrl});
+
+                     // doplnění odkazů do týdnů
+//                     console.log($calendar.find('.week a'));
+//                     $calendar.find('.week a').each(function() {
+////                        console.log(data.weeks[parseInt($(this).text())], parseInt($(this).text()));
+//                        console.log('apend links');
+//                        $(this).prop('href', data.weeks[parseInt($(this).text())]);
+//                     });
+
+                  }
+               });
+            }
+
+            $('#mixit').mixitup();
+
+            // kalendář výběru
+            var dateOpts = {
+               locale: 'cs',
+               icons: {
+                  time: 'icon icon-time',
+                  date: 'icon icon-calendar',
+                  up: 'icon icon-chevron-up',
+                  down: 'icon icon-chevron-down',
+                  previous: 'icon icon-chevron-left',
+                  next: 'icon icon-chevron-right',
+                  today: 'icon icon-screenshot',
+                  clear: 'icon icon-trash',
+                  close: 'icon icon-remove'
+               },
+               format: 'L'
+            };
+            $('input[name="filter-datef"]').datetimepicker(dateOpts);
+            $('input[name="filter-datet"]').datetimepicker(dateOpts);
+
+
+            // načítání dalších eventů
+            var currentLimit = 10;
+            var currentOffset = 0;
+            $('#button-load-advevents').on('click', function () {
+               var $button = $(this);
+               $('.name', $button).hide();
+               $('.icon', $button).show();
+               $button.prop('disabled', true);
+
+               currentOffset += currentLimit;
+               $.ajax({
+                  url: '<?php echo $this->link() ?>',
+                  data: {limit: currentLimit, offset: currentOffset},
+                  success: function (data) {
+                     var $cnt = $(data).find('.advevents-list>*');
+                     if ($cnt.length < 10) {
+                        $button.hide();
+                     }
+                     $('.advevents-list').append($cnt);
+                     $cnt.find('.advevent').trigger('hover');
+                     $('.name', $button).show();
+                     $('.icon', $button).hide();
+                     $button.prop('disabled', false);
+                  }
+               });
+            });
+         });
+
+      </script>
+
+      <h2>Doporučujeme</h2>
+      <?php
+      foreach ($this->eventsRecommended as $event) {
+         $this->includeFile('tpl://action.phtml', array('event' => $event, 'mode' => 'month'));
+      }
+      ?>
+   </div>
+</div>
+<!-- <div data-control="cog" style="position: absolute; top: 15px; right: 15px; text-align: right; display: none;">
+    <a style="cursor: pointer">
+        <span class="fa fa-cog">
+        </span>
+    </a>
+    <div class="theme-switcher text-left hidden background-white color-black"> 
+       <h3>Change element color</h3>
+       <p>For most elements, background and text colors can be set using simple color classes 
+           (eg. "background-alizarin color-white"). You can find background class for every
+           <a href="http://flatuicolors.com">flat ui color</a>.</p><p>Please tryout this few examples:</p>  
+       <a class="background-white" title="background-white color-black" data-pick="background-white color-black">
+           <span>Light gray</span></a>  
+       <a class="background-clouds" title="background-clouds color-black" data-pick="background-clouds color-black">
+           <span>Light gray</span></a>
+       <a class="background-belize-hole" title="background-belize-hole color-white"
+          data-pick="background-belize-hole color-white"><span>Blue</span>
+       </a>  
+       <a class="background-alizarin" title="background-alizarin color-white" data-pick="background-alizarin color-white">
+           <span>Red</span></a>
+       <a class="background-pomegranate" title="background-pomegranate color-white" 
+          data-pick="background-pomegranate color-white"><span>Red</span></a> 
+       <a class="background-nephritis" title="background-nephritis color-white" 
+          data-pick="background-nephritis color-white"><span>Green</span></a> 
+       <a class="background-pumpkin" title="background-pumpkin color-white" 
+          data-pick="background-pumpkin color-white"><span>Orange</span></a> 
+       <a class="background-wisteria" title="background-wisteria color-white" 
+          data-pick="background-wisteria color-white"><span>Purple</span></a>  
+       <a class="background-midnight-blue" title="background-midnight-blue color-white"
+          data-pick="background-midnight-blue color-white"><span>Dark blue</span></a>  
+       <a class="background-turquoise" title="background-turquoise color-white" 
+          data-pick="background-turquoise color-white"><span>Turquise</span></a>  
+       <a class="background-green-sea" title="background-green-sea color-white"
+          data-pick="background-green-sea color-white"><span>Turquise darker</span>
+       </a>
+    </div>
+</div>-->

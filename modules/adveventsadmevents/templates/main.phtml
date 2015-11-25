@@ -1,0 +1,272 @@
+<?
+$this->addFile("css://adveventsbase:style-admin.less");
+?>
+<h1>Místa</h1>
+<div class="content-admin">
+   <?php
+   $placesOptions = '<option value="0" ' . ($this->get("filterPlace") == 0 ? 'selected="selected"' : '')
+       . ' >' . $this->tr('nezáleží') . '</option>';
+
+   foreach ($this->places as $place) {
+      $placesOptions .= '<option value="' . $place->getPK() . '" ' . ($this->get("filterPlace") == $place->getPK() ? 'selected="selected"' : '')
+          . ' >' . $place->{AdvEventsBase_Model_Places::COLUMN_NAME} . '</option>';
+   }
+
+   $locationsOptions = '<option value="0" ' . ($this->get("filterLocation") == 0 ? 'selected="selected"' : '')
+       . ' >' . $this->tr('nezáleží') . '</option>';
+
+   foreach ($this->locations as $loc) {
+      $locationsOptions .= '<option value="' . $loc->getPK() . '" ' . ($this->get("filterLocation") == $loc->getPK() ? 'selected="selected"' : '')
+          . ' >' . $loc->{AdvEventsBase_Model_Locations::COLUMN_NAME} . '</option>';
+   }
+   
+   $orgOptions = '<option value="0" ' . ($this->get("filterOrg") == 0 ? 'selected="selected"' : '')
+       . ' >' . $this->tr('nezáleží') . '</option>';
+   foreach ($this->organizers as $org) {
+      $orgOptions .= '<option value="' . $org->getPK() . '" ' . ($this->get("filterOrg") == $loc->getPK() ? 'selected="selected"' : '')
+          . ' >' . $org->{AdvEventsBase_Model_Organizers::COLUMN_NAME} . '</option>';
+   }
+
+   $this->moduleButtons = array(
+       array(
+           'link' => $this->link()->route('addEvent'),
+           'title' => $this->tr('Přidat novou událost'),
+           'icon' => 'plus',
+           'name' => $this->tr('Přidat událost')
+       ),
+       array(
+           'content' => '<form method="get" action="' . $this->link() . '" class="full-width">
+                        <label>Od:</label>
+                        <input type="text" size="10" name="filterDateFrom" value="' . ($this->get("filterDateFrom")) . '" />
+                        <label>Do:</label>
+                        <input type="text" size="10" name="filterDateTo" value="' . ($this->get("filterDateTo")) . '" />
+                        <label>Obsah:</label>
+                        <input type="text" size="40" name="filter" value="' . ($this->get("filter")) . '" />
+                        <label>Pouze neschválené</label>
+                        <input type="checkbox" name="filterNotApproved"  value="1" ' . ($this->get("filterNotApproved") == 1 ? 'checked="checked"' : '') . '/>
+                        <br />
+                        <label>Organizátor:</label>
+                        <select name="filterOrg">' . $orgOptions . '</select>
+                        <label>Místo:</label>
+                        <select name="filterPlace">' . $placesOptions . '</select>
+                        <label>Lokace:</label>
+                        <select name="filterLocation">' . $locationsOptions . '</select>
+                        <div class="pull-right">
+                        <button class="pull-right" type="submit"><span class="icon icon-search"></span> ' . $this->tr('filtrovat') . '</button>
+                        </div>
+                     </form>',
+           'fullwidth' => true,
+       ),
+   );
+   $this->includeTpl('modules/buttons.phtml', true);
+   ?>
+   <table class="table-advevents cubecms-widget cubecms-table">
+      <thead>
+         <tr class="cubecms-header">
+            <th class="id">ID</th>
+            <th>Stav</th>
+            <th><? ps($this->tr('Název')) ?></th>
+            <th><? ps($this->tr('Čas konání')) ?></th>
+            <th><? ps($this->tr('Místo')) ?></th>
+            <th></th>
+         </tr>
+      </thead>
+      <tbody class="cubecms-widget-content" id="events-scroll-area">
+         <?
+         if (!empty($this->events)) {
+            $linkPlaceDetail = Url_Link::getCategoryAdminLink(ADVEVENT_CAT_PALCES);
+            foreach ($this->events as $event) {
+               ?>
+               <tr id="<?= $event->getPK() ?>" class="cubecms-row">
+                  <td class="id"><?php ps($event->getPK()) ?></td>
+                  <td class="id">
+                     <a href="<?php echo $this->link()->route('eventAction', array('id' => $event->getPK())) ?>" class="button-change-state button-event-action" 
+                        data-icon-active='icon-check-square-o'
+                        data-icon-inactive='icon-square-o'
+                        data-action='changeState'
+                        ><span class="icon <?php echo $event->{AdvEventsBase_Model_Events::COLUMN_ACTIVE} ? 'icon-check-square-o' : 'icon-square-o' ?> "></span></a>
+                     <a href="<?php echo $this->link()->route('eventAction', array('id' => $event->getPK())) ?>" class="button-change-state button-event-action" 
+                        data-icon-active='icon-star'
+                        data-icon-inactive='icon-star-o'
+                        data-action='recommended'
+                        ><span class="icon <?php echo $event->{AdvEventsBase_Model_Events::COLUMN_RECOMMENDED} ? 'icon-star' : 'icon-star-o' ?> "></span></a>
+                  </td>
+                  <td class="">
+                     <div class="name">
+                        <a href="<?php echo $this->link()->route('editEvent', array('id' => $event->getPK())) ?>"><? ps($event->{AdvEventsBase_Model_Events::COLUMN_NAME}); ?></a>
+                              <?php if($event->{AdvEventsBase_Model_Events::COLUMN_APPROVED} == false){?>
+                        <span class="label label-warning"><?php ps($this->tr('Neschváleno')); ?></span>
+                              <?php } ?>
+                        <div class="organizator">
+                           <em>Pořádá: 
+                              <?php if ($event->{AdvEventsBase_Model_Organizers::COLUMN_NAME}) { ?>
+                                 <strong><?php ps($event->{AdvEventsBase_Model_Organizers::COLUMN_NAME}) ?></em></strong>
+                           <?php } else { ?>
+                              -- neznámý --
+                           <?php } ?>
+                        </div>
+                     </div>
+                  </td>
+                  <td class="event-dates">
+                     <ul class="fromto">
+                        <?php
+                        $times = $event->getTimesArray();
+                        $i = 1;
+                        foreach ($times as $time) {
+                           ?>
+                           <li class="<?php echo ($i >= 3 ? 'inactive' : '') ?>">
+                              <?php
+                              if ($time->{AdvEventsBase_Model_EventsTimes::COLUMN_TIME_BEGIN} != null) {
+                                 echo Utils_DateTime::fdate('%x, %G:%i', new DateTime($time->{AdvEventsBase_Model_EventsTimes::COLUMN_DATE_BEGIN} . ' ' . $time->{AdvEventsBase_Model_EventsTimes::COLUMN_TIME_BEGIN}));
+                              } else {
+                                 echo Utils_DateTime::fdate('%x', new DateTime($time->{AdvEventsBase_Model_EventsTimes::COLUMN_DATE_BEGIN}));
+                              }
+                              if ($time->{AdvEventsBase_Model_EventsTimes::COLUMN_DATE_END} != null) {
+                                 echo Utils_DateTime::fdate(' - %x', new DateTime($time->{AdvEventsBase_Model_EventsTimes::COLUMN_DATE_END}));
+                              }
+                              if ($time->{AdvEventsBase_Model_EventsTimes::COLUMN_TIME_END} != null) {
+                                 if ($time->{AdvEventsBase_Model_EventsTimes::COLUMN_DATE_END} != null) {
+                                    echo ', ';
+                                 } else {
+                                    echo ' - ';
+                                 }
+                                 echo Utils_DateTime::fdate('%G:%i', new DateTime($time->{AdvEventsBase_Model_EventsTimes::COLUMN_TIME_END}));
+                              }
+                              if ($time->{AdvEventsBase_Model_EventsTimes::COLUMN_NOTE} != null) {
+                                 echo ' - <span class="note">' . $time->{AdvEventsBase_Model_EventsTimes::COLUMN_NOTE} . '</span>';
+                              }
+                              ?>
+                           </li>
+                           <?php
+                           $i++;
+                        }
+//                     $date = new DateTime($time->{AdvEventsBase_Model_EventsTimes::COLUMN_DATE_BEGIN} . ' ' . $time->{AdvEventsBase_Model_EventsTimes::COLUMN_TIME_BEGIN});
+//                     echo $time->{AdvEventsBase_Model_EventsTimes::COLUMN_TIME_BEGIN} != null ? Utils_DateTime::fdate('%x, %G:%i', $date) : Utils_DateTime::fdate('%x', $date);
+                        ?>
+                        <?php if ($i > 4) { ?>
+                           <li><a href="" class="button-show-more-dates">Zobrazit další</a></li>
+                        <?php } ?>
+                     </ul>
+                  </td>
+                  <td>
+                     <a class="button-show-place-detail" 
+                        href="<?php echo $linkPlaceDetail->route('detailPlace', array('id' => $event->{AdvEventsBase_Model_Events::COLUMN_ID_PLACE})) ?>"
+                        ><?php ps($event->{AdvEventsBase_Model_Places::COLUMN_NAME}) ?></a><br />
+                     <small><?php ps($event->{AdvEventsBase_Model_Locations::COLUMN_NAME}) ?></small>
+                  </td>
+                  <td>
+                     <?
+                     $event->toolbox->setTemplate(Template_Toolbox2::TEMPLATE_INLINE);
+                     echo $event->toolbox;
+                     ?>
+                  </td>
+               </tr>
+               <?
+            }
+         } else {
+            ?>
+            <tr class="cubecms-row state-inactive">
+               <td colspan="6"><? ps($this->tr('Nebyla nalezena žádná událost')) ?></td>
+            </tr>
+            <?
+         }
+         ?>
+      </tbody>
+      <tfoot class="cubecms-widget-footer">
+         <tr class="cubecms-row"><td colspan="6" class="scroll ajax-scroll" data-scroll-target="#events-scroll-area" ><? echo $this->scroll ?></td></tr>
+      </tfoot>
+   </table>
+
+   <?php
+   $this->includeFile('tpl://engine:components/modal.phtml', array('content' => '', 'id' => 'modal-place-detail',
+       'header' => 'Místo',
+       'close' => true,
+       'large' => true,
+       'footer' => '<button class="btn btn-default close-modal">Zavřít</button>'));
+   ?>
+
+   <?php
+   $this->addJsPlugin(new JsPlugin_BootstrapDatepicker());
+   $this->addJsPlugin(new JsPlugin_PrettyPhoto());
+   Template::addJS('https://maps.googleapis.com/maps/api/js?key=' . IC_GMAPS_KEY . '&signed_in=true'); // mapa
+   ?>
+   <script type="text/javascript">
+      $(document).ready(function () {
+         $('.ajax-scroll').on('click', 'a', function () {
+            var $that = $(this);
+            var selector = $(this).closest('.ajax-scroll').data('scroll-target');
+            history.pushState({page: $that.data('page')}, "Stránka", $that.prop('href'));
+            $('html, body').animate({
+               scrollTop: $(selector).closest('.main-content').offset().top
+            }, 1000);
+            // load ajax
+            $.ajax({
+               url: $that.prop('href'),
+               success: function (data) {
+                  var $cnt = $('<div></div>').html(data);
+
+                  $(selector).html($cnt.find(selector).html());
+                  $that.closest('.ajax-scroll').html($cnt.find('.ajax-scroll').html());
+
+               }
+            });
+            return false;
+         });
+
+         var dateOpts = {
+            locale: 'cs',
+            icons: {
+               time: 'icon icon-time',
+               date: 'icon icon-calendar',
+               up: 'icon icon-chevron-up',
+               down: 'icon icon-chevron-down',
+               previous: 'icon icon-chevron-left',
+               next: 'icon icon-chevron-right',
+               today: 'icon icon-screenshot',
+               clear: 'icon icon-trash',
+               close: 'icon icon-remove'
+            },
+            format: 'L'
+         };
+         $('input[name="filterDateFrom"]').datetimepicker(dateOpts);
+         $('input[name="filterDateTo"]').datetimepicker(dateOpts);
+
+         /* Detail místa */
+         $('.button-show-place-detail').on('click', function (e) {
+            e.preventDefault();
+            var $that = $(this);
+            // ajax load and place to modal
+            var $modal = $('#modal-place-detail');
+
+            $.ajax({
+               url: $that.prop('href'),
+               success: function (data) {
+                  var $html = $('<div></div>').html(data);
+                  $('.cubecms-modal-title', $modal).html($html.find('h1').text());
+                  $('.cubecms-modal-content', $modal).html($html.find('.place-content').html());
+                  $("a[rel^='lightbox']", $modal).prettyPhoto();
+               }
+            });
+            $modal.show();
+            return false;
+         });
+
+         $('.button-event-action').on('click', function (e) {
+            e.preventDefault();
+            var $that = $(this);
+            $.ajax({
+               url: $that.prop('href'), method: 'POST', data: {action: $that.data('action')},
+               success: function (data) {
+                  if (data.success === true) {
+                     $that.find('.icon').removeClass().addClass('icon')
+                        .addClass(data.state == true ? $that.data('icon-active') : $that.data('icon-inactive'));
+                  }
+//                  change icon by state
+               }
+            });
+            return false;
+         });
+
+      });
+   </script>
+</div>

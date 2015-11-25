@@ -1,0 +1,39 @@
+<?php
+$this->addFile("css://adveventsbase:style-admin.less");
+?>
+<h1><?php ps($this->organizator->{AdvEventsBase_Model_Organizers::COLUMN_NAME}) ?></h1>
+<div class="content-admin organizator-content">
+   <div class="row">
+      <div class="col-md-12">
+         <h3>Adresa</h3>
+         <?php echo $this->organizator->{AdvEventsBase_Model_Organizers::COLUMN_ADDRESS} ?>
+         <?php if($this->organizator->{AdvEventsBase_Model_Organizers::COLUMN_NOTE}){ ?>
+         <h3>Poznámka</h3>
+         <?php } ?>
+         <h3>Odkazy</h3>
+         <?php echo $this->organizator->{AdvEventsBase_Model_Organizers::COLUMN_NOTE} ?>
+         <ul class="unstyled">
+            <?php if($this->organizator->{AdvEventsBase_Model_Organizers::COLUMN_URL}){ ?>
+               <li><a href="<?php echo $this->organizator->{AdvEventsBase_Model_Organizers::COLUMN_URL}?>" class="link-external"
+                      ><span class="icon icon-globe icon-fw"></span> <?php echo $this->organizator->{AdvEventsBase_Model_Organizers::COLUMN_URL}?></a></li>
+            <?php } ?>
+            <?php if($this->organizator->{AdvEventsBase_Model_Organizers::COLUMN_URL_FCB}){ ?>
+                      <li><a href="<?php echo $this->organizator->{AdvEventsBase_Model_Organizers::COLUMN_URL_FCB}?>" class="link-external"
+                      ><span class="icon icon-facebook icon-fw"></span> <?php echo $this->organizator->{AdvEventsBase_Model_Organizers::COLUMN_URL_FCB}?></a></li>
+            <?php } ?>
+            <?php if($this->organizator->{AdvEventsBase_Model_Organizers::COLUMN_URL_TWITTER}){ ?>
+               <li><a href="<?php echo $this->organizator->{AdvEventsBase_Model_Organizers::COLUMN_URL_TWITTER}?>" class="link-external"
+                      ><span class="icon icon-twitter icon-fw"></span> <?php echo $this->organizator->{AdvEventsBase_Model_Organizers::COLUMN_URL_TWITTER}?></a></li>
+            <?php } ?>
+            <?php if($this->organizator->{AdvEventsBase_Model_Organizers::COLUMN_URL_YOUTUBE}){ ?>
+               <li><a href="<?php echo $this->organizator->{AdvEventsBase_Model_Organizers::COLUMN_URL_YOUTUBE}?>" class="link-external"
+                      ><span class="icon icon-youtube icon-fw"></span> <?php echo $this->organizator->{AdvEventsBase_Model_Organizers::COLUMN_URL_YOUTUBE}?></a></li>
+            <?php } ?>
+         </ul>
+      </div>
+   </div>
+</div>
+<div class="content-admin edit-buttons">
+   <button class="btn btn-default">Upravit</button>
+   <button class="btn btn-danger">Smazat</button>
+</div>

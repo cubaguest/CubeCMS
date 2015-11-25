@@ -1,0 +1,45 @@
+<div class="container">
+   <div data-autoplay="true" 
+        data-transitiontime="1000" 
+        data-parallax-direction="-1" 
+        data-parallax="true" 
+        data-spy="responsive-slider" 
+        class="responsive-slider-parallax slider">
+      <div data-group="slides" class="slides-container" >
+         <ul class="">
+            <?php
+            $link = Url_Link::getCategoryLink(3);
+            foreach ($this->events as $event) {
+               ?>
+               <li>
+                  <div data-group="slide" class="slide-body">
+                     <div class="wrapper">
+                        <div data-length="300" data-delay="0" data-animate="slideAppearRightToLeft" class="caption header">
+                           <a href="<?php echo $link->route('detail', array('id' => $event->getPK())) ?>">
+                              <img src="<?php echo Utils_Image::cache($event->getHomePageImage(), 1140, 350) ?>" 
+                                   alt="<?php psa($event->{AdvEventsBase_Model_Events::COLUMN_NAME}) ?>" />
+                           </a>
+                        </div>
+                     </div>
+                  </div>
+               </li>
+               <?php
+            }
+            ?>
+         </ul>
+      </div>
+      <a data-jump="prev" href="#" class="slider-control left hidden-xs hidden-sm"><i class="icon icon-angle-left"></i></a>
+      <a data-jump="next" href="#" class="slider-control right hidden-xs hidden-sm"><i class="icon icon-angle-right"></i></a>
+      <div class="pages-wrapper background-black">
+         <ol class="pages">
+            <?php
+            foreach ($this->events as $key => $event) {
+               ?>
+               <li><a data-jump-to="<?php echo $key + 1 ?>" class=""><?php echo $key + 1 ?></a></li>
+               <?php
+            }
+            ?>
+         </ol>
+      </div>
+   </div> 
+</div>
