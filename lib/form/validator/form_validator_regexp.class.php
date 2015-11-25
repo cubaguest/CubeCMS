@@ -12,7 +12,7 @@ class Form_Validator_Regexp extends Form_Validator implements Form_Validator_Int
    const PHONE = 1;
    
    
-   const REGEXP_PHONE_CZSK = '/^\(+42[01]{1}[ ]?)?([0-9]{3})[ ]?([0-9]{3})[ ]?([0-9]{3})$/';
+   const REGEXP_PHONE_CZSK = '/^(\+42[01]{1}[ ]?)?([0-9]{3})[ ]?([0-9]{3})[ ]?([0-9]{3})$/';
    const REGEXP_PHONE_ES = '/^(\+34)?[ ]?[0-9][ ]?[0-9][ ]?[0-9][ ]?[0-9][ ]?[0-9][ ]?[0-9][ ]?[0-9][ ]?[0-9][ ]?[0-9][ ]?$/';
 
    private $regexp = null;
