@@ -704,6 +704,9 @@ CubeCMS.Popup = {
              return false;
           });
        });
+       $('body.popup .button-cancel').click(function(){
+          window.close();
+       });
     },
     openPopup : function(url, title, w, h){
        // Fixes dual-screen position                         Most browsers      Firefox
