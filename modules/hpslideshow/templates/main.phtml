@@ -1,4 +1,4 @@
-<?php 
+<?php
 $this->addFile("css://style.less");
 
 $jq = new JsPlugin_JQuery();
@@ -7,105 +7,112 @@ $jq->addUISortable();
 $jq->addJQPlugin('cookie');
 $this->addJsPlugin($jq);
 $this->addJsPlugin(new JsPlugin_JQueryCSS());
-
 ?>
-<h1><?php echo $this->category()->getName();?></h1>
+<h1><?php echo $this->category()->getName(); ?></h1>
 <div class="content-admin">
    <div id="form-upload">
-      <?php 
+      <?php
       echo $this->formUpload;
       ?>
    </div>
-   <h2><?php ps($this->tr('Nahrané obrázky'))?></h2>
-   <?php if(!empty($this->images)){?>
-      <ul id="images-list" class="ui-widget ui-cube-widget">
-         <?php foreach ($this->images as $img) {?>
-         <li class="ui-widget-content ui-state-default slide-image-row" id="image-<?php echo $img->getPK()?>" data-id="<?php echo $img->getPK()?>">
-            <ul class="tabs-links clearfix">
-               <li><a class="tab-link" href="<?php echo $this->link()?>#preview-<?php echo $img->getPK()?>"><?php ps($this->tr('Náhled'))?></a></li>
-               <li><a class="tab-link" href="<?php echo $this->link()?>#edit-<?php echo $img->getPK()?>"><?php ps($this->tr('Úprava'))?></a></li>
-            </ul>
-            <div class="tab tab-preview" id="preview-<?php echo $img->getPK()?>">
-               <img class="image-slide" src="<?php echo $this->imagesUrl.$img->{HPSlideShow_Model::COLUMN_FILE}?>?t=<?php time()?>" />
-               <?if((string)$img->{HPSlideShow_Model::COLUMN_LABEL} != null){?>
-                  <div class="image-label"><?echo vve_get_lang_string($img->{HPSlideShow_Model::COLUMN_LABEL})?></div>
-               <?}?>
-               <div class="link-info">
-               <?php if((string)$img->{HPSlideShow_Model::COLUMN_LINK} != null){?>
-                  <?php ps($this->tr('Odkaz na'))?>:
-                   <a href="<?php echo $img->{HPSlideShow_Model::COLUMN_LINK}?>" class="link-external"><?php ps($img->{HPSlideShow_Model::COLUMN_LINK})?></a>
-               <?php } else if($img->{HPSlideShow_Model::COLUMN_ID_CAT} != 0){?>
-                   <?php ps($this->tr('Odkaz na kategorie'))?>:
-                  <a href="<?php echo $this->link()->clear()->category($img->{Model_Category::COLUMN_URLKEY})?>" class="link-external">
-                     <?php ps($img->{Model_Category::COLUMN_NAME});?>
-                  </a>
-               <?php } else {?>
-                  <?php ps($this->tr('Nemá proklik'))?>.
-               <?php }?>
+   <h2><?php ps($this->tr('Nahrané obrázky')) ?></h2>
+   <?php if (!empty($this->images)) { ?>
+      <div id="images-list" class="cubecms-list cubecms-list-blocks">
+         <?php foreach ($this->images as $img) { ?>
+            <div class="cubecms-list-row slide-image-row cubecms-tabs" id="image-<?php echo $img->getPK() ?>" data-id="<?php echo $img->getPK() ?>">
+               <ul class="nav nav-tabs" role="tablist">
+                  <li role="presentation" class="active">
+                     <a aria-controls="preview-<?php echo $img->getPK() ?>" role="tab" data-toggle="tab"
+                        href="<?php echo $this->link() ?>#preview-<?php echo $img->getPK() ?>"><?php ps($this->tr('Náhled')) ?></a></li>
+                  <li role="presentation" >
+                     <a aria-controls="preview-<?php echo $img->getPK() ?>" role="tab" data-toggle="tab"
+                        href="<?php echo $this->link() ?>#edit-<?php echo $img->getPK() ?>"
+                        ><?php ps($this->tr('Úprava')) ?></a></li>
+                  <li class="tab-tools" >
+                     <a href="#" style="cursor: ns-resize;">
+                        <span class="button-move"><span class="icon  icon-fw icon-arrows-v"></span></span>
+                     </a>
+                     <a class="button-changestate" data-id="<?php echo $img->getPK() ?>" href="<?php echo $this->link() ?>#changestate-<?php echo $img->getPK() ?>">
+                        <span class="icon icon-fw <?php echo $img->{HPSlideShow_Model::COLUMN_ACTIVE} ? 'icon-check-square-o' : 'icon-square-o' ?>"></span></a>
+                     <a class="button-delete" data-id="<?php echo $img->getPK() ?>" href="<?php echo $this->link() ?>#delete-<?php echo $img->getPK() ?>">
+                        <span class="icon icon-fw icon-remove text-danger"></span></a>
+                  </li>
+               </ul>
+               <div class="tab-content">
+                  <div role="tabpanel" class="tab-pane active" id="preview-<?php echo $img->getPK() ?>">
+                     <img class="image-slide img-responsive" src="<?php echo $this->imagesUrl . $img->{HPSlideShow_Model::COLUMN_FILE} ?>?t=<?php time() ?>" />
+                     <?if((string)$img->{HPSlideShow_Model::COLUMN_LABEL} != null){?>
+                     <div class="image-label"><?echo vve_get_lang_string($img->{HPSlideShow_Model::COLUMN_LABEL})?></div>
+                     <?}?>
+                     <div class="link-info">
+                        <?php if ((string) $img->{HPSlideShow_Model::COLUMN_LINK} != null) { ?>
+                           <?php ps($this->tr('Odkaz na')) ?>:
+                           <a href="<?php echo $img->{HPSlideShow_Model::COLUMN_LINK} ?>" class="link-external"><?php ps($img->{HPSlideShow_Model::COLUMN_LINK}) ?></a>
+                        <?php } else if ($img->{HPSlideShow_Model::COLUMN_ID_CAT} != 0) { ?>
+                           <?php ps($this->tr('Odkaz na kategorie')) ?>:
+                           <a href="<?php echo $this->link()->clear()->category($img->{Model_Category::COLUMN_URLKEY}) ?>" class="link-external">
+                              <?php ps($img->{Model_Category::COLUMN_NAME}); ?>
+                           </a>
+                        <?php } else { ?>
+                           <?php ps($this->tr('Nemá proklik')) ?>.
+                        <?php } ?>
+                     </div>
+                  </div>
+                  <div role="tabpanel" class="tab-pane" id="edit-<?php echo $img->getPK() ?>">
+                     <?php
+                     $this->formEdit->setAction($this->link()->anchor('image-' . $img->getPK()));
+                     $this->formEdit->html()->addClass('form-edit-image');
+                     $this->formEdit->id->setValues($img->{HPSlideShow_Model::COLUMN_ID});
+                     $this->formEdit->catId->setValues($img->{HPSlideShow_Model::COLUMN_ID_CAT});
+                     $this->formEdit->link->setValues($img->{HPSlideShow_Model::COLUMN_LINK});
+                     $this->formEdit->label->setValues($img->{HPSlideShow_Model::COLUMN_LABEL});
+                     echo $this->formEdit;
+                     ?>
+                  </div>
+               </div>
+               <div class="slide-buttons">
+
                </div>
             </div>
-            <div class="tab" id="edit-<?php echo $img->getPK()?>">
-               <?php 
-               $this->formEdit->setAction($this->link()->anchor('image-'.$img->getPK()));
-               $this->formEdit->html()->addClass('form-edit-image');
-               $this->formEdit->id->setValues($img->{HPSlideShow_Model::COLUMN_ID});
-               $this->formEdit->catId->setValues($img->{HPSlideShow_Model::COLUMN_ID_CAT});
-               $this->formEdit->link->setValues($img->{HPSlideShow_Model::COLUMN_LINK});
-               $this->formEdit->label->setValues($img->{HPSlideShow_Model::COLUMN_LABEL});
-               echo $this->formEdit;
-               ?>
-            </div>
-            <div class="slide-buttons">
-               <span class="button-move"><img src="images/icons/arrow_up_down.png" /></span>
-               <a class="button-changestate" data-id="<?php echo $img->getPK()?>" href="<?php echo $this->link()?>#changestate-<?php echo $img->getPK()?>"><img
-                       src="images/icons/<?php echo $img->{HPSlideShow_Model::COLUMN_ACTIVE} ? 'enable.png' : 'disable.png'?>" /></a>
-               <a class="button-delete" data-id="<?php echo $img->getPK()?>" href="<?php echo $this->link()?>#delete-<?php echo $img->getPK()?>"><img src="images/icons/cancel.png" /></a>
-            </div>
-         </li>
-         <?php }?>
-      </ul>
+         <?php } ?>
+      </div>
       <script type="text/javascript">
-         $(document).ready(function(){
-            $( "#images-list>li" ).each(function(){
-               var id = $(this).prop('id');
-               $(this).tabs({
-                  active   : $.cookie('hpslideshowactivetab'+id),
-                  activate : function( event, ui ){
-                      $.cookie( 'hpslideshowactivetab'+id, ui.newTab.index(),{expires : 10});
-                  }
-               });
-            });
-            $( "#images-list" ).sortable({
-               placeholder: "ui-state-highlight",
+         $(document).ready(function () {
+   //            $('.cubecms-tabs .nav-tabs a').click(function (e) {
+   //              e.preventDefault();
+   //              $(this).tab('show');
+   //            });
+            $("#images-list").sortable({
+               placeholder: "cubecms-state-highlight",
                axis: "y",
                forceHelperSize: true,
                forcePlaceholderSize: true,
-               handle : ".button-move",
-               update : function( event, ui ){
+               handle: ".button-move",
+               update: function (event, ui) {
                   $.ajax({
-                     type : 'POST', url : "<?php echo $this->link()->route('editImage')?>",
-                     data : {action : 'changepos', id : ui.item.data('id'), pos : ui.item.index()+1},
-                     success : function(data){
-                        if(data.errmsg.length != 0){
-                           alert('Chyba při přesunu: '+data.errmsg.join(";"));
+                     type: 'POST', url: "<?php echo $this->link()->route('editImage') ?>",
+                     data: {action: 'changepos', id: ui.item.data('id'), pos: ui.item.index() + 1},
+                     success: function (data) {
+                        if (data.errmsg.length != 0) {
+                           alert('Chyba při přesunu: ' + data.errmsg.join(";"));
                         }
                      }
                   });
                }
             });
-
-            $('.button-delete').click( function (){
-               if(!confirm('<?php ps($this->tr('Opravdu smazat obrázek?'))?>')){
-                   return false;
+   //
+            $('.button-delete').click(function () {
+               if (!confirm('<?php ps($this->tr('Opravdu smazat obrázek?')) ?>')) {
+                  return false;
                }
                var $li = $(this).closest('li.slide-image-row');
                var id = $(this).data("id");
                $.ajax({
                   type: "POST",
-                  url: "<?php echo $this->link()->route('editImage')?>",
-                  data: {action : "delete", id : id},
-                  success : function(data){
-                     $li.fadeOut(300, function(){
+                  url: "<?php echo $this->link()->route('editImage') ?>",
+                  data: {action: "delete", id: id},
+                  success: function (data) {
+                     $li.fadeOut(300, function () {
                         $(this).remove();
                      });
                   }
@@ -113,21 +120,20 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
                return false;
             });
 
-            $('.button-changestate').click( function (){
+            $('.button-changestate').click(function () {
                var id = $(this).data("id");
                var $this = $(this);
                $.ajax({
                   type: "POST",
-                  url: "<?php echo $this->link()->route('editImage')?>",
-                  data: {action : "changestate", id : id},
-                  success : function(data){
-                     var $img = $('img', $this);
-                     if($img.attr('src').indexOf('enable') === -1){
-                        $img.attr('src', $img.attr('src').replace('disable', 'enable'))
+                  url: "<?php echo $this->link()->route('editImage') ?>",
+                  data: {action: "changestate", id: id},
+                  success: function (data) {
+                     var $span = $('span', $this).removeClass('icon-check-square-o icon-square-o');
+                     if(data.state === true){
+                        $span.addClass('icon-check-square-o');
                      } else {
-                        $img.attr('src', $img.attr('src').replace('enable', 'disable'))
+                        $span.addClass('icon-square-o');
                      }
-
                   }
                });
                return false;
@@ -138,7 +144,7 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
       </script>
    <?php } else { ?>
       <div class="admin-info-text">
-         <?php ps($this->tr('Naní nahrán žádný obrázek'))?>
+         <?php ps($this->tr('Naní nahrán žádný obrázek')) ?>
       </div>
-   <?php }?>
+   <?php } ?>
 </div>

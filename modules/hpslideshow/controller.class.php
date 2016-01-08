@@ -162,6 +162,7 @@ class HPSlideShow_Controller extends Controller {
          $rec = $model->record($this->getRequestParam('id'));
          $rec->{HPSlideShow_Model::COLUMN_ACTIVE} = !$rec->{HPSlideShow_Model::COLUMN_ACTIVE};
          $rec->save();
+         $this->view()->state = $rec->{HPSlideShow_Model::COLUMN_ACTIVE};
          $this->infoMsg()->addMessage($this->tr('Stav byl uložen'));
          $this->link()->redirect();
       }
