@@ -385,7 +385,7 @@ class File extends TrObject implements File_Interface {
    /**
     * Metoda odešle zadaný soubor ke klientu
     */
-   public function send($forceDownload = false, $alternateName = null)
+      public function send($forceDownload = false, $alternateName = null)
    {
       $fileName = ($alternateName == null ? $this->getName() : $alternateName);
       if ($this->exist()) {
@@ -394,6 +394,8 @@ class File extends TrObject implements File_Interface {
          header('Content-Type: application/octet-stream');
          if($forceDownload){
             header('Content-Disposition: attachment; filename='.$fileName);
+         } else {
+            header('Content-Disposition: inline; filename='.$fileName);
          }
 
          header('Content-Transfer-Encoding: binary');
@@ -409,6 +411,8 @@ class File extends TrObject implements File_Interface {
          header('Content-Type: application/octet-stream');
          if($forceDownload){
             header('Content-Disposition: attachment; filename='.$fileName);
+         } else {
+            header('Content-Disposition: inline; filename='.$fileName);
          }
          header('Content-Transfer-Encoding: binary');
          header('Expires: 0');
