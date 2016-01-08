@@ -7,5 +7,14 @@
       border-right: 1px solid @nav-tabs-border-color;
       .border-bottom-radius(@border-radius-base);
    }
+   .tab-tools {
+      >a, >span {
+         display: inline-block;
+      }
+      .nav > li > a:focus {
+         background-color: transparent;
+      }
+      float: right;
+   }
    margin-bottom: @padding-large;
 }
