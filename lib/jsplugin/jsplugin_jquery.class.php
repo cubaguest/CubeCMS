@@ -88,7 +88,7 @@ class JsPlugin_JQuery extends JsPlugin {
    protected function addJs($name) {
       if (defined('VVE_ALLOW_EXTERNAL_JS') AND VVE_ALLOW_EXTERNAL_JS == true AND VVE_DEBUG_LEVEL <= 1 AND !in_array($name, $this->plugins)) {
 //         $this->addFile("http://ajax.googleapis.com/ajax/libs/jqueryui/" . self::JQUERY_UI_VERSION . "/jquery-ui.min.js");
-         $this->addFile("http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js");
+         $this->addFile(Url_Request::getTransferProtocol()."ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js");
       } else {
 //         $this->addFile(new JsPlugin_JsFile("jquery.$name.min.js"));
          $this->addFile(new JsPlugin_JsFile("jquery-ui.min.js"));
@@ -99,7 +99,7 @@ class JsPlugin_JQuery extends JsPlugin {
    protected function setFiles() {
 //		Přidání js soubrů pluginu
       if (defined('VVE_ALLOW_EXTERNAL_JS') AND VVE_ALLOW_EXTERNAL_JS == true AND VVE_DEBUG_LEVEL <= 1) {
-         $this->addFile("http://ajax.googleapis.com/ajax/libs/jquery/" . self::JQUERY_VERSION . "/jquery.min.js");
+         $this->addFile(Url_Request::getTransferProtocol()."ajax.googleapis.com/ajax/libs/jquery/" . self::JQUERY_VERSION . "/jquery.min.js");
       } else {
          $this->addFile(new JsPlugin_JsFile("jquery-" . self::JQUERY_VERSION . ".min.js"));
       }
@@ -468,4 +468,3 @@ class JsPlugin_JQuery extends JsPlugin {
    }
 
 }
-?>

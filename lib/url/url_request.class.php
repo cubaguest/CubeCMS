@@ -541,6 +541,15 @@ class Url_Request {
    }
    
    /**
+    * MNetoda vrátí přenosový protokol (http:// nebo https://)
+    * @return string
+    */
+   public static function getTransferProtocol()
+   {
+      return self::$transferProtocol;
+   }
+   
+   /**
     * Metoda vrací jestli se zpracovává celá celá stránka, nebo jenom část
     * @return bool -- true pokud je zpracovávána stránka
     */
