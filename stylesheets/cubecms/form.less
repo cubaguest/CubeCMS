@@ -24,23 +24,30 @@ input[type="image"],input[type="checkbox"],input[type="radio"] {
    border: 0;
    background-color:transparent;
 }
+input[type="submit"], input[type="reset"], input[type="button"], button, a.form-button, .button {
+   &:not(.btn) {
+      color: @form-color-text;
+   }
+}
 input[type="submit"], input[type="reset"], input[type="button"], button, a.form-button, .button, .btn {
    &:hover {
-      color: @form-color-text-hover;
+      &, span.icon {
+         color: @form-color-text-hover;
+      }
       border-color: @form-color-bg-hover;
       background-color: @form-color-bg-hover;
       text-decoration: none;
    }
    &.button-ok, &.btn-success {
       &:hover {
-         background-color: @form-color-bg-green;
-         border-color: @form-color-bg-green;
+         background-color: darken(@form-color-bg-green, 10%);
+         border-color: darken(@form-color-bg-green, 10%);
       }
    }
    &.button-cancel, &.btn-danger, input[type="reset"], button[type="reset"], .button-warning, .exclusive {
       &:hover {
-         background-color: @form-color-bg-red;
-         border-color: @form-color-bg-red;
+         background-color: darken(@form-color-bg-red, 10%);
+         border-color: darken(@form-color-bg-red, 10%);
       }
    }
    .rounded-corners(4px);
@@ -203,10 +210,12 @@ form {
    }
    &.form-vertical {
       .form-group {
+         .form-labels:not([class*="col-"]),
          .form-labels {
             width: 100%;
             float: none;
          }
+         .form-controls:not([class*="col-"]),
          .form-controls {
             width: 100%;
             float: none;
