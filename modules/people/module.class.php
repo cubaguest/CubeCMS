@@ -1,5 +1,5 @@
 <?php
 
 class People_Module extends Module {
-   protected $version = '1.2.0';
+   protected $version = '2.0.0';
 }

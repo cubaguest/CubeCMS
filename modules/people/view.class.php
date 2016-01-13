@@ -6,6 +6,10 @@ class People_View extends View {
       if($this->category()->getRights()->isWritable()) {
          $toolbox = new Template_Toolbox2();
 
+         $toolEditText = new Template_Toolbox2_Tool_PostRedirect('edit_text', $this->tr('Upravit text'), $this->link()->route('editText'));
+         $toolEditText->setIcon(Template_Toolbox2::ICON_PAGE_EDIT)->setTitle($this->tr("Upravit úvodní text"));
+         $toolbox->addTool($toolEditText);
+         
          $toolAdd = new Template_Toolbox2_Tool_PostRedirect('person_add', $this->tr('Přidat osobu'), $this->link()->route('add'));
          $toolAdd->setIcon(Template_Toolbox2::ICON_ADD)->setTitle($this->tr("Přidat novou osobu"));
          $toolbox->addTool($toolAdd);
@@ -62,5 +66,9 @@ class People_View extends View {
       $this->template()->addFile('tpl://edit_order.phtml');
    }
 
-
+   public function editTextView() {
+      $this->setTinyMCE($this->form->text, 'advanced');
+      $this->template()->addFile('tpl://edittext.phtml');
+      Template::setFullWidth(true);
+   }
 }

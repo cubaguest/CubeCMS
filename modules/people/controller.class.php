@@ -70,6 +70,12 @@ class People_Controller extends Controller {
 
       $this->view()->compScroll = $scrollComponent;
       $this->view()->people = $model->records();
+      
+      // načtení textu
+      $textM = new Text_Model();
+      $textRecord = $textM->where(Text_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Text_Model::COLUMN_SUBKEY.' = :subkey', 
+         array('idc' => $this->category()->getId(), 'subkey' => Text_Controller::TEXT_MAIN_KEY) )->record();
+      $this->view()->text = $textRecord;
    }
 
    /**
@@ -139,7 +145,7 @@ class People_Controller extends Controller {
       $person->{People_Model::COLUMN_DEGREE} = $form->degree->getValues();
       $person->{People_Model::COLUMN_DEGREE_AFTER} = $form->degreeAfter->getValues();
       $person->{People_Model::COLUMN_TEXT} = $form->text->getValues();
-      $person->{People_Model::COLUMN_TEXT_CLEAR} = strip_tags($form->text->getValues());
+      $person->{People_Model::COLUMN_TEXT_CLEAR} = Utils_Html::stripTags($form->text->getValues());
       $person->{People_Model::COLUMN_AGE} = $form->age->getValues();
       $person->{People_Model::COLUMN_LABEL} = $form->label->getValues();
       $person->{People_Model::COLUMN_EMAIL} = $form->email->getValues();
@@ -201,6 +207,7 @@ class People_Controller extends Controller {
       $form->addElement($iLabel, $gbase);
 
       $iText = new Form_Element_TextArea('text', $this->tr('Popis'));
+      $iText->setLangs();
       $iText->addValidation(New Form_Validator_NotEmpty());
       $form->addElement($iText, $gbase);
 
@@ -289,6 +296,48 @@ class People_Controller extends Controller {
       $this->view()->form = $form;
    }
 
+   public function editTextController() {
+      $this->checkControllRights();
+      $form = new Form('list_text_', true);
+      
+      $textM = new Text_Model();
+      $textRecord = $textM->where(Text_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Text_Model::COLUMN_SUBKEY.' = :subkey', 
+         array('idc' => $this->category()->getId(), 'subkey' => Text_Controller::TEXT_MAIN_KEY) )->record();
+
+      $elemText = new Form_Element_TextArea('text', $this->tr('Text'));
+      $elemText->setLangs();
+      if($textRecord != false){
+         $elemText->setValues($textRecord->{Text_Model::COLUMN_TEXT});
+      }
+      $form->addElement($elemText);
+
+      $elemS = new Form_Element_SaveCancel('save');
+      $form->addElement($elemS);
+
+      if($form->isSend() AND $form->save->getValues() == false){
+         $this->infoMsg()->addMessage($this->tr('Úpravy úvodního textu byly zrušeny'));
+         $this->link()->route()->redirect();
+      }
+
+      if($form->isValid()) {
+         if($textRecord == false){
+            $textRecord = $textM->newRecord();
+         }
+         
+         $textRecord->{Text_Model::COLUMN_TEXT} = $form->text->getValues(); 
+         $textRecord->{Text_Model::COLUMN_TEXT_CLEAR} = vve_strip_tags($form->text->getValues()); 
+         $textRecord->{Text_Model::COLUMN_ID_CATEGORY} = $this->category()->getId(); 
+         $textRecord->{Text_Model::COLUMN_SUBKEY} = Text_Controller::TEXT_MAIN_KEY; 
+         
+         $textM->save($textRecord);
+
+         $this->infoMsg()->addMessage($this->tr('Úvodní text byl uložen'));
+         $this->link()->route()->redirect();
+      }
+
+      $this->view()->form = $form;
+   }
+   
 
    /**
     * Smazání článků při odstranění kategorie
