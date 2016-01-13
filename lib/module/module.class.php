@@ -229,10 +229,10 @@ class Module
                }
             }
          }
-         $phpFiles = glob($updateDir."*_post.php");
+         $phpFiles = glob($updateDir."*_pre.php");
          if(is_array($phpFiles) && sizeof($phpFiles) > 0){
             foreach ($phpFiles as $filename) {
-               $version = str_replace("_post.php", "", basename($filename));
+               $version = str_replace("_pre.php", "", basename($filename));
                if(version_compare($version, $currentVersion) == 1){
                   $versions[$version] = null;
                }
