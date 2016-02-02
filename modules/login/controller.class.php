@@ -226,6 +226,9 @@ class Login_Controller extends Controller {
 
       $eUsername = new Form_Element_Text('username', $this->tr('Uživatelské jméno'));
       $eUsername->addValidation(new Form_Validator_NotEmpty());
+      if($this->getRequestParam('login')){
+         $eUsername->setValues($this->getRequestParam('login'));
+      }
       $form->addElement($eUsername);
 
       $elemSubmit = new Form_Element_SaveCancel('restore', array($this->tr('Zaslat'), $this->tr('Zrušit')));
