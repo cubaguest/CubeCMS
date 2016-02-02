@@ -322,10 +322,10 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * @return Form_Element -- vrací samo sebe
     */
    public function setLangs($langs = null) {
+      $this->isMultilang = $langs === false ? false : true;
       if($langs == null) {
          $langs = Locales::getAppLangsNames();
       }
-      $this->isMultilang = true;
       $this->langs = $langs;
       return $this;
    }
