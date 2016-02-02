@@ -121,7 +121,7 @@ class Template extends TrObject {
        'anchors',
        'Forms_Controller::contentFilter',
    );
-   
+       
    protected static $baseOutputFilters = array(
    );
 
@@ -573,7 +573,7 @@ class Template extends TrObject {
       }
       return false;
    }
-   
+
    /**
     * Metoda vrací jestli je aktuální stránka vstupní - tedy bez adresy
     * @return bool -- true pokud se jedná o vstupní stránku
@@ -898,10 +898,10 @@ class Template extends TrObject {
             'compress' => (VVE_DEBUG_LEVEL == 0),
             'cache_dir'=> AppCore::getAppCacheDir().Template::STYLESHEETS_DIR.DIRECTORY_SEPARATOR,
          );
-         
+            
          $css_file_name = Less_Cache::Get( 
              array( $path.$rpFile => '/cache/'.Template::STYLESHEETS_DIR.'/' ), 
-             $options, $this->getLessVariables() );
+             $options, self::getLessVariables() );
          $compiledFileUrl = $url.$css_file_name;
       } catch (Exception $exc) {
          new CoreErrors($exc);
@@ -963,7 +963,7 @@ class Template extends TrObject {
          
          $css_file_name = Less_Cache::Get( 
              array( $path.$rpFile => '/cache/'.Template::STYLESHEETS_DIR.'/' ), 
-             $options, $this->getLessVariables() );
+             $options, self::getLessVariables() );
          $compiledFileUrl = $url.$css_file_name;
       } catch (Exception $exc) {
          new CoreErrors($exc);
@@ -975,7 +975,7 @@ class Template extends TrObject {
     * Připraví pole s proměnými pro šablonu
     * @return array
     */
-   private function getLessVariables()
+   public static function getLessVariables()
    {
       return array(
          'dirFace' => "'".Template::faceUrl(false)."'",
@@ -1105,7 +1105,7 @@ class Template extends TrObject {
       }
       return $text;
    }
-   
+
    protected function applyOutputfilters($text){
       array_unique(self::$baseOutputFilters);
       foreach (self::$baseOutputFilters as $filter) {
