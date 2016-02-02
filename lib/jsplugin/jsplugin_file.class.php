@@ -16,25 +16,31 @@ class JsPlugin_File {
 	 * Název souboru
 	 * @var string
 	 */
-	private $file = null;
+	protected $file = null;
 
 	/**
 	 * Pole s parametry js souboru
 	 * @var array
 	 */
-	private $fileParams = array();
+	protected  $fileParams = array();
 
    /**
     * jestli je soubor virtuální, neexistuje reálně na filesystému
     * @var boolean
     */
-   private $virtualFile = false;
+   protected $virtualFile = false;
 
    /**
     * Adresář se souborem
     * @var string
     */
-   private $dir = null;
+   protected $dir = null;
+   
+   /**
+    * Název pluginu
+    * @var string
+    */
+   private $name = null;
 
 	/**
 	 * Konstruktor
@@ -143,6 +149,14 @@ class JsPlugin_File {
          return $this->file;
       }
    }
+   
+   /**
+    * Metoda vrací název pluginu
+    * @return string -- název pluginu
+    */
+   protected function getPluginName() {
+      return $this->name;
+   }
 
    /**
     * Metoda vrací název souboru
@@ -157,7 +171,7 @@ class JsPlugin_File {
     * @param string $name -- název pluginu
     */
    public function setPluginName($name) {
+      $this->name = $name;
       $this->dir = str_replace('JSPLUGINNAME', strtolower($name), $this->dir);
    }
 }
-?>
