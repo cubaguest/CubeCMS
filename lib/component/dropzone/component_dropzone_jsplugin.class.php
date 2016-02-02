@@ -25,10 +25,9 @@ class Component_DropZone_JsPlugin extends JsPlugin {
    {
       $this->addDependJsPlugin(new JsPlugin_JQuery());
       //	Přidání css stylu
-		$this->addFile(new JsPlugin_CssFile('css/basic.css'));
-//		$this->addFile(new JsPlugin_CssFile('css/dropzone.css'));
+		$this->addFile(new JsPlugin_LessFile('css/themesys.less'));
 		//	Přidání js soubrů pluginu
-		$this->addFile(new JsPlugin_JsFile("dropzone.min.js"));
+		$this->addFile(new JsPlugin_JsFile("dropzone.js"));
 	}
    
    public function getJSCode($params = array())

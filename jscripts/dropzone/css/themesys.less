@@ -1,0 +1,184 @@
+@import "cubecms/variables.less";
+// Color variables (appears count calculates by raw css)
+@width-base: 100px; // Appears 6 times
+
+// Height variables (appears count calculates by raw css)
+@height-base: 80px; // Appears 4 times
+
+.dropzone, .dropzone *, .dropzone-previews, .dropzone-previews *  {
+   -moz-box-sizing: border-box;
+   -webkit-box-sizing: border-box;
+   box-sizing: border-box;
+}
+
+.dropzone:after {
+   clear: both;
+   content: ".";
+   display: block;
+   height: 0;
+   line-height: 0;
+   visibility: hidden;
+}
+
+.dropzone {
+   .dz-message {
+      -ms-filter: none;
+      filter: none;
+      opacity: 1;
+   }
+   .dz-preview {
+      .dz-image {
+         img {
+            max-height: 100%;
+            max-width: 100%;
+            /*left: 0;*/
+            /*position: absolute;*/
+            /*top: 0;*/
+            /*width: @width1;*/
+         }
+         text-align: center;
+         margin: @padding-small;
+         height: @height-base;
+         width: @width-base;
+      }
+      .dz-details {
+         font-size: 9px;
+         padding: @padding-small;
+         padding-top: 0;
+         .dz-filename {
+            width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+         }
+         .dz-size {
+            margin-bottom: 2px;
+         }
+      }
+      .dz-success-mark {
+         /*color: @color0;*/
+      }
+      .dz-error-mark {
+         /*color: @color3;*/
+      }
+      .dz-progress {
+         /*background: @color2;*/
+         display: none;
+         height: 6px;
+         left: 6px;
+         position: absolute;
+         right: 6px;
+         top: 100px;
+         .dz-upload {
+            /*background-color: @color0;*/
+            bottom: 0;
+            display: block;
+            left: 0;
+            position: absolute;
+            top: 0;
+            width: 0%;
+         }
+      }
+      .dz-error-message {
+         background: rgba(255,255,255,0.85);
+         color: @form-color-bg-red;
+         display: none;
+         font-size: 10px;
+         font-weight: bold;
+         left: 0px;
+         max-width: 100%;
+         padding: @padding-small;
+         position: absolute;
+         top: 0px;
+         z-index: 500;
+         
+      }
+      &:hover.dz-error {
+         .dz-error-message {
+            display: block;
+         }
+      }
+      &:hover {
+         border-color: @form-color-bg-hover;
+      }
+      background: rgba(255,255,255,0.8);
+      border: 1px solid @form-color-border;
+      display: block;
+      float: left;
+      margin: @padding-small;
+      position: relative;
+      vertical-align: top;
+      width: @width-base + (2 * @padding-small) + 2; // +2 border
+   }
+   .dz-preview.dz-file-preview[data-dz-thumbnail] {
+      display: none;
+   }
+   .dz-preview.dz-error {
+      .dz-error-mark {
+         display: block;
+      }
+   }
+   .dz-preview.dz-success {
+      .dz-success-mark {
+         display: block;
+      }
+   }
+   .dz-preview.dz-processing {
+      .dz-progress {
+         display: block;
+      }
+   }
+   .dz-remove {
+      &:hover {
+         text-decoration: none;
+      }
+      text-decoration: none;
+      display: block;
+      margin: 0 @padding-small @padding-small @padding-small;
+      cursor: pointer !important;
+      color: @form-color-bg-red;
+   }
+   background-color: @form-color-bg;
+   border: 1px solid @form-color-border;
+   padding: @padding-small;
+   position: relative;
+   border-radius: @border-radius;
+}
+.dropzone.dz-clickable {
+   cursor: pointer;
+   .dz-message {
+      cursor: pointer;
+      span {
+         cursor: pointer;
+      }
+   }
+   * {
+      cursor: default;
+   }
+}
+.dropzone.dz-drag-hover {
+   background-color: @form-color-bg-hover;
+   border-color: @form-color-border-hover;
+}
+.dropzone.dz-started {
+   .dz-message {
+      /*display: none;*/
+   }
+}
+.dropzone .dz-preview .dz-success-mark {
+   color: @form-color-bg-green;
+}
+.dropzone .dz-preview .dz-error-mark {
+   color: @form-color-bg-red;
+}
+.dropzone .dz-preview .dz-success-mark, 
+.dropzone-previews .dz-preview .dz-success-mark, 
+.dropzone .dz-preview .dz-error-mark, 
+.dropzone-previews .dz-preview .dz-error-mark  {
+   display: none;
+   font-size: 30px;
+   position: absolute;
+   right: 5px;
+   top: 5px;
+   line-height: 1;
+}
