@@ -1,10 +1,17 @@
 /* tabs from boostrap */
 .cubecms-tabs {
    .nav-tabs {
+      &.tabs-small {
+         a {
+            font-size: @font-size-small - 2;
+         }
+      }
       > li {
          a {
+            padding: @padding-small @padding-base;
             .border-bottom-radius(0);
             border-bottom: 1px solid transparent;
+            margin-right:  @padding-small;
          }
          float: left;
          margin-bottom: -1px;
@@ -13,7 +20,7 @@
       border-bottom: 1px solid @nav-tabs-border-color;
    }
    .tab-content {
-      padding: @nav-link-padding;
+      padding: @padding-base;
       border-left: 1px solid @nav-tabs-border-color;
       border-bottom: 1px solid @nav-tabs-border-color;
       border-right: 1px solid @nav-tabs-border-color;
