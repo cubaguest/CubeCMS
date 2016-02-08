@@ -304,6 +304,7 @@ class Locales extends TrObject {
        'cs' =>
        array(
            'name' => 'Czech (Czech Republic)',
+           'label' => 'Česky',
            'locale' => 'cs_CZ.UTF-8',
            'collation' => array('mysql' => 'utf8_czech_ci'),
        ),
@@ -423,6 +424,7 @@ class Locales extends TrObject {
        'en' =>
        array(
            'name' => 'English',
+           'label' => 'English',
            'locale' => 'en_GB.UTF-8',
            'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
@@ -1140,6 +1142,7 @@ class Locales extends TrObject {
        'sk' =>
        array(
            'name' => 'Slovak (Slovakia)',
+           'label' => 'Slovensky',
            'locale' => 'sk_SK.UTF-8',
            'collation' => array('mysql' => 'utf8_slovak_ci'),
        ),
@@ -1532,11 +1535,15 @@ class Locales extends TrObject {
     *
     * @return array -- pole s názvy jazyků
     */
-   public static function getAppLangsNames()
+   public static function getAppLangsNames($returnLabels = true)
    {
       $returnArray = array();
       foreach (self::getAppLangs() as $langKey => $lang) {
-         $returnArray[$lang] = self::$locales[$lang]['name'];
+         if($returnLabels){
+            $returnArray[$lang] = isset(self::$locales[$lang]['label']) ? self::$locales[$lang]['label'] : self::$locales[$lang]['name'];
+         } else {
+            $returnArray[$lang] = self::$locales[$lang]['name'];
+         }
       }
       return $returnArray;
    }
