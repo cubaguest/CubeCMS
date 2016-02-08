@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Třída pro obsluhu INPUT prvku typu FILE
  * Třída implementující objekt pro obsluhu INPUT prvkuu typu FILE. Umožňuje kontrolu
@@ -14,14 +15,14 @@
  * @abstract      Třída pro obsluhu formulářového prvku typu Input-Text
  */
 class Form_Element_File extends Form_Element {
+
    /**
     * Adresář pro upload souborů
     * @var string
     */
    protected $uploadDir = null;
-
    private $overWrite = true;
-   
+
    /**
     * Jestli nemá zpracovávat nebezpečné soubory
     * @var 
@@ -34,9 +35,10 @@ class Form_Element_File extends Form_Element {
     * @param string $name -- název elemntu
     * @param string $label -- popis elemntu
     */
-   public function  __construct($name, $label = null, $prefix = null) {
-      parent::__construct($name, $label,$prefix);
-      $this->setUploadDir(AppCore::getAppCacheDir().uniqid('upload-'));
+   public function __construct($name, $label = null, $prefix = null)
+   {
+      parent::__construct($name, $label, $prefix);
+      $this->setUploadDir(AppCore::getAppCacheDir() . uniqid('upload-'));
       $this->addValidation(new Form_Validator_FileSize(VVE_MAX_UPLOAD_SIZE));
       $this->cssClasses['containerClass'] = 'input-file-multiple';
    }
@@ -45,33 +47,23 @@ class Form_Element_File extends Form_Element {
     * Metoda naplní element
     * @todo dodělat vytváření unikátních názvů souborů a overwrite
     */
-   public function populate() {
-      if(isset ($_FILES[$this->getName()]) && $_FILES[$this->getName()]['error'] != UPLOAD_ERR_NO_FILE) {
-         if($this->isDimensional()) {
+   public function populate()
+   {
+      $this->cleanTMPUploadDirs();
+      if (isset($_FILES[$this->getName()]) && $_FILES[$this->getName()]['error'] != UPLOAD_ERR_NO_FILE) {
+         if ($this->isDimensional()) {
             foreach ($_FILES[$this->getName()]['name'] as $key => $filename) {
                $this->uploadFile(
-                     $_FILES[$this->getName()]["name"][$key],
-                     $_FILES[$this->getName()]["tmp_name"][$key],
-                     $_FILES[$this->getName()]["error"][$key],
-                     $_FILES[$this->getName()]["type"][$key],
-                     $_FILES[$this->getName()]["size"][$key], $key );
+                   $_FILES[$this->getName()]["name"][$key], $_FILES[$this->getName()]["tmp_name"][$key], $_FILES[$this->getName()]["error"][$key], $_FILES[$this->getName()]["type"][$key], $_FILES[$this->getName()]["size"][$key], $key);
             }
-         } else if($this->isMultiLang()){
+         } else if ($this->isMultiLang()) {
             foreach ($_FILES[$this->getName()]['name'] as $key => $filename) {
                $this->uploadFile(
-                     $_FILES[$this->getName()]["name"][$key],
-                     $_FILES[$this->getName()]["tmp_name"][$key],
-                     $_FILES[$this->getName()]["error"][$key],
-                     $_FILES[$this->getName()]["type"][$key],
-                     $_FILES[$this->getName()]["size"][$key], $key );
+                   $_FILES[$this->getName()]["name"][$key], $_FILES[$this->getName()]["tmp_name"][$key], $_FILES[$this->getName()]["error"][$key], $_FILES[$this->getName()]["type"][$key], $_FILES[$this->getName()]["size"][$key], $key);
             }
          } else {
             $this->uploadFile(
-                  $_FILES[$this->getName()]["name"], 
-                  $_FILES[$this->getName()]["tmp_name"], 
-                  $_FILES[$this->getName()]["error"], 
-                  $_FILES[$this->getName()]["type"], 
-                  $_FILES[$this->getName()]["size"] );
+                $_FILES[$this->getName()]["name"], $_FILES[$this->getName()]["tmp_name"], $_FILES[$this->getName()]["error"], $_FILES[$this->getName()]["type"], $_FILES[$this->getName()]["size"]);
          }
       } else {
          $this->values = null;
@@ -79,45 +71,45 @@ class Form_Element_File extends Form_Element {
       $this->unfilteredValues = $this->values;
       $this->isPopulated = true;
    }
-    
+
    protected function uploadFile($name, $tmpName, $error, $mime, $size, $key = null)
    {
-      if($error == UPLOAD_ERR_OK) {
+      if ($error == UPLOAD_ERR_OK) {
          $saveFileName = vve_cr_safe_file_name($name);
-          
-         if($this->onlySecureFiles && in_array(pathinfo($saveFileName, PATHINFO_EXTENSION), $this->insecureFiles)){
+
+         if ($this->onlySecureFiles && in_array(pathinfo($saveFileName, PATHINFO_EXTENSION), $this->insecureFiles)) {
             $this->creteUploadError(0, $name);
             $this->isValid(false);
          } else {
             // kontrola adresáře
             $dir = new FS_Dir($this->getUploadDir());
             $dir->check();
-            if(!$this->overWrite){
+            if (!$this->overWrite) {
                $saveFileName = File::creatUniqueName($saveFileName, $dir);
             }
             move_uploaded_file($tmpName, $dir . $saveFileName);
             // vatvoření pole s informacemi o souboru
-            $this->_setFileValue( 
-                  array('name' => $saveFileName,
-                         'path' => $dir,
-                         'size' => $size,
-                         'mime' => $mime,
-                         'type' => $this->getMimeType($dir.$saveFileName),
-                         'extension' => pathinfo($dir.$saveFileName, PATHINFO_EXTENSION)), $key
-                  );
+            $this->_setFileValue(
+                array('name' => $saveFileName,
+                'path' => $dir,
+                'size' => $size,
+                'mime' => $mime,
+                'type' => $this->getMimeType($dir . $saveFileName),
+                'extension' => pathinfo($dir . $saveFileName, PATHINFO_EXTENSION)), $key
+            );
          }
-      } else if($error == UPLOAD_ERR_NO_FILE) {
+      } else if ($error == UPLOAD_ERR_NO_FILE) {
          
       } else {
          $this->creteUploadError($error, $name);
-         $this->_setFileValue( array( 'name' => $name, 'size' => $size ) );
+         $this->_setFileValue(array('name' => $name, 'size' => $size));
       };
    }
 
-   protected function _setFileValue($data, $key = null) 
+   protected function _setFileValue($data, $key = null)
    {
-      if($this->isDimensional() || $this->isMultiLang()){
-         if(!is_array($this->values)){
+      if ($this->isDimensional() || $this->isMultiLang()) {
+         if (!is_array($this->values)) {
             $this->values = array();
          }
          $key == null ? $this->values[] = $data : $this->values[$key] = $data;
@@ -130,29 +122,30 @@ class Form_Element_File extends Form_Element {
     * Metoda vytvoří chybovou hlášku podle zadaného kódu
     * @param int $errNumber -- id chybové hlášky
     */
-   protected function creteUploadError($errNumber, $fileName) {
-      switch($errNumber) {
+   protected function creteUploadError($errNumber, $fileName)
+   {
+      switch ($errNumber) {
          case 0: //no error; possible file attack!
-            $this->errMsg()->addMessage(sprintf($this->tr('Nahrávání spustitelných souborů je zakázáno ("%s")'),$fileName));
+            $this->errMsg()->addMessage(sprintf($this->tr('Nahrávání spustitelných souborů je zakázáno ("%s")'), $fileName));
             break;
          case UPLOAD_ERR_INI_SIZE: //uploaded file exceeds the upload_max_filesize directive in php.ini
          case UPLOAD_ERR_FORM_SIZE: //uploaded file exceeds the upload_max_filesize directive in php.ini
             $this->errMsg()->addMessage(sprintf($this->tr('Soubor "%s" je příliš velký maximálně %s'), $fileName, vve_create_size_str(VVE_MAX_UPLOAD_SIZE)));
             break;
          case UPLOAD_ERR_PARTIAL: //uploaded file was only partially uploaded
-            $this->errMsg()->addMessage(sprintf($this->tr('Soubor "%s" byl nahrán jen částečně'),$fileName));
+            $this->errMsg()->addMessage(sprintf($this->tr('Soubor "%s" byl nahrán jen částečně'), $fileName));
             break;
          case UPLOAD_ERR_NO_TMP_DIR: //uploaded file was only partially uploaded
-            $this->errMsg()->addMessage(sprintf($this->tr('Soubor "%s" se nepodařilo uložit do tmp adresáře'),$fileName));
+            $this->errMsg()->addMessage(sprintf($this->tr('Soubor "%s" se nepodařilo uložit do tmp adresáře'), $fileName));
             break;
          case UPLOAD_ERR_EXTENSION: //uploaded file was only partially uploaded
-            $this->errMsg()->addMessage(sprintf($this->tr('Nahrání souboru "%s" bylo zastaveno'),$fileName));
+            $this->errMsg()->addMessage(sprintf($this->tr('Nahrání souboru "%s" bylo zastaveno'), $fileName));
             break;
          case UPLOAD_ERR_CANT_WRITE: //uploaded file was only partially uploaded
-            $this->errMsg()->addMessage(sprintf($this->tr('Soubor "%s" se nepodařilo zapsat na serveru'),$fileName));
+            $this->errMsg()->addMessage(sprintf($this->tr('Soubor "%s" se nepodařilo zapsat na serveru'), $fileName));
             break;
          default: //a default error, just in case!  :)
-            $this->errMsg()->addMessage(sprintf($this->tr('Problém s nahráním souboru "%s"'),$fileName));
+            $this->errMsg()->addMessage(sprintf($this->tr('Problém s nahráním souboru "%s"'), $fileName));
             break;
       }
    }
@@ -162,9 +155,10 @@ class Form_Element_File extends Form_Element {
     * @param string $file -- cesta k souboru
     * @return string -- mime typ
     */
-   protected function getMimeType($file) {
+   protected function getMimeType($file)
+   {
       // for php 5.3 or finfo extension
-      if(function_exists('finfo_open')) {
+      if (function_exists('finfo_open')) {
          // todo doladit pod win platformu (není validní cesta)
          $finfo = new finfo(FILEINFO_MIME);
 //         $finfo = new finfo(FILEINFO_MIME, "/usr/share/misc/magic");
@@ -175,11 +169,11 @@ class Form_Element_File extends Form_Element {
          $type = $finfo->file($file);
          //vytažení extension
          $spacePos = strpos($type, ' ');
-         if($spacePos > 0){
+         if ($spacePos > 0) {
             $type = substr($type, 0, $spacePos);
          }
 
-         unset ($finfo);
+         unset($finfo);
       }
       // for php 5.2 and older
       else {
@@ -187,16 +181,17 @@ class Form_Element_File extends Form_Element {
       }
       return $type;
    }
-   
+
    /**
     * Metoda vrací příponu souboru
     * @param string $file -- název souboru
     * @return string -- přípona
     */
-   protected function getExtension($file) {
+   protected function getExtension($file)
+   {
       //najdeme první tečku.
       $dotPos = strpos($file, '.');
-      $extension = strtolower(substr($file, $dotPos+1, strlen($file)));
+      $extension = strtolower(substr($file, $dotPos + 1, strlen($file)));
       return $extension;
    }
 
@@ -204,17 +199,18 @@ class Form_Element_File extends Form_Element {
     * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
     * @return string
     */
-   public function control($renderKey = null) {
+   public function control($renderKey = null)
+   {
       $rKey = $renderKey != null ? $renderKey : $this->renderedId;
       $this->html()->clearContent();
-      if(!$this->isValid AND $this->isPopulated) {
+      if (!$this->isValid AND $this->isPopulated) {
          $this->html()->addClass('formError');
       }
-   // tady bude if při multilang
+      // tady bude if při multilang
       $this->html()->setAttrib('type', 'file');
-      if($this->isMultiple()){
+      if ($this->isMultiple()) {
          $this->html()->setAttrib('multiple', 'multiple');
-         if($this->dimensional === true){
+         if ($this->dimensional === true) {
             $container = clone $this->containerElement;
             $container
                 ->addClass($this->cssClasses['containerClass'])
@@ -222,31 +218,30 @@ class Form_Element_File extends Form_Element {
                 ->addClass($this->cssClasses['multipleClassLast'])
                 ->addClass('input-group');
 
-            $this->html()->setAttrib('name', $this->getName()."[]");
-            $this->html()->setAttrib('id', $this->getName().'_'.$rKey);
+            $this->html()->setAttrib('name', $this->getName() . "[]");
+            $this->html()->setAttrib('id', $this->getName() . '_' . $rKey);
 
             $container->setContent($this->html());
             $container->addContent($this->getMultipleButtons(true, true), true);
 
-            if($renderKey == null){
+            if ($renderKey == null) {
                $this->renderedId++;
             }
 
             return $container;
          } else {
-            if($this->dimensional == null){
-               $this->html()->setAttrib('id', $this->getName()."_".$rKey);
+            if ($this->dimensional == null) {
+               $this->html()->setAttrib('id', $this->getName() . "_" . $rKey);
             } else {
-               $this->html()->setAttrib('id', $this->getName().'_'.$rKey."_".$this->dimensional);
+               $this->html()->setAttrib('id', $this->getName() . '_' . $rKey . "_" . $this->dimensional);
             }
-            $this->html()->setAttrib('name', $this->getName().'['.$this->dimensional.']');
+            $this->html()->setAttrib('name', $this->getName() . '[' . $this->dimensional . ']');
          }
-
       } else {
          $this->html()->setAttrib('name', $this->getName());
-         $this->html()->setAttrib('id', $this->getName().'_'.$rKey);
+         $this->html()->setAttrib('id', $this->getName() . '_' . $rKey);
       }
-      if($renderKey == null){
+      if ($renderKey == null) {
          $this->renderedId++;
       }
 //      $this->html()->setAttrib('value', $this->getUnfilteredValues());
@@ -258,11 +253,12 @@ class Form_Element_File extends Form_Element {
     * @param string $dir -- adresář
     * @return Form_Element_File
     */
-   public function setUploadDir($dir) {
-      $this->uploadDir = (string)$dir;
+   public function setUploadDir($dir)
+   {
+      $this->uploadDir = (string) $dir;
       return $this;
    }
-   
+
    /**
     * Vrací aktuální adresář pro nahrání
     * @return string
@@ -282,7 +278,7 @@ class Form_Element_File extends Form_Element {
       $this->overWrite = $overwrite;
       return $this;
    }
-   
+
    /**
     * Metoda nastaví jestli je povoleno i nahrávání nebezpečných souborů
     * @param bool $onlySecure -- false pro vypnutí omezení
@@ -300,14 +296,15 @@ class Form_Element_File extends Form_Element {
     * @return File -- objekt douboru
     * @todo -- dořešit
     */
-   public function createFileObject($className = null) {
-      if($className === null){
+   public function createFileObject($className = null)
+   {
+      if ($className === null) {
          $className = "File";
-      } else if(!class_exists($className)){
-         throw new UnexpectedValueException(sprintf($this->tr('Třídu %s se nepodařilo načíst'),$className), 1);
+      } else if (!class_exists($className)) {
+         throw new UnexpectedValueException(sprintf($this->tr('Třídu %s se nepodařilo načíst'), $className), 1);
       }
 
-      if(isset($this->values['name'])){// pokud je jeden soubor
+      if (isset($this->values['name'])) {// pokud je jeden soubor
          $fileObj = new $className($this->values['name'], $this->getUploadDir());
       } else {
          $fileObj = array();
@@ -317,4 +314,21 @@ class Form_Element_File extends Form_Element {
       }
       return $fileObj;
    }
+
+   protected function cleanTMPUploadDirs()
+   {
+      if(rand(0, 1000) == 500 || CUBE_CMS_DEBUG_LEVEL > 1){ // není třeba provádět pořád
+         $i = 0;
+         foreach (glob(AppCore::getAppCacheDir() . 'upload-*/', GLOB_BRACE) as $dir) {
+            if (is_dir($dir) && is_writable($dir) && filemtime($dir) < time() - 3600 * 48) { // 48 hodin stačí
+               FS_Dir::deleteStatic($dir);
+            }
+            if($i > 100){ // ochrana proti velkému množství mazání
+               break;
+            }
+            $i++;
+         }
+      }
+   }
+
 }
