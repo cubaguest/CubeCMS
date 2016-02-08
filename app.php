@@ -182,6 +182,12 @@ class AppCore extends TrObject {
     */
    static private $isErrorPage = true;
 
+   public static $runVars = array(
+       'SIMULATE_XHR',
+       'DEBUG',
+       'FACEPREVIEW',
+   );
+   
    /*
     * MAGICKÉ METODY
    */
@@ -453,9 +459,13 @@ class AppCore extends TrObject {
          }
       }
       
-      if(isset($_REQUEST['testface'])){
-         define('VVE_TEMPLATE_FACE', $_REQUEST['testface']);
-         define('CUBE_CMS_TEMPLATE_FACE', $_REQUEST['testface']);
+      if(isset($_REQUEST['FACEPREVIEW'])){
+         define('VVE_TEMPLATE_FACE', $_REQUEST['FACEPREVIEW']);
+         define('CUBE_CMS_TEMPLATE_FACE', $_REQUEST['FACEPREVIEW']);
+      }
+      if(isset($_REQUEST['DEBUG'])){
+         define('VVE_DEBUG_LEVEL', $_REQUEST['DEBUG']);
+         define('CUBE_CMS_DEBUG_LEVEL', $_REQUEST['DEBUG']);
       }
       
       foreach ($recs as $record) {
