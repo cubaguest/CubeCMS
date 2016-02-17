@@ -227,6 +227,8 @@ abstract class File_Image_Base extends TrObject {
    {
       if($this->file->exist()) {
          $imageProperty = getimagesize((string)$this->file);
+         $this->width = $imageProperty[0];
+         $this->height = $imageProperty[1];
          if($imageProperty == false){
             throw new File_Image_Exception(sprintf($this->tr('Zadaný soubor %s není platný obrázek'), $this->file->getPath().$this->file->getName()));
          }
@@ -236,6 +238,15 @@ abstract class File_Image_Base extends TrObject {
       } else {
          throw new File_Image_Exception(sprintf($this->tr('Zadaný soubor %s není platný obrázek'), $this->file->getPath().$this->file->getName()));
       }
+   }
+   
+   /**
+    * Jestli je obrázek na šířku
+    * @return bool
+    */
+   public function isLandscape()
+   {
+      return $this->width > $this->height;
    }
    
    /**
