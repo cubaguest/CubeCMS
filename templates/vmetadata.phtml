@@ -1,8 +1,8 @@
 <?php 
-Template::addPageTitle($this->tr('metadata'));
+Template::addPageTitle($this->tr('Popisky a metadata'));
 ?>
 
-<h1><?php echo htmlspecialchars($this->category()->getName()).' - '.$this->tr('metadata')?></h1>
+<h1><?php ps(sprintf($this->tr('Popisky a metadata stránky "%s"'), $this->category()->getName()))?></h1>
 <div class="main-content-form-edit" id="article-edit-form">
    <?php echo($this->form);?>
 </div>
