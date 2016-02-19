@@ -8,6 +8,7 @@ if(isset($_GET['file'])){
    $file= urldecode($_GET["file"]);
 } else {
    $file = basename($url);
+   $url = str_replace('/'.$file, '', $url);
 }
 
 header("Content-Description: File Transfer");
