@@ -11,6 +11,7 @@ class Loader {
 
    protected static $classCache = array();
    protected static $classCacheHash = null;
+   protected static $classCacheHost = null;
 
    /**
     * Načtení knihovny která není součástí enginu
@@ -111,8 +112,15 @@ class Loader {
 
    public static function loadCache()
    {
+      
       if(is_file(AppCore::getAppCacheDir().self::FILE_CACHE)){
          include AppCore::getAppCacheDir().self::FILE_CACHE;
+      }
+      if(self::$classCacheHost != $_SERVER['SERVER_NAME'] && is_file(AppCore::getAppCacheDir().self::FILE_CACHE)){
+         unlink(AppCore::getAppCacheDir().self::FILE_CACHE);
+         self::$classCache = array();
+         self::$classCacheHost = $_SERVER['SERVER_NAME'];
+         return false;
       }
    }
    
@@ -122,6 +130,7 @@ class Loader {
       if($curHash != self::$classCacheHash){
          file_put_contents(AppCore::getAppCacheDir().self::FILE_CACHE, 
              '<?php'."\n"
+             .'self::$classCacheHost = "'.$_SERVER['SERVER_NAME'].'";'."\n"
              .'self::$classCacheHash = "'.$curHash.'";'."\n"
              .'self::$classCache = '.var_export(self::$classCache, true).';'."\n"
              );
