@@ -19,6 +19,12 @@ abstract class Controller extends TrObject {
    const SETTINGS_GROUP_SOCIAL = 'social';
    const SETTINGS_GROUP_IMAGES = 'images';
    
+   const METADATA_GROUP_BASE = 'basic';
+   const METADATA_GROUP_SITEMAP = 'sitemap';
+   const METADATA_GROUP_OTHER = 'other';
+   const METADATA_GROUP_SEO = 'seo';
+   
+   
    /**
     * Název nového actionViewru
     * @var string
@@ -711,8 +717,10 @@ abstract class Controller extends TrObject {
       $cat = $catModel->record($this->category()->getId());
       
       $form = new Form('metadata_', true);
-      $grpBasic = $form->addGroup('basic', $this->tr('Základní'), $this->tr('Základní nastavení'));
-      $grpSitemap = $form->addGroup('sitemap', $this->tr('Mapa stránek'), $this->tr('Nastavení mapy stránek pro vyhledávače'));
+      $grpBasic = $form->addGroup(self::METADATA_GROUP_BASE, $this->tr('Základní'), $this->tr('Základní popisky'));
+      $grpSeo = $form->addGroup(self::METADATA_GROUP_SITEMAP, $this->tr('SEO nasatvení'), $this->tr('SEO nastavení kateogire'));
+      $grpSitemap = $form->addGroup(self::METADATA_GROUP_SITEMAP, $this->tr('Mapa stránek'), $this->tr('Nastavení mapy stránek pro vyhledávače'));
+      $grpOther = $form->addGroup(self::METADATA_GROUP_OTHER, $this->tr('Ostatní'), $this->tr('Ostatní metadata kategorie'));
       
       $eName = new Form_Element_Text('name', $this->tr('Název kategorie'));
       $eName->addValidation(new Form_Validator_NotEmpty(null, Locales::getDefaultLang(true)));
@@ -732,21 +740,21 @@ abstract class Controller extends TrObject {
       $eKeywords->setSubLabel($this->tr('Klíčová slova, které kategorii nejlépe vystihují oddělené mezerou nebo čárkou.'));
       $eKeywords->setValues($cat->{Model_Category::COLUMN_KEYWORDS});
 //      $eKeywords->addValidation(new Form_Validator_NotEmpty());
-      $form->addElement($eKeywords, $grpBasic);
+      $form->addElement($eKeywords, $grpSeo);
       
       $eDesc = new Form_Element_TextArea('desc', $this->tr('Popis kategorie'));
       $eDesc->setLangs();
       $eDesc->setSubLabel($this->tr('Krátký popisek kategorie. (Používá jej například Google u krátkého textu ve výsledcích hledání.)'));
       $eDesc->setValues($cat->{Model_Category::COLUMN_DESCRIPTION});
 //      $eDesc->addValidation(new Form_Validator_NotEmpty());
-      $form->addElement($eDesc, $grpBasic);
+      $form->addElement($eDesc, $grpSeo);
       
       if(Auth::isAdmin()){
-         $ePrior = new Form_Element_Text('priority', $this->tr('Priorita'));
+         $ePrior = new Form_Element_Text('priority', $this->tr('Priorita ve struktuře'));
          $ePrior->addValidation(new Form_Validator_IsNumber(null, Form_Validator_IsNumber::TYPE_INT));
-         $ePrior->setSubLabel('Čím větší tím bude větší šance, že kategorie bude vybrána jako výchozí.');
+         $ePrior->setSubLabel('Čím větší tím bude větší šance, že kategorie bude vybrána jako výchozí s ohledem na oprávnění uživatele.');
          $ePrior->setValues($cat->{Model_Category::COLUMN_PRIORITY});
-         $form->addElement($ePrior, $grpBasic);
+         $form->addElement($ePrior, $grpOther);
       }
       
       
@@ -768,6 +776,10 @@ abstract class Controller extends TrObject {
       $eSitemapPrior->setValues($cat->{Model_Category::COLUMN_SITEMAP_CHANGE_PRIORITY});
       $form->addElement($eSitemapPrior, $grpSitemap);
 
+      if(function_exists('extendCategoryMetadata')){
+         extendCategoryMetadata($this->category, $form, $this->translator);
+      }
+      
       $eSave = new Form_Element_SaveCancel('save');
       $form->addElement($eSave);
       
