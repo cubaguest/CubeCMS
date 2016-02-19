@@ -66,7 +66,7 @@ class Menu_Admin_Item {
    
    public function setParams($params)
    {
-      $this->params = $params;
+      $this->params = serialize($params);
       return $this;
    }
    
