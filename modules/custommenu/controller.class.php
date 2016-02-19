@@ -62,7 +62,7 @@ class CustomMenu_Controller extends Controller {
 
       } else if($action == "changepos" && $id != null
          && ($pos = $this->getRequestParam('pos')) != null){
-         CustomMenu_Model_Items::changeOrder($id, $pos);
+         CustomMenu_Model_Items::setRecordPosition($id, $pos);
          $this->infoMsg()->addMessage($this->tr('Položka byla přesunuta'));
          $this->link()->route()->rmParam()->redirect();
       }
