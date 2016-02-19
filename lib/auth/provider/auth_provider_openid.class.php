@@ -12,7 +12,7 @@
  * @abstract      Třída pro obsluhu autorizace uživatele
  * @todo          Dodělat načítání z modelu a převést taknázvy sloupců do modelu
  */
-include_once AppCore::getAppLibDir() . 'lib' . DIRECTORY_SEPARATOR . 'nonvve' . DIRECTORY_SEPARATOR . 'openid' . DIRECTORY_SEPARATOR . 'openid.php';
+include_once AppCore::getAppLibDir() . CUBECMS_LIB_DIR . DIRECTORY_SEPARATOR . 'nonvve' . DIRECTORY_SEPARATOR . 'openid' . DIRECTORY_SEPARATOR . 'openid.php';
 
 class Auth_Provider_OpenID extends Auth_Provider implements Auth_Provider_Interface {
 

@@ -12,10 +12,13 @@
  * @license    GNU General Public License v. 2 viz. Docs/license.txt
  * @internal   Last ErrorCode 22
  */
-include_once dirname(__FILE__).DIRECTORY_SEPARATOR.'lib'.DIRECTORY_SEPARATOR.'defines.php';
-include_once dirname(__FILE__).DIRECTORY_SEPARATOR.'lib'.DIRECTORY_SEPARATOR.'loader.class.php';
-include_once dirname(__FILE__).DIRECTORY_SEPARATOR.'lib'.DIRECTORY_SEPARATOR.'trobject.class.php';
-include_once dirname(__FILE__).DIRECTORY_SEPARATOR.'lib'.DIRECTORY_SEPARATOR.'debug'.DIRECTORY_SEPARATOR.'debug.class.php';
+if(!defined('CUBECMS_LIB_DIR')){
+   define('CUBECMS_LIB_DIR', 'lib');
+}
+include_once dirname(__FILE__).DIRECTORY_SEPARATOR.CUBECMS_LIB_DIR.DIRECTORY_SEPARATOR.'defines.php';
+include_once dirname(__FILE__).DIRECTORY_SEPARATOR.CUBECMS_LIB_DIR.DIRECTORY_SEPARATOR.'loader.class.php';
+include_once dirname(__FILE__).DIRECTORY_SEPARATOR.CUBECMS_LIB_DIR.DIRECTORY_SEPARATOR.'trobject.class.php';
+include_once dirname(__FILE__).DIRECTORY_SEPARATOR.CUBECMS_LIB_DIR.DIRECTORY_SEPARATOR.'debug'.DIRECTORY_SEPARATOR.'debug.class.php';
 class AppCore extends TrObject {
    /**
     * Název enginu
@@ -45,7 +48,7 @@ class AppCore extends TrObject {
    /**
     * Adresář s knihovnami enginu
     */
-   const ENGINE_LIB_DIR = 'lib';
+   const ENGINE_LIB_DIR = CUBECMS_LIB_DIR;
    
    /**
     * Adresář s logy enginu

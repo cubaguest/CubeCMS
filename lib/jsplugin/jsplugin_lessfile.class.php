@@ -26,7 +26,7 @@ class JsPlugin_LessFile extends JsPlugin_CssFile {
 
    protected function compileLess()
    {
-      require_once AppCore::getAppLibDir()."lib".DIRECTORY_SEPARATOR."nonvve".DIRECTORY_SEPARATOR."lessphp".DIRECTORY_SEPARATOR."lessc.inc.php";
+      require_once AppCore::getAppLibDir().CUBECMS_LIB_DIR.DIRECTORY_SEPARATOR."nonvve".DIRECTORY_SEPARATOR."lessphp".DIRECTORY_SEPARATOR."lessc.inc.php";
       
       $rpFile = str_replace('/', DIRECTORY_SEPARATOR, $this->file);
       $rpMainDir = AppCore::getAppLibDir().Template::JAVASCRIPTS_DIR.DIRECTORY_SEPARATOR.$this->getPluginName().DIRECTORY_SEPARATOR;

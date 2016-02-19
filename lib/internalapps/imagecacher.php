@@ -77,14 +77,14 @@ if( ( $HASH != null && $expectedHash != $HASH )
 
 
 // load file lib and create obj
-include_once $libDir.'lib'.DIRECTORY_SEPARATOR.'defines.php';
-include_once $libDir.'lib'.DIRECTORY_SEPARATOR.'trobject.class.php';
-include_once $libDir.'lib'.DIRECTORY_SEPARATOR.'file'.DIRECTORY_SEPARATOR.'file_interface.class.php';
-include_once $libDir.'lib'.DIRECTORY_SEPARATOR.'file'.DIRECTORY_SEPARATOR.'file.class.php';
-include_once $libDir.'lib'.DIRECTORY_SEPARATOR.'file'.DIRECTORY_SEPARATOR.'image'.DIRECTORY_SEPARATOR.'file_image.class.php';
-include_once $libDir.'lib'.DIRECTORY_SEPARATOR.'file'.DIRECTORY_SEPARATOR.'image'.DIRECTORY_SEPARATOR.'file_image_base.class.php';
-include_once $libDir.'lib'.DIRECTORY_SEPARATOR.'file'.DIRECTORY_SEPARATOR.'image'.DIRECTORY_SEPARATOR.'file_image_gd.class.php';
-include_once $libDir.'lib'.DIRECTORY_SEPARATOR.'fs'.DIRECTORY_SEPARATOR.'fs_dir.class.php';
+include_once $libDir.CUBECMS_LIB_DIR.DIRECTORY_SEPARATOR.'defines.php';
+include_once $libDir.CUBECMS_LIB_DIR.DIRECTORY_SEPARATOR.'trobject.class.php';
+include_once $libDir.CUBECMS_LIB_DIR.DIRECTORY_SEPARATOR.'file'.DIRECTORY_SEPARATOR.'file_interface.class.php';
+include_once $libDir.CUBECMS_LIB_DIR.DIRECTORY_SEPARATOR.'file'.DIRECTORY_SEPARATOR.'file.class.php';
+include_once $libDir.CUBECMS_LIB_DIR.DIRECTORY_SEPARATOR.'file'.DIRECTORY_SEPARATOR.'image'.DIRECTORY_SEPARATOR.'file_image.class.php';
+include_once $libDir.CUBECMS_LIB_DIR.DIRECTORY_SEPARATOR.'file'.DIRECTORY_SEPARATOR.'image'.DIRECTORY_SEPARATOR.'file_image_base.class.php';
+include_once $libDir.CUBECMS_LIB_DIR.DIRECTORY_SEPARATOR.'file'.DIRECTORY_SEPARATOR.'image'.DIRECTORY_SEPARATOR.'file_image_gd.class.php';
+include_once $libDir.CUBECMS_LIB_DIR.DIRECTORY_SEPARATOR.'fs'.DIRECTORY_SEPARATOR.'fs_dir.class.php';
 define('VVE_USE_IMAGEMAGICK', false);
 $image = null;
 try {
