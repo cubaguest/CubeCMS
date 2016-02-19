@@ -61,7 +61,7 @@ class Model_ORM_Ordered extends Model_ORM {
     */
    protected function beforeSave(Model_ORM_Record $record, $type = 'U')
    {
-      if($record->isNew()){
+      if($record->isNew() || $record->{$this->getOrderColumn()} == null){
          $m = clone $this;
          $m->reset();
          
@@ -76,7 +76,7 @@ class Model_ORM_Ordered extends Model_ORM {
          }
          
          $count = $m->count();
-         $record->{$this->orderColumn} = $count + 1;
+         $record->{$this->getOrderColumn()} = $count + 1;
       }
 
       parent::beforeSave($record, $type);
@@ -185,5 +185,43 @@ class Model_ORM_Ordered_Record extends Model_ORM_Record {
       // update row
       $this->{$this->model->getOrderColumn()} = $newPosition;
       $this->save();
+   }
+   
+   public function moveRecordByGroup($newGroupColValues = array())
+   {
+      // není třeba pokud nejsou skupiny záznamů
+      $groupCols = $this->model->getLimitedColumns();
+      $orderCol = $this->model->getOrderColumn();
+      if(empty($groupCols)){
+         return;
+      }
+      $oldGroupColValues = array();
+      foreach ($groupCols as $colName) {
+         $oldGroupColValues[$colName] = $this->{$colName};
+      }
+      $oldPosition = $this->{$orderCol};
+      
+      // přiřazení nových hodnot
+      foreach ($newGroupColValues as $colName => $value) {
+         $this->{$colName} = $value;
+      }
+      $this->{$orderCol} = null;
+      $this->save();
+      
+      // update ostatních z původní kateogrie
+      
+      $m = clone $this->model;
+      $whereString = array($orderCol.' > :oldpos');
+      $whereBinds = array('oldpos' => $oldPosition);
+      
+      foreach ($groupCols as $key => $colName) {
+         $whereString[] = $colName.' = :col_'.$key;
+         $whereBinds['col_'.$key] = $oldGroupColValues[$colName];
+      }
+      
+      $m->where(implode(' AND ', $whereString), $whereBinds)->update(array(
+          $this->model->getOrderColumn() => array('stmt' => $this->model->getOrderColumn().' - 1')
+      ));
+      
    }
 }

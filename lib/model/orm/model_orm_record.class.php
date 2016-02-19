@@ -382,4 +382,21 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
 
       return array('columns', 'externColumns', 'pKeyValue', 'fromDb', 'model');
    }
+   
+   /**
+    * Vrátí sloupce jako klíče a jejich hodnoty
+    * @return array
+    */
+   public function __toArray()
+   {
+      $arr = array();
+      foreach ($this->columns as $name => $col) {
+         if($col['value'] === false){
+            $arr[$name] = (string)$col['value'];
+         } else {
+            $arr[$name] = $col['value'];
+         }
+      }
+      return $arr;
+   }
 }
