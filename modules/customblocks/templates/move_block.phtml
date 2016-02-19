@@ -1,0 +1,10 @@
+<?php 
+$this->addCssFile("style.less");
+?>
+<h1><?php ps( sprintf($this->tr('Přesun bloku "%s" do jiné katregorie'), $this->block->{CustomBlocks_Model_Blocks::COLUMN_NAME})); ?></h1>
+<div class="content content-admin">
+   <div class="alert alert-warning">
+      <?php ps($this->tr('POZOR: Pokud nová kateogrie nepoužívá stejnou nebo kompatibilní základní šablonu, nemusí se blok v nové kategorii zobrazit správně nebo vůbec.')); ?>
+   </div>
+   <?php  echo $this->formMove; ?>
+</div>

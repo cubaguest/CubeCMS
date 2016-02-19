@@ -211,9 +211,6 @@ class CustomBlocks_Controller extends Controller {
       
       if($form->isValid()){
          $ids = $form->id->getValues();
-         $model = new CustomBlocks_Model_Blocks();
-         
-         $stmt = $model->query("UPDATE {THIS} SET `".TextBlocks_Model::COLUMN_ORDER."` = :ord WHERE ".TextBlocks_Model::COLUMN_ID." = :id");
          foreach ($ids as $index => $id) {
             CustomBlocks_Model_Blocks::setRecordPosition($id, $index+1);
          }
@@ -227,6 +224,63 @@ class CustomBlocks_Controller extends Controller {
       $this->view()->blocks = $blocks;
    }
    
+   public function moveBlockController($id)
+   {
+      $block = CustomBlocks_Model_Blocks::getRecord($id);
+      if(!$block){
+         throw new UnexpectedPageException();
+      }
+      
+      $fMove = new Form('block_move_');
+      
+      $eCat = new Form_Element_Select('idcat', $this->tr('Cílová kategorie'));
+      $cats = Model_Category::getCategoryListByModule('customblocks');
+      $templates = $this->module()->getAllTemplates();
+      foreach ($cats as $cat) {
+         $catObj = new Category(null, false, $cat);
+         $eCat->addOption($cat->{Model_Category::COLUMN_NAME}
+         .', '.$this->tr('šablona: ').'"'.$templates['main'][$catObj->getParam('tpl_action_main')]['name'].'"'
+         .($this->category()->getId() == $cat->getPK() ? ' ('.$this->tr('Aktuální').')' : ''), $cat->getPK());
+      }
+      $fMove->addElement($eCat);
+      
+      
+      $eSave = new Form_Element_SaveCancel('move', array($this->tr('Přesunout'), $this->tr('Zrušit')));
+      $fMove->addElement($eSave);
+      
+      if($fMove->isValid()){
+         $cat = new Category($fMove->idcat->getValues());
+         
+         // přesun obrázků
+         $mBlockImages = new CustomBlocks_Model_Images();
+         $images = $mBlockImages->where(CustomBlocks_Model_Images::COLUMN_ID_BLOCK." = :idb", array('idb' => $block->getPK()))->records();
+         foreach ($images as $img) {
+            $file = new File($img->{CustomBlocks_Model_Images::COLUMN_FILE}, $this->module()->getDataDir());
+            $file->move($cat->getModule()->getDataDir());
+         }
+         
+         // přesun souborů
+         $mBlockFiles = new CustomBlocks_Model_Files();
+         $files = $mBlockFiles->where(CustomBlocks_Model_Files::COLUMN_ID_BLOCK." = :idb", array('idb' => $block->getPK()))->records();
+         foreach ($files as $f) {
+            $file = new File($f->{CustomBlocks_Model_Files::COLUMN_FILE}, $this->module()->getDataDir());
+            $file->move($cat->getModule()->getDataDir());
+         }
+         
+         // přesun bloku
+         $block->moveRecordByGroup(array(CustomBlocks_Model_Blocks::COLUMN_ID_CAT => $fMove->idcat->getValues()));
+         // hotovo
+         $this->infoMsg()->addMessage(sprintf($this->tr('Blok byl přesunut do kateogrie <a href="%s">%s</a>'), 
+            $this->link(true)->category($cat->getUrlKey()),
+             $cat->getName()
+             ));
+         $this->link()->route()->redirect();
+      }
+      
+      
+      $this->view()->formMove = $fMove;
+      $this->view()->block = $block;
+   }
    
    /* metody pro zpracování bloků */
    
@@ -349,9 +403,53 @@ class CustomBlocks_Controller extends Controller {
       $item->save();
    }
    
+   /**
+    * Vytvoří element souboru (např ke stažení)
+    * @param int $index
+    * @param string $name
+    * @param array $blockItem -- informace o položce bloku
+    * @param Model_ORM_Record $record
+    * @return \Form_Element_File
+    */
+   protected function createFormElementFiles($index, $name, $blockItem, CustomBlocks_Model_Files_Record $record = null)
+   {
+      $elemFile = new Form_Element_File('file_'.$index, $name);
+      $elemFile->setUploadDir($this->module()->getDataDir().  CustomBlocks_Model_Files::DIR_FILES);
+      $elemFile->setOverWrite(false);
+      if($record){
+         $elemFile->setSubLabel('<strong>'.$this->tr('Aktuálně').':</strong> <a href="'.$record->getUrl($this->getModule()).'">'
+             . htmlspecialchars($record->{CustomBlocks_Model_Files::COLUMN_FILE}).'</a>');
+      }
+      
+      return $elemFile;
+   }
+   
+   protected function processFormElementFiles($index, Form $form, $idBlock)
+   {
+      $name = 'file_'.$index;
+      if(!isset($form->$name) || $form->$name->getValues() == null){
+         return;
+      }
+      
+      $item = CustomBlocks_Model_Files::getItem($idBlock, $index);
+      if(!$item){
+         $item = CustomBlocks_Model_Files::getNewRecord();
+         $item->{CustomBlocks_Model_Items::COLUMN_ID_BLOCK} = $idBlock;
+         $item->{CustomBlocks_Model_Items::COLUMN_INDEX} = $index;
+      }
+      
+      $file = $form->$name->createFileObject();
+      $item->{CustomBlocks_Model_Files::COLUMN_FILE} = $file->getName();
+      $item->save();
+   }
+   
    protected function createFormElementTexts($index, $name, $blockItem, Model_ORM_Record $record = null)
    {
-      $elem = new Form_Element_TextArea('txt_'.$index, $name);
+      if(isset($blockItem['short']) && $blockItem['short'] == true){
+         $elem = new Form_Element_Text('txt_'.$index, $name);
+      } else {
+         $elem = new Form_Element_TextArea('txt_'.$index, $name);
+      }
       $elem->setLangs();
       if($record){
          $elem->setValues($record->{CustomBlocks_Model_Texts::COLUMN_CONTENT});

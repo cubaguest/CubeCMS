@@ -1,7 +1,7 @@
 <?php
 
 class CustomBlocks_Module extends Module {
-   protected $version = '1.0.0';
+   protected $version = '1.1.0';
    
    public function install()
    {
@@ -14,6 +14,8 @@ class CustomBlocks_Module extends Module {
       $m = new CustomBlocks_Model_Images();
       $m->createTable();
       $m = new CustomBlocks_Model_Videos();
+      $m->createTable();
+      $m = new CustomBlocks_Model_Files();
       $m->createTable();
       
       parent::install();

@@ -37,6 +37,13 @@ class CustomBlocks_View extends View {
                    ->setTitle($this->tr("Upravit obsah"));
                $toolbox->addTool($toolEdit);
                
+               $toolMove = new Template_Toolbox2_Tool_PostRedirect('move_block', 
+                   $this->tr('Přesunout do kateogrie'), $this->link()->route('moveBlock', array('id' => $block->getPK())));
+               $toolMove
+                   ->setIcon(Template_Toolbox2::ICON_EXPORT)
+                   ->setTitle($this->tr("Přesunout blok do jiné kateogrie"));
+               $toolbox->addTool($toolMove);
+               
                // mazání potřebuje formulář bloku
                $this->formBlockDelete->id->setValues($block->getPK());
                $tooldel = new Template_Toolbox2_Tool_Form($this->formBlockDelete);
@@ -92,6 +99,13 @@ class CustomBlocks_View extends View {
       Template::setFullWidth(true);
    }
    
+   public function moveBlockView()
+   {
+      $this->template()->addFile('tpl://customblocks:move_block.phtml');
+      Template_Navigation::addItem(sprintf($this->tr('Přesun bloku %s do jiné kateogrie'), $this->block->{CustomBlocks_Model_Blocks::COLUMN_NAME}), $this->link(), true);
+      Template::setFullWidth(true);
+   }
+   
    protected function assignTinyMCE()
    {
       if(!$this->form || !isset($this->block['items'])){
@@ -100,10 +114,12 @@ class CustomBlocks_View extends View {
       foreach ($this->block['items'] as $index => $item) {
          if($item['model'] == 'CustomBlocks_Model_Texts' && isset($item['tinymce']) && $item['tinymce'] == true){
             $elementName = 'txt_'.$index;
-            if(is_bool($item['tinymce'])){
-               $this->setTinyMCE($this->form->$elementName);
-            } else {
-               $this->setTinyMCE($this->form->$elementName, $item['tinymce']);
+            if($this->form->$elementName instanceof Form_Element_TextArea){
+               if(is_bool($item['tinymce'])){
+                  $this->setTinyMCE($this->form->$elementName);
+               } else {
+                  $this->setTinyMCE($this->form->$elementName, $item['tinymce']);
+               }
             }
          }
       }
