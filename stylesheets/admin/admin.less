@@ -106,6 +106,7 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
             overflow: hidden;
             text-decoration: none;
             color: @color-text;
+            transition: color 0s;
          }
          font-weight: bold; 
          float: left; 
@@ -945,6 +946,31 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
       margin: 0;
       padding: 0;
    }
+   &.cubecms-advform {
+      .cubecms-header {
+         h2, h3 {
+            margin: 0;
+            color: @color-text-invert;
+         }
+         .cube-gradient();
+         border: 1px solid @color-primary;
+         padding: @padding-widget;
+      }
+      .cubecms-content {
+         padding: @padding-widget;
+         border: 1px solid @color-border;
+      }
+      .cubecms-header+.cubecms-content {
+         border-top: 0px none transparent;
+      }
+      .row {
+         margin-bottom: @padding-small;
+      }
+      .buttons {
+         text-align: right;
+      }
+      margin-bottom: @padding-widget;
+   }
    /*
    Blokový vidget - něco jako dlaždice
    */
@@ -1077,6 +1103,7 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
       position: relative;
       width: auto;
       margin: 60px auto;
+      background-color: #fff;
    }
    overflow: hidden;
    overflow-x: hidden;
