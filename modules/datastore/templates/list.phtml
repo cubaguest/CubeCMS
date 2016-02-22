@@ -56,7 +56,7 @@
             $link = new Html_Element('a', $item['name'].'&nbsp;('.vve_create_size_str($item['size']).")");
             $link->setAttrib('title', $this->tr('Stáhnout').' '.$item['name'])
                  ->setAttrib('href', $item['url'])
-                 ->addClass('file-icon')->addClass('file-'.$item['ext'])->addClass('store-file')->addClass('link-external');
+                 ->addClass('file-icon')->addClass('file-'.$item['ext'])->addClass('store-file');
             // doplnit ikony podle přípony
             echo $link;
             ?>
