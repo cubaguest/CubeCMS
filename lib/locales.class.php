@@ -1889,4 +1889,12 @@ class Locales extends TrObject {
       }
       return 'utf8_unicode_ci';
    }
+   
+   public static function getSupportedLocale($lang = 'cs')
+   {
+      if(isset(self::$locales[$lang])){
+         return self::$locales[$lang];
+      }
+      return self::$locales['en'];
+   }
 }

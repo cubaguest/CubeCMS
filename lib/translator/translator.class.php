@@ -126,18 +126,32 @@ class Translator {
    {
       if($this->locale != null){
          $file = $this->locale.'.php';
+         $fileShort = preg_replace('/\_[a-z]+/i', null, $this->locale).'.php';
       } else {
          $file = Locales::getLangLocale().'.php';
+         $fileShort = preg_replace('/\_[a-z]+/i', null, Locales::getLangLocale()).'.php';
       }
+      // překlady základu
       if(file_exists($pathBase.$file) AND ($this->load == self::LOAD_BOOTH OR $this->load == self::LOAD_LIB)){
          $singular = $plural = array();
          include $pathBase.$file;
          $this->translationsS = array_merge($this->translationsS, $singular);
          $this->translationsP = array_merge($this->translationsP, $plural);
+      } else if(file_exists($pathBase.$fileShort) AND ($this->load == self::LOAD_BOOTH OR $this->load == self::LOAD_LIB)){
+         $singular = $plural = array();
+         include $pathBase.$fileShort;
+         $this->translationsS = array_merge($this->translationsS, $singular);
+         $this->translationsP = array_merge($this->translationsP, $plural);
       }
+      // překlady vzhledu
       if(file_exists($pathFace.$file) AND ($this->load == self::LOAD_BOOTH OR $this->load == self::LOAD_FACE)){
          $singular = $plural = array();
          include $pathFace.$file;
+         $this->translationsS = array_merge($this->translationsS, $singular);
+         $this->translationsP = array_merge($this->translationsP, $plural);
+      } else if(file_exists($pathFace.$fileShort) AND ($this->load == self::LOAD_BOOTH OR $this->load == self::LOAD_FACE)){
+         $singular = $plural = array();
+         include $pathFace.$fileShort;
          $this->translationsS = array_merge($this->translationsS, $singular);
          $this->translationsP = array_merge($this->translationsP, $plural);
       }
