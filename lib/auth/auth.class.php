@@ -340,10 +340,7 @@ class Auth extends TrObject {
 
       $email->setSubject(VVE_WEB_NAME.': '.$tr->tr('obnova hesla'));
 
-      $cnt = $tr->tr("<p>Vážený uživateli,</p>
-         <p>zasíláme Vám vyžádanou změnu hesla.</p>
-         <p>Pokud jste tento email nevygeneroval Vy, jedná se nejspíše o omyl jiného uživatele a můžete tento e-mail ignorovat.
-         Vašeho aktuálního hesla se změna samozřejmně nedotkne.</p>");
+      $cnt = $tr->tr("<p>Vážený uživateli,</p><p>zasíláme Vám vyžádanou změnu hesla.</p><p>Pokud jste tento email nevygeneroval Vy, jedná se nejspíše o omyl jiného uživatele a můžete tento e-mail ignorovat.Vašeho aktuálního hesla se změna samozřejmně nedotkne.</p>");
 
       $newPass = self::generatePassword();
 
