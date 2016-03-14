@@ -83,6 +83,23 @@ if( !empty($this->moduleButtons) ){
          ?>
          <li class="tools-inline"><div><?php echo $button;?></div></li>
          <?php 
+      } else if($button instanceof Form) {
+         ?>
+         <li class="tools-inline">
+            <?php 
+            echo $button->renderStart();
+            foreach ($button as $elem) {
+                if($elem instanceof Form_Element_Submit){
+                   echo $elem->control();
+                } else {
+                   echo $elem->label();
+                   echo $elem->control();
+                }
+            }
+            echo $button->renderEnd();
+            ?>
+         </li>
+         <?php 
       }
    }?>
    </ul>
