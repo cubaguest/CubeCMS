@@ -36,6 +36,9 @@ $this->addFile('js://bootstrap.min.js');
                   ps($last);
                }
                ?></span>
+            <?php if (isset($_GET['headerclose'])) { ?>
+            <a href="#" class="button-cancel"><span class="icon icon-close"></span></a>
+            <?php }?>
          </header>
 
          <section class="container">
@@ -45,14 +48,26 @@ $this->addFile('js://bootstrap.min.js');
                   $this->includeTpl("messages.phtml", true);
                   ?>
                   <div class="main-content module-<?php echo Category::getSelectedCategory()->getModule()->getName() ?> clearfix">
-                     <?php $this->includeTpl("modules.phtml", true); ?>
+                     <?php 
+                     $this->includeTpl("modules.phtml", true); 
+                     ?>
                   </div>
+                  <script type="text/javascript">
+                        $(document).ready(function(){
+                           $('form div[class^="col-md-"]').each(function(){
+                              $(this).addClass( $(this).prop('class').replace('col-md-', 'col-xs-') );
+                           });
+                           $('.button-close-popup').on('click', function(){
+                              
+                           });
+                        });
+                     </script>
                </div>
             </div>
          </section>
-         <?php if (isset($_GET['enableclose'])) { ?>
+         <?php if (isset($_GET['footerclose'])) { ?>
             <footer class="container">
-               <button type="button"><?php ps($this->tr('Zavřít')); ?></button>
+               <button type="button" class="button-close-popup"><?php ps($this->tr('Zavřít')); ?></button>
             </footer>
             <?php
          }

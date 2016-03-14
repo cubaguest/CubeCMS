@@ -698,7 +698,7 @@ CubeCMS.Popup = {
              }
              e.preventDefault();
              var url = $(this).prop('href');
-             url = (url.indexOf("?") === -1 ? url+'?popupwindow=1': url+'?popupwindow=1');
+             url = (url.indexOf("?") === -1 ? url+'?popupwindow=1': url+'&popupwindow=1');
              url = url + ($(this).data('popup-callback') === undefined ? '' : '&callback='+$(this).data('popup-callback'));
              that.openPopup(url, $(this).prop('title'), $(this).data('popup-width'),$(this).data('popup-height'));
              return false;

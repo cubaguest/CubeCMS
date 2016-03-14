@@ -1137,12 +1137,25 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
 /* popup window */
 body.popup {
    header {
+      .button-cancel {
+         &, &:visited {
+            color: @color-text-important;
+         }
+         float: right;
+         font-size: @font-size-large;
+      }
       padding-top: @padding-small;
       padding-bottom: @padding-small;
       box-shadow:0px 0px 5px @color-text-gray;
       -webkit-box-shadow:0px 0px 3px @color-text-gray;
       -moz-box-shadow: 0px 0px 3px @color-text-gray;
       margin-bottom: 5px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background-color: @color-bg;
    }
    h1 {
       font-size: @font-size-large;
@@ -1157,7 +1170,7 @@ body.popup {
    footer {
       text-align: right;
    }
-   padding-top: 0;
+   padding-top: @padding-small * 3 + (@font-size-large * 1.3);
 }
 
 @media (min-width: 768px) {
