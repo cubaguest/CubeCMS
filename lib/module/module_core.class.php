@@ -38,6 +38,15 @@ class Module_Core extends TrObject {
    {
       return $this->name;
    }
+   
+   /**
+    * Metoda vrací kategorii modulu
+    * @return Category_Core
+    */
+   public function category() 
+   {
+      return $this->category;
+   }
 
    public function runController() 
    {}
