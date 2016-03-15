@@ -1,0 +1,21 @@
+<?php
+// souhlas s použitím cookies
+if(!isset($_COOKIE[CUBE_CMS_SESSION_NAME.'_allow_use_cookie'])){ 
+   $text = Text_Model::getText(32800, Text_Model::TEXT_MAIN_KEY);
+   if((string)$text == null){
+      return;
+   }
+   
+   $this->addFile('css://cubecms/cookieinfo.less');
+   ?>
+<div id="allow-use-cookie">
+   <p class="content">
+      <?php ps($this->tr('Tento web využívá cookies. Jeho používáním s tím vyjadřujete souhlas.')); ?>
+      <a href="<?php echo Url_Link::getBaseLink()?>cookieinfo.html"><?php ps($this->tr('Zobrazit podrobnosti'));?></a>
+      <button class="confirm-button btn btn-primary" 
+              onclick="var date = new Date();date.setFullYear(date.getFullYear() + 10);document.cookie = '<?php echo CUBE_CMS_SESSION_NAME.'_allow_use_cookie'?>=1; path=/; expires=' + date.toGMTString() + '; domain=.<?php echo Url_Request::getDomain()?>'; document.getElementById('allow-use-cookie').style.display = 'none';"><?php ps($this->tr('Souhlasím')); ?></button>
+   </p>
+</div>
+<noscript><style>#allow-use-cookie { display:none; }</style></noscript>
+<?php
+}

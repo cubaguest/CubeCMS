@@ -89,6 +89,8 @@ if(Category::getSelectedCategory()->getRights()->isWritable() || Template::pVar(
    echo $help;
 }
 
+// souhlas s použitím cookies
+$this->includeFile('tpl://parts/cookieinfo.phtml');
 if($this->disableFooterGA !== true && defined('VVE_GOOGLE_ANALYTICS_CODE') && VVE_GOOGLE_ANALYTICS_CODE != null
    && !in_array($_SERVER['REMOTE_ADDR'], explode(',', VVE_ANALYTICS_DISABLED_HOSTS))){?>
 <script type="text/javascript">

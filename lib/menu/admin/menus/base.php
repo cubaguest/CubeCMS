@@ -1,5 +1,5 @@
 <?php
-$lastID = 32798;
+$lastID = 32800;
 /* 
  * Základní sekce menu
  */
@@ -97,12 +97,20 @@ $this->addItem(Menu_Admin::SECTION_CONTENT, new Menu_Admin_Item(
    'content/slideshow', 'hpslideshow', 'images.png'
 ));
 $this->addItem(Menu_Admin::SECTION_CONTENT, new Menu_Admin_Item(
+    32799, array( 'cs' => 'Pokročilý banner na úvodní stránce', 'en' => 'Homepage Advanced SlideShow'),
+   'content/advslideshow', 'hpslideshowadv', 'images.png'
+));
+$this->addItem(Menu_Admin::SECTION_CONTENT, new Menu_Admin_Item(
     32789, array( 'cs' => 'Volitelná menu', 'en' => 'Custom menus'),
    'content/custom-menu', 'custommenu', 'application_side_contract.png'
 ));
 $this->addItem(Menu_Admin::SECTION_CONTENT, new Menu_Admin_Item(
     32777, array( 'cs' => 'Úprava zdrojů vzhledu', 'en' => 'Face source edit'),
    'content/faceedit', 'faceedit', 'page_white_code_red.png'
+));
+$this->addItem(Menu_Admin::SECTION_CONTENT, new Menu_Admin_Item(
+    32800, array( 'cs' => 'Prohlášení o použití cookies', 'en' => 'Allow of cookie usage'),
+   'content/cookieinfo', 'text', 'page.png'
 ));
 
 
