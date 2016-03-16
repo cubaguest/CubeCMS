@@ -10,6 +10,9 @@ class Contact_Controller extends Controller {
    const PARAM_MAP_TYPE_IFRAME = 'iframe';
    const PARAM_FORM = 'form';
    const PARAM_FORM_SUBJECTS = 'formsub';
+   const PARAM_FORM_DIS_OWN_SUBJECT = 'formownsubdis';
+   const PARAM_FORM_SEPARATE_NAME = 'formsepname';
+   
    const PARAM_ADMIN_RECIPIENTS = 'admin_rec';
    const PARAM_OTHER_RECIPIENTS = 'other_rec';
    const TEXT_KEY_FOOTER = 'footer';
@@ -32,9 +35,18 @@ class Contact_Controller extends Controller {
 
       $formQuestion = new Form('contact_question_');
 
-      $elemName = new Form_Element_Text('name', $this->tr('Jméno a přijmení'));
-      $elemName->addValidation(new Form_Validator_NotEmpty());
-      $formQuestion->addElement($elemName);
+      if($this->category()->getParam(self::PARAM_FORM_SEPARATE_NAME, false) == true){
+         $elemName = new Form_Element_Text('name', $this->tr('Jméno'));
+         $elemName->addValidation(new Form_Validator_NotEmpty());
+         $formQuestion->addElement($elemName);
+         $elemSurName = new Form_Element_Text('surname', $this->tr('Přijmení'));
+         $elemSurName->addValidation(new Form_Validator_NotEmpty());
+         $formQuestion->addElement($elemSurName);
+      } else {
+         $elemName = new Form_Element_Text('name', $this->tr('Jméno a přijmení'));
+         $elemName->addValidation(new Form_Validator_NotEmpty());
+         $formQuestion->addElement($elemName);
+      }
 
       $elemMail = new Form_Element_Text('mail', $this->tr('Váš e-mail'));
       $elemMail->addValidation(new Form_Validator_NotEmpty());
@@ -48,7 +60,10 @@ class Contact_Controller extends Controller {
       if ($this->category()->getParam(self::PARAM_FORM_SUBJECTS, null) != null) {
          $elemSubjectDef = new Form_Element_Select('subjectDef', $this->tr('Předmět'));
          $subs = explode(';', $this->category()->getParam(self::PARAM_FORM_SUBJECTS));
-         $elemSubjectDef->setOptions(array($this->tr('< Vlastní předmět >') => 0), true);
+         if(!$this->category()->getParam(self::PARAM_FORM_DIS_OWN_SUBJECT, false)){
+            $elemSubjectDef->setOptions(array($this->tr('< Vlastní předmět >') => 0), true);
+         }
+         
          foreach ($subs as $key => $sub) {
             $elemSubjectDef->setOptions(array(preg_replace('/<.*>/', '', $sub) => $key + 1), true); // +1 protože první je vlastní
          }
@@ -78,7 +93,12 @@ class Contact_Controller extends Controller {
       if (Auth::isLogin()) { // pokud je uživatel přihlášen doplníme jeho jméno
          $modelUsers = new Model_Users();
          $user = $modelUsers->record(Auth::getUserId());
-         $formQuestion->name->setValues($user->{Model_Users::COLUMN_NAME} . ' ' . $user->{Model_Users::COLUMN_SURNAME});
+         if(isset($formQuestion->surname)){
+            $formQuestion->name->setValues($user->{Model_Users::COLUMN_NAME});
+            $formQuestion->surname->setValues($user->{Model_Users::COLUMN_SURNAME});
+         } else {
+            $formQuestion->name->setValues($user->{Model_Users::COLUMN_NAME} . ' ' . $user->{Model_Users::COLUMN_SURNAME});
+         }
          $formQuestion->mail->setValues($user->{Model_Users::COLUMN_MAIL});
       }
 
@@ -154,7 +174,9 @@ class Contact_Controller extends Controller {
       }
 
       $model->saveQuestion(
-          $formQuestion->name->getValues(), 
+          isset($formQuestion->surname) 
+            ? $formQuestion->name->getValues().' '.$formQuestion->surname->getValues() 
+            : $formQuestion->name->getValues(), 
           $formQuestion->mail->getValues(), $subject, 
           $formQuestion->text->getValues(), 
           $formQuestion->phone->getValues());
@@ -163,6 +185,7 @@ class Contact_Controller extends Controller {
 
 
       if ($formQuestion->haveElement('subjectDef') AND (int) $formQuestion->subjectDef->getValues() > 0) {
+         $subs = explode(';', $this->category()->getParam(self::PARAM_FORM_SUBJECTS));
          $subject = preg_replace('/<.*>/', '', $subs[(int) $formQuestion->subjectDef->getValues() - 1]);
          if ($formQuestion->subject->getValues() != null) {
             $subject .= ': ' . $formQuestion->subject->getValues();
@@ -177,10 +200,24 @@ class Contact_Controller extends Controller {
 
       $html = '<p>Byl odeslán kontaktní formulář ze stránek ' . VVE_WEB_NAME . '.</p>';
       $html .= '<table class="styled">';
-      $html .= '<tr>';
-      $html .= '<th>Jméno a přijmení</th>';
-      $html .= '<td>' . $formQuestion->name->getValues() . '</td>';
-      $html .= '</tr>';
+      
+      if(isset($formQuestion->surname)){
+         $html .= '<tr>';
+         $html .= '<th>Jméno</th>';
+         $html .= '<td>' . $formQuestion->name->getValues() . '</td>';
+         $html .= '</tr>';
+         $html .= '<tr>';
+         $html .= '<th>Přijmení</th>';
+         $html .= '<td>' . $formQuestion->surname->getValues() . '</td>';
+         $html .= '</tr>';
+      } else {
+         $html .= '<tr>';
+         $html .= '<th>Jméno a přijmení</th>';
+         $html .= '<td>' . $formQuestion->name->getValues() . '</td>';
+         $html .= '</tr>';
+      }
+         
+      
       $html .= '<tr>';
       $html .= '<th>E-mail</th>';
       $html .= '<td>' . $formQuestion->mail->getValues() . '</td>';
@@ -404,6 +441,14 @@ class Contact_Controller extends Controller {
       if (isset($settings[self::PARAM_FORM])) {
          $form->formEnabled->setValues($settings[self::PARAM_FORM]);
       }
+      
+      $elemFormSepName = new Form_Element_Checkbox('formSepName', 'Oddělené jméno a příjmení');
+      $elemFormSepName->setValues(false);
+      $form->addElement($elemFormSepName, $grpForm);
+      if (isset($settings[self::PARAM_FORM_SEPARATE_NAME])) {
+         $form->formSepName->setValues($settings[self::PARAM_FORM_SEPARATE_NAME]);
+      }
+      
 
       $elemFormSubjects = new Form_Element_TextArea('formSub', 'Předměty zpráv');
       $elemFormSubjects->setSubLabel(htmlspecialchars('Předdefinované předměty zprávy, odělené středníkem. Pokud je za předmětem email ve špičatých závorkách, je odeslán dotaz na uvedenou adresu, např. dotaz na zboží<jmeno@email.cz> .'));
@@ -413,6 +458,13 @@ class Contact_Controller extends Controller {
          $form->formSub->setValues($settings[self::PARAM_FORM_SUBJECTS]);
       }
 
+      $elemFormAllowOwn = new Form_Element_Checkbox('formDisabelOwnSubject', 'Zakázat vlastní předmět');
+      $elemFormAllowOwn->setValues(false);
+      $form->addElement($elemFormAllowOwn, $grpForm);
+      if (isset($settings[self::PARAM_FORM_DIS_OWN_SUBJECT])) {
+         $form->formDisabelOwnSubject->setValues($settings[self::PARAM_FORM_DIS_OWN_SUBJECT]);
+      }
+      
 
       $grpAdmin = $form->addGroup('admins', 'Nastavení příjemců', 'Nastavení příjemců odeslaných dotazů z kontaktního formuláře');
 
@@ -458,6 +510,8 @@ lze využít následující výběr již existujících uživatelů.');
 
          $settings[self::PARAM_FORM] = $form->formEnabled->getValues();
          $settings[self::PARAM_FORM_SUBJECTS] = $form->formSub->getValues();
+         $settings[self::PARAM_FORM_DIS_OWN_SUBJECT] = $form->formDisabelOwnSubject->getValues();
+         $settings[self::PARAM_FORM_SEPARATE_NAME] = $form->formSepName->getValues();
 
          $settings[self::PARAM_ADMIN_RECIPIENTS] = $form->admins->getValues();
          $settings[self::PARAM_OTHER_RECIPIENTS] = $form->otherRec->getValues();
