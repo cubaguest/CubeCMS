@@ -123,20 +123,12 @@ class People_Controller extends Controller {
 
    protected function processEditForm(Form $form, Model_ORM_Record $person = null)
    {
-      
-      if ($form->image->getValues() != null OR ($form->haveElement('imgdel') AND $form->imgdel->getValues() == true)) {
-         // smaže se původní
-         if(is_file($this->category()->getModule()->getDataDir().$person->{People_Model::COLUMN_IMAGE})){
-            /* if upload file with same name it's overwrited and then deleted. This make error!!! */
-//               @unlink($this->category()->getModule()->getDataDir().$person->{People_Model::COLUMN_IMAGE});
-         }
-         $person->{People_Model::COLUMN_IMAGE} = null;
-      }
-
       if ($form->image->getValues() != null) {
          $file = $form->image->createFileObject();
          $person->{People_Model::COLUMN_IMAGE} = $file->getName();
          unset ($file);
+      } else {
+         $person->{People_Model::COLUMN_IMAGE} = null;
       }
       
       $person->{People_Model::COLUMN_ID_CATEGORY} = $this->category()->getId();
@@ -152,8 +144,6 @@ class People_Controller extends Controller {
       $person->{People_Model::COLUMN_PHONE} = $form->phone->getValues();
       $person->{People_Model::COLUMN_SOCIAL_URL} = $form->socialUrl->getValues();
 
-      
-      
       // pokud byla zadáno pořadí, zařadíme na pořadí. Jinak dáme na konec
       $person->save($person);
       
@@ -208,7 +198,7 @@ class People_Controller extends Controller {
 
       $iText = new Form_Element_TextArea('text', $this->tr('Popis'));
       $iText->setLangs();
-      $iText->addValidation(New Form_Validator_NotEmpty());
+//      $iText->addValidation(New Form_Validator_NotEmpty());
       $form->addElement($iText, $gbase);
 
       
@@ -217,10 +207,9 @@ class People_Controller extends Controller {
 //      $iOrder->addValidation(new Form_Validator_IsNumber());
 //      $form->addElement($iOrder, $gothr);
 //      
-      $iImage = new Form_Element_File('image', $this->tr('Portrét'));
-      $iImage->addValidation(new Form_Validator_FileExtension('jpg;png'));
+      $iImage = new Form_Element_Image('image', $this->tr('Portrét'));
+      $iImage->setAllowDelete(true);
       $iImage->setUploadDir($this->module()->getDataDir());
-      $iImage->setOverWrite(false);
       $form->addElement($iImage, $gbase);
 
       $iSubmit = new Form_Element_SaveCancel('save');
@@ -228,11 +217,11 @@ class People_Controller extends Controller {
 
       if($person){
          // element pro odstranění obrázku
-         if($person->{People_Model::COLUMN_IMAGE} != null){
-            $elemRemImg = new Form_Element_Checkbox('imgdel', $this->tr('Odstranit uložený portrét'));
-            $elemRemImg->setSubLabel($this->tr('Uložen portrét').': '.$person->{People_Model::COLUMN_IMAGE});
-            $form->addElement($elemRemImg, 'basic');
-         }
+//         if($person->{People_Model::COLUMN_IMAGE} != null){
+//            $elemRemImg = new Form_Element_Checkbox('imgdel', $this->tr('Odstranit uložený portrét'));
+//            $elemRemImg->setSubLabel($this->tr('Uložen portrét').': '.$person->{People_Model::COLUMN_IMAGE});
+//            $form->addElement($elemRemImg, 'basic');
+//         }
          $form->name->setValues($person->{People_Model::COLUMN_NAME});
          $form->surname->setValues($person->{People_Model::COLUMN_SURNAME});
          $form->degree->setValues($person->{People_Model::COLUMN_DEGREE});
@@ -243,6 +232,7 @@ class People_Controller extends Controller {
          $form->email->setValues($person->{People_Model::COLUMN_EMAIL});
          $form->phone->setValues($person->{People_Model::COLUMN_PHONE});
          $form->socialUrl->setValues($person->{People_Model::COLUMN_SOCIAL_URL});
+         $form->image->setValues($person->{People_Model::COLUMN_IMAGE});
       }
       
       if($form->isSend() && $form->save->getValues() == false){
@@ -358,41 +348,41 @@ class People_Controller extends Controller {
       $form->addElement($eOnPage, 'view');
 
 
-      $form->addGroup('images', $this->tr('Nasatvení obrázků'));
+//      $form->addGroup('images', $this->tr('Nasatvení obrázků'));
+//
+//      $elemImgW = new Form_Element_Text('imgw', $this->tr('Šířka portrétu'));
+//      $elemImgW->setSubLabel($this->tr('Výchozí: ') . $this->category()->getGlobalParam('imgw', self::DEFAULT_IMAGE_WIDTH) . ' px');
+//      $elemImgW->addValidation(new Form_Validator_IsNumber());
+//      $form->addElement($elemImgW, 'images');
+//
+//      $elemImgH = new Form_Element_Text('imgh', $this->tr('Výška portrétu'));
+//      $elemImgH->setSubLabel($this->tr('Výchozí: ') . $this->category()->getGlobalParam('imgh', self::DEFAULT_IMAGE_HEIGHT) . ' px');
+//      $elemImgH->addValidation(new Form_Validator_IsNumber());
+//      $form->addElement($elemImgH, 'images');
 
-      $elemImgW = new Form_Element_Text('imgw', $this->tr('Šířka portrétu'));
-      $elemImgW->setSubLabel($this->tr('Výchozí: ') . $this->category()->getGlobalParam('imgw', self::DEFAULT_IMAGE_WIDTH) . ' px');
-      $elemImgW->addValidation(new Form_Validator_IsNumber());
-      $form->addElement($elemImgW, 'images');
+//      $elemCropImage = new Form_Element_Checkbox('cropimg', $this->tr('Ořezávat portréty'));
+//      $form->addElement($elemCropImage, 'images');
 
-      $elemImgH = new Form_Element_Text('imgh', $this->tr('Výška portrétu'));
-      $elemImgH->setSubLabel($this->tr('Výchozí: ') . $this->category()->getGlobalParam('imgh', self::DEFAULT_IMAGE_HEIGHT) . ' px');
-      $elemImgH->addValidation(new Form_Validator_IsNumber());
-      $form->addElement($elemImgH, 'images');
-
-      $elemCropImage = new Form_Element_Checkbox('cropimg', $this->tr('Ořezávat portréty'));
-      $form->addElement($elemCropImage, 'images');
-
-      if (isset($settings['imgw'])) {
-         $form->imgw->setValues($settings['imgw']);
-      }
-      if (isset($settings['imgh'])) {
-         $form->imgh->setValues($settings['imgh']);
-      }
-      if (isset($settings['cropimg'])) {
-         $form->cropimg->setValues($settings['cropimg']);
-      } else {
-         $form->cropimg->setValues($this->category()->getGlobalParam('cropimg', self::DEFAULT_IMAGE_CROP));
-      }
+//      if (isset($settings['imgw'])) {
+//         $form->imgw->setValues($settings['imgw']);
+//      }
+//      if (isset($settings['imgh'])) {
+//         $form->imgh->setValues($settings['imgh']);
+//      }
+//      if (isset($settings['cropimg'])) {
+//         $form->cropimg->setValues($settings['cropimg']);
+//      } else {
+//         $form->cropimg->setValues($this->category()->getGlobalParam('cropimg', self::DEFAULT_IMAGE_CROP));
+//      }
 
       if (isset($settings['recordsonpage'])) {
          $form->numOnPage->setValues($settings['recordsonpage']);
       }
       // znovu protože mohl být už jednou validován bez těchto hodnot
       if ($form->isValid()) {
-         $settings['imgw'] = $form->imgw->getValues();
-         $settings['imgh'] = $form->imgh->getValues();
-         $settings['cropimg'] = $form->cropimg->getValues();
+//         $settings['imgw'] = $form->imgw->getValues();
+//         $settings['imgh'] = $form->imgh->getValues();
+//         $settings['cropimg'] = $form->cropimg->getValues();
          $settings['recordsonpage'] = $form->numOnPage->getValues();
       }
    }
