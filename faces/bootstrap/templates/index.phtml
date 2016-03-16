@@ -1,8 +1,4 @@
 <?php 
-if(Template::browser()->isMobile() && ( !isset($_COOKIE['mobile'] ) || $_COOKIE['mobile'] == false ) ){
-   $this->includeFile("tpl://index_handle.phtml");
-   return;
-}
 // base metatags
 Template_Core::setMetaTag('Robots', 'index,follow');
 Template_Core::setMetaTag('generator', AppCore::ENGINE_NAME.' '.AppCore::ENGINE_VERSION);
