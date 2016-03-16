@@ -1,11 +1,3 @@
-#groups-tabs ul li a {
-   font-size: 11px;
-   padding: 2px;
-}
-#groups-tabs .ui-tabs-panel {
-   padding: 10px 5px 5px 5px;
-}
-
 #groups-tabs table {
    width: 100%;
    margin-bottom: 5px;
@@ -24,31 +16,4 @@
 }
 #groups-tabs table .column-action {
    text-align: right;
-}
-
-/* OLD */
-
-div.section {
-/*   padding: 10px;*/
-}
-
-div.section table {
-   table-layout: fixed;
-   border: 1px solid silver;
-   width: 100%;
-}
-div.section table th, div.section table td {
-   padding: 3px;
-}
-div.section table em {
-   font-size: x-small;
-}
-div.section table .header-cell form {
-   float: right;
-}
-div.section table .key-cell {
-   word-wrap: break-word;
-}
-div.section table .end-row {
-   border-bottom: 1px solid silver;
 }
