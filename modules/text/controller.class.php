@@ -262,11 +262,13 @@ class Text_Controller extends Controller {
       $grpText = $form->addGroup('text', $this->tr('Text'));
       $grpView = $form->addGroup('view', $this->tr('Vzhed'));
       
-      $label = new Form_Element_Text('label', $this->tr('Nadpis'));
-      $label->addFilter(new Form_Filter_StripTags());
-      $label->setSubLabel($this->tr('Doplní se namísto nadpisu stránky'));
-      $label->setLangs();
-      $form->addElement($label, $grpText);
+      if(($this->category() instanceof Category_Admin) == false){
+         $label = new Form_Element_Text('label', $this->tr('Nadpis'));
+         $label->addFilter(new Form_Filter_StripTags());
+         $label->setSubLabel($this->tr('Doplní se namísto nadpisu stránky'));
+         $label->setLangs();
+         $form->addElement($label, $grpText);
+      }
 
       $textarea = new Form_Element_TextArea('text', $this->tr("Text"));
       $textarea->setLangs();
@@ -290,7 +292,7 @@ class Text_Controller extends Controller {
          $this->view()->fields = array_keys($this->customFields);
       }
       
-      if($mainText){
+      if($mainText && ($this->category() instanceof Category_Admin) == false){
          $perex = new Form_Element_TextArea('desc', $this->tr("Popis"));
          $perex->setLangs();
          $perex->setSubLabel($this->tr('Krátký popisek. Bývá uveden v přehledech a pro vyhledávače.'));
@@ -306,8 +308,10 @@ class Text_Controller extends Controller {
       
       if($rec instanceof Model_ORM_Record){
          $form->text->setValues($rec->{Text_Model::COLUMN_TEXT});
-         $form->label->setValues($rec->{Text_Model::COLUMN_LABEL});
-         if($mainText){
+         if(isset($form->label)){
+            $form->label->setValues($rec->{Text_Model::COLUMN_LABEL});
+         }
+         if($mainText && isset($form->desc)){
             $form->desc->setValues( isset($rec->catdesc) ? $rec->catdesc : $this->category()->getDataObj()->{Model_Category::COLUMN_DESCRIPTION});
             if(isset($form->image)){
                $form->image->setValues( isset($rec->catimg) ? $rec->catimg : $this->category()->getDataObj()->{Model_Category::COLUMN_IMAGE});
@@ -322,8 +326,10 @@ class Text_Controller extends Controller {
       $eSave = new Form_Element_Submit('save', $this->tr('Uložit'));
       $eSave->html()->addClass('btn-success');
       $submits->addElement($eSave);
-      $ePreview = new Form_Element_Submit('preview', $this->tr('Náhled'));
-      $submits->addElement($ePreview);
+      if(($this->category() instanceof Category_Admin) == false) {
+         $ePreview = new Form_Element_Submit('preview', $this->tr('Náhled'));
+         $submits->addElement($ePreview);
+      }
       $form->addElement($submits);
       
       return $form;
