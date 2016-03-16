@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}projects` (
   `project_keywords` varchar(300) DEFAULT NULL,
   `project_desc` varchar(500) DEFAULT NULL,
   `project_order` int(11) DEFAULT '0',
+  `project_place` VARCHAR(100) NULL DEFAULT NULL,
   PRIMARY KEY (`id_project`),
   KEY `id_user` (`id_user`,`project_urlkey`),
   KEY `id_user_last_edit` (`id_user_last_edit`),

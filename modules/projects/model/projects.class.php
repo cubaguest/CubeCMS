@@ -66,6 +66,19 @@ class Projects_Model_Projects extends Model_ORM_Ordered {
       // napojení na related projects   
 //      $this->addRelatioOneToMany(self::COLUMN_ID, 'Articles_Model_PrivateUsers', Articles_Model_PrivateUsers::COLUMN_A_H_U_ID_ARTICLE);
    }
+   
+   public static function getSomeProjects($limit)
+   {
+      $m = new self();
+      
+      $pr = $m
+         ->joinFK(self::COLUMN_ID_SECTION)
+         ->join(array('Projects_Model_Sections_1' => Projects_Model_Sections::COLUMN_ID_CATEGORY), 'Model_Category', Model_Category::COLUMN_ID)
+         ->limit(0, $limit)
+         ->order(array(self::COLUMN_TIME_ADD => Model_ORM::ORDER_DESC))
+         ->records();
+      return $pr;
+   }
 }
 
 class Projects_Model_Projects_Record extends Model_ORM_Ordered_Record {
