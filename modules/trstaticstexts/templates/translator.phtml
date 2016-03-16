@@ -1,104 +1,142 @@
-<?php 
+<?php
 $this->addFile("css://style.css");
 $this->addJsPlugin(New JsPlugin_JQuery());
 $this->addJsPlugin(New JsPlugin_JQueryCSS());
 ?>
-<h1><?php  echo $this->module != null ? sprintf($this->tr('Překladač statických textů modulu "%s"'), $this->module) : $this->tr('Překladač statických textů jádra');?></h1>
+<h1><?php echo $this->module != null ? sprintf($this->tr('Překladač statických textů modulu "%s"'), $this->module) : $this->tr('Překladač statických textů jádra'); ?></h1>
 <div class="ui-widget ">
-<?php 
-$this->formTr->html()->setAttrib('id', 'form_translation');
-echo $this->formTr->renderStart();
-?>
-<fieldset>
-   <legend><?php echo $this->tr('Jednotná čísla');?></legend>
-   <table style="width: 100%;" cellpadding="0" cellspacing="0">
-   <?php 
-   $rowTrS = 1;
-   foreach ($this->singulars as $strHash => $translation) {?>
-      <tr class="ui-widget-content ui-state-default <?php if($translation[0] == $translation[1]){echo "ui-state-highlight";}?>"><td>
-         <table id="tr_si_<?php echo $rowTrS++?>" class="tr_row full-width">
-      <tr><th><?php echo $this->tr('Originál');?>:</th></tr>
-      <tr><td class="tr_str"><?php echo $translation[0];?></td></tr>
-      <tr><th><?php echo $this->formTr->trsingular->label();?></th></tr>
-      <tr>
-         <td class=""><?php 
-      $this->formTr->trsingular->html()->setAttrib('rows', 1)->setAttrib('cols', 60)->addClass('tr_str_res');
-      $this->formTr->trsingular->setDimensional($strHash);
-      $this->formTr->trsingular->setValues($translation[1]);
-      echo $this->formTr->trsingular->controll();
-      ?></td>
-      </tr>
-   </table>
-   </td></tr>
-   <?php }?>
-   </table>
-</fieldset>
-
-<fieldset id="text-plurals">
-   <legend><?php echo $this->tr('Množná čísla');?></legend>
-   <table cellpadding="0" cellspacing="0" class="full-width">
-   <?php 
-   $rowTrP = 1;
-   foreach ($this->plurals as $strHash => $translation) {?>
-   <tr class="ui-widget-content ui-state-default <?php if($translation[0][0] == $translation[1][0]){echo "ui-state-highlight";}?>"><td>
-         <table id="tr_pl_<?php echo $rowTrP++?>" class="tr_pl_row full-width">
-         <tr><th colspan="3"><?php echo $this->tr('Originál');?>:</th></tr>
-         <tr>
-            <td class="tr_pl_str_1" style="width: 33%;"><em><?php echo htmlspecialchars($translation[0][0]);?></em></td>
-            <td class="tr_pl_str_2" style="width: 33%;"><em><?php echo htmlspecialchars($translation[0][1]);?></em></td>
-            <td class="tr_pl_str_3" style="width: 33%;"><em><?php if(isset($translation[0][2])){echo htmlspecialchars($translation[0][2]);}?></em></td>
-         </tr>
-         <!-- translations -->
-         <tr>
-            <th><?php echo $this->formTr->trplural1->label();?></th>
-            <th><?php echo $this->formTr->trplural2->label();?></th>
-            <th><?php echo $this->formTr->trplural3->label();?></th>
-         </tr>
-         <tr>
-            <td><?php 
-            $this->formTr->trplural1->html()->setAttrib('rows', 1)->setAttrib('cols', 20)->addClass('tr_pl_str_1_res');
-            $this->formTr->trplural1->setDimensional($strHash);
-            $this->formTr->trplural1->setValues(null);
-            if(isset ($translation[1][0])) {
-               $this->formTr->trplural1->setValues($translation[1][0]);
-            }
-            echo $this->formTr->trplural1->controll();
-            ?></td>
-            <td><?php 
-            $this->formTr->trplural2->html()->setAttrib('rows', 1)->setAttrib('cols', 20)->addClass('tr_pl_str_2_res');
-            $this->formTr->trplural2->setDimensional($strHash);
-            $this->formTr->trplural2->setValues(null);
-            if(isset ($translation[1][1])) {
-               $this->formTr->trplural2->setValues($translation[1][1]);
-            }
-            echo $this->formTr->trplural2->controll();
-            ?></td>
-            <td><?php 
-            if(isset($translation[1][2])){
-               $this->formTr->trplural3->html()->setAttrib('rows', 1)->setAttrib('cols', 20)->addClass('tr_pl_str_3_res');
-               $this->formTr->trplural3->setDimensional($strHash);
-               $this->formTr->trplural3->setValues(null);
-               if(isset ($translation[1][2])) {
-                  $this->formTr->trplural3->setValues($translation[1][2]);
-               }
-               echo $this->formTr->trplural3->controll();
-            }
-            ?></td>
-         </tr>
-      </table>
-   </td></tr>
-   <?php }?>
-   </table>
-</fieldset>
-<fieldset>
-   <?php 
-      echo $this->formTr->save;
+   <?php
+   $this->formTr->html()->setAttrib('id', 'form_translation');
+   echo $this->formTr->renderStart();
    ?>
-</fieldset>
+   <fieldset class="cubecms-widget cubecms-list">
+      <legend><?php echo $this->tr('Jednotná čísla'); ?></legend>
+      <div class="full-width">
+         <?php
+         $rowTrS = 1;
+         $prevFile = null;
+         foreach ($this->singulars as $strHash => $translation) {
+            if ($translation[2] != $prevFile) {
+               ?>
+               <h3><?php ps($this->tr('Soubor:') . ' ' . $translation[2]); ?></h3>
+               <div><small><i><?php ps(str_replace(AppCore::getAppLibDir(), DIRECTORY_SEPARATOR, $translation[3])); ?></i></small></div>
+               <?php
+               $prevFile = $translation[2];
+            }
+            ?>
+            <div class="cubecms-list-row <?php
+            if ($translation[0] == $translation[1]) {
+               echo "cubecms-state-highlight";
+            }
+            ?>">
+               <table id="tr_si_<?php echo $rowTrS++ ?>" class="tr_row full-width">
+                  <tr><th><?php echo $this->tr('Originál'); ?>:</th></tr>
+                  <tr><td class="tr_str"><?php echo nl2br(htmlspecialchars($translation[0])); ?></td></tr>
+                  <tr><th><?php echo $this->formTr->trsingular->label(); ?></th></tr>
+                  <tr>
+                     <td class=""><?php
+                        $this->formTr->trsingular->html()->setAttrib('rows', 1)->setAttrib('cols', 60)->addClass('tr_str_res');
+                        $this->formTr->trsingular->setDimensional($strHash);
+                        $this->formTr->trsingular->setValues($translation[1]);
+                        echo $this->formTr->trsingular->controll();
+                        ?></td>
+                  </tr>
+               </table>
+            </div>
+         <?php } ?>
+      </div>
+   </fieldset>
+
+   <fieldset id="text-plurals"  class="cubecms-widget cubecms-list">
+      <legend><?php echo $this->tr('Množná čísla'); ?></legend>
+      <div class="full-width">
+         <?php
+         $rowTrP = 1;
+         $prevFile = null;
+         foreach ($this->plurals as $strHash => $translation) {
+            if ($translation[2] != $prevFile) {
+               ?>
+               <h3><?php ps($this->tr('Soubor:') . ' ' . $translation[2]); ?></h3>
+               <div><small><i><?php ps(str_replace(AppCore::getAppLibDir(), DIRECTORY_SEPARATOR, $translation[3])); ?></i></small></div>
+               <?php
+               $prevFile = $translation[2];
+            }
+            ?>
+            <div class="cubecms-list-row <?php
+            if ($translation[0][0] == $translation[1][0]
+                || $translation[0][1] == $translation[1][1]
+                || (isset($translation[0][2]) && $translation[0][2] == $translation[1][2])) {
+               echo "cubecms-state-highlight";
+            }
+            ?>">
+               <table id="tr_pl_<?php echo $rowTrP++ ?>" class="tr_pl_row full-width">
+                  <tr><th colspan="3"><?php echo $this->tr('Originál'); ?>:</th></tr>
+                  <tr>
+                     <td class="tr_pl_str_1" style="width: 33%;"><em><?php echo nl2br(htmlspecialchars($translation[0][0])); ?></em></td>
+                     <td class="tr_pl_str_2" style="width: 33%;"><em><?php echo nl2br(htmlspecialchars($translation[0][1])); ?></em></td>
+                     <td class="tr_pl_str_3" style="width: 33%;"><em><?php
+                           if (isset($translation[0][2])) {
+                              echo nl2br(htmlspecialchars($translation[0][2]));
+                           }
+                           ?></em></td>
+                  </tr>
+                  <!-- translations -->
+                  <tr>
+                     <th><?php echo $this->formTr->trplural1->label(); ?></th>
+                     <th><?php echo $this->formTr->trplural2->label(); ?></th>
+                     <th><?php echo $this->formTr->trplural3->label(); ?></th>
+                  </tr>
+                  <tr>
+                     <td><?php
+                        $this->formTr->trplural1->html()->setAttrib('rows', 1)->setAttrib('cols', 20)->addClass('tr_pl_str_1_res');
+                        $this->formTr->trplural1->setDimensional($strHash);
+                        $this->formTr->trplural1->setValues(null);
+                        if (isset($translation[1][0])) {
+                           $this->formTr->trplural1->setValues($translation[1][0]);
+                        }
+                        echo $this->formTr->trplural1->controll();
+                        ?></td>
+                     <td><?php
+                        $this->formTr->trplural2->html()->setAttrib('rows', 1)->setAttrib('cols', 20)->addClass('tr_pl_str_2_res');
+                        $this->formTr->trplural2->setDimensional($strHash);
+                        $this->formTr->trplural2->setValues(null);
+                        if (isset($translation[1][1])) {
+                           $this->formTr->trplural2->setValues($translation[1][1]);
+                        }
+                        echo $this->formTr->trplural2->controll();
+                        ?></td>
+                     <td><?php
+                        if (isset($translation[1][2])) {
+                           $this->formTr->trplural3->html()->setAttrib('rows', 1)->setAttrib('cols', 20)->addClass('tr_pl_str_3_res');
+                           $this->formTr->trplural3->setDimensional($strHash);
+                           $this->formTr->trplural3->setValues(null);
+                           if (isset($translation[1][2])) {
+                              $this->formTr->trplural3->setValues($translation[1][2]);
+                           }
+                           echo $this->formTr->trplural3->controll();
+                        }
+                        ?></td>
+                  </tr>
+               </table>
+            </div>
+         <?php } ?>
+      </div>
+   </fieldset>
+   <fieldset>
+      <?php
+      echo $this->formTr->save;
+      ?>
+   </fieldset>
 
 
-<?php echo $this->formTr->renderEnd();?>
+   <?php echo $this->formTr->renderEnd(); ?>
 </div>
+<?php
+$this->addJsPlugin(new JsPlugin_TextAreaAutoSize());
+?>
 <script type="text/javascript">
-   $(document).ready(function(){});
+   $(document).ready(function () {
+      $('#form_translation fieldset').show();
+      $('#form_translation textarea').autogrow({horizontal: false});
+   });
 </script>
