@@ -1,0 +1,116 @@
+<?php
+$this->addFile("css://style.less");
+
+$jq = new JsPlugin_JQuery();
+$jq->addUISortable();
+$this->addJsPlugin($jq);
+?>
+<h1><?php echo $this->category()->getName(); ?></h1>
+<div class="content-admin">
+   <?php
+   $this->moduleButtons = array(
+       array(
+           'link' => $this->link()->route('addSlide'),
+           'title' => $this->tr('Přidat nový slajd'),
+           'icon' => Template_Toolbox2::ICON_ADD,
+           'name' => $this->tr('Přidat nový slajd'),
+       ),
+   );
+   $this->includeTpl('modules/buttons.phtml', true);
+   ?>
+   <table class="slides-list cubecms-widget cubecms-table" id="slides-list">
+      <thead class="cubecms-header">
+         <tr class="">
+            <th scope="col" class=""></th>
+            <th scope="col" class=""><?php echo $this->tr('Název') ?></th>
+            <th scope="col" class=""><?php echo $this->tr('Jazyk') ?></th>
+            <th scope="col" class=""><?php echo $this->tr('Počet položek') ?></th>
+            <th scope="col" class=""><?php echo $this->tr('Animace') ?></th>
+            <th scope="col" class=""><?php echo $this->tr('Akce') ?></th>
+         </tr>
+      </thead>
+      <tbody>
+         <?php
+         if (!empty($this->slides)) {
+            foreach ($this->slides as $key => $slide) {
+               ?>
+               <tr class="cubecms-row slide-row <?php echo $slide->{HPSlideShowAdv_Model::COLUMN_ACTIVE} ? '' : 'cubecms-state-disable' ?>" data-id="<?php echo $slide->getPK() ?>">
+                  <td class="col-move"><span class="button-move icon icon-arrows-v icon-fw"></span></td>
+                  <td>
+                     <a href="<?php echo $this->link()->route('editSlide', array('id' => $slide->getPK())) ?>"><?php
+                        ps($slide->{HPSlideShowAdv_Model::COLUMN_NAME});
+                        ?></a>
+                  </td>
+                  <td><?php
+                     $name = Locales::getLangLabel($slide->{HPSlideShowAdv_Model::COLUMN_LANG});
+                     ps(reset($name));
+                     ?></td>
+                  <td><?php ps($slide->items_count) ?></td>
+                  <td>
+                     <?php ps($slide->{HPSlideShowAdv_Model::COLUMN_ANIMATION} . ' (' . $slide->{HPSlideShowAdv_Model::COLUMN_DELAY} . ' s)'); ?>
+                  </td>
+                  <td> <?php echo $slide->toolbox; ?> </td>
+               </tr>
+               <?php
+            }
+         } else {
+            ?>
+            <tr class="cubecms-row">
+               <td colspan="2"><?php echo $this->tr('Není uložen žádný slide'); ?></td>
+            </tr>
+            <?php
+         }
+         ?>
+
+      </tbody>
+   </table>
+   <script type = "text/javascript">
+      $(document).ready(function () {
+         $("#slides-list tbody").sortable({
+            placeholder: "cubecms-state-highlight",
+            axis: "y",
+//            forceHelperSize: true,
+//            forcePlaceholderSize: true,
+            handle: ".button-move",
+            helper: function (e, ui) {
+               ui.children().each(function () {
+                  $(this).width($(this).width());
+               });
+               return ui;
+            },
+            update: function (event, ui) {
+               $.ajax({
+                  type: 'POST', url: "<?php echo $this->link()->route('editSlideParams') ?>",
+                  data: {action: 'changepos', id: ui.item.data('id'), pos: ui.item.index() + 1},
+                  success: function (data) {
+                     if (data.errmsg.length != 0) {
+                        alert('Chyba při přesunu: ' + data.errmsg.join(";"));
+                     }
+                  }
+               });
+            }
+         });
+
+         $('.toolbox-button-changeState').on('click', function () {
+            var id = $(this).closest('.slide-row').data("id");
+            var $this = $(this);
+            $.ajax({
+               type: "POST",
+               url: "<?php echo $this->link()->route('editSlideParams') ?>",
+               data: {action: "changestate", id: id},
+               success: function (data) {
+                  var $span = $('span.icon', $this).removeClass('icon-check-square-o icon-square-o');
+                  if (data.slide.<?php echo HPSlideShowAdv_Model::COLUMN_ACTIVE ?> === true) {
+                     $this.closest('.slide-row').removeClass('cubecms-state-disable');
+                     $span.addClass('icon-check-square-o');
+                  } else {
+                     $this.closest('.slide-row').addClass('cubecms-state-disable');
+                     $span.addClass('icon-square-o');
+                  }
+               }
+            });
+            return false;
+         });
+      });
+   </script>
+</div>

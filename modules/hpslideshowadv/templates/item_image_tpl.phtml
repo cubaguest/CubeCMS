@@ -1,0 +1,21 @@
+<div class="slide-item image-content" <?php echo isset($elemId) ? 'id="'.$elemId.'"' : ''?>
+     <?php echo isset($item) ? ' data-id="'.$item->getPK().'"' : ''?>
+     <?php echo isset($item) ? ' data-posx="'.$item->{HPSlideShowAdv_Model_Items::COLUMN_POS_X}.'"' : ''?>
+     <?php echo isset($item) ? ' data-posy="'.$item->{HPSlideShowAdv_Model_Items::COLUMN_POS_Y}.'"' : ''?>
+     <?php echo isset($item) ? ' data-animation="'.$item->{HPSlideShowAdv_Model_Items::COLUMN_ANIMATION}.'"' : ''?>
+     <?php echo isset($item) ? ' data-animationout="'.$item->{HPSlideShowAdv_Model_Items::COLUMN_ANIMATION_OUT}.'"' : ''?>
+     <?php echo isset($item) ? ' data-animationspeed="'.$item->{HPSlideShowAdv_Model_Items::COLUMN_ANIMATION_SPEED}.'"' : ''?>
+     <?php echo isset($item) ? ' data-animationspeedout="'.$item->{HPSlideShowAdv_Model_Items::COLUMN_ANIMATION_SPEED_OUT}.'"' : ''?>
+     <?php echo isset($item) ? ' data-classes="'.$item->{HPSlideShowAdv_Model_Items::COLUMN_CLASSES}.'"' : ''?>
+     <?php echo isset($item) ? ' data-delay="'.$item->{HPSlideShowAdv_Model_Items::COLUMN_DELAY}.'"' : ''?>
+     <?php echo isset($item) ? ' data-link="'.$item->{HPSlideShowAdv_Model_Items::COLUMN_LINK}.'"' : ''?>
+     <?php echo isset($item) ? ' data-styles="'.$item->{HPSlideShowAdv_Model_Items::COLUMN_STYLES}.'"' : ''?>
+     <?php echo isset($item) ? ' data-width="'.$item->{HPSlideShowAdv_Model_Items::COLUMN_WIDTH}.'"' : ''?>
+     <?php echo isset($item) ? ' data-height="'.$item->{HPSlideShowAdv_Model_Items::COLUMN_HEIGHT}.'"' : ''?>
+     >
+   <div class="tools">
+      <span class="icon icon-arrows"></span>
+      <span class="icon icon-remove"></span>
+   </div>
+   <div class="content"><img src="<?php echo isset($item) ? $this->imagesUrl.$item->{HPSlideShowAdv_Model_Items::COLUMN_IMAGE} : ''?>" /></div>
+</div>

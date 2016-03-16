@@ -1,0 +1,93 @@
+<div id="hp-slideshowadv">
+   <div id="dexp-layerslider" class="layerslider-bannercontainer tp-simpleresponsive">
+      <div class="layerslider-banner">
+         <ul>
+            <?php
+            foreach ($this->slides as $slide) {
+               $items = $slide->getItems();
+               ?>
+               <li data-transition="fade" data-masterspeed="300">
+                  <img src="<?php echo tp() ?>slide-bg.jpg" alt=""/>
+                  <?php foreach ($items as $item) { ?>
+                     <div id="dexp-layerslider-layer" class="<?php echo $item->{HPSlideShowAdv_Model_Items::COLUMN_CLASSES} ?>" 
+                          data-x="<?php echo $item->{HPSlideShowAdv_Model_Items::COLUMN_POS_X} ?>" 
+                          data-y="<?php echo $item->{HPSlideShowAdv_Model_Items::COLUMN_POS_Y} ?>" 
+                          data-speed="<?php echo $item->{HPSlideShowAdv_Model_Items::COLUMN_ANIMATION_SPEED} ?>" 
+                          data-start="<?php echo $item->{HPSlideShowAdv_Model_Items::COLUMN_DELAY} ?>" 
+                          data-easing="<?php echo $item->{HPSlideShowAdv_Model_Items::COLUMN_ANIMATION} ?>" 
+                          data-endeasing="<?php echo $item->{HPSlideShowAdv_Model_Items::COLUMN_ANIMATION_OUT} ?>">
+                             <?php
+                             if ($item->{HPSlideShowAdv_Model_Items::COLUMN_CONTENT} != null) {
+                                echo $item->{HPSlideShowAdv_Model_Items::COLUMN_CONTENT};
+                             }
+                             if ($item->{HPSlideShowAdv_Model_Items::COLUMN_IMAGE} != null) {
+                                ?>
+                           <img src="<?php echo $this->imagesUrl . $item->{HPSlideShowAdv_Model_Items::COLUMN_IMAGE} ?>" alt="" />
+                        <?php } ?>
+                     </div>
+                  <?php } ?>
+               </li>
+            <?php } ?>
+         </ul>
+      </div>
+   </div>
+   <?php
+   $this->addFile('js://engine:dexp.layerslider.js');
+   $this->addFile('js://engine:jquery.themepunch.revolution.min.js');
+   $this->addFile('css://engine:autowidth.css');
+   $this->addFile('css://engine:captions.css');
+   $this->addFile('css://engine:fullwidth.css');
+   $this->addFile('css://engine:layerslider.css');
+   $this->addFile('css://engine:responsive.css');
+   $this->addFile('css://engine:settings.css');
+   $this->addFile('css://engine:simple.css');
+   ?>
+   <<script type="text/javascript">
+
+      $(document).ready(function ($) {
+         if ($.fn.cssOriginal != undefined)
+            $.fn.css = $.fn.cssOriginal;
+         $('#dexp-layerslider .layerslider-banner')
+            .css({opacity: 1})
+            .revolution({
+               "delay": "9000",
+               "startheight": "450",
+               "startwidth": "1170",
+               "hideThumbs": "",
+               "thumbWidth": "",
+               "thumbHeight": "",
+               "thumbAmount": "",
+               "navigationType": "none",
+               "navigationArrows": "verticalcentered",
+               "navigationStyl e": "square",
+               "navigationHAlign": "center",
+               "navigationVAlign": " bottom",
+               "navigationHOffset": 0,
+               "navigationVOffset": 20,
+               "soloArrowLeftHalign": "left",
+               "soloArrowLeftValign": "center",
+               "soloArrowLeftHOffset": 20,
+               "soloArrowLeftVOffset": 0,
+               "soloArrow RightHalign": "ri ght",
+               "soloArrowRightValign": "center",
+               "soloArrowRightHOffset": 20,
+               "soloArrowRightVOffset": 0,
+               "touchenabled": "on",
+               "onHoverStop": "on",
+               "stopAtSlide": -1,
+               "stopAfterLoops": -1,
+               "hideCaptionAtLimit": 0,
+               "hideAllCaptionAtLilmit": 0,
+               "hideSliderAtLimit": 0,
+               "shadow": "",
+               "fullWidth": "on",
+               "fullScreen": "off",
+               "fullScreenOffsetContainer": "",
+               "lazyLoad": "on",
+               "timer": "bottom",
+               "shuffle": "off",
+               "dottedOverlay": "none"});
+      });//--><!]]>
+
+
+   </script>

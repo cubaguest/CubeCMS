@@ -1,0 +1,710 @@
+<?php
+$this->addFile("css://style.less");
+
+$jq = new JsPlugin_JQuery();
+$jq->addUISortable();
+$jq->addUIDraggable();
+$jq->addUIResizable();
+$this->addJsPlugin($jq);
+//$this->addJsPlugin(new JsPlugin_JQueryCSS());
+
+$h = $this->tr('Přidání slajdu');
+?>
+<h1><?php ps($h); ?></h1>
+<div class="content-admin">
+   <h2><?php ps($this->tr('Informace o slajdu')); ?></h2>
+   <?php
+   echo $this->formSlideInfo;
+   ?>
+   <?php
+   if ($this->slide != null) {
+      ?>
+      <h2 id="anchorDesigner"><?php ps($this->tr('Rozvržení slajdu')); ?></h2>
+      <?php
+      $this->moduleButtons = array(
+          array(
+              'link' => $this->link()->route(),
+              'title' => $this->tr('Zavřít'),
+              'icon' => Template_Toolbox2::ICON_CLOSE,
+              'name' => $this->tr('Zavřít'),
+          ),
+          array(
+              'id' => 'addText',
+              'link' => $this->link()->anchor('addText'),
+              'title' => $this->tr('Přidat nový text'),
+              'icon' => Template_Toolbox2::ICON_ADD,
+              'name' => $this->tr('Přidat nový text'),
+          ),
+          array(
+              'id' => 'addImage',
+              'link' => $this->link()->anchor('addImage'),
+              'title' => $this->tr('Přidat nový obrázek'),
+              'icon' => Template_Toolbox2::ICON_ADD,
+              'name' => $this->tr('Přidat nový obrázek'),
+          ),
+      );
+      $this->includeTpl('modules/buttons.phtml', true);
+      
+      $style = null;
+      if($this->slide->{HPSlideShowAdv_Model::COLUMN_IMAGE} != null){
+         $style = "background-image: url('".$this->slide->getBGImageUrl()."'); background-size: cover;";
+      }
+      ?>
+
+      <div id="slide-edit-area-wrap">
+         <div id="slide-edit-area" style="<?php echo $style?>">
+            <?php
+            if (!empty($this->slideItems)) {
+               foreach ($this->slideItems as $key => $item) {
+                  if ($item->{HPSlideShowAdv_Model_Items::COLUMN_IMAGE} != null) {
+                     $this->includeFile('tpl://item_image_tpl.phtml', array('item' => $item, 'elemId' => 'item-' . $item->getPK()));
+                  }
+//                  if ($item->{HPSlideShowAdv_Model_Items::COLUMN_CONTENT} != null) {
+                  $this->includeFile('tpl://item_text_tpl.phtml', array('item' => $item, 'elemId' => 'item-' . $item->getPK()));
+//                  }
+               }
+            }
+            ?>
+         </div>
+      </div>
+      <div id="slide-item-text-tpl" class="hidden">
+         <?php
+         $this->includeFile('tpl://item_text_tpl.phtml');
+         ?>
+      </div>
+      <div id="slide-item-image-tpl" class="hidden">
+         <?php
+         $this->includeFile('tpl://item_image_tpl.phtml');
+         ?>
+      </div>
+
+      <div id="slide-item-edit" class="cubecms-widget cubecms-advform" style="display: none;">
+         <div class="cubecms-header">
+            <h3><?php ps($this->tr('Nastavení položky')); ?>:</h3>
+         </div>
+         <div class="cubecms-content">
+            <form action="<?php echo $this->link() ?>" role="form">
+               <div class="row">
+                  <div class="col-md-3">
+                     <label for="inputItemStyleDelay"><?php ps($this->tr('Zpoždění')); ?>:</label>
+                     <div class="input-group">
+                        <input type="number" min="0" step="100" id="inputItemStyleDelay" class="form-control" name="delay" />
+                        <span class="input-group-addon">ms</span>
+                     </div>
+                     <label for="inputItemStyleClasses"><?php ps($this->tr('Třídy')); ?>:</label>
+                     <select name="classes" id="inputItemStyleClasses" multiple="multiple" class="form-control" size="10">
+                        <?php
+                        foreach ($this->itemClasses as $name => $class) {
+                           if (is_array($class)) {
+                              ?>
+                              <optgroup label="<?php psa($name) ?>">
+                                 <?php foreach ($class as $n => $cla) { ?>
+                                    <option value="<?php echo $cla; ?>"><?php echo is_string($n) ? $n : $cla; ?></option>
+                                 <?php } ?>
+                              </optgroup>
+                           <?php } else { ?>
+                              <option value="<?php echo $class; ?>"><?php echo is_string($name) ? $name : $class; ?></option>
+                           <?php } ?>
+                        <?php } ?>
+                     </select>
+                  </div>
+                  <div class="col-md-3">
+                     <label for="inputItemStyleAnimIn"><?php ps($this->tr('Animace vstupní')); ?>:</label>
+                     <select name="animation" id="inputItemStyleAnimIn" class="form-control">
+                        <?php foreach ($this->itemAnimations as $key => $s) { ?>
+                           <option value="<?php echo is_int($key) ? $s : $key; ?>"><?php echo $s; ?></option>
+                        <?php } ?>
+                     </select>
+                     <label for="inputItemStyleAnimInSpeed"><?php ps($this->tr('Rychlost')); ?>:</label>
+                     <div class="input-group">
+                        <input type="number" min="0" step="100" class="form-control" name="animationspeed" id="inputItemStyleAnimInSpeed" />
+                        <span class="input-group-addon">ms</span>
+                     </div>
+                     <label for="inputItemStyleAnimOut"><?php ps($this->tr('Animace výstupní')); ?>:</label>
+                     <select name="animationout" id="inputItemStyleAnimOut" class="form-control">
+                        <?php foreach ($this->itemAnimationsOut as $key => $s) { ?>
+                           <option value="<?php echo is_int($key) ? $s : $key; ?>"><?php echo $s; ?></option>
+                        <?php } ?>
+                     </select>
+                     <label for="inputItemStyleAnimOutSpeed"><?php ps($this->tr('Rychlost')); ?>:</label>
+                     <div class="input-group">
+                        <input type="number" min="0" step="100" class="form-control" name="animationspeedout" id="inputItemStyleAnimOutSpeed" />
+                        <span class="input-group-addon">ms</span>
+                     </div>
+
+                  </div>
+                  <div class="col-md-6">
+                     <label for="inputItemStyleLink"><?php ps($this->tr('Odkaz')); ?>:</label>
+                     <div class="input-group">
+                        <input type="text" class="form-control" name="link" id="inputItemStyleLink" />
+                        <span class="input-group-addon"><span class="icon icon-link"></span></span>
+                     </div>
+                     <label for="inputItemStyleCSS"><?php ps($this->tr('CSS styly')); ?>:</label>
+                     <textarea name="styles" id="inputItemStyleCSS" cols="30" rows="5" class="form-control"></textarea>
+                     <div class="row">
+                        <div class="col-md-6">
+                           <label for="inputItemStylePosX"><?php ps($this->tr('Pozice')); ?>:</label>
+                           <div class="input-group">
+                              <span class="input-group-addon">X:</span>
+                              <input type="number" min="0" id="inputItemStylePosX" class="form-control" name="posx" />
+                              <span class="input-group-addon">px</span>
+                              <span class="input-group-addon">Y:</span>
+                              <input type="number" min="0" id="inputItemStylePosY" class="form-control" name="posy" />
+                              <span class="input-group-addon">px</span>
+                           </div>
+                        </div>
+                        <div class="col-md-6">
+                           <label for="inputItemStyleWidth"><?php ps($this->tr('Rozměry obrázku')); ?>:</label>
+                           <div class="input-group">
+                              <span class="input-group-addon">W:</span>
+                              <input type="number" min="0" id="inputItemStyleWidth" class="form-control" name="width" />
+                              <span class="input-group-addon">px</span>
+                              <span class="input-group-addon">H:</span>
+                              <input type="number" min="0" id="inputItemStyleHeight" class="form-control" name="height" />
+                              <span class="input-group-addon">px</span>
+                           </div>
+                           <div class="checkbox">
+                              <label for="inputItemStyleRatio">
+                                 <input type="checkbox" checked="checked" id="inputItemStyleRatio" /> <?php ps($this->tr('zachovat poměr stran')); ?> 
+                              </label>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               <div class="row">
+                  <div class="col-md-12 buttons">
+                     <button id="buttonRemoveItem" class="btn btn-danger" type="button"><span class="icon icon-remove"></span> <?php ps($this->tr('Odstranit položku')); ?></button>
+                  </div>
+               </div>
+            </form>
+         </div>
+
+      </div>
+      <div id="slide-items-save" class="cubecms-widget cubecms-advform">
+         <div class="cubecms-content">
+            <div class="row">
+               <div class="col-md-12 buttons">
+                  <button id="buttonSaveItem"  class="btn btn-success" type="button"><span class="icon icon-check"></span> <?php ps($this->tr('Uložit rozvržení')); ?></button>
+               </div>
+            </div>
+         </div>
+      </div>
+
+      <div id="image-uploader" style="display: none;">
+         <?php
+         $this->formUplaodImage->html()->setAttrib('id', 'slideImageUplaodForm');
+         echo $this->formUplaodImage;
+         ?>
+      </div>
+
+      <h2><?php ps($this->tr('Položky slajdu')); ?></h2>
+      <table id="slide-items-list" class="slide-items-list cubecms-widget cubecms-table">
+         <thead class="cubecms-header">
+            <tr class="">
+               <th scope="col" class="slideitem-tb-type"><?php echo $this->tr('Typ') ?></th>
+               <th scope="col" class="slideitem-tb-delay"><?php echo $this->tr('Zpoždění') ?></th>
+               <th scope="col" class="slideitem-tb-animations"><?php echo $this->tr('Animace') ?></th>
+               <th scope="col" class="slideitem-tb-actions"><?php echo $this->tr('Akce') ?></th>
+            </tr>
+         </thead>
+         <tbody>
+            <?php
+            if (!empty($this->slideItems)) {
+               foreach ($this->slideItems as $key => $item) {
+                  ?>
+                  <tr class="cubecms-row" id="row-item-<?php echo $item->getPK() ?>">
+                     <td>
+                        <a class="select-item" href="<?php echo $this->link() ?>#item-<?php echo $item->getPK() ?>"><?php
+                           echo $item->{HPSlideShowAdv_Model_Items::COLUMN_IMAGE} == null ? $this->tr('Textové pole') : $this->tr('Obrázek');
+                           ?></a>
+                        <?php
+                        if ((string) $item->{HPSlideShowAdv_Model_Items::COLUMN_CONTENT} != null) {
+                           echo '<br />';
+                           echo Utils_String::truncate(strip_tags((string) $item->{HPSlideShowAdv_Model_Items::COLUMN_CONTENT}), 30);
+                        }
+                        ?>
+                     </td>
+                     <td>
+                        <?php
+                        echo $item->{HPSlideShowAdv_Model_Items::COLUMN_DELAY} . 'ms';
+                        ?>
+                     </td>
+                     <td>
+                        <?php
+                        echo $this->tr('Příchozí') . ' ' . $item->{HPSlideShowAdv_Model_Items::COLUMN_ANIMATION}
+                        . ' (' . $item->{HPSlideShowAdv_Model_Items::COLUMN_ANIMATION_SPEED} . 'ms)' . '<br />';
+                        echo $this->tr('Odchozí') . ' ' . $item->{HPSlideShowAdv_Model_Items::COLUMN_ANIMATION_OUT}
+                        . ' (' . $item->{HPSlideShowAdv_Model_Items::COLUMN_ANIMATION_SPEED_OUT} . 'ms)' . '<br />';
+                        ?>
+                     </td>
+                     <td>
+                        <?php
+                        echo $item->toolbox;
+                        ?>
+                     </td>
+                  </tr>
+                  <?php
+               }
+            } else {
+               ?>
+               <tr class="cubecms-row">
+                  <td colspan="4"><?php echo $this->tr('Není vložen žádný objekt'); ?></td>
+               </tr>
+               <?php
+            }
+            ?>
+
+         </tbody>
+      </table>
+
+      <script type = "text/javascript">
+
+         $(document).ready(function () {
+            // resize area to specific banner size (relative)
+            var $area = $('#slide-edit-area');
+            var $itemEditForm = $('#slide-item-edit');
+            var $itemsTable = $('#slide-items-list');
+            var dimensionX = <?php echo $this->dimensions['width'] ?>;
+            var dimensionY = <?php echo $this->dimensions['height'] ?>;
+            var sizeMultipler = $area.width() / dimensionX;
+            var changesSaved = true;
+
+            var draggableOpts = {
+               handle: ".icon-arrows",
+               containment: "parent",
+               stop: function (event, ui) {
+                  $(this).data('posx', Math.round($(this).position().left / sizeMultipler));
+                  $(this).data('posy', Math.round($(this).position().top / sizeMultipler));
+                  $('#inputItemStylePosX', $itemEditForm).val(Math.round($(this).position().left / sizeMultipler));
+                  $('#inputItemStylePosY', $itemEditForm).val(Math.round($(this).position().top / sizeMultipler));
+                  someChanged();
+               }
+            };
+
+            var resizableOpts = {
+               containment: "parent",
+               stop: function (event, ui) {
+                  $(this).data('width', Math.round($(this).width() / sizeMultipler));
+                  $(this).data('height', Math.round($(this).height() / sizeMultipler));
+                  $('#inputItemStyleWidth', $itemEditForm).val(Math.round($(this).width() / sizeMultipler));
+                  $('#inputItemStyleHeight', $itemEditForm).val(Math.round($(this).height() / sizeMultipler));
+                  someChanged();
+               },
+               aspectRatio: true
+            };
+
+            var resizableTextOpts = {
+               containment: "parent",
+               stop: function (event, ui) {
+                  $(this).data('width', Math.round($(this).width() / sizeMultipler));
+                  $('#inputItemStyleWidth', $itemEditForm).val(Math.round($(this).width() / sizeMultipler));
+                  someChanged();
+               },
+               aspectRatio: false
+            };
+
+            var itemAjaxUrl = '<?php echo $this->link()->route('editItem', array('idItem' => '[ID]')) ?>';
+            $area.height(sizeMultipler * dimensionY);
+
+            // pozicování elementu
+            $('.slide-item', $area).each(function () {
+               $(this).css({
+                  left: (parseFloat($(this).data('posx')) * sizeMultipler) + 'px',
+                  top: (parseFloat($(this).data('posy')) * sizeMultipler) + 'px'
+               });
+               if ($(this).hasClass('image-content')) {
+                  $(this).css({
+                     width: (parseFloat($(this).data('width')) * sizeMultipler) + 'px',
+                     height: (parseFloat($(this).data('height')) * sizeMultipler) + 'px'
+                  });
+               }
+               if ($(this).hasClass('text-content')) {
+                  if ($(this).data('width') !== '0' && $(this).data('width') !== 0) {
+                     var width = (parseFloat($(this).data('width')) * sizeMultipler) + 'px';
+                  } else {
+                     var width = 'auto';
+                  }
+                  $(this).css({width: width});
+               }
+
+               if ($(this).data('classes') !== '') {
+                  $(this).find('.content').addClass($(this).data('classes'));
+               }
+               if ($(this).data('styles') !== '') {
+                  $(this).find('.content').attr('style', $(this).data('styles'));
+               }
+            });
+
+            function processItem($item, action, callback)
+            {
+               var dragable = false, resizable = false;
+               if (typeof $item.draggable("instance") !== "undefined") {
+                  dragable = true;
+                  $item.draggable("destroy");
+                  //                  deactivateItem($item);
+               }
+               if (typeof $item.resizable("instance") !== "undefined") {
+                  resizable = true;
+                  $item.resizable("destroy");
+                  //                  deactivateItem($item);
+               }
+
+               var data = $item.data();
+               data.action = action;
+
+               //               data['ui-draggable'] = null; // funkce nesmí být v datech formuláře
+
+               if ($item.hasClass('text-content')) {
+                  data['content'] = $item.find('.content').html(); // funkce nesmí být v datech formuláře
+               }
+
+               $.ajax({
+                  method: 'POST',
+                  data: data,
+                  url: itemAjaxUrl.replace('[ID]', data.id),
+                  success: function (result) {
+                     if (dragable) {
+                        $item.draggable(draggableOpts);
+                     }
+                     if (resizable) {
+                        if ($item.hasClass('image-content')) {
+                           $item.resizable(resizableOpts);
+                        }
+                        if ($item.hasClass('text-content')) {
+                           $item.resizable(resizableTextOpts);
+                        }
+                     }
+                     if ($.isFunction(callback)) {
+                        callback(result);
+                     }
+                  }
+               });
+            }
+
+            function openEditForm($item)
+            {
+               // doplnění hodnot
+
+               $.each($item.data(), function (index, value) {
+                  // inputy 
+                  var $input = $('[name="' + index + '"]', $itemEditForm);
+                  if ($input.length > 0) {
+                     $input.val(value);
+                  }
+                  // select boxy, je třeba parsovat zvláště
+                  if (value && index === 'classes' && value !== '' && value !== null) {
+                     $.each(value.split(" "), function (i, e) {
+                        $('select[name="classes"] option[value="' + e + '"]', $itemEditForm).prop("selected", true);
+                     });
+                  }
+
+               });
+               $itemEditForm.data('targetItem', $item);
+               $itemEditForm.show();
+            }
+
+            function closeEditForm($item)
+            {
+               $itemEditForm.hide();
+            }
+
+            function activateItem($item)
+            {
+               if ($item.hasClass('active')) {
+                  return true;
+               }
+
+               $item.addClass('active');
+               if ($item.hasClass('text-content')) {
+                  $item.find('.content').prop('contenteditable', true)
+   //                     .trigger('focus')
+                     ;
+               }
+               openEditForm($item);
+               $itemsTable.find('#row-item-' + $item.data('id')).addClass('cubecms-state-highlight');
+               $item.draggable(draggableOpts);
+
+               if ($item.hasClass('image-content')) {
+                  $item.resizable(resizableOpts);
+               }
+               if ($item.hasClass('text-content')) {
+                  $item.resizable(resizableTextOpts);
+               }
+
+               return true;
+            }
+
+            function deactivateItem($item)
+            {
+               $item.removeClass('active').find('.content').prop('contenteditable', false);
+               $itemsTable.find('.cubecms-state-highlight').removeClass('cubecms-state-highlight');
+               if (typeof $item.draggable("instance") !== "undefined") {
+                  $item.draggable("destroy");
+               }
+               if (typeof $item.resizable("instance") !== "undefined") {
+                  $item.resizable("destroy");
+               }
+               closeEditForm($item);
+            }
+
+            function deactivateItems()
+            {
+               $area.find('.active').each(function () {
+                  deactivateItem($(this));
+               });
+            }
+
+            function assignItemData($item, itemData) {
+               $item
+                  .data({
+                     'id': itemData.<?php echo HPSlideShowAdv_Model_Items::COLUMN_ID ?>,
+                     'animation': itemData.<?php echo HPSlideShowAdv_Model_Items::COLUMN_ANIMATION ?>,
+                     'animationout': itemData.<?php echo HPSlideShowAdv_Model_Items::COLUMN_ANIMATION_OUT ?>,
+                     'animationspeed': itemData.<?php echo HPSlideShowAdv_Model_Items::COLUMN_ANIMATION_SPEED ?>,
+                     'animationspeedout': itemData.<?php echo HPSlideShowAdv_Model_Items::COLUMN_ANIMATION_SPEED_OUT ?>,
+                     'classes': itemData.<?php echo HPSlideShowAdv_Model_Items::COLUMN_CLASSES ?>,
+                     'delay': itemData.<?php echo HPSlideShowAdv_Model_Items::COLUMN_DELAY ?>,
+                     'height': itemData.<?php echo HPSlideShowAdv_Model_Items::COLUMN_HEIGHT ?>,
+                     'width': itemData.<?php echo HPSlideShowAdv_Model_Items::COLUMN_WIDTH ?>,
+                     'link': itemData.<?php echo HPSlideShowAdv_Model_Items::COLUMN_LINK ?>,
+                     'posx': itemData.<?php echo HPSlideShowAdv_Model_Items::COLUMN_POS_X ?>,
+                     'posy': itemData.<?php echo HPSlideShowAdv_Model_Items::COLUMN_POS_Y ?>,
+                     'styles': itemData.<?php echo HPSlideShowAdv_Model_Items::COLUMN_STYLES ?>
+                  })
+                  .prop('id', 'item-' + itemData.id_slide_item);
+            }
+
+            function reloadItemsList()
+            {
+               $('#slide-items-list').load('<?php echo $this->link() ?> #slide-items-list>*');
+            }
+
+            function someChanged()
+            {
+               changesSaved = true;
+               $('#buttonSaveItem .icon').removeClass().addClass('icon icon-save');
+               
+               $(window).on("beforeunload", function () {
+                  return '<?php echo $this->tr('Nebyly uloženy změny. Opravdu chcete odejít?')?>';
+               });
+            }
+
+            $('#addText').on('click', function (e) {
+               deactivateItems();
+               var $editDiv = $('#slide-item-text-tpl>*').clone();
+
+               $editDiv.addClass('editable-content');
+               $('.content', $editDiv).html('Text here');
+
+               $editDiv.data({
+                  id: null,
+                  posx: 0,
+                  width: 0,
+                  posy: 0
+               });
+
+
+               // store item to server
+               processItem($editDiv, 'save', function (data) {
+                  assignItemData($editDiv, data.item);
+                  $area.append($editDiv);
+                  activateItem($editDiv);
+                  reloadItemsList();
+               });
+               return false;
+            });
+
+            $('#addImage').on('click', function (e) {
+               deactivateItems();
+               $('#slide_upload_image_1').click();
+               e.preventDefault();
+               return false;
+            });
+
+            $('#slideImageUplaodForm').on('submit', (function (e) {
+               e.preventDefault();
+               var formData = new FormData(this);
+
+               $.ajax({
+                  type: 'POST',
+                  url: '<?php echo $this->link()->route('uploadSlideItem') ?>',
+                  data: formData,
+                  cache: false,
+                  contentType: false,
+                  processData: false,
+                  success: function (data) {
+                     var $editDiv = $('#slide-item-image-tpl>*').clone();
+                     $editDiv
+                        .find('.content img').prop('src', '<?php echo $this->imagesUrl ?>' + data.item.<?php echo HPSlideShowAdv_Model_Items::COLUMN_IMAGE ?>);
+                     assignItemData($editDiv, data.item);
+                     $area.append($editDiv);
+                     activateItem($editDiv);
+                     reloadItemsList();
+                  },
+                  error: function (data) {
+                     console.log("error");
+                     console.log(data);
+                  }
+               });
+            }));
+
+            $("#slide_upload_image_1").on("change", function () {
+               $("#slideImageUplaodForm").submit();
+            });
+
+            $itemEditForm.on('change', '#inputItemStyleRatio', function () {
+               var $item = $itemEditForm.data('targetItem');
+               if (typeof $item.resizable("instance") === "undefined") {
+                  return;
+               }
+               $item.resizable('destroy');
+               if ($(this).is(':checked')) {
+                  if ($item.hasClass('image-content')) {
+                     $item.resizable(resizableOpts);
+                  } else if ($item.hasClass('text-content')) {
+                     $item.resizable(resizableTextOpts);
+                  }
+               } else {
+                  if ($item.hasClass('image-content')) {
+                     $item.resizable($.extend({}, resizableOpts, {aspectRatio: false}));
+                  } else if ($item.hasClass('text-content')) {
+                     $item.resizable(resizableTextOpts);
+                  }
+               }
+            });
+
+
+            $area.on('click', '.slide-item .icon-remove', function () {
+               // ajax call to remove
+               var $item = $(this).closest('.slide-item');
+               processItem($item, 'remove', function () {
+                  deactivateItem($item);
+                  $item.remove();
+               });
+            });
+
+            $area.on('click', '.slide-item', function (e) {
+               // clear form and load data
+               $area.find('.active').each(function () {
+                  deactivateItem($(this));
+               });
+               activateItem($(this));
+               return false;
+            });
+
+            $area.on('click', function () {
+   //               if (!$(event.target).closest('.slide-item.active').length && !$(event.target).is('.slide-item.active')) {
+   //                  $area.find('.active').each(function () {
+   //                     var $item = $(this);
+   //                     deactivateItem($item);
+   //                  });
+   //               }
+            });
+
+            $itemEditForm.on('change', 'input,select,textarea', function () {
+               someChanged();
+               var $item = $itemEditForm.data('targetItem');
+               // store inputs to data 
+               $('input,select,textarea', $itemEditForm).each(function () {
+                  var value = $(this).val();
+                  if ($.isArray(value)) {
+                     value = value.join(' ');
+                  }
+                  $item.data($(this).prop('name'), value);
+               });
+            });
+
+            $('#buttonSaveItem').on('click', function () {
+               var $item = $itemEditForm.data('targetItem');
+               if (typeof $item !== "undefined" && $item.length === 0) {
+                  // store inputs to data 
+                  $('input,select,textarea', $itemEditForm).each(function () {
+                     var value = $(this).val();
+                     if ($.isArray(value)) {
+                        value = value.join(' ');
+                     }
+                     $item.data($(this).prop('name'), value);
+                  });
+               }
+               var $items = $area.find('.slide-item');
+               var counter = 0;
+               $items.each(function () {
+                  processItem($(this), 'save', function () {
+                     counter++;
+                     if ($items.length === counter) {
+                        reloadItemsList();
+                     }
+                  });
+               });
+               // process save on item
+               $('#buttonSaveItem .icon').removeClass().addClass('icon icon-check');
+               $(window).off("beforeunload");
+               changesSaved = true;
+            });
+
+            $('#slide-items-list').on('click', '.select-item', function () {
+               $area.find('.active').each(function () {
+                  deactivateItem($(this));
+               });
+               var $item = $('#' + this.href.substring(this.href.indexOf("#") + 1));
+               activateItem($item);
+
+               $('html, body').animate({scrollTop: $("#anchorDesigner").offset().top}, 800);
+
+               return false;
+            });
+
+            /*  apliakce stylů z formu */
+            $('#inputItemStyleClasses', $itemEditForm).on('change', function () {
+               var classes = [];
+               var allclasses = [];
+               $('select[name="classes"] :selected', $itemEditForm).each(function (i, selected) {
+                  classes[i] = $(selected).text().replace(/^\./, '');
+               });
+               $('select[name="classes"] option', $itemEditForm).each(function (i, value) {
+                  allclasses[i] = $(value).text().replace(/^\./, '');
+               });
+               var $item = $itemEditForm.data('targetItem');
+               if ($item.length > 0) {
+                  var $cnt = $item.find('.content');
+                  $cnt.removeClass(allclasses.join(' '));
+                  $cnt.addClass(classes.join(' '));
+               }
+               someChanged();
+            });
+            $('#inputItemStyleCSS', $itemEditForm).on('keyup', function () {
+               var $item = $itemEditForm.data('targetItem');
+               if ($item.length > 0) {
+                  var $cnt = $item.find('.content').attr('style', $(this).val());
+               }
+               someChanged();
+            });
+            $('#inputItemStylePosX', $itemEditForm).on('change', function () {
+               var $item = $itemEditForm.data('targetItem');
+               if ($item.length > 0) {
+                  $item.css('left', (parseFloat($(this).val()) * sizeMultipler) + 'px');
+                  $item.data('posx', $(this).val());
+               }
+               someChanged();
+            });
+            $('#inputItemStylePosY', $itemEditForm).on('change', function () {
+               var $item = $itemEditForm.data('targetItem');
+               if ($item.length > 0) {
+                  $item.css('top', (parseFloat($(this).val()) * sizeMultipler) + 'px');
+                  $item.data('posy', $(this).val());
+               }
+               someChanged();
+            });
+         });
+      </script>
+
+      <?php
+      $this->includeFile('tpl://engine:components/modal.phtml', array('content' => '', 'id' => 'modal-edit-text',
+          'header' => 'Obrázek pozadí',
+          'close' => true,
+          'large' => false,
+          'footer' => '<button class="btn btn-default close-modal">Zavřít</button>'));
+      ?>
+   <?php } ?>
+</div>
