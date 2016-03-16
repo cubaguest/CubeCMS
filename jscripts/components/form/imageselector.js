@@ -23,6 +23,14 @@ $(document).ready(function(){
       });
    }
    
+   $container.on('click', '.button-clear-image-selector', function(e){
+      e.preventDefault();
+      var $replacement = $(this).prev('input').clone(true);
+      $(this).prev('input').replaceWith($replacement);
+      var $img = $(this).closest('.image-selector').find('.image-selector-img-box img');
+      $img.prop('src', $img.data('originalsrc'));
+      return false;
+   });
    $container.on('click', '.image-selector-img-box', function(){
       $(this).closest('.image-selector').find('input[type="file"]').first().click();
    });
