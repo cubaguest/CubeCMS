@@ -50,6 +50,7 @@ class Menu_Admin_Item {
       $this->urlkey = $urlkey;
       $this->module = $module;
       $this->icon = $icon;
+      $this->datadir = Utils_String::toSafeFileName($module);
    }
    
    public static function getLastID()
