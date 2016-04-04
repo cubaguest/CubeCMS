@@ -72,7 +72,8 @@ class CustomBlocks_View extends View {
    public function addBlockView()
    {
        $this->template()->addFile('tpl://customblocks:edit_block.phtml');
-       $this->blockName = isset($this->block['name'][Locales::getLang()]) ? $this->block['name'][Locales::getLang()] : reset($this->block['name']);
+       $name = $this->block['name'];
+       $this->blockName = isset($name[Locales::getLang()]) ? $name[Locales::getLang()] : reset($name);
        Template_Navigation::addItem(sprintf($this->tr('Přidání bloku %s'), $this->blockName), $this->link(), true);
        Template::addPageTitle($this->category()->getName());
        Template::addPageTitle(sprintf($this->tr('Přidání bloku %s'), $this->blockName));

@@ -230,7 +230,7 @@ class CustomBlocks_Controller extends Controller {
       if(!$block){
          throw new UnexpectedPageException();
       }
-      
+   
       $fMove = new Form('block_move_');
       
       $eCat = new Form_Element_Select('idcat', $this->tr('Cílová kategorie'));
@@ -310,8 +310,9 @@ class CustomBlocks_Controller extends Controller {
                
                $elementRecord = $model
                    ->where(CustomBlocks_Model_Items::COLUMN_ID_BLOCK." = :idb AND ".CustomBlocks_Model_Items::COLUMN_INDEX." = :ind",
-                       array('idb' => $blockRecord->getPK(), 'ind' => $index) )
+                       array('idb' => $blockRecord->getPK(), 'ind' => (string)$index) )
                    ->record();
+               
                if(!$elementRecord){
                   $elementRecord = null;
                }
@@ -447,12 +448,26 @@ class CustomBlocks_Controller extends Controller {
    {
       if(isset($blockItem['short']) && $blockItem['short'] == true){
          $elem = new Form_Element_Text('txt_'.$index, $name);
+      } else if(isset($blockItem['select']) && is_array($blockItem['select'])){
+         $elem = new Form_Element_Select('txt_'.$index, $name);
+         $elem->setOptions($blockItem['select']);
       } else {
          $elem = new Form_Element_TextArea('txt_'.$index, $name);
       }
-      $elem->setLangs();
+      
+      if(!isset($blockItem['lang']) || $blockItem['lang'] == true){
+         $elem->setLangs();
+      } 
+      
+      if(isset($blockItem['select']) && is_array($blockItem['select'])){
+         $elem->setLangs(false);
+      }
       if($record){
-         $elem->setValues($record->{CustomBlocks_Model_Texts::COLUMN_CONTENT});
+         if($elem instanceof Form_Element_Select || !$elem->isMultiLang()){
+            $elem->setValues($record->{CustomBlocks_Model_Texts::COLUMN_CONTENT}[Locales::getDefaultLang()]);
+         } else {
+            $elem->setValues($record->{CustomBlocks_Model_Texts::COLUMN_CONTENT});
+         }
       }
       return $elem;
    }
@@ -470,7 +485,11 @@ class CustomBlocks_Controller extends Controller {
          $item->{CustomBlocks_Model_Items::COLUMN_ID_BLOCK} = $idBlock;
          $item->{CustomBlocks_Model_Items::COLUMN_INDEX} = $index;
       }
-      $item->{CustomBlocks_Model_Texts::COLUMN_CONTENT} = $form->$name->getValues();
+      if($form->$name instanceof Form_Element_Select || !$form->$name->isMultiLang()){
+         $item->{CustomBlocks_Model_Texts::COLUMN_CONTENT}[Locales::getDefaultLang()] = $form->$name->getValues();
+      } else {
+         $item->{CustomBlocks_Model_Texts::COLUMN_CONTENT} = $form->$name->getValues();
+      }
       $item->save();
    }
    

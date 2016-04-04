@@ -22,7 +22,7 @@ abstract class CustomBlocks_Model_Items extends Model_ORM {
    protected function  _initTable() {
       $this->addColumn(self::COLUMN_ID, array('datatype' => 'int', 'ai' => true, 'nn' => true, 'pk' => true));
       $this->addColumn(self::COLUMN_ID_BLOCK, array('datatype' => 'int', 'nn' => true, 'index' => true));
-      $this->addColumn(self::COLUMN_INDEX, array('datatype' => 'int', 'nn' => true, 'index' => true, 'pdoparam' => PDO::PARAM_INT, 'default' => 0));
+      $this->addColumn(self::COLUMN_INDEX, array('datatype' => 'varchar(10)', 'nn' => true, 'index' => true, 'pdoparam' => PDO::PARAM_STR, 'default' => 0));
 //      $this->addColumn(self::COLUMN_ORDER, array('datatype' => 'int', 'nn' => true, 'default' => 0));
       
 //      $this->setLimitedColumns(array(self::COLUMN_ID_BLOCK));
@@ -34,7 +34,7 @@ abstract class CustomBlocks_Model_Items extends Model_ORM {
    public static function getItem($idBlock, $index)
    {
       $m = new static();
-      $rec = $m->where(self::COLUMN_ID_BLOCK." = :idb AND ".self::COLUMN_INDEX." = :idi", array('idb' => $idBlock, 'idi' => $index))->record();
+      $rec = $m->where(self::COLUMN_ID_BLOCK." = :idb AND ".self::COLUMN_INDEX." = :idi", array('idb' => $idBlock, 'idi' => (string)$index))->record();
       if(!$rec || $rec->isNew()){
          return false;
       }
