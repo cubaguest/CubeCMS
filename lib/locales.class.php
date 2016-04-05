@@ -1558,12 +1558,12 @@ class Locales extends TrObject {
       $retLang = self::getDefaultLang();
       if (VVE_ENABLE_LANG_AUTODETECTION && isset($_SERVER["HTTP_ACCEPT_LANGUAGE"])) {
          $clientString = $_SERVER["HTTP_ACCEPT_LANGUAGE"];
-// odstraníme mezery KHTML, webkit
+         // odstraníme mezery KHTML, webkit
          $clientString = str_replace(" ", "", $clientString);
-// rozdělit na jazyky
+         // rozdělit na jazyky
          $clientLangs = Explode(",", $clientString);
 
-// zkrácení jazyků
+         // zkrácení jazyků
          function langs_strings_repair(&$lang, $key)
          {
             $match = array();
@@ -1572,15 +1572,22 @@ class Locales extends TrObject {
          }
 
          array_walk($clientLangs, 'langs_strings_repair');
-// test existence primárního jazyka
-         if ($clientLangs[0] == self::getDefaultLang())
+         // test existence primárního jazyka
+         if ($clientLangs[0] == self::getDefaultLang()) {
             return self::getDefaultLang();
-// test podobnoti
+         }
+         // zkoušení dalších jazyků, které klient podporuje
+         foreach ($clientLangs as $lang) {
+            if(self::isAppLang($lang)){
+               return $lang;
+            }
+         }
+         // test podobnoti
          if (isset(self::$similaryLangs[$clientLangs[0]])
              AND in_array(self::$similaryLangs[$clientLangs[0]], self::getAppLangs())) {
             return self::$similaryLangs[$clientLangs[0]];
          }
-// volba podle klienta
+         // volba podle klienta
          $match = array();
          foreach ($clientLangs as $lang) {
             if (in_array($lang, self::getAppLangs()))
