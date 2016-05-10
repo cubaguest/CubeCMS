@@ -40,6 +40,7 @@ class Form_Element_File extends Form_Element {
       parent::__construct($name, $label, $prefix);
       $this->setUploadDir(AppCore::getAppCacheDir() . uniqid('upload-'));
       $this->addValidation(new Form_Validator_FileSize(VVE_MAX_UPLOAD_SIZE));
+      $this->addValidation(new Form_Validator_FileExtension(Form_Validator_FileExtension::ALL));
       $this->cssClasses['containerClass'] = 'input-file-multiple';
    }
 
