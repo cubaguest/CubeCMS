@@ -34,7 +34,11 @@ class Navigation_Controller extends Controller {
       $menu = Category_Structure::getStructure();
       if ($menu != false) {
          $this->ignoreCats = explode(';', $this->category()->getParam(self::PARAM_IGNORE_IDS, null));
-         $newMenu = $this->recursive($menu->getCategory($this->category()->getId()));
+         $newMenu = self::recursive(
+            $menu->getCategory($this->category()->getId()), 
+            $this->ignoreCats,
+            $this->category()->getParam(self::PARAM_NESTED_LEVEL, self::DEFAUL_NESTED_LEVEL)
+            );
          $this->view()->structure = $newMenu;
       }
 
@@ -47,19 +51,21 @@ class Navigation_Controller extends Controller {
 
    }
 
-   private function recursive(Category_Structure $obj, $level = 1)
+   public static function recursive(Category_Structure $obj, $ignoredCats, $deep = 1, $level = 1)
    {
       $retArr = array();
       foreach ($obj->getChildrens() as $child) {
-         if($this->ignoreCats && in_array($child->getId(), $this->ignoreCats)){
+         if($ignoredCats && in_array($child->getId(), $ignoredCats)){
             continue;
          }
+         $urlLink = new Url_Link_Module();
          $ar = array(
             'name' => $child->getCatObj()->getName(),
+            'namelong' => (string)$child->getCatObj()->getName(true) != null ? $child->getCatObj()->getName(true) : $child->getCatObj()->getName(),
             'label' => $child->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_DESCRIPTION},
             'obj' => $child->getCatObj()->getCatDataObj(),
             'category' => $child->getCatObj(),
-            'link' => $this->link(true)->category($child->getCatObj()->getUrlKey()),
+            'link' => $urlLink->clear(true)->category($child->getCatObj()->getUrlKey()),
             'childs' => array(),
             'text' => null,
          );
@@ -70,8 +76,8 @@ class Navigation_Controller extends Controller {
             }
          }   
             
-         if (!$child->isEmpty() AND ($level + 1 <= $this->category()->getParam(self::PARAM_NESTED_LEVEL, self::DEFAUL_NESTED_LEVEL))) {
-            $ar['childs'] = $this->recursive($child, $level + 1);
+         if (!$child->isEmpty() AND ($level + 1 <= $deep)) {
+            $ar['childs'] = self::recursive($child, $ignoredCats, $deep, $level + 1);
          }
          array_push($retArr, $ar);
       }

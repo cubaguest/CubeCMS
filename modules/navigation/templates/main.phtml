@@ -1,5 +1,5 @@
 <?php 
-   $h1 = $this->category()->getName();
+   $h1 = $this->category()->getName(true);
    $this->addPageTitle($h1);
 
    define('M_NAVIGATION_GOTO', $this->tr('Přejít na'));
@@ -11,7 +11,9 @@
       $retStr .= '<ul class="module-navigation-container module-navigation-level-'.$level.'">';
       foreach ($structure as $item) {
          $retStr .= '<li>'
-            .'<a href="'.$item['link'].'" title="'.M_NAVIGATION_GOTO.' '.htmlspecialchars($item['name']).'">'.htmlspecialchars($item['name']).'</a>';
+            .'<a href="'.$item['link'].'" title="'.M_NAVIGATION_GOTO.' '.htmlspecialchars($item['namelong']).'">'
+               .'<img src="'.$item['category']->getImage().'" height="40" /> '
+               .htmlspecialchars($item['namelong']).'</a>';
             if(!empty ($item['label'])){
                $retStr .= '<br />'.$item['label'];
             }
@@ -26,7 +28,7 @@
 
 ?>
 <h1><?php $this->includeFile('tpl://engine:headline/icon.phtml'); echo $h1;?></h1>
-<div class="main-content-detail">
+<div class="main-content-detail" style="background-color: <?php echo $this->category()->getParam('bgcolor')?>">
    <div class="main-content-text">
    <?php 
    if($this->text != null AND strpos($this->text, '{LIST}') !== false){

@@ -1,18 +1,49 @@
-<?php 
+<?php
+if (!$this->structure) {
+   return;
+}
+
+if (!defined('M_NAVIGATION_PANEL_GOTO')) {
+
+   define('M_NAVIGATION_PANEL_GOTO', $this->tr('Přejít na'));
+
+   function navPanelRenderStructure($structure, $level = 1)
+   {
+      if (empty($structure))
+         return null;
+      $retStr = null;
+      $retStr .= '<ul class="module-navigation-container module-navigation-level-' . $level . '">';
+      foreach ($structure as $item) {
+         $retStr .= '<li>'
+            . '<a href="' . $item['link'] . '" title="' . M_NAVIGATION_PANEL_GOTO . ' ' . htmlspecialchars($item['name']) . '">'
+            . '<img src="' . $item['category']->getImage() . '" height="40" /> '
+            . htmlspecialchars($item['name']) . '</a>';
+         if (!empty($item['childs'])) {
+            $retStr .= navPanelRenderStructure($item['childs'], $level + 1);
+         }
+         $retStr .= '</li>';
+      }
+      $retStr .= '</ul>';
+      return $retStr;
+   }
+
+}
 $icon = null;
-if($this->panelObj()->getIcon() != null){
-   $icon = '<img src="'.Panel_Obj::getIconDir().$this->panelObj()->getIcon().'" alt="'.$this->panelObj()->getIcon().'" />';
+if ($this->panelObj()->getIcon() != null) {
+   $icon = '<img src="' . Panel_Obj::getIconDir() . $this->panelObj()->getIcon() . '" alt="' . $this->panelObj()->getIcon() . '" />';
 }
 $backImg = null;
-if($this->panelObj()->getBackImage() != null){
-   $backImg = 'background-image: url(\''.Panel_Obj::getBackImgDir().$this->panelObj()->getBackImage().'\');';
+if ($this->panelObj()->getBackImage() != null) {
+   $backImg = 'background-image: url(\'' . Panel_Obj::getBackImgDir() . $this->panelObj()->getBackImage() . '\');';
 }
+$form = Auth::getAuthenticator('internal')->getLoginForm();
 ?>
-<p class="panelLabel"><?php echo $icon?><a href="<?php echo $this->link()?>" title="<?php echo htmlspecialchars($this->panelObj()->getName())?>"><?php echo $this->panelObj()->getName()?></a></p>
-<div class="panelText" style="<?php echo $backImg?>">
-   <?php echo $this->text->{Text_Model_Detail::COLUMN_TEXT}?><br />
+<div class="name">
+   <?php echo $icon ?><a href="<?php echo $this->l(); ?>" title="<?php psa($this->panelObj()->getName()) ?>"
+      ><?php ps($this->panelObj()->getName()) ?></a>
 </div>
-<p class="panelLinkMore">
-   <a href="<?php echo $this->link()?>"
-      title="<?php echo htmlspecialchars($this->category()->getLabel())?>"><?php echo $this->tr('Více')?></a>
-</p>
+<div class="content" style="<?php echo $backImg ?>">
+   <?php
+   echo navPanelRenderStructure($this->structure);
+   ?>
+</div>
