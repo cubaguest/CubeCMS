@@ -32,7 +32,8 @@ class Text_Controller extends Controller {
       $fieldsTypes = $this->view()->getCurrentTemplateParam('customFieldsType', false);
       if($fields){
          foreach($fields as $tpl => $labels){
-            $this->customFields[$tpl] = isset($labels[Locales::getLang()]) ? $labels[Locales::getLang()] : $labels[Locales::getDefaultLang()];
+            $this->customFields[$tpl] = isset($labels[Locales::getLang()]) ? $labels[Locales::getLang()] :
+               isset($labels[Locales::getDefaultLang()]) ? $labels[Locales::getDefaultLang()] : $labels['cs'];
          }
       }
       if($fieldsTypes){
