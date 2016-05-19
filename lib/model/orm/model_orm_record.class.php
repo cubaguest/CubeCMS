@@ -126,7 +126,8 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
       } else {
          // tady detekce jazyka
          $collLen = strlen($collName);
-         if ($collLen > 3 && ($collName[$collLen - 3] == '_') || ($collName[$collLen - 3] == '_' && $collName[$collLen - 6] == '_') ) {
+         if ($collLen > 3 && 
+             ( ($collName[$collLen - 3] == '_') || ($collName[$collLen - 3] == '_' && isset($collName[$collLen - 6]) && $collName[$collLen - 6] == '_') )) {
             if($collName[$collLen - 6] == '_'){
                $lang = substr($collName, -5);
                $collName = substr($collName, 0, $collLen-6);
