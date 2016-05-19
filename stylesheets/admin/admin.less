@@ -888,6 +888,16 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
          color: @color-text-invert;
       }
       td {
+         &.cubecms-sortable-column {
+            span {
+               display: block;
+               cursor: ns-resize;
+               height: 100%;
+            }
+            text-align: center;
+            width: 30px;
+            padding: 0;
+         }
       }
       a.button-change-state > .icon {
          color: @color-text;
