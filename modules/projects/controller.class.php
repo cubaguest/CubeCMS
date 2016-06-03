@@ -327,6 +327,7 @@ class Projects_Controller extends Controller {
          $rec->{Projects_Model_Projects::COLUMN_TEXT_CLEAR} = strip_tags($rec->{Projects_Model_Projects::COLUMN_TEXT});
          $rec->{Projects_Model_Projects::COLUMN_TPL_PARAMS} = htmlentities($form->tplParams->getValues());
          $rec->{Projects_Model_Projects::COLUMN_PLACE} = $form->place->getValues();
+         $rec->{Projects_Model_Projects::COLUMN_IMPORTANT} = $form->important->getValues();
          $date = $form->dateadd->getValues();
          $date->setTime(date("H"), date("i"), date("s"));
          $rec->{Projects_Model_Projects::COLUMN_TIME_ADD} = $date;
@@ -441,6 +442,7 @@ class Projects_Controller extends Controller {
          $rec->{Projects_Model_Projects::COLUMN_TEXT_CLEAR} = strip_tags($rec->{Projects_Model_Projects::COLUMN_TEXT});
          $rec->{Projects_Model_Projects::COLUMN_TPL_PARAMS} = htmlentities($form->tplParams->getValues());
          $rec->{Projects_Model_Projects::COLUMN_PLACE} = $form->place->getValues();
+         $rec->{Projects_Model_Projects::COLUMN_IMPORTANT} = $form->important->getValues();
          
          $date = $form->dateadd->getValues();
          $dateOld = new DateTime($rec->{Projects_Model_Projects::COLUMN_TIME_ADD});
@@ -775,6 +777,11 @@ class Projects_Controller extends Controller {
       }
       $form->addElement($elemRealted, $fGrpInclusion);
       
+      $elemImportant = new Form_Element_Checkbox('important', $this->tr('Důležitý projekt'));
+      $elemImportant->setSubLabel($this->tr('Projekt se tak například zobrazí na různých stránkách, například v panelu.'));
+      $form->addElement($elemImportant, $fGrpInclusion);
+      
+      
       $elemDateAdd = new Form_Element_Text('dateadd', $this->tr('Datum přidání'));
       $elemDateAdd->setValues(strftime("%x"));
       $elemDateAdd->addFilter(new Form_Filter_DateTimeObj());
@@ -815,6 +822,7 @@ class Projects_Controller extends Controller {
          $form->section->setValues($prRecord->{Projects_Model_Projects::COLUMN_ID_SECTION});
          $form->tplParams->setValues($prRecord->{Projects_Model_Projects::COLUMN_TPL_PARAMS});
          $form->place->setValues($prRecord->{Projects_Model_Projects::COLUMN_PLACE});
+         $form->important->setValues($prRecord->{Projects_Model_Projects::COLUMN_IMPORTANT});
          $date = new DateTime($prRecord->{Projects_Model_Projects::COLUMN_TIME_ADD});
          $form->dateadd->setValues(Utils_DateTime::fdate("%x", $date));
          

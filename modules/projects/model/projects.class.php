@@ -25,6 +25,7 @@ class Projects_Model_Projects extends Model_ORM_Ordered {
    const COLUMN_DESCRIPTION = 'project_desc';
    const COLUMN_ORDER = 'project_order';
    const COLUMN_PLACE = 'project_place';
+   const COLUMN_IMPORTANT = 'project_important';
 
    protected function  _initTable() {
       $this->setTableName(self::DB_TABLE, 't_proj');
@@ -50,6 +51,7 @@ class Projects_Model_Projects extends Model_ORM_Ordered {
       $this->addColumn(self::COLUMN_TIME_EDIT, array('datatype' => 'timestamp', 'pdoparam' => PDO::PARAM_STR, 'default' => 'CURRENT_TIMESTAMP'));
       
       $this->addColumn(self::COLUMN_WEIGHT, array('datatype' => 'smallint', 'default' => 0));
+      $this->addColumn(self::COLUMN_IMPORTANT, array('datatype' => 'tinylint(1)', 'pdoparam' => PDO::PARAM_INT, 'default' => 0));
       $this->addColumn(self::COLUMN_TPL_PARAMS, array('datatype' => 'varchar(500)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
       
       $this->addColumn(self::COLUMN_KEYWORDS, array('datatype' => 'varchar(300)', 'pdoparam' => PDO::PARAM_STR));
@@ -76,6 +78,20 @@ class Projects_Model_Projects extends Model_ORM_Ordered {
          ->join(array('Projects_Model_Sections_1' => Projects_Model_Sections::COLUMN_ID_CATEGORY), 'Model_Category', Model_Category::COLUMN_ID)
          ->limit(0, $limit)
          ->order(array(self::COLUMN_TIME_ADD => Model_ORM::ORDER_DESC))
+         ->records();
+      return $pr;
+   }
+   
+   public static function getImportantProjects($idCategory, $limit = 8)
+   {
+      $m = new self();
+      
+      $pr = $m
+         ->joinFK(self::COLUMN_ID_SECTION)
+         ->join(array('Projects_Model_Sections_1' => Projects_Model_Sections::COLUMN_ID_CATEGORY), 'Model_Category', Model_Category::COLUMN_ID)
+         ->limit(0, $limit)
+         ->where('Projects_Model_Sections_1.'.Projects_Model_Sections::COLUMN_ID_CATEGORY." = :idc AND ".self::COLUMN_IMPORTANT.' = 1', array('idc' => (int)$idCategory))
+         ->order(array(self::COLUMN_ORDER => Model_ORM::ORDER_ASC))
          ->records();
       return $pr;
    }
