@@ -121,14 +121,14 @@ class Form_Validator_FileExtension extends Form_Validator implements Form_Valida
          case 'Form_Element_File':
             if($elemObj->isMultiple() OR $elemObj->isMultiLang()) {
                foreach ($values as $file){
-                  if(!$this->checkExtension($file['extension'])) {
+                  if(!$this->checkExtension($file['name'])) {
                      $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
                      $this->isValid = false;
                      return false;
                   }
                }
             } else {
-               if(!$this->checkExtension($values['extension'])){
+               if(!$this->checkExtension($values['name'])){
                   $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
                   $this->isValid = false;
                   return false;
@@ -141,15 +141,19 @@ class Form_Validator_FileExtension extends Form_Validator implements Form_Valida
       return true;
    }
 
-   protected function checkExtension($ext)
+   protected function checkExtension($filename)
    {
+      $extensions = explode('.', $filename);
+      unset($extensions[0]); // první je název souboru
       // disallow all non secure extension
-      if($this->currentExtType != self::ALL_NO_SAFE && in_array($ext, $this->notAllowedExtensions)){
-         return false;
-      }
-      if($this->currentExtType != self::ALL && $this->currentExtType != self::ALL_NO_SAFE
-         && !in_array(strtolower($ext), $this->extensions)) {
-         return false;
+      foreach ($extensions as $ext) {
+         if($this->currentExtType != self::ALL_NO_SAFE && in_array($ext, $this->notAllowedExtensions)){
+            return false;
+         }
+         if($this->currentExtType != self::ALL && $this->currentExtType != self::ALL_NO_SAFE
+            && !in_array(strtolower($ext), $this->extensions)) {
+            return false;
+         }
       }
       return true;
    }
