@@ -45,7 +45,8 @@ class JsPlugin_LessFile extends JsPlugin_CssFile {
       } else if(is_file($rpMainDir.$rpFile)) { // soubor v knihovnách
          $path = $rpMainDir;
       } else {
-         throw new Template_Exception(sprintf($this->tr('Soubor "%s%s" nebyl nalezen'), $rpMainDir, $rpFile));
+         $tr = new Translator();
+         CoreErrors::addException(new Template_Exception(sprintf($tr->tr('Soubor "%s%s" nebyl nalezen'), $rpMainDir, $rpFile)));
       }
 
       $url = Url_Request::getBaseWebDir(false).AppCore::ENGINE_CACHE_DIR."/".Template::STYLESHEETS_DIR."/"
