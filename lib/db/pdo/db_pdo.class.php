@@ -18,6 +18,7 @@ class Db_PDO extends PDO {
     * @var string
     */
    private static $serverName;
+   private static $serverPort = null;
    private static $userName;
    private static $userPassword;
    private static $dbName;
@@ -37,7 +38,7 @@ class Db_PDO extends PDO {
          if(func_num_args() == 0) { // default connector
             switch (self::$connectorType) {
                case 'mysqli':
-                  parent::__construct("mysql:host=".self::$serverName.";dbname=".self::$dbName,
+                  parent::__construct("mysql:host=".self::$serverName.";".(self::$serverPort ? 'port='.self::$serverPort.';' : '')."dbname=".self::$dbName,
                      self::$userName, self::$userPassword, array(
                         PDO::ATTR_PERSISTENT => false,
                         PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
@@ -90,6 +91,8 @@ class Db_PDO extends PDO {
     */
    public static function factory() {
       self::$serverName = VVE_DB_SERVER;
+      self::$serverPort = defined("VVE_DB_SERVER_PORT") ? VVE_DB_SERVER_PORT : null;
+      self::$serverPort = defined("CUBE_CMS_DB_SERVER_PORT") ? CUBE_CMS_DB_SERVER_PORT : self::$serverPort;
       self::$userName = VVE_DB_USER;
       self::$userPassword = VVE_DB_PASSWD;
       self::$dbName = VVE_DB_NAME;
