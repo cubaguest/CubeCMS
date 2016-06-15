@@ -365,7 +365,9 @@ class Forms_Controller extends Controller {
 
    protected static function createDynamicForm($idForm)
    {
-      function errHandlerTmp (){};
+      if(!function_exists('errHandlerTmp')){
+         function errHandlerTmp (){};
+      }
       $modelElements = new Forms_Model_Elements();
       $elements = $modelElements
          ->where(Forms_Model_Elements::COLUMN_ID_FORM." = :idf", array('idf' => (int)$idForm))
@@ -373,7 +375,12 @@ class Forms_Controller extends Controller {
          ->records();
       
       $form = new Form('dnymic_form_'.$idForm);
-      
+      $link = new Url_Link();
+      $form->setAction($link
+         ->param(Url_Request::URL_TYPE_MODULE_PROCESS, 'Forms')
+         ->param(Url_Request::URL_TYPE_MODULE_PROCESS_DO, 'processFrom')
+         ->param('formid', $idForm)
+         );
       $formGrp = null;
       foreach ($elements as $e) {
          $formElement = new Form_Element_Hidden('not');
@@ -451,6 +458,49 @@ class Forms_Controller extends Controller {
       return $form;
    }
    
+   // metodu volat jako statickou metodu kontroleru, pokud je v parametrech $_GET procesAction
+   public static function processFrom()
+   {
+      if(!isset($_GET['formid'])){
+         return;
+      }
+      
+      $form = self::createDynamicForm((int)$_GET['formid']);
+      $link = new Url_Link();
+      
+      
+      if($form->isValid()){
+         
+         $params = array(
+            'pagename' => null,
+            'pagelink' => (string)$link,
+            'pageinfo' => Category::getSelectedCategory()->getName(),
+            'categoryname' => Category::getSelectedCategory()->getName(),
+            'categorylink' => (string)$link->clear(),
+            'redirectlink' => $link->clear(),
+         );
+         
+         $formModel = new Forms_Model();
+         $fRec = $formModel->record((int)$_GET['formid']);
+         // update send counter
+         $fRec->{Forms_Model::COLUMN_SENDED} = $fRec->{Forms_Model::COLUMN_SENDED}+1;
+         $fRec->save();
+         // semd to mail
+         $mail = true;
+         if($mail){
+            self::sendMail($form, $fRec, array(
+               '{PAGE_NAME}' => $params['pagename'],
+               '{PAGE_LINK}' => $params['pagelink'],
+               '{CATEGORY_NAME}' => $params['categoryname'],
+               '{CATEGORY_LINK}' => $params['categorylink'],
+               '{PAGE_INFO}' => $params['pageinfo'],
+            ));
+         }
+         AppCore::getInfoMessages()->addMessage($fRec->{Forms_Model::COLUMN_MSG});
+         $link->rmParam(Url_Request::URL_TYPE_MODULE_PROCESS)->rmParam(Url_Request::URL_TYPE_MODULE_PROCESS_DO)->redirect();
+      }
+   }
+   
    /**
     * Metoda vytvoří šablonu pro formulář
     * @param unknown_type $idForm
@@ -484,28 +534,7 @@ class Forms_Controller extends Controller {
       $form = self::createDynamicForm($fRec->{Forms_Model::COLUMN_ID});
       $tpl->dynamicFormRecord = $fRec;
       $tpl->dynamicForm = $form;
-      
-      if($form->isValid()){
-         // update send counter
-         $fRec->{Forms_Model::COLUMN_SENDED} = $fRec->{Forms_Model::COLUMN_SENDED}+1;
-         $formModel->save($fRec);
-         
-         // semd to mail
-         $mail = true;
-         if($mail){
-            self::sendMail($form, $fRec, array(
-               '{PAGE_NAME}' => $params['pagename'],
-               '{PAGE_LINK}' => $params['pagelink'],
-               '{CATEGORY_NAME}' => $params['categoryname'],
-               '{CATEGORY_LINK}' => $params['categorylink'],
-               '{PAGE_INFO}' => $params['pageinfo'],
-            ));
-         }
-         
-         AppCore::getInfoMessages()->addMessage($fRec->{Forms_Model::COLUMN_MSG});
-         $params['redirectlink']->reload();
-      }
-      
+      $form->isValid();
       return $tpl;
    }
    

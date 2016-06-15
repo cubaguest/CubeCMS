@@ -1,6 +1,74 @@
-<?php if($this->dynamicForm != null){?>
-   <?php if($this->disableTitle !== true){ ?>
-   <h2><?php ps($this->dynamicFormRecord->{Forms_Model::COLUMN_NAME})?></h2>
-   <?php }?>
-   <?php echo $this->dynamicForm;?>
-<?php }?>
+<?php
+if ($this->dynamicForm == null) {
+   return;
+}
+
+if ($this->modalForm) {
+   $errs = AppCore::getUserErrors()->getMessages();
+   $info = AppCore::getInfoMessages()->getMessages();
+   $show = $this->dynamicForm->isSend() && $this->dynamicForm->isValid() == false;
+   $this->dynamicForm->html()->addClass('ajax-form');
+   ?>
+   <div class="modal fade" tabindex="-1" role="dialog" id="formModal<?php echo $this->dynamicFormRecord->getPK() ?>">
+      <div class="modal-dialog <?php echo $this->modalLarge ? 'modal-lg' : '' ?>" role="document">
+         <div class="modal-content">
+            <div class="modal-header">
+               <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+               <h4 class="modal-title" id="formModal<?php echo $this->dynamicFormRecord->getPK() ?>Label"><?php ps($this->dynamicFormRecord->{Forms_Model::COLUMN_NAME}) ?></h4>
+            </div>
+            <div class="modal-body">
+               <div class="alert alert-danger alert-dismissable <?php echo empty($errs) ? 'hide' : '' ?>" role="alert">
+                  <?php if (!empty($errs)) { ?>
+                     <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                     <?php foreach ($errs as $err) { ?>
+                        <div><span class="icon icon-warning"></span> <?php ps($err) ?></div>
+                     <?php } ?>
+                  <?php } ?>
+               </div>
+               <div class="alert alert-info alert-dismissable <?php echo empty($info) ? 'hide' : '' ?>" role="alert">
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                  <?php if (!empty($info)) { ?>
+                     <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                     <?php foreach ($info as $msg) { ?>
+                        <div><span class="icon icon-check"></span> <?php ps($msg) ?></div>
+                     <?php } ?>
+                  <?php } ?>
+               </div>
+               <?php echo $this->dynamicForm; ?>
+            </div>
+         </div>
+      </div>
+   </div>
+   <script type="text/javascript">
+      $(document).ready(function () {
+   <?php if ($show) { ?>
+            $('#formModal<?php echo $this->dynamicFormRecord->getPK() ?>').modal('show');
+   <?php } ?>
+         $('#formModal<?php echo $this->dynamicFormRecord->getPK() ?>').on('submit', 'form', function (e) {
+            e.preventDefault();
+            var $form = $(this);
+            $form.closest('.modal-body').find('.alert-info').html(null).removeClass('show');
+            $form.closest('.modal-body').find('.alert-danger').html(null).removeClass('show');
+            $.ajax({
+               url: $form.prop('action'),
+               data: $form.serialize(),
+               method: 'POST',
+               success: function (data) {
+                  $('#formModal<?php echo $this->dynamicFormRecord->getPK() ?> .modal-body').html(
+                     $(data).find('#formModal<?php echo $this->dynamicFormRecord->getPK() ?> .modal-body').html()
+                     );
+               }
+            });
+            return false;
+         });
+      });
+   </script>
+<?php } else {
+   ?>
+   <?php if ($this->disableTitle !== true) { ?>
+      <h2><?php ps($this->dynamicFormRecord->{Forms_Model::COLUMN_NAME}) ?></h2>
+   <?php } ?>
+   <?php echo $this->dynamicForm; ?>
+   <?php
+}
+
