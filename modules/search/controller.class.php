@@ -16,12 +16,11 @@ class Search_Controller extends Controller {
          
          $source = $this->getRequestParam('s', 'all');
          // kvůli identifikaci webu - stejná session pro několik webů viz. global auth
-         $sessionName = 'search_'.md5(VVE_WEB_NAME);
+         $cache = new Cache_File('search_'.md5(CUBE_CMS_PRIMARY_DOMAIN . $searchStr . $source));
+         $cacheResult = $cache->get();
          // jetli je nové nebo staré hledání
-         if(VVE_DEBUG_LEVEL == 0 // pouze pokud je vypnut debug režim používat cache
-            AND isset ($_SESSION[$sessionName]) AND $_SESSION[$sessionName]['string'] == $searchStr
-            AND $_SESSION[$sessionName]['source'] == '$source') {
-            $results = $_SESSION[$sessionName]['results'];
+         if(VVE_DEBUG_LEVEL <= 1 && $cacheResult) {
+            $results = $cacheResult;
          } else {
             if($source == 'all') {
                $apis = $model->getApis($this->category()->getId());
@@ -37,7 +36,7 @@ class Search_Controller extends Controller {
             $results = Search::getResults();
             $results = Search::sortResults($results);
             $results = Search::prepareResultsForView($results);
-            $_SESSION[$sessionName] = array('string' => $searchStr, 'results' => $results, 'source' => $source);
+            $cache->set($results);
          }
          
          $this->view()->countAllResults = count($results);
@@ -232,4 +231,3 @@ class Search_Controller extends Controller {
       }
    }
 }
-?>
