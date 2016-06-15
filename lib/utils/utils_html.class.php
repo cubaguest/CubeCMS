@@ -185,6 +185,23 @@ class Utils_Html {
       $text = preg_replace($regex, '<a class="mail" href="mailto:\\1@\\2.\\3">\\1@\\2.\\3</a>', $text);
       return $text;
    }
+
+   /**
+    * Ochrání emaily před spamboty
+    * @param string $email
+    * @return string
+    */
+   public static function protectedEmailLink($email, $classes = '')
+   {
+      $parts = explode('@', $email);
+
+      $string = '<script type="text/javascript"> '
+         .'document.write("<a class=\"'. (is_array($classes) ? implode(' ', $classes) : $classes ).'\" href=\"mailto");'
+         .'document.write(":" + "'.$parts[0].'" + "@");'
+         .'document.write("'.$parts[1].'" + "\">" + "'.$parts[0].'" + "@" + "'.$parts[1].'" + "<\/a>");'
+         .'</script>';
+      return $string;
+   }
    
    /**
     * Zabezpečí emaily
