@@ -1,0 +1,2 @@
+OPRAVY:
+- Přidání metody volání statické metody kontroleru před hlavním modulem.

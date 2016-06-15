@@ -1,0 +1,2 @@
+OPRAVY:
+- orpava výchozí hodnoty pro datumy session v mysql (kompatibilita s MySQL 5.7)
