@@ -23,6 +23,8 @@ class Url_Request {
    const URL_TYPE_COMPONENT_REQUEST = 'component';
    const URL_TYPE_JSPLUGIN_REQUEST = 'jsplugin';
    const URL_TYPE_SUPPORT_SERVICE = 'supportservice';
+   const URL_TYPE_MODULE_PROCESS = 'processModule';
+   const URL_TYPE_MODULE_PROCESS_DO = 'action';
 
    const URL_FILE_RSS = 'rss.xml';
    const URL_FILE_ATOM = 'atom.xml';
