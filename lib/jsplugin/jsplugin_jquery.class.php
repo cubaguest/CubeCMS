@@ -424,7 +424,7 @@ class JsPlugin_JQuery extends JsPlugin {
     * @return JsPlugin_JQuery
     */
    public function addPluginCookie() {
-      $this->addFile(new JsPlugin_JsFile("jquery.cookie.min.js"));
+      $this->addJQPlugin("cookie");
       return $this;
    }
 
