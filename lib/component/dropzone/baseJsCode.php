@@ -66,10 +66,16 @@
 //         return this._updateMaxFilesReachedClass();
       },
       success: function (file, response) {
-         file._fileName = response.filename;
-         if (file.previewElement) {
-            $('.dz-filename>span', file.previewElement).text(response.filename).data('dz-name', response.filename);
-            file.previewElement.classList.add("dz-success");
+         if(response.uploaded === true){
+            file._fileName = response.filename;
+            if (file.previewElement) {
+               $('.dz-filename>span', file.previewElement).text(response.filename).data('dz-name', response.filename);
+               file.previewElement.classList.add("dz-success");
+            }
+         } else {
+            // remove tpl
+            $(file.previewElement).remove();
+            CubeCMS.Msg.show(response);
          }
          return;
       }
