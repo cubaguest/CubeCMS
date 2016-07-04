@@ -21,7 +21,7 @@ class Utils_Dir {
       if($checkWritableDirs){
          if(strpos($path, AppCore::getAppCacheDir()) === false && strpos($path, AppCore::getAppDataDir()) === false){
             $tr = new Translator();
-            throw new Exception($tr->tr('Předaná cesta není v adresáři pro uložení'));
+            throw new Exception(sprintf($tr->tr('Předaná cesta "%s" není v adresáři pro uložení'), $path));
          }
       }
       return $path;
