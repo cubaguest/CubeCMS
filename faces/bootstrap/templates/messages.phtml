@@ -1,4 +1,4 @@
-<div class="alert alert-info <?php if(empty ($this->messages)){ echo "hidden";}?>" id="infoMessages" role="alert">
+<div class="alert alert-info" id="infoMessages" role="alert" <?php if(empty ($this->messages)){ echo 'style="display:none;"';}?>>
      <?php // Vypis hlasek
      if(!empty ($this->messages)) {
         foreach ($this->messages as $message) {
@@ -8,7 +8,7 @@
 </div>
 <!--{*-CORE_ERRORS-*}-->
 <?php  // chyby modulu?>
-<div class="alert alert-danger <?php if(empty ($this->moduleErrors) AND Template::pVar('IE_WARN') == false) { echo "hidden";}?>" id="errMessages" role="alert">
+<div class="alert alert-danger" id="errMessages" role="alert" <?php if(empty ($this->moduleErrors) AND Template::pVar('IE_WARN') == false) { echo 'style="display:none;"';}?>>
    <?php 
    if(Template::pVar('IE_WARN') == true){ $this->includeTpl('ie6browser.phtml',true); }
    if(!empty ($this->moduleErrors)) {
