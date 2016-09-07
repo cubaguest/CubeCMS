@@ -73,6 +73,7 @@ class TextStatic_Controller extends Controller {
          } else {
             $e = new Form_Element_TextArea($text->{Text_Model::COLUMN_SUBKEY}, $text->{Text_Model::COLUMN_LABEL});
          }
+         $e->setLangs();
          $e->setValues($text->{Text_Model::COLUMN_TEXT});
          $f->addElement($e);
       }
