@@ -1,0 +1,34 @@
+<?php
+?>
+<h1><?php 
+   echo $this->category()->getName();
+   ?></h1>
+<div class="content">
+   <?php
+   $this->moduleButtons = array(
+      array(
+         'link' => $this->link()->route('edit'),
+         'title' => $this->tr('Upravit texty'),
+         'icon' => Template_Toolbox2::ICON_PAGE_EDIT,
+         'name' => $this->tr('Upravit texty'),
+      ),
+   );
+   $this->includeTpl('modules/buttons.phtml', true);
+   ?>
+   <div class="text post">
+      <?php 
+         foreach ($this->texts as $text) {
+            ?>
+            <h2><?php ps($this->tr('Položka').': '.$text->{Text_Model::COLUMN_LABEL}) ?></h2>
+            <?php
+            if((string)$text == null){
+               ?>
+               <div class="alert alert-warning"><?php ps( $this->tr('Není definován')) ?></div>
+               <?php
+            } else {
+               echo $text;
+            }         
+         }
+      ?>
+   </div>
+</div>
