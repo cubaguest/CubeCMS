@@ -23,7 +23,7 @@ function sendError($msg = null){
 
 
 if(!isset($_GET['s']) || !isset($_GET['tf']) || !isset($_GET['is'])){
-   sendError('Nejsou pYed�ny vaechny parametry');
+   sendError('Nejsou předány všechny parametry');
 }
 if(isset($_GET['debug'])){
    echo "LIB dir:".$libDir."<br />";
@@ -34,6 +34,15 @@ define('VVE_IMAGE_COMPRESS_QUALITY', 97);
 
 // Base init urlencode atd here
 $SOURCE = $strSource = str_replace(" ", "+", $_GET['s']); // tohle chce opravit pYed�v�n� + v url znamen� pYi pYevodu mezeru
+if(strpos($SOURCE, '.php') !== false 
+    || strpos($SOURCE, '.phtml') !== false
+    || strpos($SOURCE, '.htaccess') !== false
+    ){
+   header('HTTP/1.0 403 Forbidden');
+   echo "Denied"; 
+   die;
+}
+
 $FACE = $strFace = $_GET['tf'];
 $sizesTMP = $strSize = $_GET['is'];
 $HASH = isset($_GET['hash']) ? urldecode($_GET['hash']) : null;
@@ -50,15 +59,15 @@ $expectedHash = sha1($strSize.VVE_DB_PASSWD);
 // parse sizes
 $m = array();
 if(preg_match('/^([0-9]+)?x([0-9]+)?(c?)(?:-f_([0-9]+)?(?:_([0-9]+)?)?(?:_([0-9]+)?)?(?:_([0-9]+)?)?(?:_([0-9]+)?)?)?$/', $sizesTMP, $m) == false){
-   sendError('Vylikost nebyla zad�na');
+   sendError('Vylikost nebyla zadána');
 }
 $SIZES['w'] = (int)$m[1];
 $SIZES['h'] = (int)$m[2];
 $SIZES['c'] = $m[3] == "c" ? true : false;
 
 // 4 - typ filtru
-// prvn� parametr filtru
-// druh� parametr filtru
+// první parametr filtru
+// druhý parametr filtru
 $filterParams = array();
 if(isset($m[4])){
    $filterParams = array_slice($m, 4);
@@ -70,7 +79,7 @@ if( ( $HASH != null && $expectedHash != $HASH )
          || ( $SIZES['c'] == true && ( $SIZES['w'] == null || $SIZES['h'] == null ) )
        ) )
    ){
-      sendError('Nekorektn� rozmry');
+      sendError('Nekorektní rozmry');
 }
 
 // check file
@@ -91,6 +100,11 @@ try {
    $image = new File_Image($webDir.$SOURCE);
    if(!$image->exist()){
       $image = new File_Image($libDir.$SOURCE);
+   }
+   if(!$image->isImage()){
+      header('HTTP/1.0 403 Forbidden');
+      echo "Denied"; 
+      die;
    }
 
    $resizeType = File_Image_Base::RESIZE_AUTO;
