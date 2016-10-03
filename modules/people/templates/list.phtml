@@ -1,73 +1,79 @@
-<?php 
+<?php
+
 function getDegree($degree) {
-   $str = null;
-   if ($degree != null) {
-      $str .= $degree;
-      if ($degree[strlen($degree) - 1] != '.') {
-         $str .=  '.';
-      }
-      $str .= ' ';
-   }
-   return $str;
+    $str = null;
+    if ($degree != null) {
+        $str .= $degree;
+        if ($degree[strlen($degree) - 1] != '.') {
+            $str .= '.';
+        }
+        $str .= ' ';
+    }
+    return $str;
 }
-echo $this->toolbox;// TOOLBOXY
+
+echo $this->toolbox; // TOOLBOXY
 $this->addFile('css://style.less');
 ?>
-<h1 class=""><?php echo $this->category()->getName()?></h1>
+<h1 class=""><?php echo $this->category()->getName() ?></h1>
 <div class="posts-list persons-list">
-<?php 
-   if(!empty ($this->people)) {
-      foreach ($this->people as $person) {
-         
-         $name = getDegree($person->{People_Model::COLUMN_DEGREE})
-               .$person->{People_Model::COLUMN_NAME}.' '
-               .$person->{People_Model::COLUMN_SURNAME}.' '
-               .getDegree($person->{People_Model::COLUMN_DEGREE_AFTER});
-         ?>
-         <div class="person clearfix" id="preson-<?php echo $person->{People_Model::COLUMN_ID}?>">
-            <h2><?php ps($name);?></h2>
-            <div class="person-image">
-               <?php 
-               $src = Utils_Image::cache($this->category()->getModule()->getDataDir().$person->{People_Model::COLUMN_IMAGE},
-                   300, 275, true);
-               ?>
-               <img src="<?php echo $src?>" alt="<?php ps($name)?>" />
-            </div>
-         
-            <div class="person-content text">
-               <?php 
-               if($person->{People_Model::COLUMN_PHONE}){
-                  ?>
-                  <div class=""><?php ps($this->tr('Tel.:')); ?><span class="phone"><?php ps($person->{People_Model::COLUMN_PHONE})?></span></div>
-                  <?php 
-               }
-               if($person->{People_Model::COLUMN_EMAIL}){
-                  ?>
-                  <div class=""><?php ps($this->tr('E-mail:')); ?><span class="email"><?php ps($person->{People_Model::COLUMN_EMAIL})?></span></div>
-                  <?php 
-               }
-               if($person->{People_Model::COLUMN_SOCIAL_URL}){
-                  ?>
-                  <div class=""><a href="<?php echo $person->{People_Model::COLUMN_SOCIAL_URL}?>" class="profile link-external"><?php ps($this->tr('Profil'))?></a></div>
-                  <?php 
-               }
-               
-               echo $person->{People_Model::COLUMN_TEXT};
-               ?>
-            </div>
-            <?php 
-            if($this->toolboxEdit != null){
-               $this->toolboxEdit->person_edit->setAction($this->link()->route('edit', array('id' => $person->{People_Model::COLUMN_ID})));
-               $this->toolboxEdit->person_del_->getForm()->id->setValues($person->{People_Model::COLUMN_ID});
-               echo $this->toolboxEdit;
+    <div class="row">
+        <?php
+        if (!empty($this->people)) {
+            foreach ($this->people as $person) {
+
+                $name = getDegree($person->{People_Model::COLUMN_DEGREE})
+                        . $person->{People_Model::COLUMN_NAME} . ' '
+                        . $person->{People_Model::COLUMN_SURNAME} . ' '
+                        . getDegree($person->{People_Model::COLUMN_DEGREE_AFTER});
+                ?>
+                <div class="person" id="person-<?php echo $person->{People_Model::COLUMN_ID} ?>">
+                    <div class="col-sm-3">
+                            <?php
+                            $src = Utils_Image::cache($this->category()->getModule()->getDataDir() . $person->{People_Model::COLUMN_IMAGE}, 300, 275, true);
+                            ?>
+                            <img class="img-responsive person-image" src="<?php echo $src ?>" alt="<?php ps($name) ?>" />
+                    </div>
+                    <div class="col-sm-9">
+                        <h2><?php ps($name); ?></h2>
+                        <div class="person-content text">
+                            <?php
+                            if ($person->{People_Model::COLUMN_PHONE}) {
+                                ?>
+                                <div class=""><?php ps($this->tr('Tel.:')); ?><span class="phone"><?php ps($person->{People_Model::COLUMN_PHONE}) ?></span></div>
+                                <?php
+                            }
+                            if ($person->{People_Model::COLUMN_EMAIL}) {
+                                ?>
+                                <div class=""><?php ps($this->tr('E-mail:')); ?><span class="email"><?php ps($person->{People_Model::COLUMN_EMAIL}) ?></span></div>
+                                <?php
+                            }
+                            if ($person->{People_Model::COLUMN_SOCIAL_URL}) {
+                                ?>
+                                <div class=""><a href="<?php echo $person->{People_Model::COLUMN_SOCIAL_URL} ?>" class="profile link-external"><?php ps($this->tr('Profil')) ?></a></div>
+                                    <?php
+                                }
+
+                                echo $person->{People_Model::COLUMN_TEXT};
+                                ?>
+                        </div>
+                        <?php
+                        if ($this->toolboxEdit != null) {
+                            $this->toolboxEdit->person_edit->setAction($this->link()->route('edit', array('id' => $person->{People_Model::COLUMN_ID})));
+                            $this->toolboxEdit->person_del_->getForm()->id->setValues($person->{People_Model::COLUMN_ID});
+                            echo $this->toolboxEdit;
+                        }
+                        ?>
+                    </div>
+                </div>
+                <?php
             }
-            ?>
-         </div>
-      <?php }
-   } else {
-      echo ($this->tr('Není vložena žádná osoba'));
-   }?>
+        } else {
+            echo ($this->tr('Není vložena žádná osoba'));
+        }
+        ?>
+    </div>
 </div>
-<?php 
+<?php
 echo $this->compScroll;
 ?>

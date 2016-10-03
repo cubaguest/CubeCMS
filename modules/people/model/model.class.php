@@ -38,7 +38,7 @@ class People_Model extends Model_ORM_Ordered {
       $this->addColumn(self::COLUMN_IMAGE, array('datatype' => 'varchar(45)', 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_ORDER, array('datatype' => 'smallint', 'default' => 0, 'pdoparam' => PDO::PARAM_INT));
       $this->addColumn(self::COLUMN_AGE, array('datatype' => 'int', 'pdoparam' => PDO::PARAM_INT, 'default' => null));
-      $this->addColumn(self::COLUMN_LABEL, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
+      $this->addColumn(self::COLUMN_LABEL, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR, 'default' => null, 'lang' => true));
       $this->addColumn(self::COLUMN_EMAIL, array('datatype' => 'varchar(50)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
       $this->addColumn(self::COLUMN_PHONE, array('datatype' => 'varchar(20)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
       $this->addColumn(self::COLUMN_SOCIAL_URL, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));

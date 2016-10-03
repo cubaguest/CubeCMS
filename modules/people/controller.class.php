@@ -192,6 +192,7 @@ class People_Controller extends Controller {
       $form->addElement($iSocilaUrl, $gbase);
       
       $iLabel = new Form_Element_Text('label', $this->tr('Funkce'));
+      $iLabel->setLangs();
       $iLabel->setSubLabel($this->tr('Zařazení, přezdívka, krátký popis a podobně'));
       $iLabel->addFilter(new Form_Filter_StripTags());
       $form->addElement($iLabel, $gbase);
