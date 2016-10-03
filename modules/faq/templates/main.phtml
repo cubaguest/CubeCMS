@@ -1,0 +1,33 @@
+<?php ?> 
+<?php
+echo $this->toolbox;
+?>   
+<h1><?php ps($this->category()->getName()) ?></h1>
+<div class="content">
+   <div class="row">
+      <div class="col-md-12">
+         <?php if (!empty($this->questions)) { ?>
+            <div class="user-questions">
+               <?php foreach ($this->questions as $q) { ?>
+                  <div class="user-question">
+                     <div class="row">
+                        <div class="col-md-12">
+                           <?php echo $q->{FAQ_Model::COLUMN_QUESTION} ?>
+                        </div>
+                        <div class="col-md-12 answer">
+                           <p><?php echo $q->{FAQ_Model::COLUMN_ANSWER} ?></p>
+                        </div>
+                     </div>
+                     <?php
+                     echo $q->toolbox;
+                     ?>
+                  </div>
+               <?php } ?>
+            </div>
+            <?php
+            echo $this->scrollComponent;
+         }
+         ?>
+      </div>
+   </div>
+</div>

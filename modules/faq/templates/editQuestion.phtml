@@ -1,0 +1,13 @@
+<?php ?> 
+<h1><?php ps($this->tr('Úrpava položky'))?></h1>
+<div class="content">
+   <div class="row">
+      <div class="col-md-12">
+         <?php 
+         $this->form->question->html()->setAttrib('rows', 8);
+         $this->form->answer->html()->setAttrib('rows', 8);
+         echo $this->form;
+         ?>
+      </div>
+   </div>
+</div>
