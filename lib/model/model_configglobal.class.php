@@ -150,8 +150,11 @@ class Model_ConfigGlobal extends Model_ORM {
     */
    public function mergedConfigValues(){
       $m = new Model_Config();
-      $this->currentSql = 'SELECT * FROM (SELECT `'.self::COLUMN_KEY.'`, `'.self::COLUMN_VALUE.'` FROM '.$m->getTableName().' UNION ALL SELECT `'.self::COLUMN_KEY.'`, `'.self::COLUMN_VALUE.'`'
-         .' FROM `'.self::DB_TABLE.'`) AS t GROUP BY t.`'.self::COLUMN_KEY.'`';
+      $this->currentSql = 'SELECT `'.self::COLUMN_KEY.'`, `'.self::COLUMN_VALUE.'` FROM `'.$m->getTableName().'`
+         UNION ALL
+         SELECT `'.self::COLUMN_KEY.'`, `'.self::COLUMN_VALUE.'` FROM `'.self::DB_TABLE.'`
+         WHERE `'.self::COLUMN_KEY.'` NOT IN (SELECT `'.self::COLUMN_KEY.'` FROM `'.$m->getTableName().'`)
+         ORDER BY `'.self::COLUMN_KEY.'`';
       return $this;
    }
 }
