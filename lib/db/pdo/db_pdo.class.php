@@ -42,7 +42,11 @@ class Db_PDO extends PDO {
                      self::$userName, self::$userPassword, array(
                         PDO::ATTR_PERSISTENT => false,
                         PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
-                        PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"
+                        PDO::MYSQL_ATTR_INIT_COMMAND => 
+                           CUBE_CMS_DEBUG_SQL 
+                           ? "SET NAMES utf8;"
+                           : "SET NAMES utf8, SESSION sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';"
+                       
                      ));
                   break;
                case 'pgsql':
