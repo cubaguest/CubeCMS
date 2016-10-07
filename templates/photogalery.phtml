@@ -1,48 +1,100 @@
-<?php 
-/* 
+<?php
+/*
  * Šablona pro fotogalerie
  */
 
-// jquery galerka
-$this->addJsPlugin(new JsPlugin_PrettyPhoto());
+$this->addFile('js://engine:blueimp/query.blueimp-gallery.min.js');
+$this->addFile('css://engine:blueimp/blueimp-gallery.less');
 
 $propName = $this->propName == null ? PhotoGalery_Model_Images::COLUMN_NAME : $this->propName;
 $propAlt = $this->propAlt == null ? PhotoGalery_Model_Images::COLUMN_DESC : $this->propAlt;
 $propFile = $this->propFile == null ? PhotoGalery_Model_Images::COLUMN_FILE : $this->propFile;
 
-$dirBase = $this->imagesBaseDir != null ? $this->imagesBaseDir : $this->category()->getModule()->getDataDir(true).$this->websubdir;
+$dirBase = $this->imagesBaseDir != null ? $this->imagesBaseDir : $this->category()->getModule()->getDataDir(true) . $this->websubdir;
 
-$dirSmall = $this->imagesDirSmall != null ? $dirBase.$this->imagesDirSmall : $dirBase.Photogalery_Controller::DIR_SMALL.'/';
-$dirMedium = $this->imagesDirMedium != null ? $dirBase.$this->imagesDirMedium : $dirBase.Photogalery_Controller::DIR_MEDIUM.'/';
-$dirBig = $this->imagesDirBig != null ? $dirBase.$this->imagesDirBig : $dirBase.Photogalery_Controller::DIR_ORIGINAL.'/';
-
+$dirSmall = $this->imagesDirSmall != null ? $dirBase . $this->imagesDirSmall : $dirBase . Photogalery_Controller::DIR_SMALL . '/';
+$dirMedium = $this->imagesDirMedium != null ? $dirBase . $this->imagesDirMedium : $dirBase . Photogalery_Controller::DIR_MEDIUM . '/';
+$dirBig = $this->imagesDirBig != null ? $dirBase . $this->imagesDirBig : $dirBase . Photogalery_Controller::DIR_ORIGINAL . '/';
 
 $images = $this->images;
 $c = count($images);
-if($c != 0){?>
-   <div class="main-content-images">
-      <?php 
-      $class = 'image';
-      foreach ($images as $image) {
-         $imgFile = isset($image->{$propFile}) ? $image->{$propFile} : $image[$propFile];
-         ?><a class="<?php echo $class;?>" rel="prettyPhoto[pp_gal]" href="<?php echo $dirMedium.$imgFile?>" title="<?php echo $image->{$propAlt}?>" ><img src="<?php echo $dirSmall.$imgFile?>" alt="<?php echo $image->{$propName}?>" /></a><?php 
-      }
-      echo $this->toolboxImages;
-      ?>
+$randId = uniqid('blueimp_');
+if ($c != 0) {
+   ?>
+   <div class="images-gallery clearfix">
+      <div class="image-preview">
+         <div class="image-previw-wrapper">
+            <div id="<?php echo $randId; ?>">
+               <div class="row photogalery">
+                  <?php
+                  $class = 'blueimp-image';
+                  foreach ($images as $image) {
+                     $imgFile = isset($image->{$propFile}) ? $image->{$propFile} : $image[$propFile];
+                     ?>
+                     <div class="col-md-3">
+                        <a class="<?php echo $class; ?>" href="<?php echo $dirMedium . $imgFile ?>" title="<?php echo $image->{$propAlt} ?>" >
+                           <img class="photos img-responsive" src="<?php echo $dirSmall . $imgFile ?>" alt="<?php echo $image->{$propName} ?>" /></a>
+                     </div>
+                     <?php
+                  }
+                  ?>
+               </div>
+            </div>
+            <?php echo $this->toolboxImages; ?>
+         </div>
+      </div>
    </div>
-   <script type="text/javascript">
-      /* <![CDATA[ */
-      $(document).ready(function(){ $("a[rel^='prettyPhoto']").prettyPhoto(); });
-      /* ]]> */
-   </script>
-<?php } else if($this->toolboxImages != null){?>
+
+<?php } else if ($this->toolboxImages != null) { ?>
    <div class="admin-info-text">
-      <?php 
+      <?php
       echo $this->tr('Galerie neobsahuje žádný obrázek.');
-      if($this->linkEditImages){
+      if ($this->linkEditImages) {
          printf($this->tr('<a class="" href="%s">Nahrát</a>.'), $this->link()->route($this->linkEditImages));
       }
       echo $this->toolboxImages;
       ?>
    </div>
-<?php }?>
+<?php } ?>
+<script type="text/javascript">
+   $(document).ready(function () {
+      if ($('#blueimp-gallery').length === 0) {
+         $('body').append('<div id="blueimp-gallery" class="blueimp-gallery blueimp-gallery-controls">'
+                 + '<div class="slides"></div>'
+                 + '<h3 class="title"></h3>'
+                 + '<a class="prev">‹</a>'
+                 + '<a class="next">›</a>'
+                 + '<a class="close">×</a>'
+                 + '<a class="play-pause"></a>'
+                 + '<ol class="indicator"></ol>'
+                 + '</div>');
+
+      }
+      var blueimpOpts = {
+         toggleControlsOnReturn: false,
+         closeOnSwipeUpOrDown: true,
+         disableScroll: false,
+         stretchImages: false
+      };
+
+      $('#<?php echo $randId ?> a.blueimp-image').on('click', function (e) {
+         e.preventDefault();
+         var $this = $(this);
+         var $images = $('#<?php echo $randId ?> a.blueimp-image');
+         var images = new Array();
+         if ($images.length > 0) {
+            $images.each(function () {
+               var imageObj = {
+                  title: $(this).prop('title'),
+                  href: $(this).prop('href'),
+//                  type: 'image/jpeg',
+                  thumbnail: $('img',this).prop('src')
+               };
+               images.push(imageObj);
+            });
+            var fullscreenGallery = blueimp.Gallery(images, $.extend({index: $this.parent().index() }, blueimpOpts));
+         }
+         return false;
+      });
+   });
+</script>

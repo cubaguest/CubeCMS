@@ -1,0 +1,61 @@
+<?php
+/*
+ * Šablona pro fotogalerie
+ */
+
+// jquery galerka
+$this->addJsPlugin(new JsPlugin_PrettyPhoto());
+
+$propName = $this->propName == null ? PhotoGalery_Model_Images::COLUMN_NAME : $this->propName;
+$propAlt = $this->propAlt == null ? PhotoGalery_Model_Images::COLUMN_DESC : $this->propAlt;
+$propFile = $this->propFile == null ? PhotoGalery_Model_Images::COLUMN_FILE : $this->propFile;
+
+$dirBase = $this->imagesBaseDir != null ? $this->imagesBaseDir : $this->category()->getModule()->getDataDir(true) . $this->websubdir;
+
+$dirSmall = $this->imagesDirSmall != null ? $dirBase . $this->imagesDirSmall : $dirBase . Photogalery_Controller::DIR_SMALL . '/';
+$dirMedium = $this->imagesDirMedium != null ? $dirBase . $this->imagesDirMedium : $dirBase . Photogalery_Controller::DIR_MEDIUM . '/';
+$dirBig = $this->imagesDirBig != null ? $dirBase . $this->imagesDirBig : $dirBase . Photogalery_Controller::DIR_ORIGINAL . '/';
+
+
+$images = $this->images;
+$c = count($images);
+if ($c != 0) {
+    ?>
+    <div class="main-content-images">
+        <div class="row">
+
+            <?php
+            $class = 'image';
+            foreach ($images as $image) {
+                $imgFile = isset($image->{$propFile}) ? $image->{$propFile} : $image[$propFile];
+                ?>
+                <div class="col-sm-3">
+
+                    <a class="<?php echo $class; ?>" rel="prettyPhoto[pp_gal]" href="<?php echo $dirMedium . $imgFile ?>" title="<?php echo $image->{$propAlt} ?>" >
+                        <img class="img-responsive" src="<?php echo $dirSmall . $imgFile ?>" alt="<?php echo $image->{$propName} ?>" />
+                    </a>
+                </div>
+                <?php
+            }
+            echo $this->toolboxImages;
+            ?>
+        </div>
+    </div>
+    <script type="text/javascript">
+        /* <![CDATA[ */
+        $(document).ready(function () {
+            $("a[rel^='prettyPhoto']").prettyPhoto();
+        });
+        /* ]]> */
+    </script>
+<?php } else if ($this->toolboxImages != null) { ?>
+    <div class="admin-info-text">
+        <?php
+        echo $this->tr('Galerie neobsahuje žádný obrázek.');
+        if ($this->linkEditImages) {
+            printf($this->tr('<a class="" href="%s">Nahrát</a>.'), $this->link()->route($this->linkEditImages));
+        }
+        echo $this->toolboxImages;
+        ?>
+    </div>
+<?php } ?>
