@@ -274,7 +274,13 @@ class Events_Controller extends Controller {
       $this->runEventsActions();
 
       $dateFrom = new DateTime($this->getRequestParam('dateFrom', date("Y-m-1")));
-      $dateTo = new DateTime($this->getRequestParam('dateTo', date("Y-m-t")));
+      if($this->getRequestParam('dateTo') != null){
+         $dateTo = new DateTime($this->getRequestParam('dateTo'));
+      } else {
+         $dateTo = new DateTime(date("Y-m-t"));
+         $dateTo->modify('+3 months');
+      }
+
       $this->view()->dateFrom = $dateFrom;
       $this->view()->dateTo = $dateTo;
 
@@ -492,8 +498,13 @@ class Events_Controller extends Controller {
          ->order(array(Events_Model_Categories::COL_NAME))
          ->records();
 
-
-      $form = $this->createEventEditForm(null, $cats, $isPublicAdd, $isPublicAdd);
+      $baseEvent = null;
+      if($this->getRequestParam('source')){
+         $baseEvent = Events_Model::getRecord((int)$this->getRequestParam('source'));
+         $baseEvent->setNew(false);
+      }
+      
+      $form = $this->createEventEditForm($baseEvent, $cats, $isPublicAdd, $isPublicAdd);
 
       $eAddAnother = new Form_Element_Checkbox('addAnother', $this->tr('Přidat další položku'));
       $eAddAnother->setSubLabel($this->tr('Při zaškrtnutí bude po uložení zobrazen tento formulář znovu'));
@@ -597,7 +608,8 @@ class Events_Controller extends Controller {
          $event->{Events_Model::COL_TIME_TO} = $form->timeto->getValues();
          $event->{Events_Model::COL_ID_EVE_CATEGORY} = $form->cat->getValues();
          $event->{Events_Model::COL_NAME} = $form->name->getValues();
-         $event->{Events_Model::COL_NOTE} = $form->note->getValues();// COL_TEXT
+         $event->{Events_Model::COL_TEXT} = $form->desc->getValues();// COL_TEXT
+         $event->{Events_Model::COL_NOTE} = $form->note->getValues();
          $event->{Events_Model::COL_PLACE} = $form->place->getValues();
          $event->{Events_Model::COL_PRICE} = $form->price->getValues();
          $event->{Events_Model::COL_PERSON} = $form->person->getValues();
@@ -651,7 +663,9 @@ class Events_Controller extends Controller {
       }
 
       $eDesc = new Form_Element_TextArea('desc', $this->tr('Popisek'));
-      $eDesc->addFilter(new Form_Filter_StripTags());
+      if($isAnonym){
+         $eDesc->addFilter(new Form_Filter_StripTags());
+      }
       $form->addElement($eDesc, $fGrpBase);
       
       $eNote = new Form_Element_TextArea('note', $this->tr('Poznámka'));

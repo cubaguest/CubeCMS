@@ -26,11 +26,11 @@ class Events_View extends View {
          $toolAddEv->setIcon(Template_Toolbox2::ICON_ADD)->setAction($this->link()->route('addEvent'));
          $toolbox->addTool($toolAddEv);
 
-         $toolEventsList = new Template_Toolbox2_Tool_Redirect('eventsList', $this->tr('Seznam událostí'));
+         $toolEventsList = new Template_Toolbox2_Tool_Redirect('eventsList', $this->tr('Správa událostí'));
          $toolEventsList->setIcon('list')->setAction($this->link()->route('listEvents'));
          $toolbox->addTool($toolEventsList);
 
-         $toolCatsList = new Template_Toolbox2_Tool_Redirect('catsList', $this->tr('Seznam kategorií'));
+         $toolCatsList = new Template_Toolbox2_Tool_Redirect('catsList', $this->tr('Správa kategorií'));
          $toolCatsList->setIcon('list')->setAction($this->link()->route('listCats'));
          $toolbox->addTool($toolCatsList);
 
@@ -80,6 +80,7 @@ class Events_View extends View {
       
       $toolRemove = new Template_Toolbox2_Tool_Form($this->formDelete);
       $toolRemove->setIcon(Template_Toolbox2::ICON_DELETE)->setConfirmMeassage($this->tr('Opravdu smazat kategorii včetně přiřazených akcí?'));
+      $toolRemove->setImportant(true);
       $toolbox->addTool($toolRemove);
       
       $this->toolboxItem = $toolbox;
@@ -96,12 +97,16 @@ class Events_View extends View {
       $toolbox->setIcon(Template_Toolbox2::ICON_PEN);
       
       $toolRecomended = new Template_Toolbox2_Tool_Form($this->formRecomended);
-      $toolRecomended->setIcon('star_add.png');
+      $toolRecomended->setIcon('star');
       $toolbox->addTool($toolRecomended);
       
       $toolVisible = new Template_Toolbox2_Tool_Form($this->formVisible);
-      $toolVisible->setIcon('eye.png');
+      $toolVisible->setIcon('eye');
       $toolbox->addTool($toolVisible);
+      
+      $toolClone = new Template_Toolbox2_Tool_PostRedirect('cloneEvent', $this->tr('Duplikovat'), $this->link()->route('addEvent'));
+      $toolClone->setIcon('copy');
+      $toolbox->addTool($toolClone);
       
       $toolEdit = new Template_Toolbox2_Tool_PostRedirect('editEvent', $this->tr('Upravit'), $this->link());
       $toolEdit->setIcon(Template_Toolbox2::ICON_PEN);
@@ -109,6 +114,7 @@ class Events_View extends View {
       
       $toolRemove = new Template_Toolbox2_Tool_Form($this->formDelete);
       $toolRemove->setIcon(Template_Toolbox2::ICON_DELETE)->setConfirmMeassage($this->tr('Opravdu smazat položku?'));
+      $toolRemove->setImportant(true);
       $toolbox->addTool($toolRemove);
       
       $this->toolboxItem = $toolbox;
@@ -120,6 +126,7 @@ class Events_View extends View {
    {
       $this->template()->addFile('tpl://editEvent.phtml');
       Template_Module::setEdit(true);
+      $this->setTinyMCE($this->form->desc, 'advanced');
    }
    
    public function editEventView()

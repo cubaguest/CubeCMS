@@ -61,15 +61,15 @@ class Events_Model extends Model_ORM {
    public static function getCurrentEvents($idc, $limit)
    {
       $model = new self();
-      $modelWhere = null;
-      $modelBindValues = array();
+      $modelWhere = Events_Model_Categories::COL_ID_CATEGORY . " = :idc AND " . Events_Model::COL_PUBLIC . " = 1";
+      $modelBindValues = array('idc' => $idc);
       
       $dateFrom = new DateTime;
       $dateTo = new DateTime;
       $dateTo->modify('+1 year');
       
       // model settings
-      $modelWhere .= "(" . Events_Model::COL_DATE_FROM . " BETWEEN :dateStart1 AND :dateEnd1 "
+      $modelWhere .= " AND ( " . Events_Model::COL_DATE_FROM . " BETWEEN :dateStart1 AND :dateEnd1 "
          . " OR " . Events_Model::COL_DATE_TO . " BETWEEN :dateStart2 AND :dateEnd2 "
          . " OR ( " . Events_Model::COL_DATE_FROM . " < :dateStart3 AND " . Events_Model::COL_DATE_TO . " > :dateEnd3 )".")"
          ." AND " . Events_Model::COL_PUBLIC . " = 1"
@@ -91,4 +91,47 @@ class Events_Model extends Model_ORM {
       return $events;
       
    }
+   
+   public static function getCurrentEventsinCats($idc, $limit)
+   {
+      $model = new Events_Model();
+      $modelWhere = Events_Model_Categories::COL_ID_CATEGORY . " = :idc AND " . Events_Model::COL_PUBLIC . " = 1";
+      $modelBindValues = array('idc' => $idc);
+      
+      $dateFrom = new DateTime;
+      $dateTo = new DateTime;
+      $dateTo->modify('+1 year');
+      
+      // model settings
+      $modelWhere .= " AND (" . Events_Model::COL_DATE_FROM . " BETWEEN :dateStart1 AND :dateEnd1 "
+         . " OR " . Events_Model::COL_DATE_TO . " BETWEEN :dateStart2 AND :dateEnd2 "
+         . " OR ( " . Events_Model::COL_DATE_FROM . " < :dateStart3 AND " . Events_Model::COL_DATE_TO . " > :dateEnd3 )"
+         .")";
+      $modelBindValues['dateStart1'] = $modelBindValues['dateStart2'] = $modelBindValues['dateStart3'] = $dateFrom;
+      $modelBindValues['dateEnd1'] = $modelBindValues['dateEnd2'] = $modelBindValues['dateEnd3'] = $dateTo;
+      
+      $events = $model
+         ->joinFK(Events_Model::COL_ID_EVE_CATEGORY)
+         ->order(array(
+            Events_Model_Categories::COL_NAME => Model_ORM::ORDER_ASC,
+            Events_Model::COL_DATE_FROM => Model_ORM::ORDER_ASC,
+            Events_Model::COL_TIME_FROM => Model_ORM::ORDER_ASC,
+         ))
+         ->where($modelWhere, $modelBindValues)
+         ->limit(0, $limit)
+         ->records();
+      
+      $eventsSorted = array();
+      if (!empty($events)) {
+         foreach ($events as $event) {
+            $cId = $event->{Events_Model_Categories::COL_ID};
+            if (!isset($eventsSorted[$cId])) {
+               $eventsSorted[$cId] = array('cat' => $event, 'events' => array());
+            }
+            $eventsSorted[$cId]['events'][] = $event;
+         }
+      }
+      return $eventsSorted;
+   }
+           
 }

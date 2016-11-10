@@ -23,66 +23,81 @@ if (isset($_GET['dateFrom']) || isset($_GET['dateTo']) || isset($_GET['cat']) ||
 ?>
 <h1><?php ps($h1) ?></h1>
 <div class="form-edit">
-   <div class="module-tool-buttons clearfix">
 
-      <div>
-         <a href="<?php echo $this->link()->route('addEvent') ?>" title="<?php echo $this->tr('Přidat novou událost') ?>"
-            ><img src="images/icons/add.png" alt="add" /> <?php echo $this->tr('Přidat událost') ?></a>
-         <a id="buttonShowFilter" href="<?php echo $this->link() ?>#filter" title="<?php echo $this->tr('Zobrazit filtraci') ?>"
-            style="<?php if ($showFFrom) echo 'display: none;'; ?>"
-            ><img src="images/icons/magnifier.png" alt="filter" /> <?php echo $this->tr('Filtrace') ?></a>
+   <?php
+   $this->moduleButtons = array(
+       array(
+           'link' => $this->link()->route('addEvent'),
+           'title' => $this->tr('Přidat novou událost'),
+           'icon' => Template_Toolbox2::ICON_ADD,
+           'name' => $this->tr('Přidat novou událost'),
+       ),
+       array(
+           'id' => 'buttonShowFilter',
+           'link' => $this->link() . '#filter',
+           'title' => $this->tr('Zobrazit filtraci'),
+           'icon' => 'search',
+           'name' => $this->tr('Filtrace') . ($showFFrom ? ' (zapnuta)' : ' (vypnuta)'),
+       ),
+   );
+   $this->includeTpl('modules/buttons.phtml', true);
+   ?>
+   <form id="formFilter" action="<?php echo $this->link() ?>" method="get" class="form-horizontal" style="<?php if (!$showFFrom) echo 'display: none;'; ?>">
+      <div class="form-group">
+         <label for="dateFrom" class="col-sm-2 control-label"><?php echo $this->tr('Od') ?>:</label>
+         <div class="col-sm-10">
+            <input name="dateFrom" value="<?php echo vve_date("%x", $this->dateFrom) ?>" type="text" id="dateFrom" class="form-control"  />
+         </div>
       </div>
-      <form id="formFilter" action="<?php echo $this->link() ?>" method="get" style="<?php if (!$showFFrom) echo 'display: none;'; ?>">
-         <fieldset>
-            <legend><?php echo $this->tr('Filtrace') ?></legend>
-            <table class="form-table">
-               <tr>
-                  <th class="form-labels"><label for="dateFrom"><?php echo $this->tr('Od') ?>:</label></th>
-                  <td class="form-controlls"><input name="dateFrom" value="<?php echo vve_date("%x", $this->dateFrom) ?>" type="text" id="dateFrom" /></td>
-               </tr>
-               <tr>
-                  <th class="form-labels"><label for="dateTo"><?php echo $this->tr('Do') ?>:</label></th>
-                  <td class="form-controlls"><input name="dateTo" value="<?php echo vve_date("%x", $this->dateTo) ?>" type="text" id="dateTo" /></td>
-               </tr>
-               <tr>
-                  <th class="form-labels"><label for="contain"><?php echo $this->tr('Název') ?>:</label></th>
-                  <td class="form-controlls"><input name="contain" value="<?php if (isset($_GET['contain'])) echo $_GET['contain'] ?>" type="text" id="contain" /></td>
-               </tr>
-               <?php if ($this->isControll) { ?>
-                  <tr>
-                     <th class="form-labels"><label for="catSelect"><?php echo $this->tr('Kategorie') ?>:</label></th>
-                     <td class="form-controlls">
-                        <select name="cat" id="catSelect">
-                           <option value=""><?php echo $this->tr('vše') ?></option>
-                           <?php foreach ($this->cats as $cat) { ?>
-                              <option <?php
-                              if (isset($_GET['cat']) && $_GET['cat'] == $cat->{Events_Model_Categories::COL_ID}) {
-                                 echo 'selected="selected"';
-                              }
-                              ?> 
-                                 value="<?php echo $cat->{Events_Model_Categories::COL_ID} ?>"><?php ps($cat->{Events_Model_Categories::COL_NAME}) ?></option>      
-                              <?php } ?>
-                        </select>
-                     </td>
-                  </tr>
-                  <tr>
-                     <th class="form-labels"></th>
-                     <td class="form-controlls"><input name="onlyPublicAdd" type="checkbox" id="onlyPublicAdd" <?php if (isset($_GET['onlyPublicAdd']) && $_GET['onlyPublicAdd'] == "on") echo 'checked="checked"' ?> /> <label for="onlyPublicAdd"><?php echo $this->tr('Pouze veřejně přidané') ?></label></td>
-                  </tr>
-               <?php } ?>
-               <tr>
-                  <td></td>
-                  <td class="form-controlls">
-                     <input value="<?php echo $this->tr('Filtrovat') ?>" type="submit" />
-                     <input value="<?php echo $this->tr('Zrušit filtraci') ?>" type="button" id="buttonHideFilter" 
-                            onclick="window.location = '<?php echo $this->link()->rmParam(array('dateFrom', 'dateTo', 'contain', 'cat', 'onlyPublicAdd')) ?>';"/>
-                  </td>
-               </tr>
-            </table>
-            <?php if (isset($_GET['token'])) { ?><input type="hidden" name="token" value="<?php echo $_GET['token'] ?>" /><?php } ?>
-         </fieldset>
-      </form>
-   </div>
+      <div class="form-group">
+         <label for="dateTo" class="col-sm-2 control-label"><?php echo $this->tr('Do') ?>:</label>
+         <div class="col-sm-10">
+            <input name="dateTo" value="<?php echo vve_date("%x", $this->dateTo) ?>" type="text" id="dateTo" class="form-control" />
+         </div>
+      </div>
+      <div class="form-group">
+         <label for="contain"  class="col-sm-2 control-label"><?php echo $this->tr('Název') ?>:</label>
+         <div class="col-sm-10">
+            <input name="contain" value="<?php if (isset($_GET['contain'])) echo $_GET['contain'] ?>" type="text" id="contain" class="form-control" />
+         </div>
+      </div>
+      <?php if ($this->isControll) { ?>
+         <div class="form-group">
+            <label for="catSelect" class="col-sm-2 control-label"><?php echo $this->tr('Kategorie') ?>:</label>
+            <div class="col-sm-10">
+               <select name="cat" id="catSelect" class="form-control">
+                  <option value=""><?php echo $this->tr('vše') ?></option>
+                  <?php foreach ($this->cats as $cat) { ?>
+                     <option <?php
+                     if (isset($_GET['cat']) && $_GET['cat'] == $cat->{Events_Model_Categories::COL_ID}) {
+                        echo 'selected="selected"';
+                     }
+                     ?> 
+                        value="<?php echo $cat->{Events_Model_Categories::COL_ID} ?>"><?php ps($cat->{Events_Model_Categories::COL_NAME}) ?></option>      
+                     <?php } ?>
+               </select>
+            </div>
+         </div>
+         <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+               <div class="checkbox">
+                  <label >
+                     <input name="onlyPublicAdd" type="checkbox" id="onlyPublicAdd" <?php if (isset($_GET['onlyPublicAdd']) && $_GET['onlyPublicAdd'] == "on") echo 'checked="checked"' ?> />
+                     <?php echo $this->tr('Pouze veřejně přidané') ?></label>
+               </div>
+            </div>
+         </div>
+      <?php } ?>
+
+      <div class="form-group">
+         <div class="col-sm-offset-2 col-sm-10">
+            <input value="<?php echo $this->tr('Filtrovat') ?>" type="submit" />
+            <input value="<?php echo $this->tr('Zrušit filtraci') ?>" type="button" id="buttonHideFilter" 
+                   onclick="window.location = '<?php echo $this->link()->rmParam(array('dateFrom', 'dateTo', 'contain', 'cat', 'onlyPublicAdd')) ?>';"/>
+         </div>
+      </div>
+      <?php if (isset($_GET['token'])) { ?><input type="hidden" name="token" value="<?php echo $_GET['token'] ?>" /><?php } ?>
+   </form>
    <script type="text/javascript">
       $(document).ready(function () {
          var dates = $('input#dateFrom, input#dateTo').datepicker({
@@ -99,12 +114,14 @@ if (isset($_GET['dateFrom']) || isset($_GET['dateTo']) || isset($_GET['cat']) ||
                dates.not(this).datepicker("option", option, date);
             }
          });
-<?php if ($showFFrom) { ?>
-            $('#buttonShowFilter').hide();
-<?php } ?>
          $('#buttonShowFilter').click(function () {
-            $('#formFilter').slideDown('fast');
-            $(this).hide();
+            console.log($('#formFilter').is(':hidden'));
+            if ($('#formFilter').is(':hidden')) {
+               $('#formFilter').slideDown('fast');
+            } else {
+               $('#formFilter').slideUp('fast');
+            }
+            return false;
          });
       });
    </script>
@@ -117,9 +134,9 @@ if (isset($_GET['dateFrom']) || isset($_GET['dateTo']) || isset($_GET['cat']) ||
             foreach ($cat['events'] as $event) {
                $state = $event->{Events_Model::COL_PUBLIC} != true ? "ui-state-disabled" : null;
                ?>
-               <table class="ui-widget full-width event-event-item <?php if ($event->{Events_Model::COL_PUBLIC_ADD} == true) { ?>event-public-add<?php } ?>">
-                  <tr class="ui-widget-header">
-                     <td class="event-name" colspan="2">
+               <table class="cubecms-widget cubecms-table full-width event-event-item <?php if ($event->{Events_Model::COL_PUBLIC_ADD} == true) { ?>event-public-add<?php } ?>">
+                  <tr class="cubecms-header">
+                     <th class="event-name" colspan="2">
                         <input type="checkbox" name="event_selected" value="<?php echo $event->{Events_Model::COL_ID} ?>" />
                         <?php if ($event->{Events_Model::COL_IS_RECOMMENDED} == true) { ?>
                            <img src="images/icons/star.png" alt="recomend" title="<?php echo $this->tr('Položka je doporučována') ?>" />
@@ -143,7 +160,6 @@ if (isset($_GET['dateFrom']) || isset($_GET['dateTo']) || isset($_GET['cat']) ||
                            if ($event->{Events_Model::COL_DATE_TO} != null) {
                               $dateStr .= " - " . vve_date("%x", new DateTime($event->{Events_Model::COL_DATE_TO}));
                            }
-//               echo $dateStr;
 
                            $timeStr = null;
                            if ($event->{Events_Model::COL_TIME_FROM} != null) {
@@ -152,58 +168,58 @@ if (isset($_GET['dateFrom']) || isset($_GET['dateTo']) || isset($_GET['cat']) ||
                            if ($event->{Events_Model::COL_TIME_TO} != null) {
                               $timeStr .= " - " . vve_date("%G:%i", new DateTime($event->{Events_Model::COL_TIME_TO}));
                            }
-//               echo $timeStr;
                            ?>
                         </em>
                         <?php
                         $this->toolboxItem->editEvent->setAction($this->link()->route('editEvent', array('idevent' => $event->{Events_Model::COL_ID})));
+                        $this->toolboxItem->cloneEvent->setAction($this->link()->route('addEvent')->param('source', $event->{Events_Model::COL_ID}));
                         $this->toolboxItem->ev_delete->getForm()->id->setValues($event->{Events_Model::COL_ID});
 
                         if ($this->isControll) {
                            $this->toolboxItem->ev_change_recomended_->getForm()->id->setValues($event->{Events_Model::COL_ID});
                            $this->toolboxItem->ev_change_recomended_->setIcon(
-                                   $event->{Events_Model::COL_IS_RECOMMENDED} == true ? 'star_delete.png' : 'star_add.png');
+                                   $event->{Events_Model::COL_IS_RECOMMENDED} == true ? 'star-o' : 'star');
                         } else {
                            unset($this->toolboxItem->ev_change_recomended_);
                         }
 
                         $this->toolboxItem->ev_change_visible->getForm()->id->setValues($event->{Events_Model::COL_ID});
                         $this->toolboxItem->ev_change_visible->setIcon(
-                                $event->{Events_Model::COL_PUBLIC} == true ? 'eye_delete.png' : 'eye.png');
+                                $event->{Events_Model::COL_PUBLIC} == true ? 'eye-slash' : 'eye');
 
                         $this->toolboxItem->setTemplate(Template_Toolbox2::TEMPLATE_INLINE);
                         echo $this->toolboxItem;
                         ?>
-                     </td>
+                     </th>
                   </tr>
-                  <tr class="ui-widget-content <?php echo $state ?>">
+                  <tr class="cubecms-row <?php echo $state ?>">
                      <th scope="row" class="param-name"><?php echo $this->tr('Datum a čas') ?></th>
                      <td><?php echo $dateStr . $timeStr ?></td>
                   </tr>
 
                   <?php if ($event->{Events_Model::COL_PLACE} != null) { ?>
-                     <tr class="ui-widget-content <?php echo $state ?>">
+                     <tr class="cubecms-row <?php echo $state ?>">
                         <th scope="row" class="param-name"><?php echo $this->tr('Místo konání') ?></th>
                         <td><?php echo $event->{Events_Model::COL_PLACE} ?></td>
                      </tr>
                   <?php } ?>
 
                   <?php if ($event->{Events_Model::COL_PRICE} != null) { ?>
-                     <tr class="ui-widget-content <?php echo $state ?>">
+                     <tr class="cubecms-row <?php echo $state ?>">
                         <th scope="row" class="param-name"><?php echo $this->tr('Cena') ?></th>
                         <td><?php echo $event->{Events_Model::COL_PRICE} ?> Kč</td>
                      </tr>
                   <?php } ?>
 
                   <?php if ($event->{Events_Model::COL_CONTACT} != null) { ?>
-                     <tr class="ui-widget-content <?php echo $state ?>">
+                     <tr class="cubecms-row <?php echo $state ?>">
                         <th scope="row" class="param-name"><?php echo $this->tr('Kontakt') ?></th>
                         <td><?php echo $event->{Events_Model::COL_CONTACT} ?></td>
                      </tr>
                   <?php } ?>
 
                   <?php if ($event->{Events_Model::COL_NOTE} != null) { ?>
-                     <tr class="ui-widget-content <?php echo $state ?>">
+                     <tr class="cubecms-row <?php echo $state ?>">
                         <th scope="row" class="param-name"><?php echo $this->tr('Poznámka') ?></th>
                         <td><?php echo $event->{Events_Model::COL_NOTE} ?></td>
                      </tr>
