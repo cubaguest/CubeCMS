@@ -19,27 +19,27 @@ class Events_View extends View {
          $toolbox = new Template_Toolbox2();
 
          $toolHome = new Template_Toolbox2_Tool_Redirect('home', $this->tr('Úvodní strana'));
-         $toolHome->setIcon('date.png')->setAction($this->link()->route());
+         $toolHome->setIcon('home')->setAction($this->link()->route());
          $toolbox->addTool($toolHome);
 
          $toolAddEv = new Template_Toolbox2_Tool_Redirect('eventAdd', $this->tr('Přidat událost'));
-         $toolAddEv->setIcon('add.png')->setAction($this->link()->route('addEvent'));
+         $toolAddEv->setIcon(Template_Toolbox2::ICON_ADD)->setAction($this->link()->route('addEvent'));
          $toolbox->addTool($toolAddEv);
 
          $toolEventsList = new Template_Toolbox2_Tool_Redirect('eventsList', $this->tr('Seznam událostí'));
-         $toolEventsList->setIcon('date_magnify.png')->setAction($this->link()->route('listEvents'));
+         $toolEventsList->setIcon('list')->setAction($this->link()->route('listEvents'));
          $toolbox->addTool($toolEventsList);
 
          $toolCatsList = new Template_Toolbox2_Tool_Redirect('catsList', $this->tr('Seznam kategorií'));
-         $toolCatsList->setIcon('date.png')->setAction($this->link()->route('listCats'));
+         $toolCatsList->setIcon('list')->setAction($this->link()->route('listCats'));
          $toolbox->addTool($toolCatsList);
 
          $toolAddCat = new Template_Toolbox2_Tool_Redirect('catAdd', $this->tr('Přidat kategorii'));
-         $toolAddCat->setIcon('add.png')->setAction($this->link()->route('addCat'));
+         $toolAddCat->setIcon(Template_Toolbox2::ICON_ADD)->setAction($this->link()->route('addCat'));
          $toolbox->addTool($toolAddCat);
 
          $toolExports = new Template_Toolbox2_Tool_Redirect('export', $this->tr('Export dat'));
-         $toolExports->setIcon('download.png')->setAction($this->link()->route('exports'));
+         $toolExports->setIcon(Template_Toolbox2::ICON_EXPORT)->setAction($this->link()->route('exports'));
          $toolbox->addTool($toolExports);
 
          $this->toolbox = $toolbox;
@@ -134,4 +134,3 @@ class Events_View extends View {
       Template_Module::setEdit(true);
    }
 }
-?>

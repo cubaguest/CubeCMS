@@ -1,0 +1,1 @@
+ALTER TABLE  `{PREFIX}events` ADD  `event_person` VARCHAR( 1000 ) NULL DEFAULT NULL;

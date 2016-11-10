@@ -11,6 +11,7 @@ class Events_Controller extends Controller {
    const DIR_EVENT_IMAGES = "events";
    
    const PARAM_ADMIN_RECIPIENTS = 'admin_rec';
+   const PARAM_DEFAULT_RANGE = 'events_range';
 
    protected function init()
    {
@@ -24,16 +25,20 @@ class Events_Controller extends Controller {
 
       $dateFrom = new DateTime($this->getRequestParam('dateFrom', date("Y-m-d")));
       $dateTo = new DateTime($this->getRequestParam('dateTo', date("Y-m-d")));
-      switch ($this->getRequestParam('range', 'day')) {
-         case 'week':
-            $dateTo->modify('+1 week');
-            break;
-         case 'month':
-            $dateTo->modify('+1 month');
-            break;
-         case 'day':
-         default:
-            break;
+      if($this->getRequestParam('range')){
+         switch ($this->getRequestParam('range', 'day')) {
+            case 'week':
+               $dateTo->modify('+1 week');
+               break;
+            case 'month':
+               $dateTo->modify('+1 month');
+               break;
+            case 'day':
+            default:
+               break;
+         }
+      } else {
+         $dateTo->modify($this->category()->getParam(self::PARAM_DEFAULT_RANGE, '+1 month'));
       }
       
       $this->view()->dateFrom = $dateFrom;
@@ -508,7 +513,9 @@ class Events_Controller extends Controller {
          $record->{Events_Model::COL_ID_EVE_CATEGORY} = $form->cat->getValues();
          $record->{Events_Model::COL_NAME} = $form->name->getValues();
          $record->{Events_Model::COL_NOTE} = $form->note->getValues();// COL_TEXT
+         $record->{Events_Model::COL_TEXT} = $form->desc->getValues();// COL_TEXT
          $record->{Events_Model::COL_PLACE} = $form->place->getValues();
+         $record->{Events_Model::COL_PERSON} = $form->person->getValues();
          $record->{Events_Model::COL_PRICE} = $form->price->getValues();
          $record->{Events_Model::COL_PUBLIC} = true;
          $record->{Events_Model::COL_PUBLIC_ADD} = $isPublicAdd;
@@ -593,6 +600,7 @@ class Events_Controller extends Controller {
          $event->{Events_Model::COL_NOTE} = $form->note->getValues();// COL_TEXT
          $event->{Events_Model::COL_PLACE} = $form->place->getValues();
          $event->{Events_Model::COL_PRICE} = $form->price->getValues();
+         $event->{Events_Model::COL_PERSON} = $form->person->getValues();
          $model->save($event);
 
          $this->infoMsg()->addMessage($this->tr('Událost byla uložena'));
@@ -624,12 +632,13 @@ class Events_Controller extends Controller {
       $ePlace = new Form_Element_Text('place', $this->tr('Místo konání'));
       $ePlace->addFilter(new Form_Filter_StripTags());
       $form->addElement($ePlace, $fGrpBase);
+      
 
       $ePrice = new Form_Element_Text('price', $this->tr('Cena v Kč'));
       $ePrice->addFilter(new Form_Filter_StripTags());
       $ePrice->addValidation(new Form_Validator_IsNumber());
       $form->addElement($ePrice, $fGrpBase);
-
+      
       if ($withContact) {
          $fGrpContact = $form->addGroup('contact', $this->tr("Kontakt"));
          $eContact = new Form_Element_TextArea('contact', $this->tr('Kontakt'));
@@ -641,10 +650,18 @@ class Events_Controller extends Controller {
          $form->addElement($eContact, $fGrpContact);
       }
 
+      $eDesc = new Form_Element_TextArea('desc', $this->tr('Popisek'));
+      $eDesc->addFilter(new Form_Filter_StripTags());
+      $form->addElement($eDesc, $fGrpBase);
+      
       $eNote = new Form_Element_TextArea('note', $this->tr('Poznámka'));
       $eNote->addFilter(new Form_Filter_StripTags());
       $form->addElement($eNote, $fGrpBase);
 
+      $ePerson = new Form_Element_Text('person', $this->tr('Osoba'));
+      $ePerson->addFilter(new Form_Filter_StripTags());
+      $form->addElement($ePerson, $fGrpBase);
+      
       $elemCat = new Form_Element_Select('cat', $this->tr('Kategorie'));
       if (!empty($catsRecords)) {
          if(count($catsRecords) > 1){
@@ -696,7 +713,9 @@ class Events_Controller extends Controller {
             $form->contact->setValues($event->{Events_Model::COL_CONTACT});
          }
          $form->note->setValues($event->{Events_Model::COL_NOTE});// COL_TEXT
+         $form->desc->setValues($event->{Events_Model::COL_TEXT});// COL_TEXT
          $form->cat->setValues($event->{Events_Model::COL_ID_EVE_CATEGORY});
+         $form->person->setValues($event->{Events_Model::COL_PERSON});
          if ($event->{Events_Model::COL_DATE_FROM} != null) {
             $date = new DateTime($event->{Events_Model::COL_DATE_FROM});
             $form->datefrom->setValues(vve_date("%x", $date));
@@ -964,10 +983,18 @@ class Events_Controller extends Controller {
 
       $form->addElement($elemAdmins, $grpAdmin);
 
+      $elemRange = new Form_Element_Text('range', 'Výchozí rozsah');
+      $elemRange->setSubLabel($this->tr('Výchozí je 1 měsíc. Např.: +2 month, +15 days, +1 year atd.'));
+      
+      if (isset($settings[self::PARAM_DEFAULT_RANGE])){
+         $elemRange->setValues($settings[self::PARAM_DEFAULT_RANGE]);
+      }
+      $form->addElement($elemRange, self::SETTINGS_GROUP_VIEW);
+      
       // znovu protože mohl být už jednou validován bez těchto hodnot
       if($form->isValid()) {
          $settings[self::PARAM_ADMIN_RECIPIENTS] = $form->admins->getValues();
+         $settings[self::PARAM_DEFAULT_RANGE] = $form->range->getValues();
       }
    }
 }
-?>
