@@ -17,11 +17,11 @@ class Form_Element_ImagesUploader extends Form_Element_File {
    
    public function populate()
    {
-      parent::populate();
       $this->inputDir->populate();
+      parent::populate();
       
       $componentDZ = new Component_Dropzone();
-      $componentDZ->setConfig('path', $this->inputDir->getValues());
+      $componentDZ->setConfig('path', AppCore::getAppWebDir().str_replace('..', '', $this->inputDir->getValues()));
       $this->setValues($componentDZ->getFiles());
    }
    
@@ -39,7 +39,7 @@ class Form_Element_ImagesUploader extends Form_Element_File {
    public function setUploadDir($dir)
    {
       parent::setUploadDir($dir);
-      $this->inputDir->setValues($dir);
+      $this->inputDir->setValues(str_replace(AppCore::getAppWebDir(), '', $dir));
    }
 
    public function setImagesKey($key)
@@ -111,7 +111,7 @@ class Form_Element_ImagesUploader extends Form_Element_File {
       $wrap->addContent($inputWrap);
       $wrap->addContent((string)$componentDZ);
       $wrap->addContent($this->inputDir->control());
-      
+
       if($renderKey == null){
          $this->renderedId++;
       }
