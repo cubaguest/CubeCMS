@@ -59,7 +59,7 @@ class Component_Dropzone extends Component {
       $form->addElement($elemPath);
       // naplnění kvůli nasatvení uploadu
       $form->path->populate();
-      $path = Utils_Dir::secureUpload($form->path->getValues());
+      $path = Utils_Dir::secureUpload(AppCore::getAppWebDir().$form->path->getValues());
       $path = new FS_Dir($path);
       $path->check(); // kontrola vytvoření
       
