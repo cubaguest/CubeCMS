@@ -19,7 +19,10 @@ class Utils_Dir {
           null,
       ), $path);
       if($checkWritableDirs){
-         if(strpos($path, AppCore::getAppCacheDir()) === false && strpos($path, AppCore::getAppDataDir()) === false){
+         if(strpos($path, AppCore::getAppCacheDir()) === false 
+                 && strpos($path, AppCore::getAppDataDir()) === false
+                 && strpos($path, CUBE_CMS_DATA_DIR) !== 0
+                 ){
             $tr = new Translator();
             throw new Exception(sprintf($tr->tr('Předaná cesta "%s" není v adresáři pro uložení'), $path));
          }
