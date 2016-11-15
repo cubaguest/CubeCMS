@@ -9,7 +9,7 @@ class Form_Element_ImagesUploader extends Form_Element_File {
 
    public function __construct($name, $label = null, $prefix = null)
    {
-      $this->inputDir = new Form_Element_Hidden($this->getName(true).'_dirName');
+      $this->inputDir = new Form_Element_Hidden($this->getName(true).'_dirName_'.$name);
       parent::__construct($name, $label, $prefix);
       $this->dirKey = md5(microtime().$_SERVER['REMOTE_ADDR']);
       $this->setMultiple(true);
@@ -59,7 +59,7 @@ class Form_Element_ImagesUploader extends Form_Element_File {
       
       $wrap = new Html_Element('div');
       $wrap->addClass('dropzone');
-      $wrap->setAttrib('id', 'dropzone-'.$this->renderedId);
+      $wrap->setAttrib('id', 'dropzone-'.$this->renderedId.'-'.$this->getName());
       
       $inputWrap = new Html_Element('div');
       $inputWrap->addClass('fallback');
@@ -102,7 +102,7 @@ class Form_Element_ImagesUploader extends Form_Element_File {
       } else {
          $componentDZ->setConfig('maxFiles', $this->maxFiles);
       }
-      $componentDZ->setConfig('selector', '#dropzone-'.$this->renderedId);
+      $componentDZ->setConfig('selector', '#dropzone-'.$this->renderedId.'-'.$this->getName());
       $componentDZ->setConfig('postData',array('target' => 'path') );
       $componentDZ->setConfig('path', $this->inputDir->getValues() );
       $componentDZ->setConfig('imageskey', $this->imagesKey );
