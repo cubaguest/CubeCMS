@@ -71,6 +71,21 @@ $this->addTemplate('main',
                          ),
                      ) 
                   ),
+               'gallery' => 
+                  array(
+                     'name' => array('cs' => 'Galerie'),
+                     'template' => 'gallery.phtml',
+                     'items' => array(
+                         1 => array( 
+                             'model' => 'CustomBlocks_Model_Gallery',
+                             'name' => array('cs' => 'Obrázky')
+                         ),
+                         2 => array( 
+                             'model' => 'CustomBlocks_Model_Gallery',
+                             'name' => array('cs' => 'Obrázky 2')
+                         ),
+                     ) 
+                  ),
                 
                 
                 

@@ -1,0 +1,34 @@
+<div class="block block-gallery">
+   <h2>Fotogalerie</h2>
+   <?php
+//   $url = $block->block_items[1]->{CustomBlocks_Model_Videos::COLUMN_URL};
+   if (isset($block->block_items[1])) {
+      ?>
+      <h3>galerie 1:</h3>
+      <div>
+         <?php
+         foreach ($block->block_items[1]->getImages() as $img) {
+            ?>
+            <img src="<?php echo Utils_Image::cache($img->getUrl($this->category()->getModule()), 200, 200, true) ?>" alt="" />
+            <?php
+         }
+         ?>
+      </div>
+      <?php
+   }
+   if (isset($block->block_items[2])) {
+      ?>
+      <h3>galerie 2:</h3>
+      <div>
+         <?php
+         foreach ($block->block_items[2]->getImages() as $img) {
+            ?>
+            <img src="<?php echo Utils_Image::cache($img->getUrl($this->category()->getModule()), 200, 100, true) ?>" alt="" />
+            <?php
+         }
+         ?>
+      </div>
+      <?php
+   }
+   ?>
+</div>

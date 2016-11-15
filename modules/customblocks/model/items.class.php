@@ -40,5 +40,11 @@ abstract class CustomBlocks_Model_Items extends Model_ORM {
       }
       return $rec;
    }
+
+   public static function getItems($idBlock, $index)
+   {
+      $m = new static();
+      return $m->where(self::COLUMN_ID_BLOCK." = :idb AND ".self::COLUMN_INDEX." = :idi", array('idb' => $idBlock, 'idi' => (string)$index))->records();
+   }
 }
  

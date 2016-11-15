@@ -46,7 +46,7 @@ class CustomBlocks_View extends View {
                
                // mazání potřebuje formulář bloku
                $this->formBlockDelete->id->setValues($block->getPK());
-               $tooldel = new Template_Toolbox2_Tool_Form($this->formBlockDelete);
+               $tooldel = new Template_Toolbox2_Tool_Form(clone $this->formBlockDelete);
                $tooldel->setIcon(Template_Toolbox2::ICON_DELETE)->setTitle($this->tr('Smazat blok'))
                   ->setConfirmMeassage($this->tr('Opravdu smazat blok?'))
                   ->setImportant(true);

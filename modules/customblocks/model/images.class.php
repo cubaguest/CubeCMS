@@ -26,7 +26,9 @@ class CustomBlocks_Model_Images extends CustomBlocks_Model_Items {
       if(isset($this->params['dir'])){
          $image = self::getRecord($pk);
          $file = new File($image->{self::COLUMN_FILE}, $this->params['dir'].self::DIR_IMG);
-         $file->delete();
+         if($file->exist()){
+            $file->delete();
+         }
       }
       parent::beforeDelete($pk);
    }
