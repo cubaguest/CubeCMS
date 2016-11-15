@@ -311,10 +311,18 @@ class Category_Core extends TrObject {
     */
    public static function getImageDir($type = self::DIR_IMAGE, $realpath = false)
    {
-      if ($realpath) {
-         return AppCore::getAppDataDir() . $type . DIRECTORY_SEPARATOR;
+      if(is_dir(AppCore::getAppDataDir() . $type . DIRECTORY_SEPARATOR)){
+         if ($realpath) {
+            return AppCore::getAppDataDir() . $type . DIRECTORY_SEPARATOR;
+         } else {
+            return Url_Request::getBaseWebDir() . VVE_DATA_DIR . URL_SEPARATOR . $type . URL_SEPARATOR;
+         }
       } else {
-         return Url_Request::getBaseWebDir() . VVE_DATA_DIR . URL_SEPARATOR . $type . URL_SEPARATOR;
+         if ($realpath) {
+            return Utils_CMS::getTitleImagePath(false);
+         } else {
+            return Utils_CMS::getTitleImagePath(true);
+         }
       }
    }
    
