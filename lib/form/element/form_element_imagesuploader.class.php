@@ -97,6 +97,7 @@ class Form_Element_ImagesUploader extends Form_Element_File {
       }
       
       $componentDZ = new Component_Dropzone();
+      $componentDZ->setConfig('maxFileSize', $this->maxFileSize);
       if(!$this->isMultiple()){
          $componentDZ->setConfig('maxFiles', 1);
       } else {
