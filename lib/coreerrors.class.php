@@ -38,7 +38,7 @@ class CoreErrors {
     * @param Exception $exception -- zachycená vyjímka
     */
    public static function addException(Exception $exception) {
-      if(CUBE_CMS_DEBUG_LEVEL == 0){
+      if(defined("CUBE_CMS_DEBUG_LEVEL") && CUBE_CMS_DEBUG_LEVEL == 0){
          self::logError($exception->getCode(), $exception->getMessage(), $exception->getFile(), $exception->getLine());
          self::sendErrorToMail($exception->getCode(), $exception->getMessage(), $exception->getFile(), $exception->getLine(), $exception->getTraceAsString());
       }
