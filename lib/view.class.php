@@ -149,6 +149,29 @@ abstract class View extends TrObject {
    }
 
    /**
+    * Metoda vrací název viewru podle dané akce a výstupu
+    * @param string $actionName -- název akce
+    * @param string $output -- typ výstupu (html, json)
+    * @return string
+    */
+   final public function getViewer($actionName, $output = null)
+   {
+      $output = $output == null ? Template_Output::getOutputType() : $output;
+      $viewName = null;
+      if(method_exists($this, $actionName.ucfirst($output).'View')) {
+         $viewName = $actionName.ucfirst($output).'View';
+      } else if(method_exists($this, $actionName.'View')) {
+         $viewName = $actionName.'View';
+      }
+      return $viewName;
+   }
+
+   final public function hasViewer($action, $output = null)
+   {
+      return (bool) $this->getViewer($action, $output);
+   }
+
+   /**
     * Metoda vrací objekt šablony, přes kerý se přiřazují proměnné do šablony
     * @return Template_Module -- objekt šablony
     */
