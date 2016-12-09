@@ -428,7 +428,7 @@ abstract class Model_ORM extends Model implements ArrayAccess {
    {
       if ($pk == null AND $this->where == null AND empty($this->orders) AND empty($this->selectedColumns)) { // pokud nejsou žádné podmínky je vytvořen nový
          Log::msg('Using record for new row is deprecated!! Caller: '.  json_encode(debug_backtrace()));
-         return new $this->rowClass($this->tableStructure);
+         return new $this->rowClass($this->tableStructure, false, $this);
       }
 
       $obj = clone $this;
