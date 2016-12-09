@@ -106,6 +106,7 @@ class Menu_Admin_Item {
    
    public function getIcon()
    {
+      // replace old png icons to fontAwesome
       return $this->icon;
    }
    

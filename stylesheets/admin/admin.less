@@ -63,7 +63,7 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
                opacity: 0.9;
                /* IE 7 */
             }
-            width: 220px; 
+            width: 260px; 
             visibility: hidden; 
             position: absolute; 
             top: 100%; 
@@ -92,7 +92,14 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
                margin-right: 4px;
                margin-top: 4px;
             }
+            span.icon {
+               margin-right: 4px;
+               color: @color-primary;
+            }
             &:hover {
+               span.icon { 
+                  color: @color-bg; 
+               }
                background: @color-bg-hover !important; 
                text-decoration: none;
                color: @color-bg; 
@@ -127,6 +134,9 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
       }
       li.adminmenu-shop-item, li.adminmenu-shop-item ul li {
          /*background-color: #660000;*/
+      }
+      &.right-menu {
+         float: right;
       }
    }
    background-color: @color-bg;
@@ -236,9 +246,12 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
    }
    a, a:visited, button, input {
       &:hover {
+         &, * {
+            color: @color-bg-hover !important;
+         }
          background-image: none;
          background-color: transparent;
-         color: @color-bg-hover !important;
+         /*color: @color-bg-hover !important;*/
       }
       background: none transparent;
       color: @color-text !important;
@@ -252,7 +265,9 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
       &.important {
          a, a:visited, button, input {
             &:hover {
-               color: @color-bg-important !important;
+               &, * {
+                  color: @color-bg-important !important;
+               }
             }
          }
       }
@@ -834,6 +849,15 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
 }
 
 /* UI widget adminstrace */
+.cubecms-state-highlight {
+   border-color: @color-border-hightlight !important;
+   background-color: @color-bg-hightlight !important;
+}
+.cubecms-state-disable {
+   border-color: @color-border-gray !important;
+   background-color: @color-bg-gray !important;
+}
+
 .cubecms-widget {
    a, a:visited {
       color: @color-primary;
@@ -841,11 +865,30 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
    // widgets
    &.cubecms-table {
       th, .cubecms-header {
-         .cube-gradient();
-         border: 1px solid @color-primary;
          &, td, th {
             color: @color-text-invert;
          }
+         .toolbox-inline {
+            .important {
+               input[type="submit"], input[type="reset"], input[type="button"], button, a, a:visited, a:link {
+                  &:hover {
+                     &, span {
+                        color: @color-text-important !important;
+                     }
+                  }
+               }
+            }
+            input[type="submit"], input[type="reset"], input[type="button"], button, a, a:visited, a:link {
+               &:hover {
+                  &, span {
+                     color: @color-text-gray !important;
+                  }
+               }
+               color: @color-text-invert !important;
+            }
+         }
+         .cube-gradient();
+         border: 1px solid @color-primary;
       }
       td, .cubecms-row {
          &.state-hightlight {
@@ -1039,6 +1082,15 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
          .rounded-corners();
       }
    }
+   // blok s bloky a vnitřním řazením
+   &.cubecms-list-blocks-multisort {
+      .cubecms-list-block {
+         &:hover {
+            /*background-color: @color-bg-content;*/
+         }
+      }
+      
+   }
    &.cubecms-widget-sorting {
       .rounded-corners();
       border: 1px solid @color-border;
@@ -1059,14 +1111,7 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
    }
    font-size: @font-size;
 }
-.cubecms-state-highlight {
-   border-color: @color-border-hightlight !important;
-   background-color: @color-bg-hightlight !important;
-}
-.cubecms-state-disable {
-   border-color: @color-border-gray !important;
-   background-color: @color-bg-gray !important;
-}
+
 /* modal */
 /* used from Bootstrap 3.0 */
 .cubecms-modal {
@@ -1187,6 +1232,13 @@ body.popup {
       text-align: right;
    }
    padding-top: @padding-small * 3 + (@font-size-large * 1.3);
+}
+
+.main-content-images {
+    a.image {
+        margin-bottom: 30px;
+        display: block;
+    }
 }
 
 @media (min-width: 768px) {

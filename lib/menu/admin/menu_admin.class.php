@@ -23,6 +23,10 @@ class Menu_Admin {
    const SECTION_LISTS = "lists";
    const SECTION_SHOP = "shop";
 
+   const POSITION_LEFT = 'l';
+   const POSITION_RIGHT = 'r';
+   const POSITION_CENTER = 'c';
+   
    private static $instance = false;
 
    /**
@@ -68,11 +72,12 @@ class Menu_Admin {
       Model_CategoryAdm::addRecord($item);
    }
    
-   public function addSection($name, $labels, $icon)
+   public function addSection($name, $labels, $icon, $position = self::POSITION_LEFT)
    {
       $this->items[$name] = array(
           'labels' => $labels,
           'icon' => $icon,
+          'position' => $position,
           'items' => array(),
       );
    }
@@ -81,9 +86,15 @@ class Menu_Admin {
     * 
     * @return Menu_Admin_Item[]
     */
-   public function getItems()
+   public function getItems($position = self::POSITION_LEFT)
    {
-      return $this->items;
+      $items = array();
+      foreach ($this->items as $key => $section) {
+         if($section['position'] == $position){
+            $items[$key] = $section;
+         }
+      }
+      return $items;
    }
 
 }
