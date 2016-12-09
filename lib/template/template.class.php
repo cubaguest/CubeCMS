@@ -123,6 +123,7 @@ class Template extends TrObject {
    );
        
    protected static $baseOutputFilters = array(
+       'Template_Postfilters::typo'
    );
 
    /*
