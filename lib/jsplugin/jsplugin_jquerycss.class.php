@@ -17,15 +17,16 @@ class JsPlugin_JQueryCSS extends JsPlugin_JQuery {
 //     */
 //    protected $config = array('theme' => JsPlugin_JQuery::BASE_THEME);
 //
-// 	protected function initJsPlugin() {
-//       $this->setJsFilesDir('jquery');
+ 	protected function initJsPlugin() {
+       $this->setJsFilesDir('jquery');
+       $this->setJsPluginName('jquery');
 //       if(defined('VVE_JQUERY_THEME')){
 //          $this->setCfgParam('theme', VVE_JQUERY_THEME);
 //       }
-//    }
+    }
 
 	protected function setFiles() {
-      $this->addFile(new JsPlugin_CssFile("ui/themes/jquery-ui.min.css", false));
+//      $this->addFile(new JsPlugin_CssFile("ui/themes/jquery-ui.min.css", false));
       $this->addFile(new JsPlugin_CssFile("theme.css", false, self::getThemeDir($this->getCfgParam('theme'))));
 	}
 }
