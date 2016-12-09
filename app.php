@@ -411,7 +411,7 @@ class AppCore extends TrObject {
       date_default_timezone_set('Europe/Prague');
       // nastavení mb kodování na UTF protože celá aplikace pracuje s UTF
       mb_internal_encoding("UTF-8");
-      if (version_compare(PHP_VERSION, '6.0.0', '<')) {
+      if (version_compare(PHP_VERSION, '5.6.0', '<')) {
          iconv_set_encoding('input_encoding', 'UTF-8');
          iconv_set_encoding('output_encoding', 'UTF-8');
          iconv_set_encoding('internal_encoding', 'UTF-8');
@@ -802,8 +802,11 @@ class AppCore extends TrObject {
 //            return false;
          }
 
-         if ((Url_Request::getInstance()->isXHRRequest() AND $routes->getRespondClass() != null)
-            OR ( Url_Request::getInstance()->getOutputType() == 'json' AND $routes->getRespondClass() == null AND ob_get_contents() == null )) {
+          if ((Url_Request::getInstance()->isXHRRequest() AND $routes->getRespondClass() != null)
+            OR ( Url_Request::getInstance()->getOutputType() == 'json' AND $routes->getRespondClass() == null AND ob_get_contents() == null )
+                    /* je XHR, není implmentována metoda viewru a výstup je také prázdný */
+            OR ( Url_Request::getInstance()->isXHRRequest() AND $controller->view()->hasViewer($controller->getActionView()) === false AND ob_get_contents() == null )
+                 ) {
             // render odpovědi pro XHR
             if ($routes->getRespondClass() != null) {
                $class = $routes->getRespondClass();
