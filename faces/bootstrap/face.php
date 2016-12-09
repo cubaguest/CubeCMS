@@ -1,9 +1,9 @@
-<?php 
+<?php
+
 /**
  * Hlavní konfigurační soubor vzhledu
  * Default face
  */
-
 $face['name'] = "Bootstrap default template";
 $face['desc'] = "Default Bootstrap CubeCMS tepmlate";
 $face['version'] = "1.0";
@@ -23,12 +23,12 @@ $face['panels'] = array(
 
 /*
  * modules settings
- */ 
+ */
 // banners
 $modules['banners']['positions'] = array(
-    'left' => array('label' => "Box v levo"), 
-    'right' => array('label' => "Box v pravo"), 
-    'bottom' => array('label' => "Box dole", 'random' => true), 
+   'left' => array('label' => "Box v levo"),
+   'right' => array('label' => "Box v pravo"),
+   'bottom' => array('label' => "Box dole", 'random' => true),
 );
 
 $modules['custommenu']['positions'] = array(
@@ -47,19 +47,21 @@ $modules['hpslideshow']['dimensions'] = array(
 $modules['contact']['footer'] = true;
 
 // základní nasatvení vzhledu
-if(!function_exists('getFaceEnviromentItems')){
+if (!function_exists('getFaceEnviromentItems')) {
+
    function getFaceEnviromentItems()
    {
       $items = array();
-      
+
 //      $imageHeader = new Form_Element_File('headerImage', 'Oprázek v hlavičce');
 //      $imageHeader->addValidation(new Form_Validator_FileExtension('jpg'));
 //      $imageHeader->setUploadDir(AppCore::getAppDataDir());
 //      $items[] = $imageHeader;
-      
-      
+
+
       return $items;
    }
+
    function processFaceEnviroment(Form $form)
    {
 //      if(isset($form->headerImage) && $form->headerImage->getValues() != null){
@@ -67,27 +69,45 @@ if(!function_exists('getFaceEnviromentItems')){
 //         $img->rename('header.jpg');
 //      }
    }
+
 }
 
 // nastavení kateogrie
-if(!function_exists('extendCategorySettings')){
+if (!function_exists('extendCategorySettings')) {
+
    function extendCategorySettings(Category $category, Form $form, &$settings, Translator $translator)
    {
-//      // lev� menu
-//      if($category->getModule()->getName() == 'text'){
-//         $elemSubName = new Form_Element_Text('subname', $translator->tr('Drobn� nadpis v klaimu'));
-//         $elemSubName->setSubLabel($translator->tr('Nadpis se zobraz� ne hlavn�m nadpisem str�nky'));
-//         $elemSubName->setLangs();
-//         $form->addElement($elemSubName, Categories_Controller::SETTINGS_GROUP_VIEW);
-//
-//         if(isset($settings[EADV_PARAM_SUBNAME])){
-//            $form->subname->setValues($settings[EADV_PARAM_SUBNAME]);
-//         }
-//      }
-//      if($form->isValid()){
-//         if(isset($form->subname)){
-//            $settings[EADV_PARAM_SUBNAME] = $form->subname->getValues();
-//         }
-//      }
+      // obrázek
+      $elemImgR = new Form_Element_ImageSelector('rightImage', $translator->tr('Obrázek napravo'));
+      $elemImgR->setUploadDir(Utils_CMS::getTitleImagePath(false));
+      $form->addElement($elemImgR, Categories_Controller::SETTINGS_GROUP_IMAGES);
+
+      if (isset($settings['cimgr'])) {
+         $form->rightImage->setValues($settings['cimgr']);
+      }
+      
+      // help box
+      $elemColor = new Form_Element_Select('color', $translator->tr('Barva'));
+      $elemColor->setOptions(array(
+         'Žádná' => '',
+         'Červená' => 'red',
+         'Modrá' => 'blue',
+      ));
+      $form->addElement($elemColor, Categories_Controller::SETTINGS_GROUP_VIEW);
+
+      if (isset($settings['bgcolor'])) {
+         $form->color->setValues($settings['bgcolor']);
+      }
+      // uložení
+      if ($form->isValid()) {
+         if (isset($form->rightImage)) {
+            $img = $form->rightImage->getValues();
+            $settings['cimgr'] = $img['name'];
+         }
+         if (isset($form->color)) {
+            $settings['bgcolor'] = $form->color->getValues();
+         }
+      }
    }
+
 }
