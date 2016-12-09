@@ -101,6 +101,9 @@ class Url
       return $ref->newInstanceArgs(func_get_args());
    }
    
+   /**
+    * @todo doplnit kontrolu www u hosta. na některých hostinzích nevrací www a to je problém
+    */
    protected function getCurrentUrl()
    {
       $ssl = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? true:false;
@@ -109,7 +112,7 @@ class Url
       $port = $_SERVER['SERVER_PORT'];
       $port = ((!$ssl && $port=='80') || ($ssl && $port=='443')) ? '' : ':'.$port;
       $host = isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? $_SERVER['HTTP_X_FORWARDED_HOST'] : 
-         !isset($_SERVER['SERVER_NAME']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'];
+         isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'];
       return $protocol . '://' . $host . (strpos($host, ":") === false ? $port : "") . $_SERVER['REQUEST_URI'];
    }
 
