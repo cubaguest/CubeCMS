@@ -22,6 +22,7 @@ class Form_Element_File extends Form_Element {
     */
    protected $uploadDir = null;
    private $overWrite = true;
+   protected $filesMoved = false;
 
    /**
     * Jestli nemá zpracovávat nebezpečné soubory
@@ -55,16 +56,16 @@ class Form_Element_File extends Form_Element {
          if ($this->isDimensional()) {
             foreach ($_FILES[$this->getName()]['name'] as $key => $filename) {
                $this->uploadFile(
-                   $_FILES[$this->getName()]["name"][$key], $_FILES[$this->getName()]["tmp_name"][$key], $_FILES[$this->getName()]["error"][$key], $_FILES[$this->getName()]["type"][$key], $_FILES[$this->getName()]["size"][$key], $key);
+                       $_FILES[$this->getName()]["name"][$key], $_FILES[$this->getName()]["tmp_name"][$key], $_FILES[$this->getName()]["error"][$key], $_FILES[$this->getName()]["type"][$key], $_FILES[$this->getName()]["size"][$key], $key);
             }
          } else if ($this->isMultiLang()) {
             foreach ($_FILES[$this->getName()]['name'] as $key => $filename) {
                $this->uploadFile(
-                   $_FILES[$this->getName()]["name"][$key], $_FILES[$this->getName()]["tmp_name"][$key], $_FILES[$this->getName()]["error"][$key], $_FILES[$this->getName()]["type"][$key], $_FILES[$this->getName()]["size"][$key], $key);
+                       $_FILES[$this->getName()]["name"][$key], $_FILES[$this->getName()]["tmp_name"][$key], $_FILES[$this->getName()]["error"][$key], $_FILES[$this->getName()]["type"][$key], $_FILES[$this->getName()]["size"][$key], $key);
             }
          } else {
             $this->uploadFile(
-                $_FILES[$this->getName()]["name"], $_FILES[$this->getName()]["tmp_name"], $_FILES[$this->getName()]["error"], $_FILES[$this->getName()]["type"], $_FILES[$this->getName()]["size"]);
+                    $_FILES[$this->getName()]["name"], $_FILES[$this->getName()]["tmp_name"], $_FILES[$this->getName()]["error"], $_FILES[$this->getName()]["type"], $_FILES[$this->getName()]["size"]);
          }
       } else {
          $this->values = null;
@@ -76,27 +77,20 @@ class Form_Element_File extends Form_Element {
    protected function uploadFile($name, $tmpName, $error, $mime, $size, $key = null)
    {
       if ($error == UPLOAD_ERR_OK) {
-         $saveFileName = vve_cr_safe_file_name($name);
-
-         if ($this->onlySecureFiles && in_array(pathinfo($saveFileName, PATHINFO_EXTENSION), $this->insecureFiles)) {
+         if ($this->onlySecureFiles && in_array(pathinfo($name, PATHINFO_EXTENSION), $this->insecureFiles)) {
             $this->creteUploadError(0, $name);
             $this->isValid(false);
          } else {
-            // kontrola adresáře
             $dir = new FS_Dir($this->getUploadDir());
             $dir->check();
-            if (!$this->overWrite) {
-               $saveFileName = File::creatUniqueName($saveFileName, $dir);
-            }
-            move_uploaded_file($tmpName, $dir . $saveFileName);
+            $saveFileName = Utils_String::toSafeFileName($name);
+
             // vatvoření pole s informacemi o souboru
             $this->_setFileValue(
-                array('name' => $saveFileName,
-                'path' => $dir,
-                'size' => $size,
-                'mime' => $mime,
-                'type' => $this->getMimeType($dir . $saveFileName),
-                'extension' => pathinfo($dir . $saveFileName, PATHINFO_EXTENSION)), $key
+               $this->createFileDataArray(
+                       $saveFileName, $dir, $size, $mime, 
+                       $tmpName, $this->getMimeType($tmpName), 
+                       pathinfo($saveFileName, PATHINFO_EXTENSION)), $key
             );
          }
       } else if ($error == UPLOAD_ERR_NO_FILE) {
@@ -104,7 +98,30 @@ class Form_Element_File extends Form_Element {
       } else {
          $this->creteUploadError($error, $name);
          $this->_setFileValue(array('name' => $name, 'size' => $size));
-      };
+      }
+   }
+
+   public function validate()
+   {
+      parent::validate();
+      if (!$this->filesMoved && $this->isPopulated() && $this->isValid() && $this->getValues() != null) {
+         $this->filesMoved = true;
+         // samotný přesun do filesystému z TMP a update hodnot
+         $this->moveFilesFromTMP();
+      }
+   }
+
+   protected function createFileDataArray($name, $path, $size, $mime, $tmp, $type = null, $extension = null)
+   {
+      return array(
+          'name' => $name,
+          'path' => $path,
+          'size' => $size,
+          'mime' => $mime,
+          'tmp' => $tmp,
+          'type' => $type,
+          'extension' => $extension
+      );
    }
 
    protected function _setFileValue($data, $key = null)
@@ -117,6 +134,36 @@ class Form_Element_File extends Form_Element {
       } else {
          $this->values = $data;
       }
+   }
+
+   protected function moveFilesFromTMP()
+   {
+      $values = $this->getValues();
+      if ($this->isDimensional() || $this->isMultiLang()) {
+         foreach ($values as $key => $file) {
+            $filename = $this->moveUplodedFile($file);
+            $values[$key]['name'] = $filename;
+         }
+      } else {
+         $filename = $this->moveUplodedFile($values);
+         $values['name'] = $filename;
+      }
+      $this->setFilteredValues($values);
+   }
+
+   protected function moveUplodedFile($file)
+   {
+      $saveFileName = $file['name'];
+      if (!$this->overWrite) {
+         $saveFileName = File::creatUniqueName($saveFileName, (string) $file['path']);
+      }
+      // tohle by mohl být content test na skripty v souboru
+//      if(filesize($file['tmp']) < 1024 * 512 ){
+//         var_dump('check php cnt');die;
+//      }
+
+      move_uploaded_file($file['tmp'], (string) $file['path'] . DIRECTORY_SEPARATOR . $saveFileName);
+      return $saveFileName;
    }
 
    /**
@@ -214,10 +261,10 @@ class Form_Element_File extends Form_Element {
          if ($this->dimensional === true) {
             $container = clone $this->containerElement;
             $container
-                ->addClass($this->cssClasses['containerClass'])
-                ->addClass($this->cssClasses['multipleClass'])
-                ->addClass($this->cssClasses['multipleClassLast'])
-                ->addClass('input-group');
+                    ->addClass($this->cssClasses['containerClass'])
+                    ->addClass($this->cssClasses['multipleClass'])
+                    ->addClass($this->cssClasses['multipleClassLast'])
+                    ->addClass('input-group');
 
             $this->html()->setAttrib('name', $this->getName() . "[]");
             $this->html()->setAttrib('id', $this->getName() . '_' . $rKey);
@@ -304,12 +351,13 @@ class Form_Element_File extends Form_Element {
       } else if (!class_exists($className)) {
          throw new UnexpectedValueException(sprintf($this->tr('Třídu %s se nepodařilo načíst'), $className), 1);
       }
-
-      if (isset($this->values['name'])) {// pokud je jeden soubor
-         $fileObj = new $className($this->values['name'], $this->getUploadDir());
+      $values = $this->getValues();
+      if (isset($values['name'])) {// pokud je jeden soubor
+         $fileObj = new $className($values['name'], $this->getUploadDir());
+//         var_dump('createfileobj', $fileObj);
       } else {
          $fileObj = array();
-         foreach ($this->values as $file) {
+         foreach ($values as $file) {
             $fileObj[] = new $className($file['name'], $this->getUploadDir());
          }
       }
@@ -318,13 +366,13 @@ class Form_Element_File extends Form_Element {
 
    protected function cleanTMPUploadDirs()
    {
-      if(rand(0, 1000) == 500 || CUBE_CMS_DEBUG_LEVEL > 1){ // není třeba provádět pořád
+      if (rand(0, 1000) == 500 || CUBE_CMS_DEBUG_LEVEL > 1) { // není třeba provádět pořád
          $i = 0;
          foreach (glob(AppCore::getAppCacheDir() . 'upload-*/', GLOB_BRACE) as $dir) {
             if (is_dir($dir) && is_writable($dir) && filemtime($dir) < time() - 3600 * 48) { // 48 hodin stačí
                FS_Dir::deleteStatic($dir);
             }
-            if($i > 100){ // ochrana proti velkému množství mazání
+            if ($i > 100) { // ochrana proti velkému množství mazání
                break;
             }
             $i++;

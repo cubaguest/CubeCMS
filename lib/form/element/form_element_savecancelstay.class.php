@@ -8,7 +8,13 @@
  *                $LastChangedBy: $ $LastChangedDate: $
  * @abstract      Třída pro obsluhu skupiny elementů
  */
-class Form_Element_SaveCancel extends Form_Element {
+class Form_Element_SaveCancelStay extends Form_Element {
+   
+   const STATE_SAVE_CLOSE = 1;
+   const STATE_SAVE = 2;
+   const STATE_CANCEL = 0;
+
+
    protected $formElementLabel = array();
 
    private $cancelConfirmMsg = true;
@@ -17,7 +23,7 @@ class Form_Element_SaveCancel extends Form_Element {
       $this->htmlElement = new Html_Element('input');
       $this->html()->setAttrib('type', 'submit');
       if($this->getLabel() == null){
-         $this->formElementLabel = array($this->tr('Uložit'),$this->tr('Zrušit'));
+         $this->formElementLabel = array($this->tr('Uložit'),$this->tr('Uložit a zavřít'), $this->tr('zavřít'));
       } else {
          if(!is_array($this->getLabel())){
             throw new UnexpectedValueException($this->tr('Pro skupinu elementů SaveCancel musí být label zadán jako pole se dvěma popiskama'));
@@ -39,7 +45,7 @@ class Form_Element_SaveCancel extends Form_Element {
     * @return bool
     */
    public function isSend() {
-      if(isset ($_REQUEST[$this->getName().'_ok']) OR isset ($_REQUEST[$this->getName().'_cancel'])){
+      if(isset ($_REQUEST[$this->getName().'_ok']) OR isset ($_REQUEST[$this->getName().'_okstay']) OR isset ($_REQUEST[$this->getName().'_cancel'])){
          return true;
       }
       return false;
@@ -47,9 +53,11 @@ class Form_Element_SaveCancel extends Form_Element {
 
    public function populate() {
       if(isset ($_REQUEST[$this->getName().'_ok'])) {
-         $this->values = true;
+         $this->values = self::STATE_SAVE;
+      } else if(isset ($_REQUEST[$this->getName().'_ok_close'])) {
+         $this->values = self::STATE_SAVE_CLOSE;
       } else {
-         $this->values = false;
+         $this->values = self::STATE_CANCEL;
       }
       $this->unfilteredValues = $this->values;
       $this->isPopulated = true;
@@ -61,6 +69,8 @@ class Form_Element_SaveCancel extends Form_Element {
     */
    public function control($renderKey = null) {
       $rKey = $renderKey != null ? $renderKey : $this->renderedId;
+      
+      // save button
       $this->setValues($this->formElementLabel[0]);
       $this->html()->clearClasses();
       $this->html()->removeAttrib('onclick');
@@ -68,12 +78,26 @@ class Form_Element_SaveCancel extends Form_Element {
          $this->html()->addClass($class);
       }
       
-      $ctrlSave = clone parent::control();
+      $ctrlSave = clone parent::control($renderKey);
       $this->renderedId--;
       $ctrlSave->setAttrib('name', $this->getName().'_ok');
       $ctrlSave->setAttrib('id', $this->getName().'_ok_'.$rKey);
 
+      // save and stay button
       $this->setValues($this->formElementLabel[1]);
+      $this->html()->clearClasses();
+      $this->html()->removeAttrib('onclick');
+      foreach ($this->cssClasses['confirmClass'] as $class) {
+         $this->html()->addClass($class);
+      }
+      
+      $ctrlSaveStay = clone parent::control($renderKey);
+      $this->renderedId--;
+      $ctrlSaveStay->setAttrib('name', $this->getName().'_ok_close');
+      $ctrlSaveStay->setAttrib('id', $this->getName().'_ok_close_'.$rKey);
+      
+      // cancel button
+      $this->setValues($this->formElementLabel[2]);
       $this->html()->clearClasses();
       
       if($this->cancelConfirmMsg == true){
@@ -82,14 +106,15 @@ class Form_Element_SaveCancel extends Form_Element {
       foreach ($this->cssClasses['cancelClass'] as $class) {
          $this->html()->addClass($class);
       }
-      $ctrlCancel = clone parent::control();
+      
+      $ctrlCancel = clone parent::control($renderKey);
       $this->renderedId--;
       $ctrlCancel->setAttrib('name', $this->getName().'_cancel');
       $ctrlCancel->setAttrib('id', $this->getName().'_cancel_'.$rKey);
       if($renderKey == null){
          $this->renderedId++;
       }
-      return (string)$ctrlSave.(string)$ctrlCancel;
+      return (string)$ctrlSave.(string)$ctrlSaveStay.(string)$ctrlCancel;
    }
 
    /**
@@ -104,4 +129,3 @@ class Form_Element_SaveCancel extends Form_Element {
       return (string)$this->control();
    }
 }
-?>
