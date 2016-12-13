@@ -172,10 +172,13 @@ class CustomBlocks_Controller extends Controller {
 
       if ($form->isValid()) {
          $this->processForm($form, $block, $this->getRequest('type'), $blockRecord->getPK());
-
          $this->log(sprintf('Upraven volitelný blok %s', $blockRecord->getPK()));
          $this->infoMsg()->addMessage($this->tr('Blok byl Uložen'));
-         $this->link()->route()->redirect();
+         if($form->save->getValues() == Form_Element_SaveCancelStay::STATE_SAVE_CLOSE){
+            $this->link()->route()->redirect();
+         } else {
+            $this->link()->redirect();
+         }
       }
 
       $this->view()->form = $form;
@@ -280,7 +283,7 @@ class CustomBlocks_Controller extends Controller {
       $form = new Form('block_edit');
 
       $elemBlockName = new Form_Element_Text('blockname', $this->tr('Název bloku'));
-      $elemBlockName->addValidation(new Form_Validator_NotEmpty());
+      $elemBlockName->addValidation(new Form_Validator_NotEmpty(null, Locales::getDefaultLang()));
       $elemBlockName->setLangs();
       if ($blockRecord) {
          $elemBlockName->setValues($blockRecord->{CustomBlocks_Model_Blocks::COLUMN_NAME});
@@ -312,7 +315,7 @@ class CustomBlocks_Controller extends Controller {
          }
       }
 
-      $submit = new Form_Element_SaveCancel('save');
+      $submit = new Form_Element_SaveCancelStay('save');
       $form->addElement($submit);
 
       if ($form->isSend() && $form->save->getValues() == false) {
@@ -360,13 +363,15 @@ class CustomBlocks_Controller extends Controller {
     */
    protected function createFormElementImages($index, $name, $blockItem, CustomBlocks_Model_Images_Record $record = null)
    {
-      $elemImg = new Form_Element_File('img_' . $index, $name);
+      $elemImg = new Form_Element_Image('img_' . $index, $name);
       $elemImg->setUploadDir($this->module()->getDataDir() . CustomBlocks_Model_Images::DIR_IMG);
       $elemImg->setOverWrite(false);
-      $elemImg->addValidation(new Form_Validator_FileExtension('jpg;png;bmp;gif'));
+//      $elemImg->addValidation(new Form_Validator_FileExtension('jpg;png;bmp;gif'));
       if ($record) {
-         $src = Utils_Image::cache($record->getUrl($this->getModule()), 500, 50);
-         $elemImg->setSubLabel('<strong>' . $this->tr('Aktuálně') . ':</strong> <img src="' . $src . '" />');
+//         $src = Utils_Image::cache($record->getUrl($this->getModule()), 500, 50);
+//         $elemImg->setSubLabel('<strong>' . $this->tr('Aktuálně') . ':</strong> <img src="' . $src . '" />');
+         $elemImg->setImage($record->getPath($this->getModule()));
+         $elemImg->setAllowDelete();
       }
 
       return $elemImg;
@@ -375,7 +380,7 @@ class CustomBlocks_Controller extends Controller {
    protected function processFormElementImages($index, Form $form, $idBlock)
    {
       $name = 'img_' . $index;
-      if (!isset($form->$name) || $form->$name->getValues() == null) {
+      if (!isset($form->$name)) {
          return;
       }
 
@@ -385,16 +390,26 @@ class CustomBlocks_Controller extends Controller {
          $item->{CustomBlocks_Model_Items::COLUMN_ID_BLOCK} = $idBlock;
          $item->{CustomBlocks_Model_Items::COLUMN_INDEX} = $index;
       }
-
-      $file = $form->$name->createFileObject();
-      $item->{CustomBlocks_Model_Images::COLUMN_FILE} = $file->getName();
-      $item->save();
+//      var_dump('name', $name, $form->$name->getValues() );
+//      var_dump($form->$name->createFileObject());
+//      die;
+      if($form->$name->getValues() != null){
+         $file = $form->$name->createFileObject();
+         $item->{CustomBlocks_Model_Images::COLUMN_FILE} = $file->getName();
+         $item->save();
+      } else {
+         if(!$item->isNew()){
+            $m = new CustomBlocks_Model_Images();
+            $m->delete($item);
+         }
+      }
    }
 
    protected function createFormElementGallery($index, $name, $blockItem, CustomBlocks_Model_Gallery_Record $record = null)
    {
       $elemImg = new Form_Element_ImagesUploader('img_' . $index, $name);
       $elemImg->setMaxFiles(50);
+      $elemImg->setMaxFileSize(6*1024*1024);
 //      Debug::log($record);
       $elemImg->addValidation(new Form_Validator_FileExtension('jpg;png;bmp;gif'));
       if ($record) {
@@ -483,12 +498,12 @@ class CustomBlocks_Controller extends Controller {
     */
    protected function createFormElementFiles($index, $name, $blockItem, CustomBlocks_Model_Files_Record $record = null)
    {
-      $elemFile = new Form_Element_File('file_' . $index, $name);
-      $elemFile->setUploadDir($this->module()->getDataDir() . CustomBlocks_Model_Files::DIR_FILES);
+      $elemFile = new Form_Element_FileAdv('file_' . $index, $name);
+      $elemFile->setUploadDir($this->module()->getDataDir(false) . CustomBlocks_Model_Files::DIR_FILES);
       $elemFile->setOverWrite(false);
-      if ($record) {
-         $elemFile->setSubLabel('<strong>' . $this->tr('Aktuálně') . ':</strong> <a href="' . $record->getUrl($this->getModule()) . '">'
-                 . htmlspecialchars($record->{CustomBlocks_Model_Files::COLUMN_FILE}) . '</a>');
+      if ($record && $record->{CustomBlocks_Model_Files::COLUMN_FILE}) {
+         $elemFile->setAllowDelete(true);
+         $elemFile->setValues($record->getPath($this->getModule()));
       }
 
       return $elemFile;
@@ -497,7 +512,7 @@ class CustomBlocks_Controller extends Controller {
    protected function processFormElementFiles($index, Form $form, $idBlock)
    {
       $name = 'file_' . $index;
-      if (!isset($form->$name) || $form->$name->getValues() == null) {
+      if (!isset($form->$name)) {
          return;
       }
 
@@ -507,9 +522,16 @@ class CustomBlocks_Controller extends Controller {
          $item->{CustomBlocks_Model_Items::COLUMN_ID_BLOCK} = $idBlock;
          $item->{CustomBlocks_Model_Items::COLUMN_INDEX} = $index;
       }
-
-      $file = $form->$name->createFileObject();
-      $item->{CustomBlocks_Model_Files::COLUMN_FILE} = $file->getName();
+//      Debug::log($name, $form->$name->getValues());
+      if($form->$name->getValues() != null){
+         $file = $form->$name->createFileObject();
+         $item->{CustomBlocks_Model_Files::COLUMN_FILE} = $file->getName();
+      } else {
+         if(!$item->isNew()){
+            $m = new CustomBlocks_Model_Files();
+            $m->delete($item);
+         }
+      }
       $item->save();
    }
 

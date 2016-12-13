@@ -32,10 +32,11 @@ class CustomBlocks_Model_Files extends CustomBlocks_Model_Items {
 
 class CustomBlocks_Model_Files_Record extends Model_ORM_Record {
    
-   public function getPath($modulePath)
+   public function getPath(Module $module)
    {
-//      $this->{CustomBlocks_Model_Blocks::COLUMN_DATA} = serialize($data);
-      return null;
+      return $module->getDataDir(false)
+          .  CustomBlocks_Model_Files::DIR_FILES.'/'
+          .$this->{CustomBlocks_Model_Files::COLUMN_FILE};
    }
    
    public function getUrl(Module $module)

@@ -36,10 +36,11 @@ class CustomBlocks_Model_Images extends CustomBlocks_Model_Items {
 
 class CustomBlocks_Model_Images_Record extends Model_ORM_Record {
    
-   public function getPath($modulePath)
+   public function getPath(Module $module)
    {
-//      $this->{CustomBlocks_Model_Blocks::COLUMN_DATA} = serialize($data);
-      return null;
+      return $module->getDataDir(false)
+          .CustomBlocks_Model_Images::DIR_IMG.'/'
+          .$this->{CustomBlocks_Model_Images::COLUMN_FILE};
    }
    
    public function getUrl(Module $module)

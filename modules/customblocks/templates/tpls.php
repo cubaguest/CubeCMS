@@ -33,6 +33,10 @@ $this->addTemplate('main',
                              'name' => array('cs' => 'Textové pole'),
                              'tinymce' => true,
                          ),
+                         'dwfile' => array( // označuje index, který je pak v šabloně
+                             'model' => 'CustomBlocks_Model_Files',
+                             'name' => array('cs' => 'Soubor ke stažení'),
+                         ),
                      ) 
                   ),
                'text' => 
