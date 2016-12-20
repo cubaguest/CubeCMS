@@ -44,7 +44,7 @@ class Template_Postfilters {
 		$replacement = " \\1&nbsp;";
 		$text = preg_replace($pattern, $replacement, $text);
 
-		$pattern = "/&[a-z]+;".$czechPripositions."[[:blank:]]{1}/";
+		$pattern = "/&(?![lt])[a-z]+;".$czechPripositions."[[:blank:]]{1}/";
 		$replacement = "&nbsp;\\1&nbsp;";
 		$text = preg_replace($pattern, $replacement, $text);
 
