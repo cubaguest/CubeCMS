@@ -239,6 +239,26 @@ CubeCMS.Tools = {
       var scrollbarWidth = scrollDiv.offsetWidth - scrollDiv.clientWidth;
       document.body.removeChild(scrollDiv);
       return scrollbarWidth;
+   },
+   rememberTabSelection: function (tabPaneSelector, useHash) {
+      var key = 'selectedTabFor' + tabPaneSelector;
+      if (get(key))
+         $(tabPaneSelector).find('a[href="' + get(key) + '"]').tab('show');
+
+      $(tabPaneSelector).on("click", 'a[data-toggle]', function (event) {
+         set(key, this.getAttribute('href'));
+      });
+
+      function get(key) {
+         return useHash ? location.hash : localStorage.getItem(key);
+      }
+
+      function set(key, value) {
+         if (useHash)
+            location.hash = value;
+         else
+            localStorage.setItem(key, value);
+      }
    }
 };
 
