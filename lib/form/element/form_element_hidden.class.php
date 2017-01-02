@@ -42,5 +42,9 @@ class Form_Element_Hidden extends Form_Element {
    public function labelValidations($renderKey = null) {
       return (string)null;
    }
+   
+   protected function getMultipleButtons($first = false, $last = false)
+   {
+      return;
+   }
 }
-?>
