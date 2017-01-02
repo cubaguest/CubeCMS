@@ -284,7 +284,7 @@ abstract class Shop_Product_Controller extends Controller {
     */
    protected function createForm(Model_ORM_Record $product)
    {
-      $form = new Form('product_', true);
+      $form = new Form('product_');
       
       $fGrpInfo = $form->addGroup('info', $this->tr('Základní informace'));
       
@@ -333,18 +333,18 @@ abstract class Shop_Product_Controller extends Controller {
       $eQuantity->setValues(0);
       $form->addElement($eQuantity, $fGrpInfo);
 
-      $eImage = new Form_Element_File('image', $this->tr('Obrázek'));
-      $eImage->addValidation(new Form_Validator_FileExtension('jpg'));
-      $eImage->setUploadDir(Shop_Tools::getProductImagesDir());
-      $form->addElement($eImage, $fGrpInfo);
       
-      if($product instanceof Model_ORM_Record AND $product->{Shop_Model_Product::COLUMN_IMAGE} != null){
-         $eImageDel = new Form_Element_Checkbox('imageDel', $this->tr('Smazat obrázek'));
-         $eImageDel->setSubLabel(sprintf($this->tr('Uložen obrázek: %s<br />%s')
-            ,$product->{Shop_Model_Product::COLUMN_IMAGE}
-            ,'<img src="'.$this->module()->getDataDir(true).self::DIR_IMAGES.'/small/'.$product->{Shop_Model_Product::COLUMN_IMAGE}.'" height="50" />'
-            ));
-         $form->addElement($eImageDel, $fGrpInfo);
+      if($product instanceof Model_ORM_Record && $product->getTitleImage() != null){
+         // výběr z uložených obrázků a možnost nahrání nového titulního
+         $eImage = new Form_Element_ImageSelector('image', $this->tr('Titulní obrázek'));
+         $eImage->setValues($product->getTitleImage()->getPk().'.'.$product->getTitleImage()->{Shop_Model_ProductImage::COLUMN_TYPE});
+         $eImage->setUploadDir(Shop_Tools::getProductImagesDir().$product->getPK().DIRECTORY_SEPARATOR);
+         $form->addElement($eImage, $fGrpInfo);
+      } else {
+         // nahrání nového titulního
+         $eImage = new Form_Element_Image('image', $this->tr('Titulní obrázek'));
+         $eImage->setUploadDir(Shop_Tools::getProductImagesDir().$product->getPK().DIRECTORY_SEPARATOR);
+         $form->addElement($eImage, $fGrpInfo);
       }
       
       $ePersonalPickupOnly = new Form_Element_Checkbox('personalPickupOnly', $this->tr('Pouze osobní odběr'));
@@ -474,7 +474,7 @@ abstract class Shop_Product_Controller extends Controller {
       if($product == false){
          return;
       }
-      
+      $newProduct = $product->isNew();
       $form = $this->createForm($product);
       
       if($form->isSend() && $form->save->getValues() == false){
@@ -493,15 +493,6 @@ abstract class Shop_Product_Controller extends Controller {
                @unlink(Shop_Tools::getProductImagesDir().DIRECTORY_SEPARATOR.$product->{Shop_Model_Product::COLUMN_IMAGE});
             }
             $product->{Shop_Model_Product::COLUMN_IMAGE} = null;
-         }
-         
-         // uložení nového obrázku
-         if ($form->image->getValues() != null) {
-            $image = $form->image->createFileObject('Filesystem_File_Image');
-            $image->saveAs(Shop_Tools::getProductImagesDir().'small', VVE_IMAGE_THUMB_W, VVE_IMAGE_THUMB_H, (bool)VVE_IMAGE_THUMB_CROP);
-            $image->resampleImage(VVE_DEFAULT_PHOTO_W, VVE_DEFAULT_PHOTO_H, false);
-            $image->save();
-            $product->{Shop_Model_Product::COLUMN_IMAGE} = $image->getName();
          }
          
          // uložení dat
@@ -526,6 +517,42 @@ abstract class Shop_Product_Controller extends Controller {
          $product->{Shop_Model_Product::COLUMN_KEYWORDS} = $form->keywords->getValues();
          $product->{Shop_Model_Product::COLUMN_IS_NEW_TO_DATE} = $form->isNewDate->getValues();
          $model->save($product);
+         
+         // uložení nového obrázku
+         if ($form->image->getValues() != null) {
+            $modelImages = new Shop_Model_ProductImage();
+            if($form->image instanceof Form_Element_ImageSelector){
+               if($form->image->isUploadedImage()){
+                  // upload nového obrázku
+                  /* @var $fileObj File */
+                  $fileObj = $form->image->createFileObject();
+                  $newObj = $modelImages->newRecord();
+                  $newObj->{Shop_Model_ProductImage::COLUMN_ID_PRODUCT} = $product->getPK();
+                  $newObj->{Shop_Model_ProductImage::COLUMN_NAME} = $product->{Shop_Model_Product::COLUMN_NAME};
+                  $newObj->{Shop_Model_ProductImage::COLUMN_TYPE} = $fileObj->getExtension();
+                  $newObj->save();
+                  $newObj->setAsTitle();
+                  $fileObj->rename($newObj->getPK().'.'.$fileObj->getExtension());
+               } else {
+                  // nastavení titulního starého obrázku
+                  $image = $form->image->getValues();
+                  $idImage = preg_replace('/\.[a-z]+/', '', $image['name']);
+                  $imgObj = $modelImages->record((int)$idImage);
+                  $imgObj->setAsTitle();
+               }
+               
+            } else if($form->image instanceof Form_Element_Image){
+               $fileObj = $form->image->createFileObject();
+               $newObj = $modelImages->newRecord();
+               $newObj->{Shop_Model_ProductImage::COLUMN_ID_PRODUCT} = $product->getPK();
+               $newObj->{Shop_Model_ProductImage::COLUMN_NAME} = $product->{Shop_Model_Product::COLUMN_NAME};
+               $newObj->{Shop_Model_ProductImage::COLUMN_TYPE} = $fileObj->getExtension();
+               $newObj->save();
+               $newObj->setAsTitle();
+               $fileObj->rename($newObj->getPK().'.'.$fileObj->getExtension());
+            }
+         }
+         
          $this->editCompleteCallback($product);
       }
       
@@ -561,7 +588,7 @@ abstract class Shop_Product_Controller extends Controller {
       if($this->getRequestParam('deleteComb', false)){
          // smazání kombinací a propojneí s atributy
          $variant = $modelProductVariants->record($this->getRequestParam('deleteComb', 0));
-         var_dump($_GET);flush();
+         //var_dump($_GET);flush();
          if($variant){
             $modelCombinationHasVariant = new Shop_Model_ProductCombinationHasVariant();
             $modelCombinations = new Shop_Model_ProductCombinations();
@@ -895,6 +922,130 @@ abstract class Shop_Product_Controller extends Controller {
       $this->view()->productCombinations = $productCombinations;
    }
 
+   public function editProductImages($product)
+   {
+      $model = new Shop_Model_Product();
+      
+      if($product instanceof Model_ORM_Record){
+//         $product = $model->newRecord();
+      } else if(is_int($product)){
+         $product = $model->where(Shop_Model_Product::COLUMN_ID.' = :id', array('id' => $product))->record();
+      } else if(is_string($product)){
+         $product = $model->where(Shop_Model_Product::COLUMN_URLKEY.' = :ukey ', array('ukey' => $product))->record();
+      } else {
+         $product = $model->newRecord();
+      }
+      $this->view()->product = $product;
+
+      if($product == false){
+         return;
+      }
+      
+      $modelImages = new Shop_Model_ProductImage();
+      $productImages = $modelImages->where(Shop_Model_ProductImage::COLUMN_ID_PRODUCT, $product->getPK())->records();
+      
+      // form na přidání obrázku
+      $form = new Form('pradimage_');
+      
+      $elemImages = new Form_Element_File('images', $this->tr('Obrázky'));
+      $elemImages->setMultiple(true);
+      $elemImages->addValidation(new Form_Validator_NotEmpty());
+      $elemImages->addValidation(new Form_Validator_FileExtension('jpg'));
+      $form->addElement($elemImages);
+      
+      $eSend = new Form_Element_Submit('send', $this->tr('Nahrát'));
+      $form->addElement($eSend);
+      
+      // uložení
+      if($form->isValid()){
+         
+         $files = $form->images->createFileObject();
+         $basePath = Shop_Tools::getProductImagesDir(false);
+         $productDir = $basePath.$product->getPK().DIRECTORY_SEPARATOR;
+         FS_Dir::checkStatic($productDir);
+         $markTitle = !(bool)count($productImages);
+         
+         foreach ($files as $file) {
+            /* @var $image File */
+            $imageRecord = $modelImages->newRecord();
+            $imageRecord->{Shop_Model_ProductImage::COLUMN_ID_PRODUCT} = $product->getPK();
+            $imageRecord->{Shop_Model_ProductImage::COLUMN_NAME} = $product->{Shop_Model_Product::COLUMN_NAME};
+//            $imageRecord->{Shop_Model_ProductImage::COLUMN_ORDER} = 1;
+            $imageRecord->{Shop_Model_ProductImage::COLUMN_IS_TITLE} = false;
+            $imageRecord->{Shop_Model_ProductImage::COLUMN_TYPE} = $file->getExtension();
+            $imageRecord->save();
+            $file->move($productDir);
+            $file->rename($imageRecord->getPK().'.'.$file->getExtension());
+         }
+         
+         // pokud je to první obrázek u produktu, tak označ jako titulní
+         if($markTitle){
+            $modelImages = new Shop_Model_ProductImage();
+            $modelImages
+               ->where(Shop_Model_ProductImage::COLUMN_ID_PRODUCT.' = :idp AND '.Shop_Model_ProductImage::COLUMN_ORDER.' = 1', array('idp' => $product->getPK()) )
+               ->update(array(Shop_Model_ProductImage::COLUMN_IS_TITLE => true));
+         }
+         
+         $this->infoMsg()->addMessage($this->tr('Obrázky byly nahrány'));
+         $this->link()->reload();
+      }
+      $this->view()->formAdd = $form;
+      
+      $formEdit = new Form('preditimage');
+      
+      $elemDelete = new Form_Element_Hidden('delete');
+      $elemDelete->setMultiple();
+      $elemDelete->setValues(0);
+      $formEdit->addElement($elemDelete);
+      
+      $elemOrder = new Form_Element_Hidden('order');
+      $elemOrder->setMultiple();
+      $elemOrder->setValues(0);
+      $formEdit->addElement($elemOrder);
+      
+      $elemIsTitle = new Form_Element_Hidden('isTitle');
+      $elemIsTitle->setMultiple();
+      $elemIsTitle->setValues(0);
+      $formEdit->addElement($elemIsTitle);
+      
+      $elemLabel = new Form_Element_Text('name', $this->tr('popisek'));
+      $elemLabel->setLangs();
+      $elemLabel->setMultiple();
+      $formEdit->addElement($elemLabel);
+      
+      $elemSave = new Form_Element_Submit('save', $this->tr('Uložit'));
+      $elemSave->setMultiple();
+      $formEdit->addElement($elemSave);
+      
+      if($formEdit->isValid()){
+         $names = $formEdit->name->getValues();
+         $deletes = $formEdit->delete->getValues();
+         $isTitles = $formEdit->isTitle->getValues();
+         
+         $order = 1;
+         $modelI = new Shop_Model_ProductImage();
+         foreach ($names as $id => $name) {
+            $imageRec = Shop_Model_ProductImage::getRecord($id);
+            if($deletes[$id] == 1){
+               // model rovnou maže obrázky, čili není nutné zpracovat
+               $modelI->delete($id);
+            } else {
+               $imageRec->{Shop_Model_ProductImage::COLUMN_IS_TITLE} = $isTitles[$id];
+               $imageRec->{Shop_Model_ProductImage::COLUMN_ORDER} = $order;
+               $imageRec->{Shop_Model_ProductImage::COLUMN_NAME} = $name;
+               $imageRec->save();
+               $order++;
+            }
+         }
+         
+         $this->infoMsg()->addMessage($this->tr('Obrázky byly uloženy'));
+         $this->link()->reload();
+      }
+      $this->view()->formEdit = $formEdit;
+      $this->view()->productImages = $productImages;
+   }
+   
+   
    protected function formDeleteProduct($product)
    {
       if(!$this->rights()->isWritable()){ return; }
@@ -930,7 +1081,7 @@ abstract class Shop_Product_Controller extends Controller {
          return;
       }
 
-      // image
+      // images
       if($product->{Shop_Model_Product::COLUMN_IMAGE} != null){
          if(is_file(Shop_Tools::getProductImagesDir().'small'.DIRECTORY_SEPARATOR.$product->{Shop_Model_Product::COLUMN_IMAGE})
            && is_writable(Shop_Tools::getProductImagesDir().'small'.DIRECTORY_SEPARATOR.$product->{Shop_Model_Product::COLUMN_IMAGE})){
@@ -1029,7 +1180,7 @@ abstract class Shop_Product_Controller extends Controller {
          }
       }
 
-      // duplikace obrázku
+      // duplikace obrázků
       $img = new File($product->{Shop_Model_Product::COLUMN_IMAGE}, self::getImagesDir());
       if($img->exist()){
          $img = $img->copy(self::getImagesDir(), true);
@@ -1079,6 +1230,11 @@ abstract class Shop_Product_Controller extends Controller {
 
    }
 
+   public function processChangeProductImagePosition($image, $newpos)
+   {
+
+   }
+   
    protected function editCompleteCallback(Model_ORM_Record $product)
    {
       $this->infoMsg()->addMessage($this->tr('Zboží bylo uloženo'));

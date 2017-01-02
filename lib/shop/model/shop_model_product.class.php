@@ -88,6 +88,7 @@ class Shop_Model_Product extends Model_ORM {
 
       $this->addRelatioOneToMany(self::COLUMN_ID, 'Shop_Model_ProductVariants', Shop_Model_ProductVariants::COLUMN_ID_PRODUCT);
       $this->addRelatioOneToMany(self::COLUMN_ID, 'Shop_Model_ProductCombinations', Shop_Model_ProductCombinations::COLUMN_ID_PRODUCT);
+      $this->addRelatioOneToMany(self::COLUMN_ID, 'Shop_Model_ProductImage', Shop_Model_ProductImage::COLUMN_ID_PRODUCT);
    }
 
    protected function beforeSave(Model_ORM_Record $record, $type = 'U')
@@ -186,6 +187,57 @@ class Shop_Model_Product extends Model_ORM {
          }
       }
       return isset(self::$productCatCounter[$idCategory]) ? self::$productCatCounter[$idCategory] : 0;
+   }
+
+   public function records($fetchParams = self::FETCH_LANG_CLASS)
+   {
+      // asi načíst i s titulními obrázky nějak rozumně, tak aby se to dalo kešovat
+      // je bez id produktu v obrázku,protože se kryje s id produktu 
+      $this->join(self::COLUMN_ID, 'Shop_Model_ProductImage', Shop_Model_ProductImage::COLUMN_ID_PRODUCT, 
+//              array(Shop_Model_ProductImage::COLUMN_ID, Shop_Model_ProductImage::COLUMN_NAME, 
+//                  Shop_Model_ProductImage::COLUMN_IS_TITLE, Shop_Model_ProductImage::COLUMN_ORDER, 
+//                  Shop_Model_ProductImage::COLUMN_TYPE), 
+//              array('*'), 
+              null, 
+              self::JOIN_LEFT, ' AND '.Shop_Model_ProductImage::COLUMN_IS_TITLE.' = 1');
+//      Debug::log($this->getSQLQuery());
+      $records = parent::records($fetchParams);
+      return $records;
+   }
+
+}
+
+class Shop_Model_Product_Record extends Model_ORM_Record {
+
+   protected static $_titleImages = array();
+
+   public function getTitleImage()
+   {
+      // pokud je již nasatven, jen ho vrať
+      if(!isset(self::$_titleImages[$this->getPK()])){
+         if(isset($this->{Shop_Model_ProductImage::COLUMN_ID})){
+            self::$_titleImages[$this->getPK()] = $this->createModelRecordObject('Shop_Model_ProductImage');
+         } else {
+            // pokud není tak jej vypiš
+            $m = new Shop_Model_ProductImage();
+            self::$_titleImages[$this->getPK()] = $m
+                    ->where(Shop_Model_ProductImage::COLUMN_ID_PRODUCT.' = :idp AND '.Shop_Model_ProductImage::COLUMN_IS_TITLE.' = 1',
+                            array('idp' => $this->getPK()))
+                    ->record();
+         }
+      }
+      return self::$_titleImages[$this->getPK()];
+   }
+
+   public function getImages()
+   {
+      $m = new Shop_Model_ProductImage();
+      return $m->where(Shop_Model_ProductImage::COLUMN_ID_PRODUCT, $this->getPK())->records();
+   }
+   
+   public function getUrlKey()
+   {
+      return $this->{Shop_Model_Product::COLUMN_URLKEY};
    }
 
 }

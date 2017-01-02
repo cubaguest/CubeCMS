@@ -55,9 +55,20 @@ class ShopProductGeneralAdmin_Controller extends Shop_Product_Controller {
    /**
     * Kontroler pro editaci textu
     */
-   public function editController() {
+   public function editController($urlkey) {
       $this->checkWritebleRights();
-      $this->editProduct((int)$this->getRequest('idp'));
+      $this->editProduct((string)$urlkey);
+      if($this->view()->product == false OR $this->view()->product == null){
+         return false;
+      }
+   }
+   
+   /**
+    * Kontroler pro editaci textu
+    */
+   public function editImagesController($urlkey) {
+      $this->checkWritebleRights();
+      $this->editProductImages((string)$urlkey);
       if($this->view()->product == false OR $this->view()->product == null){
          return false;
       }
@@ -67,6 +78,16 @@ class ShopProductGeneralAdmin_Controller extends Shop_Product_Controller {
    {
       $this->infoMsg()->addMessage($this->tr('Zboží bylo uloženo'));
       $this->link()->route()->redirect();
+   }
+   
+   protected function editCancelCallback($isEdit = true)
+   {
+      $this->infoMsg()->addMessage($this->tr('Změny byly zrušeny'));
+      if($isEdit){
+         $this->link()->route()->reload();
+      } else {
+         $this->link()->route()->reload();
+      }
    }
 
    protected function checkListAction()
@@ -113,9 +134,6 @@ class ShopProductGeneralAdmin_Controller extends Shop_Product_Controller {
       $this->link()->redirect();
    }
 
-   /**
-    * Kontroler pro editaci textu
-    */
    public function addController() {
       $this->checkWritebleRights();
       $this->editProduct();
@@ -143,10 +161,10 @@ class ShopProductGeneralAdmin_Controller extends Shop_Product_Controller {
       $this->view()->product = $product;
    }
 
-   public function editVariantsController()
+   public function editVariantsController($urlkey)
    {
       $this->checkWritebleRights();
-      $this->editProductVariants((int)$this->getRequest('idp'));
+      $this->editProductVariants((string)$urlkey);
       if($this->view()->product == false OR $this->view()->product == null){
          return false;
       }

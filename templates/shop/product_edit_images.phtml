@@ -1,0 +1,184 @@
+<?php
+$jq = new JsPlugin_JQuery();
+$jq->addUISortable();
+$this->addJsPlugin($jq);
+$this->addJsPlugin(new JsPlugin_PrettyPhoto());
+$this->addFile('css://engine:shop/style.less');
+// do titulku
+$h = $this->tr('úprava obrázků produktu') . ' ' . $this->product->{Shop_Model_Product::COLUMN_NAME};
+$this->addPageTitle($h);
+?>
+<h1><?php echo $h; ?></h1>
+<div class="main-content-form-edit" id="produc-images-edit-form">
+   <?php
+   if ($this->moduleActionButtons == null) {
+      $this->moduleButtons = array(
+          array(
+              'link' => $this->linkBack == null ? $this->link()->route('detail') : $this->linkBack,
+              'title' => $this->tr('Zavřít úpravu obrázků a přejít zpět na produkt'),
+              'icon' => 'chevron-left',
+              'name' => $this->tr('Zpět na produkt'),
+          ),
+      );
+   } else {
+      $this->moduleButtons = $this->moduleActionButtons;
+   }
+   $this->includeTpl('modules/buttons.phtml', true);
+   ?>
+   <h2><?php ps($this->tr('Přidání obrázků')) ?></h2>
+   <div id="product-form-add-images">
+      <?php
+      echo($this->formAdd);
+      ?>
+   </div>
+   <h2><?php ps($this->tr('Seznam uložených obrázků')) ?></h2>
+   <div id="product-images-list">
+      <?php
+      echo $this->formEdit->renderStart();
+      ?>
+      <table class="cubecms-widget cubecms-table" id="product-images-table">
+         <thead class="cubecms-header">
+            <tr>
+               <th style="width: 30px;"></th>
+               <th style="width: 40px;"><?php ps($this->tr('ID')) ?></th>
+               <th style="width: 130px;"><?php ps($this->tr('Obrázek')) ?></th>
+               <th><?php ps($this->tr('Popisek')) ?></th>
+               <th style="width: 50px;"></th>
+            </tr>
+         </thead>
+         <?php if (!empty($this->productImages)) { ?>
+            <tfoot>
+               <tr class="cubecms-row text-right">
+                  <td colspan="5">
+                     <?php
+                     $this->formEdit->save->html()->addClass('btn')->addClass('btn-default');
+                     echo $this->formEdit->save->control();
+                     ?>
+                  </td>
+               </tr>
+            </tfoot>
+         <?php } ?>
+         <tbody>
+            <?php
+            if (!empty($this->productImages)) {
+               foreach ($this->productImages as $image) {
+                  $this->formEdit->order->setMultiple($image->getPK());
+                  $this->formEdit->order->setValues($image->{Shop_Model_ProductImage::COLUMN_ORDER});
+
+                  $this->formEdit->delete->setMultiple($image->getPK());
+
+                  $this->formEdit->isTitle->setMultiple($image->getPK());
+                  $this->formEdit->isTitle->setValues($image->{Shop_Model_ProductImage::COLUMN_IS_TITLE});
+
+                  $this->formEdit->name->setMultiple($image->getPK());
+                  $this->formEdit->name->setValues($image->{Shop_Model_ProductImage::COLUMN_NAME});
+                  $this->formEdit->name->html()->addClass('form-control');
+                  ?>
+                  <tr class="cubecms-row <?php echo $image->{Shop_Model_ProductImage::COLUMN_IS_TITLE} ? 'cubecms-state-highlight' : '' ?>">
+                     <td class="text-center">
+                        <div class="sorting-area">
+                           <span class="icon icon-arrows-v"></span><br />
+                        </div>
+                        <?php echo $this->formEdit->order->control(); ?>
+                     </td>
+                     <td class="text-center">
+                        <?php echo $image->getPK() ?>
+                     </td>
+                     <td class="text-center">
+                        <?php
+                        $src = Utils_Image::cache($image->getUrl(), 100, round(100 / 4 * 3), true);
+                        $srcBig = $image->getUrl();
+                        ?>
+                        <a href="<?php echo $srcBig ?>" rel="prettyPhoto" title="<?php psa($image->{Shop_Model_ProductImage::COLUMN_NAME}) ?>"><img 
+                              src="<?php echo $src ?>" alt="<?php psa($image->{Shop_Model_ProductImage::COLUMN_NAME}) ?>" /></a>
+                     </td>
+                     <td>
+                        <div>
+                           <?php
+                           echo $this->formEdit->name->controlAll();
+                           ?>
+                        </div>
+                        <?php 
+                        if ($image->getFile()->exist()) { ?>
+                           <div class="font-small">
+                              <em><?php ps($this->tr('Velikost')) ?>: <?php echo Utils_String::createSizeString($image->getFile()->getSize()); ?>,
+                                 <?php echo $image->getFile()->getData()->getWidth(); ?> x <?php echo $image->getFile()->getData()->getHeight(); ?> px </em>
+                           </div>
+                        <?php } ?>
+                     </td>
+                     <td>
+                        <?php echo $this->formEdit->delete->control(); ?>
+                        <?php echo $this->formEdit->isTitle->control(); ?>
+                        <a href="#" class="mark-image-title text-warning <?php echo $image->{Shop_Model_ProductImage::COLUMN_IS_TITLE} ? 'hidden' : '' ?>"><span class="icon icon-star"></span></a>
+                        <a href="#" class="mark-image-delete text-danger"><span class="icon icon-remove"></span></a>
+                     </td>
+                  </tr>
+                  <?php
+               }
+            } else {
+               ?>
+               <tr class="cubecms-row">
+                  <td colspan="5"><?php ps($this->tr('Není vložen žádný obrázek')) ?></td>
+               </tr>
+            <?php } ?>
+         </tbody>
+
+      </table>
+      <?php
+      echo $this->formEdit->renderStart();
+      ?>
+   </div>
+
+   <script type="text/javascript">
+      $(document).ready(function () {
+         $("a[rel^='prettyPhoto']").prettyPhoto();
+
+
+         var $baseTable = $('#product-images-table tbody');
+         // mazání
+         $('.mark-image-delete').on('click', function (e) {
+            e.preventDefault();
+            // pokud je výchozí, označ první po smazání
+            var markTitleFirst = false;
+            if ($(this).closest('tr').hasClass('cubecms-state-highlight')) {
+               markTitleFirst = true;
+            }
+            $(this).closest('tr').removeClass('cubecms-state-highlight').fadeOut(300, function () {
+               if (markTitleFirst) {
+                  $baseTable.find('tr:visible').first().find('.mark-image-title').click();
+               }
+            });
+            $(this).closest('tr').find('input.preditimagedelete_class').val(1);
+         });
+
+         // označení výchozího
+         $('.mark-image-title').on('click', function (e) {
+            e.preventDefault();
+            $('tr', $baseTable).removeClass('cubecms-state-highlight');
+            $('input.preditimageisTitle_class', $baseTable).val(0);
+            $('.mark-image-title', $baseTable).removeClass('hidden');
+            $(this).closest('tr').addClass('cubecms-state-highlight');
+            $(this).closest('tr').find('.mark-image-title').addClass('hidden');
+            $(this).closest('tr').find('input.preditimageisTitle_class').val('1');
+         });
+
+         // přesun
+
+         $baseTable.sortable({
+            placeholder: "cubecms-list-row cubecms-state-highlight",
+            forceHelperSize: true, forcePlaceholderSize: true,
+            cursor: 'move',
+            "axis": 'y',
+            handle: '.sorting-area',
+            helper: function (e, ui) {
+               ui.children().each(function () {
+                  $(this).width($(this).width());
+               });
+               return ui;
+            }
+         });
+
+
+      });
+   </script>
+</div>

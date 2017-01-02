@@ -1,39 +1,45 @@
-<?php 
-if(empty($this->products)){
+<?php
+if (empty($this->products)) {
    return;
 }
 
 $icon = null;
-if($this->panelObj()->getIcon() != null){
-   $icon = '<img src="'.Panel_Obj::getIconDir().$this->panelObj()->getIcon().'" alt="'.$this->panelObj()->getIcon().'" />';
+if ($this->panelObj()->getIcon() != null) {
+   $icon = '<img src="' . Panel_Obj::getIconDir() . $this->panelObj()->getIcon() . '" alt="' . $this->panelObj()->getIcon() . '" />';
 }
 $backImg = null;
-if($this->panelObj()->getBackImage() != null){
-   $backImg = 'background-image: url(\''.Panel_Obj::getBackImgDir().$this->panelObj()->getBackImage().'\');';
-}?>
-<div class="name"><?php echo $icon?><?php ps($this->panelObj()->getName())?></div>
-<?php foreach ($this->products as $product) {
-   $link = (string)$this->link()
-      ->category($product->curlkey)
-      ->route('detail', array('urlkey' => $product->{Shop_Model_Product::COLUMN_URLKEY}));
-
-   $src = vve_image_cacher(Shop_Product_Controller::getImagesDir(true).$product->{Shop_Model_Product::COLUMN_IMAGE}, 100);
+if ($this->panelObj()->getBackImage() != null) {
+   $backImg = 'background-image: url(\'' . Panel_Obj::getBackImgDir() . $this->panelObj()->getBackImage() . '\');';
+}
+?>
+<div class="name"><?php echo $icon ?><?php ps($this->panelObj()->getName()) ?></div>
+<?php
+foreach ($this->products as $product) {
+   $link = (string) $this->link()
+                   ->category($product->curlkey)
+                   ->route('detail', array('urlkey' => $product->{Shop_Model_Product::COLUMN_URLKEY}));
    ?>
-<div class="content article">
-   <div class="name">
-      <a href="<?php echo $link?>" title="<?php ps($product->{Shop_Model_Product::COLUMN_NAME})?>"
-              ><?php ps($product->{Shop_Model_Product::COLUMN_NAME})?></a>
+   <div class="content article">
+      <div class="name">
+         <a href="<?php echo $link ?>" title="<?php ps($product->{Shop_Model_Product::COLUMN_NAME}) ?>"
+            ><?php ps($product->{Shop_Model_Product::COLUMN_NAME}) ?></a>
+      </div>
+      <?php
+      if ($product->getTitleImage() != null) {
+         $w = 300;
+         $src = Utils_Image::cache($product->getTitleImage()->getUrl(), $w, round($w / 4 * 3), true);
+         ?>
+         <div>
+            <a href="<?php echo $link ?>" title="<?php ps($product->{Shop_Model_Product::COLUMN_NAME}) ?>">
+               <img class="img-responsive" src="<?php echo $src ?>" alt="<?php ps($product->{Shop_Model_Product::COLUMN_NAME}) ?>" />
+            </a>
+         </div>
+      <?php } ?>
+      <div>
+         <?php ps($this->tr('Cena:') . " " . Shop_Tools::getPriceOfProduct($product, $product->{Shop_Model_ProductCombinations::COLUMN_PRICE}, true)) ?>
+      </div>
+      <div class="link-more">
+         <a href="<?php echo $link ?>" title="<?php ps($product->{Shop_Model_Product::COLUMN_NAME}) ?>"><?php ps($this->tr('Více')) ?></a>
+      </div>
    </div>
-   <div>
-      <a href="<?php echo $link?>" title="<?php ps($product->{Shop_Model_Product::COLUMN_NAME})?>">
-         <img src="<?php echo $src?>" alt="<?php ps($product->{Shop_Model_Product::COLUMN_NAME})?>" />
-      </a>
-   </div>
-   <div>
-      <?php ps($this->tr('Cena:')." ".Shop_Tools::getPriceOfProduct($product, $product->{Shop_Model_ProductCombinations::COLUMN_PRICE}, true))?>
-   </div>
-   <div class="link-more">
-      <a href="<?php echo $link?>" title="<?php ps($product->{Shop_Model_Product::COLUMN_NAME})?>"><?php ps($this->tr('Více'))?></a>
-   </div>
-</div>
-<?php }?>
+<?php } ?>

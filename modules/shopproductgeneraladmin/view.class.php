@@ -9,6 +9,45 @@ class ShopProductGeneralAdmin_View extends Shop_Product_View {
    {
       $this->template()->addFile('tpl://list.phtml');
       Template_Module::setEdit(true);
+      
+      $toolbox = new Template_Toolbox2();
+      $toolEdit = new Template_Toolbox2_Tool_Redirect('editProduct', 
+              $this->tr('Upravit produkt'));
+      $toolEdit->setIcon(Template_Toolbox2::ICON_PAGE_EDIT);
+      $toolbox->addTool($toolEdit);
+
+      $toolEditV = new Template_Toolbox2_Tool_Redirect('editVariant', 
+              $this->tr('Upravit varianty produktu'));
+      $toolEditV->setIcon('code-fork');
+      $toolbox->addTool($toolEditV);
+
+      $toolEditImg = new Template_Toolbox2_Tool_Redirect('editImages', 
+              $this->tr('Upravit obrázky produktu'));
+      $toolEditImg->setIcon(Template_Toolbox2::ICON_IMAGE_WRENCH);
+      $toolbox->addTool($toolEditImg);
+
+      $toolCopy = new Template_Toolbox2_Tool_Redirect('duplicate', 
+              $this->tr('Duplikovat produkt'));
+      $toolCopy->setIcon(Template_Toolbox2::ICON_COPY);
+      $toolbox->addTool($toolCopy);
+
+
+      $toolDel = new Template_Toolbox2_Tool_PostRedirect('delete', 
+              $this->tr('Smazat produkt'));
+      $toolDel->setIcon(Template_Toolbox2::ICON_DELETE);
+      $toolDel->setImportant(true);
+      $toolbox->addTool($toolDel);
+      
+      foreach ($this->products as $p) {
+         $toolbox->editProduct->setAction($this->link()->clear()->route('edit', array('urlkey' => (string)$p->getUrlKey())));
+         $toolbox->editVariant->setAction($this->link()->clear()->route('editVariants', array('urlkey' => (string)$p->getUrlKey())));
+         $toolbox->editImages->setAction($this->link()->clear()->route('editImages', array('urlkey' => (string)$p->getUrlKey())));
+         $toolbox->duplicate->setAction($this->link()->clear()->param('duplicate', $p->getPK()));
+         $toolbox->delete->setAction($this->link()->clear()->param('id', $p->getPK())->param('action', 'delete'));
+         $toolbox->delete->setConfirmMeassage(sprintf($this->tr('Smazat produkt %s ?'), $p->{Shop_Model_Product::COLUMN_NAME}));
+         $p->toolbox = clone $toolbox;
+      }
+      
    }
 
    public function detailView() 
@@ -52,8 +91,25 @@ class ShopProductGeneralAdmin_View extends Shop_Product_View {
    {
       $this->editProduct(true);
       Template_Module::setEdit(true);
-      Template_Navigation::addItem($this->product->{Shop_Model_Product::COLUMN_NAME}, $this->link()->route('detail'));
+      Template_Navigation::addItem($this->product->{Shop_Model_Product::COLUMN_NAME}, $this->link()->route('edit'));
       Template_Navigation::addItem($this->tr('Úprava'), $this->link());
+   }
+   
+   public function editImagesView() 
+   {
+      $this->editImages(true);
+      Template_Module::setEdit(true);
+      Template_Navigation::addItem($this->product->{Shop_Model_Product::COLUMN_NAME}, $this->link()->route('edit'));
+      Template_Navigation::addItem($this->tr('Úprava obrázků produktu'), $this->link());
+      
+      $this->moduleActionButtons = array(
+         array(
+            'link' => $this->link()->route(),
+            'title' => $this->tr('Zavřít úpravu obrázků a přejít zpět na seznam produktů'),
+            'icon' => 'chevron-left',
+            'name' => $this->tr('Zpět na seznam'),
+         ),
+      );
    }
    
    public function editVariantsView() 
@@ -67,7 +123,7 @@ class ShopProductGeneralAdmin_View extends Shop_Product_View {
          array(
             'link' => $this->link()->route(),
             'title' => $this->tr('Zavřít úpravu variant a přejít zpět na seznam produktů'),
-            'icon' => 'go-left.png',
+            'icon' => 'chevron-left',
             'name' => $this->tr('Zpět na seznam'),
          ),
       );

@@ -27,6 +27,17 @@ class Shop_Product_View extends View {
    }
    
    /**
+    * Metoda vytvoří formulář produktu
+    * @param type $product
+    * @return Form 
+    */
+   protected function editImages()
+   {
+      $this->template()->addFile("tpl://engine:shop/product_edit_images.phtml");
+      Template_Module::setEdit(true);
+   }
+   
+   /**
     * Metoda vytvoří formulář variant produktu
     * @param type $product
     * @return Form 

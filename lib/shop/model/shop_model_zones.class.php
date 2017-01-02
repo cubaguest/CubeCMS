@@ -20,5 +20,3 @@ class Shop_Model_Zones extends Model_ORM {
       $this->setPk(self::COLUMN_ID);
    }
 }
-
-?>
