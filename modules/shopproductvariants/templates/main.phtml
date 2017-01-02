@@ -11,31 +11,36 @@ $buttonCancelEdit = '<button name="cancel" class="button-cancel" onclick="clearF
 ?>
 <h1><?php echo  $this->category()->getName() ?></h1>
 <div class="main-content-admin-form">
-   <div id="variants-groups">
-      <h2 class="ui-widget ui-widget-header"><?php echo $this->tr('Skupiny')?></h2>
+   <div class="row">
+      <div class="col-md-6">
+         <div id="variants-groups">
+            <h2 class="ui-widget ui-widget-header"><?php echo $this->tr('Skupiny')?></h2>
 
-      <ul id="variants-groups-list" class="ui-widget ui-widget-content"></ul>
-      <div id="groups-control" class="ui-widget ui-widget-header ui-cube-widget">
-         <button onclick="ShopVariants.addGroup()"><?php ps($this->tr('Přidat'))?></button>
-         <button onclick="ShopVariants.loadGroups()"><?php ps($this->tr('Obnovit'))?></button>
+            <ul id="variants-groups-list" class="ui-widget ui-widget-content"></ul>
+            <div id="groups-control" class="ui-widget ui-widget-header ui-cube-widget">
+               <button onclick="ShopVariants.addGroup()"><?php ps($this->tr('Přidat'))?></button>
+               <button onclick="ShopVariants.loadGroups()"><?php ps($this->tr('Obnovit'))?></button>
+            </div>
+            <div id="dialog-variant-group-edit">
+               <?php echo $this->formEditGroup;?>
+            </div>
+         </div>
       </div>
-      <div id="dialog-variant-group-edit">
-         <?php echo $this->formEditGroup;?>
+      <div class="col-md-6">
+         <div id="variants-values">
+            <h2 class="ui-widget ui-widget-header"><?php ps($this->tr('Atributy'));?> <span id="group-name"></span></h2>
+
+            <ul id="variants-values-list" class="ui-widget ui-widget-content"></ul>
+
+            <div id="values-control" class="ui-widget ui-widget-header ui-cube-widget">
+               <button id="button-add-variant" onclick="ShopVariants.addVariant()"><?php ps($this->tr('Přidat'))?></button>
+            </div>
+            <div id="dialog-variant-edit">
+               <?php echo $this->formEditVariant;?>
+            </div>
+         </div>
       </div>
    </div>
-   <div id="variants-values">
-      <h2 class="ui-widget ui-widget-header"><?php ps($this->tr('Atributy'));?> <span id="group-name"></span></h2>
-
-      <ul id="variants-values-list" class="ui-widget ui-widget-content"></ul>
-
-      <div id="values-control" class="ui-widget ui-widget-header ui-cube-widget">
-         <button id="button-add-variant" onclick="ShopVariants.addVariant()"><?php ps($this->tr('Přidat'))?></button>
-      </div>
-      <div id="dialog-variant-edit">
-         <?php echo $this->formEditVariant;?>
-      </div>
-   </div>
-   <hr class="reseter" />
 
    <script type="text/javascript" charset="utf-8">
       /* <![CDATA[ */
@@ -49,10 +54,10 @@ $buttonCancelEdit = '<button name="cancel" class="button-cancel" onclick="clearF
           });
 
          ShopVariants.init({
-            urlGroups : '<?php echo $this->link()->route('groupsList')?>',
-            urlEditGroup : '<?php echo $this->link()->route('editGroup')?>',
-            urlVariants : '<?php echo $this->link()->route('variantsList')?>',
-            urlEditVariant : '<?php echo $this->link()->route('editVariant')?>'
+            urlGroups : '<?php echo $this->link()->clear()->route('groupsList')?>',
+            urlEditGroup : '<?php echo $this->link()->clear()->route('editGroup')?>',
+            urlVariants : '<?php echo $this->link()->clear()->route('variantsList')?>',
+            urlEditVariant : '<?php echo $this->link()->clear()->route('editVariant')?>'
          }, {
             $dialogGroup : $('#dialog-variant-group-edit'),
             $dialogVariant : $('#dialog-variant-edit'),

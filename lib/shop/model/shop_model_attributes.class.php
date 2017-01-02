@@ -23,8 +23,8 @@ class Shop_Model_Attributes extends Model_ORM {
       
       $this->addForeignKey(self::COLUMN_ID_GROUP, 'Shop_Model_AttributesGroups', Shop_Model_AttributesGroups::COLUMN_ID);
 
-      $this->addRelatioOneToMany(self::COLUMN_ID, 'Shop_Model_ProductVariants', Shop_Model_ProductVariants::COLUMN_ID_ATTR);
-      $this->addRelatioOneToMany(self::COLUMN_ID, 'Shop_Model_ProductCombinationHasVariant', Shop_Model_ProductCombinationHasVariant::COLUMN_ID_VARIANT);
+      $this->addRelatioOneToMany(self::COLUMN_ID, 'Shop_Model_Product_Variants', Shop_Model_Product_Variants::COLUMN_ID_ATTR);
+      $this->addRelatioOneToMany(self::COLUMN_ID, 'Shop_Model_Product_CombinationHasVariant', Shop_Model_Product_CombinationHasVariant::COLUMN_ID_VARIANT);
    }
 
    protected function beforeSave(Model_ORM_Record $record, $type = 'U')

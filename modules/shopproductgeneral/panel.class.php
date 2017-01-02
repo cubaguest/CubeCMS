@@ -10,7 +10,7 @@ class ShopProductGeneral_Panel extends Panel {
 
       $whereStr =
          Shop_Model_Product::COLUMN_ACTIVE.' = 1 '
-               .'AND ('.Shop_Model_ProductCombinations::COLUMN_IS_DEFAULT.' = 1 OR '.Shop_Model_ProductCombinations::COLUMN_IS_DEFAULT.' IS NULL )'
+               .'AND ('.Shop_Model_Product_Combinations::COLUMN_IS_DEFAULT.' = 1 OR '.Shop_Model_Product_Combinations::COLUMN_IS_DEFAULT.' IS NULL )'
                .'AND '.Shop_Model_Product::COLUMN_URLKEY.' IS NOT NULL';
 
       $whereBinds = array();
@@ -26,7 +26,7 @@ class ShopProductGeneral_Panel extends Panel {
       $modelProducts
          ->joinFK(Shop_Model_Product::COLUMN_ID_CATEGORY, array(Model_Category::COLUMN_NAME, 'curlkey' => Model_Category::COLUMN_URLKEY))
          ->joinFK(Shop_Model_Product::COLUMN_ID_TAX)
-         ->join(Shop_Model_Product::COLUMN_ID, 'Shop_Model_ProductCombinations', Shop_Model_ProductCombinations::COLUMN_ID_PRODUCT)
+         ->join(Shop_Model_Product::COLUMN_ID, 'Shop_Model_Product_Combinations', Shop_Model_Product_Combinations::COLUMN_ID_PRODUCT)
          ->limit(0, $this->panelObj()->getParam(self::PARAM_NUM_PRODUCTS, 3))
          ->order(array('RAND(NOW())' => Model_ORM::ORDER_ASC))
          ->where($whereStr, $whereBinds)

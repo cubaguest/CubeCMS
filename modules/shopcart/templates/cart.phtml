@@ -1,168 +1,177 @@
-<?php 
+<?php
 $this->addFile('css://style.less');
 $this->addFile('js://cart.js');
 $jQuery = new JsPlugin_JQuery();
 $jQuery->addUISpinner();
 $datepicker = false;
-if(isset ($this->formNext->pickupDate)){
-   $datepicker = true;
-   $jQuery->addUIDatepicker();
+if (isset($this->formNext->pickupDate)) {
+    $datepicker = true;
+    $jQuery->addUIDatepicker();
 }
 $this->addJsPlugin($jQuery);
 $this->step = 1;
 ?>
-<h1><?php echo $this->category()->getName();?></h1>
-<?php if(!$this->cart->isEmpty()){
-   $this->includeFile('tpl://navigation.phtml');
+<h1><?php echo $this->category()->getName(); ?></h1>
+<?php
+if (!$this->cart->isEmpty()) {
+    $this->includeFile('tpl://navigation.phtml');
 }
 ?>
 <script type="text/javascript">
-   $(document).ready(function(){
-      <?php if(!$this->cart->isEmpty()){?>
-      Cart.init({
-         shippings : <?php echo json_encode($this->shippings)?>,
-         freeShipAndPayFrom : <?php echo (int)$this->freeShipAndPayFrom?>,
-         payments : <?php echo json_encode($this->payments)?>,
-         disallowPayments : <?php echo json_encode($this->disallowPayments)?>,
-         priceCart : <?php echo str_replace(',', '.',$this->cart->getPrice())?>,
-         priceShipping : <?php echo $this->shippingPrice?>,
-         pricePayment : <?php echo $this->paymentPrice?>,
-         updateUrl : '<?php echo $this->link()->route('cartUpdate')?>',
-         currency : '<?php echo VVE_SHOP_CURRENCY_NAME?>',
-         datepicker : <?php echo $datepicker ? "true" : "false";?>,
-         roundDecimals : <?php echo (int)VVE_SHOP_PRICE_ROUND_DECIMAL?>,
-         decimals : <?php echo (int)VVE_SHOP_PRICE_DECIMALS?>,
-         msg : {
-            free : '<?php echo $this->tr('Zdarma')?>',
-            deleteItem : '<?php echo $this->tr('Smazat tuto položku?')?>'
-         }
-      });
-      <?php }?>
-   });
+    $(document).ready(function () {
+<?php if (!$this->cart->isEmpty()) { ?>
+            Cart.init({
+                shippings: <?php echo json_encode($this->shippings) ?>,
+                freeShipAndPayFrom: <?php echo (int) $this->freeShipAndPayFrom ?>,
+                payments: <?php echo json_encode($this->payments) ?>,
+                disallowPayments: <?php echo json_encode($this->disallowPayments) ?>,
+                priceCart: <?php echo str_replace(',', '.', $this->cart->getPrice()) ?>,
+                priceShipping: <?php echo $this->shippingPrice ?>,
+                pricePayment: <?php echo $this->paymentPrice ?>,
+                updateUrl: '<?php echo $this->link()->route('cartUpdate') ?>',
+                currency: '<?php echo VVE_SHOP_CURRENCY_NAME ?>',
+                datepicker: <?php echo $datepicker ? "true" : "false"; ?>,
+                roundDecimals: <?php echo (int) VVE_SHOP_PRICE_ROUND_DECIMAL ?>,
+                decimals: <?php echo (int) VVE_SHOP_PRICE_DECIMALS ?>,
+                msg: {
+                    free: '<?php echo $this->tr('Zdarma') ?>',
+                    deleteItem: '<?php echo $this->tr('Smazat tuto položku?') ?>'
+                }
+            });
+<?php } ?>
+    });
 </script>
 
 <div class="main-content-list" id="shop-cart">
-   <?php if(!$this->cart->isEmpty()){?>
-   <h2><?php echo $this->tr('Obsah košíku');?></h2>
-   <?php 
-   $this->formItems->html()->setAttrib('id', 'form-items-qty');
-   echo $this->formItems->renderStart();
-   ?>
-   <table class="full-width" id="table-cart-items">
-      <thead>
-         <tr>
-            <th class="column-1"><?php echo $this->tr('Název')?></th>
-            <th class="column-2"><?php echo $this->tr('Cena/ks')?></th>
-            <th class="column-3"><?php echo $this->tr('Počet')?></th>
-            <th class="column-4"><?php echo $this->tr('Cena')?></th>
-            <th class="column-5"></th>
-         </tr>
-      </thead>
-      <tbody>
-      <?php foreach ($this->cart as $item) {
-         $this->formItems->qty->setMultiple($item->getId());
-         $this->formItems->qty->html()->addClass('shop-cart-qty');
-         $this->formItems->qty->setValues($item->getQty());
-         ?>
-         <tr id="cart-item-<?php echo $item->getId()?>" class="cart-item">
-            <td class="column-1 product-name">
-               <a href="<?php echo $item->getUrl()?>" title="<?php echo $item->getName()?>"><?php echo $item->getName()?></a>
-               <?php if($item->getNote() != null){
-                  echo '<p class="font-small">';
-                  ps($item->getNote());
-                  echo '</p>';
-               }?>
-               <?php if ($item->getCode() != null){?>
-               <p><?php  ps($item->getCode())?></p>
-               <?php }?>
-            </td>
-            <td class="product-price-by-piece no-wrap"><?php 
-               echo Shop_Tools::getFormatedPrice($item->getPrice(false));
-               echo ' / '.$item->getUnitSize().' '.$item->getUnit();
-               ?>
-               <input class="unit-size" type="hidden" value="<?php echo $item->getUnitSize()?>" />
-               <?php if($item->getProductQty() >= 0 ){ // @todo kontrola jestli je pro zboží povolen sklad (z produktu)  ?>
-               <input class="max-qty" type="hidden" value="<?php echo $item->getProductQty()?>" />
-               <?php }?>
-            </td>
-            <td><?php 
-               echo $this->formItems->qty->controll().' '.$item->getUnit();
-            ?></td>
-            <td class="column-4 column-price">
-               <span class="price product-price"><?php echo Shop_Tools::getFormatedPrice($item->getPrice())?></span>
-               <input class="product-price-input" type="hidden" value="<?php echo str_replace(",", '.', $item->getPrice())?>" />
-            </td>
-            <td class="column-5">
-               <a class="button-delete-item" href="<?php echo $this->link()->param('dp', $item->getId())?>" title="<?php echo $this->tr('Odtsranit z košíku')?>">
-                  <img src="/images/icons/delete.png" alt="del" />
-               </a>
-            </td>
-         </tr>
-      <?php }?>
-      </tbody>
-      <tfoot>
-         <tr>
-            <td><?php  echo $this->formItems->set->controll();?></td>
-            <td colspan="2" class="price column-price"><?php echo $this->tr('Cena za zboží:')?></strong></td>
-            <td colspan="" class="price column-price products-price">
-               <?php echo Shop_Tools::getFormatedPrice($this->cart->getPrice())?> </strong>
-            </td>
-            <td></td>
-         </tr>
-      </tfoot>
-   </table>
-   <?php echo $this->formItems->renderEnd();?>
-   <?php if(VVE_DEBUG_LEVEL > 1){?>
-   <div style="float: right;">
-      <?php 
-      echo $this->formReset->renderStart();
-      echo $this->formReset->reset->controll();
-      echo $this->formReset->renderEnd();
-      ?>
-   </div>
-   <?php }?>
-   
-   <h2><?php echo $this->tr('Doprava a platba');?></h2>
-   <?php echo $this->formNext->renderStart();?>
-   <table class="full-width">
-      <tbody>
-         <tr>
-            <td><?php  echo $this->formNext->shipping->label();?></td>
-            <td><?php  
-            echo $this->formNext->shipping->controll();
-            if(isset ($this->formNext->pickupDate)){
-               echo $this->formNext->pickupDate->label();
-               echo $this->formNext->pickupDate->controll();
-            }
-            ?></td>
-            <td class="column-4 column-price" >
-               <span id="shipping-price"><?php echo $this->shippingPrice > 0 ? Shop_Tools::getFormatedPrice($this->shippingPrice) : $this->tr('Zdarma')?></span>
-            </td>
-         </tr>
-         <tr>
-            <td><?php  echo $this->formNext->payment->label();?></td>
-            <td><?php  echo $this->formNext->payment->controll();?></td>
-            <td class="column-4 column-price" >
-               <span id="payment-price"><?php echo $this->paymentPrice > 0 ? Shop_Tools::getFormatedPrice($this->paymentPrice) : $this->tr('Zdarma')?></span>
-            </td>
-         </tr>
-         <tr>
-            <th><?php  echo $this->tr('Cena celkem');?></th>
-            <td></td>
-            <td class="price column-price">
-               <span id="full-price">
-                  <?php  echo Shop_Tools::getFormatedPrice($this->cart->getPrice()+$this->shippingPrice+$this->paymentPrice);?>
-               </span>
-            </td>
-         </tr>
-         <tr>
-            <td colspan="3" class="align-right"><?php  echo $this->formNext->send->controll();?></td>
-         </tr>
-      </tbody>
-   </table>
-   <?php echo $this->formNext->renderEnd();?>
-   <?php } else {?>
-   <div class="text"><p><?php echo $this->tr('Košík neobsahuje žádnou položku.')?></p></div>
-   <?php }?>
+    <?php if (!$this->cart->isEmpty()) { ?>
+        <h2><?php echo $this->tr('Obsah košíku'); ?></h2>
+        <?php
+        $this->formItems->html()->setAttrib('id', 'form-items-qty');
+        echo $this->formItems->renderStart();
+        ?>
+        <div class="table-responsive">
+
+            <table class="table table-striped" id="table-cart-items">
+                <thead>
+                    <tr>
+                        <th class="column-1"><?php echo $this->tr('Název') ?></th>
+                        <th class="column-2"><?php echo $this->tr('Cena/ks') ?></th>
+                        <th class="column-3"><?php echo $this->tr('Počet') ?></th>
+                        <th class="column-4"><?php echo $this->tr('Cena') ?></th>
+                        <th class="column-5"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    foreach ($this->cart as $item) {
+                        $this->formItems->qty->setMultiple($item->getId());
+                        $this->formItems->qty->html()->addClass('shop-cart-qty');
+                        $this->formItems->qty->setValues($item->getQty());
+                        ?>
+                        <tr id="cart-item-<?php echo $item->getId() ?>" class="cart-item">
+                            <td class="column-1 product-name">
+                                <a href="<?php echo $item->getUrl() ?>" title="<?php echo $item->getName() ?>"><?php echo $item->getName() ?></a>
+                                <?php
+                                if ($item->getNote() != null) {
+                                    echo '<p class="font-small">';
+                                    ps($item->getNote());
+                                    echo '</p>';
+                                }
+                                ?>
+                                <?php if ($item->getCode() != null) { ?>
+                                    <p><?php ps($item->getCode()) ?></p>
+                                <?php } ?>
+                            </td>
+                            <td class="product-price-by-piece no-wrap"><?php
+                                echo Shop_Tools::getFormatedPrice($item->getPrice(false));
+                                echo ' / ' . $item->getUnitSize() . ' ' . $item->getUnit();
+                                ?>
+                                <input class="unit-size" type="hidden" value="<?php echo $item->getUnitSize() ?>" />
+                                <?php if ($item->getProductQty() >= 0) { // @todo kontrola jestli je pro zboží povolen sklad (z produktu)   ?>
+                                    <input class="max-qty" type="hidden" value="<?php echo $item->getProductQty() ?>" />
+                                <?php } ?>
+                            </td>
+                            <td><?php
+                                echo $this->formItems->qty->controll() . ' ' . $item->getUnit();
+                                ?></td>
+                            <td class="column-4 column-price">
+                                <span class="price product-price"><?php echo Shop_Tools::getFormatedPrice($item->getPrice()) ?></span>
+                                <input class="product-price-input" type="hidden" value="<?php echo str_replace(",", '.', $item->getPrice()) ?>" />
+                            </td>
+                            <td class="column-5">
+                                <a class="button-delete-item" href="<?php echo $this->link()->param('dp', $item->getId()) ?>" title="<?php echo $this->tr('Odtsranit z košíku') ?>">
+                                    <img src="/images/icons/delete.png" alt="del" />
+                                </a>
+                            </td>
+                        </tr>
+                    <?php } ?>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td><?php echo $this->formItems->set->controll(); ?></td>
+                        <td colspan="2" class="price column-price"><?php echo $this->tr('Cena za zboží:') ?></strong></td>
+                        <td colspan="" class="price column-price products-price">
+                            <?php echo Shop_Tools::getFormatedPrice($this->cart->getPrice()) ?> </strong>
+                        </td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <?php echo $this->formItems->renderEnd(); ?>
+        <?php if (VVE_DEBUG_LEVEL > 1) { ?>
+            <div style="float: right;">
+                <?php
+                echo $this->formReset->renderStart();
+                echo $this->formReset->reset->controll();
+                echo $this->formReset->renderEnd();
+                ?>
+            </div>
+        <?php } ?>
+
+        <h2><?php echo $this->tr('Doprava a platba'); ?></h2>
+        <?php echo $this->formNext->renderStart(); ?>
+        <div class="table-responsive">
+        <table class="table table-striped">
+            <tbody>
+                <tr>
+                    <td><?php echo $this->formNext->shipping->label(); ?></td>
+                    <td><?php
+                        echo $this->formNext->shipping->controll();
+                        if (isset($this->formNext->pickupDate)) {
+                            echo $this->formNext->pickupDate->label();
+                            echo $this->formNext->pickupDate->controll();
+                        }
+                        ?></td>
+                    <td class="column-4 column-price" >
+                        <span id="shipping-price"><?php echo $this->shippingPrice > 0 ? Shop_Tools::getFormatedPrice($this->shippingPrice) : $this->tr('Zdarma') ?></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><?php echo $this->formNext->payment->label(); ?></td>
+                    <td><?php echo $this->formNext->payment->controll(); ?></td>
+                    <td class="column-4 column-price" >
+                        <span id="payment-price"><?php echo $this->paymentPrice > 0 ? Shop_Tools::getFormatedPrice($this->paymentPrice) : $this->tr('Zdarma') ?></span>
+                    </td>
+                </tr>
+                <tr>
+                    <th><?php echo $this->tr('Cena celkem'); ?></th>
+                    <td></td>
+                    <td class="price column-price">
+                        <span id="full-price">
+                            <?php echo Shop_Tools::getFormatedPrice($this->cart->getPrice() + $this->shippingPrice + $this->paymentPrice); ?>
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3" class="align-right"><?php echo $this->formNext->send->controll(); ?></td>
+                </tr>
+            </tbody>
+        </table>
+            </div>
+        <?php echo $this->formNext->renderEnd(); ?>
+    <?php } else { ?>
+        <div class="text"><p><?php echo $this->tr('Košík neobsahuje žádnou položku.') ?></p></div>
+            <?php } ?>
 </div>
 

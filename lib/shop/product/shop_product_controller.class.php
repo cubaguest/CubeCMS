@@ -35,7 +35,7 @@ abstract class Shop_Product_Controller extends Controller {
       $eProductId->addValidation(new Form_Validator_IsNumber(null, Form_Validator_IsNumber::TYPE_INT));
       $formAdd->addElement($eProductId);
 
-      if($useCombinations && $idProduct != null && ($variantsTMP = Shop_Model_ProductVariants::getVariants($idProduct)) ){
+      if($useCombinations && $idProduct != null && ($variantsTMP = Shop_Model_Product_Variants::getVariants($idProduct)) ){
          $selects = array();
          foreach ($variantsTMP as $variant) {
             $selectName = 'attribute_'.$variant->{Shop_Model_AttributesGroups::COLUMN_ID};
@@ -44,14 +44,14 @@ abstract class Shop_Product_Controller extends Controller {
                $formAdd->addElement($elemVariantSelect);
             }
             $variantName = (string)$variant->{Shop_Model_Attributes::COLUMN_NAME};
-//            $variant->{Shop_Model_ProductVariants::COLUMN_PRICE_ADD} >= 0 ?
-//               $variantName .= ' +'.Shop_Tools::getPrice($variant->{Shop_Model_ProductVariants::COLUMN_PRICE_ADD})
-//               : $variantName .= Shop_Tools::getPrice($variant->{Shop_Model_ProductVariants::COLUMN_PRICE_ADD});
+//            $variant->{Shop_Model_Product_Variants::COLUMN_PRICE_ADD} >= 0 ?
+//               $variantName .= ' +'.Shop_Tools::getPrice($variant->{Shop_Model_Product_Variants::COLUMN_PRICE_ADD})
+//               : $variantName .= Shop_Tools::getPrice($variant->{Shop_Model_Product_Variants::COLUMN_PRICE_ADD});
 
-            $formAdd->$selectName->setOptions(array( $variantName => $variant->{Shop_Model_ProductVariants::COLUMN_ID} ), true);
+            $formAdd->$selectName->setOptions(array( $variantName => $variant->{Shop_Model_Product_Variants::COLUMN_ID} ), true);
 
-            if($variant->{Shop_Model_ProductVariants::COLUMN_IS_DEFAULT}){
-               $formAdd->$selectName->setValues($variant->{Shop_Model_ProductVariants::COLUMN_ID});
+            if($variant->{Shop_Model_Product_Variants::COLUMN_IS_DEFAULT}){
+               $formAdd->$selectName->setValues($variant->{Shop_Model_Product_Variants::COLUMN_ID});
             }
             $selects[$variant->{Shop_Model_AttributesGroups::COLUMN_ID}] = $selectName;
          }
@@ -91,13 +91,13 @@ abstract class Shop_Product_Controller extends Controller {
             }
             // kontrola množství
             if($useCombinations) {
-               $combination = Shop_Model_ProductCombinations::getCombinationByVariants($product->getPK(), $selectedVariants);
+               $combination = Shop_Model_Product_Combinations::getCombinationByVariants($product->getPK(), $selectedVariants);
             } else {
-               $combination = Shop_Model_ProductCombinations::getDefaultCombination($product->getPK());
+               $combination = Shop_Model_Product_Combinations::getDefaultCombination($product->getPK());
             }
             if($product->{Shop_Model_Product::COLUMN_STOCK} && !VVE_SHOP_ALLOW_BUY_NOT_IN_STOCK){
                // kontrola skladu
-               $productQty = ($combination ? $combination->{Shop_Model_ProductCombinations::COLUMN_QTY} : $product->{Shop_Model_Product::COLUMN_QUANTITY});
+               $productQty = ($combination ? $combination->{Shop_Model_Product_Combinations::COLUMN_QTY} : $product->{Shop_Model_Product::COLUMN_QUANTITY});
                if($productQty <= 0){
                   $eQuantity->isValid(false);
                   if($combination){
@@ -123,23 +123,23 @@ abstract class Shop_Product_Controller extends Controller {
          // pokud má produkt kombinace
          $idProduct = $product->getPK();
 
-         if(Shop_Model_ProductCombinations::productHasCombination($idProduct)){
+         if(Shop_Model_Product_Combinations::productHasCombination($idProduct)){
             if($useCombinations && $this->view()->productVariantsSelects){
                // jsou kombinace a varianty
                $selectedVariants = array();
                foreach($this->view()->productVariantsSelects as $name) {
                   $selectedVariants[] = $formAdd->$name->getValues();
                }
-               $combination = Shop_Model_ProductCombinations::getCombinationByVariants($idProduct, $selectedVariants);
+               $combination = Shop_Model_Product_Combinations::getCombinationByVariants($idProduct, $selectedVariants);
             } else {
                // výběr kombinací není zadán, bere se v potaz výchozí
-               $combination = Shop_Model_ProductCombinations::getDefaultCombination($idProduct);
+               $combination = Shop_Model_Product_Combinations::getDefaultCombination($idProduct);
             }
          }
          $combination
             ? $this->addToCart(
                $formAdd->productId->getValues(), $formAdd->qty->getValues(),
-               $combination->{Shop_Model_ProductCombinations::COLUMN_ID}
+               $combination->{Shop_Model_Product_Combinations::COLUMN_ID}
             )
             : $this->addToCart($formAdd->productId->getValues(), $formAdd->qty->getValues());
 
@@ -189,7 +189,7 @@ abstract class Shop_Product_Controller extends Controller {
       $model->setSelectAllLangs(false);
       $model
          ->joinFK(Shop_Model_Product::COLUMN_ID_TAX)
-         ->join(Shop_Model_Product::COLUMN_ID, 'Shop_Model_ProductCombinations', Shop_Model_ProductCombinations::COLUMN_ID_PRODUCT);
+         ->join(Shop_Model_Product::COLUMN_ID, 'Shop_Model_Product_Combinations', Shop_Model_Product_Combinations::COLUMN_ID_PRODUCT);
 
       if($joinCategory){
          $model->joinFK(Shop_Model_Product::COLUMN_ID_CATEGORY);
@@ -198,13 +198,13 @@ abstract class Shop_Product_Controller extends Controller {
       if($idCategory != 0){
          $model->where( ($this->category()->getRights()->isWritable() ? null : Shop_Model_Product::COLUMN_ACTIVE.' = 1 AND ' ).
                Shop_Model_Product::COLUMN_ID_CATEGORY.' = :idc '
-               .'AND ('.Shop_Model_ProductCombinations::COLUMN_IS_DEFAULT.' = 1 OR '.Shop_Model_ProductCombinations::COLUMN_IS_DEFAULT.' IS NULL )'
+               .'AND ('.Shop_Model_Product_Combinations::COLUMN_IS_DEFAULT.' = 1 OR '.Shop_Model_Product_Combinations::COLUMN_IS_DEFAULT.' IS NULL )'
                .'AND '.Shop_Model_Product::COLUMN_URLKEY.' IS NOT NULL ',
             array('idc' => $this->category()->getId())
          );
       } else {
          $model->where( ($this->category()->getRights()->isWritable() ? null : Shop_Model_Product::COLUMN_ACTIVE.' = 1 AND ')
-               .'('.Shop_Model_ProductCombinations::COLUMN_IS_DEFAULT.' = 1 OR '.Shop_Model_ProductCombinations::COLUMN_IS_DEFAULT.' IS NULL )'
+               .'('.Shop_Model_Product_Combinations::COLUMN_IS_DEFAULT.' = 1 OR '.Shop_Model_Product_Combinations::COLUMN_IS_DEFAULT.' IS NULL )'
                .'AND '.Shop_Model_Product::COLUMN_URLKEY.' IS NOT NULL ',
             array()
          );
@@ -244,10 +244,10 @@ abstract class Shop_Product_Controller extends Controller {
 
       $combBind = array();
       if($combinationId == 0){
-         $combWhereString = 'AND ( '.Shop_Model_ProductCombinations::COLUMN_IS_DEFAULT.' = 1'
-            .' OR '.Shop_Model_ProductCombinations::COLUMN_IS_DEFAULT.' IS NULL)';
+         $combWhereString = 'AND ( '.Shop_Model_Product_Combinations::COLUMN_IS_DEFAULT.' = 1'
+            .' OR '.Shop_Model_Product_Combinations::COLUMN_IS_DEFAULT.' IS NULL)';
       } else {
-         $combWhereString = 'AND '.Shop_Model_ProductCombinations::COLUMN_ID.' = :idcomb ';
+         $combWhereString = 'AND '.Shop_Model_Product_Combinations::COLUMN_ID.' = :idcomb ';
          $combBind['idcomb'] = $combinationId;
       }
 
@@ -255,8 +255,8 @@ abstract class Shop_Product_Controller extends Controller {
          ->joinFK(Shop_Model_Product::COLUMN_ID_TAX)
          ->join(
             Shop_Model_Product::COLUMN_ID,
-            'Shop_Model_ProductCombinations',
-            Shop_Model_ProductCombinations::COLUMN_ID_PRODUCT
+            'Shop_Model_Product_Combinations',
+            Shop_Model_Product_Combinations::COLUMN_ID_PRODUCT
          )
          ->where( ($this->category()->getRights()->isWritable() ? null :Shop_Model_Product::COLUMN_ACTIVE.' = 1 AND ')
             .Shop_Model_Product::COLUMN_ID_CATEGORY.' = :idc '
@@ -267,12 +267,12 @@ abstract class Shop_Product_Controller extends Controller {
 
       $product = $model->record();
       // pokud má produkt kombinace, načteme je
-      if(isset($product->{Shop_Model_ProductCombinations::COLUMN_ID})
-         && $product->{Shop_Model_ProductCombinations::COLUMN_ID} != null){
-         $modelCombinations = new Shop_Model_ProductCombinations();
+      if(isset($product->{Shop_Model_Product_Combinations::COLUMN_ID})
+         && $product->{Shop_Model_Product_Combinations::COLUMN_ID} != null){
+         $modelCombinations = new Shop_Model_Product_Combinations();
          // load default combination
          $this->view()->productCombinations
-            = Shop_Model_ProductCombinations::getCombinations($product->getPK());
+            = Shop_Model_Product_Combinations::getCombinations($product->getPK());
       }
       return $product;
    }
@@ -337,7 +337,7 @@ abstract class Shop_Product_Controller extends Controller {
       if($product instanceof Model_ORM_Record && $product->getTitleImage() != null){
          // výběr z uložených obrázků a možnost nahrání nového titulního
          $eImage = new Form_Element_ImageSelector('image', $this->tr('Titulní obrázek'));
-         $eImage->setValues($product->getTitleImage()->getPk().'.'.$product->getTitleImage()->{Shop_Model_ProductImage::COLUMN_TYPE});
+         $eImage->setValues($product->getTitleImage()->getPk().'.'.$product->getTitleImage()->{Shop_Model_Product_Images::COLUMN_TYPE});
          $eImage->setUploadDir(Shop_Tools::getProductImagesDir().$product->getPK().DIRECTORY_SEPARATOR);
          $form->addElement($eImage, $fGrpInfo);
       } else {
@@ -520,16 +520,16 @@ abstract class Shop_Product_Controller extends Controller {
          
          // uložení nového obrázku
          if ($form->image->getValues() != null) {
-            $modelImages = new Shop_Model_ProductImage();
+            $modelImages = new Shop_Model_Product_Images();
             if($form->image instanceof Form_Element_ImageSelector){
                if($form->image->isUploadedImage()){
                   // upload nového obrázku
                   /* @var $fileObj File */
                   $fileObj = $form->image->createFileObject();
                   $newObj = $modelImages->newRecord();
-                  $newObj->{Shop_Model_ProductImage::COLUMN_ID_PRODUCT} = $product->getPK();
-                  $newObj->{Shop_Model_ProductImage::COLUMN_NAME} = $product->{Shop_Model_Product::COLUMN_NAME};
-                  $newObj->{Shop_Model_ProductImage::COLUMN_TYPE} = $fileObj->getExtension();
+                  $newObj->{Shop_Model_Product_Images::COLUMN_ID_PRODUCT} = $product->getPK();
+                  $newObj->{Shop_Model_Product_Images::COLUMN_NAME} = $product->{Shop_Model_Product::COLUMN_NAME};
+                  $newObj->{Shop_Model_Product_Images::COLUMN_TYPE} = $fileObj->getExtension();
                   $newObj->save();
                   $newObj->setAsTitle();
                   $fileObj->rename($newObj->getPK().'.'.$fileObj->getExtension());
@@ -544,9 +544,9 @@ abstract class Shop_Product_Controller extends Controller {
             } else if($form->image instanceof Form_Element_Image){
                $fileObj = $form->image->createFileObject();
                $newObj = $modelImages->newRecord();
-               $newObj->{Shop_Model_ProductImage::COLUMN_ID_PRODUCT} = $product->getPK();
-               $newObj->{Shop_Model_ProductImage::COLUMN_NAME} = $product->{Shop_Model_Product::COLUMN_NAME};
-               $newObj->{Shop_Model_ProductImage::COLUMN_TYPE} = $fileObj->getExtension();
+               $newObj->{Shop_Model_Product_Images::COLUMN_ID_PRODUCT} = $product->getPK();
+               $newObj->{Shop_Model_Product_Images::COLUMN_NAME} = $product->{Shop_Model_Product::COLUMN_NAME};
+               $newObj->{Shop_Model_Product_Images::COLUMN_TYPE} = $fileObj->getExtension();
                $newObj->save();
                $newObj->setAsTitle();
                $fileObj->rename($newObj->getPK().'.'.$fileObj->getExtension());
@@ -567,7 +567,7 @@ abstract class Shop_Product_Controller extends Controller {
    public function editProductVariants($product)
    {
       $model = new Shop_Model_Product();
-      $modelProductVariants = new Shop_Model_ProductVariants();
+      $modelProductVariants = new Shop_Model_Product_Variants();
       $model->joinFK(Shop_Model_Product::COLUMN_ID_TAX);
       if($product instanceof Model_ORM_Record){
 //         $product = $model->newRecord();
@@ -590,27 +590,27 @@ abstract class Shop_Product_Controller extends Controller {
          $variant = $modelProductVariants->record($this->getRequestParam('deleteComb', 0));
          //var_dump($_GET);flush();
          if($variant){
-            $modelCombinationHasVariant = new Shop_Model_ProductCombinationHasVariant();
-            $modelCombinations = new Shop_Model_ProductCombinations();
+            $modelCombinationHasVariant = new Shop_Model_Product_CombinationHasVariant();
+            $modelCombinations = new Shop_Model_Product_Combinations();
 
 //            Model_ORM::lockModels( array($modelCombinationHasVariant, $modelProductVariants, $modelCombinations) );
             try {
                // kombinace k dané variantě
                $combinations = $modelCombinationHasVariant
-                  ->joinFK(Shop_Model_ProductCombinationHasVariant::COLUMN_ID_COMBINATION)
-                  ->where(Shop_Model_ProductCombinations::COLUMN_ID_PRODUCT." = :idp "
-                     ."AND ".Shop_Model_ProductCombinationHasVariant::COLUMN_ID_VARIANT.' = :idv',
+                  ->joinFK(Shop_Model_Product_CombinationHasVariant::COLUMN_ID_COMBINATION)
+                  ->where(Shop_Model_Product_Combinations::COLUMN_ID_PRODUCT." = :idp "
+                     ."AND ".Shop_Model_Product_CombinationHasVariant::COLUMN_ID_VARIANT.' = :idv',
                   array(
-                     'idp' => $variant->{Shop_Model_ProductVariants::COLUMN_ID_PRODUCT},
-                     'idv' => $variant->{Shop_Model_ProductVariants::COLUMN_ID}))
+                     'idp' => $variant->{Shop_Model_Product_Variants::COLUMN_ID_PRODUCT},
+                     'idv' => $variant->{Shop_Model_Product_Variants::COLUMN_ID}))
                   ->records(PDO::FETCH_OBJ);
 //
-//               $modelCombinationHasVariant2 = new Shop_Model_ProductCombinationHasVariant();
+//               $modelCombinationHasVariant2 = new Shop_Model_Product_CombinationHasVariant();
                foreach ($combinations as $c) {
-//                  $modelCombinationHasVariant2->where(Shop_Model_ProductCombinationHasVariant::COLUMN_ID_COMBINATION." = :idc",
-//                     array('idc' => $c->{Shop_Model_ProductCombinations::COLUMN_ID}))->delete();
+//                  $modelCombinationHasVariant2->where(Shop_Model_Product_CombinationHasVariant::COLUMN_ID_COMBINATION." = :idc",
+//                     array('idc' => $c->{Shop_Model_Product_Combinations::COLUMN_ID}))->delete();
 //
-                  $modelCombinations->delete($c->{Shop_Model_ProductCombinations::COLUMN_ID});
+                  $modelCombinations->delete($c->{Shop_Model_Product_Combinations::COLUMN_ID});
                }
 
                // pokud se jedná o poslední variantu z dané skupiny, smažou se všechny vytvořené kombinace,
@@ -618,25 +618,25 @@ abstract class Shop_Product_Controller extends Controller {
 
 
                // pokud je výchozí, nastaví se jiná varianta jako výchozí
-               if($variant->{Shop_Model_ProductVariants::COLUMN_IS_DEFAULT}){
-                  $modelProductVariants = new Shop_Model_ProductVariants();
+               if($variant->{Shop_Model_Product_Variants::COLUMN_IS_DEFAULT}){
+                  $modelProductVariants = new Shop_Model_Product_Variants();
                   $otherVariants = $modelProductVariants
-                     ->joinFK(Shop_Model_ProductVariants::COLUMN_ID_ATTR)
+                     ->joinFK(Shop_Model_Product_Variants::COLUMN_ID_ATTR)
                      ->where(
-                        Shop_Model_ProductVariants::COLUMN_ID_PRODUCT.' = :idp AND '.Shop_Model_Attributes::COLUMN_ID_GROUP." = :idatg AND "
-                           .Shop_Model_ProductVariants::COLUMN_ID." != :idv",
+                        Shop_Model_Product_Variants::COLUMN_ID_PRODUCT.' = :idp AND '.Shop_Model_Attributes::COLUMN_ID_GROUP." = :idatg AND "
+                           .Shop_Model_Product_Variants::COLUMN_ID." != :idv",
                      array(
                         'idp' => $product->{Shop_Model_Product::COLUMN_ID},
                         'idatg' => $variant->{Shop_Model_Attributes::COLUMN_ID_GROUP},
-                        'idv' => $variant->{Shop_Model_ProductVariants::COLUMN_ID}
+                        'idv' => $variant->{Shop_Model_Product_Variants::COLUMN_ID}
                      ))
                      ->records();
 
                   if($otherVariants && count($otherVariants) > 0){
                      $vNewDefault = $otherVariants[0];
-                     $vNewDefault->{Shop_Model_ProductVariants::COLUMN_IS_DEFAULT} = true;
+                     $vNewDefault->{Shop_Model_Product_Variants::COLUMN_IS_DEFAULT} = true;
                      $modelProductVariants->save($vNewDefault);
-                     Shop_Model_ProductCombinations::generateDefaultCombination($product->getPK());
+                     Shop_Model_Product_Combinations::generateDefaultCombination($product->getPK());
                   }
                }
 
@@ -674,18 +674,18 @@ abstract class Shop_Product_Controller extends Controller {
          $qtys = $formComb->qty->getValues();
          $prices = $formComb->price->getValues();
 
-         $modelCombination = new Shop_Model_ProductCombinations();
+         $modelCombination = new Shop_Model_Product_Combinations();
          foreach ($qtys as $id => $qty) {
             if(!is_numeric($qty)){
                continue;
             }
-            $modelCombination->where(Shop_Model_ProductCombinations::COLUMN_ID." = :idc", array('idc' => (int)$id))
+            $modelCombination->where(Shop_Model_Product_Combinations::COLUMN_ID." = :idc", array('idc' => (int)$id))
                ->update(array(
-                  Shop_Model_ProductCombinations::COLUMN_QTY => (int)$qty,
-                  Shop_Model_ProductCombinations::COLUMN_PRICE => (int)$prices[$id],
+                  Shop_Model_Product_Combinations::COLUMN_QTY => (int)$qty,
+                  Shop_Model_Product_Combinations::COLUMN_PRICE => (int)$prices[$id],
                ));
          }
-         Shop_Model_ProductCombinations::updateProductQty($product->getPK());
+         Shop_Model_Product_Combinations::updateProductQty($product->getPK());
          $this->infoMsg()->addMessage($this->tr('Množství bylo aktualizováno'));
          $this->link()->redirect();
       }
@@ -693,16 +693,16 @@ abstract class Shop_Product_Controller extends Controller {
       $this->view()->formComb = $formComb;
 
       // načtení variant produktu
-      $modelProductVariants = new Shop_Model_ProductVariants();
+      $modelProductVariants = new Shop_Model_Product_Variants();
       $productVariants = $modelProductVariants
-         ->join(Shop_Model_ProductVariants::COLUMN_ID_ATTR, array( 'prattr' => "Shop_Model_Attributes"), Shop_Model_Attributes::COLUMN_ID)
+         ->join(Shop_Model_Product_Variants::COLUMN_ID_ATTR, array( 'prattr' => "Shop_Model_Attributes"), Shop_Model_Attributes::COLUMN_ID)
          ->join( array('prattr' => Shop_Model_Attributes::COLUMN_ID_GROUP), "Shop_Model_AttributesGroups", Shop_Model_AttributesGroups::COLUMN_ID)
-         ->join(Shop_Model_ProductVariants::COLUMN_ID,
-               "Shop_Model_ProductCombinationHasVariant",
-               Shop_Model_ProductCombinationHasVariant::COLUMN_ID_VARIANT,
-               array(Shop_Model_ProductCombinationHasVariant::COLUMN_ID_COMBINATION))
-         ->groupBy(Shop_Model_ProductVariants::COLUMN_ID)
-         ->where(Shop_Model_ProductVariants::COLUMN_ID_PRODUCT." = :idp", array('idp' => $product->{Shop_Model_Product::COLUMN_ID}))
+         ->join(Shop_Model_Product_Variants::COLUMN_ID,
+               "Shop_Model_Product_CombinationHasVariant",
+               Shop_Model_Product_CombinationHasVariant::COLUMN_ID_VARIANT,
+               array(Shop_Model_Product_CombinationHasVariant::COLUMN_ID_COMBINATION))
+         ->groupBy(Shop_Model_Product_Variants::COLUMN_ID)
+         ->where(Shop_Model_Product_Variants::COLUMN_ID_PRODUCT." = :idp", array('idp' => $product->{Shop_Model_Product::COLUMN_ID}))
          ->order(array(
             'prattr.'.Shop_Model_Attributes::COLUMN_ID_GROUP => Model_ORM::ORDER_ASC,
             Shop_Model_Attributes::COLUMN_ORDER => Model_ORM::ORDER_ASC,
@@ -715,8 +715,8 @@ abstract class Shop_Product_Controller extends Controller {
       $defaults = array();
       $variantsGroups = array();
       foreach ($productVariants as $var) {
-         if($var->{Shop_Model_ProductVariants::COLUMN_IS_DEFAULT}){
-            $defaults[] = $var->{Shop_Model_ProductVariants::COLUMN_ID};
+         if($var->{Shop_Model_Product_Variants::COLUMN_IS_DEFAULT}){
+            $defaults[] = $var->{Shop_Model_Product_Variants::COLUMN_ID};
          }
          $variantsGroups[$var->{Shop_Model_Attributes::COLUMN_ID_GROUP}] = $var;
       }
@@ -754,14 +754,14 @@ abstract class Shop_Product_Controller extends Controller {
          $ids = $formAddVariant->ids->getValues();
 
 
-         $modelProductVariants = new Shop_Model_ProductVariants();
+         $modelProductVariants = new Shop_Model_Product_Variants();
          $modelAttributes = new Shop_Model_Attributes();
 //         Model_ORM::lockModels(array($modelProductVariants, $modelAttributes));
 
          foreach($ids as $id) {
             $alreadyExist = (bool)$modelProductVariants
-               ->where(Shop_Model_ProductVariants::COLUMN_ID_PRODUCT." = :idp AND "
-                  .Shop_Model_ProductVariants::COLUMN_ID_ATTR." = :ida",
+               ->where(Shop_Model_Product_Variants::COLUMN_ID_PRODUCT." = :idp AND "
+                  .Shop_Model_Product_Variants::COLUMN_ID_ATTR." = :ida",
                   array('idp' => $product->{Shop_Model_Product::COLUMN_ID}, 'ida' => $id))
                ->count();
             // nepřidávat pokud existuje
@@ -770,21 +770,21 @@ abstract class Shop_Product_Controller extends Controller {
             }
 
             $rec = $modelProductVariants->newRecord();
-            $rec->{Shop_Model_ProductVariants::COLUMN_ID_ATTR} = $id;
-            $rec->{Shop_Model_ProductVariants::COLUMN_ID_PRODUCT} = $product->{Shop_Model_Product::COLUMN_ID};
+            $rec->{Shop_Model_Product_Variants::COLUMN_ID_ATTR} = $id;
+            $rec->{Shop_Model_Product_Variants::COLUMN_ID_PRODUCT} = $product->{Shop_Model_Product::COLUMN_ID};
             // @todo kontorla pokud je z dané skupiny první, nastavit jako výchozí
 
             try {
                $attr = $modelAttributes->record($id);
 
                $isSomeInGroup = (bool)$modelProductVariants
-                  ->joinFK(Shop_Model_ProductVariants::COLUMN_ID_ATTR)
-                  ->where(Shop_Model_ProductVariants::COLUMN_ID_PRODUCT." = :idp AND "
+                  ->joinFK(Shop_Model_Product_Variants::COLUMN_ID_ATTR)
+                  ->where(Shop_Model_Product_Variants::COLUMN_ID_PRODUCT." = :idp AND "
                      .Shop_Model_Attributes::COLUMN_ID_GROUP." = :idg",
                   array('idp' => $product->{Shop_Model_Product::COLUMN_ID}, 'idg' => $attr->{Shop_Model_Attributes::COLUMN_ID_GROUP}))
                   ->count();
 
-               $rec->{Shop_Model_ProductVariants::COLUMN_IS_DEFAULT} = $isSomeInGroup ? false : true;
+               $rec->{Shop_Model_Product_Variants::COLUMN_IS_DEFAULT} = $isSomeInGroup ? false : true;
                $rec->save();
             } catch (Exception $e) {
                new CoreErrors($e);
@@ -862,19 +862,19 @@ abstract class Shop_Product_Controller extends Controller {
          $key = 0;
          $defaultVariants = array();
          foreach ($productVariants as $variant) {
-            $variant->{Shop_Model_ProductVariants::COLUMN_PRICE_ADD} = $prices[$variant->{Shop_Model_ProductVariants::COLUMN_ID}];
-            $variant->{Shop_Model_ProductVariants::COLUMN_CODE_ADD} =
-               isset($codes[$variant->{Shop_Model_ProductVariants::COLUMN_ID}]) ?
-               $codes[$variant->{Shop_Model_ProductVariants::COLUMN_ID}] : null;
-            $variant->{Shop_Model_ProductVariants::COLUMN_WEIGHT_ADD} = $weights[$variant->{Shop_Model_ProductVariants::COLUMN_ID}];
+            $variant->{Shop_Model_Product_Variants::COLUMN_PRICE_ADD} = $prices[$variant->{Shop_Model_Product_Variants::COLUMN_ID}];
+            $variant->{Shop_Model_Product_Variants::COLUMN_CODE_ADD} =
+               isset($codes[$variant->{Shop_Model_Product_Variants::COLUMN_ID}]) ?
+               $codes[$variant->{Shop_Model_Product_Variants::COLUMN_ID}] : null;
+            $variant->{Shop_Model_Product_Variants::COLUMN_WEIGHT_ADD} = $weights[$variant->{Shop_Model_Product_Variants::COLUMN_ID}];
 
-            $variant->{Shop_Model_ProductVariants::COLUMN_IS_DEFAULT} = false;
-            if(in_array($variant->{Shop_Model_ProductVariants::COLUMN_ID}, $defaults)){
-               $variant->{Shop_Model_ProductVariants::COLUMN_IS_DEFAULT} = true;
+            $variant->{Shop_Model_Product_Variants::COLUMN_IS_DEFAULT} = false;
+            if(in_array($variant->{Shop_Model_Product_Variants::COLUMN_ID}, $defaults)){
+               $variant->{Shop_Model_Product_Variants::COLUMN_IS_DEFAULT} = true;
             }
 
-            if($variant->{Shop_Model_ProductVariants::COLUMN_IS_DEFAULT}){
-               $defaultVariants[] = $variant->{Shop_Model_ProductVariants::COLUMN_ID};
+            if($variant->{Shop_Model_Product_Variants::COLUMN_IS_DEFAULT}){
+               $defaultVariants[] = $variant->{Shop_Model_Product_Variants::COLUMN_ID};
             }
 
             $variant->save();
@@ -890,14 +890,14 @@ abstract class Shop_Product_Controller extends Controller {
 
          }
          // generování kombinací
-         Shop_Model_ProductCombinations::generateCombinations(
+         Shop_Model_Product_Combinations::generateCombinations(
             $variantForComb,
             $defaultVariants,
             $product->getPK(),
             $product->{Shop_Model_Product::COLUMN_QUANTITY},
             $formEditVariants->generatePrice->getValues()
          );
-         Shop_Model_ProductCombinations::generateDefaultCombination($product->getPK());
+         Shop_Model_Product_Combinations::generateDefaultCombination($product->getPK());
 
          $this->infoMsg()->addMessage($this->tr('Kombinace byly generovány'));
          $this->link()->redirect();
@@ -906,14 +906,14 @@ abstract class Shop_Product_Controller extends Controller {
       $this->view()->formEditVariants = $formEditVariants;
 
       // get combinations -- move to model
-      $modelCombinations = new Shop_Model_ProductCombinations();
+      $modelCombinations = new Shop_Model_Product_Combinations();
       $modelCombinations->prepareForProductCombinations($product->getPK());
 
       if($this->getRequestParam('pord', false)){
          $modelCombinations->order(array('price' => $this->getRequestParam('pord', 'a') == 'a' ? Model_ORM::ORDER_ASC : Model_ORM::ORDER_DESC));
       }
       if($this->getRequestParam('qord', false)){
-         $modelCombinations->order(array(Shop_Model_ProductCombinations::COLUMN_QTY => $this->getRequestParam('qord', 'a') == 'a' ? Model_ORM::ORDER_ASC : Model_ORM::ORDER_DESC));
+         $modelCombinations->order(array(Shop_Model_Product_Combinations::COLUMN_QTY => $this->getRequestParam('qord', 'a') == 'a' ? Model_ORM::ORDER_ASC : Model_ORM::ORDER_DESC));
       }
       if($this->getRequestParam('word', false)){
          $modelCombinations->order(array('weight' => $this->getRequestParam('word', 'a') == 'a' ? Model_ORM::ORDER_ASC : Model_ORM::ORDER_DESC));
@@ -941,8 +941,8 @@ abstract class Shop_Product_Controller extends Controller {
          return;
       }
       
-      $modelImages = new Shop_Model_ProductImage();
-      $productImages = $modelImages->where(Shop_Model_ProductImage::COLUMN_ID_PRODUCT, $product->getPK())->records();
+      $modelImages = new Shop_Model_Product_Images();
+      $productImages = $modelImages->where(Shop_Model_Product_Images::COLUMN_ID_PRODUCT, $product->getPK())->records();
       
       // form na přidání obrázku
       $form = new Form('pradimage_');
@@ -968,11 +968,11 @@ abstract class Shop_Product_Controller extends Controller {
          foreach ($files as $file) {
             /* @var $image File */
             $imageRecord = $modelImages->newRecord();
-            $imageRecord->{Shop_Model_ProductImage::COLUMN_ID_PRODUCT} = $product->getPK();
-            $imageRecord->{Shop_Model_ProductImage::COLUMN_NAME} = $product->{Shop_Model_Product::COLUMN_NAME};
-//            $imageRecord->{Shop_Model_ProductImage::COLUMN_ORDER} = 1;
-            $imageRecord->{Shop_Model_ProductImage::COLUMN_IS_TITLE} = false;
-            $imageRecord->{Shop_Model_ProductImage::COLUMN_TYPE} = $file->getExtension();
+            $imageRecord->{Shop_Model_Product_Images::COLUMN_ID_PRODUCT} = $product->getPK();
+            $imageRecord->{Shop_Model_Product_Images::COLUMN_NAME} = $product->{Shop_Model_Product::COLUMN_NAME};
+//            $imageRecord->{Shop_Model_Product_Images::COLUMN_ORDER} = 1;
+            $imageRecord->{Shop_Model_Product_Images::COLUMN_IS_TITLE} = false;
+            $imageRecord->{Shop_Model_Product_Images::COLUMN_TYPE} = $file->getExtension();
             $imageRecord->save();
             $file->move($productDir);
             $file->rename($imageRecord->getPK().'.'.$file->getExtension());
@@ -980,10 +980,10 @@ abstract class Shop_Product_Controller extends Controller {
          
          // pokud je to první obrázek u produktu, tak označ jako titulní
          if($markTitle){
-            $modelImages = new Shop_Model_ProductImage();
+            $modelImages = new Shop_Model_Product_Images();
             $modelImages
-               ->where(Shop_Model_ProductImage::COLUMN_ID_PRODUCT.' = :idp AND '.Shop_Model_ProductImage::COLUMN_ORDER.' = 1', array('idp' => $product->getPK()) )
-               ->update(array(Shop_Model_ProductImage::COLUMN_IS_TITLE => true));
+               ->where(Shop_Model_Product_Images::COLUMN_ID_PRODUCT.' = :idp AND '.Shop_Model_Product_Images::COLUMN_ORDER.' = 1', array('idp' => $product->getPK()) )
+               ->update(array(Shop_Model_Product_Images::COLUMN_IS_TITLE => true));
          }
          
          $this->infoMsg()->addMessage($this->tr('Obrázky byly nahrány'));
@@ -1023,16 +1023,139 @@ abstract class Shop_Product_Controller extends Controller {
          $isTitles = $formEdit->isTitle->getValues();
          
          $order = 1;
-         $modelI = new Shop_Model_ProductImage();
+         $modelI = new Shop_Model_Product_Images();
          foreach ($names as $id => $name) {
-            $imageRec = Shop_Model_ProductImage::getRecord($id);
+            $imageRec = Shop_Model_Product_Images::getRecord($id);
             if($deletes[$id] == 1){
                // model rovnou maže obrázky, čili není nutné zpracovat
                $modelI->delete($id);
             } else {
-               $imageRec->{Shop_Model_ProductImage::COLUMN_IS_TITLE} = $isTitles[$id];
-               $imageRec->{Shop_Model_ProductImage::COLUMN_ORDER} = $order;
-               $imageRec->{Shop_Model_ProductImage::COLUMN_NAME} = $name;
+               $imageRec->{Shop_Model_Product_Images::COLUMN_IS_TITLE} = $isTitles[$id];
+               $imageRec->{Shop_Model_Product_Images::COLUMN_ORDER} = $order;
+               $imageRec->{Shop_Model_Product_Images::COLUMN_NAME} = $name;
+               $imageRec->save();
+               $order++;
+            }
+         }
+         
+         $this->infoMsg()->addMessage($this->tr('Obrázky byly uloženy'));
+         $this->link()->reload();
+      }
+      $this->view()->formEdit = $formEdit;
+      $this->view()->productImages = $productImages;
+   }
+   
+   public function editProductParams($product)
+   {
+      $model = new Shop_Model_Product();
+      
+      if($product instanceof Model_ORM_Record){
+//         $product = $model->newRecord();
+      } else if(is_int($product)){
+         $product = $model->where(Shop_Model_Product::COLUMN_ID.' = :id', array('id' => $product))->record();
+      } else if(is_string($product)){
+         $product = $model->where(Shop_Model_Product::COLUMN_URLKEY.' = :ukey ', array('ukey' => $product))->record();
+      } else {
+         $product = $model->newRecord();
+      }
+      $this->view()->product = $product;
+
+      if($product == false){
+         return;
+      }
+      
+      $modelParams = new Shop_Model_ProductParams();
+      $productImages = $modelParams->where(Shop_Model_ProductParams::COLUMN_ID_PRODUCT, $product->getPK())->records();
+      
+      // form na přidání obrázku
+      $form = new Form('pradimage_');
+      
+      $elemImages = new Form_Element_File('images', $this->tr('Obrázky'));
+      $elemImages->setMultiple(true);
+      $elemImages->addValidation(new Form_Validator_NotEmpty());
+      $elemImages->addValidation(new Form_Validator_FileExtension('jpg'));
+      $form->addElement($elemImages);
+      
+      $eSend = new Form_Element_Submit('send', $this->tr('Nahrát'));
+      $form->addElement($eSend);
+      
+      // uložení
+      if($form->isValid()){
+         
+         $files = $form->images->createFileObject();
+         $basePath = Shop_Tools::getProductImagesDir(false);
+         $productDir = $basePath.$product->getPK().DIRECTORY_SEPARATOR;
+         FS_Dir::checkStatic($productDir);
+         $markTitle = !(bool)count($productImages);
+         
+         foreach ($files as $file) {
+            /* @var $image File */
+            $imageRecord = $modelImages->newRecord();
+            $imageRecord->{Shop_Model_Product_Images::COLUMN_ID_PRODUCT} = $product->getPK();
+            $imageRecord->{Shop_Model_Product_Images::COLUMN_NAME} = $product->{Shop_Model_Product::COLUMN_NAME};
+//            $imageRecord->{Shop_Model_Product_Images::COLUMN_ORDER} = 1;
+            $imageRecord->{Shop_Model_Product_Images::COLUMN_IS_TITLE} = false;
+            $imageRecord->{Shop_Model_Product_Images::COLUMN_TYPE} = $file->getExtension();
+            $imageRecord->save();
+            $file->move($productDir);
+            $file->rename($imageRecord->getPK().'.'.$file->getExtension());
+         }
+         
+         // pokud je to první obrázek u produktu, tak označ jako titulní
+         if($markTitle){
+            $modelImages = new Shop_Model_Product_Images();
+            $modelImages
+               ->where(Shop_Model_Product_Images::COLUMN_ID_PRODUCT.' = :idp AND '.Shop_Model_Product_Images::COLUMN_ORDER.' = 1', array('idp' => $product->getPK()) )
+               ->update(array(Shop_Model_Product_Images::COLUMN_IS_TITLE => true));
+         }
+         
+         $this->infoMsg()->addMessage($this->tr('Obrázky byly nahrány'));
+         $this->link()->reload();
+      }
+      $this->view()->formAdd = $form;
+      
+      $formEdit = new Form('preditimage');
+      
+      $elemDelete = new Form_Element_Hidden('delete');
+      $elemDelete->setMultiple();
+      $elemDelete->setValues(0);
+      $formEdit->addElement($elemDelete);
+      
+      $elemOrder = new Form_Element_Hidden('order');
+      $elemOrder->setMultiple();
+      $elemOrder->setValues(0);
+      $formEdit->addElement($elemOrder);
+      
+      $elemIsTitle = new Form_Element_Hidden('isTitle');
+      $elemIsTitle->setMultiple();
+      $elemIsTitle->setValues(0);
+      $formEdit->addElement($elemIsTitle);
+      
+      $elemLabel = new Form_Element_Text('name', $this->tr('popisek'));
+      $elemLabel->setLangs();
+      $elemLabel->setMultiple();
+      $formEdit->addElement($elemLabel);
+      
+      $elemSave = new Form_Element_Submit('save', $this->tr('Uložit'));
+      $elemSave->setMultiple();
+      $formEdit->addElement($elemSave);
+      
+      if($formEdit->isValid()){
+         $names = $formEdit->name->getValues();
+         $deletes = $formEdit->delete->getValues();
+         $isTitles = $formEdit->isTitle->getValues();
+         
+         $order = 1;
+         $modelI = new Shop_Model_Product_Images();
+         foreach ($names as $id => $name) {
+            $imageRec = Shop_Model_Product_Images::getRecord($id);
+            if($deletes[$id] == 1){
+               // model rovnou maže obrázky, čili není nutné zpracovat
+               $modelI->delete($id);
+            } else {
+               $imageRec->{Shop_Model_Product_Images::COLUMN_IS_TITLE} = $isTitles[$id];
+               $imageRec->{Shop_Model_Product_Images::COLUMN_ORDER} = $order;
+               $imageRec->{Shop_Model_Product_Images::COLUMN_NAME} = $name;
                $imageRec->save();
                $order++;
             }
@@ -1139,8 +1262,8 @@ abstract class Shop_Product_Controller extends Controller {
       $product->save();
 
       // duplikace varinat
-      $modelVariants = new Shop_Model_ProductVariants();
-      $variants = $modelVariants->where(Shop_Model_ProductVariants::COLUMN_ID_PRODUCT." = :idp", array('idp' => $origId))->records();
+      $modelVariants = new Shop_Model_Product_Variants();
+      $variants = $modelVariants->where(Shop_Model_Product_Variants::COLUMN_ID_PRODUCT." = :idp", array('idp' => $origId))->records();
 
       $createdCombinations = array(); // pole s ID starých a nových kombinací 'oldid' => 'newid'
       if($variants){
@@ -1148,24 +1271,24 @@ abstract class Shop_Product_Controller extends Controller {
             // duplikace varianty
             $oldVariantId = $variant->getPK();
             $variant->setNew();
-            $variant->{Shop_Model_ProductVariants::COLUMN_ID_PRODUCT} = $product->getPK();
+            $variant->{Shop_Model_Product_Variants::COLUMN_ID_PRODUCT} = $product->getPK();
             $variant->save();
 
             // načtou se propojení s kombinacemi
-            $modelCombVariant = new Shop_Model_ProductCombinationHasVariant();
+            $modelCombVariant = new Shop_Model_Product_CombinationHasVariant();
             $combinationsHasVariants = $modelCombVariant
-               ->where(Shop_Model_ProductCombinationHasVariant::COLUMN_ID_VARIANT." = :idv", array('idv' => $oldVariantId))
+               ->where(Shop_Model_Product_CombinationHasVariant::COLUMN_ID_VARIANT." = :idv", array('idv' => $oldVariantId))
                ->records();
             // projdou se propojení
             foreach ($combinationsHasVariants as $combinationHasVariant) {
                // pokud nová kombinace ještě neexistuje tak se vytvoří
-               $oldComId = $combinationHasVariant->{Shop_Model_ProductCombinationHasVariant::COLUMN_ID_COMBINATION};
+               $oldComId = $combinationHasVariant->{Shop_Model_Product_CombinationHasVariant::COLUMN_ID_COMBINATION};
 
                if(!isset($createdCombinations[$oldComId])){
-                  $modelCombination = new Shop_Model_ProductCombinations();
+                  $modelCombination = new Shop_Model_Product_Combinations();
                   $combination = $modelCombination->record($oldComId);
                   $combination->setNew();
-                  $combination->{Shop_Model_ProductCombinations::COLUMN_ID_PRODUCT} = $product->getPK();
+                  $combination->{Shop_Model_Product_Combinations::COLUMN_ID_PRODUCT} = $product->getPK();
                   $combination->save();
                   // uložíme že kombinace je vytvořena
                   $createdCombinations[$oldComId] = $combination->getPK();
@@ -1173,8 +1296,8 @@ abstract class Shop_Product_Controller extends Controller {
 
                // uložení propojení s novou kombinací
                $combVar = $modelCombVariant->newRecord();
-               $combVar->{Shop_Model_ProductCombinationHasVariant::COLUMN_ID_COMBINATION} = $createdCombinations[$oldComId];
-               $combVar->{Shop_Model_ProductCombinationHasVariant::COLUMN_ID_VARIANT} = $variant->getPK();
+               $combVar->{Shop_Model_Product_CombinationHasVariant::COLUMN_ID_COMBINATION} = $createdCombinations[$oldComId];
+               $combVar->{Shop_Model_Product_CombinationHasVariant::COLUMN_ID_VARIANT} = $variant->getPK();
                $combVar->save();
             }
          }

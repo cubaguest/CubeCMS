@@ -50,8 +50,8 @@ echo $this->toolbox;
                             ?>
                         </div>
                         <?php
-                        $qty = $product->{Shop_Model_ProductCombinations::COLUMN_QTY} != null ?
-                                (int) $product->{Shop_Model_ProductCombinations::COLUMN_QTY} : (int) $product->{Shop_Model_Product::COLUMN_QUANTITY};
+                        $qty = $product->{Shop_Model_Product_Combinations::COLUMN_QTY} != null ?
+                                (int) $product->{Shop_Model_Product_Combinations::COLUMN_QTY} : (int) $product->{Shop_Model_Product::COLUMN_QUANTITY};
                         if ($this->formAddToCart instanceof Form && ( ($product->{Shop_Model_Product::COLUMN_STOCK} && $qty > 0) || (!$product->{Shop_Model_Product::COLUMN_STOCK}) || VVE_SHOP_ALLOW_BUY_NOT_IN_STOCK)
                         ) {
                             echo $this->formAddToCart->renderStart();
@@ -67,7 +67,7 @@ echo $this->toolbox;
                             echo $this->formAddToCart->add->controll();
                             echo '</div>';
                             echo $this->formAddToCart->renderEnd();
-                        } else if ($product->{Shop_Model_ProductCombinations::COLUMN_ID} != null) {
+                        } else if ($product->{Shop_Model_Product_Combinations::COLUMN_ID} != null) {
                             echo $this->tr('Zboží v této variantě je vyprodáno. Zkuste vybrat jinout variantu.');
                         } else {
                             echo $this->tr('Zboží je vyprodáno.');

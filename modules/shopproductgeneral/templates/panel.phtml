@@ -36,7 +36,7 @@ foreach ($this->products as $product) {
          </div>
       <?php } ?>
       <div>
-         <?php ps($this->tr('Cena:') . " " . Shop_Tools::getPriceOfProduct($product, $product->{Shop_Model_ProductCombinations::COLUMN_PRICE}, true)) ?>
+         <?php ps($this->tr('Cena:') . " " . Shop_Tools::getPriceOfProduct($product, $product->{Shop_Model_Product_Combinations::COLUMN_PRICE}, true)) ?>
       </div>
       <div class="link-more">
          <a href="<?php echo $link ?>" title="<?php ps($product->{Shop_Model_Product::COLUMN_NAME}) ?>"><?php ps($this->tr('Více')) ?></a>

@@ -40,15 +40,15 @@ class Shop_Cart implements Iterator, ArrayAccess {
             GROUP_CONCAT(t_attr_g.atgroup_name_cs, ': ', t_attr.attribute_name_cs SEPARATOR ', ') AS combination_label,
             COALESCE(product_combination_quantity, quantity) AS product_quantity
           * */
-//         Shop_Model_Product::COLUMN_WEIGHT => 'COALESCE(SUM(t_var.'.Shop_Model_ProductVariants::COLUMN_WEIGHT_ADD.'), 0) + t_pr.'.Shop_Model_Product::COLUMN_WEIGHT,
-//         Shop_Model_Product::COLUMN_PRICE => 'COALESCE(SUM(t_comb.'.Shop_Model_ProductCombinations::COLUMN_PRICE.'), 0) + t_pr.'.Shop_Model_Product::COLUMN_PRICE,
-         Shop_Model_Product::COLUMN_WEIGHT => 'COALESCE(t_var.'.Shop_Model_ProductVariants::COLUMN_WEIGHT_ADD.', 0) + t_pr.'.Shop_Model_Product::COLUMN_WEIGHT,
-         Shop_Model_Product::COLUMN_PRICE => 'COALESCE(t_comb.'.Shop_Model_ProductCombinations::COLUMN_PRICE.', 0) + t_pr.'.Shop_Model_Product::COLUMN_PRICE,
-         Shop_Model_Product::COLUMN_QUANTITY => 'COALESCE(t_comb.'.Shop_Model_ProductCombinations::COLUMN_QTY.', t_pr.'.Shop_Model_Product::COLUMN_QUANTITY.')',
+//         Shop_Model_Product::COLUMN_WEIGHT => 'COALESCE(SUM(t_var.'.Shop_Model_Product_Variants::COLUMN_WEIGHT_ADD.'), 0) + t_pr.'.Shop_Model_Product::COLUMN_WEIGHT,
+//         Shop_Model_Product::COLUMN_PRICE => 'COALESCE(SUM(t_comb.'.Shop_Model_Product_Combinations::COLUMN_PRICE.'), 0) + t_pr.'.Shop_Model_Product::COLUMN_PRICE,
+         Shop_Model_Product::COLUMN_WEIGHT => 'COALESCE(t_var.'.Shop_Model_Product_Variants::COLUMN_WEIGHT_ADD.', 0) + t_pr.'.Shop_Model_Product::COLUMN_WEIGHT,
+         Shop_Model_Product::COLUMN_PRICE => 'COALESCE(t_comb.'.Shop_Model_Product_Combinations::COLUMN_PRICE.', 0) + t_pr.'.Shop_Model_Product::COLUMN_PRICE,
+         Shop_Model_Product::COLUMN_QUANTITY => 'COALESCE(t_comb.'.Shop_Model_Product_Combinations::COLUMN_QTY.', t_pr.'.Shop_Model_Product::COLUMN_QUANTITY.')',
          'combination_label' => 'GROUP_CONCAT(t_attr_g.'.Model_ORM::getLangColumn(Shop_Model_AttributesGroups::COLUMN_NAME)
             .', \': \', t_attr.'.Model_ORM::getLangColumn(Shop_Model_Attributes::COLUMN_NAME).' SEPARATOR \', \')',
          'combination_codes_json' => 'CONCAT(\'{\', GROUP_CONCAT(\'"\', t_attr.'.Shop_Model_Attributes::COLUMN_ID_GROUP.', \'"\', \' : \',
-                                 \'"\', t_var.'.Shop_Model_ProductVariants::COLUMN_CODE_ADD.', \'"\' SEPARATOR \', \'), \'}\')',
+                                 \'"\', t_var.'.Shop_Model_Product_Variants::COLUMN_CODE_ADD.', \'"\' SEPARATOR \', \'), \'}\')',
 
       ))
       ->join(
@@ -76,24 +76,24 @@ class Shop_Cart implements Iterator, ArrayAccess {
       // join kombinací
       ->join(
          array($modelCart->getTableShortName() => Shop_Model_Cart::COLUMN_ID_COMBINATION),
-         array('t_comb' => 'Shop_Model_ProductCombinations'),
-         Shop_Model_ProductCombinations::COLUMN_ID , false
+         array('t_comb' => 'Shop_Model_Product_Combinations'),
+         Shop_Model_Product_Combinations::COLUMN_ID , false
       )
       // propojení kombinace varinaty
       ->join(
-         array('t_comb' => Shop_Model_ProductCombinations::COLUMN_ID),
-         array('t_comb_var' => 'Shop_Model_ProductCombinationHasVariant'),
-         Shop_Model_ProductCombinationHasVariant::COLUMN_ID_COMBINATION  , false
+         array('t_comb' => Shop_Model_Product_Combinations::COLUMN_ID),
+         array('t_comb_var' => 'Shop_Model_Product_CombinationHasVariant'),
+         Shop_Model_Product_CombinationHasVariant::COLUMN_ID_COMBINATION  , false
       )
       // napojneí na varinaty
       ->join(
-         array('t_comb_var' => Shop_Model_ProductCombinationHasVariant::COLUMN_ID_VARIANT),
-         array('t_var' => 'Shop_Model_ProductVariants'),
-         Shop_Model_ProductVariants::COLUMN_ID , false
+         array('t_comb_var' => Shop_Model_Product_CombinationHasVariant::COLUMN_ID_VARIANT),
+         array('t_var' => 'Shop_Model_Product_Variants'),
+         Shop_Model_Product_Variants::COLUMN_ID , false
       )
       // napojneí na atributy
       ->join(
-         array('t_var' => Shop_Model_ProductVariants::COLUMN_ID_ATTR),
+         array('t_var' => Shop_Model_Product_Variants::COLUMN_ID_ATTR),
          array('t_attr' => 'Shop_Model_Attributes'),
          Shop_Model_Attributes::COLUMN_ID , false
       )

@@ -23,19 +23,19 @@ $productWight = number_format($this->product->{Shop_Model_Product::COLUMN_WEIGHT
 if ($this->productCombinations) {
     foreach ($this->productCombinations as $comb) {
         $combJS .= "CubeCMS.Shop.addCombination("
-                . $comb->{Shop_Model_ProductCombinations::COLUMN_ID}
+                . $comb->{Shop_Model_Product_Combinations::COLUMN_ID}
                 . ", [" . $comb->comb_variant_ids . "], "
-                . $comb->{Shop_Model_ProductCombinations::COLUMN_PRICE} . ", " . number_format($comb->weight, 3, '.', '') . ", "
-                . ($comb->comb_codes_json != null ? $comb->comb_codes_json : "''") . ", " . $comb->{Shop_Model_ProductCombinations::COLUMN_QTY} . ");\n";
+                . $comb->{Shop_Model_Product_Combinations::COLUMN_PRICE} . ", " . number_format($comb->weight, 3, '.', '') . ", "
+                . ($comb->comb_codes_json != null ? $comb->comb_codes_json : "''") . ", " . $comb->{Shop_Model_Product_Combinations::COLUMN_QTY} . ");\n";
 
         $diff = false;
         if ($this->selectedVariants != null) {
             $diff = array_diff(explode(',', $comb->comb_variant_ids), $this->selectedVariants);
         }
-        if ((is_array($diff) && empty($diff) ) || ( $this->selectedVariants == null && $comb->{Shop_Model_ProductCombinations::COLUMN_IS_DEFAULT} )) {
-            $productPrice = $productPrice + $comb->{Shop_Model_ProductCombinations::COLUMN_PRICE};
+        if ((is_array($diff) && empty($diff) ) || ( $this->selectedVariants == null && $comb->{Shop_Model_Product_Combinations::COLUMN_IS_DEFAULT} )) {
+            $productPrice = $productPrice + $comb->{Shop_Model_Product_Combinations::COLUMN_PRICE};
             $productCode = Shop_Tools::getProductCode($productCode, json_decode($comb->comb_codes_json));
-            $productQty = $comb->{Shop_Model_ProductCombinations::COLUMN_QTY};
+            $productQty = $comb->{Shop_Model_Product_Combinations::COLUMN_QTY};
             $productWight = $productWight + $comb->weight;
         }
     }
@@ -61,7 +61,7 @@ if ($this->productCombinations) {
                             ?>
                             <a href="<?php echo $this->product->getTitleImage()->getUrl() ?>"
                                rel="prettyPhoto[pr]" title="<?php ps($this->product->{Shop_Model_Product::COLUMN_NAME}) ?>">
-                               <img class="img-responsive image" src="<?php echo $imgSmall ?>" alt="<?php echo $this->product->getTitleImage()->{Shop_Model_ProductImage::COLUMN_NAME} ?>"/>
+                               <img class="img-responsive image" src="<?php echo $imgSmall ?>" alt="<?php echo $this->product->getTitleImage()->{Shop_Model_Product_Images::COLUMN_NAME} ?>"/>
                             </a>
                         </div>
                         
@@ -71,9 +71,9 @@ if ($this->productCombinations) {
                     foreach ($images as $img) {
                        $smallSrc = Utils_Image::cache($img->getUrl(), 80, 80, true);
                        ?>
-                        <a href="<?php echo $img->getUrl() ?>" title="<?php ps($img->{Shop_Model_ProductImage::COLUMN_NAME}) ?>"
+                        <a href="<?php echo $img->getUrl() ?>" title="<?php ps($img->{Shop_Model_Product_Images::COLUMN_NAME}) ?>"
                            rel="prettyPhoto[pr]"
-                           ><img src="<?php echo $smallSrc ?>" alt="<?php ps($img->{Shop_Model_ProductImage::COLUMN_NAME}) ?>" /></a>
+                           ><img src="<?php echo $smallSrc ?>" alt="<?php ps($img->{Shop_Model_Product_Images::COLUMN_NAME}) ?>" /></a>
                        <?php
                     }
                     ?>
@@ -175,7 +175,7 @@ if ($this->productCombinations) {
     CubeCMS.Shop.currency = '<?php echo Shop_Tools::getCurrency() ?>';
     CubeCMS.Shop.roundDecimals = <?php echo (int) VVE_SHOP_PRICE_ROUND_DECIMAL ?>;
     CubeCMS.Shop.decimals = <?php echo (int) VVE_SHOP_PRICE_DECIMALS ?>;
-    var defaultCombinationId = <?php echo ($this->defaultCombination ? $this->defaultCombination->{Shop_Model_ProductCombinations::COLUMN_ID} : 0 ) ?>;
+    var defaultCombinationId = <?php echo ($this->defaultCombination ? $this->defaultCombination->{Shop_Model_Product_Combinations::COLUMN_ID} : 0 ) ?>;
 
     CubeCMS.Shop.setProduct({
         code: '<?php echo $this->product->{Shop_Model_Product::COLUMN_CODE} ?>',

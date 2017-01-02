@@ -7,10 +7,10 @@ $steps = array(
 );
 ?>
 <div>
-   <ul class="shop-step-list">
+   <div class="row shop-step-list">
    <?php foreach ($steps as $stepNum => $s) {?>
-      <li class="<?php if($stepNum == $step){ echo 'selected';} ?>"><?php echo $s?></li>
+      <div class="<?php if($stepNum == $step){ echo 'selected';} ?> col-sm-4"><?php echo $s?></div>
    <?php }?>
-   </ul>
-   <hr class="reseter" />
+   </div>
 </div>
+           

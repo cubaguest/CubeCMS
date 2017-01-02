@@ -400,7 +400,7 @@ class ShopCart_Controller extends Controller {
              */
 
             $mProducts = new Shop_Model_Product();
-            $mProductsComb = new Shop_Model_ProductCombinations();
+            $mProductsComb = new Shop_Model_Product_Combinations();
 //            Model_ORM::lockModels(array($mProducts, Model_ORM::LOCK_WRITE), array($mProductsComb, Model_ORM::LOCK_READ));
             // kontrola dosupnosti zboží pokud není povolen nákup zboží které není skladem
             if(!VVE_SHOP_ALLOW_BUY_NOT_IN_STOCK){
@@ -409,17 +409,17 @@ class ShopCart_Controller extends Controller {
                      ->columns(array(
                         '*',
                         Shop_Model_Product::COLUMN_QUANTITY =>
-                           'COALESCE('.$mProductsComb->getTableShortName().'.'.Shop_Model_ProductCombinations::COLUMN_QTY
+                           'COALESCE('.$mProductsComb->getTableShortName().'.'.Shop_Model_Product_Combinations::COLUMN_QTY
                               .', '.$mProducts->getTableShortName().'.'.Shop_Model_Product::COLUMN_QUANTITY.')',
                      ))
                      ->join(
-                        Shop_Model_Product::COLUMN_ID, array( $mProductsComb->getTableShortName() => 'Shop_Model_ProductCombinations'),
-                        Shop_Model_ProductCombinations::COLUMN_ID_PRODUCT)
+                        Shop_Model_Product::COLUMN_ID, array( $mProductsComb->getTableShortName() => 'Shop_Model_Product_Combinations'),
+                        Shop_Model_Product_Combinations::COLUMN_ID_PRODUCT)
 
 
                      ->where(    // tady je chyba pokud není kombinace (idc = 0)
                         Shop_Model_Product::COLUMN_ID." = :idp AND "
-                           ."(".Shop_Model_ProductCombinations::COLUMN_ID." = :idc OR ".Shop_Model_ProductCombinations::COLUMN_ID." IS NULL)",
+                           ."(".Shop_Model_Product_Combinations::COLUMN_ID." = :idc OR ".Shop_Model_Product_Combinations::COLUMN_ID." IS NULL)",
                         array('idp' => $item->getProductId(), 'idc' => $item->getCombinationId()))
                      ->record();
                   $mProducts->reset();// reset variables ob product
@@ -458,7 +458,7 @@ class ShopCart_Controller extends Controller {
             $order = $this->createOrder($formOrder, $cart, $customer);
             $orderID = $order->getPK();
 
-            $mCombination = new Shop_Model_ProductCombinations();
+            $mCombination = new Shop_Model_Product_Combinations();
 //            $mCombination->lock(Model_ORM::LOCK_WRITE);
             Model_ORM::lockModels(array($mProducts, Model_ORM::LOCK_WRITE), array($mCombination, Model_ORM::LOCK_WRITE));
             // samotný update zboží a zařazování položek do objednávky
@@ -474,10 +474,10 @@ class ShopCart_Controller extends Controller {
                      )));
                } else {
                   // update product
-                  $mCombination->where(Shop_Model_ProductCombinations::COLUMN_ID." = :idc", array('idc' => $item->getCombinationId()))
+                  $mCombination->where(Shop_Model_Product_Combinations::COLUMN_ID." = :idc", array('idc' => $item->getCombinationId()))
                      ->update(
-                     array( Shop_Model_ProductCombinations::COLUMN_QTY => array(
-                        'stmt' => Shop_Model_ProductCombinations::COLUMN_QTY." - :qty",
+                     array( Shop_Model_Product_Combinations::COLUMN_QTY => array(
+                        'stmt' => Shop_Model_Product_Combinations::COLUMN_QTY." - :qty",
                         'values' => array('qty' => (int)$item->getQty())
                      )));
                }

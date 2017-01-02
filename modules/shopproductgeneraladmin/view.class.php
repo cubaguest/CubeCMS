@@ -25,6 +25,11 @@ class ShopProductGeneralAdmin_View extends Shop_Product_View {
               $this->tr('Upravit obrázky produktu'));
       $toolEditImg->setIcon(Template_Toolbox2::ICON_IMAGE_WRENCH);
       $toolbox->addTool($toolEditImg);
+      
+      $toolEditParams = new Template_Toolbox2_Tool_Redirect('editParams', 
+              $this->tr('Upravit parametry produktu'));
+      $toolEditParams->setIcon(Template_Toolbox2::ICON_COG);
+      $toolbox->addTool($toolEditParams);
 
       $toolCopy = new Template_Toolbox2_Tool_Redirect('duplicate', 
               $this->tr('Duplikovat produkt'));
@@ -42,6 +47,7 @@ class ShopProductGeneralAdmin_View extends Shop_Product_View {
          $toolbox->editProduct->setAction($this->link()->clear()->route('edit', array('urlkey' => (string)$p->getUrlKey())));
          $toolbox->editVariant->setAction($this->link()->clear()->route('editVariants', array('urlkey' => (string)$p->getUrlKey())));
          $toolbox->editImages->setAction($this->link()->clear()->route('editImages', array('urlkey' => (string)$p->getUrlKey())));
+         $toolbox->editParams->setAction($this->link()->clear()->route('editParams', array('urlkey' => (string)$p->getUrlKey())));
          $toolbox->duplicate->setAction($this->link()->clear()->param('duplicate', $p->getPK()));
          $toolbox->delete->setAction($this->link()->clear()->param('id', $p->getPK())->param('action', 'delete'));
          $toolbox->delete->setConfirmMeassage(sprintf($this->tr('Smazat produkt %s ?'), $p->{Shop_Model_Product::COLUMN_NAME}));
@@ -116,13 +122,30 @@ class ShopProductGeneralAdmin_View extends Shop_Product_View {
    {
       $this->editProductVariants();
       Template_Module::setEdit(true);
-      Template_Navigation::addItem($this->product->{Shop_Model_Product::COLUMN_NAME}, $this->link()->route('detail'));
+      Template_Navigation::addItem($this->product->{Shop_Model_Product::COLUMN_NAME}, $this->link()->route('edit'));
       Template_Navigation::addItem($this->tr('Úprava variant'), $this->link());
 
       $this->moduleActionButtons = array(
          array(
             'link' => $this->link()->route(),
             'title' => $this->tr('Zavřít úpravu variant a přejít zpět na seznam produktů'),
+            'icon' => 'chevron-left',
+            'name' => $this->tr('Zpět na seznam'),
+         ),
+      );
+   }
+   
+   public function editParamsView() 
+   {
+      $this->editProductParams();
+      Template_Module::setEdit(true);
+      Template_Navigation::addItem($this->product->{Shop_Model_Product::COLUMN_NAME}, $this->link()->route('detail'));
+      Template_Navigation::addItem($this->tr('Úprava parametrů'), $this->link());
+
+      $this->moduleActionButtons = array(
+         array(
+            'link' => $this->link()->route(),
+            'title' => $this->tr('Zavřít úpravu parametrů a přejít zpět na seznam produktů'),
             'icon' => 'chevron-left',
             'name' => $this->tr('Zpět na seznam'),
          ),

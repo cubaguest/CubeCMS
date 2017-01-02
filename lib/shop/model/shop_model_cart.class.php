@@ -32,7 +32,7 @@ class Shop_Model_Cart extends Model_ORM {
       $this->setPk(self::COLUMN_ID);
       
       $this->addForeignKey(self::COLUMN_ID_PRODUCT, 'Shop_Model_Product', Shop_Model_Product::COLUMN_ID);
-      $this->addForeignKey(self::COLUMN_ID_COMBINATION, 'Shop_Model_ProductCombinations', Shop_Model_ProductCombinations::COLUMN_ID);
+      $this->addForeignKey(self::COLUMN_ID_COMBINATION, 'Shop_Model_Product_Combinations', Shop_Model_Product_Combinations::COLUMN_ID);
       $this->addForeignKey(self::COLUMN_ID_USER, 'Model_Users');
    }
 

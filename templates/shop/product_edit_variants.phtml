@@ -111,18 +111,18 @@ $this->addPageTitle($h);
                            }
                            ?>
                            <tr id="variant-<?php echo $variant->getPK() ?>"
-                               class="variant cubecms-row <?php if ($variant->{Shop_Model_ProductCombinationHasVariant::COLUMN_ID_COMBINATION} == null) echo ""; ?>">
+                               class="variant cubecms-row <?php if ($variant->{Shop_Model_Product_CombinationHasVariant::COLUMN_ID_COMBINATION} == null) echo ""; ?>">
                               <td></td>
                               <td><?php
                                  ps($variant->{Shop_Model_Attributes::COLUMN_NAME});
-                                 if ($variant->{Shop_Model_ProductCombinationHasVariant::COLUMN_ID_COMBINATION} == null) {
+                                 if ($variant->{Shop_Model_Product_CombinationHasVariant::COLUMN_ID_COMBINATION} == null) {
                                     echo " *";
                                  }
                                  ?></td>
                               <td class="text-center">
                                  <?php
                                  $this->formEditVariants->default->setMultiple($variant->{Shop_Model_Attributes::COLUMN_ID_GROUP});
-                                 $this->formEditVariants->default->setOptions(array($variant->{Shop_Model_ProductVariants::COLUMN_ID}));
+                                 $this->formEditVariants->default->setOptions(array($variant->{Shop_Model_Product_Variants::COLUMN_ID}));
                                  $this->formEditVariants->default->setRenderlabelInControl(false);
                                  echo $this->formEditVariants->default->control();
                                  ?>
@@ -135,8 +135,8 @@ $this->addPageTitle($h);
                                           <div class="input-group">
                                              <?php
                                              $this->formEditVariants->price->html()->addClass('price_without_tax');
-                                             $this->formEditVariants->price->setMultiple($variant->{Shop_Model_ProductVariants::COLUMN_ID});
-                                             $this->formEditVariants->price->setValues($variant->{Shop_Model_ProductVariants::COLUMN_PRICE_ADD});
+                                             $this->formEditVariants->price->setMultiple($variant->{Shop_Model_Product_Variants::COLUMN_ID});
+                                             $this->formEditVariants->price->setValues($variant->{Shop_Model_Product_Variants::COLUMN_PRICE_ADD});
                                              echo $this->formEditVariants->price->control();
                                              ?>
                                              <span class="input-group-addon"><?php echo CUBE_CMS_SHOP_CURRENCY_NAME ?></span>
@@ -150,7 +150,7 @@ $this->addPageTitle($h);
                                              <input type="text" class="product_variants_price_class price_with_tax form-control"
                                                     value="<?php
                                                     echo Shop_Tools::getPrice(
-                                                            $variant->{Shop_Model_ProductVariants::COLUMN_PRICE_ADD}, $this->product->{Shop_Model_Tax::COLUMN_VALUE}, false);
+                                                            $variant->{Shop_Model_Product_Variants::COLUMN_PRICE_ADD}, $this->product->{Shop_Model_Tax::COLUMN_VALUE}, false);
                                                     ?>">
                                              <span class="input-group-addon"><?php echo CUBE_CMS_SHOP_CURRENCY_NAME ?></span>
                                           </div>
@@ -159,22 +159,22 @@ $this->addPageTitle($h);
                                  </table>
                               </td>
                               <td><?php
-                                 $this->formEditVariants->code->setMultiple($variant->{Shop_Model_ProductVariants::COLUMN_ID});
-                                 $this->formEditVariants->code->setValues($variant->{Shop_Model_ProductVariants::COLUMN_CODE_ADD});
+                                 $this->formEditVariants->code->setMultiple($variant->{Shop_Model_Product_Variants::COLUMN_ID});
+                                 $this->formEditVariants->code->setValues($variant->{Shop_Model_Product_Variants::COLUMN_CODE_ADD});
                                  echo $this->formEditVariants->code->control();
                                  ?></td>
                               <td>
                                  <div class="input-group">
                                     <?php
-                                    $this->formEditVariants->weight->setMultiple($variant->{Shop_Model_ProductVariants::COLUMN_ID});
-                                    $this->formEditVariants->weight->setValues($variant->{Shop_Model_ProductVariants::COLUMN_WEIGHT_ADD});
+                                    $this->formEditVariants->weight->setMultiple($variant->{Shop_Model_Product_Variants::COLUMN_ID});
+                                    $this->formEditVariants->weight->setValues($variant->{Shop_Model_Product_Variants::COLUMN_WEIGHT_ADD});
                                     echo $this->formEditVariants->weight->control();
                                     ?> 
                                     <span class="input-group-addon">Kg</span>
                                  </div>
                               </td>
                               <td>
-                                 <a href="<?php echo $this->link()->param('deleteComb', $variant->{Shop_Model_ProductVariants::COLUMN_ID}) ?>"
+                                 <a href="<?php echo $this->link()->param('deleteComb', $variant->{Shop_Model_Product_Variants::COLUMN_ID}) ?>"
                                     class="button-delete-variant" >
                                     <img src="/images/icons/delete.png" alt="del" />
                                  </a>
@@ -333,16 +333,16 @@ $this->addPageTitle($h);
                      foreach ($this->productCombinations as $c) {
                         ?>
                         <tr class="cubecms-row combination-row <?php
-                        if ($c->{Shop_Model_ProductCombinations::COLUMN_IS_DEFAULT}) {
+                        if ($c->{Shop_Model_Product_Combinations::COLUMN_IS_DEFAULT}) {
                            echo ' cubecms-state-highlight';
                         }
-                        if ($c->{Shop_Model_ProductCombinations::COLUMN_QTY} == 0 && $this->product->{Shop_Model_Product::COLUMN_STOCK}) {
+                        if ($c->{Shop_Model_Product_Combinations::COLUMN_QTY} == 0 && $this->product->{Shop_Model_Product::COLUMN_STOCK}) {
                            echo " cubecms-state-error";
                         }
                         ?>">
                            <td class="combination-name">
                               <?php
-                              if ($c->{Shop_Model_ProductCombinations::COLUMN_IS_DEFAULT}) {
+                              if ($c->{Shop_Model_Product_Combinations::COLUMN_IS_DEFAULT}) {
                                  ?><img src="/images/icons/asterisk_yellow.png" alt="default" title="<?php echo $this->tr('Výchozí kombinace') ?>" /> <?php
                               }
                               ps($c->comb_name)
@@ -365,8 +365,8 @@ $this->addPageTitle($h);
                                  
                               <?php
                               $this->formComb->qty->html()->addClass('form-control')->addClass('text-right');
-                              $this->formComb->qty->setMultiple($c->{Shop_Model_ProductCombinations::COLUMN_ID});
-                              $this->formComb->qty->setValues($c->{Shop_Model_ProductCombinations::COLUMN_QTY});
+                              $this->formComb->qty->setMultiple($c->{Shop_Model_Product_Combinations::COLUMN_ID});
+                              $this->formComb->qty->setValues($c->{Shop_Model_Product_Combinations::COLUMN_QTY});
                               echo $this->formComb->qty->control();
                               ?>
                                  <span class="input-group-addon"><?php echo $this->product->{Shop_Model_Product::COLUMN_UNIT}?></span>
@@ -377,13 +377,13 @@ $this->addPageTitle($h);
 //                     ps( ($c->price > 0 ? "+".$c->price : $c->price)." Kč");
 //                     echo "<br />";
                               $this->formComb->price->html()->addClass('form-control form-control-autowidth')->addClass('text-right');
-                              $this->formComb->price->setMultiple($c->{Shop_Model_ProductCombinations::COLUMN_ID});
-                              $this->formComb->price->setValues($c->{Shop_Model_ProductCombinations::COLUMN_PRICE});
+                              $this->formComb->price->setMultiple($c->{Shop_Model_Product_Combinations::COLUMN_ID});
+                              $this->formComb->price->setValues($c->{Shop_Model_Product_Combinations::COLUMN_PRICE});
                               echo $this->formComb->price->control()/* .Shop_Tools::getCurrency() */;
 //                     echo "<br />";
                               ps("+" . Shop_Tools::getFormatedPrice($this->product->{Shop_Model_Product::COLUMN_PRICE}));
 
-                              // ps(Shop_Tools::getPriceOfProduct($this->product, $c->{Shop_Model_ProductCombinations::COLUMN_PRICE}));
+                              // ps(Shop_Tools::getPriceOfProduct($this->product, $c->{Shop_Model_Product_Combinations::COLUMN_PRICE}));
                               ?>
                               = <span class="product-variant-total" data-baseprice="<?php echo $this->product->{Shop_Model_Product::COLUMN_PRICE} ?>"><span></span> <?php echo Shop_Tools::getCurrency() ?></span>
                            </td>

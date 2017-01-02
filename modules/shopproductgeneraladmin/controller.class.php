@@ -63,9 +63,6 @@ class ShopProductGeneralAdmin_Controller extends Shop_Product_Controller {
       }
    }
    
-   /**
-    * Kontroler pro editaci textu
-    */
    public function editImagesController($urlkey) {
       $this->checkWritebleRights();
       $this->editProductImages((string)$urlkey);
@@ -74,6 +71,15 @@ class ShopProductGeneralAdmin_Controller extends Shop_Product_Controller {
       }
    }
 
+   
+   public function editParamsController($urlkey) {
+      $this->checkWritebleRights();
+      $this->editProductParams((string)$urlkey);
+      if($this->view()->product == false OR $this->view()->product == null){
+         return false;
+      }
+   }
+   
    protected function editCompleteCallback(Model_ORM_Record $product)
    {
       $this->infoMsg()->addMessage($this->tr('Zboží bylo uloženo'));
@@ -186,12 +192,12 @@ class ShopProductGeneralAdmin_Controller extends Shop_Product_Controller {
       $model->setSelectAllLangs(false);
       $model
          ->joinFK(Shop_Model_Product::COLUMN_ID_TAX)
-         ->join(Shop_Model_Product::COLUMN_ID, 'Shop_Model_ProductCombinations', Shop_Model_ProductCombinations::COLUMN_ID_PRODUCT,
+         ->join(Shop_Model_Product::COLUMN_ID, 'Shop_Model_Product_Combinations', Shop_Model_Product_Combinations::COLUMN_ID_PRODUCT,
          array(
-            'priceMin' => '(MIN(`'.Shop_Model_ProductCombinations::COLUMN_PRICE.'`) + `'.Shop_Model_Product::COLUMN_PRICE.'`)',
-            'priceMax' => '(MAX(`'.Shop_Model_ProductCombinations::COLUMN_PRICE.'`) + `'.Shop_Model_Product::COLUMN_PRICE.'`)',
-//            'quantity' => 'SUM(`'.Shop_Model_ProductCombinations::COLUMN_QTY.'`) + `'.Shop_Model_Product::COLUMN_QUANTITY.'`',
-            'quantity' => 'SUM(`'.Shop_Model_ProductCombinations::COLUMN_QTY.'`)',
+            'priceMin' => '(MIN(`'.Shop_Model_Product_Combinations::COLUMN_PRICE.'`) + `'.Shop_Model_Product::COLUMN_PRICE.'`)',
+            'priceMax' => '(MAX(`'.Shop_Model_Product_Combinations::COLUMN_PRICE.'`) + `'.Shop_Model_Product::COLUMN_PRICE.'`)',
+//            'quantity' => 'SUM(`'.Shop_Model_Product_Combinations::COLUMN_QTY.'`) + `'.Shop_Model_Product::COLUMN_QUANTITY.'`',
+            'quantity' => 'SUM(`'.Shop_Model_Product_Combinations::COLUMN_QTY.'`)',
          ))
          ->joinFK(Shop_Model_Product::COLUMN_ID_CATEGORY, array(
             Model_Category::COLUMN_NAME, Model_Category::COLUMN_MODULE, Model_Category::COLUMN_URLKEY,
@@ -202,7 +208,7 @@ class ShopProductGeneralAdmin_Controller extends Shop_Product_Controller {
          $model->where( Shop_Model_Product::COLUMN_ID_CATEGORY.' = :idc ', array('idc' => $idCategory) );
       } else {
 //         $model->where(
-//               // .'('.Shop_Model_ProductCombinations::COLUMN_IS_DEFAULT.' = 1 OR '.Shop_Model_ProductCombinations::COLUMN_IS_DEFAULT.' IS NULL )'
+//               // .'('.Shop_Model_Product_Combinations::COLUMN_IS_DEFAULT.' = 1 OR '.Shop_Model_Product_Combinations::COLUMN_IS_DEFAULT.' IS NULL )'
 //               // .'AND '
 //               Shop_Model_Product::COLUMN_URLKEY.' IS NOT NULL ',
 //            array()

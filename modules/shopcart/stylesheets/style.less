@@ -2,7 +2,7 @@
    padding: 5px 10px;
 }
 
-#shop-cart table {
+/*#shop-cart table {
    .column-1 {
       padding-left: 0;
    }
@@ -18,7 +18,7 @@
    .product-price, .column-price { text-align: right; }
 
 
-}
+}*/
 
 #shop-cart {
    .price { font-weight: bold;}
@@ -35,19 +35,19 @@ table .cart-full-price {
    font-weight: bold;
    font-size: 120%;
 }
-
+table.form-table {
+    background-color: inherit !important;
+    border: none !important;
+}
 .shop-step-list {
-   li {
+   div {
       &.selected {
          background-color: #fdf5ce;
          font-weight: bold;
       }
 
-      float: left;
-      width: 33%;
       padding: 5px 0;
       text-align: center;
-      list-style: none;
       margin-bottom: 1em;
    }
    padding: 0; margin: 0;
@@ -70,4 +70,9 @@ input.goto_order_pickupDate_class {
 .column-price {
    white-space: nowrap;
    text-align: right;
+}
+.form-group {
+    .col-sm-10 {
+    margin-bottom: 14px !important;
+    }
 }

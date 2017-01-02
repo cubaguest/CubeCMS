@@ -63,18 +63,18 @@ $this->addPageTitle($h);
             if (!empty($this->productImages)) {
                foreach ($this->productImages as $image) {
                   $this->formEdit->order->setMultiple($image->getPK());
-                  $this->formEdit->order->setValues($image->{Shop_Model_ProductImage::COLUMN_ORDER});
+                  $this->formEdit->order->setValues($image->{Shop_Model_Product_Images::COLUMN_ORDER});
 
                   $this->formEdit->delete->setMultiple($image->getPK());
 
                   $this->formEdit->isTitle->setMultiple($image->getPK());
-                  $this->formEdit->isTitle->setValues($image->{Shop_Model_ProductImage::COLUMN_IS_TITLE});
+                  $this->formEdit->isTitle->setValues($image->{Shop_Model_Product_Images::COLUMN_IS_TITLE});
 
                   $this->formEdit->name->setMultiple($image->getPK());
-                  $this->formEdit->name->setValues($image->{Shop_Model_ProductImage::COLUMN_NAME});
+                  $this->formEdit->name->setValues($image->{Shop_Model_Product_Images::COLUMN_NAME});
                   $this->formEdit->name->html()->addClass('form-control');
                   ?>
-                  <tr class="cubecms-row <?php echo $image->{Shop_Model_ProductImage::COLUMN_IS_TITLE} ? 'cubecms-state-highlight' : '' ?>">
+                  <tr class="cubecms-row <?php echo $image->{Shop_Model_Product_Images::COLUMN_IS_TITLE} ? 'cubecms-state-highlight' : '' ?>">
                      <td class="text-center">
                         <div class="sorting-area">
                            <span class="icon icon-arrows-v"></span><br />
@@ -89,8 +89,8 @@ $this->addPageTitle($h);
                         $src = Utils_Image::cache($image->getUrl(), 100, round(100 / 4 * 3), true);
                         $srcBig = $image->getUrl();
                         ?>
-                        <a href="<?php echo $srcBig ?>" rel="prettyPhoto" title="<?php psa($image->{Shop_Model_ProductImage::COLUMN_NAME}) ?>"><img 
-                              src="<?php echo $src ?>" alt="<?php psa($image->{Shop_Model_ProductImage::COLUMN_NAME}) ?>" /></a>
+                        <a href="<?php echo $srcBig ?>" rel="prettyPhoto" title="<?php psa($image->{Shop_Model_Product_Images::COLUMN_NAME}) ?>"><img 
+                              src="<?php echo $src ?>" alt="<?php psa($image->{Shop_Model_Product_Images::COLUMN_NAME}) ?>" /></a>
                      </td>
                      <td>
                         <div>
@@ -109,7 +109,7 @@ $this->addPageTitle($h);
                      <td>
                         <?php echo $this->formEdit->delete->control(); ?>
                         <?php echo $this->formEdit->isTitle->control(); ?>
-                        <a href="#" class="mark-image-title text-warning <?php echo $image->{Shop_Model_ProductImage::COLUMN_IS_TITLE} ? 'hidden' : '' ?>"><span class="icon icon-star"></span></a>
+                        <a href="#" class="mark-image-title text-warning <?php echo $image->{Shop_Model_Product_Images::COLUMN_IS_TITLE} ? 'hidden' : '' ?>"><span class="icon icon-star"></span></a>
                         <a href="#" class="mark-image-delete text-danger"><span class="icon icon-remove"></span></a>
                      </td>
                   </tr>

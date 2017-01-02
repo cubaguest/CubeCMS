@@ -8,7 +8,7 @@ if(!empty($this->groups)){
        >
 
       <span class="move ui-icon ui-icon-arrowthick-2-n-s"></span>
-      <a href="<?php echo $this->link()->route('variantsList', array('idg' => $group->getPK()))?>"
+      <a href="<?php echo $this->link()->clear()->route('variantsList', array('idg' => $group->getPK()))?>"
          onclick="ShopVariants.selectGroup(this); return false;"
          class="name"><?php ps_lang($group->{Shop_Model_AttributesGroups::COLUMN_NAME})?></a>
             <span class="controls">

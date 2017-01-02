@@ -1,21 +1,26 @@
 <?php
 /**
  * Třída pro obsluhu akcí a kontrolerů modulu
+ *
  */
 
-class ShopProductNew_Controller extends Shop_Product_Controller {
-   /**
- * Kontroler pro zobrazení textu
- */
-   public function mainController() {
-      //		Kontrola práv
+class ShopProductList_Controller extends Shop_Product_Controller {
+
+   public function init()
+   {
+       parent::init();
+   }
+
+   public function mainController()
+   {
+         //		Kontrola práv
       $this->checkReadableRights();
       $this->loadProducts(
          $this->getRequestParam('num', $this->category()->getParam('scroll', 20)),
          $this->getRequestParam('sort'));
       $this->createAddToCartForm();
    }
-
+   
    protected function loadProducts($productsOnPage = 0, $sort = 'p', $idCategory = 0, $joinCategory = false)
    {
       $model = new Shop_Model_Product();
@@ -24,15 +29,15 @@ class ShopProductNew_Controller extends Shop_Product_Controller {
          ->joinFK(Shop_Model_Product::COLUMN_ID_TAX)
          ->join(Shop_Model_Product::COLUMN_ID, 'Shop_Model_Product_Combinations', Shop_Model_Product_Combinations::COLUMN_ID_PRODUCT);
 
-//      if($joinCategory){
-         $model->joinFK(Shop_Model_Product::COLUMN_ID_CATEGORY);
-//      }
+      $struct = Category_Structure::getStructure(Category_Structure::ALL)->getCategory($this->category()->getId());
+      $cats = $this->catsToArrayForForm($struct);
+      
 
+      $model->joinFK(Shop_Model_Product::COLUMN_ID_CATEGORY);
       $model->where( ($this->category()->getRights()->isWritable() ? null : Shop_Model_Product::COLUMN_ACTIVE.' = 1 AND ')
             .'('.Shop_Model_Product_Combinations::COLUMN_IS_DEFAULT.' = 1 OR '.Shop_Model_Product_Combinations::COLUMN_IS_DEFAULT.' IS NULL )'
-            .'AND '.Shop_Model_Product::COLUMN_URLKEY.' IS NOT NULL '
-            .'AND '.Shop_Model_Product::COLUMN_IS_NEW_TO_DATE.' >= CURDATE() ',
-         array()
+            .'AND '.Shop_Model_Product::COLUMN_URLKEY.' IS NOT NULL AND '.Shop_Model_Product::COLUMN_ID_CATEGORY.' IN ('.$model->getWhereINPlaceholders($cats).')',
+         $model->getWhereINValues($cats)
       );
 
       // řazení
@@ -56,9 +61,21 @@ class ShopProductNew_Controller extends Shop_Product_Controller {
       $this->view()->products = $model->records();
    }
 
-   /**
-    * Kontroler pro editaci textu
-    */
+   private function catsToArrayForForm($categories)
+   {
+      $ret = array();
+      // pokud je hlavní kategorie
+      if ($categories->getLevel() != 0) {
+         $ret[] = $categories->getCatObj()->getId();
+      } 
+      if (!$categories->isEmpty()) {
+         foreach ($categories as $cat) {
+            $ret = array_merge($ret, $this->catsToArrayForForm($cat));
+         }
+      }
+      return $ret;
+   }
+   
    public function settings(&$settings, Form &$form) {
       $fGrpView = $form->addGroup('view', $this->tr('Nastavení vzhledu'));
 

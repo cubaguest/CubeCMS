@@ -36,7 +36,7 @@ class Shop_Cart_Item
          $this->id = $item->{Shop_Model_Cart::COLUMN_ID};
          $this
             ->setProductId($item->{Shop_Model_Product::COLUMN_ID})
-            ->setCombinationId($item->{Shop_Model_ProductCombinations::COLUMN_ID})
+            ->setCombinationId($item->{Shop_Model_Product_Combinations::COLUMN_ID})
             ->setImage($item->{Shop_Model_Product::COLUMN_IMAGE})
             ->setName($item->{Shop_Model_Product::COLUMN_NAME})
             ->setNote($item->combination_label)
