@@ -9,6 +9,9 @@ class Form_Element_ImageSelector extends Form_Element_File {
    protected $imageSelector;
    protected $images = array();
    
+   protected $imageIsUplaoded = false;
+
+
    public function __construct($name, $label = null, $prefix = null)
    {
       parent::__construct($name, $label, $prefix);
@@ -26,6 +29,9 @@ class Form_Element_ImageSelector extends Form_Element_File {
    {
       parent::populate();
       $this->imageSelector->populate();
+      if($this->getValues()){
+         $this->imageIsUplaoded = true;
+      }
       if(!$this->getValues() && $this->imageSelector->getValues()){
          $finfo = finfo_open(FILEINFO_MIME_TYPE);
          $fileInfo = array (
@@ -37,6 +43,7 @@ class Form_Element_ImageSelector extends Form_Element_File {
             'extension' => pathinfo($this->uploadDir.$this->imageSelector->getValues(), PATHINFO_EXTENSION),
          );
          $this->setFilteredValues($fileInfo);
+         $this->filesMoved = true; // pokud byl již validován
       }
    }
    
@@ -164,6 +171,11 @@ class Form_Element_ImageSelector extends Form_Element_File {
    public function setImages($images)
    {
       
+   }
+   
+   public function isUploadedImage()
+   {
+      return $this->imageIsUplaoded;
    }
    
    public function setValues($values, $key = null)
