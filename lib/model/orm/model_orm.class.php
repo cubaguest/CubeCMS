@@ -287,7 +287,7 @@ abstract class Model_ORM extends Model implements ArrayAccess {
     * Metoda vrací název primárního klíče
     * @return string
     */
-   protected function getPkName()
+   public function getPkName()
    {
       return $this->pKey;
    }
