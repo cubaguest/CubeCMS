@@ -47,10 +47,12 @@ class File_Image extends File {
    private function initImageObj()
    {
       /* může být prázdný ??? */
-      if(VVE_USE_IMAGEMAGICK == true){
-         $this->imageObj = new File_Image_Imagick($this);
-      } else {
-         $this->imageObj = new File_Image_Gd($this);
+      if(is_file($this)){
+         if(VVE_USE_IMAGEMAGICK == true){
+            $this->imageObj = new File_Image_Imagick($this);
+         } else {
+            $this->imageObj = new File_Image_Gd($this);
+         }
       }
    }
 
