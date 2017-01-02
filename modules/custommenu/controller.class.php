@@ -53,20 +53,19 @@ class CustomMenu_Controller extends Controller {
          $model = new CustomMenu_Model_Items();
          $model->delete($id);
          $this->infoMsg()->addMessage($this->tr('Položka byla smazána'));
-         $this->link()->route()->rmParam()->redirect();
+         $this->link()->route()->rmParam()->file()->redirect();
 
       } else if($action == "changeState" && $id != null){
          CustomMenu_Model_Items::changeState($id);
          $this->infoMsg()->addMessage($this->tr('Položka byla smazána'));
-         $this->link()->route()->rmParam()->redirect();
+         $this->link()->route()->rmParam()->file()->redirect();
 
       } else if($action == "changepos" && $id != null
          && ($pos = $this->getRequestParam('pos')) != null){
          CustomMenu_Model_Items::setRecordPosition($id, $pos);
          $this->infoMsg()->addMessage($this->tr('Položka byla přesunuta'));
-         $this->link()->route()->rmParam()->redirect();
+         $this->link()->route()->rmParam()->file()->redirect();
       }
-
    }
 
    protected function createFormMenuItem($item = null)
