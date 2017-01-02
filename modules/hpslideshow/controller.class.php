@@ -113,6 +113,7 @@ class HPSlideShow_Controller extends Controller {
             $image->getData()
                ->resize($dimensions['width'], $dimensions['height'], File_Image_Base::RESIZE_CROP)
                ->save();
+            $img->{HPSlideShow_Model::COLUMN_FILE} = $image->getName();
          }
          
          $img->save();
