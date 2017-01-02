@@ -400,4 +400,40 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
       }
       return $arr;
    }
+   
+   /**
+    * Vytvoří záznam z dat do jiného modelu. 
+    * Můsí být vybrány všechny sloupce z původního modelu, jinak neprojde
+    * @param string|Model_ORM $ormmodel
+    */
+   public function createModelRecordObject($ormmodel, $emptyRecord = false)
+   {
+      
+      if(is_string($ormmodel)){
+         $ormmodel = new $ormmodel();
+      }
+      
+      if($this->{$ormmodel->getPkName()} == null && $emptyRecord == false){
+         return false;
+      }
+      
+      $allColumsloaded = true;
+      
+      foreach ($ormmodel->getColumns() as $name => $params) {
+         if(!isset($this->{$name})){
+            $allColumsloaded = false;
+         }
+      }
+      
+      if($allColumsloaded){
+         $rec = $ormmodel->newRecord();
+         
+         foreach ($ormmodel->getColumns() as $name => $params) {
+            $rec->{$name} = $this->{$name};
+         }
+         $rec->setNew(false);
+         return $rec;
+      }
+      return $emptyRecord ? $ormmodel->newRecord() : false;
+   }
 }
