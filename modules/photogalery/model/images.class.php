@@ -266,7 +266,10 @@ class PhotoGalery_Model_Images extends Model_ORM_Ordered {
    }
 }
 
-
-//class PhotoGalery_Model_Images_Record extends Model_ORM_Ordered_Record {
-//   
-//}
+class PhotoGalery_Model_Images_Record extends Model_ORM_Ordered_Record {
+   public function getUrl(Module $module, $galleryPath = null, $dir = Photogalery_Controller::DIR_ORIGINAL)
+   {
+      return $module->getDataDir(true) . ($galleryPath ? $galleryPath.'/' : '') 
+         . $dir . URL_SEPARATOR . $this->{PhotoGalery_Model_Images::COLUMN_FILE};
+   }
+}
