@@ -355,6 +355,30 @@ class Articles_Model extends Model_ORM {
       $cache->set($cacheKey, $artsYears);
       return $artsYears;
    }
+
+   /**
+    * metoda vrací články z dané kateogrie
+    * @param int $idCategory
+    * @param int $limit
+    * @return Articles_Model_Record[]
+    */
+   public static function getArticles($idCategory, $limit = 10)
+   {
+      $model = new Articles_Model();
+      return $model->where(self::COLUMN_ID_CATEGORY." = :idc "
+          ." AND ".self::COLUMN_CONCEPT." = 0 "
+          ." AND ".Articles_Model::COLUMN_URLKEY." IS NOT NULL "
+          ." AND ".self::COLUMN_ADD_TIME.' < NOW()',
+          array('idc' => $idCategory))
+          ->joinFK(self::COLUMN_ID_CATEGORY)
+          ->joinFK(Articles_Model::COLUMN_ID_USER, array(
+            Model_Users::COLUMN_USERNAME, 'usernameName' => Model_Users::COLUMN_NAME, 'usernameSurName' => Model_Users::COLUMN_SURNAME))
+          ->limit(0, $limit)
+          ->order(array(
+                  Articles_Model::COLUMN_PRIORITY => Model_ORM::ORDER_DESC,
+                  Articles_Model::COLUMN_ADD_TIME => Model_ORM::ORDER_DESC))
+          ->records();
+   }
 }
 
 
