@@ -1,7 +1,7 @@
 <?php 
 $jQuery = new JsPlugin_JQuery();
 $jQuery->addUICore();
-$jQuery->addUIDialog();
+//$jQuery->addUIDialog();
 $jQuery->addUISortable();
 $this->addJsPlugin($jQuery);
 $this->addFile('css://style.less');
@@ -13,31 +13,41 @@ $buttonCancelEdit = '<button name="cancel" class="button-cancel" onclick="clearF
 <div class="main-content-admin-form">
    <div class="row">
       <div class="col-md-6">
-         <div id="variants-groups">
-            <h2 class="ui-widget ui-widget-header"><?php echo $this->tr('Skupiny')?></h2>
-
-            <ul id="variants-groups-list" class="ui-widget ui-widget-content"></ul>
-            <div id="groups-control" class="ui-widget ui-widget-header ui-cube-widget">
-               <button onclick="ShopVariants.addGroup()"><?php ps($this->tr('Přidat'))?></button>
-               <button onclick="ShopVariants.loadGroups()"><?php ps($this->tr('Obnovit'))?></button>
+         <div id="variants-groups" class="cubecms-widget cubecms-widget-sorting">
+            <div class="cubecms-header"><?php echo $this->tr('Skupiny')?></div>
+            <div class="cubecms-content">
+               <ul id="variants-groups-list" class="cubecms-widget cubecms-list"></ul>
+               <div id="groups-control" class="cubecms-footer">
+                  <button onclick="ShopVariants.addGroup()" class="btn btn-success"><span class="icon icon-plus"></span> <?php ps($this->tr('Přidat'))?></button>
+                  <button onclick="ShopVariants.loadGroups()" class="btn btn-primary"><span class="icon icon-refresh"></span> <?php ps($this->tr('Obnovit'))?></button>
+               </div>
             </div>
-            <div id="dialog-variant-group-edit">
-               <?php echo $this->formEditGroup;?>
-            </div>
+            <?php
+            $this->includeFile('tpl://engine:components/modal.phtml', array('content' => (string)$this->formEditGroup, 'id' => 'dialog-variant-group-edit',
+                'header' => $this->tr('Přidání skupiny atributů'),
+                'close' => true,
+                'large' => true,
+                'footer' => '<button class="btn btn-default close-modal">Zavřít</button>'));
+            ?>
          </div>
       </div>
       <div class="col-md-6">
-         <div id="variants-values">
-            <h2 class="ui-widget ui-widget-header"><?php ps($this->tr('Atributy'));?> <span id="group-name"></span></h2>
-
-            <ul id="variants-values-list" class="ui-widget ui-widget-content"></ul>
-
-            <div id="values-control" class="ui-widget ui-widget-header ui-cube-widget">
-               <button id="button-add-variant" onclick="ShopVariants.addVariant()"><?php ps($this->tr('Přidat'))?></button>
+         <div id="variants-values" class="cubecms-widget cubecms-widget-sorting">
+            <div class="cubecms-header"><?php ps($this->tr('Atributy'));?> <span id="group-name"></span></div>
+            <div class="cubecms-content">
+               <ul id="variants-values-list" class="cubecms-widget cubecms-list"></ul>
+               <div id="values-control" class="cubecms-footer">
+                  <button id="button-add-variant"  class="btn btn-success" onclick="ShopVariants.addVariant()"
+                          ><span class="icon icon-plus"></span> <?php ps($this->tr('Přidat'))?></button>
+               </div>
             </div>
-            <div id="dialog-variant-edit">
-               <?php echo $this->formEditVariant;?>
-            </div>
+            <?php
+            $this->includeFile('tpl://engine:components/modal.phtml', array('content' => (string)$this->formEditVariant, 'id' => 'dialog-variant-edit',
+                'header' => $this->tr('Přidání parametru'),
+                'close' => true,
+                'large' => true,
+                'footer' => '<button class="btn btn-default close-modal">Zavřít</button>'));
+            ?>
          </div>
       </div>
    </div>
@@ -57,7 +67,18 @@ $buttonCancelEdit = '<button name="cancel" class="button-cancel" onclick="clearF
             urlGroups : '<?php echo $this->link()->clear()->route('groupsList')?>',
             urlEditGroup : '<?php echo $this->link()->clear()->route('editGroup')?>',
             urlVariants : '<?php echo $this->link()->clear()->route('variantsList')?>',
-            urlEditVariant : '<?php echo $this->link()->clear()->route('editVariant')?>'
+            urlEditVariant : '<?php echo $this->link()->clear()->route('editVariant')?>',
+            strings : {
+               dlgEditGroupTitle : '<?php echo $this->tr('Úprava skupiny')?>',
+               dlgAddGroupTitle : '<?php echo $this->tr('Přidání skupiny')?>',
+               dlgEditAttrTitle : '<?php echo $this->tr('Úprava parametru')?>',
+               dlgAddAttrTitle : '<?php echo $this->tr('Přidání parametru')?>',
+               infoSetName : 'Musí být zadán název',
+               confirmDeleteVariant : 'Smazat tento atribut?',
+               confirmDeleteGroup : 'Smazat tuto skupinu?',
+               emptyValues : 'Žádná hodnota není vytvořena',
+               saved : 'uloženo'
+            }
          }, {
             $dialogGroup : $('#dialog-variant-group-edit'),
             $dialogVariant : $('#dialog-variant-edit'),

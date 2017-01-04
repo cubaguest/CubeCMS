@@ -13,7 +13,9 @@ ShopVariants = {
       $formEditParam : null,
       $formEditValue : null,
       strings : {
+         dlgAddGroupTitle : 'Přidání skupiny',
          dlgEditGroupTitle : 'Úprava skupiny',
+         dlgAddAttrTitle : 'Přidání parametru',
          dlgEditAttrTitle : 'Úprava parametru',
          infoSetName : 'Musí být zadán název',
          confirmDeleteVariant : 'Smazat tento atribut?',
@@ -50,22 +52,9 @@ ShopVariants = {
    /* BASE INIT */
    initDialogs : function(){
       var _this = this;
-      this.$dialogGroup.dialog({
-         autoOpen: false, height: 170, width: 600, modal: true, resizable: false,
-         title : _this.opts.strings.dlgEditGroupTitle,
-         close: function() {
-            // clear form
-            _this.clearFormEditGroup();
-         }
-      });
-      this.$dialogVariant.dialog({
-         autoOpen: false, height: 170, width: 600, modal: true, resizable: false,
-         title : _this.opts.strings.dlgEditAttrTitle,
-         close: function() {
-            // clear form
-            _this.clearFormEditVariant();
-         }
-      });
+      _this.clearFormEditGroup();
+      this.$dialogGroup = $('#dialog-variant-group-edit');
+      this.$dialogVariant = $('#dialog-variant-edit');
    },
    /* INIT EVENTS */
    initEvents : function(){
@@ -73,10 +62,10 @@ ShopVariants = {
       // potvrzení formuláře
       this.$formEditGroup.submit(function(){
          // check form
-         if($('input[name="group_edit_name"]').val() == ""){
-            alert(_this.opts.strings.infoSetName);
-            return false;
-         }
+//         if($('input[name="group_edit_name"]').val() == ""){
+//            alert(_this.opts.strings.infoSetName);
+//            return false;
+//         }
          $.ajax({
             type : 'POST', url : _this.opts.urlEditGroup,
             data : $(this).serialize(),
@@ -90,7 +79,7 @@ ShopVariants = {
                         $('li#attrgroup-'+_this.selectedGroupId+' a.name', _this.$listGroups).click();
                      }
                   });
-                  _this.$dialogGroup.dialog('close');
+                  _this.$dialogGroup.hide();
                }
             }
          });
@@ -98,17 +87,17 @@ ShopVariants = {
       });
       this.$formEditVariant.submit(function(){
          // check form
-         if($('input[name="variant_edit_name"]').val() == ""){
-            alert(_this.opts.strings.infoSetName);
-            return false;
-         }
+//         if($('input[name="variant_edit_name"]').val() == ""){
+//            alert(_this.opts.strings.infoSetName);
+//            return false;
+//         }
          $.ajax({
             type : 'POST', url : _this.opts.urlEditVariant,
             data : $(this).serialize(),
             success : function(data){
                if(data.errmsg.length == 0){
                   _this.loadVariants( _this.$listVariants.data('loadedUrl') );
-                  _this.$dialogVariant.dialog('close');
+                  _this.$dialogVariant.hide();
                }
             }
          });
@@ -118,8 +107,8 @@ ShopVariants = {
    },
    // výběr
    selectGroup : function(linkObj){
-      $('li', this.$listGroups).removeClass('ui-state-highlight');
-      var $row = $(linkObj).closest('li').addClass('ui-state-highlight');
+      $('li', this.$listGroups).removeClass('cubecms-state-highlight');
+      var $row = $(linkObj).closest('li').addClass('cubecms-state-highlight');
       var data = this.getGroupData($row);
       this.selectedParamId = data.id;
 
@@ -127,7 +116,6 @@ ShopVariants = {
          .val(data.id);
 
       this.$groupNameBox.text($(linkObj).text());
-//      this.$buttonAddVariant.hide();
       this.$buttonAddVariant.show();
       // load values
       this.loadVariants(linkObj.href);
@@ -137,10 +125,14 @@ ShopVariants = {
    // přidávání
    addGroup : function(){
       this.selectedGroupId = -1;
-      this.$dialogGroup.dialog('open');
+      this.clearFormEditGroup();
+      this.$dialogGroup.show();
+      this.$dialogGroup.find('.cubecms-modal-title').text(this.opts.strings.dlgAddGroupTitle);
    },
    addVariant : function(){
-      this.$dialogVariant.dialog('open');
+      this.clearFormEditVariant();
+      this.$dialogVariant.show();
+      this.$dialogVariant.find('.cubecms-modal-title').text(this.opts.strings.dlgAddAttrTitle);
    },
    // úpravy
    editGroup : function(id){
@@ -149,19 +141,27 @@ ShopVariants = {
 
       // assign to form
       $('input[name="group_edit_id"]', this.$formEditGroup).val(id);
-      $('input[name="group_edit_name"]', this.$formEditGroup).val(data.name);
+      $.each(data.name, function(lang, value){
+         $('input[name="group_edit_name['+lang+']"]', this.$formEditGroup).val(value);
+      });
       this.selectedGroupId = data.id;
+      $('#attrgroup-'+data.id).find('a.cubecms-name').click();
       // show dialog
-      this.$dialogGroup.dialog('open');
+      this.$dialogGroup.show();
+      this.$dialogGroup.find('.cubecms-modal-title').text(this.opts.strings.dlgEditGroupTitle);
    },
    editVariant : function(id){
       var $row = $('#attr-'+id);
       var data = this.getVariantData($row);
       // assign to form
       $('input[name="variant_edit_id"]', this.$formEditVariant).val(id);
-      $('input[name="variant_edit_name"]', this.$formEditVariant).val(data.name)
+      $.each(data.name, function(lang, value){
+         $('input[name="variant_edit_name['+lang+']"]', this.$formEditVariant).val(value);
+      });
+      $('input[name="variant_edit_code"]', this.$formEditVariant).val(data.code);
       // show dialog
-      this.$dialogVariant.dialog('open');
+      this.$dialogVariant.show();
+      this.$dialogVariant.find('.cubecms-modal-title').text(this.opts.strings.dlgEditAttrTitle);
    },
    // mazani
    deleteGroup : function(id){
@@ -202,16 +202,19 @@ ShopVariants = {
       return { id : $row.data('id'), name : $row.data('name') };
    },
    getVariantData : function($row){
-      return { id : $row.data('id'), name : $row.data('name') };
+      return { id : $row.data('id'), name : $row.data('name'), code : $row.data('code') };
    },
    // nahraje seznam parametrů
    loadGroups : function(callback){
       var _this = this;
+      this.clearVariants();
       $(this.$listGroups).load(this.opts.urlGroups, function(){
          // init sorting
          $(_this.$listGroups).sortable({
-            handle: ".move",
-            axis: "y",
+            handle: ".sort-area",
+            placeholder: "cubecms-list-row cubecms-state-highlight",
+            forceHelperSize: true, 
+            forcePlaceholderSize: true,
             update: function( event, ui ) {
                $.ajax({
                   type : 'POST', url : _this.opts.urlEditGroup,
@@ -247,8 +250,10 @@ ShopVariants = {
          .load(link, function(){
             // init sorting
             $(_this.$listVariants).sortable({
-               handle: ".move",
-               axis: "y",
+               handle: ".sort-area",
+               placeholder: "cubecms-list-row cubecms-state-highlight",
+               forceHelperSize: true, 
+               forcePlaceholderSize: true,
                update: function( event, ui ) {
                   $.ajax({
                      type : 'POST', url : _this.opts.urlEditVariant,
@@ -268,15 +273,17 @@ ShopVariants = {
    // podpůrné
    clearFormEditGroup : function(){
       $('input[name="group_edit_id"]', this.$formEditGroup).val("");
-      $('input[name="group_edit_name"]', this.$formEditGroup).val("");
+      $('input.group_edit_name_class', this.$formEditGroup).val("");
    },
    clearFormEditVariant : function(){
       $('input[name="variant_edit_id"]', this.$formEditVariant).val("");
-      $('input[name="variant_edit_name"]', this.$formEditVariant).val("");
+      $('input[name="variant_edit_code"]', this.$formEditVariant).val("");
+      $('input.variant_edit_name_class', this.$formEditVariant).val("");
    },
    clearVariants : function(){
       this.$listVariants
          .data('loadedUrl', null)
-         .html('<li class="ui-widget-content">'+this.opts.strings.emptyValues+'</li>')
+         .html('<li class="ui-widget-content">'+this.opts.strings.emptyValues+'</li>');
+      this.$buttonAddVariant.hide();
    }
-}
+};

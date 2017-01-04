@@ -2,19 +2,32 @@
 if(!empty($this->variants)){
    foreach( $this->variants as $attr ) {?>
    <li id="attr-<?php echo $attr->{Shop_Model_Attributes::COLUMN_ID}?>"
-       class="ui-state-default clearfix"
+       class="item cubecms-list-row clearfix"
        data-id="<?php echo $attr->getPK()?>"
-       data-name="<?php echo $attr->{Shop_Model_Attributes::COLUMN_NAME}?>">
-      <span class="move ui-icon ui-icon-arrowthick-2-n-s"></span>
-      <span class="name"><?php p_lang($attr->{Shop_Model_Attributes::COLUMN_NAME})?></span>
-            <span class="controls">
-               <a href="<?php echo $this->link()->param('editv', $attr->{Shop_Model_Attributes::COLUMN_ID})?>"
-                  onclick="ShopVariants.editVariant(<?php echo $attr->getPK()?>); return false;"
-                  class="button-edit-value"><img src="/images/icons/pencil.png" /></a>
-               <a href="<?php echo $this->link()->param('deletev', $attr->{Shop_Model_Attributes::COLUMN_ID})?>"
-                  onclick="ShopVariants.deleteVariant(<?php echo $attr->getPK()?>); return false;"
-                  class="button-delete-value"><img src="/images/icons/delete.png" /></a>
-            </span>
+       data-name='<?php echo json_encode($attr->{Shop_Model_Attributes::COLUMN_NAME}->toArray())?>'
+       data-code="<?php echo $attr->{Shop_Model_Attributes::COLUMN_CODE}?>">
+      <div class="cubecms-sort sort-area">
+         <span class="icon icon-arrows"></span>
+      </div>
+      <span class="cubecms-name">
+         <?php 
+         p_lang($attr->{Shop_Model_Attributes::COLUMN_NAME});
+         if($attr->{Shop_Model_Attributes::COLUMN_CODE}){
+            echo ' <em>(';
+            ps($attr->{Shop_Model_Attributes::COLUMN_CODE});
+            echo ')</em>';
+         }
+         ?>
+      </span>
+      
+      <span class="cubecms-tools">
+         <a href="<?php echo $this->link()->param('editv', $attr->{Shop_Model_Attributes::COLUMN_ID})?>"
+            onclick="ShopVariants.editVariant(<?php echo $attr->getPK()?>); return false;"
+            class="button-edit-value"><span class="icon icon-pencil"></span></a>
+         <a href="<?php echo $this->link()->param('deletev', $attr->{Shop_Model_Attributes::COLUMN_ID})?>"
+            onclick="ShopVariants.deleteVariant(<?php echo $attr->getPK()?>); return false;"
+            class="button-delete-value important"><span class="icon icon-remove"></span></a>
+      </span>
    </li>
    <?php }
 } else {?>

@@ -2,26 +2,29 @@
 if(!empty($this->groups)){
    foreach( $this->groups as $group ) {?>
    <li id="attrgroup-<?php echo $group->getPK()?>"
-       class="ui-state-default clearfix"
+       class="item cubecms-list-row clearfix"
        data-id="<?php echo $group->getPK()?>"
-       data-name="<?php echo $group->{Shop_Model_AttributesGroups::COLUMN_NAME}?>"
+       data-name='<?php echo json_encode($group->{Shop_Model_AttributesGroups::COLUMN_NAME}->toArray())?>'
        >
-
-      <span class="move ui-icon ui-icon-arrowthick-2-n-s"></span>
+            <?php 
+            ?>
+      <div class="cubecms-sort sort-area">
+         <span class="icon icon-arrows"></span>
+      </div>
       <a href="<?php echo $this->link()->clear()->route('variantsList', array('idg' => $group->getPK()))?>"
          onclick="ShopVariants.selectGroup(this); return false;"
-         class="name"><?php ps_lang($group->{Shop_Model_AttributesGroups::COLUMN_NAME})?></a>
-            <span class="controls">
-               <a href="<?php echo $this->link()->param('g', $group->{Shop_Model_AttributesGroups::COLUMN_ID})
-                  ->param('editg', $group->{Shop_Model_AttributesGroups::COLUMN_ID})?>"
-                  onclick="ShopVariants.editGroup(<?php echo $group->getPK()?>); return false;"
-                  class="button-edit-group"><img src="/images/icons/pencil.png" /></a>
-               <a href="<?php echo $this->link()->param('deleteg', $group->{Shop_Model_AttributesGroups::COLUMN_ID})?>"
-                  onclick="ShopVariants.deleteGroup(<?php echo $group->getPK()?>); return false;"
-                  class="button-delete-group"><img src="/images/icons/delete.png" /></a>
-            </span>
+         class="cubecms-name"><?php ps_lang($group->{Shop_Model_AttributesGroups::COLUMN_NAME})?></a>
+      <span class="cubecms-tools">
+         <a href="<?php echo $this->link()->param('g', $group->{Shop_Model_AttributesGroups::COLUMN_ID})
+            ->param('editg', $group->{Shop_Model_AttributesGroups::COLUMN_ID})?>"
+            onclick="ShopVariants.editGroup(<?php echo $group->getPK()?>); return false;"
+            class="button-edit-group"><span class="icon icon-pencil"></span></a>
+         <a href="<?php echo $this->link()->param('deleteg', $group->{Shop_Model_AttributesGroups::COLUMN_ID})?>"
+            onclick="ShopVariants.deleteGroup(<?php echo $group->getPK()?>); return false;"
+            class="button-delete-group important"><span class="icon icon-remove"></span></a>
+      </span>
    </li>
    <?php }
 } else {?>
    <li><?php ps($this->tr('Není vytvořen žádný parametr'))?></li>
-<?php }?>
+<?php }
