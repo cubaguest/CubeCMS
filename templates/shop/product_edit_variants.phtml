@@ -51,7 +51,7 @@ $this->addPageTitle($h);
                   if ($element instanceof Form_Element_Text || $element instanceof Form_Element_TextArea) {
                      $element->html()->addClass('form-control');
                   } else if ($element instanceof Form_Element_Submit || $element instanceof Form_Element_Button) {
-                     $element->html()->addClass('btn btn-default');
+                     $element->html()->addClass('btn btn-primary');
                   }
                }
 
@@ -113,12 +113,16 @@ $this->addPageTitle($h);
                            <tr id="variant-<?php echo $variant->getPK() ?>"
                                class="variant cubecms-row <?php if ($variant->{Shop_Model_Product_CombinationHasVariant::COLUMN_ID_COMBINATION} == null) echo ""; ?>">
                               <td></td>
-                              <td><?php
+                              <td>
+                                 <?php
                                  ps($variant->{Shop_Model_Attributes::COLUMN_NAME});
                                  if ($variant->{Shop_Model_Product_CombinationHasVariant::COLUMN_ID_COMBINATION} == null) {
                                     echo " *";
                                  }
-                                 ?></td>
+                                 if($variant->{Shop_Model_Attributes::COLUMN_CODE}){ ?>
+                                       <em>(<?php echo $variant->{Shop_Model_Attributes::COLUMN_CODE}?>)</em>
+                                 <?php } ?>
+                              </td>
                               <td class="text-center">
                                  <?php
                                  $this->formEditVariants->default->setMultiple($variant->{Shop_Model_Attributes::COLUMN_ID_GROUP});
@@ -234,7 +238,7 @@ $this->addPageTitle($h);
                   <div class="col-sm-1">
                      <div class="form-controls">
                         <?php
-                        $this->formProductCode->save->html()->addClass('btn')->addClass('btn-default');
+                        $this->formProductCode->save->html()->addClass('btn')->addClass('btn-primary');
                         echo $this->formProductCode->save;
                         ?>
                      </div>
@@ -270,7 +274,7 @@ $this->addPageTitle($h);
                               ?>
                            </td>
                            <td class="variants-groups-buttons">
-                              <button class="button-add-code btn btn-default" type="button"
+                              <button class="button-add-code btn btn-primary" type="button"
                                       data-codeadd="<?php echo $group->{Shop_Model_Attributes::COLUMN_ID_GROUP} ?>"
                                       ><span class="icon icon-plus"></span> <?php ps($this->tr('přidat do kódu')) ?></button>
                            </td>
@@ -285,6 +289,7 @@ $this->addPageTitle($h);
          <div id="product-combinations" class="tab-pane" role="presentation">
             <?php
             echo $this->formComb->renderStart();
+            $this->formComb->save->html()->addClass('btn')->addClass('btn-primary');
             ?>
             <table id="products-combinations-table" class="full-width combinations-table cubecms-widget cubecms-table">
                <thead class="">
@@ -304,7 +309,7 @@ $this->addPageTitle($h);
                         echo $this->includeFile('tpl://engine:modules/buttons-table-order.phtml');
                         ?>
                      </th>
-                     <th>
+                     <th colspan="3">
                         <?php
                         echo $this->tr('Cena bez dph');
                         $this->orderParam = 'pord';
@@ -314,15 +319,17 @@ $this->addPageTitle($h);
       <!--               <th></th>-->
                   </tr>
                   <tr class="cubecms-row">
-                     <td colspan="5" class="combination-controll">
+                     <td colspan="7" class="combination-controll">
                         <?php echo $this->formComb->save ?>
                      </td>
                   </tr>
                </thead>
                <tfoot>
                   <tr class="cubecms-footer">
-                     <td colspan="5" class="combination-controll">
-                        <?php echo $this->formComb->save ?>
+                     <td colspan="7" class="combination-controll">
+                        <?php 
+                        echo $this->formComb->save;
+                        ?>
                      </td>
                   </tr>
                </tfoot>
@@ -348,10 +355,10 @@ $this->addPageTitle($h);
                               ps($c->comb_name)
                               ?>
                            </td>
-                           <td class="combination-code">
+                           <td class="combination-code text-nowrap">
                               <?php
                               echo Shop_Tools::getProductCode(
-                                      $this->product->{Shop_Model_Product::COLUMN_CODE}, json_decode($c->comb_codes_json)
+                                      $this->product->{Shop_Model_Product::COLUMN_CODE}, json_decode($c->comb_codes_json), $c->comb_attr_codes_json
                               );
                               ?>
                            </td>
@@ -362,7 +369,6 @@ $this->addPageTitle($h);
                            </td>
                            <td class="combination-qty">
                               <div class="input-group">
-                                 
                               <?php
                               $this->formComb->qty->html()->addClass('form-control')->addClass('text-right');
                               $this->formComb->qty->setMultiple($c->{Shop_Model_Product_Combinations::COLUMN_ID});
@@ -374,23 +380,22 @@ $this->addPageTitle($h);
                            </td>
                            <td class="combination-price inline-elements">
                               <?php
-//                     ps( ($c->price > 0 ? "+".$c->price : $c->price)." Kč");
-//                     echo "<br />";
                               $this->formComb->price->html()->addClass('form-control form-control-autowidth')->addClass('text-right');
                               $this->formComb->price->setMultiple($c->{Shop_Model_Product_Combinations::COLUMN_ID});
                               $this->formComb->price->setValues($c->{Shop_Model_Product_Combinations::COLUMN_PRICE});
-                              echo $this->formComb->price->control()/* .Shop_Tools::getCurrency() */;
-//                     echo "<br />";
-                              ps("+" . Shop_Tools::getFormatedPrice($this->product->{Shop_Model_Product::COLUMN_PRICE}));
-
-                              // ps(Shop_Tools::getPriceOfProduct($this->product, $c->{Shop_Model_Product_Combinations::COLUMN_PRICE}));
+                              echo $this->formComb->price->control();
                               ?>
+                           </td>
+                           <td class="text-right text-nowrap">
+                              <?php ps("+" . Shop_Tools::getFormatedPrice($this->product->{Shop_Model_Product::COLUMN_PRICE})); ?>
+                           </td>
+                           <td class="text-right text-nowrap">
                               = <span class="product-variant-total" data-baseprice="<?php echo $this->product->{Shop_Model_Product::COLUMN_PRICE} ?>"><span></span> <?php echo Shop_Tools::getCurrency() ?></span>
                            </td>
                         </tr>
                         <?php if ($row % 10 == 0) { ?>
                            <tr>
-                              <td colspan="5" class="ui-widget-content combination-controll"><?php echo $this->formComb->save ?></td>
+                              <td colspan="7" class="ui-widget-content combination-controll"><?php echo $this->formComb->save ?></td>
                            </tr>
                            <?php
                         }
@@ -399,7 +404,7 @@ $this->addPageTitle($h);
                   } else {
                      ?>
                      <tr class="cubecms-row cubecms-state-disable">
-                        <td colspan="5"><?php echo $this->tr('Žádná kombinace není generována.') ?></td>
+                        <td colspan="7"><?php echo $this->tr('Žádná kombinace není generována.') ?></td>
                      </tr>
                   <?php } ?>
                </tbody>
