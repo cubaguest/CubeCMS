@@ -7,7 +7,7 @@ class Articles_View extends View {
       if($this->selectedTag != null){
          Template_Navigation::addItem( sprintf( $this->tr('štítek: %s'), $this->selectedTag), $this->link());
       }
-      
+      Template_Navigation::addItem($this->category()->getName(), $this->link()->route());
 //      if($this->rights()->isControll() AND $this->text == false){
 //         $this->text = new Object();
 //         $this->text->{Text_Model::COLUMN_TEXT} = $this->tr('Text nebyl definován. Vytvoříte jej pomocí nastrojů editace.');
@@ -36,6 +36,7 @@ class Articles_View extends View {
          $this->createListToolbox();
       }
       $this->createDetailToolbox();
+      Template_Navigation::addItem($this->category()->getName(), $this->link()->route());
       Template_Navigation::addItem($this->article->{Articles_Model::COLUMN_NAME}, $this->link());
    }
    
