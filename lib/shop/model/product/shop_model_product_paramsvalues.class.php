@@ -7,11 +7,11 @@
 class Shop_Model_Product_ParamsValues extends Model_ORM_Ordered {
 
    const DB_TABLE = 'shop_products_params_values';
-   const COLUMN_ID = 'id_product_paramvalue';
+   const COLUMN_ID = 'id_product_param_value';
    const COLUMN_ID_PARAM = 'id_product_param';
    const COLUMN_ID_PRODUCT = 'id_product';
    const COLUMN_VALUE = 'product_param_value';
-   const COLUMN_ORDER = '	product_param_order';
+   const COLUMN_ORDER = 'product_param_order';
 
    protected function _initTable()
    {
@@ -21,7 +21,7 @@ class Shop_Model_Product_ParamsValues extends Model_ORM_Ordered {
       $this->addColumn(self::COLUMN_ID_PRODUCT, array('datatype' => 'int', 'nn' => true, 'index' => array(self::COLUMN_ID_PRODUCT, self::COLUMN_ID_PARAM, self::COLUMN_ORDER)));
       $this->addColumn(self::COLUMN_ID_PARAM, array('datatype' => 'int', 'nn' => true));
 
-      $this->addColumn(self::COLUMN_VALUE, array('datatype' => 'varchar(100)', 'nn' => true, 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_VALUE, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR, 'lang' => true));
       $this->addColumn(self::COLUMN_ORDER, array('datatype' => 'int', 'dafeult' => 0));
 
       $this->setPk(self::COLUMN_ID);
@@ -39,6 +39,9 @@ class Shop_Model_Product_ParamsValues extends Model_ORM_Ordered {
    
    public static function getProductValues($idProduct)
    {
-      
+      $m = new self();
+      return $m->joinFK(self::COLUMN_ID_PARAM)
+              ->where(self::COLUMN_ID_PRODUCT, $idProduct)
+              ->records();
    }
 }

@@ -1,0 +1,135 @@
+<?php
+$jq = new JsPlugin_JQuery();
+$jq->addUISortable();
+$this->addJsPlugin($jq);
+$this->addJsPlugin(new JsPlugin_PrettyPhoto());
+$this->addFile('css://engine:shop/style.less');
+// do titulku
+$h = $this->tr('úprava prametrů produktu') . ' ' . $this->product->{Shop_Model_Product::COLUMN_NAME};
+$this->addPageTitle($h);
+?>
+<h1><?php echo $h; ?></h1>
+<div class="main-content-form-edit" id="produc-params-edit-form">
+   <?php
+   if ($this->moduleActionButtons == null) {
+      $this->moduleButtons = array(
+          array(
+              'link' => $this->linkBack == null ? $this->link()->route('detail') : $this->linkBack,
+              'title' => $this->tr('Zavřít úpravu prametrů a přejít zpět na produkt'),
+              'icon' => 'chevron-left',
+              'name' => $this->tr('Zpět na produkt'),
+          ),
+      );
+   } else {
+      $this->moduleButtons = $this->moduleActionButtons;
+   }
+   $this->includeTpl('modules/buttons.phtml', true);
+   ?>
+   <h2><?php ps($this->tr('Seznam parametrů')) ?></h2>
+   <div id="product-images-list">
+      <?php
+      echo $this->formEdit->renderStart();
+      ?>
+      <table class="cubecms-widget cubecms-table" id="product-params-table">
+         <thead class="cubecms-header">
+            <tr>
+               <th style="width: 30px;"></th>
+               <th style="width: 40px;"><?php ps($this->tr('ID')) ?></th>
+               <th><?php ps($this->tr('Název')) ?></th>
+               <th><?php ps($this->tr('Hodnota')) ?></th>
+               <th style="width: 50px;"></th>
+            </tr>
+         </thead>
+         <tfoot>
+            <tr class="cubecms-row text-right">
+               <td colspan="5">
+                  <button type="button" class="button-add-param btn btn-primary"><span class="icon icon-plus"></span> <?php ps($this->tr('Nový parametr')) ?></button>
+                  <?php
+                  $this->formEdit->save->html()->addClass('btn')->addClass('btn-primary');
+                  if(empty($this->productParams)) {
+                     $this->formEdit->save->html()->addClass('hidden');
+                  }
+                  echo $this->formEdit->save->control();
+                  ?>
+               </td>
+            </tr>
+            <?php
+            $this->includeFile('tpl://engine:shop/product_edit_params_tpl.phtml');
+            ?>
+         </tfoot>
+         <tbody>
+            <?php
+            if (!empty($this->productParams)) {
+               foreach ($this->productParams as $param) {
+                  $this->includeFile('tpl://engine:shop/product_edit_params_tpl.phtml', array('param' => $param));
+               }
+            }
+            ?>
+            <tr class="cubecms-row <?php echo empty($this->productParams) ? '' : 'hidden' ?>" id="product-no-params">
+               <td colspan="5"><?php ps($this->tr('Není přiřazen žádný parametr')) ?></td>
+            </tr>
+         </tbody>
+
+      </table>
+      <?php
+      echo $this->formEdit->renderStart();
+      ?>
+   </div>
+
+   <script type="text/javascript">
+      $(document).ready(function () {
+         var $baseTable = $('#product-params-table tbody');
+         var $baseTPL = $('#param-row-NEW');
+         var lastInsertedID = 1;
+         function replaceId($root, oldId, newId){
+            $('*', $root).each(function(){
+               var $_elem = $(this);
+               $.each(['name', 'class', 'id'], function(index, name){
+                  var attr = $_elem.attr(name);
+                  if (typeof attr !== typeof undefined && attr !== false) {
+                     $_elem.attr(name, attr.toString().replace(oldId, newId));
+                  }
+               });
+            });
+            
+         }
+         
+         // mazání
+         $('.button-add-param').on('click', function (e) {
+            e.preventDefault();
+            var $newRow = $baseTPL.clone(true);
+            $newRow.removeAttr('id');
+            replaceId($newRow, '{NEW}', '{NEW_'+lastInsertedID+'}');
+            lastInsertedID++;
+            // nějakou metodu v cmsku, která přepíše atributy input prvků na požadované ID
+            
+            $('#product-no-params').addClass('hidden').before($newRow);
+            $('.preditparamssave_class').removeClass('hidden');
+         });
+
+         // označení výchozího
+         $('.mark-param-delete').on('click', function (e) {
+            e.preventDefault();
+            $(this).closest('tr').fadeOut(300).find('.preditparamsdelete_class').val(1);
+         });
+
+         // přesun
+
+         $baseTable.sortable({
+            placeholder: "cubecms-list-row cubecms-state-highlight",
+            forceHelperSize: true, forcePlaceholderSize: true,
+            cursor: 'move',
+            "axis": 'y',
+            handle: '.sorting-area',
+            helper: function (e, ui) {
+               ui.children().each(function () {
+                  $(this).width($(this).width());
+               });
+               return ui;
+            }
+         });
+
+
+      });
+   </script>
+</div>
