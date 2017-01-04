@@ -483,18 +483,6 @@ abstract class Shop_Product_Controller extends Controller {
       
       if($form->isValid()){
          // mazání obrázku
-         $imgInfo = $form->image->getValues();
-         if(($form->haveElement('imageDel') && $form->imageDel->getValues() == true)
-            || ($imgInfo != null && $imgInfo['name'] != $product->{Shop_Model_Product::COLUMN_IMAGE}) ){
-            if(is_file(Shop_Tools::getProductImagesDir().'small'.DIRECTORY_SEPARATOR.$product->{Shop_Model_Product::COLUMN_IMAGE})){
-               @unlink(Shop_Tools::getProductImagesDir().'small'.DIRECTORY_SEPARATOR.$product->{Shop_Model_Product::COLUMN_IMAGE});
-            }
-            if(is_file(Shop_Tools::getProductImagesDir().DIRECTORY_SEPARATOR.$product->{Shop_Model_Product::COLUMN_IMAGE})){
-               @unlink(Shop_Tools::getProductImagesDir().DIRECTORY_SEPARATOR.$product->{Shop_Model_Product::COLUMN_IMAGE});
-            }
-            $product->{Shop_Model_Product::COLUMN_IMAGE} = null;
-         }
-         
          // uložení dat
          $product->{Shop_Model_Product::COLUMN_ID_CATEGORY} = $form->cat->getValues();
          
@@ -1064,108 +1052,103 @@ abstract class Shop_Product_Controller extends Controller {
          return;
       }
       
-      $modelParams = new Shop_Model_ProductParams();
-      $productImages = $modelParams->where(Shop_Model_ProductParams::COLUMN_ID_PRODUCT, $product->getPK())->records();
+//      $modelParams = new Shop_Model_ProductParams();
+      $productParams = Shop_Model_Product_ParamsValues::getProductValues($product->getPK());
+      $productAllParams = Shop_Model_Product_Params::getAllRecords();
       
-      // form na přidání obrázku
-      $form = new Form('pradimage_');
       
-      $elemImages = new Form_Element_File('images', $this->tr('Obrázky'));
-      $elemImages->setMultiple(true);
-      $elemImages->addValidation(new Form_Validator_NotEmpty());
-      $elemImages->addValidation(new Form_Validator_FileExtension('jpg'));
-      $form->addElement($elemImages);
-      
-      $eSend = new Form_Element_Submit('send', $this->tr('Nahrát'));
-      $form->addElement($eSend);
-      
-      // uložení
-      if($form->isValid()){
-         
-         $files = $form->images->createFileObject();
-         $basePath = Shop_Tools::getProductImagesDir(false);
-         $productDir = $basePath.$product->getPK().DIRECTORY_SEPARATOR;
-         FS_Dir::checkStatic($productDir);
-         $markTitle = !(bool)count($productImages);
-         
-         foreach ($files as $file) {
-            /* @var $image File */
-            $imageRecord = $modelImages->newRecord();
-            $imageRecord->{Shop_Model_Product_Images::COLUMN_ID_PRODUCT} = $product->getPK();
-            $imageRecord->{Shop_Model_Product_Images::COLUMN_NAME} = $product->{Shop_Model_Product::COLUMN_NAME};
-//            $imageRecord->{Shop_Model_Product_Images::COLUMN_ORDER} = 1;
-            $imageRecord->{Shop_Model_Product_Images::COLUMN_IS_TITLE} = false;
-            $imageRecord->{Shop_Model_Product_Images::COLUMN_TYPE} = $file->getExtension();
-            $imageRecord->save();
-            $file->move($productDir);
-            $file->rename($imageRecord->getPK().'.'.$file->getExtension());
-         }
-         
-         // pokud je to první obrázek u produktu, tak označ jako titulní
-         if($markTitle){
-            $modelImages = new Shop_Model_Product_Images();
-            $modelImages
-               ->where(Shop_Model_Product_Images::COLUMN_ID_PRODUCT.' = :idp AND '.Shop_Model_Product_Images::COLUMN_ORDER.' = 1', array('idp' => $product->getPK()) )
-               ->update(array(Shop_Model_Product_Images::COLUMN_IS_TITLE => true));
-         }
-         
-         $this->infoMsg()->addMessage($this->tr('Obrázky byly nahrány'));
-         $this->link()->reload();
-      }
-      $this->view()->formAdd = $form;
-      
-      $formEdit = new Form('preditimage');
+      $formEdit = new Form('preditparams');
       
       $elemDelete = new Form_Element_Hidden('delete');
       $elemDelete->setMultiple();
       $elemDelete->setValues(0);
       $formEdit->addElement($elemDelete);
       
-      $elemOrder = new Form_Element_Hidden('order');
-      $elemOrder->setMultiple();
-      $elemOrder->setValues(0);
-      $formEdit->addElement($elemOrder);
+      if(!empty($productAllParams)){
+         $elemIdParam = new Form_Element_Select('paramid', $this->tr('Parametr'));
+//         $elemIdParam->setDimensional();
+         $elemIdParam->addOption($this->tr('Vyberte parametr nebo zadejte nový níže'), 0);
+         foreach ($productAllParams as $param) {
+            $elemIdParam->addOption($param->{Shop_Model_Product_Params::COLUMN_NAME}, (int)$param->getPK());
+         }
+         $formEdit->addElement($elemIdParam);
+      }
       
-      $elemIsTitle = new Form_Element_Hidden('isTitle');
-      $elemIsTitle->setMultiple();
-      $elemIsTitle->setValues(0);
-      $formEdit->addElement($elemIsTitle);
+      $elemNewParam = new Form_Element_Text('paramname', $this->tr('Název'));
+      $elemNewParam->setLangs();
+      $elemNewParam->setMultiple();
+      $formEdit->addElement($elemNewParam);
       
-      $elemLabel = new Form_Element_Text('name', $this->tr('popisek'));
-      $elemLabel->setLangs();
-      $elemLabel->setMultiple();
-      $formEdit->addElement($elemLabel);
+      $elemValue = new Form_Element_Text('value', $this->tr('Hodnota'));
+      $elemValue->setLangs();
+      $elemValue->setMultiple();
+      $formEdit->addElement($elemValue);
       
       $elemSave = new Form_Element_Submit('save', $this->tr('Uložit'));
       $elemSave->setMultiple();
       $formEdit->addElement($elemSave);
       
       if($formEdit->isValid()){
-         $names = $formEdit->name->getValues();
          $deletes = $formEdit->delete->getValues();
-         $isTitles = $formEdit->isTitle->getValues();
+         if(isset($formEdit->paramid)){
+            $paramids = $formEdit->paramid->getValues();
+         }
+         $paramnames = $formEdit->paramname->getValues();
+         $values = $formEdit->value->getValues();
          
          $order = 1;
-         $modelI = new Shop_Model_Product_Images();
-         foreach ($names as $id => $name) {
-            $imageRec = Shop_Model_Product_Images::getRecord($id);
+         $modelP = new Shop_Model_Product_ParamsValues();
+         foreach ($paramnames as $id => $name) {
+            if($id == '{NEW}'){
+               continue;
+            }
+            
+//            var_dump($id, $deletes[$id], $paramnames[$id], $values[$id]);
+            
+            
             if($deletes[$id] == 1){
-               // model rovnou maže obrázky, čili není nutné zpracovat
-               $modelI->delete($id);
+               // pokud není new smazat z db. jinak na něj kašlat
+               if(strpos($id, '{NEW_') === false){
+                  $modelP->delete($id);
+               }
             } else {
-               $imageRec->{Shop_Model_Product_Images::COLUMN_IS_TITLE} = $isTitles[$id];
-               $imageRec->{Shop_Model_Product_Images::COLUMN_ORDER} = $order;
-               $imageRec->{Shop_Model_Product_Images::COLUMN_NAME} = $name;
-               $imageRec->save();
+               if(strpos($id, '{NEW_') === false){
+                  $recordValue = Shop_Model_Product_ParamsValues::getRecord($id);
+               } else {
+                  $recordValue = Shop_Model_Product_ParamsValues::getNewRecord();
+               }
+               
+               // pokud je vyplněn název nového parametru
+               if($paramnames[$id][Locales::getDefaultLang()] != null){
+                  // vytvoří se nový parametr
+                  $recordParam = Shop_Model_Product_Params::getNewRecord();
+                  $recordParam->{Shop_Model_Product_Params::COLUMN_NAME} = $name;
+                  $recordParam->save();
+                  
+                  // přiřadí se hodnota parametru k produktu a hodnotě
+                  $recordValue->{Shop_Model_Product_ParamsValues::COLUMN_ID_PARAM} = $recordParam->getPK(); // id parametru
+               } 
+               // pokud není vyplněn název, ale je zadáno id
+               else if(isset ($paramids) && isset ($paramids[$id])) {
+                  $recordValue->{Shop_Model_Product_ParamsValues::COLUMN_ID_PARAM} = $paramids[$id];
+               }
+               // přiřadí se hodnota parametru k produktu a hodnotě
+               $recordValue->{Shop_Model_Product_ParamsValues::COLUMN_ID_PRODUCT} = $product->getPK();
+               $recordValue->{Shop_Model_Product_ParamsValues::COLUMN_VALUE} = $values[$id];
+               $recordValue->{Shop_Model_Product_ParamsValues::COLUMN_ORDER} = $order;
+               $recordValue->save();
+               
                $order++;
             }
          }
+//         var_dump(CoreErrors::getErrors());
+//         die;
          
-         $this->infoMsg()->addMessage($this->tr('Obrázky byly uloženy'));
+         $this->infoMsg()->addMessage($this->tr('Parametry byly uloženy'));
          $this->link()->reload();
       }
       $this->view()->formEdit = $formEdit;
-      $this->view()->productImages = $productImages;
+      $this->view()->productParams = $productParams;
    }
    
    

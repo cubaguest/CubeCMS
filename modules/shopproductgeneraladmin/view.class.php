@@ -139,7 +139,7 @@ class ShopProductGeneralAdmin_View extends Shop_Product_View {
    {
       $this->editProductParams();
       Template_Module::setEdit(true);
-      Template_Navigation::addItem($this->product->{Shop_Model_Product::COLUMN_NAME}, $this->link()->route('detail'));
+      Template_Navigation::addItem($this->product->{Shop_Model_Product::COLUMN_NAME}, $this->link()->route('edit'));
       Template_Navigation::addItem($this->tr('Úprava parametrů'), $this->link());
 
       $this->moduleActionButtons = array(

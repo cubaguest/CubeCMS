@@ -38,7 +38,7 @@ class Shop_Tools
       return ' '.VVE_SHOP_CURRENCY_NAME;
    }
 
-   public static function getProductCode($code, $groupIdsNames = false)
+   public static function getProductCode($code, $groupIdsNames = false, $attrCodes = false)
    {
       if(is_string($groupIdsNames)){
          $groupIdsNames = json_decode($groupIdsNames);
@@ -53,6 +53,29 @@ class Shop_Tools
          }
          $code = str_replace($replace, $groupIdsNames, $code);
       }
+      
+      if(is_string($attrCodes)){
+         $attrCodes = json_decode($attrCodes);
+      }
+      if(is_object($attrCodes)){
+         $attrCodes = get_object_vars($attrCodes);
+      }
+      if(is_array($attrCodes)){
+         $replace = array_keys($attrCodes);
+         foreach($replace as &$r) {
+            $r = '{'.$r.'}';
+         }
+         $code = str_replace($replace, $attrCodes, $code);
+      }
+      
+//      if($attrCodes && is_string($attrCodes)){
+//         $attrGroups = explode(';', $attrCodes);
+//         foreach ($attrGroups as $attrCodeStr) {
+//            $attrCode = explode(':', $attrCodeStr);
+//            $code = str_replace('{'.$attrCode[0].'}', $attrCode[1], $code);
+//         }
+//      }
+      
       return $code;
    }
 

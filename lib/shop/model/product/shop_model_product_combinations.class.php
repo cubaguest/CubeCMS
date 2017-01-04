@@ -314,6 +314,9 @@ class Shop_Model_Product_Combinations extends Model_ORM {
          'comb_name' =>
          'GROUP_CONCAT( attr_g.'.Model_ORM::getLangColumn(Shop_Model_AttributesGroups::COLUMN_NAME)
             .',": ", attr.'.Model_ORM::getLangColumn(Shop_Model_Attributes::COLUMN_NAME).' ORDER BY '.Shop_Model_AttributesGroups::COLUMN_ORDER.' SEPARATOR ", ")',
+         'comb_attr_codes_json' =>
+         "CONCAT('{', GROUP_CONCAT( '\"', attr.".Shop_Model_Attributes::COLUMN_ID_GROUP.", '\"', \" : \","
+            ." '\"', attr.".  Shop_Model_Attributes::COLUMN_CODE.", '\"' ORDER BY ".Shop_Model_Attributes::COLUMN_ORDER." SEPARATOR ', '),'}')",
 //         'price' =>
 //         'SUM(vari.'.Shop_Model_Product_Variants::COLUMN_PRICE_ADD.')',
          'weight' =>
