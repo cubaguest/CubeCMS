@@ -1,4 +1,5 @@
-<?php  // načtení detailu
+<?php
+// načtení detailu
 $this->addPageTitle($this->article->{Articles_Model::COLUMN_NAME});
 $h1 = $this->article->{Articles_Model::COLUMN_NAME};
 $piroBox = new JsPlugin_PiroBox();
@@ -7,125 +8,137 @@ echo $this->toolbox;
 
 $image = null;
 if ($this->article->{Articles_Model::COLUMN_TITLE_IMAGE} != null) {
-   $imgSrc = vve_image_cacher(vve_tpl_art_title_image($this->article->{Articles_Model::COLUMN_TITLE_IMAGE}), 300, 225);
-   $imgAlt = htmlspecialchars($this->article->{Articles_Model::COLUMN_NAME});
-   $image = "<img src=\"$imgSrc\" alt=\"$imgAlt\" class=\"title-image image-left\" />";
+    $imgSrc = vve_image_cacher(vve_tpl_art_title_image($this->article->{Articles_Model::COLUMN_TITLE_IMAGE}), 300, 225);
+    $imgAlt = htmlspecialchars($this->article->{Articles_Model::COLUMN_NAME});
+    $image = "<img src=\"$imgSrc\" alt=\"$imgAlt\" class=\"title-image image-left img-responsive\" />";
 }
 
 $addTime = new DateTime($this->article->{Articles_Model::COLUMN_ADD_TIME});
 $editTime = new DateTime($this->article->{Articles_Model::COLUMN_EDIT_TIME});
 ?>
 
-<h1><?php $this->includeFile('tpl://engine:headline/icon.phtml'); echo htmlspecialchars($h1); if($this->article->{Articles_Model::COLUMN_CONCEPT} == true)echo $this->tr(' - koncept');?></h1>
+<h1><?php
+    $this->includeFile('tpl://engine:headline/icon.phtml');
+    ps($h1);
+    if ($this->article->{Articles_Model::COLUMN_CONCEPT} == true)
+        echo $this->tr(' - koncept');
+    ?></h1>
 
 <div class="post">
-   <div class="info info-top">
-      <?php echo $this->tr('Přidáno');?>: <span class="date"><?php echo vve_date("%x %X", $addTime)?></span>,
-      <?php echo $this->tr('aktualizováno');?>: <span class="date-edit"><?php echo vve_date("%x %X", $editTime)?></span>,
-      <?php echo $this->tr('uživatelem');?>: <span class="author"><?php echo $this->article->{Model_Users::COLUMN_USERNAME}?></span>
-   </div>
-   <?php if((string)$this->article->{Articles_Model::COLUMN_ANNOTATION} != null){?>
-   <div class="annotation"><?php 
-      echo $image;$image = null;
-      echo $this->filter((string)$this->article->{Articles_Model::COLUMN_ANNOTATION}, array('emoticons', 'filesicons'));
-      ?>
-   <hr class="reseter" />
-   </div>
-   <?php }?>
-   <div class="text"><?php 
-      echo $image;
-      echo $this->filter((string)$this->article->{Articles_Model::COLUMN_TEXT}, array('emoticons', 'filesicons'));
-    ?></div>
-   <hr class="reseter" />
-   <?php $this->includeTpl('privateText.phtml', false,null,'articles');?>
-   
-   <?php if( $this->tags ){?>
-   <div class="tags">
-      <?php  
-      echo '<strong>'.$this->tr('Štítky').": </strong>";
-      $printArray = array();
-      foreach ($this->tags as $tag) {
-         $printArray[] = '<a href="'.($this->link()->clear()->param(Articles_Controller::GET_TAG_PARAM, $tag) )
-            .'" title="'.sprintf( $this->tr('zobraziz položky se štítkem %s'), $tag ).'">'.$tag.'</a>';
-      }
-      echo implode(', ', $printArray);
-      ?>
-   </div>
-   <?php }?>
+    <div class="info info-top">
+        <?php echo $this->tr('Přidáno'); ?>: <span class="date"><?php echo vve_date("%x %X", $addTime) ?></span>,
+        <?php echo $this->tr('aktualizováno'); ?>: <span class="date-edit"><?php echo vve_date("%x %X", $editTime) ?></span>,
+        <?php echo $this->tr('uživatelem'); ?>: <span class="author"><?php echo $this->article->{Model_Users::COLUMN_USERNAME} ?></span>
+    </div>
+    <?php if ((string) $this->article->{Articles_Model::COLUMN_ANNOTATION} != null) { ?>
+        <div class="annotation"><?php
+            echo $image;
+            $image = null;
+            echo $this->filter((string) $this->article->{Articles_Model::COLUMN_ANNOTATION}, array('emoticons', 'filesicons'));
+            ?>
+            <hr class="reseter" />
+        </div>
+    <?php } ?>
+    <div class="text"><?php
+        echo $image;
+        echo $this->filter((string) $this->article->{Articles_Model::COLUMN_TEXT}, array('emoticons', 'filesicons'));
+        ?>
+    </div>
+    <hr class="reseter" />
+    <?php $this->includeTpl('privateText.phtml', false, null, 'articles'); ?>
 
-   <?php 
-   if($this->images){
-      ?>
-      <h2><a href="<?php echo $this->photoGalleryLink?>"><?php ps($this->tr('Fotogalerie')); ?></a></h2>
-      <?php
-      $this->includeFile('tpl://engine:photogalery.phtml');
-   }
-   ?>
-   
-   <?php if(!empty($this->similar)){?>
-   <h3><?php ps('Podobné články')?></h3>
-   <ul class="related-posts">
-      <?php foreach($this->similar as $item){?>
-      <li>
-         <a href="<?php echo $this->link()->route('detail', array('urlkey' => $item->{Articles_Model::COLUMN_URLKEY}))?>"
-            title="<?php ps($item->{Articles_Model::COLUMN_NAME})?>"><?php ps(vve_tpl_truncate($item->{Articles_Model::COLUMN_NAME}, 50));?></a>
-      </li>
-      <?php }?>
-   </ul>
-   <?php }?>
-   
-   <script type="text/javascript">
-      /* <![CDATA[ */
-      $(document).ready(function(){$().piroBox({slideShow : true, slideSpeed : 3});});
-      /* ]]> */
-   </script>
-   <hr class="reseter" />
-   <?php if($this->articles != null){?>
-   <form name="gotoart" action="<?php echo $this->link();?>" method="get" onsubmit="document.gotoart.action = document.getElementById('gotoArtLinkSel').value">
-      <p>
-         <label><?php echo $this->tr('Přejít na')?></label>
-         <select id="gotoArtLinkSel">
-            <?php foreach ($this->articles as $article) {?>
-            <option value="<?php echo $this->link()->route('detail', array('urlkey' => (string)$article->{Articles_Model::COLUMN_URLKEY}));?>">
-            <?php echo vve_tpl_truncate((string)$article->{Articles_Model::COLUMN_NAME}, 100)?>
-            </option>
-            <?php }?>
-         </select>
-         <input type="submit" value="<?php echo $this->tr('Přejít')?>" />
-      </p>
-   </form>
-   <?php } else {
-      $this->includeTpl("buttonback.phtml", true);
-   }
-   
-   
-   $this->includeFile('tpl://engine:parts/gastats.phtml');
-   
-   if($this->category()->getParam('shareTools', true) == true){
-   $this->includeTpl('articletools.phtml', true, array(
-      'lastEditTime' => $this->article->{Articles_Model::COLUMN_EDIT_TIME},
-              'lastEditUser' => $this->article->{Model_Users::COLUMN_USERNAME},
-              'createdByUser' => $this->article->usernameCreated,
-              'linkToPdf' => $this->link()->route('detailExport', array('output' => 'pdf')),
-              'linkToHtml' => $this->link()->route('detailExport', array('output' => 'html')),
-              'shares' => array('url' => $this->link(), 'title' => $this->article->{Articles_Model::COLUMN_NAME})));
-   }
+    <?php if ($this->tags) { ?>
+        <div class="tags">
+            <?php
+            echo '<strong>' . $this->tr('Štítky') . ": </strong>";
+            $printArray = array();
+            foreach ($this->tags as $tag) {
+                $printArray[] = '<a href="' . ($this->link()->clear()->param(Articles_Controller::GET_TAG_PARAM, $tag) )
+                        . '" title="' . sprintf($this->tr('zobraziz položky se štítkem %s'), $tag) . '">' . $tag . '</a>';
+            }
+            echo implode(', ', $printArray);
+            ?>
+        </div>
+    <?php } ?>
+
+    <?php
+    if ($this->images) {
+        ?>
+        <h2><a href="<?php echo $this->photoGalleryLink ?>"><?php ps($this->tr('Fotogalerie')); ?></a></h2>
+        <?php
+        $this->includeFile('tpl://engine:photogalery.phtml');
+    }
+    ?>
+
+    <?php if (!empty($this->similar)) { ?>
+        <h3><?php ps('Podobné články') ?></h3>
+        <div class="row">
+            <?php foreach ($this->similar as $item) { ?>
+            <div class="col-sm-12">
+                    <a href="<?php echo $this->link()->route('detail', array('urlkey' => $item->{Articles_Model::COLUMN_URLKEY})) ?>"
+                       title="<?php ps($item->{Articles_Model::COLUMN_NAME}) ?>"><?php ps(vve_tpl_truncate($item->{Articles_Model::COLUMN_NAME}, 50)); ?></a>
+                </div>
+            <?php } ?>
+        </div>
+    <?php } ?>
+
+    <script type="text/javascript">
+        /* <![CDATA[ */
+        $(document).ready(function () {
+            $().piroBox({slideShow: true, slideSpeed: 3});
+        });
+        /* ]]> */
+    </script>
+    <hr class="reseter" />
+    <?php if ($this->articles != null) { ?>
+        <form name="gotoart" action="<?php echo $this->link(); ?>" method="get" onsubmit="document.gotoart.action = document.getElementById('gotoArtLinkSel').value">
+            <p>
+                <label><?php echo $this->tr('Přejít na') ?></label>
+                <select id="gotoArtLinkSel">
+                    <?php foreach ($this->articles as $article) { ?>
+                        <option value="<?php echo $this->link()->route('detail', array('urlkey' => (string) $article->{Articles_Model::COLUMN_URLKEY})); ?>">
+                            <?php echo vve_tpl_truncate((string) $article->{Articles_Model::COLUMN_NAME}, 100) ?>
+                        </option>
+                    <?php } ?>
+                </select>
+                <input type="submit" value="<?php echo $this->tr('Přejít') ?>" />
+            </p>
+        </form>
+        <?php
+    } else {
+        $this->includeTpl("buttonback.phtml", true);
+    }
+
+
+    $this->includeFile('tpl://engine:parts/gastats.phtml');
+
+    if ($this->category()->getParam('shareTools', true) == true) {
+        $this->includeTpl('articletools.phtml', true, array(
+            'lastEditTime' => $this->article->{Articles_Model::COLUMN_EDIT_TIME},
+            'lastEditUser' => $this->article->{Model_Users::COLUMN_USERNAME},
+            'createdByUser' => $this->article->usernameCreated,
+            'linkToPdf' => $this->link()->route('detailExport', array('output' => 'pdf')),
+            'linkToHtml' => $this->link()->route('detailExport', array('output' => 'html')),
+            'shares' => array('url' => $this->link(), 'title' => $this->article->{Articles_Model::COLUMN_NAME})));
+    }
 //   echo $this->toolbox;
-   ?>
-   <?php 
-   if($this->article != null AND ( 
-      strpos((string)$this->article->{Articles_Model_Detail::COLUMN_TEXT}, 'pirobox') !== false
-      OR strpos((string)$this->article->{Articles_Model::COLUMN_TEXT_PRIVATE}, 'pirobox') !== false)){
-   
-      $this->addJsPlugin(new JsPlugin_PiroBox());
-   ?>
-   <script type="text/javascript">
-      /* <![CDATA[ */
-      $(document).ready(function(){$().piroBox({slideShow : true,slideSpeed : 3});});
-      /* ]]> */
-   </script>
-<?php }?>
+    ?>
+    <?php
+    if ($this->article != null AND (
+            strpos((string) $this->article->{Articles_Model_Detail::COLUMN_TEXT}, 'pirobox') !== false
+            OR strpos((string) $this->article->{Articles_Model::COLUMN_TEXT_PRIVATE}, 'pirobox') !== false)) {
+
+        $this->addJsPlugin(new JsPlugin_PiroBox());
+        ?>
+        <script type="text/javascript">
+            /* <![CDATA[ */
+            $(document).ready(function () {
+                $().piroBox({slideShow: true, slideSpeed: 3});
+            });
+            /* ]]> */
+        </script>
+    <?php } ?>
 </div>
-<?php echo $this->comments;?>
+<?php echo $this->comments; ?>
 
 
