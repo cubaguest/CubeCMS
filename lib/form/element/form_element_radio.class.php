@@ -71,7 +71,9 @@ class Form_Element_Radio extends Form_Element_Select {
       $numOpts = count($this->options);
       foreach ($this->options as $optLabel => $optVal) {
          $wrap = clone $this->containerElement;
-         $wrap->addClass('radio');
+         if($numOpts > 1){
+            $wrap->addClass('radio');
+         }
          $opt = clone $this->html();
          if($this->isMultiple()) {
             $opt->setAttrib('name', $this->getName()."[".$this->dimensional."]");
