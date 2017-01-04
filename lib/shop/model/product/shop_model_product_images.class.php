@@ -92,13 +92,19 @@ class Shop_Model_Product_Images_Record extends Model_ORM_Ordered_Record {
       // odznačení všech na netitulní
       $m = new Shop_Model_Product_Images();
       
-      $m->where(Shop_Model_Product_Images::COLUMN_ID_PRODUCT.' = :idp AND '.Shop_Model_Product_Images::COLUMN_IS_TITLE.' = 1', 
-              array('idp' => $this->{Shop_Model_Product_Images::COLUMN_ID_PRODUCT}))
-                      ->update(array(Shop_Model_Product_Images::COLUMN_IS_TITLE => false));
+      $old = $m->where(Shop_Model_Product_Images::COLUMN_ID_PRODUCT.' = :idp AND '.Shop_Model_Product_Images::COLUMN_IS_TITLE.' = 1', 
+              array('idp' => $this->{Shop_Model_Product_Images::COLUMN_ID_PRODUCT}))->record();
+//       
+      if($old){
+         if($old->getPK() == $this->getPK()){
+            return;
+         }        
+         $old->{Shop_Model_Product_Images::COLUMN_IS_TITLE} = false;
+         $old->save();
+      }
       
-      // označení aktuálního na titulní
       $this->{Shop_Model_Product_Images::COLUMN_IS_TITLE} = true;
-      return $this->save();        
+      $this->save();        
    }
 
 }
