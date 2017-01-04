@@ -239,5 +239,13 @@ class Shop_Model_Product_Record extends Model_ORM_Record {
    {
       return $this->{Shop_Model_Product::COLUMN_URLKEY};
    }
-
+   
+   public function getParams()
+   {
+      $m = new Shop_Model_Product_ParamsValues();
+      
+      return $m->joinFK(Shop_Model_Product_ParamsValues::COLUMN_ID_PARAM)
+              ->where(Shop_Model_Product_ParamsValues::COLUMN_ID_PRODUCT, $this->getPK())
+              ->records();
+   }
 }
