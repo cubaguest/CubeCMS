@@ -207,7 +207,7 @@ class Form_Decorator implements Form_Decorator_Interface {
       if($element instanceof Form_Element_Button 
           || $element instanceof Form_Element_Submit
           ){
-         $element->html()->addClass('btn')->addClass('btn-default');
+         $element->html()->addClass('btn')->addClass('btn-primary');
       } 
       // textová pole
       else if(
