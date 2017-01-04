@@ -206,7 +206,7 @@ class Install_Core {
                if (is_file($phpDir.$prePhpFile)) {
                   include $phpDir.$prePhpFile;
                }
-
+//               var_dump($sqlDir.$sqlFile);
                // update sql
                if (is_file($sqlDir.$sqlFile)) {
                   $this->processSqlUpgradeFile($sqlDir.$sqlFile);
@@ -244,7 +244,7 @@ class Install_Core {
             }
          }
       }
-
+//die;
       Install_Module::updateAllModules();
       // update subdomains
       $this->updateSubdomains();
@@ -290,8 +290,9 @@ class Install_Core {
 
             }
          }
-//          echo nl2br("-- SQL Update :\n ".$sql);die();
+//          echo nl2br("-- SQL Update :\n ".$sql);
          $sql = $this->replaceDBPrefix($sql);
+//          echo nl2br("-- SQL Update :\n ".$sql).'<br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />';
 //          echo $sql;
          $this->runSQLCommand($sql);
 
@@ -345,7 +346,10 @@ class Install_Core {
          ->columns(array(Model_Config::COLUMN_KEY, Model_Config::COLUMN_VALUE))
          ->where(Model_Config::COLUMN_KEY, 'VERSION')
          ->record();
-      if($record == false) $record = $modelCfg->newRecord();
+      if($record == false) {
+         $record = $modelCfg->newRecord();
+         $record->{Model_Config::COLUMN_KEY} = 'VERSION';
+      }
       $record->{Model_Config::COLUMN_VALUE} = 6;
       $record->{Model_Config::COLUMN_TYPE} = Model_Config::TYPE_STRING;
       $record->{Model_Config::COLUMN_LABEL} = 'Verze jádra';

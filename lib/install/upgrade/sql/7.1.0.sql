@@ -13,4 +13,5 @@ ALTER TABLE `{PREFIX}categories` DROP COLUMN `show_when_login_only` , DROP COLUM
 -- konfiguracni volby
 INSERT INTO `{PREFIX}config` (`key`, `label`, `value`, `values`, `protected`, `type`) VALUES
 ('TOKENS_STORE', 'Kde se mají ukládat bezpečnostní tokeny', 'session', 'session;db;file', 0, 'list'),
-('MAIN_TPL_VIEWS', 'Vzhledy hlavní šablony', null, null, 0, 'string');
+('MAIN_TPL_VIEWS', 'Vzhledy hlavní šablony', null, null, 0, 'string')
+;

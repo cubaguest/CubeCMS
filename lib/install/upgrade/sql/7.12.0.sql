@@ -1,5 +1,16 @@
 
 -- forms module
+
+CREATE TABLE IF NOT EXISTS `{PREFIX}modules_instaled` (
+  `id_module` smallint(6) NOT NULL AUTO_INCREMENT,
+  `name` varchar(30) NOT NULL,
+  `version_major` tinyint(3) unsigned NOT NULL DEFAULT '1',
+  `version_minor` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `version` varchar(5) NOT NULL DEFAULT '1.0.0',
+  PRIMARY KEY (`id_module`),
+  UNIQUE KEY `name_UNIQUE` (`name`)
+) ENGINE=MyISAM AUTO_INCREMENT=86 DEFAULT CHARSET=utf8;
+
 INSERT INTO `{PREFIX}modules_instaled` (`name`, `version_major`, `version_minor`) VALUES ('forms', 1, 0);
 
 CREATE TABLE IF NOT EXISTS `{PREFIX}forms` (

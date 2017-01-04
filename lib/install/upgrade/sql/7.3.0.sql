@@ -43,24 +43,23 @@ INSERT INTO `cubecms_global_config` SELECT * FROM `{PREFIX}config` WHERE
 `key` != 'VERSION' AND
 `key` != 'RELEASE';
 
-
 /* tabulka s podweby */
 CREATE TABLE IF NOT EXISTS `{PREFIX}sites` (
-  `id_site` smallint(6) NOT NULL AUTO_INCREMENT,
+  `id_site` int(6) NOT NULL AUTO_INCREMENT,
   `domain` varchar(20) NOT NULL,
-  `dir` varchar(20) NOT NULL,
-  `table_prefix` varchar(20) NOT NULL,
+  `dir` varchar(20) NULL DEFAULT NULL,
+  `table_prefix` varchar(20) NULL DEFAULT NULL,
   `is_main` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id_site`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-/* main site */
-INSERT INTO `{PREFIX}sites` (`domain`, `is_main`) VALUES ('www', 1);
+
+INSERT INTO `{PREFIX}sites` (`domain`, `is_main`, `table_prefix`) VALUES ('www', 1, '{PREFIX}');
 
 CREATE TABLE IF NOT EXISTS `{PREFIX}sites_groups` (
-  `id_site` smallint(6) NOT NULL,
+  `id_site` int(6) NOT NULL,
   `id_group` int(11) NOT NULL,
   KEY `id_site` (`id_site`,`id_group`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='tabulka propojení webů se skupinami adminů';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 
 /* END_UPDATE */

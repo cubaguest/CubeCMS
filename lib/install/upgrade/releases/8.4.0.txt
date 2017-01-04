@@ -1,0 +1,4 @@
+Vylepšení:
+- přidání podpory obrázků u produktů
+- přidání podpory parametrů u produktů
+- vylepšení eshopu
