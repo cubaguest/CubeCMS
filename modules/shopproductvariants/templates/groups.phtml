@@ -13,7 +13,10 @@ if(!empty($this->groups)){
       </div>
       <a href="<?php echo $this->link()->clear()->route('variantsList', array('idg' => $group->getPK()))?>"
          onclick="ShopVariants.selectGroup(this); return false;"
-         class="cubecms-name"><?php ps_lang($group->{Shop_Model_AttributesGroups::COLUMN_NAME})?></a>
+         class="cubecms-name">
+            <?php ps_lang($group->{Shop_Model_AttributesGroups::COLUMN_NAME})?>
+         <em>(ID: <?php echo $group->getPK()?>)</em>
+      </a>
       <span class="cubecms-tools">
          <a href="<?php echo $this->link()->param('g', $group->{Shop_Model_AttributesGroups::COLUMN_ID})
             ->param('editg', $group->{Shop_Model_AttributesGroups::COLUMN_ID})?>"
