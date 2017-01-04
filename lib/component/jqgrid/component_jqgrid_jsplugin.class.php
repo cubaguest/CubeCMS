@@ -28,7 +28,9 @@ class Component_JqGrid_JsPlugin extends JsPlugin_JQuery {
 //      $this->addDependJsPlugin(new JsPlugin_JQueryCSS());
 //      $jquery->addUICore();
 //		Přidání css stylu
-		$this->addFile(new JsPlugin_CssFile('css/ui.jqgrid.css'));
+//		$this->addFile(new JsPlugin_CssFile('css/ui.jqgrid.css'));
+		$this->addFile(new JsPlugin_CssFile('css/ui.jqgrid-bootstrap.css'));
+		$this->addFile(new JsPlugin_CssFile('css/ui.jqgrid-bootstrap-ui.css'));
 		//		Přidání js soubrů pluginu
 		$this->addFile(new JsPlugin_JsFile("i18n/grid.locale-".Locales::getLang().".js"));
 		$this->addFile(new JsPlugin_JsFile("jquery.jqGrid.min.js"));
