@@ -857,9 +857,13 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
    border-color: @color-border-gray !important;
    background-color: @color-bg-gray !important;
 }
+.cubecms-state-error {
+   border-color: @color-border-danger !important;
+   background-color: @color-bg-danger !important;
+}
 
 .cubecms-widget {
-   a, a:visited {
+   a:not(.btn), a:visited:not(.btn) {
       color: @color-primary;
    }
    // widgets
@@ -887,8 +891,30 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
                color: @color-text-invert !important;
             }
          }
+         .order-buttons {
+            a, a:visited {
+               &.active {
+                  color: @color-text-important;
+               }
+               .icon {
+                  font-size: @font-size-small;
+               }
+               color: @color-text-invert;
+               float: left;
+               border: 0px solid;
+               background-color: transparent;
+               background-image: none;
+               
+            }
+            float: right;
+            display: inline-block;
+         }
          .cube-gradient();
          border: 1px solid @color-primary;
+      }
+      .cubecms-footer {
+         border-top: 1px solid @color-border;
+         padding: @padding-widget;
       }
       td, .cubecms-row {
          &.state-hightlight {
@@ -965,6 +991,7 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
       width: 100%;
       margin-bottom: @padding-large;
    }
+   /* vidget pro seznam (ul, div) */
    &.cubecms-list {
       .cubecms-list-row {
          .header {
@@ -977,7 +1004,7 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
                font-weight: bold;
             }
             .tools {
-
+               
             }
             padding: 0;
             margin: 0;
@@ -986,6 +1013,17 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
          }
          .content {
 
+         }
+         .cubecms-sort {
+            float: left;
+            cursor: move;
+            margin-right: @padding-widget;
+         }
+         .cubecms-name {
+            
+         }
+         .cubecms-tools {
+            float: right;
          }
          &:hover {
             border-color: @color-border-hover;
@@ -1097,7 +1135,14 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
       margin-bottom: @padding-widget;
    }
    // contents
-   >.cubecms-widget-footer {
+   >.cubecms-widget-header, >.cubecms-header {
+      .cube-gradient();
+      border-bottom: 1px solid @color-border;
+      padding: @padding-widget;
+      color: #fff;
+      font-weight: bold;
+   }
+   >.cubecms-widget-footer, >.cubecms-footer {
       border-top: 1px solid @color-border;
       padding: @padding-widget;
    }
@@ -1106,9 +1151,19 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
       margin-bottom: @padding-widget;
       color: @color-text-light;
    }
-   >.cubecms-widget-content, >.cubecms-widget {
+   >.cubecms-widget-content, >.cubecms-content, >.cubecms-widget {
       margin: @padding-widget;
    }
+   
+   .cubecms-tools {
+      .important {
+         &, &:hover, &:visited, &:active, &:focus {
+            color: @color-text-important;
+         }
+      }
+      display: inline-block;
+   }
+   
    font-size: @font-size;
 }
 

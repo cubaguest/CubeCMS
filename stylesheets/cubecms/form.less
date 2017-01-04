@@ -538,6 +538,42 @@ form {
          margin-left: 110px;
       }
    }
+   .file-selector {
+      input, select {
+         .rounded-corners();
+      }
+      .file-selector-file-box {
+         &:before {
+            /*content: "";*/
+            /*display: inline-block;*/
+            /*height: 100%;*/
+            /*vertical-align: middle;*/
+         }
+         span {
+         }
+         /*.rounded-corners();*/
+         /*.inner-box-sahadow();*/
+         /*overflow: hidden;*/
+         padding: @padding-small 0;
+         /*border: 1px solid @color-border;*/
+         /*background-color: @color-bg;*/
+         /*text-align: center;*/
+      }
+      .file-selector-inputs {
+         .file-selector-input-box {
+            margin-bottom: @padding-small;
+         }
+         .file-selector-delete-checkbox {
+            label {
+               font-weight: bold;
+            }
+            input {
+               vertical-align: 0px;
+            }
+            margin-top: @padding-small;
+         }
+      }
+   }
 }
 /* modal pro výběr obrázku */
 .image-selector-modal {

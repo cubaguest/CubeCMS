@@ -6,9 +6,6 @@
       font-weight: bold;
    }
 
-   .product_variants_price_class { width: 50px; }
-   .product_variants_code_class { width: 100px; }
-   .product_variants_weight_class { width: 50px; }
    .box-add-attr-code {
       float: right;
    }
@@ -46,6 +43,10 @@
 
 // seznam kombinací
 #products-combinations-table {
+   .product-variant-total {
+      font-weight: bold;
+   }
+   
    .combination-code {
       white-space: nowrap;
    }
@@ -57,11 +58,23 @@
    .combination-qty,
    .combination-price {
       input {
-         width: 40px;
+         /*width: 40px;*/
       }
       text-align: center;
    }
    .combination-price, .combination-weight, .combination-controll {
       text-align: right;
+   }
+}
+
+#product-images-table, #product-params-table {
+   .sorting-area {
+      cursor: move;
+   }
+}
+
+#product-params-table {
+   #param-row-NEW {
+      display: none;
    }
 }
