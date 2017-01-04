@@ -8,15 +8,17 @@ class Shop_Model_Attributes extends Model_ORM {
    const COLUMN_ID = 'id_attribute';
    const COLUMN_ID_GROUP = 'id_attribute_group';
    const COLUMN_NAME = 'attribute_name';
+   const COLUMN_CODE = 'attribute_code';
    const COLUMN_ORDER = 'attribute_order';
 
    protected function _initTable() {
       $this->setTableName(self::DB_TABLE, 't_attr_grps');
 
-      $this->addColumn(self::COLUMN_ID, array('datatype' => 'smallint', 'ai' => true, 'nn' => true, 'pk' => true));
-      $this->addColumn(self::COLUMN_ID_GROUP, array('datatype' => 'smallint', 'nn' => true));
+      $this->addColumn(self::COLUMN_ID, array('datatype' => 'int', 'ai' => true, 'nn' => true, 'pk' => true));
+      $this->addColumn(self::COLUMN_ID_GROUP, array('datatype' => 'int', 'nn' => true));
 
       $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(100)', 'nn' => true, 'pdoparam' => PDO::PARAM_STR, 'lang' => true));
+      $this->addColumn(self::COLUMN_CODE, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_ORDER, array('datatype' => 'int', 'dafeult' => 0));
 
       $this->setPk(self::COLUMN_ID);
