@@ -9,7 +9,12 @@
  *                $LastChangedBy: $ $LastChangedDate: $
  */
 class Utils_Image {
-
+   
+   const IMG_RATION_16BY9 = '16x9';
+   const IMG_RATION_16BY10 = '16x10';
+   const IMG_RATION_4BY3 = '4x3';
+   const IMG_RATION_3BY4 = '4x3';
+   
    public static function cache($path, $width = null, $height = null, $crop = false, $filter = array())
    {
       if (strpos($path, AppCore::getAppWebDir()) !== false) { // absolutní cesta
@@ -31,6 +36,15 @@ class Utils_Image {
       $path = $parts[0];
       if (isset($parts[1])) {
          $getParasms = $parts[1];
+      }
+      
+      if(is_string($height)){
+         $parts = explode('x', $height);
+         if(isset($parts[0]) && isset($parts[1])){
+            $height = round($width/(int)$parts[0]*(int)$parts[1]);
+         } else {
+            $height = (int)$height;
+         }
       }
 
 
