@@ -59,6 +59,9 @@ class Email {
    protected $sendFromAddress = null;
    protected $sendFromName = null;
    
+   protected $replayAddress = null;
+   protected $replayName = null;
+   
    protected $files = array();
 
       /**
@@ -107,6 +110,18 @@ class Email {
    {
       $this->sendFromAddress = $address;
       $this->sendFromName = $name;
+      return $this;
+   }
+   
+   /**
+    * Metoda nastaví adresu pro odpověď
+    * @param string $from -- adresa pro odesílání
+    * @return Email -- vrací sebe
+    */
+   public function setReplayTo($address, $name=null)
+   {
+      $this->replayAddress = $address;
+      $this->replayName = $name;
       return $this;
    }
 
@@ -274,6 +289,9 @@ class Email {
       } else {
          $this->message()->setSender(VVE_NOREPLAY_MAIL, $this->sanitize(VVE_WEB_NAME));
          $this->message()->setFrom(VVE_NOREPLAY_MAIL, $this->sanitize(VVE_WEB_NAME));
+      }
+      if($this->replayAddress != null){
+         $this->message()->setReplyTo($this->replayAddress, $this->replayName);
       }
       
       if(!empty($this->files)){
