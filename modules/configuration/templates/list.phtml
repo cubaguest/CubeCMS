@@ -130,6 +130,8 @@ $this->formLocDelete->html()->setAttrib('name', 'form-remove-value');
                return false;
             }
          });
+         // base init
+         CubeCMS.Tools.rememberTabSelection('#groups-tabs', !localStorage);
       });
    </script>
 </div>
