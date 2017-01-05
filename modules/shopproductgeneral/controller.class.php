@@ -75,6 +75,14 @@ class ShopProductGeneral_Controller extends Shop_Product_Controller {
          return false;
       }
    }
+   
+   public function editParamsController($urlkey) {
+      $this->checkWritebleRights();
+      $this->editProductParams((string)$urlkey);
+      if($this->view()->product == false OR $this->view()->product == null){
+         return false;
+      }
+   }
 
    /**
     * Kontroler pro editaci textu

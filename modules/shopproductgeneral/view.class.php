@@ -56,6 +56,11 @@ class ShopProductGeneral_View extends Shop_Product_View {
                  $this->link()->route('editImages'));
          $toolEditImages->setIcon(Template_Toolbox2::ICON_IMAGE)->setTitle($this->tr("Upravit obrázky vybraného produktu"));
          $toolbox->addTool($toolEditImages);
+         
+         $toolEditParams = new Template_Toolbox2_Tool_PostRedirect('edit_product_params', $this->tr('Upravit parametry'),
+                 $this->link()->route('editParams'));
+         $toolEditParams->setIcon(Template_Toolbox2::ICON_COG)->setTitle($this->tr("Upravit parametry vybraného produktu"));
+         $toolbox->addTool($toolEditParams);
 
          $toolState = new Template_Toolbox2_Tool_Form($this->formState);
          $toolState->setIcon($this->formState->state->getValues() ? "enable.png" : "disable.png")->setTitle($this->formState->change->getLabel());
@@ -94,6 +99,14 @@ class ShopProductGeneral_View extends Shop_Product_View {
       $this->editImages();
       Template_Navigation::addItem($this->product->{Shop_Model_Product::COLUMN_NAME}, $this->link()->route('detail'));
       Template_Navigation::addItem($this->tr('Úprava obrázků'), $this->link());
+   }
+   
+   public function editParamsView() 
+   {
+      $this->editProductParams();
+      Template_Module::setEdit(true);
+      Template_Navigation::addItem($this->product->{Shop_Model_Product::COLUMN_NAME}, $this->link()->route('detail'));
+      Template_Navigation::addItem($this->tr('Úprava parametrů'), $this->link());
    }
    
    public function addView() 
