@@ -177,13 +177,15 @@ class Shop_Model_Product extends Model_ORM {
       if (self::$productCatCounter === false) {
          $m = new self();
          $counters = $m
-                 ->columns(array('counter' => 'COUNT(`' . self::COLUMN_ID . '`)', self::COLUMN_ID_CATEGORY))
+                 ->columns(array('counter' => 'COUNT( `'.$m->getTableShortName().'`.`' . self::COLUMN_ID . '`)', self::COLUMN_ID_CATEGORY))
                  ->joinFK(self::COLUMN_ID_CATEGORY)
                  ->where(self::COLUMN_ACTIVE . ' = 1', array())
                  ->groupBy(array(self::COLUMN_ID_CATEGORY))
                  ->records(PDO::FETCH_OBJ);
-         foreach ($counters as $c) {
-            self::$productCatCounter[$c->{self::COLUMN_ID_CATEGORY}] = $c->counter;
+         if($counters){
+            foreach ($counters as $c) {
+               self::$productCatCounter[$c->{self::COLUMN_ID_CATEGORY}] = $c->counter;
+            }
          }
       }
       return isset(self::$productCatCounter[$idCategory]) ? self::$productCatCounter[$idCategory] : 0;
