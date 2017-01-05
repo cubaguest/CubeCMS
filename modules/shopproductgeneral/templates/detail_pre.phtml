@@ -1,0 +1,37 @@
+<?php 
+// setup combinations
+$combJS = null;
+$productPrice = number_format($this->product->{Shop_Model_Product::COLUMN_PRICE}, 2, '.', '');
+$productCode = $this->product->{Shop_Model_Product::COLUMN_CODE};
+$productQty = $this->product->{Shop_Model_Product::COLUMN_QUANTITY};
+$productWight = number_format($this->product->{Shop_Model_Product::COLUMN_WEIGHT}, 3, '.', '');
+if ($this->productCombinations) {
+   foreach ($this->productCombinations as $comb) {
+      $code = array_merge(
+              ($comb->comb_attr_codes_json != null ? (array)json_decode($comb->comb_attr_codes_json) : array()),
+              ($comb->comb_codes_json != null ? (array)json_decode($comb->comb_codes_json) : array()));
+      
+      $combJS .= "CubeCMS.Shop.addCombination("
+              . $comb->{Shop_Model_Product_Combinations::COLUMN_ID}
+              . ", [" . $comb->comb_variant_ids . "], "
+              . $comb->{Shop_Model_Product_Combinations::COLUMN_PRICE} . ", " . number_format($comb->weight, 3, '.', '') . ", "
+              . ($code != null ? json_encode($code) : "''") . ", " . $comb->{Shop_Model_Product_Combinations::COLUMN_QTY} . ");\n";
+
+      $diff = false;
+      if ($this->selectedVariants != null) {
+         $diff = array_diff(explode(',', $comb->comb_variant_ids), $this->selectedVariants);
+      }
+      if ((is_array($diff) && empty($diff) ) || ( $this->selectedVariants == null && $comb->{Shop_Model_Product_Combinations::COLUMN_IS_DEFAULT} )) {
+         $productPrice = $productPrice + $comb->{Shop_Model_Product_Combinations::COLUMN_PRICE};
+         $productCode = Shop_Tools::getProductCode($productCode, json_decode($comb->comb_codes_json));
+         $productQty = $comb->{Shop_Model_Product_Combinations::COLUMN_QTY};
+         $productWight = $productWight + $comb->weight;
+      }
+   }
+}
+
+$this->productPrice = $productPrice;
+$this->productCode = $productCode;
+$this->productQty = $productQty;
+$this->productWeight = $productWight;
+$this->combinationsJS = $combJS;

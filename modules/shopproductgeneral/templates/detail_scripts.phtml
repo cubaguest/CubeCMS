@@ -1,0 +1,99 @@
+<script type="text/javascript">
+   /* <![CDATA[ */
+   CubeCMS.Shop.currency = '<?php echo Shop_Tools::getCurrency() ?>';
+   CubeCMS.Shop.roundDecimals = <?php echo (int) VVE_SHOP_PRICE_ROUND_DECIMAL ?>;
+   CubeCMS.Shop.decimals = <?php echo (int) VVE_SHOP_PRICE_DECIMALS ?>;
+   var defaultCombinationId = <?php echo ($this->defaultCombination ? $this->defaultCombination->{Shop_Model_Product_Combinations::COLUMN_ID} : 0 ) ?>;
+
+   CubeCMS.Shop.setProduct({
+      code: '<?php echo $this->product->{Shop_Model_Product::COLUMN_CODE} ?>',
+      price: <?php echo $this->product->{Shop_Model_Product::COLUMN_PRICE} ?>,
+      tax: <?php echo number_format($this->product->{Shop_Model_Tax::COLUMN_VALUE} == 0 ? 0 : $this->product->{Shop_Model_Tax::COLUMN_VALUE} / 100, 2, '.', '') ?>,
+      weight: <?php echo number_format($this->product->{Shop_Model_Product::COLUMN_WEIGHT}, 2, '.', '') ?>,
+      qty: <?php echo $this->product->{Shop_Model_Product::COLUMN_QUANTITY} ?>,
+      unit: '<?php echo $this->product->{Shop_Model_Product::COLUMN_UNIT} ?>'
+   });
+
+   $(document).ready(function () {
+      // init spinner
+      var spinner = $('input[name="product_add_qty"]').spinner({
+         min: <?php echo $this->product->{Shop_Model_Product::COLUMN_UNIT_SIZE} ?>,
+         step: <?php echo $this->product->{Shop_Model_Product::COLUMN_UNIT_SIZE} ?>
+         <?php
+         if ($this->product->{Shop_Model_Product::COLUMN_STOCK} && !VVE_SHOP_ALLOW_BUY_NOT_IN_STOCK) {
+            echo ",max : " . $this->productQty;
+         }
+         ?>
+      });
+
+      function changeCombination(varArr) {
+         $.each(CubeCMS.Shop.combinations, function (key, value) {
+            if ($(varArr).not(this.variants).length == 0 && $(this.variants).not(varArr).length == 0) {
+               var multipler = parseInt($('input[name="product_add_qty"]').val()) /<?php echo $this->product->{Shop_Model_Product::COLUMN_UNIT_SIZE} ?>;
+               // update price
+               var price = multipler * CubeCMS.Shop.getProductPrice(CubeCMS.Shop.product.price + this.price, CubeCMS.Shop.product.tax);
+               var priceWoutTax = multipler * (CubeCMS.Shop.product.price + this.price);
+               $('.product-price').text(CubeCMS.Shop.getFormattedPrice(price));
+               $('.product-price-wout-tax').text(CubeCMS.Shop.getFormattedPrice(priceWoutTax));
+
+               <?php if ($this->product->{Shop_Model_Product::COLUMN_STOCK}) { ?>
+                  // update qty
+                  var str = '<?php echo $this->tr('Vyprodáno') ?>';
+                  $('.product-to-cart').show();
+                  if (this.qty > 0) {
+                     str = '<?php echo $this->tr('Skladem {0} {1}') ?>'.format(this.qty, CubeCMS.Shop.product.unit);
+                  } else if (this.qty < 0) {
+                     str = '<?php echo $this->tr('Skladem') ?>';
+                  } else {
+                     // hide buy box
+                     <?php
+                     if (!VVE_SHOP_ALLOW_BUY_NOT_IN_STOCK) {
+                        echo "$('.product-to-cart').hide();\n";
+                     }
+                     ?>
+                  }
+                  <?php
+                  if (!VVE_SHOP_ALLOW_BUY_NOT_IN_STOCK) {
+                     echo "spinner.spinner( \"option\", \"max\", this.qty);";
+                  }
+                  ?>
+                  $('.product-qty').text(str);
+               <?php } ?>
+
+               // update code
+               $('.product-code').text(CubeCMS.Shop.getProductCode(this.codes));
+               // update weight
+               $('.product-weight').text(multipler * (CubeCMS.Shop.product.weight + this.weight) + " Kg");
+            }
+         });
+      }
+
+      <?php echo $this->combinationsJS; ?>
+
+      $('select.select-variant').change(function () {
+         var selArray = new Array();
+         $('select.select-variant').each(function () {
+            selArray.push(parseInt($(this).val()));
+         });
+         changeCombination(selArray);
+      });
+      $('input[name="product_add_qty"]').change(function () {
+         if ($(this).val() == "") {
+            $(this).val(<?php echo $this->product->{Shop_Model_Product::COLUMN_UNIT_SIZE} ?>);
+         }
+         if ($('select.select-variant').length > 0) {
+            $('select.select-variant').first().change();
+         } else {
+            // přepočítat zboží podle množství
+            var multipler = parseInt($('input[name="product_add_qty"]').val()) /<?php echo $this->product->{Shop_Model_Product::COLUMN_UNIT_SIZE} ?>;
+            $('.product-weight').text(multipler * (CubeCMS.Shop.product.weight) + " Kg");
+            var price = multipler * CubeCMS.Shop.getProductPrice(CubeCMS.Shop.product.price, CubeCMS.Shop.product.tax);
+            var priceWoutTax = multipler * CubeCMS.Shop.roundPrice(CubeCMS.Shop.product.price);
+            $('.product-price').text(CubeCMS.Shop.getFormattedPrice(price));
+            $('.product-price-wout-tax').text(CubeCMS.Shop.getFormattedPrice(priceWoutTax));
+         }
+      });
+   });
+   /* ]]> */
+</script>
+
