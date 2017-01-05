@@ -110,26 +110,61 @@ $this->includeFile('tpl://shopproductgeneral:detail_pre.phtml');
                         // varianty
                         if ($this->productVariantsSelects) {
                            foreach ($this->productVariantsSelects as $name) {
-                              echo '<div class="attr-line clearfix">';
-                              $this->formAddToCart->$name->html()->addClass('select-variant');
-                              echo $this->formAddToCart->$name->label() . "<br />";
-                              echo $this->formAddToCart->$name->control();
-                              echo '</div>';
+                              ?>
+                              <div class="attr-line">
+                                 <div class="row">
+                                    <div class="col-sm-5">
+                                       <?php
+                                       $this->formAddToCart->$name->html()->addClass('select-variant');
+                                       echo $this->formAddToCart->$name->label();
+                                       ?>
+                                    </div>
+                                    <div class="col-sm-7">
+                                       <?php
+                                       echo $this->formAddToCart->$name->control();
+                                       ?>
+                                    </div>
+                                 </div>
+                              </div>
+                              <?php
                            }
                         }
+                        ?>
+                        <div class=" product-to-cart clearfix <?php echo (($this->productQty <= 0 && $this->product->{Shop_Model_Product::COLUMN_STOCK} && !VVE_SHOP_ALLOW_BUY_NOT_IN_STOCK) ? " hidden" : null) ?>">
+                           <div class="attr-line">
+                              <div class="row">
+                                 <div class="col-sm-7">
+                                    <?php
+                                    echo $this->formAddToCart->qty->label();
+                                    $this->formAddToCart->qty->html()->addClass('quantity-detail');
+                                    ?>
+                                 </div>
 
-                        echo '<div class="attr-line product-to-cart clearfix'
-                        . (($this->productQty <= 0 && $this->product->{Shop_Model_Product::COLUMN_STOCK} && !VVE_SHOP_ALLOW_BUY_NOT_IN_STOCK) ? " hidden" : null) . '">';
-                        echo '<div class="left">';
-                        echo $this->formAddToCart->qty->label();
-                        echo $this->formAddToCart->qty->control();
-                        echo '&nbsp;' . $this->product->{Shop_Model_Product::COLUMN_UNIT} . '&nbsp;';
-                        echo '</div><div class="right">';
-
-                        echo $this->formAddToCart->productId->control();
-                        echo $this->formAddToCart->add->control();
-                        echo '</div>';
-                        echo '</div>';
+                                 <div class="col-sm-5">
+                                    <div class="input-group">
+                                       <?php
+                                       $this->formAddToCart->qty->html()->addClass('form-control');
+                                       $this->formAddToCart->qty->html()->setAttrib('min', $this->product->{Shop_Model_Product::COLUMN_UNIT_SIZE});
+                                       $this->formAddToCart->qty->html()->setAttrib('step', $this->product->{Shop_Model_Product::COLUMN_UNIT_SIZE});
+                                       if ($this->product->{Shop_Model_Product::COLUMN_STOCK} && !VVE_SHOP_ALLOW_BUY_NOT_IN_STOCK) {
+                                          $this->formAddToCart->qty->html()->setAttrib('max', $this->productQty);
+                                       }
+                                       echo $this->formAddToCart->qty->setType('number')->control();
+//                                       echo $this->formAddToCart->qty->control();
+                                       ?>
+                                       <span class="input-group-addon"><?php echo $this->product->{Shop_Model_Product::COLUMN_UNIT} ?></span>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div>
+                           <?php
+                           $this->formAddToCart->add->html()->addClass('btn btn-tlacitko');
+                           $this->formAddToCart->add->setLabel('vložit do košíku');
+                           echo $this->formAddToCart->productId->control();
+                           echo $this->formAddToCart->add->control();
+                           ?>
+                        </div>
+                        <?php
                         echo $this->formAddToCart->renderEnd();
                      }
                      ?>
@@ -174,5 +209,8 @@ $this->includeFile('tpl://shopproductgeneral:detail_scripts.phtml');
 <script type="text/javascript">
 $(document).ready(function(){
    $("a[rel^='prettyPhoto']").prettyPhoto();
+   
+   
+   
 });
 </script>

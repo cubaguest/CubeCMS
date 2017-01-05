@@ -15,16 +15,6 @@
    });
 
    $(document).ready(function () {
-      // init spinner
-      var spinner = $('input[name="product_add_qty"]').spinner({
-         min: <?php echo $this->product->{Shop_Model_Product::COLUMN_UNIT_SIZE} ?>,
-         step: <?php echo $this->product->{Shop_Model_Product::COLUMN_UNIT_SIZE} ?>
-         <?php
-         if ($this->product->{Shop_Model_Product::COLUMN_STOCK} && !VVE_SHOP_ALLOW_BUY_NOT_IN_STOCK) {
-            echo ",max : " . $this->productQty;
-         }
-         ?>
-      });
 
       function changeCombination(varArr) {
          $.each(CubeCMS.Shop.combinations, function (key, value) {
@@ -46,17 +36,16 @@
                      str = '<?php echo $this->tr('Skladem') ?>';
                   } else {
                      // hide buy box
-                     <?php
-                     if (!VVE_SHOP_ALLOW_BUY_NOT_IN_STOCK) {
-                        echo "$('.product-to-cart').hide();\n";
+                     <?php if (!VVE_SHOP_ALLOW_BUY_NOT_IN_STOCK) { ?>
+                        $('.product-to-cart').hide();
+                     <?php } ?>
+                  }
+                  <?php if (!VVE_SHOP_ALLOW_BUY_NOT_IN_STOCK) { ?>
+                     $('input[name="product_add_qty"]').prop('max', this.qty);
+                     if($('input[name="product_add_qty"]').val() > this.qty){
+                        $('input[name="product_add_qty"]').val(this.qty);
                      }
-                     ?>
-                  }
-                  <?php
-                  if (!VVE_SHOP_ALLOW_BUY_NOT_IN_STOCK) {
-                     echo "spinner.spinner( \"option\", \"max\", this.qty);";
-                  }
-                  ?>
+                  <?php } ?>
                   $('.product-qty').text(str);
                <?php } ?>
 
