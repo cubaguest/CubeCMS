@@ -14,12 +14,28 @@
  * @abstract      Třída pro obsluhu formulářového prvku typu Input-Text
  */
 class Form_Element_Text extends Form_Element {
-/**
- * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
- * @return string
- */
+
+   /**
+    *
+    * @var string
+    */
+   protected $elemType = 'text';
+
+   /**
+   * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
+   * @return string
+   */
    public function control($renderKey = null) {
-      $this->html()->setAttrib('type', 'text');
+      $this->html()->setAttrib('type', $this->elemType);
       return parent::control($renderKey = null);
+   }
+   
+   /**
+   * Metoda nastaví typ prvku
+   * @return string
+   */
+   public function setType($type = 'text') {
+      $this->elemType = $type;
+      return $this;
    }
 }

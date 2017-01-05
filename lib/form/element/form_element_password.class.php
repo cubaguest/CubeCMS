@@ -14,13 +14,5 @@
  * @abstract      Třída pro obsluhu formulářového prvku typu Input-Text
  */
 class Form_Element_Password extends Form_Element_Text {
-   /**
-    * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
-    * @return string
-    */
-   public function control($renderKey = null) {
-      $this->html()->setAttrib('type', 'password');
-      return Form_Element::control($renderKey);
-   }
+   protected $elemType = 'password';
 }
-?>
