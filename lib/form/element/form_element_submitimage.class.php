@@ -20,6 +20,11 @@ class Form_Element_SubmitImage extends Form_Element_Submit implements Form_Eleme
     */
    private $imageFile = null;
 
+    protected function init() {
+      $this->htmlElement = new Html_Element('input');
+      $this->html()->setAttrib('type', 'image');
+   }
+   
    /**
     * Metoda naplní prvek
     */
