@@ -35,7 +35,7 @@ CubeCMS.Shop = {
       var code = this.product.code;
       $.each(variantCodes, function(id, c){
          var replacement = "{"+id+"}";
-         console.log(replacement, c, code.replace(replacement, c));
+//         console.log(replacement, c, code.replace(replacement, c));
          code = code.replace(replacement, c);
       });
       return code;
