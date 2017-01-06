@@ -1,0 +1,5 @@
+/* UPDATE_MAIN_SITE */
+/* END_UPDATE */
+
+ALTER TABLE `{PREFIX}panels` 
+ADD COLUMN `is_admin_cat` TINYINT(1) NULL DEFAULT 0;

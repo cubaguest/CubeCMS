@@ -31,7 +31,7 @@ class AppCore extends TrObject {
    /**
     * Verze enginu
     */
-   const ENGINE_VERSION = '8.3.2';
+   const ENGINE_VERSION = '8.4.1';
 
    /**
     * Obsahuje hlavní soubor aplikace
@@ -481,7 +481,7 @@ class AppCore extends TrObject {
       }
 
       foreach ($recs as $record) {
-         if (!defined('CUBE_CMS_' . $record->{Model_Config::COLUMN_KEY})) {
+         if (!defined('CUBE_CMS_' . $record->{Model_Config::COLUMN_KEY}) && !defined('VVE_' . $record->{Model_Config::COLUMN_KEY})) {
             if ($record->{Model_Config::COLUMN_VALUE} == 'true') {
                define(strtoupper('VVE_' . $record->{Model_Config::COLUMN_KEY}), true);
                define(strtoupper('CUBE_CMS_' . $record->{Model_Config::COLUMN_KEY}), true);
@@ -1059,8 +1059,7 @@ class AppCore extends TrObject {
    private function checkAttacks()
    {
       // přidat rychlou deblokaci
-
-      if (Model_IPBlocks::isBlocked(Utils_Net::getClientIP())) {
+      if (defined('CUBE_CMS_VERSION') && version_compare(CUBE_CMS_VERSION, '8.0.0' ,'>') && Model_IPBlocks::isBlocked(Utils_Net::getClientIP())) {
          echo 'Yout IP address is blocekd. Please write email to: ' . CUBE_CMS_WEB_MASTER_EMAIL;
          if (function_exists('http_response_code')) {
             http_response_code(503);
@@ -1082,6 +1081,8 @@ class AppCore extends TrObject {
          $this->_initConfig();
          // kontrola útoků a blokací
          $this->checkAttacks();
+         // init jazyka
+         Locales::factory();
          // kontrola verze enginu
          $this->checkCoreVersion();
          // inicializace URL
@@ -1092,7 +1093,7 @@ class AppCore extends TrObject {
          $this->_initMessagesAndErrors();
 
          //inicializace lokalizace
-         Locales::factory();
+//         Locales::factory();
          Url_Request::detectLang();
          // tohle je tady kvůli základní inicializaci překladače
          $tr = new Translator();
