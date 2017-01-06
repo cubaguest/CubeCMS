@@ -20,7 +20,7 @@ class Form_Element_SaveCancelStay extends Form_Element {
    private $cancelConfirmMsg = true;
 
    protected function init() {
-      $this->htmlElement = new Html_Element('input');
+      $this->htmlElement = new Html_Element('button');
       $this->html()->setAttrib('type', 'submit');
       if($this->getLabel() == null){
          $this->formElementLabel = array($this->tr('Uložit'),$this->tr('Uložit a zavřít'), $this->tr('zavřít'));
@@ -80,6 +80,7 @@ class Form_Element_SaveCancelStay extends Form_Element {
       
       $ctrlSave = clone parent::control($renderKey);
       $this->renderedId--;
+      $ctrlSave->setContent($this->formElementLabel[0]);
       $ctrlSave->setAttrib('name', $this->getName().'_ok');
       $ctrlSave->setAttrib('id', $this->getName().'_ok_'.$rKey);
 
@@ -93,6 +94,7 @@ class Form_Element_SaveCancelStay extends Form_Element {
       
       $ctrlSaveStay = clone parent::control($renderKey);
       $this->renderedId--;
+      $ctrlSaveStay->setContent($this->formElementLabel[1]);
       $ctrlSaveStay->setAttrib('name', $this->getName().'_ok_close');
       $ctrlSaveStay->setAttrib('id', $this->getName().'_ok_close_'.$rKey);
       
@@ -109,6 +111,7 @@ class Form_Element_SaveCancelStay extends Form_Element {
       
       $ctrlCancel = clone parent::control($renderKey);
       $this->renderedId--;
+      $ctrlCancel->setContent($this->formElementLabel[2]);
       $ctrlCancel->setAttrib('name', $this->getName().'_cancel');
       $ctrlCancel->setAttrib('id', $this->getName().'_cancel_'.$rKey);
       if($renderKey == null){

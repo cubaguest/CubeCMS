@@ -15,7 +15,7 @@
  */
 class Form_Element_Submit extends Form_Element implements Form_Element_Interface {
    protected function init() {
-      $this->htmlElement = new Html_Element('input');
+      $this->htmlElement = new Html_Element('button');
       $this->html()->setAttrib('type', 'submit');
    }
 
@@ -26,7 +26,16 @@ class Form_Element_Submit extends Form_Element implements Form_Element_Interface
    public function control($renderKey = null) {
       
       $this->setValues($this->getLabel());
-      return parent::control($renderKey);
+      $this->html()->setContent((string)$this->getLabel());
+      $this->html()->setAttrib('name', $this->getName());
+      $this->html()->setAttrib('id', $this->getName().'_'.$this->renderedId);
+      $this->html()->addClass($this->getName()."_class");
+      $this->html()->setAttrib('value', htmlspecialchars((string)$this->getLabel()));
+      if($renderKey == null){
+         $this->renderedId++;
+      }
+      return $this->html();
+//      return parent::control($renderKey);
    }
 
    /**
