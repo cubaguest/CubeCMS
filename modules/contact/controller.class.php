@@ -242,7 +242,8 @@ class Contact_Controller extends Controller {
       $email->setSubject($subject);
       $email->setContent(Email::getBaseHtmlMail($html));
 
-      $email->setFrom(array($formQuestion->mail->getValues() => $formQuestion->name->getValues()));
+//      $email->setFrom(array($formQuestion->mail->getValues() => $formQuestion->name->getValues()));
+      $email->setReplayTo(array($formQuestion->mail->getValues() => $formQuestion->name->getValues()));
       //$mail->addAddress($formQuestion->mail->getValues()); // odesílat na odesílatele?
 
       if (empty($adminMails)) { // pokud je prázdný výtahneme nasatvené maily
