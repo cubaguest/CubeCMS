@@ -23,6 +23,7 @@ class Model_Panel extends Model_ORM {
 //    const COLUMN_ID_CAT = 'id_category';
    const COLUMN_ID_CAT = 'id_cat';
    const COLUMN_ID_SHOW_CAT = 'id_show_cat';
+   const COLUMN_ADMIN_CAT = 'is_admin_cat';
    const COLUMN_NAME = 'pname';
    const COLUMN_ORDER = 'porder';
    const COLUMN_POSITION    = 'position';
@@ -46,6 +47,7 @@ class Model_Panel extends Model_ORM {
       $this->addColumn(self::COLUMN_ICON, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR, 'default' => null, 'aliasFor' => 'icon'));
       $this->addColumn(self::COLUMN_IMAGE, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR, 'default' => null, 'aliasFor' => 'background'));
       $this->addColumn(self::COLUMN_FORCE_GLOBAL, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => false));
+      $this->addColumn(self::COLUMN_ADMIN_CAT, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => false));
 
       $this->setPk(self::COLUMN_ID);
       $this->addForeignKey(self::COLUMN_ID_CAT, 'Model_Category', Model_Category::COLUMN_ID);
@@ -68,9 +70,8 @@ class Model_Panel extends Model_ORM {
     * @return PDOStatement -- objekt s daty
     */
    public function getPanelsList($idCat = 0, $withRights = false) {
-      $dbc = Db_PDO::getInstance();
-
       if($withRights) {
+         $dbc = Db_PDO::getInstance();
          $dbst = $dbc->prepare("SELECT *, panel.icon AS picon FROM ".Db_PDO::table(self::DB_TABLE)." AS panel"
                  ." JOIN ".Db_PDO::table(Model_Category::DB_TABLE)." AS cat ON cat."
                  .Model_Category::COLUMN_CAT_ID." = panel.".self::COLUMN_ID_CAT
@@ -80,17 +81,21 @@ class Model_Panel extends Model_ORM {
                  ." AND (panel.".self::COLUMN_ID_SHOW_CAT." = :idcat)"
                  ." ORDER BY panel.".self::COLUMN_POSITION." ASC, panel.".self::COLUMN_ORDER." DESC");
          $dbst->bindValue(":idgrp",Auth::getGroupId() , PDO::PARAM_INT);
+         $dbst->bindValue(':idcat', $idCat, PDO::PARAM_INT);
+         $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
+         $dbst->execute();
+         return $dbst->fetchAll(PDO::FETCH_CLASS, 'Model_LangContainer');
       } else {
-         $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS panel
-         JOIN ".Db_PDO::table(Model_Category::DB_TABLE)." AS cat ON cat.".Model_Category::COLUMN_CAT_ID." = panel.".self::COLUMN_ID_CAT
-                 ." WHERE (panel.".self::COLUMN_ID_SHOW_CAT." = :idcat)"
-                 ." ORDER BY panel.".self::COLUMN_POSITION." ASC, panel.".self::COLUMN_ORDER." DESC");
+         return $this->joinFK(self::COLUMN_ID_CAT)
+                 ->order(array(self::COLUMN_POSITION => Model_ORM::ORDER_ASC, self::COLUMN_ORDER => Model_ORM::ORDER_DESC))
+                 ->where(self::COLUMN_ID_SHOW_CAT, $idCat)
+                 ->records();
+//         $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)." AS panel
+//         JOIN ".Db_PDO::table(Model_Category::DB_TABLE)." AS cat ON cat.".Model_Category::COLUMN_CAT_ID." = panel.".self::COLUMN_ID_CAT
+//                 ." WHERE (panel.".self::COLUMN_ID_SHOW_CAT." = :idcat)"
+//                 ." ORDER BY panel.".self::COLUMN_POSITION." ASC, panel.".self::COLUMN_ORDER." DESC");
       }
 
-      $dbst->bindValue(':idcat', $idCat, PDO::PARAM_INT);
-      $dbst->setFetchMode(PDO::FETCH_CLASS, 'Model_LangContainer');
-      $dbst->execute();
-      return $dbst->fetchAll(PDO::FETCH_CLASS, 'Model_LangContainer');
    }
 
    /**
@@ -181,5 +186,3 @@ class Model_Panel extends Model_ORM {
       return true;
    }
 }
-
-?>

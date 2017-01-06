@@ -66,8 +66,11 @@ class Menu_Admin {
       }
    }
 
-   public function addItem($section, $item)
+   public function addItem($section, Menu_Admin_Item $item)
    {
+      if($item->getId() > Menu_Admin_Item::$lastId){
+         Menu_Admin_Item::$lastId = $item->getId();
+      }
       $this->items[$section]['items'][] = $item;
       Model_CategoryAdm::addRecord($item);
    }

@@ -149,4 +149,3 @@ class Category_Admin extends Category {
       return $this->category;
    }
 }
-?>

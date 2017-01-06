@@ -11,7 +11,9 @@ foreach ($this->panels as $key => $panel) {
    <td>
          <?php 
          if((string)$panel->{Model_Panel::COLUMN_NAME} != null) {
-            echo ($panel->{Model_Panel::COLUMN_NAME}.' (<span title="'.$this->tr('Kategorie').'">'.$panel->{Model_Category::COLUMN_NAME}.'</span>)');
+            echo ($panel->{Model_Panel::COLUMN_NAME}.' (<span title="'.$this->tr('Kategorie').'">'
+                    . ($panel->{Model_Panel::COLUMN_ADMIN_CAT} ? $this->tr('admin') : $panel->{Model_Category::COLUMN_NAME})
+                    .'</span>)');
          } else {
             echo ($panel->{Model_Category::COLUMN_NAME});
          }

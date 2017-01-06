@@ -13,7 +13,7 @@
  */
 class Menu_Admin_Item {
    
-   public static $lastId = 32789;
+   public static $lastId = 32801;
 
    protected $name;
    
@@ -41,7 +41,7 @@ class Menu_Admin_Item {
     */
    public function __construct($id, $name, $urlkey, $module, $icon = null)
    {
-      
+
       $this->id = $id;
       if($id >= self::$lastId){
          self::$lastId = $id+1;

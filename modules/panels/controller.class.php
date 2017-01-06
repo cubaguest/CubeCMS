@@ -103,23 +103,24 @@ class Panels_Controller extends Controller {
          $panel = $model->newRecord();
          
          $panel->{Model_Panel::COLUMN_ID_CAT} = $this->editForm->panel_cat->getValues();
+         $panel->{Model_Panel::COLUMN_ADMIN_CAT} = $this->editForm->panel_cat->getValues() > Model_CategoryAdm::CATEGORY_BASE_ID;
          $panel->{Model_Panel::COLUMN_POSITION} = $this->editForm->panel_box->getValues();
          $panel->{Model_Panel::COLUMN_NAME} = $this->editForm->panel_name->getValues();
          $panel->{Model_Panel::COLUMN_ORDER} = $this->editForm->panel_order->getValues();
          $panel->{Model_Panel::COLUMN_FORCE_GLOBAL} = $this->editForm->forceGlobal->getValues();
          
-         if(isset ($this->editForm->iconStored)){
-            $panel->{Model_Panel::COLUMN_ICON} = $this->editForm->iconStored->getValues();
-         }
+//         if(isset ($this->editForm->iconStored)){
+//            $panel->{Model_Panel::COLUMN_ICON} = $this->editForm->iconStored->getValues();
+//         }
          if(isset ($this->editForm->imageStored)){
             $panel->{Model_Panel::COLUMN_IMAGE} = $this->editForm->imageStored->getValues();
          }
          
          // ikona
-         if($this->editForm->icon->getValues() != null) {
-            $f = $this->editForm->icon->getValues();
-            $panel->{Model_Panel::COLUMN_ICON} = $f['name'];
-         }
+//         if($this->editForm->icon->getValues() != null) {
+//            $f = $this->editForm->icon->getValues();
+//            $panel->{Model_Panel::COLUMN_ICON} = $f['name'];
+//         }
          // obrázek
          if($this->editForm->image->getValues() != null) {
             $f = $this->editForm->image->getValues();
@@ -170,10 +171,6 @@ class Panels_Controller extends Controller {
       $this->editForm->panel_show_cat->setValues($panel->{Model_Panel::COLUMN_ID_SHOW_CAT});
       $this->editForm->forceGlobal->setValues($panel->{Model_Panel::COLUMN_FORCE_GLOBAL});
       
-      if(isset ($this->editForm->iconStored)){
-         $this->editForm->iconStored->setValues($panel->{Model_Panel::COLUMN_ICON});
-      }
-      
       if(isset ($this->editForm->imageStored)){
          $this->editForm->imageStored->setValues($panel->{Model_Panel::COLUMN_IMAGE});
       }
@@ -188,16 +185,13 @@ class Panels_Controller extends Controller {
       }
 
       if($this->editForm->isValid()){
-         
          $panel->{Model_Panel::COLUMN_ID_CAT} = $this->editForm->panel_cat->getValues();
+         $panel->{Model_Panel::COLUMN_ADMIN_CAT} = $this->editForm->panel_cat->getValues() > Model_CategoryAdm::CATEGORY_BASE_ID;
          $panel->{Model_Panel::COLUMN_POSITION} = $this->editForm->panel_box->getValues();
          $panel->{Model_Panel::COLUMN_NAME} = $this->editForm->panel_name->getValues();
          $panel->{Model_Panel::COLUMN_ORDER} = $this->editForm->panel_order->getValues();
          $panel->{Model_Panel::COLUMN_ID_SHOW_CAT} = $this->editForm->panel_show_cat->getValues();
          $panel->{Model_Panel::COLUMN_FORCE_GLOBAL} = $this->editForm->forceGlobal->getValues();
-         if(isset ($this->editForm->iconStored)){
-            $panel->{Model_Panel::COLUMN_ICON} = $this->editForm->iconStored->getValues();
-         }
          if(isset ($this->editForm->imageStored)){
             $panel->{Model_Panel::COLUMN_IMAGE} = $this->editForm->imageStored->getValues();
          }
@@ -206,11 +200,6 @@ class Panels_Controller extends Controller {
             $panel->{Model_Panel::COLUMN_ID_SHOW_CAT} = 0;
          }
          
-         // ikona
-         if($this->editForm->icon->getValues() != null) {
-            $f = $this->editForm->icon->getValues();
-            $panel->{Model_Panel::COLUMN_ICON} = $f['name'];
-         }
          // pozadí
          if($this->editForm->image->getValues() != null) {
             $f = $this->editForm->image->getValues();
@@ -229,7 +218,6 @@ class Panels_Controller extends Controller {
                $model->update(array(
                   Model_Panel::COLUMN_NAME => $this->editForm->panel_name->getValues(),
                   Model_Panel::COLUMN_IMAGE => $panel->{Model_Panel::COLUMN_IMAGE},
-                  Model_Panel::COLUMN_ICON => $panel->{Model_Panel::COLUMN_ICON},
                   Model_Panel::COLUMN_ORDER => $panel->{Model_Panel::COLUMN_ORDER},
                ));
             $this->log(sprintf('Upraveny panely kategorie id:%s', $panel->{Model_Panel::COLUMN_ID_CAT}));
@@ -240,7 +228,6 @@ class Panels_Controller extends Controller {
          $this->link()->route()->reload();
       }
 
-      $this->view()->panelIcon = $panel->{Model_Panel::COLUMN_ICON};
       $this->view()->panelbackImg = $panel->{Model_Panel::COLUMN_BACK_IMAGE};
       $this->view()->panel = $panel;
       $this->view()->form = $this->editForm;
@@ -252,21 +239,35 @@ class Panels_Controller extends Controller {
       $struct = Category_Structure::getStructure(Category_Structure::ALL);
       $panelCats = $this->createArray($struct);
 
+      $panelAdminCats = Model_CategoryAdm::getCategories();
+      
       $form = new Form('panel_'/*, true*/);
       $form->addGroup('settings', $this->tr('Základní'), $this->tr('Přiřazení panelu ke kategorii a jeho umístění'));
 
       $panelCategory = new Form_Element_Select('panel_cat', $this->tr('Panel kategorie'));
+      $keyBase = $this->tr('Ze struktury');
+      $keyAdmin = $this->tr('Z administrace');
+      $options = array(
+          $keyBase => array(),
+          $keyAdmin => array(),
+         );
       foreach ($panelCats as $cat) {
          if(file_exists(AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
             .$cat['module'].DIRECTORY_SEPARATOR.'panel.class.php')) {
-               $panelCategory->setOptions(array($cat['structname'] => $cat['id']), true);
+            $options[$keyBase][$cat['structname']] = $cat['id'];
          }
       }
+      foreach ($panelAdminCats as $id => $cat) {
+         if(file_exists(AppCore::getAppLibDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR
+            .$cat['module'].DIRECTORY_SEPARATOR.'panel.class.php')) {
+            $name = (string)$cat->{Model_Category::COLUMN_NAME};
+            $options[$keyAdmin][$name] = $id;
+         }
+      }
+      $panelCategory->setOptions($options);
       $form->addElement($panelCategory,'settings');
 
       // panel zobrazit u kategorie
-      
-      
       $panelForCats = $this->createArray($struct, true);
 
       $panelShowCategory = new Form_Element_Select('panel_show_cat', $this->tr('Zobrazit v'));
@@ -303,21 +304,6 @@ class Panels_Controller extends Controller {
       $panelName->setSubLabel($this->tr('Pokud není název zvolen, je použit název kategorie'));
       $form->addElement($panelName,'view');
 
-      $elemIcon = new  Form_Element_File('icon', $this->tr('Ikona'));
-      $elemIcon->setUploadDir(Panel_Obj::getIconDir(false));
-      $elemIcon->addValidation(new Form_Validator_FileExtension('jpg;png;gif'));
-      $form->addElement($elemIcon,'view');
-
-      $dir = Panel_Obj::getIconDir(false);
-      if(is_dir($dir)){
-         $elemIconStored = new Form_Element_Select('iconStored', $this->tr('Uložené ikony'));
-         $elemIconStored->addOption($this->tr('Žádný'), null);
-         foreach (glob($dir."*.{jpg,jpeg,gif,png,JPG,JPEG,GIF,PNG}", GLOB_BRACE) as $filename) {
-            $elemIconStored->addOption(basename($filename), basename($filename));
-         }
-         $form->addElement($elemIconStored,'view');
-      }
-      
       $elemImage = new  Form_Element_File('image', $this->tr('Obrázek panelu'));
       $elemImage->setSubLabel($this->tr('Obrázek panelu nebo pozadí dle vytvořené šablony.'));
       $elemImage->setUploadDir(Panel_Obj::getImgDir(false));
@@ -409,8 +395,12 @@ class Panels_Controller extends Controller {
 
    private function getPanelsTemplates($catId) 
    {
-      $catModel = new Model_Category();
-      $cat = $catModel->getCategoryById($catId);
+      if($catId > Model_CategoryAdm::CATEGORY_BASE_ID){
+         $cat = Model_CategoryAdm::getCategoryByID($catId);
+      } else {
+         $catModel = new Model_Category();
+         $cat = $catModel->getCategoryById($catId);
+      }
 
       $tpls = array();
       foreach (new DirectoryIterator(AppCore::getAppLibDir().AppCore::MODULES_DIR
@@ -426,8 +416,13 @@ class Panels_Controller extends Controller {
 
    public function getPanelInfoController() 
    {
-      $catModel = new Model_Category();
-      $cat = $catModel->getCategoryById($this->getRequestParam('id'));
+      $id = (int)$this->getRequestParam('id');
+      if($id > Model_CategoryAdm::CATEGORY_BASE_ID){
+         $cat = Model_CategoryAdm::getCategoryByID($id);
+      } else {
+         $catModel = new Model_Category();
+         $cat = $catModel->getCategoryById($id);
+      }
       $data = array('code' => true, 'data' => $this->tr('Žádné informace'));
 
       $cnt = file_get_contents(AppCore::getAppLibDir().AppCore::MODULES_DIR
@@ -484,5 +479,3 @@ class Panels_Controller extends Controller {
    }
 
 }
-
-?>

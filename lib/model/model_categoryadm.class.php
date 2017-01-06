@@ -12,6 +12,8 @@
  */
 class Model_CategoryAdm extends Model {
 
+   const CATEGORY_BASE_ID = 32769;
+
    /**
     * Objekt s admin menu
     * @var Menu_Admin_Item[]
@@ -35,6 +37,11 @@ class Model_CategoryAdm extends Model {
    public static function getCategoryByID($id)
    {
       return isset(self::$items[$id]) ? self::$items[$id] : false;
+   }
+   
+   public static function getCategories()
+   {
+      return self::$items;
    }
 
    public static function getCategoryByModule($module)
