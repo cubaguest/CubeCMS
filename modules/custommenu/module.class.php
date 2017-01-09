@@ -1,5 +1,3 @@
 <?php
-
-class CustomMenu_Module extends Module_Admin {
-   protected $version = '1.0.0';
+class CustomMenu_Module extends AdminCustomMenu_Module {
 }

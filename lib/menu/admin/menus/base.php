@@ -102,7 +102,7 @@ $this->addItem(Menu_Admin::SECTION_CONTENT, new Menu_Admin_Item(
 ));
 $this->addItem(Menu_Admin::SECTION_CONTENT, new Menu_Admin_Item(
     32789, array( 'cs' => 'Volitelná menu', 'en' => 'Custom menus'),
-   'content/custom-menu', 'custommenu', 'list'
+   'content/custom-menu', 'admincustommenu', 'list'
 ));
 $this->addItem(Menu_Admin::SECTION_CONTENT, new Menu_Admin_Item(
     32777, array( 'cs' => 'Úprava zdrojů vzhledu', 'en' => 'Face source edit'),

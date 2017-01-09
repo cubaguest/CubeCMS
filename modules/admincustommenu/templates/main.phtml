@@ -36,23 +36,23 @@ $this->addJsPlugin($jq);
                   foreach ($box['items'] as $item) {?>
                   <tr id="custom-menu-item-<?php echo $item->getPK()?>" class="custom-menu-item ui-widget-content"
                       data-id="<?php echo $item->getPK()?>"
-                      data-name='<?php echo htmlentities(json_encode($item->{CustomMenu_Model_Items::COLUMN_NAME}->getArray()))?>'
-                      data-box='<?php echo $item->{CustomMenu_Model_Items::COLUMN_BOX}?>'
-                      data-active="<?php echo $item->{CustomMenu_Model_Items::COLUMN_ACTIVE} ? "true" : "false" ?>"
-                      data-link="<?php echo $item->{CustomMenu_Model_Items::COLUMN_LINK}?>"
-                      data-idcat="<?php echo $item->{CustomMenu_Model_Items::COLUMN_ID_CATEGORY}?>"
-                      data-newwin="<?php echo $item->{CustomMenu_Model_Items::COLUMN_NEW_WINDOW} ? "true" : "false" ?>"
+                      data-name='<?php echo htmlentities(json_encode($item->{AdminCustomMenu_Model_Items::COLUMN_NAME}->getArray()))?>'
+                      data-box='<?php echo $item->{AdminCustomMenu_Model_Items::COLUMN_BOX}?>'
+                      data-active="<?php echo $item->{AdminCustomMenu_Model_Items::COLUMN_ACTIVE} ? "true" : "false" ?>"
+                      data-link="<?php echo $item->{AdminCustomMenu_Model_Items::COLUMN_LINK}?>"
+                      data-idcat="<?php echo $item->{AdminCustomMenu_Model_Items::COLUMN_ID_CATEGORY}?>"
+                      data-newwin="<?php echo $item->{AdminCustomMenu_Model_Items::COLUMN_NEW_WINDOW} ? "true" : "false" ?>"
                           >
                      <td class="move"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span></td>
-                     <td class="name"><?php ps($item->{CustomMenu_Model_Items::COLUMN_NAME})?></td>
+                     <td class="name"><?php ps($item->{AdminCustomMenu_Model_Items::COLUMN_NAME})?></td>
                      <td class="link">
                         <?php 
-                        $href = $item->{CustomMenu_Model_Items::COLUMN_LINK} != null ? $item->{CustomMenu_Model_Items::COLUMN_LINK} : $item->catLink;
+                        $href = $item->{AdminCustomMenu_Model_Items::COLUMN_LINK} != null ? $item->{AdminCustomMenu_Model_Items::COLUMN_LINK} : $item->catLink;
                         ?>
                         <a href="<?php echo $href?>" title="<?php ps($href);?>"><?php echo(vve_tpl_xhtml_cut($href, 30))?></a>
                      </td>
                      <td class="actions">
-                        <?php $icon = $item->{CustomMenu_Model_Items::COLUMN_ACTIVE} ? 'eye' : "eye-slash";?>
+                        <?php $icon = $item->{AdminCustomMenu_Model_Items::COLUMN_ACTIVE} ? 'eye' : "eye-slash";?>
                         <a href="<?php echo $this->link()->route('edit')->param('action', 'changeState')->param('id', $item->getPK())?>"><span class="icon icon-<?php echo $icon?>"></span></a>
                         <a href="<?php echo $this->link()->param('action', 'edit')->param('id', $item->getPK())?>"
                            onclick="CustomMenu.editCustomMenuItem(<?php echo $item->getPK()?>); return false;"
