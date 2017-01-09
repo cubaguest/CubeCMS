@@ -15,15 +15,17 @@ class JsPlugin_JsTree extends JsPlugin {
    protected $config = array('theme' => 'classic');
 
 	protected function initJsPlugin() {
-
+      $this->setJsFilesDir('jstree');
 	}
 
 	protected function setFiles() {
       $jq = new JsPlugin_JQuery();
-      $jq->addJQPlugin('cookie');
       $this->addDependJsPlugin($jq);
 //		Přidání css stylu
-		$this->addFile(new JsPlugin_CssFile('themes/'.$this->getCfgParam('theme').'/style.css'));
+//		$this->addFile(new JsPlugin_CssFile('themes/'.$this->getCfgParam('theme').'/style.css'));
+		$this->addFile(new JsPlugin_LessFile('themes/proton/style.less'));
+//      $this->addFile(new JsPlugin_LessFile('themes/proton/style.css');
+      
 		//		Přidání js soubrů pluginu
 		$this->addFile(new JsPlugin_JsFile("jquery.jstree.min.js"));
 	}
