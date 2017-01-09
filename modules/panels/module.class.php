@@ -1,5 +1,4 @@
 <?php
 
-class Panels_Module extends Module_Admin {
-   protected $version = '1.1.0';
+class Panels_Module extends AdminPanels_Module {
 }

@@ -62,7 +62,7 @@ $this->addItem(Menu_Admin::SECTION_STRUCT, new Menu_Admin_Item(
 ));
 $this->addItem(Menu_Admin::SECTION_STRUCT, new Menu_Admin_Item(
     32786, array( 'cs' => 'Panely', 'en' => 'Panels'),
-   'structure/panels', 'panels', 'window-maximize'
+   'structure/panels', 'adminpanels', 'window-maximize'
 ));
 
 /* 
