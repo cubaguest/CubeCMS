@@ -67,6 +67,9 @@ abstract class Panel extends TrObject {
          $link->setModuleRoutes($routes);
          $link->clear(true)->category($this->category()->getUrlKey());
       }
+      if($this->category instanceof Category_Admin && !Auth::isAdmin()){
+         $link->clear(true);
+      }
       $this->link = $link;
       // locales
       $this->locale = new Locales($category->getModule()->getName());
@@ -215,8 +218,10 @@ abstract class Panel extends TrObject {
    
    public function viewSettingsController(){
       $form = new Form('settings_', true);
-      $grpBasic = $form->addGroup('basic', $this->tr('Základní nastavení'));
-      $grpView = $form->addGroup('view', $this->tr('Nastavení vzhledu'));
+      $grpBasic = $form->addGroup(AdminPanels_Controller::SETTINGS_GROUP_BASE, $this->tr('Základní nastavení'));
+      $grpView = $form->addGroup(AdminPanels_Controller::SETTINGS_GROUP_VIEW, $this->tr('Nastavení vzhledu'));
+      $grpTpls = $form->addGroup(AdminPanels_Controller::SETTINGS_GROUP_TEMPLATES, $this->tr('Nastavení šablon'));
+      $grpImages = $form->addGroup(AdminPanels_Controller::SETTINGS_GROUP_IMAGES, $this->tr('Nastavení obrázků'));
 
       $settings = $this->panelObj()->getParams();
 
@@ -231,10 +236,15 @@ abstract class Panel extends TrObject {
          if(isset($settings[$tplElementName])){
             $tplSelect->setValues($settings[$tplElementName]);
          }
-         $form->addElement($tplSelect, $grpView);
+         $form->addElement($tplSelect, $grpTpls);
       }
       
       $settings['_module'] = $this->category()->getModule()->getName();
+      
+      if(function_exists('extendPanelSettings')){
+         extendPanelSettings($this->category, $form, $settings, $this->translator);
+      }
+      
       if(method_exists($this, 'settings')){
          $this->settings($settings, $form);
       } else if(method_exists(ucfirst($this->category()->getModule()->getName()).'_Panel','settingsController')) {

@@ -111,3 +111,28 @@ if (!function_exists('extendCategorySettings')) {
    }
 
 }
+
+// nastavení panelu
+if (!function_exists('extendPanelSettings')) {
+
+   function extendPanelSettings(Category $category, Form $form, &$settings, Translator $translator)
+   {
+      // obrázek
+      $elemIcon = new Form_Element_Select('picon', $translator->tr('Ikona panelu'));
+      $elemIcon->setOptions(array(
+          $translator->tr('Obecný') => 'none',
+          $translator->tr('kolečko') => 'cog',
+      ));
+      $form->addElement($elemIcon, AdminPanels_Controller::SETTINGS_GROUP_VIEW);
+
+      if (isset($settings['picon'])) {
+         $form->picon->setValues($settings['picon']);
+      }
+      // uložení
+      if ($form->isValid()) {
+         if (isset($form->picon)) {
+            $settings['picon'] = $form->picon->getValues();
+         }
+      }
+   }
+}
