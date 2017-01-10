@@ -96,7 +96,7 @@ class Categories_Controller extends Controller {
       $this->mainController();
    }
 
-   public function editController()
+   public function editController($categoryid)
    {
       $this->checkWritebleRights();
 
@@ -117,7 +117,7 @@ class Categories_Controller extends Controller {
       $form->description->setValues($record->{Model_Category::COLUMN_DESCRIPTION});
       // nadřazená kategorie
 
-      $structure = Category_Structure::getStructure(Category_Structure::ALL);
+      $structure = clone Category_Structure::getStructure(Category_Structure::ALL);
 
       $selCat = $structure->getCategory($this->getRequest('categoryid'));
       $structure->removeCat($this->getRequest('categoryid'));
@@ -285,18 +285,8 @@ class Categories_Controller extends Controller {
 
          // uprava struktury
          if ($form->parent_cat->getValues() != $selCat->getParentId()) {
-            $menuRepair = Category_Structure::getStructure(!$this->isMainStruct());
-            $cat = $menuRepair->getCategory($this->getRequest('categoryid'));
-            $menuRepair->removeCat($this->getRequest('categoryid'));
-            $menuRepair->addChild($cat, $form->parent_cat->getValues());
-            $menuRepair->saveStructure(!$this->isMainStruct());
+            $this->moveCategory($categoryid, $form->parent_cat->getValues(), false, -1);
          }
-
-         // vytvoření tabulek
-         // instalace
-//         $mInsClass = ucfirst($form->module->getValues()) . '_Install';
-//         $mInstall = new $mInsClass();
-//         $mInstall->installModule();
 
          $mClass = ucfirst($form->module->getValues()) . '_Module';
          if(!class_exists($mClass)){
@@ -945,17 +935,10 @@ class Categories_Controller extends Controller {
       $modelCat = new Model_Category();
       $structure = Category_Structure::getStructure(Category_Structure::ALL);
       $this->repairStructure($structure, $modelCat);
-      $movedCat = $structure->getCategory($idMovedCat);
+      $movedCat = $structure->getCategory((int)$idMovedCat);
       // definice ve struktuře pro přesun
       $oldParentCatId = $movedCat->getParentId();
 
-      
-      if ($oldParentCatId == $idNewParentCat){ // pokud je ve stejné urovní a naví se posunuje dopředu, je nutné odečíst jednu pozici (přesunovaný prvek)
-         $posCurrent = $structure->getPosition($idMovedCat);
-         if($posCurrent < $position){ 
-            $position--;
-         }
-      }
       // přesun do jiné kategorie
       $structure->removeCat($idMovedCat);
       $structure->addChild($movedCat, $idNewParentCat, $position);
@@ -990,6 +973,7 @@ class Categories_Controller extends Controller {
    private function repairStructure(Category_Structure $struct, Model_ORM $model)
    {
       if(!$struct->isEmpty()){
+         $model->reset();
          foreach ($struct->getChildrens() as $child) {
             $count = $model->where(Model_Category::COLUMN_CAT_ID." = :idc", array('idc' => $child->getId()))->count();
             if($count == 0){ // pokud není v db je odstraněna
