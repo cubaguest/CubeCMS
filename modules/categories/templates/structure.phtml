@@ -1,18 +1,54 @@
-<?php 
+<?php
 $this->addCssFile("style.less");
 $jq = new JsPlugin_JQuery();
-$jq->addUIDialog();
 $this->addJsPlugin($jq);
 $this->addJsPlugin(new JsPlugin_JsTree());
 
-function vveCatsRenderFunc($menuArr) {
+function vveCatsRenderFunc($menuArr)
+{
    echo '<ul>';
    foreach ($menuArr as $key => $item) {
-      echo '<li id="cat-id-'.$item->getCatObj()->getId().'">';
       
-      $name = (string)$item != null ? htmlspecialchars((string)$item) : '<span class="no-original">'.htmlspecialchars($item->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_NAME}[Locales::getDefaultLang()]).'</span>';
-      echo '<a href="#">'.$name.'&nbsp;'.vve_tpl_show_text_langs($item->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_URLKEY}).' - '.$item->getCatObj()->getId().'</a>';
-      if(!$item->isEmpty()) {
+      $data =array(
+          'type' => ($item->isEmpty() ? '' : 'folder'),
+          'catid' => $item->getID(),
+          );
+
+      switch ($item->getCatObj()->getModule()->getName()) {
+         case 'text':
+         case 'textwphotos':
+            $data['type'] = 'text';
+            break;
+         case 'articles':
+         case 'articleslist':
+         case 'articleswgal':
+         case 'news':
+            $data['type'] = 'articles';
+            break;
+         case 'photogalery':
+         case 'photogalerymed':
+            $data['type'] = 'photogalery';
+            break;
+         case 'navigation':
+            $data['type'] = 'sitemap';
+            break;
+         case 'customblocks':
+         case 'textblocks':
+            $data['type'] = 'blocks';
+            break;
+         case 'displayform':
+            $data['type'] = 'form';
+            break;
+         case 'login':
+            $data['type'] = 'user';
+            break;
+      }
+      
+      echo '<li id="cat-id-' . $item->getCatObj()->getId() . '" data-jstree=\''.  json_encode($data).'\'>';
+
+      $name = (string) $item != null ? htmlspecialchars((string) $item) : '<span class="no-original">' . htmlspecialchars($item->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_NAME}[Locales::getDefaultLang()]) . '</span>';
+      echo '<a href="#">' . $name . '&nbsp;' . vve_tpl_show_text_langs($item->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_URLKEY}) . ' - ' . $item->getCatObj()->getId() . '</a>';
+      if (!$item->isEmpty()) {
          vveCatsRenderFunc($item);
       }
       echo '</li>';
@@ -23,174 +59,240 @@ function vveCatsRenderFunc($menuArr) {
 // funkce pro render menu
 echo $this->toolbox;
 ?>
-
-<h1><?php echo $this->tr("Struktura stránek")?></h1>
-<?php //=$this->includeTpl('navigation.phtml');?>
+<h1><?php echo $this->tr("Struktura stránek") ?></h1>
+<?php //=$this->includeTpl('navigation.phtml'); ?>
 <div class="main-content-detail">
-   <p><?php echo $this->tr('Ve struktuře jsou zobrazeny také zkryté položky.');?></p>
-   <?php //sekce
-   $typeClass = 'mainStruct';
+   <div class="alert alert-info">
+      <?php echo $this->tr('Ve struktuře jsou zobrazeny také zkryté položky.'); ?>
+   </div>
+   <?php
+   //sekce
    $id = 'categories-table';
-   if($this->isMainMenu != true) {
-      $id = 'admin-categories-table';
-      $typeClass = 'adminStruct';
-      echo '<p><strong>'.$this->tr("Pozor úprava administračního menu může ovlivnit chování celých stránek!").'</strong></p>';
-   }
    ?>
-   <hr />
    <div id="category-buttons">
-      <form name="form-add" method="post" action="<?php echo $this->link()->route('add')?>">
-         <input type="submit" value="<?php echo $this->tr('Přidat')?>" name="category_add" />
+      <form name="form-add" method="post" action="<?php echo $this->link()->route('add') ?>">
+         <button type="submit" name="category_add" value="<?php psa($this->tr('Přidat')) ?>"><span class="icon icon-plus"></span> <?php ps($this->tr('Přidat')) ?></button>
       </form>
-      <form name="form-edit" method="post" action="<?php echo $this->link()->route('edit',array('categoryid' => '-ID-'))?>">
-         <input type="submit" value="<?php echo $this->tr('Upravit')?>" name="category_edit" />
+      <form name="form-edit" method="post" action="<?php echo $this->link()->route('edit', array('categoryid' => '-ID-')) ?>">
+         <input type="submit" value="<?php echo $this->tr('Upravit') ?>" name="category_edit" />
       </form>
-      <form name="form-settings" method="post" action="<?php echo $this->link()->route('settings',array('categoryid' => '-ID-'))?>">
-         <input type="submit" value="<?php echo $this->tr('Nastavit')?>" name="category_settings"  />
+      <form name="form-settings" method="post" action="<?php echo $this->link()->route('settings', array('categoryid' => '-ID-')) ?>">
+         <input type="submit" value="<?php echo $this->tr('Nastavit') ?>" name="category_settings"  />
       </form>
-      <button id="button-copy-cat"><?php echo $this->tr('Kopírovat')?></button>
-      <form name="form-delete" method="post" action="<?php echo $this->link()?>">
-         <input class="button-cancel" type="submit" value="<?php echo $this->tr('Smazat')?>" name="category_delete"  />
+      <button id="button-copy-cat"><?php echo $this->tr('Kopírovat') ?></button>
+      <form name="form-delete" method="post" action="<?php echo $this->link() ?>">
+         <input class="button-cancel" type="submit" value="<?php echo $this->tr('Smazat') ?>" name="category_delete"  />
          <input type="hidden" value="" name="category_id" />
       </form>
-      <label title="<?php echo $this->tr('Upravít URL adresy kategorie a podkategorií.')?>"
-             for="checkbox-regen-url"><?php echo $this->tr('Upravit URL adresy při přesunu')?></label>
+      <label title="<?php echo $this->tr('Upravít URL adresy kategorie a podkategorií.') ?>"
+             for="checkbox-regen-url"><?php echo $this->tr('Upravit URL adresy při přesunu') ?></label>
       <input id="checkbox-regen-url" type="checkbox" name="cat_regenerate_urls" checked="checked"
-             title="<?php echo $this->tr('Upravít URL adresy kategorie a podkategorií.')?>" />
-   </div>
-   <br />
-   <div id="category-structure-wrap">
-      <div id="category-structure" class="<?php echo $typeClass?>"><?php if($this->structure != null){echo vveCatsRenderFunc($this->structure);}?></div>
+             title="<?php echo $this->tr('Upravít URL adresy kategorie a podkategorií.') ?>" />
    </div>
    
-   <div id="category-info"><div></div></div>
-   <hr class="reseter" />
-   <div id="copy-cat-dialog" title="<?php echo $this->tr('Kopírování kategorie')?>"><?php  echo $this->formCopy;?></div>
+   <div class="row">
+      <div class="col-md-8">
+         <div id="category-structure-wrap">
+            <div id="category-structure" class="">
+            <?php
+               if ($this->structure != null) {
+                  echo vveCatsRenderFunc($this->structure);
+               }
+               ?></div>
+         </div>
+      </div>
+      <div class="col-md-4">
+         <div id="category-info"><div></div></div>
+      </div>
+   </div>
+   <?php
+      $this->includeFile('tpl://engine:components/modal.phtml', 
+         array('content' => (string)$this->formCopy, 
+            'id' => 'copy-cat-dialog',
+            'header' => $this->tr('Kopírování kategorie'),
+            'close' => true,
+            'large' => true,
+            'footer' => '<button class="btn btn-default close-modal">'.$this->tr('Zavřít').'</button>'));
+            ?>
    <script type="text/javascript">
       /* <![CDATA[ */
-      function getIdCat(str){
+      function getIdCat(str) {
          return str.match(/cat-id-(\d+)/)[1];
       }
 
       // načte informace o kategorii a vloží do boxu
-      function loadCatinfo(idc){
+      function loadCatinfo(idc) {
          showLoadBox($('#category-info').parent('div'));
+         CubeCMS.Loader.showLoadBox($('#category-info'), '<?php echo $this->tr('Načítám...');?>');
          $.ajax({
-               type: "GET", url: "<?php echo $this->link()->route("getCatInfo")?>", cache : false,
-               data: {idc : idc},
-               success: function(data){
-                  $('#category-info div').hide().html(data).show();
-                  hideLoadBox();
-               }
-            });
+            type: "GET", url: "<?php echo $this->link()->route("getCatInfo") ?>", cache: false,
+            data: {idc: idc},
+            success: function (data) {
+               $('#category-info div').hide().html(data).show();
+               CubeCMS.Loader.hideLoadBox();
+            }
+         });
       }
 
-      $(document).ready(function(){
-         $("#category-structure")
-         .bind('select_node.jstree', function(e, node){
-            var idc = getIdCat($(node.rslt.obj).attr('id'));
-            loadCatinfo(idc);
-            $('#button-copy-cat').removeClass('disabled').removeAttr('disabled');
-         })
-         .bind('deselect_node.jstree', function(e, node){
-            $('#button-copy-cat').addClass('disabled').attr('disabled', 'disabled');
-         })
-         .bind('move_node.jstree', function(e, node){
-            var newPos = {
-               idc : 0,parent : 0,position : 0,regenerate : false
-            };
-            newPos.idc = getIdCat($(node.rslt.o).attr('id'));
-            if(node.rslt.cr != -1){newPos.parent = getIdCat($(node.rslt.cr).attr('id'));}
-            newPos.position = node.rslt.cp;
-            if($('input[name=cat_regenerate_urls]').is(':checked')){newPos.regenerate = true;}
-            showLoadBox('#category-structure');
-            $.ajax({
-               type: "POST", url: "<?php echo $this->link()->route("moveCat")?>",
-               data: newPos,
-               success: function(data){
-                  hideLoadBox();
-                  loadCatinfo(newPos.idc);
-               }
-            });
-         })
-         .jstree({core : {html_titles : true,auto_save : true}, ui : {select_limit : 1}, plugins : [ "themes", "html_data", "ui", "cookies", "dnd", "crrm" ]});
+      $('#category-structure')
+      .on('select_node.jstree', function(e, node){
+         loadCatinfo(node.node.data.jstree.catid);
+         $('#button-copy-cat').removeClass('disabled').removeAttr('disabled');
+      })
+      .on('deselect_node.jstree', function(e, node){
+         $('#button-copy-cat').addClass('disabled').attr('disabled', 'disabled');
+      })
+      .bind('move_node.jstree', function(e, node){
+         var parent = $('#category-structure').jstree(true).get_node(node.parent);
+         var newPos = {
+            idc : node.node.data.jstree.catid,
+            parent : node.parent == "#" ? 0 : parent.data.jstree.catid,
+            position : node.position,
+            regenerate : $('input[name=cat_regenerate_urls]').is(':checked')
+         };
+         //console.log(parent, e, node, newPos);
+         //return;
+         //newPos.idc = getIdCat($(node.rslt.o).attr('id'));
+         //if(node.rslt.cr != -1){newPos.parent = getIdCat($(node.rslt.cr).attr('id'));}
+         //newPos.position = node.rslt.cp;
+         showLoadBox('#category-structure');
+         $.ajax({
+            type: "POST", url: "<?php echo $this->link()->route("moveCat") ?>",
+            data: newPos,
+            success: function(data){
+               CubeCMS.Loader.hideLoadBox();
+               loadCatinfo(newPos.idc);
+            }
+         });
+      })
+      .jstree({
+         core: {
+            animation: 0,
+            "check_callback": true,
+            themes: {
+               name : 'proton',
+               responsive: true
+            }
+         },
+         types: {
+            "#": {
+               "max_children": -1,
+               "max_depth": -1,
+               "valid_children": -1
+            },
+            "root": {
+               icon: "icon icon-globe",
+               "valid_children": -1
+            },
+            "default": {
+               icon: "icon icon-file-o",
+               "valid_children": -1
+            },
+            "text": {
+               icon: "icon icon-file-text-o",
+               "valid_children": -1
+            },
+            "articles": {
+               icon: "icon icon-files-o",
+               "valid_children": -1
+            },
+            "photogalery": {
+               icon: "icon icon-file-image-o",
+               "valid_children": -1
+            },
+            "sitemap": {
+               icon: "icon icon-sitemap",
+               "valid_children": -1
+            },
+            "blocks": {
+               icon: "icon icon-cubes",
+               "valid_children": -1
+            },
+            "form": {
+               icon: "icon icon-list-alt",
+               "valid_children": -1
+            },
+            "user": {
+               icon: "icon icon-user",
+               "valid_children": -1
+            }
+         },
+         "plugins": [
+            "dnd", "themes", "types"
+//            , "wholerow"
+         ]
       });
+
       // změna panelů
-      $('input[name=cat_ind_panels]').live('change', function(){
-         var sendData = {enabled : false,idc : $(this).parents('div#category-info').find('input[name=id_cat]').val()};
-         if($(this).is(":checked")){sendData.enabled = true;}
-         $.ajax({type: "POST", url: "<?php echo $this->link()->route("changeIndPanels")?>",data: sendData,
-            success: function(msg){}})
+      $('input[name=cat_ind_panels]').live('change', function () {
+         var sendData = {enabled: false, idc: $(this).parents('div#category-info').find('input[name=id_cat]').val()};
+         if ($(this).is(":checked")) {
+            sendData.enabled = true;
+         }
+         $.ajax({type: "POST", url: "<?php echo $this->link()->route("changeIndPanels") ?>", data: sendData,
+            success: function (msg) {}})
       });
       // změna visibility
-      $('select[name=cat_visibility]').live('change', function(){
-         var sendData = {idc : $(this).parents('div#category-info').find('input[name=id_cat]').val(),value : $(this).val()};
-         $.ajax({type: "POST", url: "<?php echo $this->link()->route("changeVisibility")?>",
-            data: sendData, success: function(msg){}})
+      $('select[name=cat_visibility]').live('change', function () {
+         var sendData = {idc: $(this).parents('div#category-info').find('input[name=id_cat]').val(), value: $(this).val()};
+         $.ajax({type: "POST", url: "<?php echo $this->link()->route("changeVisibility") ?>",
+            data: sendData, success: function (msg) {}})
       });
       // editace a nastavení
-      $('form[name=form-edit], form[name=form-settings]').submit(function(){
+      $('form[name=form-edit], form[name=form-settings]').submit(function () {
          // doplnění id
-         var idstr = $('#category-structure').jstree("get_selected").attr('id');
-         if(typeof(idstr) != "undefined"){
-            var id = getIdCat(idstr);
+         if (typeof ($('#category-structure').jstree("get_selected")) != "undefined") {
+            var id = $('#'+$('#category-structure').jstree("get_selected")).data('jstree').catid;
             this.action = decodeURI(this.action).replace('-ID-', id);
             return true;
          }
          return false;
       });
       // přidání kategorie (pokud je vybraná přidáme id)
-      $('form[name=form-add]').submit(function(){
+      $('form[name=form-add]').submit(function () {
          // doplnění id
-         var idstr = $('#category-structure').jstree("get_selected").attr('id');
-         if(typeof(idstr) != "undefined"){
-            var id = getIdCat(idstr);
-            this.action = '<?php echo $this->link()->route('add')?>?id='+id;
+         
+         if (typeof ($('#category-structure').jstree("get_selected")) != "undefined") {
+            var id = $('#'+$('#category-structure').jstree("get_selected")).data('jstree').catid;
+            this.action = '<?php echo $this->link()->route('add') ?>?id=' + id;
          }
          return true;
       });
       // mazání
-      $('form[name=form-delete]').submit(function(){
-         var node = $('#category-structure').jstree("get_selected");
-         if(node.length == 0) return false;
-         var q = '<?php echo $this->tr('Oprvadu odstranit kategorii "%s"? (Odstraní se také její potomci.)')?>';
+      $('form[name=form-delete]').submit(function () {
+         var node = $('#'+$('#category-structure').jstree("get_selected"));
+         if (node.length == 0)
+            return false;
+         var q = '<?php echo $this->tr('Oprvadu odstranit kategorii "%s"? (Odstraní se také její potomci.)') ?>';
          q = q.replace('%s', node.text());
-         if(confirm(q)){
+         if (confirm(q)) {
             // doplnění id
-            $('input[name=category_id]').val(getIdCat(node.attr('id')));
+            $('input[name=category_id]').val(node.data('jstree').catid);
             return true;
          }
          return false;
       });
       // úprava url klíče
-      $('td.editable').live('click', function(){
-         if($('input', this).length == 0){
-            var cnt = $('a',this).text();
+      $('td.editable').live('click', function () {
+         if ($('input', this).length == 0) {
+            var cnt = $('a', this).text();
             $(this).find('a').hide();
-            var $input = $('<input />').attr({ type : 'text', name : 'newvalue' }).val(cnt);
+            var $input = $('<input />').attr({type: 'text', name: 'newvalue'}).val(cnt);
             $(this).append($input);
             $input.focus();
          }
       });
-      $('td.editable input').live('focusout', function(){
-            var cnt = $(this).val();
-            $(this).prev('a').text(cnt).show();
-            $(this).remove();
+      $('td.editable input').live('focusout', function () {
+         var cnt = $(this).val();
+         $(this).prev('a').text(cnt).show();
+         $(this).remove();
       });
-
       // kopírování
-      var $copyDialog = $('#copy-cat-dialog').dialog({
-         autoOpen: <?php echo $this->showCopyDialog == true ? "true" : "false" ?>,
-			height: 220,
-			width: 500,
-			// position: "top",
-			resizable: false
-      });
-      $('#button-copy-cat').click(function(){
-         $copyDialog.dialog( "open" );
+      $('#button-copy-cat').click(function () {
+         $('#copy-cat-dialog').show();
          // add id to form
-         $copyDialog.find('input[name="cat_copy_id"]')
-            .val( getIdCat( $('#category-structure').jstree("get_selected").attr('id') ) );
+         $('#copy-cat-dialog').find('input[name="cat_copy_id"]')
+                 .val($('#'+$('#category-structure').jstree("get_selected")).data('jstree').catid);
       });
       /* ]]> */
    </script>
