@@ -343,7 +343,9 @@ abstract class Shop_Product_Controller extends Controller {
       } else {
          // nahrání nového titulního
          $eImage = new Form_Element_Image('image', $this->tr('Titulní obrázek'));
-         $eImage->setUploadDir(Shop_Tools::getProductImagesDir().$product->getPK().DIRECTORY_SEPARATOR);
+         if(!$product->isNew()){
+            $eImage->setUploadDir(Shop_Tools::getProductImagesDir().$product->getPK().DIRECTORY_SEPARATOR);
+         }
          $form->addElement($eImage, $fGrpInfo);
       }
       
@@ -538,6 +540,10 @@ abstract class Shop_Product_Controller extends Controller {
                $newObj->save();
                $newObj->setAsTitle();
                $fileObj->rename($newObj->getPK().'.'.$fileObj->getExtension());
+               if($newProduct){
+                  FS_Dir::checkStatic(Shop_Tools::getProductImagesDir().$product->getPK().DIRECTORY_SEPARATOR);
+                  $fileObj->move(Shop_Tools::getProductImagesDir().$product->getPK().DIRECTORY_SEPARATOR);
+               }
             }
          }
          
@@ -1175,7 +1181,7 @@ abstract class Shop_Product_Controller extends Controller {
       $this->view()->formDelete = $formDelete;
    }
 
-   public function processDeleteProduct(Model_ORM_Record $product)
+   public function processDeleteProduct($product)
    {
       $model = new Shop_Model_Product();
       if($product instanceof Model_ORM_Record){
@@ -1187,19 +1193,8 @@ abstract class Shop_Product_Controller extends Controller {
          return;
       }
 
-      // images
-      if($product->{Shop_Model_Product::COLUMN_IMAGE} != null){
-         if(is_file(Shop_Tools::getProductImagesDir().'small'.DIRECTORY_SEPARATOR.$product->{Shop_Model_Product::COLUMN_IMAGE})
-           && is_writable(Shop_Tools::getProductImagesDir().'small'.DIRECTORY_SEPARATOR.$product->{Shop_Model_Product::COLUMN_IMAGE})){
-               @unlink(Shop_Tools::getProductImagesDir().'small'.DIRECTORY_SEPARATOR.$product->{Shop_Model_Product::COLUMN_IMAGE});
-         }
-         if(is_file(Shop_Tools::getProductImagesDir().DIRECTORY_SEPARATOR.$product->{Shop_Model_Product::COLUMN_IMAGE})
-            && is_writable(Shop_Tools::getProductImagesDir().DIRECTORY_SEPARATOR.$product->{Shop_Model_Product::COLUMN_IMAGE})){
-               @unlink(Shop_Tools::getProductImagesDir().DIRECTORY_SEPARATOR.$product->{Shop_Model_Product::COLUMN_IMAGE});
-         }
-      }
       $model->delete($product);
-      // @todo smazat kombinace, varinaty a propojení
+      // @todo smazat kombinace, varinaty a propojení - řeší se v modelu produktu
    }
 
    protected function formDupliacateProduct(Model_ORM_Record $product)
