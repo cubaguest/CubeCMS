@@ -80,7 +80,7 @@ class Model_Category extends Model_ORM {
 
    protected function _initTable()
    {
-      $this->setTableName($this->tableName, 't_cats');
+      $this->setTableName(self::DB_TABLE, 't_cats');
 
       $this->addColumn(self::COLUMN_ID, array('datatype' => 'int', 'ai' => true, 'nn' => true, 'pk' => true));
       $this->addColumn(self::COLUMN_ID_USER_OWNER, array('datatype' => 'int', 'nn' => true, 'default' => 0));
