@@ -200,7 +200,7 @@ class Module
             if(!class_exists($mClass)){
                $mClass = 'Module';
             }
-            $inst = new $mClass($module, array(), self::getModuleVersion($moduleName, $this->dbPrefix), $this->dbPrefix);
+            $inst = new $mClass($module, array(), self::getModuleVersion($module, $this->dbPrefix), $this->dbPrefix);
          }
       }
    }
