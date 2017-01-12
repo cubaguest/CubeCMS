@@ -32,4 +32,12 @@ class Form_Decorator_Vertical extends Form_Decorator implements Form_Decorator_I
       return $html;
    }
    
+   public function createRow($name, $formElements)
+   {
+      $row = parent::createRow($name, $formElements);
+      if($formElements[$name] instanceof Form_Element_Checkbox){
+         $row->addClass('form-group-inline');
+      }
+      return $row;
+   }
 }

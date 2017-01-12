@@ -209,7 +209,7 @@ form {
       display: table;
    }
    &.form-vertical {
-      .form-group {
+      .form-group:not([class*="form-group-inline"]) {
          .form-labels:not([class*="col-"]),
          .form-labels {
             width: 100%;

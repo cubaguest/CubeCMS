@@ -27,7 +27,10 @@ class Form_Decorator implements Form_Decorator_Interface {
       'ctrlcontent' => array('labelLangs', 'controll', 'labelValidations', 'subLabel'), // název metod pro render
       'labelwrapwidth' => 100,
       'ctrlwrapwidth' => 400,
-      'hiddenClass' => 'hidden');
+      'hiddenClass' => 'hidden',
+      'labelColClass' => 'col-md-3',
+      'controlColClass' => 'col-md-9',
+       );
    protected $content = null;
    protected $groupText = null;
    protected $groupName = null;
@@ -43,6 +46,7 @@ class Form_Decorator implements Form_Decorator_Interface {
     */
    public function __construct($decoration = array())
    {
+      $this->decoration = array_merge($this->decoration, $decoration);
    }
 
    /**
@@ -122,7 +126,7 @@ class Form_Decorator implements Form_Decorator_Interface {
    public function createLabel($element)
    {
       $cell = new Html_Element('div');
-      $cell->addClass('col-md-3')->addClass('form-labels');
+      $cell->addClass($this->decoration['labelColClass'])->addClass('form-labels');
       if(
           !$element instanceof Form_Element_Button 
           && !$element instanceof Form_Element_Submit 
@@ -144,7 +148,7 @@ class Form_Decorator implements Form_Decorator_Interface {
    public function createControl($element)
    {
       $cell = new Html_Element('div');
-      $cell->addClass('col-md-9')->addClass('form-controls');
+      $cell->addClass($this->decoration['controlColClass'])->addClass('form-controls');
       
       if($element->isMultiLang()){
          $cell->addContent($element->labelLangs());
@@ -245,6 +249,11 @@ class Form_Decorator implements Form_Decorator_Interface {
       }
       $pHtml->addClass('inline');
       $html->addContent($pHtml);
+      
+      $errHtml = new Html_Element('div');
+      $errHtml->addClass('form-errors');
+      $html->addContent($errHtml);
+      
       return $html;
    }
    
