@@ -61,6 +61,6 @@ interface Form_Decorator_Interface {
     * Renderuje ovládací prvek
     * @param Html_Element $param
     */
-   public function createForm(Form $form);
+   public function createForm();
    
 }

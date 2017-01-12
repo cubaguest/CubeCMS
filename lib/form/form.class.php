@@ -77,7 +77,8 @@ class Form extends TrObject implements ArrayAccess, Iterator {
    private $tokenIsOk = false;
    private $submitElement = null;
    private $decorator = null;
-
+   
+   protected $errors = array();
 
    /**
     * Konstruktor vytváří objekt formuláře
@@ -85,7 +86,7 @@ class Form extends TrObject implements ArrayAccess, Iterator {
     */
    function __construct($prefix = null, $protectForm = false, Form_Decorator_Interface $decorator = null) {
       $this->formPrefix = $prefix;
-      $this->decorator = $decorator == null ? new Form_Decorator() : $decorator;
+      $this->decorator = $decorator == null ? new Form_Decorator_Horizontal() : $decorator;
       
       $this->htmlElement = new Html_Element('form');
       $this->htmlElement->setAttrib('role', 'form');
@@ -399,9 +400,11 @@ class Form extends TrObject implements ArrayAccess, Iterator {
          if(!$element->isPopulated()){
             $element->populate();
          }
+         /* @var $element Form_Element */
          $element->validate();
          if(!$element->isValid()) {
             $this->isValid = false;
+//            $this->errors[] = $element->get
             continue;
          }
          $element->filter();

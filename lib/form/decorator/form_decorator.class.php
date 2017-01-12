@@ -11,62 +11,60 @@
  * @abstract      Třída dekorátoru pro formulář
  */
 class Form_Decorator implements Form_Decorator_Interface {
-
-   protected $decoration = array('wrap' => 'table',
-      'wrapclass' => 'form-table',
-      'wrapgroupclass' => 'form-table form-table-group',
-      'grouplabelclass' => 'form-group-text',
-      'rowwrap' => 'tr',
-      'labelwrap' => 'th',
-      'labelwrapclass' => 'form-labels',
-      'sublabelclass' => 'form-sub-label',
-      'ctrlwrap' => 'td',
-      'ctrlwrapclass' => 'form-controlls',
-      'newline' => false,
-      'labelcontent' => array('label'),
-      'ctrlcontent' => array('labelLangs', 'controll', 'labelValidations', 'subLabel'), // název metod pro render
-      'labelwrapwidth' => 100,
-      'ctrlwrapwidth' => 400,
-      'hiddenClass' => 'hidden',
-      'labelColClass' => 'col-md-3',
-      'controlColClass' => 'col-md-9',
-       );
-   protected $content = null;
-   protected $groupText = null;
-   protected $groupName = null;
+   private $content = null;
    
-   protected $hasAdvFields = false;
-
-
-   const CHECKBOX_LABEL_AFTER_CHARS = 25;
-
+   protected $decoration = array();
+   
+   /**
+    *
+    * @var Form
+    */
+   protected $form = null;
+   
    /**
     * Konstruktor vytvoří obal
-    * @param array $decoration -- pole s nastavením pro dekorátor prvky
+    * @param array $decoration -- pole s nastavením pro dekorátor
+    *
+    * <p>
+    * prvky<br/>
+    * <ul>
+    * <li>'wrap' -- obal elementů (table)</li>
+    * <li>'rowwrap' -- obal řádku (tr)</li>
+    * <li>'labelwrap' -- obal popisku (th)</li>
+    * <li>'ctrlwrap' -- obal kontrolního prvku (td)</li>
+    * </ul>
+    * </p>
     */
-   public function __construct($decoration = array())
+   public function __construct($decoration = null)
    {
-      $this->decoration = array_merge($this->decoration, $decoration);
+      if($decoration){
+         $this->decoration = array_merge($this->decoration, $decoration);
+      }
    }
 
    /**
-    * 
-    * @param Form $form
+    * Metoda vygeneruje řádek pro formulář
     * @return string
     */
    public function render(Form $form)
    {
-      $html = $this->createForm($form);
-      foreach ($form->elementsGroups as $name => $group) {
+      $this->form = $form;
+      return $this->prepareForm();
+   }
+   
+   protected function prepareForm()
+   {
+      $html = $this->createForm();
+      foreach ($this->form->elementsGroups as $name => $group) {
          if(is_array($group)){
-            $html->addContent($this->createGroup($name, $group, $form->elements));
+            $html->addContent($this->createGroup($name, $group, $this->form->elements));
          } else {
-            $html->addContent($this->createRow($name, $form->elements));
+            $html->addContent($this->createRow($name, $this->form->elements));
          }
       }
       return (string)$html;
    }
-   
+
    /**
     * Renderuje celou skupinu elementů
     * @param type $param
@@ -101,22 +99,7 @@ class Form_Decorator implements Form_Decorator_Interface {
     */
    public function createRow($name, $formElements)
    {
-      $row = new Html_Element('div');
-      $row->addClass('form-group');
-      if($formElements[$name] instanceof Form_Element_Hidden){
-         $row->addClass('form-group-hidden');
-      }
-      if( $formElements[$name]->isPopulated() && !$formElements[$name]->isValid() ){
-         $row->addClass('has-error');
-      }
-      if( $formElements[$name]->isAdvanced()){
-         $row->addClass('form-group-advanced');
-         $this->hasAdvFields = true;
-      }
-      $row->addContent( $this->createLabel($formElements[$name]) );
-      $row->addContent( $this->createControl($formElements[$name]) );
-      
-      return $row;
+      return $this->createLabel($formElements[$name]) . $this->createControl($formElements[$name]);
    }
    
    /**
@@ -125,20 +108,15 @@ class Form_Decorator implements Form_Decorator_Interface {
     */
    public function createLabel($element)
    {
-      $cell = new Html_Element('div');
-      $cell->addClass($this->decoration['labelColClass'])->addClass('form-labels');
+      $string = null;
       if(
           !$element instanceof Form_Element_Button 
           && !$element instanceof Form_Element_Submit 
           && !$element instanceof Form_Element_SaveCancel 
-          && !$element instanceof Form_Element_Checkbox 
           ){
-         $cell->addContent($element->label());
+         $string .= $element->label();
       }
-      if($element instanceof Form_Element_Checkbox && mb_strlen($element->getLabel()) <= self::CHECKBOX_LABEL_AFTER_CHARS){
-         $cell->addContent($element->label());
-      }
-      return $cell;
+      return $string;
    }
    
    /**
@@ -147,114 +125,40 @@ class Form_Decorator implements Form_Decorator_Interface {
     */
    public function createControl($element)
    {
-      $cell = new Html_Element('div');
-      $cell->addClass($this->decoration['controlColClass'])->addClass('form-controls');
-      
-      if($element->isMultiLang()){
-         $cell->addContent($element->labelLangs());
-      }
-      
-      if($element instanceof Form_Element_Multi){
-         $wrap = new Html_Element('div');
-         $wrap->addClass('inline-elements');
-         foreach ($element as $e) {
-            $this->addControlClass($e);
-            
-            $wrapControl = new Html_Element('div');
-            if($e instanceof Form_Element_Checkbox){
-               $wrapControl->addClass('checkbox');
-               $wrapControl->addContent($e->control());
-               $wrapControl->addContent($e->label(null, true));
-            } else {
-               $wrapControl->addClass('group');
-               $e->htmlLabel()->addClass('sr-only');
-               $wrapControl->addContent($e->label());
-               $wrapControl->addContent($e->control());
-            }
-               
-            $wrap->addContent($wrapControl);
-         }
-         $cell->addContent($wrap);
-      } else if($element instanceof Form_Element_Checkbox && mb_strlen($element->getLabel()) > self::CHECKBOX_LABEL_AFTER_CHARS) {
-         $cell->addContent($element->control());
-         $cell->addContent($element->label(null, true));
-      } else {
-         $this->addControlClass($element);
-         $cell->addContent($element->control());
-      }
-      
-      
-      // subpopisky a validace
-      if($element->labelValidations() != null){
-         $validations = new Html_Element('div', $element->labelValidations());
-         $validations->addClass('help-block');
-         $cell->addContent($validations);
-      }
-      if($element->getSubLabel() != null){
-         $sublabel = new Html_Element('div', $element->subLabel());
-         $sublabel->addClass('help-block');
-         $cell->addContent($sublabel);
-      }
+      $string = null;
+      $string .= $element->control();
       $scripts = $element->scripts();
       if($scripts != null){
-         $cell->addContent(new Html_Element_Script($scripts));
+         $string .= new Html_Element_Script($scripts);
       }
-      
-      return $cell;
+      return $string;
    }
    
-   /**
-    * Přidá potřebné třídy do elementu
-    */
-   protected function addControlClass(Form_Element $element)
-   {
-      if($element instanceof Form_Element_Button 
-          || $element instanceof Form_Element_Submit
-          ){
-         $element->html()->addClass('btn')->addClass('btn-primary');
-      } 
-      // textová pole
-      else if(
-          $element instanceof Form_Element_Text 
-          || $element instanceof Form_Element_Password 
-          || $element instanceof Form_Element_File 
-          || $element instanceof Form_Element_TextArea 
-          || ($element instanceof Form_Element_Select && !$element instanceof Form_Element_Radio) ){
-         $element->html()->addClass('form-control');
-      } 
-      else if($element instanceof Form_Element_SaveCancel){
-         $element->cssClasses['confirmClass'] = array_merge($element->cssClasses['confirmClass'], array('btn', 'btn-success'));
-         $element->cssClasses['cancelClass'] = array_merge($element->cssClasses['cancelClass'], array('btn', 'btn-danger'));
-      }
-//      else if($element instanceof Form_Element_SaveCancel){
-//      }
-   }
-
-
    /**
     * Renderuje ovládací prvek
     * @param Html_Element $param
     */
-   public function createForm(Form $form)
+   public function createForm()
    {
-      $html = clone $form->html();
-      $html
-          ->addClass('form-horizontal')
-          ->setAttrib('role', 'form');
+      $html = $this->form->html();
+      $html->clearContent();
+      $html->setAttrib('role', 'form');
+      $html->addClass('form-inline');
+      $html->addContent($this->createMsgBox());
       // kontrolní prvky
-      $pHtml = new Html_Element('div', $form->elementCheckForm->control());
-      $pHtml->addContent($form->elementFormID->control());
-      if($form->protectForm && $form->elementToken instanceof Form_Element_Token){
-         $pHtml->addContent((string)$form->elementToken->controll());
+      $html->addContent($this->form->elementCheckForm->control());
+      $html->addContent($this->form->elementFormID->control());
+      if($this->form->protectForm && $this->form->elementToken instanceof Form_Element_Token){
+         $html->addContent($this->form->elementToken->controll());
       }
-      $pHtml->addClass('inline');
-      $html->addContent($pHtml);
-      
+      return $html;
+   }
+   
+   protected function createMsgBox()
+   {
       $errHtml = new Html_Element('div');
       $errHtml->addClass('form-errors');
-      $html->addContent($errHtml);
-      
-      return $html;
+      return $errHtml;
    }
    
 }
