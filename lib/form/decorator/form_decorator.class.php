@@ -158,7 +158,11 @@ class Form_Decorator implements Form_Decorator_Interface {
    {
       $errHtml = new Html_Element('div');
       $errHtml->addClass('form-errors');
-      return $errHtml;
+      $errHtml->setAttrib('style', 'display:none;');
+      $infoHtml = new Html_Element('div');
+      $infoHtml->addClass('form-success');
+      $infoHtml->setAttrib('style', 'display:none;');
+      return $infoHtml.$errHtml;
    }
    
 }
