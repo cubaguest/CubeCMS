@@ -11,16 +11,16 @@
  * @abstract      Třída dekorátoru pro formulář
  */
 class Form_Decorator implements Form_Decorator_Interface {
+
    private $content = null;
-   
    protected $decoration = array();
-   
+
    /**
     *
     * @var Form
     */
    protected $form = null;
-   
+
    /**
     * Konstruktor vytvoří obal
     * @param array $decoration -- pole s nastavením pro dekorátor
@@ -37,7 +37,7 @@ class Form_Decorator implements Form_Decorator_Interface {
     */
    public function __construct($decoration = null)
    {
-      if($decoration){
+      if ($decoration) {
          $this->decoration = array_merge($this->decoration, $decoration);
       }
    }
@@ -51,18 +51,18 @@ class Form_Decorator implements Form_Decorator_Interface {
       $this->form = $form;
       return $this->prepareForm();
    }
-   
+
    protected function prepareForm()
    {
       $html = $this->createForm();
       foreach ($this->form->elementsGroups as $name => $group) {
-         if(is_array($group)){
+         if (is_array($group)) {
             $html->addContent($this->createGroup($name, $group, $this->form->elements));
          } else {
             $html->addContent($this->createRow($name, $this->form->elements));
          }
       }
-      return (string)$html;
+      return (string) $html;
    }
 
    /**
@@ -71,13 +71,13 @@ class Form_Decorator implements Form_Decorator_Interface {
     */
    public function createGroup($name, $params, $formElements)
    {
-      if(empty($params['elements'])){
+      if (empty($params['elements'])) {
          return null;
       }
-      
+
       $grp = new Html_Element('fieldset');
       $name = new Html_Element('span', $params['label']);
-      if(mb_strlen($params['text']) <= 80){
+      if (mb_strlen($params['text']) <= 80) {
          $text = new Html_Element('span', new Html_Element('small', $params['text']));
          $grp->addContent(new Html_Element('legend', $name->addClass('legend-name') . $text->addClass('legend-text')));
       } else {
@@ -89,10 +89,10 @@ class Form_Decorator implements Form_Decorator_Interface {
       foreach ($params['elements'] as $name => $realname) {
          $grp->addContent($this->createRow($name, $formElements));
       }
-      
+
       return $grp;
    }
-   
+
    /**
     * Renderuje řádek elementu
     * @param type $param
@@ -101,7 +101,7 @@ class Form_Decorator implements Form_Decorator_Interface {
    {
       return $this->createLabel($formElements[$name]) . $this->createControl($formElements[$name]);
    }
-   
+
    /**
     * Renderuje popisek k prvku
     * @param type $param
@@ -109,16 +109,14 @@ class Form_Decorator implements Form_Decorator_Interface {
    public function createLabel($element)
    {
       $string = null;
-      if(
-          !$element instanceof Form_Element_Button 
-          && !$element instanceof Form_Element_Submit 
-          && !$element instanceof Form_Element_SaveCancel 
-          ){
+      if (
+              !$element instanceof Form_Element_Button && !$element instanceof Form_Element_Submit && !$element instanceof Form_Element_SaveCancel
+      ) {
          $string .= $element->label();
       }
       return $string;
    }
-   
+
    /**
     * Renderuje ovládací prvek
     * @param type $param
@@ -128,12 +126,12 @@ class Form_Decorator implements Form_Decorator_Interface {
       $string = null;
       $string .= $element->control();
       $scripts = $element->scripts();
-      if($scripts != null){
+      if ($scripts != null) {
          $string .= new Html_Element_Script($scripts);
       }
       return $string;
    }
-   
+
    /**
     * Renderuje ovládací prvek
     * @param Html_Element $param
@@ -148,21 +146,25 @@ class Form_Decorator implements Form_Decorator_Interface {
       // kontrolní prvky
       $html->addContent($this->form->elementCheckForm->control());
       $html->addContent($this->form->elementFormID->control());
-      if($this->form->protectForm && $this->form->elementToken instanceof Form_Element_Token){
+      if ($this->form->protectForm && $this->form->elementToken instanceof Form_Element_Token) {
          $html->addContent($this->form->elementToken->controll());
       }
       return $html;
    }
-   
+
    protected function createMsgBox()
    {
       $errHtml = new Html_Element('div');
-      $errHtml->addClass('form-errors');
+      $errHtml->addClass('form-errors')
+              ->addClass('alert')
+              ->addClass('alert-danger');
       $errHtml->setAttrib('style', 'display:none;');
       $infoHtml = new Html_Element('div');
-      $infoHtml->addClass('form-success');
+      $infoHtml->addClass('form-success')
+              ->addClass('alert')
+              ->addClass('alert-success');
       $infoHtml->setAttrib('style', 'display:none;');
-      return $infoHtml.$errHtml;
+      return $infoHtml . $errHtml;
    }
-   
+
 }
