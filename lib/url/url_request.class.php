@@ -30,7 +30,8 @@ class Url_Request {
    const URL_FILE_ATOM = 'atom.xml';
    
    const URL_POPUP_WINDOW = 'popupwindow';
-
+   
+   const URL_OUTPUT_TYPE = '_cms_output';
 
    /**
     * jestli se jedná o normální url nebo url s podpůrnými službami
@@ -332,10 +333,12 @@ class Url_Request {
                   $this->urlType = self::URL_TYPE_MODULE_REQUEST;
                   $this->outputType = $fileMatchs[2];
                   $this->pageFull = false;
-               } else if(self::isXHRRequest() || isset ($_GET['out'])){ // při XHR není nutné zpracovávat celou stránku :-)
+               } else if(self::isXHRRequest() || isset ($_GET['out']) || isset ($_REQUEST[self::URL_OUTPUT_TYPE])){ // při XHR není nutné zpracovávat celou stránku :-)
                   $this->urlType = self::URL_TYPE_MODULE_REQUEST;
                   if(isset ($_GET['out'])){
                      $this->outputType = $_GET['out'];
+                  } else if(isset ($_REQUEST[self::URL_OUTPUT_TYPE])){
+                     $this->outputType = $_REQUEST[self::URL_OUTPUT_TYPE];
                   }
                   $this->pageFull = false;
                }
@@ -364,6 +367,7 @@ class Url_Request {
                      $this->urlType = self::URL_TYPE_MODULE_REQUEST;
                      $this->pageFull = false;
                   }
+                  $this->outputType = isset($_REQUEST[self::URL_OUTPUT_TYPE]) ? $_REQUEST[self::URL_OUTPUT_TYPE] : $this->outputType;
                   // jinak se jednná o kategorii
                   $this->category = (string)$item->{Model_Category::COLUMN_URLKEY};
                   $this->moduleUrlPart = $matches[1];

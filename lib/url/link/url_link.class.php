@@ -44,6 +44,13 @@ class Url_Link extends Url {
    protected static $currentCategory = null;
 
    /**
+    * Interní typ výstupu
+    * @var string
+    */
+   protected $output = null;
+
+
+   /**
     * Proměná se zvolenou cestou
     * @var string
     */
@@ -195,6 +202,12 @@ class Url_Link extends Url {
          self::$currentParams = self::parseParams($params);
       }
    }
+   
+   public function setOutput($type = null)
+   {
+      $this->output = $type;
+      return $this;
+   }
 
    /**
     * Metoda odstraní všechny parametry v odkazu
@@ -205,6 +218,7 @@ class Url_Link extends Url {
       $this->file(null);
       $this->route = null;
       $this->anchor = null;
+      $this->output = null;
       if($withOutCategory) {
          $this->category();
       }
@@ -241,6 +255,9 @@ class Url_Link extends Url {
          $returnString.=$this->getFile();
       }
       //        Parsovatelné parametry
+      if($this->output){
+         $this->param(Url_Request::URL_OUTPUT_TYPE, $this->output);
+      }
       if(!empty ($this->paramsArray)) {
          $returnString.=$this->getParams();
       }
