@@ -42,6 +42,7 @@ class ShopProductList_Controller extends Shop_Product_Controller {
 
       // řazení
       $sortTypes = self::getSortTypes();
+      $model->order(array(Shop_Model_Product::COLUMN_NAME => Model_ORM::ORDER_ASC));
       if(isset ($sortTypes[$sort])){
          $model->order(array($sortTypes[$sort]['column'] => $sortTypes[$sort]['sort']));
       }
