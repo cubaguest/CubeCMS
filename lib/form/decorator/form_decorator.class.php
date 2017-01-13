@@ -154,17 +154,21 @@ class Form_Decorator implements Form_Decorator_Interface {
 
    protected function createMsgBox()
    {
+      $boxHtml = new Html_Element('div');
+      $boxHtml->addClass('form-msgs');
       $errHtml = new Html_Element('div');
       $errHtml->addClass('form-errors')
               ->addClass('alert')
               ->addClass('alert-danger');
       $errHtml->setAttrib('style', 'display:none;');
+      $boxHtml->addContent($errHtml);
       $infoHtml = new Html_Element('div');
       $infoHtml->addClass('form-success')
               ->addClass('alert')
               ->addClass('alert-success');
       $infoHtml->setAttrib('style', 'display:none;');
-      return $infoHtml . $errHtml;
+      $boxHtml->addContent($infoHtml);
+      return $boxHtml;
    }
 
 }
