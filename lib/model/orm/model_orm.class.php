@@ -928,11 +928,10 @@ abstract class Model_ORM extends Model implements ArrayAccess {
          $replacements = array();
          foreach (array_merge($this->bindValues, $this->whereBindValues, $this->havingBindValues) as $key => $value) {
             $k = $key;
-            if(strpos(':', $key) === false){
+            if(strpos($key,':') === false){
                $k = ':'.$key;
             }
             $replacements[$k] = is_int($value) ? $value : '\''.$value.'\'';
-            
          }
          $sql = str_replace(array_keys($replacements), $replacements, $sql);
       }
