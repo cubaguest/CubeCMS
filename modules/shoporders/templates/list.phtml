@@ -19,9 +19,9 @@ $this->addFile('css://style.css');
    
       function showOrder(id, callback){
          selOrderId = id;
-         var link = '<?php echo  $this->link()->route('viewOrder') ?>';
+         var link = '<?php echo  $this->link()->route('viewOrder', array('id' => '[ID]')) ?>';
          $.ajax({
-            url: link.replace('{id}', id),
+            url: link.replace('[ID]', id),
             cache: false,
             success: function(html){
                $("#order-detail").html(html);
@@ -38,7 +38,7 @@ $this->addFile('css://style.css');
          });
       }
       function downloadOrder(type, id){
-         window.location.href = ('<?php echo $this->link()->route('exportOrder')?>').replace('{id}', id).replace('{output}', type);
+         window.location.href = ('<?php echo $this->link()->route('exportOrder', array('id' => '[ID]', 'output' => '[output]'))?>').replace('[ID]', id).replace('[output]', type);
       }
       function deleteOrder(id){
          var link = '<?php echo  $this->link()->route('deleteOrder') ?>';
@@ -90,7 +90,8 @@ $this->addFile('css://style.css');
             datatype: 'json',
             ajaxGridOptions : {type:"POST"},
             url: '<?php echo  $this->link()->route('ordersList'); ?>',
-            colNames:['ID', '<?php echo  $this->tr('Jméno a příjmení') ?>', '<?php echo  $this->tr('Přijato') ?>', '<?php echo  $this->tr('Datum odběru') ?>', '<?php echo  $this->tr('Status') ?>',
+            colNames:['ID', '<?php echo  $this->tr('Jméno a příjmení') ?>', '<?php echo  $this->tr('Přijato') ?>', 
+               '<?php echo  $this->tr('Datum odběru') ?>', '<?php echo  $this->tr('Status') ?>',
                '<?php echo  $this->tr('Cena') ?>', '<?php echo  $this->tr('Akce') ?>'],
             colModel:[
                {name:'id',	index:'id',	width:50, fixed :true, formatter: 'showNewStatus'},
@@ -113,11 +114,11 @@ $this->addFile('css://style.css');
             },
             caption: "<?php echo  $this->tr('Přehled objednávek') ?>",
             height: '100%',
-            editurl : '<?php echo  $this->link()->route('view', array('id' => '{ID}')); ?>',
+            editurl : '<?php echo  $this->link()->route('view', array('id' => '[ID]')); ?>',
             gridComplete: function(){ 
                var ids = $(this).jqGrid('getDataIDs'); 
                var button;
-               for(var i=0; i < ids.length;i++){ 
+               for(var i=0; i<ids.length;i++){ 
                   var cl = ids[i]; 
                   button = '<input type="image" src="images/icons/magnifier.png" value="<?php echo  $this->tr('Ukaž') ?>" onclick="showOrder(\''+ids[i]+'\');" />'
                      +'<input type="image" src="images/icons/printer.png" value="<?php echo  $this->tr('Tisk') ?>" onclick="printOrder(\''+ids[i]+'\');\" />'

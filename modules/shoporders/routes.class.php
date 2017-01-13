@@ -12,5 +12,3 @@ class ShopOrders_Routes extends Routes {
       $this->addRoute('exportOrder', "order-::id::\.(?P<output>(?:pdf))", 'exportOrder','order-{id}.{output}');
 	}
 }
-
-?>
