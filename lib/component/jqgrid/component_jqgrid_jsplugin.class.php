@@ -37,15 +37,15 @@ class Component_JqGrid_JsPlugin extends JsPlugin_JQuery {
 	}
 
    public function setCellEdit() {
-      $this->addFile(new JsPlugin_JsFile("grid.celledit.min.js"));
+//      $this->addFile(new JsPlugin_JsFile("grid.celledit.min.js"));
    }
 
    public function setInLineEdit() {
-      $this->addFile(new JsPlugin_JsFile("grid.inlinedit.min.js"));
+//      $this->addFile(new JsPlugin_JsFile("grid.inlinedit.min.js"));
    }
 
    public function addSubgridSupport() {
-		$this->addFile(new JsPlugin_JsFile("grid.subgrid.js"));
+//		$this->addFile(new JsPlugin_JsFile("grid.subgrid.js"));
    }
 }
 /*
@@ -54,4 +54,3 @@ class Component_JqGrid_JsPlugin extends JsPlugin_JQuery {
  * 2. modal edit
  * 3. form edit (inside)
  */
-?>
