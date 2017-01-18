@@ -51,6 +51,8 @@
 	margin: 0;
 	padding: 0; 
 	overflow: hidden;
+   border-left: 0px none transparent !important;
+   border-right: 0px none transparent !important;
 }
 .ui-jqgrid .ui-jqgrid-hbox {
 	float: left; 
@@ -180,6 +182,8 @@ div.tablediv > .table-bordered {
 }
 .ui-jqgrid tr.jqgrow {  
 	outline-style: none; 
+   border-left:  0px none transparent;
+   border-right: 0px none transparent;
 }
 .ui-jqgrid tr.jqgroup {  
 	outline-style: none; 
@@ -187,7 +191,8 @@ div.tablediv > .table-bordered {
 .ui-jqgrid .ui-jqgrid-btable tbody tr.jqgrow td { 
 	overflow: hidden; 
 	white-space: pre; 
-	padding-right: 2px;
+	padding-right: 4px;
+	padding-left: 4px;
 }
 .ui-jqgrid tr.jqgfirstrow  td {
 	height:auto; 
@@ -288,6 +293,9 @@ div.tablediv > .table-bordered {
 .ui-jqgrid .ui-pager-control .ui-pager-table td {
 	border-top : 0px none !important;
 	min-height : 20px !important;
+}
+.ui-jqgrid .ui-pager-control .ui-pager-table td:hover {
+	border : 0px none !important;
 }
 .ui-jqgrid .ui-pg-button  { 
 	height:auto; 
@@ -887,7 +895,9 @@ ul.ui-search-menu li, ul.ui-nav-menu li {
 .ui-jqgrid .ui-jqgrid-htable .ui-th-div {
 	height:17px;
 	margin-top:5px;
-	display:inine-block;
+	display:inline-block;
+   padding-right: 4px;
+	padding-left: 4px;
 }
 .column-menu, .ui-search-menu {
 	padding: 10px 15px;
