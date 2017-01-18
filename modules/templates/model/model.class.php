@@ -17,6 +17,7 @@ class Templates_Model extends Model_ORM {
    const COLUMN_CONTENT    = 'content';
    const COLUMN_ADD_TIME   = 'time_add';
    const COLUMN_TYPE       = 'type';
+   const COLUMN_LANG       = 'lang';
 
    /**
     * Pole s typy šablon
@@ -37,6 +38,7 @@ class Templates_Model extends Model_ORM {
       $this->addColumn(self::COLUMN_CONTENT, array('datatype' => 'text', 'pdoparam' => PDO::PARAM_STR, 'nn' => true, 'default' => false));
       $this->addColumn(self::COLUMN_ADD_TIME, array('datatype' => 'datetime', 'pdoparam' => PDO::PARAM_STR, 'default' => 'CURRENT_TIMESTAMP'));
       $this->addColumn(self::COLUMN_TYPE, array('datatype' => 'varchar(10)', 'pdoparam' => PDO::PARAM_STR, 'default' => self::TEMPLATE_TYPE_TEXT));
+      $this->addColumn(self::COLUMN_LANG, array('datatype' => 'varchar(5)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
 
       $this->setPk(self::COLUMN_ID);
    }
@@ -49,15 +51,6 @@ class Templates_Model extends Model_ORM {
     * @deprecated - Use ORM!
     */
    public function getTemplate($id) {
-      $dbc = Db_PDO::getInstance();
-      $dbst = $dbc->prepare("SELECT * FROM ".Db_PDO::table(self::DB_TABLE)
-              ." WHERE ".self::COLUMN_ID." = :idt");
-
-      $dbst->bindValue(':idt', (int)$id, PDO::PARAM_INT);
-      $dbst->execute();
-
-      return $dbst->fetchObject();
+      return $this->record($id);
    }
 }
-
-?>
