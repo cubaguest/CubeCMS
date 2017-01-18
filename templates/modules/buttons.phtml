@@ -2,7 +2,7 @@
 if( !empty($this->moduleButtons) ){
    $this->addFile('css://engine:admin/admin.less');// need for buttons style
    ?>
-   <ul class="module-tool-buttons clearfix">
+   <ul class="module-tool-buttons clearfix hidden-print">
    <?php foreach ($this->moduleButtons as $id => $button) {
       if(is_array($button) && !isset($button['content'])){
          
@@ -57,18 +57,26 @@ if( !empty($this->moduleButtons) ){
                $button['attributes']['href'] = $button['link'];
                $button['attributes']['title'] = $button['title'];
 
-               $cnt = '<a class=" '.($button['name'] != null ? '' : '').'" ';
+//               if($button['link'] != null){
+                  $cnt = '<a class=" '.($button['name'] != null ? '' : '').'" ';
+//               } else {
+//                  $cnt = '<button type="button" class=" '.($button['name'] != null ? '' : '').'" ';
+//               }
                foreach($button['attributes'] as $name => $value){
                   $cnt .= $value != null ? $name.'="'.$value.'" ' : null;
                }
-
                $cnt .= '>';
+               
                if(isset($button['faicon'])){
                   $cnt .= '<span class="icon icon-'.$button['faicon'].'"></span>';
                } else if($button['icon']){
                   $cnt .= '<img src="'.$iconSrc.'" alt="'.$button['icon'].'" />';
                }
-               $cnt .= htmlspecialchars($button['name']).'</a>';
+//               if($button['link'] != null){
+                  $cnt .= htmlspecialchars($button['name']).'</a>';
+//               } else {
+//                  $cnt .= htmlspecialchars($button['name']).'</button>';
+//               }
 
                break;
          }
