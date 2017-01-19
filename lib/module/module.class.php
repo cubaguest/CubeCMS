@@ -249,6 +249,7 @@ class Module
             /* php prepare update */
             $phpFile = $version.'.php';
             $phpPreFile = $version.'_pre.php';
+            $phpPostFile = $version.'_post.php';
             $sqlFile = $version.'.sql';
 
             try {
@@ -264,6 +265,10 @@ class Module
                // normal patch
                if (is_file($updateDir.$phpFile)) {
                   include $updateDir.$phpFile;
+               }
+               // některé moduly mají i post
+               if (is_file($updateDir.$phpPostFile)) {
+                  include $updateDir.$phpPostFile;
                }
                $model = new Model_Module();
                $model
