@@ -163,7 +163,7 @@ class Form_Element_FileAdv extends Form_Element_File {
    public function setValues($values, $key = null)
    {
 //      var_dump($values);
-      if(is_string($values) && is_file($values)){
+      if(is_string($values)){
          // hodnota obsahuje i cestu
          if (strpos($values, '/') !== false) {
             if (substr($values, 0, 1) != '/') {
@@ -171,14 +171,20 @@ class Form_Element_FileAdv extends Form_Element_File {
             }
             $this->setUploadDir(dirname($values) . DIRECTORY_SEPARATOR);
             $filename = basename($values);
+         } 
+         // neobsahuje cestu, jenom název souboru, ale je zadán upload dir
+         else if(strpos($values, '/') === false && (string)$this->getUploadDir() != null) {
+            $values = (string)$this->getUploadDir().$values;
          }
-         $this->origFile = $this->createFileDataArray(
-                 basename($values), 
-                 dirname($values).DIRECTORY_SEPARATOR, 
-                 filesize($values), 
-                  $this->getMimeType($values), $values, 
-                 $this->getMimeType($values),
-                 pathinfo($values, PATHINFO_EXTENSION));
+         if(is_file($values)){
+            $this->origFile = $this->createFileDataArray(
+                    basename($values), 
+                    dirname($values).DIRECTORY_SEPARATOR, 
+                    filesize($values), 
+                     $this->getMimeType($values), $values, 
+                    $this->getMimeType($values),
+                    pathinfo($values, PATHINFO_EXTENSION));
+         }
       } else if($values instanceof File){
          $this->origFil = $this->createFileDataArray(
                  $values->getName(), 
