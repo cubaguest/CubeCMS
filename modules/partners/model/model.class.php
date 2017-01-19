@@ -2,7 +2,7 @@
 /*
  * Třída modelu lidí
 */
-class Partners_Model extends Model_ORM {
+class Partners_Model extends Model_ORM_Ordered {
    const DB_TABLE = 'partners';
 
    /**
@@ -34,7 +34,7 @@ class Partners_Model extends Model_ORM {
       $this->setPk(self::COLUMN_ID);
       
       $this->addForeignKey(self::COLUMN_ID_CATEGORY, 'Model_Category');
+      $this->setOrderColumn(self::COLUMN_ORDER);
+      $this->setLimitedColumns(array(self::COLUMN_ID_CATEGORY));
    }
 }
-
-?>
