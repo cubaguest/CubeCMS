@@ -1,0 +1,15 @@
+<?php 
+// do titulku
+if($this->group != null) {
+   $h = sprintf($this->tr('Úprava skupiny položek "%s"'),$this->group->{Partners_Model_Groups::COLUMN_NAME});
+} else {
+   $h = $this->tr('Přidání skupiny položek');
+}
+$this->addPageTitle($h);
+?>
+<h1><?php echo $h?></h1>
+<div class="main-content-form-edit">
+   <?php 
+   echo($this->form);
+   ?>
+</div>

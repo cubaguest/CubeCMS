@@ -1,0 +1,58 @@
+<?php 
+// do titulku
+$h = $this->tr('Úprava pořadí skupin položek');
+$this->addPageTitle($h);
+
+$jq = new JsPlugin_JQuery();
+$jq->addUISortable();
+$this->addJsPlugin($jq);
+$this->addFile('css://style.css');
+?>
+<h1><?php echo  $h ?></h1>
+<div class="main-content-form-edit">
+   <?php  echo $this->form->renderStart(); ?>
+   <fieldset class="fieldset-alt"><legend><span class="form-legend-name"><?php echo $this->tr('Pořadí skupin položek v zobrazení')?></span>
+         <span class="form-legend-text"></span>
+      </legend>
+      <table class="form-table">
+         <tr>
+            <th class="form-labels"><label for="partner_degreeAfter_1" class="partner_degreeAfter_label_class"><?php echo $this->tr('Skupiny')?>:</label></th>
+            <td class="form-controlls">
+            <ul id="partners-list">
+               <?php 
+               foreach ($this->partnersGroups as $group) {
+                  ?>
+                  <li class="ui-state-default">
+                     <span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
+                     <?php 
+                     echo $group->{Partners_Model_Groups::COLUMN_NAME};
+                     $this->form->id->setValues($group->{Partners_Model_Groups::COLUMN_ID});
+                     echo $this->form->id;
+                    ?>
+                  </li>
+               <?php }?>
+            </ul>
+            </td>
+         </tr>
+         <tr>
+            <td class="form-labels"></td>
+            <td class="form-controlls font-small"><?php echo $this->tr('Pro změnu pořadí stačí položku uchopit myší a přesunout.')?></td>
+         </tr>
+         <tr>
+            <th class="form-labels"><?php echo $this->form->save->label()?></th>
+            <td class="form-controlls"><?php echo $this->form->save->controllAll()?></td>
+         </tr>
+      </table>
+   </fieldset>   
+   <?php  echo $this->form->renderEnd(); ?>
+   <script>
+	$(function() {
+		$( "#partners-list" ).sortable({
+			placeholder: "ui-state-highlight",
+         cursor: 'move',
+         forceHelperSize: true
+		});
+		$( "#partners-list" ).disableSelection();
+	});
+	</script>
+</div>

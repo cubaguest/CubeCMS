@@ -6,12 +6,12 @@
 }
 
 .partner-image {
-   float: left;
-   width: 110px;
+/*   float: left;
+   width: 110px;*/
 }
 .partner-image img {}
 .partner-text {
-   margin-left: 120px;
+   /*margin-left: 120px;*/
 }
 
 .partner-disabled {

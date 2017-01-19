@@ -1,52 +1,66 @@
-<?php 
+<?php
 $this->addFile('css://style.css');
-
 ?>
-<h1><?php echo $this->category()->getName()?></h1>
-<div class="main-content-list partners-list">
-   <?php 
-   if(!empty($this->partners)){?>
-   
-   <?php 
-      foreach ($this->partners as $partner) {
-         $imgsrc = vve_image_cacher($this->category()->getModule()->getDataDir(true).$partner->{Partners_Model::COLUMN_IMAGE}, 100, 100);
-         
-         // set Toolbox
-         if($this->toolboxEdit != null){
-            $this->toolboxEdit->partner_edit->setAction($this->link()->route('edit', array('id' => $partner->{Partners_Model::COLUMN_ID})));
-            $this->toolboxEdit->partner_del_->getForm()->id->setValues($partner->{Partners_Model::COLUMN_ID});
-            $this->toolboxEdit->partner_visibility_->getForm()->id->setValues($partner->{Partners_Model::COLUMN_ID});
-         }
-         $classes = array();
-         if($partner->{Partners_Model::COLUMN_DISABLED}){
-            $classes[] = "partner-disabled";
-         }
-         
-         ?>
-   <div id="partner-<?php echo $partner->{Partners_Model::COLUMN_ID}?>" class="partner <?php echo implode(" ",$classes)?>">
-      <div class="partner-image">
-         <?php if($partner->{Partners_Model::COLUMN_IMAGE} != null){?>
-            <img src="<?php echo $imgsrc ?>" alt="<?php ps($partner->{Partners_Model::COLUMN_NAME})?>" />
-         <?php }?>
-      </div>
-      <div class="partner-text">
-         <div class="text">
-            <h2><?php if($partner->{Partners_Model::COLUMN_URL} != null){?>
-               <a href="<?php echo $partner->{Partners_Model::COLUMN_URL}?>" title="<?php ps($partner->{Partners_Model::COLUMN_NAME})?>"
-                  class="link-external" ><?php ps($partner->{Partners_Model::COLUMN_NAME})?></a>
-            <?php } else {?>
-               <?php ps($partner->{Partners_Model::COLUMN_NAME})?>
-            <?php }?></h2>
-            <p><?php ps($partner->{Partners_Model::COLUMN_TEXT})?></p>
-         </div>
-         <hr class="reseter" />
-      </div>
-      <?php echo $this->toolboxEdit;?>
+<h1><?php echo $this->category()->getName() ?></h1>
+<div class="row">
+   <div class="main-content-list partners-list">
+
+      <?php if (!empty($this->partners)) { ?>
+
+         <?php
+         $prevGrp = null;
+         foreach ($this->partners as $partner) {
+            $imgsrc = vve_image_cacher($this->category()->getModule()->getDataDir(true) . $partner->{Partners_Model::COLUMN_IMAGE}, 200, 200);
+
+            // set Toolbox
+            if ($this->toolboxEdit != null) {
+               $this->toolboxEdit->partner_edit->setAction($this->link()->route('edit', array('id' => $partner->{Partners_Model::COLUMN_ID})));
+               $this->toolboxEdit->partner_del_->getForm()->id->setValues($partner->{Partners_Model::COLUMN_ID});
+               $this->toolboxEdit->partner_visibility_->getForm()->id->setValues($partner->{Partners_Model::COLUMN_ID});
+            }
+            $classes = array();
+            if ($partner->{Partners_Model::COLUMN_DISABLED}) {
+               $classes[] = "partner-disabled";
+            }
+            if ($prevGrp != $partner->{Partners_Model_Groups::COLUMN_ID}) {
+               $prevGrp = $partner->{Partners_Model_Groups::COLUMN_ID};
+               ?>
+               <h2><?php ps($partner->{Partners_Model_Groups::COLUMN_NAME}) ?></h2>
+               <?php
+            }
+            ?>
+            <div class="col-sm-12">
+               <div id="partner-<?php echo $partner->{Partners_Model::COLUMN_ID} ?>" class="partner <?php echo implode(" ", $classes) ?>">
+                  <div class="row"> 
+                     <div class="col-sm-4">
+                        <div class="partner-image">
+                           <?php if ($partner->{Partners_Model::COLUMN_IMAGE} != null) { ?>
+                              <img class="img-responsive" src="<?php echo $imgsrc ?>" alt="<?php ps($partner->{Partners_Model::COLUMN_NAME}) ?>" />
+                           <?php } ?>
+                        </div>
+                     </div>
+                     <div class="col-sm-8">
+                        <div class="partner-text">
+                           <div class="text">
+                              <h2><?php if ($partner->{Partners_Model::COLUMN_URL} != null) { ?>
+                                    <a href="<?php echo $partner->{Partners_Model::COLUMN_URL} ?>" title="<?php ps($partner->{Partners_Model::COLUMN_NAME}) ?>"
+                                       class="link-external" ><?php ps($partner->{Partners_Model::COLUMN_NAME}) ?></a>
+                                 <?php } else { ?>
+                                    <?php ps($partner->{Partners_Model::COLUMN_NAME}) ?>
+                                 <?php } ?></h2>
+                              <p><?php ps($partner->{Partners_Model::COLUMN_TEXT}) ?></p>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  <?php echo $this->toolboxEdit; ?>
+               </div>
+            </div>
+         <?php } ?>
+      <?php } ?>
+
    </div>
-      <?php }?>
-   <?php }?>
-   
 </div>
-<?php 
-   echo $this->toolbox;// TOOLBOXY
+<?php
+echo $this->toolbox; // TOOLBOXY
 ?>

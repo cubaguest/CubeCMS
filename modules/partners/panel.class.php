@@ -7,20 +7,20 @@ class Partners_Panel extends Panel {
    const LIST_TYPE_RAND = "rand";
 
    public function panelController() {
-      $model = new Partners_Model();
-      $model
-         ->where(Partners_Model::COLUMN_ID_CATEGORY." = :idc AND ".Partners_Model::COLUMN_DISABLED." = 0", array('idc' => $this->category()->getId()));
-      
-      switch ($this->panelObj()->getParam('type', self::DEFAULT_TYPE)) {
-         case self::LIST_TYPE_RAND:
-            $model->order(array('RAND(NOW())' => Model_ORM::ORDER_ASC));
-            break;
-         case self::LIST_TYPE_LIST:
-         default:
-            $model->order(array(Partners_Model::COLUMN_ORDER => Model_ORM::ORDER_ASC));
-            break;
-      }
-      $this->template()->partners = $model->limit(0, $this->panelObj()->getParam('num',self::DEFAULT_NUM_PARTNERS))->records();
+//      $model = new Partners_Model();
+//      $model
+//         ->where(Partners_Model::COLUMN_ID_CATEGORY." = :idc AND ".Partners_Model::COLUMN_DISABLED." = 0", array('idc' => $this->category()->getId()));
+//      
+//      switch ($this->panelObj()->getParam('type', self::DEFAULT_TYPE)) {
+//         case self::LIST_TYPE_RAND:
+//            $model->order(array('RAND(NOW())' => Model_ORM::ORDER_ASC));
+//            break;
+//         case self::LIST_TYPE_LIST:
+//         default:
+//            $model->order(array(Partners_Model::COLUMN_ORDER => Model_ORM::ORDER_ASC));
+//            break;
+//      }
+//      $this->template()->partners = $model->limit(0, $this->panelObj()->getParam('num',self::DEFAULT_NUM_PARTNERS))->records();
    }
 
    public function panelView() {
