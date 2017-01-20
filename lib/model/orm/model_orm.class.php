@@ -1477,6 +1477,15 @@ abstract class Model_ORM extends Model implements ArrayAccess {
          $cond = $cond . ' = :colval';
          $bindValues = array('colval' => $bindValues);
       }
+      
+      // přidání dvojtečky do všech klíčů (ryhlejší zpracování vy výstupu)
+      foreach ($bindValues as $key => $value) {
+         if(strpos($key, ':') === false){
+            $bindValues[':'.$key] = $value;
+            unset($bindValues[$key]);
+         }
+      }
+      
       if ($append == false) {
          $this->where = $cond;
          $this->whereBindValues = $bindValues;
@@ -1977,7 +1986,7 @@ abstract class Model_ORM extends Model implements ArrayAccess {
             $retype = null;
             if (strpos($coll, '(') == 0) { // musí být na začátku před řetězcem
                $retype = array();
-               preg_match('/^\(([a-z]+(?:_[A-Z]{2})?)\)(.*)$/i', $coll, $retype);
+               preg_match('/^\(([a-z]+)\)(.*)$/i', $coll, $retype);
                if (isset($retype[1])) {
                   $coll = $retype[2];
                   $retype = $retype[1];
@@ -1998,16 +2007,25 @@ abstract class Model_ORM extends Model implements ArrayAccess {
             } else if (strpos($coll, '.') !== false) {
                // doplnění uvozovek u cizích sloupců
                $retWhere .= preg_replace('/([a-z_-]+)\.([a-z_-]+)/i', '`\1`.`\2`', $coll);
-//            } else if (preg_match ('/\:([a-z]+)/', $coll, $paramm) != false) {
-//               // doplnění uvozovek u cizích sloupců
-//               if(is_array($this->whereBindValues[$paramm[1]])){
-//                  foreach ($this->whereBindValues[$paramm[1]] as $key => $param) {
-//                  }
-//                  $retWhere .= $coll . ' ';
-//                  Debug::log('is array param name: '.$paramm[1].' val: ',$paramm, $this->whereBindValues);
-//               } else {
-//                  $retWhere .= $coll . ' ';
-//               }
+            } else if (preg_match ('/\:[a-z0-9]+/i', $coll, $paramm) != false) {
+               // pokud je parametr pole a má pole hodnot
+               $paramName = $paramm[0];
+               if(isset($this->whereBindValues[$paramName]) && is_array($this->whereBindValues[$paramName])){
+                  $whereReplaceStr = array();
+                  $values = array_values($this->whereBindValues[$paramName]);
+                  unset($this->whereBindValues[$paramName]);
+                  $prefix = substr(uniqid(), -8);
+                  foreach ($values as $key => $value) {
+                     if($value instanceof Model_ORM_Record){
+                        $value = $value->getPK();
+                     }
+                     $keyF = ':'.$prefix.'_arr_'.$key;
+                     $this->whereBindValues[$keyF] = $value;
+                     $whereReplaceStr[] = $keyF;
+                  }
+                  $coll = '('.implode(',',$whereReplaceStr).')';
+               }
+               $retWhere .= $coll . ' ';
             } else {
                $retWhere .= $coll . ' ';
             }
