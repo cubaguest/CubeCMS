@@ -165,6 +165,18 @@ class Template_Toolbox2 extends Template {
       $this->{$tool->getName()} = $tool;
       return $this;
    }
+   
+   /**
+    * Metoda odebere do šablony nástroj
+    * @param string $tool -- název nástroje
+    * @return Template_Toolbox2 -- vrací sám sebe
+    */
+   public function removeTool($tool) {
+      if(is_string($tool) && isset($this->tools[$tool])){
+         unset($this->tools[$tool]);
+      }
+      return $this;
+   }
 
    /**
     * Metoda vrací pole se všemi nástroji
