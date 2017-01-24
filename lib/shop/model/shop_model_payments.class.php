@@ -18,6 +18,7 @@ class Shop_Model_Payments extends Model_ORM
     * Názvy sloupců v databázi
     */
    const COLUMN_ID = 'id_payment';
+   const COLUMN_ID_STATE = 'id_order_state';
    const COLUMN_NAME = 'payment_name';
    const COLUMN_TEXT = 'payment_text';
    const COLUMN_PRICE_ADD = 'price_add';
@@ -27,7 +28,8 @@ class Shop_Model_Payments extends Model_ORM
    protected function  _initTable() {
       $this->setTableName(self::DB_TABLE, 't_s_pay');
 
-      $this->addColumn(self::COLUMN_ID, array('datatype' => 'smallint', 'ai' => true, 'nn' => true, 'pk' => true));
+      $this->addColumn(self::COLUMN_ID, array('datatype' => 'int', 'ai' => true, 'nn' => true, 'pk' => true));
+      $this->addColumn(self::COLUMN_ID_STATE, array('datatype' => 'int', 'index' => true, 'default' => null));
       
       $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(200)', 'lang' => true, 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_TEXT, array('datatype' => 'text', 'lang' => true, 'pdoparam' => PDO::PARAM_STR));
@@ -40,4 +42,3 @@ class Shop_Model_Payments extends Model_ORM
       $this->setPk(self::COLUMN_ID);
    }
 }
-?>

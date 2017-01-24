@@ -492,8 +492,21 @@ class ShopCart_Controller extends Controller {
             // remove from cart
             $cart->clear();
 
-            // přidání statusu
-            $this->createOrderStatus($orderID);
+            // základní stav objednávky
+//            $order->changeState(CUBE_CMS_SHOP_ORDER_DEFAULT_STATUS);
+            
+            // stav objednávky pokud má platba 
+             // základní stav objednávky
+            $order->changeState(CUBE_CMS_SHOP_ORDER_DEFAULT_STATUS);
+
+            $modelPayments = new Shop_Model_Payments();
+            $payment = $modelPayments->record($order->{Shop_Model_Orders::COLUMN_PAYMENT_ID});
+            if($payment->{Shop_Model_Payments::COLUMN_ID_STATE} != null){
+               $order->changeState($payment->{Shop_Model_Payments::COLUMN_ID_STATE});
+            }
+            
+            // nasatvení stavu objendávky, podle zadané platební metody
+//            $this->createOrderStatus($orderID);
 
             // send mails
             $this->generateMails($order, $cart);
@@ -662,20 +675,11 @@ class ShopCart_Controller extends Controller {
       // ostatní položky objednávky
       $order->{Shop_Model_Orders::COLUMN_NOTE} = $formOrder->note->getValues();
       $order->{Shop_Model_Orders::COLUMN_IP} = $_SERVER['REMOTE_ADDR'];
-//         Debug::log($_SESSION, $order);
-      $modelOrder->save($order);
+      $order->save();
+      
       $_SESSION['shop_order']['orderId'] = $order->getPK();
       $_SESSION['shop_order']['paymentClass'] = $payment->{Shop_Model_Payments::COLUMN_CLASS};
       return $order;
-   }
-
-   private function createOrderStatus($idOrder)
-   {
-      $modelStatus = new Shop_Model_OrderStatus();
-      $status = $modelStatus->newRecord();
-      $status->{Shop_Model_OrderStatus::COLUMN_ID_ORDER} = $idOrder;
-      $status->{Shop_Model_OrderStatus::COLUMN_NAME} = VVE_SHOP_ORDER_DEFAULT_STATUS;
-      $modelStatus->save($status);
    }
 
    private function createOrderItem($orderId, Shop_Cart_Item $item)
@@ -707,6 +711,24 @@ class ShopCart_Controller extends Controller {
 
    private function generateMails($order, $cart)
    {
+      // tady pouze admin mail. uživatel se odesílá při změně stavu
+      $state = Shop_Model_OrdersStates::getRecord(CUBE_CMS_SHOP_ORDER_DEFAULT_STATUS);
+      
+      if($state->{Shop_Model_OrdersStates::COLUMN_ID_TEMPLATE} != 0 && CUBE_CMS_SHOP_ORDER_MAIL != null){
+         $cnt = Templates_Model::getTemplate($state->{Shop_Model_OrdersStates::COLUMN_ID_TEMPLATE}, Locales::getDefaultLang());
+         
+         $mailCnt = Shop_Tools::getMailTplContent($cnt->{Templates_Model::COLUMN_CONTENT}, $order);
+         
+         $emailAdmin = new Email(true);
+         $emailAdmin->addAddress(CUBE_CMS_SHOP_ORDER_MAIL);
+         $emailAdmin->setFrom(CUBE_CMS_NOREPLAY_MAIL);
+         $emailAdmin->setSubject(sprintf('[NOVÁ OBJEDNÁVKA] číslo %s', Shop_Tools::getFormatOrderNumber($order->{Shop_Model_Orders::COLUMN_ID})));
+         $emailAdmin->setContent(Email::getBaseHtmlMail($mailCnt));
+         $emailAdmin->send();
+      }
+      return;
+      
+      
       $userMailText = $adminMailText =
          "Objednávka z {STRANKY}<br /><br />
          {INFO}<br /><br />
@@ -835,19 +857,19 @@ class ShopCart_Controller extends Controller {
       $adminMailText = str_replace($searchArr, $replaceArr, $adminMailText);
       
       $emailUser = new Email(true);
-      $emailUser->addAddress($order->{Shop_Model_Orders::COLUMN_CUSTOMER_EMAIL});
-      $emailUser->setFrom(VVE_NOREPLAY_MAIL);
-      $emailUser->setSubject(sprintf('[NOVÁ OBJEDNÁVKA] číslo %s', $order->{Shop_Model_Orders::COLUMN_ID}));
-      $emailUser->setContent(Email::getBaseHtmlMail($userMailText));
-      $emailUser->send();
+//      $emailUser->addAddress($order->{Shop_Model_Orders::COLUMN_CUSTOMER_EMAIL});
+//      $emailUser->setFrom(VVE_NOREPLAY_MAIL);
+//      $emailUser->setSubject(sprintf('[NOVÁ OBJEDNÁVKA] číslo %s', $order->{Shop_Model_Orders::COLUMN_ID}));
+//      $emailUser->setContent(Email::getBaseHtmlMail($userMailText));
+//      $emailUser->send();
 
       if(VVE_SHOP_ORDER_MAIL != null){
-         $emailAdmin = new Email(true);
-         $emailAdmin->addAddress(VVE_SHOP_ORDER_MAIL);
-         $emailAdmin->setFrom(VVE_NOREPLAY_MAIL);
-         $emailAdmin->setSubject(sprintf('[NOVÁ OBJEDNÁVKA] číslo %s', $order->{Shop_Model_Orders::COLUMN_ID}));
-         $emailAdmin->setContent(Email::getBaseHtmlMail($adminMailText));
-         $emailAdmin->send();
+//         $emailAdmin = new Email(true);
+//         $emailAdmin->addAddress(VVE_SHOP_ORDER_MAIL);
+//         $emailAdmin->setFrom(VVE_NOREPLAY_MAIL);
+//         $emailAdmin->setSubject(sprintf('[NOVÁ OBJEDNÁVKA] číslo %s', $order->{Shop_Model_Orders::COLUMN_ID}));
+//         $emailAdmin->setContent(Email::getBaseHtmlMail($adminMailText));
+//         $emailAdmin->send();
       }
    }
    
@@ -897,5 +919,3 @@ class ShopCart_Controller extends Controller {
    public function settings(&$settings, Form &$form) {
    }
 }
-
-?>

@@ -64,14 +64,17 @@ class ShopOrders_Controller extends Controller {
 //         $groups = $this->getAllowedGroups($jqGrid);
       }
       
-      $modelSt = new Shop_Model_OrderStatus();
-      $modelOrders->columns(array(Shop_Model_Orders::COLUMN_ID, Shop_Model_Orders::COLUMN_CUSTOMER_NAME, Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY,
-         Shop_Model_Orders::COLUMN_IS_NEW, Shop_Model_Orders::COLUMN_TIME_ADD, Shop_Model_Orders::COLUMN_TOTAL,
-         Shop_Model_Orders::COLUMN_PICKUP_DATE,
+//      $modelSt = new Shop_Model_OrderStatus();
+      $modelHistory = new Shop_Model_OrdersHistory();
+      $modelState = new Shop_Model_OrdersStates();
+      $modelOrders
+      ->columns(array('*',
          'status' => 
-         '(SELECT '.Shop_Model_OrderStatus::COLUMN_NAME.' FROM '.$modelSt->getTableName()
-         .' WHERE '.Shop_Model_OrderStatus::COLUMN_ID_ORDER.' = '.$modelOrders->getTableShortName().'.'.Shop_Model_Orders::COLUMN_ID
-         .' ORDER BY '.Shop_Model_OrderStatus::COLUMN_TIME_ADD.' DESC LIMIT 0,1)'));
+         '(SELECT CONCAT_WS( \';\' , os.'. $modelState->getLangColumn(Shop_Model_OrdersStates::COLUMN_NAME).',os.'.Shop_Model_OrdersStates::COLUMN_COLOR.') '
+          . ' FROM '.$modelHistory->getTableName().' AS oh'
+         .' LEFT JOIN '.$modelState->getTableName().' AS os ON os.'.Shop_Model_OrdersStates::COLUMN_ID.' = oh.'.  Shop_Model_OrdersHistory::COLUMN_ID_STATE
+         .' WHERE oh.'.Shop_Model_OrdersHistory::COLUMN_ID_ORDER.' = '.$modelOrders->getTableShortName().'.'.Shop_Model_Orders::COLUMN_ID
+         .' ORDER BY oh.'.  Shop_Model_OrdersHistory::COLUMN_TIME_ADD.' DESC LIMIT 0,1)'));
       
       $jqGrid->respond()->sql = $modelOrders->getSQLQuery();
       
@@ -79,7 +82,7 @@ class ShopOrders_Controller extends Controller {
       
       $fromRow = ($jqGrid->request()->page - 1) * $jqGrid->respond()->getRecordsOnPage();
       
-      $orders = $modelOrders->limit($fromRow, $jqGrid->request()->rows)->records(PDO::FETCH_OBJ);
+      $orders = $modelOrders->limit($fromRow, $jqGrid->request()->rows)->records();
       // out
       foreach ($orders as $order) {
          $pickupDate = "";
@@ -88,13 +91,16 @@ class ShopOrders_Controller extends Controller {
          }
          $name = $order->{Shop_Model_Orders::COLUMN_CUSTOMER_NAME}
             . ( $order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY} != null ? " (". $order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY} .')' : null );
+         $status = explode(';', $order->status);   
+            
          array_push($jqGrid->respond()->rows, 
             array('id' => $order->{Shop_Model_Orders::COLUMN_ID},
                   'name' => $name,
                   'neworder' => $order->{Shop_Model_Orders::COLUMN_IS_NEW},
                   'time' => vve_date('%x %X', new DateTime($order->{Shop_Model_Orders::COLUMN_TIME_ADD})),
                   'pickupdate' => $pickupDate,
-                  'status' => $order->status,
+                  'status' => $status[0],
+                  'color' => isset($status[1]) ? $status[1] : null,
                   'price' => $order->{Shop_Model_Orders::COLUMN_TOTAL},
                      ));
       }
@@ -121,13 +127,6 @@ class ShopOrders_Controller extends Controller {
       $this->view()->items = $modelItems->where(Shop_Model_OrderItems::COLUMN_ID_ORDER.' = :ido', 
          array('ido' => $order->{Shop_Model_Orders::COLUMN_ID}))->records();
          
-      $modelStatus = new Shop_Model_OrderStatus();
-      
-      $this->view()->statuses = $modelStatus
-         ->where(Shop_Model_OrderStatus::COLUMN_ID_ORDER.' = :ido', array('ido' => $order->{Shop_Model_Orders::COLUMN_ID}))
-         ->order(array(Shop_Model_OrderStatus::COLUMN_TIME_ADD => Model_ORM::ORDER_ASC))
-         ->records();
-      
       $this->changeStatusController($order->{Shop_Model_Orders::COLUMN_ID});
    }
 
@@ -137,29 +136,13 @@ class ShopOrders_Controller extends Controller {
       $formChangeStatus->setProtected(false);
       $formChangeStatus->setAction($this->link()->route('changeStatus'));
       
-      $eName = new Form_Element_Text('name', $this->tr('Název'));
-      $formChangeStatus->addElement($eName);
+      $eNameSel = new Form_Element_Select('stateId', $this->tr('Název'));
       
-      $eNameSel = new Form_Element_Select('nameSel', $this->tr('Název'));
-      
-      $status = explode(';', VVE_SHOP_ORDER_STATUS);
-      
-      if(empty ($status)){
-         $eNameSel->setOptions(
-            array(
-            $this->tr('přijato') => $this->tr('přijato'),
-            $this->tr('odesláno') => $this->tr('odesláno'),
-            $this->tr('zrušeno') => $this->tr('zrušeno'),
-            $this->tr('zaplaceno') => $this->tr('zaplaceno'),
-            $this->tr('zabaleno') => $this->tr('zabaleno'),
-            $this->tr('vráceno') => $this->tr('vráceno'),
-         ));
-      } else {
-         foreach ($status as $value) {
-            $eNameSel->setOptions(array($value => $value), true);
-         }
+      $mState = new Shop_Model_OrdersStates();
+      $states = $mState->where(Shop_Model_OrdersStates::COLUMN_DELETED.' = 0', array())->records();
+      foreach ($states as $value) {
+         $eNameSel->addOption($value->{Shop_Model_OrdersStates::COLUMN_NAME}, $value->getPK());
       }
-      
       $formChangeStatus->addElement($eNameSel);
       
       $eId = new Form_Element_Hidden('id');
@@ -168,74 +151,22 @@ class ShopOrders_Controller extends Controller {
       }
       $formChangeStatus->addElement($eId);
       
-      $eNote = new Form_Element_TextArea('note', $this->tr('Popis'));
+      $eNote = new Form_Element_TextArea('note', $this->tr('Poznámka'));
       $formChangeStatus->addElement($eNote);
       
-      $eAdd = new Form_Element_Submit('add', $this->tr('Přidat'));
+      $eAdd = new Form_Element_Submit('add', $this->tr('Uložit'));
       $formChangeStatus->addElement($eAdd);
       
       $eInformCustomer = new Form_Element_Checkbox('infoCust', $this->tr('Informovat zákazníka e-mailem'));
+      $eInformCustomer->setValues(true);
       $formChangeStatus->addElement($eInformCustomer);
       // checboxy o upozornění
-      
+
       if($formChangeStatus->isValid()){
-         $modelStatus = new Shop_Model_OrderStatus();
-         $status = $modelStatus->newRecord();
          
-         $status->{Shop_Model_OrderStatus::COLUMN_ID_ORDER} = $formChangeStatus->id->getValues();
-         if($formChangeStatus->name->getValues() != null){
-            $status->{Shop_Model_OrderStatus::COLUMN_NAME} = $formChangeStatus->name->getValues();
-         } else {
-            $status->{Shop_Model_OrderStatus::COLUMN_NAME} = $formChangeStatus->nameSel->getValues();
-         }
-         $status->{Shop_Model_OrderStatus::COLUMN_NOTE} = $formChangeStatus->note->getValues();
-         
-         $modelStatus->save($status);
-         
-         if($formChangeStatus->infoCust->getValues() == true){
-            $modelOrder = new Shop_Model_Orders();
-            $email = new Email(true);
-            $order = $modelOrder->record($status->{Shop_Model_OrderStatus::COLUMN_ID_ORDER});
-            
-            $email->setSubject(sprintf($this->tr('Změna stavu objednávky č. %s'), $order->{Shop_Model_Orders::COLUMN_ID}));
-            
-            $MailText = "<p>Dobrý den</p>"
-               ."<p>Vaší objednávce číslo: {CISLO} v obchodě {STRANKY} byl upraven stav.</p>"
-               ."<p>Nový stav Vaší objednávky je: <strong>\"{STAV}\"</strong></p>"
-               ."<p>Poznámmka: {POZN}</p>";
-            
-            $file = $this->module()->getDataDir().'mail_tpl_orderstatus_'.Locales::getLang().'.html';
-            if (is_file($file)) {
-               $MailText = file_get_contents($file);
-            }
-            
-            $MailText = str_replace(array(
-               "{CISLO}",
-               "{STRANKY}",
-               "{ADRESA_OBCHOD}",
-               "{DATUM_ZMENY}",
-               "{STAV}",
-               "{POZN}",
-            ), array(
-               $order->{Shop_Model_Orders::COLUMN_ID},
-               VVE_WEB_NAME,
-               VVE_SHOP_STORE_ADDRESS,
-               vve_date("%x %X", new DateTime()),
-               $status->{Shop_Model_OrderStatus::COLUMN_NAME},
-               $status->{Shop_Model_OrderStatus::COLUMN_NOTE} != null ? $status->{Shop_Model_OrderStatus::COLUMN_NOTE} : '<em>'.$this->tr('není').'</em>',
-            ), $MailText);
-            
-            
-            $email->setContent(Email::getBaseHtmlMail($MailText));
-            $email->addAddress($order->{Shop_Model_Orders::COLUMN_CUSTOMER_EMAIL}, $order->{Shop_Model_Orders::COLUMN_CUSTOMER_NAME});
-            $email->send();
-         }
-         
-         $this->view()->newStatus = array(
-            'date' => vve_date('%x %X'),
-            'name' => $status->{Shop_Model_OrderStatus::COLUMN_NAME},
-            'note' => $status->{Shop_Model_OrderStatus::COLUMN_NOTE},
-         );
+         $order = Shop_Model_Orders::getRecord($formChangeStatus->id->getValues());
+         $order->changeState($formChangeStatus->stateId->getValues(), $formChangeStatus->infoCust->getValues(), $formChangeStatus->note->getValues());
+         $this->view()->newStatus = $order->getLastState();
          
          $this->infoMsg()->addMessage($this->tr('Změna byla uložena'));
          $this->link()->route()->reload();
@@ -414,5 +345,3 @@ class ShopOrders_Controller extends Controller {
       exit();
    }
 }
-
-?>

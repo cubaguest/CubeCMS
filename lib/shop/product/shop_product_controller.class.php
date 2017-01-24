@@ -1238,6 +1238,7 @@ abstract class Shop_Product_Controller extends Controller {
       $product->setNew();
       $product->{Shop_Model_Product::COLUMN_ACTIVE} = false;
       $product->{Shop_Model_Product::COLUMN_NAME} = $this->tr('Kopie')." ".$product->{Shop_Model_Product::COLUMN_NAME};
+      $product->{Shop_Model_Product::COLUMN_ORDER} = false;
       $product->save();
 
       // duplikace varinat
@@ -1281,18 +1282,27 @@ abstract class Shop_Product_Controller extends Controller {
             }
          }
       }
-
       // duplikace obrázků
-      $img = new File($product->{Shop_Model_Product::COLUMN_IMAGE}, self::getImagesDir());
-      if($img->exist()){
-         $img = $img->copy(self::getImagesDir(), true);
-         // kopie miniatury
-         $thumb = new File($product->{Shop_Model_Product::COLUMN_IMAGE}, self::getImagesDir()."small".DIRECTORY_SEPARATOR);
-         $thumb->copy(self::getImagesDir()."small".DIRECTORY_SEPARATOR, true);
-         // uložení nového názvu obrázku
-         $product->{Shop_Model_Product::COLUMN_IMAGE} = $img->getName();
-         $product->save();
+      $mPRImages = new Shop_Model_Product_Images();
+      $images = $mPRImages->where(Shop_Model_Product_Images::COLUMN_ID_PRODUCT, $origId)->records();
+      foreach ($images as $img) {
+         /* @var $file File_Image */
+         $file = $img->getFile();
+         $file = $file->copy(Shop_Tools::getProductImagesDir(false) . $product->getPK(). DIRECTORY_SEPARATOR, true);
+         $img->setNew();
+         $img->{Shop_Model_Product_Images::COLUMN_ID_PRODUCT} = $product->getPK();
+         $img->save();
+         $file->rename($img->{Shop_Model_Product_Images::COLUMN_ID} . '.' . $img->{Shop_Model_Product_Images::COLUMN_TYPE});
+      } 
+      
+      $mPrParams = new Shop_Model_Product_ParamsValues();
+      $params = $mPrParams->where(Shop_Model_Product_ParamsValues::COLUMN_ID_PRODUCT, $origId)->records();
+      foreach ($params as $param) {
+         $param->setNew(true);
+         $param->{Shop_Model_Product_ParamsValues::COLUMN_ID_PRODUCT} = $product->getPK();
+         $param->save();
       }
+      
    }
 
    protected function formChangeState(Model_ORM_Record $product)

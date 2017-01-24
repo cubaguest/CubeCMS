@@ -27,5 +27,3 @@ class Shop_Model_OrderStatus extends Model_ORM {
       $this->addForeignKey(self::COLUMN_ID_ORDER, 'Shop_Model_Orders', Shop_Model_Orders::COLUMN_ID);
    }
 }
-
-?>

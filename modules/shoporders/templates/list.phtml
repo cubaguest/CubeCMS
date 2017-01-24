@@ -1,11 +1,11 @@
-<?php 
+<?php
 $jsJqGrid = new Component_JqGrid_JsPlugin();
 $this->addJsPlugin($jsJqGrid);
 $jQuery = new JsPlugin_JQuery();
 $this->addJsPlugin($jQuery);
 $this->addFile('css://style.css');
 ?>
-<h1><?php echo  $this->category()->getName() ?></h1>
+<h1><?php echo $this->category()->getName() ?></h1>
 <div class="main-content-admin-form">
    <table id="table-orders"></table>
    <div id="table-orders-pager"></div>
@@ -16,134 +16,149 @@ $this->addFile('css://style.css');
       /* <![CDATA[ */
       var selOrderId = 0;
       var ordersGrid;
-   
-      function showOrder(id, callback){
+
+      function showOrder(id, callback) {
          selOrderId = id;
-         var link = '<?php echo  $this->link()->route('viewOrder', array('id' => '[ID]')) ?>';
+         var link = '<?php echo $this->link()->route('viewOrder', array('id' => '[ID]')) ?>';
          $.ajax({
             url: link.replace('[ID]', id),
             cache: false,
-            success: function(html){
+            success: function (html) {
                $("#order-detail").html(html);
                // odstranění tučného
 //               $("#table-orders").trigger("reloadGrid");
-               if (callback && typeof(callback) === "function") { callback(); }
-               $('html,body').animate({scrollTop: $("#order-detail").offset().top-40},'slow');
+               if (callback && typeof (callback) === "function") {
+                  callback();
+               }
+               $('html,body').animate({scrollTop: $("#order-detail").offset().top - 40}, 'slow');
             }
          });
       }
-      function printOrder(id){
-         showOrder(id, function(){
+      function printOrder(id) {
+         showOrder(id, function () {
             window.print();
          });
       }
-      function downloadOrder(type, id){
-         window.location.href = ('<?php echo $this->link()->route('exportOrder', array('id' => '[ID]', 'output' => '[output]'))?>').replace('[ID]', id).replace('[output]', type);
+      function downloadOrder(type, id) {
+         window.location.href = ('<?php echo $this->link()->route('exportOrder', array('id' => '[ID]', 'output' => '[output]')) ?>').replace('[ID]', id).replace('[output]', type);
       }
-      function deleteOrder(id){
-         var link = '<?php echo  $this->link()->route('deleteOrder') ?>';
-         if(!confirm('<?php echo  $this->tr('Opravdu smazat objednávku?') ?>')){
+      function deleteOrder(id) {
+         var link = '<?php echo $this->link()->route('deleteOrder') ?>';
+         if (!confirm('<?php echo $this->tr('Opravdu smazat objednávku?') ?>')) {
             return;
          }
-         $.ajax({ url: link,type: "POST", cache: false,
-            data : {id : id},
-            success: function(data){
-               if(data.errmsg.length > 0 ){ errMsg(data.errmsg); } 
-               else { ordersGrid.trigger("reloadGrid"); }
+         $.ajax({url: link, type: "POST", cache: false,
+            data: {id: id},
+            success: function (data) {
+               if (data.errmsg.length > 0) {
+                  errMsg(data.errmsg);
+               } else {
+                  ordersGrid.trigger("reloadGrid");
+               }
             }
          });
       }
-      $(document).ready(function() {
-         $.extend($.fn.fmatter , {
-            showNewStatus : function(cellvalue, options, rowdata) {
-               var op = $.extend({type: null}, $.jgrid.formatter.currency);
-               if(typeof options.colModel.formatoptions !== 'undefined') {
-                  op = $.extend({}, op, options.colModel.formatoptions);
-               }
-               
-               if(op.type == 'currency'){
-                  cellvalue = $.fn.fmatter.currency(cellvalue, options);
-               }
-               
-               if(rowdata.neworder == true){
-                  return "<strong>"+cellvalue+"</strong>";
-               } 
-               return cellvalue;
-            }
-         });
-         $.extend($.fn.fmatter.showNewStatus , {
-            unformat : function(cellvalue, options) {
-               var op = $.extend({type: null}, $.jgrid.formatter.currency);
-               if(typeof options.colModel.formatoptions !== 'undefined') {
-                  op = $.extend({}, op, options.colModel.formatoptions);
-               }
-               
-               if(op.type == 'currency'){
-                  cellvalue = $.fn.fmatter.currency.unformat(cellvalue, options);
-               }
-            
-               return cellvalue.replace("<strong>","").replace("</strong>","");
-            }
-         });
-         
+      $(document).ready(function () {
          ordersGrid = $("#table-orders").jqGrid({
             datatype: 'json',
-            ajaxGridOptions : {type:"POST"},
-            url: '<?php echo  $this->link()->route('ordersList'); ?>',
-            colNames:['ID', '<?php echo  $this->tr('Jméno a příjmení') ?>', '<?php echo  $this->tr('Přijato') ?>', 
-               '<?php echo  $this->tr('Datum odběru') ?>', '<?php echo  $this->tr('Status') ?>',
-               '<?php echo  $this->tr('Cena') ?>', '<?php echo  $this->tr('Akce') ?>'],
-            colModel:[
-               {name:'id',	index:'id',	width:50, fixed :true, formatter: 'showNewStatus'},
-               {name:'name', index:'name', formatter: 'showNewStatus'},
-               {name:'time', index:'time', width:140, fixed :true, formatter: 'showNewStatus'},
-               {name:'pickupdate', index:'pickupdate', width:80, fixed :true, formatter: 'showNewStatus'},
-               {name:'status', index:'status', width:70, fixed :true, formatter: 'showNewStatus'},
-               {name:'price', index:'price', width:100, align:"right", fixed :true, formatter: 'showNewStatus', formatoptions: {type: "currency", decimalSeparator:",", thousandsSeparator: " ", decimalPlaces: 2, suffix: " Kč"} },
-               {name:'act', index:'act', width:80, fixed :true, fixed:true, sortable:false, resize:false/*, formatter:'actions',formatoptions:{keys:true}*/}
+            ajaxGridOptions: {type: "POST"},
+            url: '<?php echo $this->link()->route('ordersList'); ?>',
+            colNames: ['ID', '<?php echo $this->tr('Jméno a příjmení') ?>', '<?php echo $this->tr('Přijato') ?>',
+               '<?php echo $this->tr('Datum odběru') ?>', '<?php echo $this->tr('Status') ?>',
+               '<?php echo $this->tr('Cena') ?>', '<?php echo $this->tr('Akce') ?>'],
+            colModel: [
+               {name: 'id', index: 'id', width: 50, fixed: true, formatter: 'showNewStatus'},
+               {name: 'name', index: 'name', formatter: 'showNewStatus'},
+               {name: 'time', index: 'time', width: 140, fixed: true, formatter: 'showNewStatus'},
+               {name: 'pickupdate', index: 'pickupdate', width: 80, fixed: true, formatter: 'showNewStatus'},
+               {name: 'status', index: 'status', width: 70, fixed: true, formatter: 'showNewStatus', formatoptions: {type: "color"},
+                  cellattr: function (id, val, rawObj, cm, rdata) {
+                     if (rawObj.color !== "") { // verify that the testing is correct in your case
+                        return "style=\"background-color:"+rawObj.color+"\"";
+                     }
+                  }},
+               {name: 'price', index: 'price', width: 100, align: "right", fixed: true, formatter: 'showNewStatus',
+                  formatoptions: {type: "currency", decimalSeparator: ",", thousandsSeparator: " ", decimalPlaces: 2, suffix: " Kč"}},
+               {name: 'act', index: 'act', width: 80, fixed: true, fixed:true, sortable: false, resize: false/*, formatter:'actions',formatoptions:{keys:true}*/}
             ],
-            rowNum:15,
-            autowidth : true,
-            rowList:[15,30,60,100],
+            rowNum: 15,
+            autowidth: true,
+            rowList: [15, 30, 60, 100],
             pager: '#table-orders-pager',
             sortname: 'time',
             viewrecords: true,
+            gridview: true,
             sortorder: "desc",
             jsonReader: {
-               repeatitems : false, root:"rows"
+               repeatitems: false, root: "rows"
             },
-            caption: "<?php echo  $this->tr('Přehled objednávek') ?>",
+            caption: "<?php echo $this->tr('Přehled objednávek') ?>",
             height: '100%',
-            editurl : '<?php echo  $this->link()->route('view', array('id' => '[ID]')); ?>',
-            gridComplete: function(){ 
-               var ids = $(this).jqGrid('getDataIDs'); 
+            editurl: '<?php echo $this->link()->route('view', array('id' => '[ID]')); ?>',
+            gridComplete: function () {
+               var ids = $(this).jqGrid('getDataIDs');
                var button;
-               for(var i=0; i<ids.length;i++){ 
-                  var cl = ids[i]; 
-                  button = '<input type="image" src="images/icons/magnifier.png" value="<?php echo  $this->tr('Ukaž') ?>" onclick="showOrder(\''+ids[i]+'\');" />'
-                     +'<input type="image" src="images/icons/printer.png" value="<?php echo  $this->tr('Tisk') ?>" onclick="printOrder(\''+ids[i]+'\');\" />'
-                     +'<input type="image" src="images/icons/delete.png" value="<?php echo  $this->tr('Smazat') ?>" onclick="deleteOrder(\''+ids[i]+'\');" />'
-                     +'<input type="image" src="images/files/pdf.gif" value="<?php echo  $this->tr('Tisknout') ?>" onclick="downloadOrder(\'pdf\', \''+ids[i]+'\');" />'
-                  ; 
-                  $(this).jqGrid('setRowData',ids[i],{act:button}); 
+               for (var index = 0; index < ids.length; index++) {
+                  var cl = ids[index];
+                  button = '<input type="image" src="images/icons/magnifier.png" value="<?php echo $this->tr('Ukaž') ?>" onclick="showOrder(\'' + ids[index] + '\');" />'
+                          + '<input type="image" src="images/icons/printer.png" value="<?php echo $this->tr('Tisk') ?>" onclick="printOrder(\'' + ids[index] + '\');\" />'
+                          + '<input type="image" src="images/icons/delete.png" value="<?php echo $this->tr('Smazat') ?>" onclick="deleteOrder(\'' + ids[index] + '\');" />'
+                          + '<input type="image" src="images/files/pdf.gif" value="<?php echo $this->tr('Tisknout') ?>" onclick="downloadOrder(\'pdf\', \'' + ids[index] + '\');" />'
+                          ;
+                  $(this).jqGrid('setRowData', ids[index], {act: button});
                }
-               if(selOrderId != 0){
+               if (selOrderId != 0) {
                   $(this).jqGrid('setSelection', selOrderId);
                }
             },
-            onSelectRow: function(rowid, status) { 
-               if(status){
+            onSelectRow: function (rowid, status) {
+               if (status) {
                   showOrder(rowid);
-                  $('#'+rowid+' td', this).each(function(){ // unmark new
-                     $(this).html( $(this).html().replace('<strong>', "").replace('</strong>', "") );
+                  $('#' + rowid + ' td', this).each(function () { // unmark new
+                     $(this).html($(this).html().replace('<strong>', "").replace('</strong>', ""));
                   });
                }
                return false;
             }
          });
+
+         ordersGrid.jqGrid('navGrid', '#table-orders-pager', {edit: false, add: false, del: false, refresh: true});
          
-         ordersGrid.jqGrid('navGrid','#table-orders-pager', {edit: false, add: false, del:false, refresh: true});
-      
+         
+         $.extend($.fn.fmatter, {
+            showNewStatus: function (cellvalue, options, rowdata) {
+               var op = $.extend({type: null}, options.currency);
+               if (typeof options.colModel.formatoptions !== 'undefined') {
+                  op = $.extend({}, op, options.colModel.formatoptions);
+               }
+//               console.log(options, rowdata);
+               if (op.type == 'currency') {
+                  cellvalue = $.fn.fmatter.currency(cellvalue, options);
+//               } else if (op.type == 'color') {
+//                  cellvalue = cellvalue+'col';
+////                  console.log(cellvalue, options, rowdata);
+//                  ordersGrid.setCell(rowdata.id , 'status', cellvalue, { background: '#888888'});
+               }
+               if (rowdata.neworder == true) {
+                  return "<strong>" + cellvalue + "</strong>";
+               }
+               return cellvalue;
+            }
+         });
+         $.extend($.fn.fmatter.showNewStatus, {
+            unformat: function (cellvalue, options) {
+               var op = $.extend({type: null}, options.currency);
+               if (typeof options.colModel.formatoptions !== 'undefined') {
+                  op = $.extend({}, op, options.colModel.formatoptions);
+               }
+
+               if (op.type == 'currency') {
+                  cellvalue = $.fn.fmatter.currency.unformat(cellvalue, options);
+               }
+
+               return cellvalue.replace("<strong>", "").replace("</strong>", "");
+            }
+         });
       });
       /* ]]> */
    </script>
