@@ -44,12 +44,12 @@ class ShopProductGeneralAdmin_View extends Shop_Product_View {
       $toolbox->addTool($toolDel);
       
       foreach ($this->products as $p) {
-         $toolbox->editProduct->setAction($this->link()->clear()->route('edit', array('urlkey' => (string)$p->getUrlKey())));
-         $toolbox->editVariant->setAction($this->link()->clear()->route('editVariants', array('urlkey' => (string)$p->getUrlKey())));
-         $toolbox->editImages->setAction($this->link()->clear()->route('editImages', array('urlkey' => (string)$p->getUrlKey())));
-         $toolbox->editParams->setAction($this->link()->clear()->route('editParams', array('urlkey' => (string)$p->getUrlKey())));
-         $toolbox->duplicate->setAction($this->link()->clear()->param('duplicate', $p->getPK()));
-         $toolbox->delete->setAction($this->link()->clear()->param('id', $p->getPK())->param('action', 'delete'));
+         $toolbox->editProduct->setAction($this->link()->route('edit', array('urlkey' => (string)$p->getUrlKey())));
+         $toolbox->editVariant->setAction($this->link()->route('editVariants', array('urlkey' => (string)$p->getUrlKey())));
+         $toolbox->editImages->setAction($this->link()->route('editImages', array('urlkey' => (string)$p->getUrlKey())));
+         $toolbox->editParams->setAction($this->link()->route('editParams', array('urlkey' => (string)$p->getUrlKey())));
+         $toolbox->duplicate->setAction($this->link()->param('action','duplicate')->param('idp', $p->getPK()));
+         $toolbox->delete->setAction($this->link()->param('idp', $p->getPK())->param('action', 'delete'));
          $toolbox->delete->setConfirmMeassage(sprintf($this->tr('Smazat produkt %s ?'), $p->{Shop_Model_Product::COLUMN_NAME}));
          $p->toolbox = clone $toolbox;
       }

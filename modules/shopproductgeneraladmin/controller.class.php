@@ -214,6 +214,7 @@ class ShopProductGeneralAdmin_Controller extends Shop_Product_Controller {
 //            array()
 //         );
       }
+      $model->groupBy(Shop_Model_Product::COLUMN_ID);
 
       // řazení
       $sortTypes = self::getSortTypes();
@@ -231,7 +232,6 @@ class ShopProductGeneralAdmin_Controller extends Shop_Product_Controller {
       if($scrollComponent instanceof Component_Scroll){
          $model->limit($scrollComponent->getStartRecord(), $scrollComponent->getRecordsOnPage());
       }
-      $model->groupBy(Shop_Model_Product::COLUMN_ID);
       $this->view()->scrollComp = $scrollComponent;
 //      Debug::log($model->getSQLQuery());
       $this->view()->products = $model->records();

@@ -141,7 +141,12 @@ $this->addJsPlugin(new JsPlugin_PrettyPhoto());
             <?php } ?>
          </tbody>
          <tfoot class="cubecms-widget-footer">
-            <tr class="ui-widget-header">
+            <tr class="cubecms-row">
+               <td colspan="8">
+                  <?php echo $this->scrollComp ?>
+               </td>
+            </tr>
+            <tr class="cubecms-row">
                <td colspan="8">
                   <?php ps($this->tr('Zaškrtnuté')) ?>:
                   <select name="list-action">
