@@ -4,11 +4,17 @@ class AdminCustomMenu_View extends View {
       $this->template()->addTplFile('main.phtml');
    }
 
-   public static function getMenu($name)
+   public static function getMenu($nameOrId)
    {
       $model = new CustomMenu_Model_Items();
       $tpl = new Template_Module(new Url_Link_Module(), Category::getSelectedCategory());
 
+      $name = $nameOrId;
+      if(is_int($name)){
+         $root = AdminCustomMenu_Model_Items::getRecord($name);
+         $name = $root->{AdminCustomMenu_Model_Items::COLUMN_BOX};
+      }
+      
       $tpl->box = $name;
 
       // parametry boxu
@@ -48,5 +54,14 @@ class AdminCustomMenu_View extends View {
       return $tpl;
    }
 
+   public function editMenuView()
+   {
+      $this->template()->addFile('tpl://editform.phtml');
+   }
+   
+   public function editMenuItemView()
+   {
+      $this->template()->addFile('tpl://editform.phtml');
+   }
 }
 

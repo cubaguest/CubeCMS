@@ -1,3 +1,24 @@
+@import "variables.less";
+
+#menus-structure-wrap {
+   .jstree-anchor:hover + .menu-item-info {
+/*      display: block;*/
+      color: @gray;
+   }
+   .jstree-anchor.inactive {
+      font-style: italic;
+      color: @gray-light;
+   }
+   .menu-item-info {
+      /*display: none;*/
+      color: @gray-light;
+      margin-left: 48px;
+   }
+   
+   border: 1px solid @gray-light;
+}
+
+
 .menu-box {
    table {
       .move {

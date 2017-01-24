@@ -1,89 +1,258 @@
-<?php  // načtení detailu
+<?php
+// načtení detailu
 $this->addFile("css://style.less");
 $this->addFile("js://custommenu.js");
 $jq = new JsPlugin_JQuery();
-$jq->addUISortable();
-$jq->addUIDialog();
 $this->addJsPlugin($jq);
-
+$this->addJsPlugin(new JsPlugin_JsTree());
 ?>
-<h1><?php ps($this->category()->getName());?></h1>
+<h1><?php ps($this->tr('Uživatelská menu')); ?></h1>
 <div class="content-admin clearfix" id="custom-menu-list">
-   <?php 
-   if(!empty($this->boxes)){
-      foreach ($this->boxes as $key => $box) {?>
-      <div class="menu-box">
-         <h2><?php ps($box['name'])?></h2>
-         <table class="full-width ui-cube ui-cube-widget ui-table-widget">
-            <thead>
-               <tr class="ui-widget-header">
-                  <td></td>
-                  <th><?php ps($this->tr('Název'))?></th>
-                  <th><?php ps($this->tr('Odkaz'))?></th>
-                  <td></td>
-               </tr>
-            </thead>
-            <tfoot>
-               <tr class="ui-widget-content">
-                  <td colspan="4">
-                     <button onclick="CustomMenu.addCustomMenuItem('<?php echo $key?>');"><?php ps($this->tr('Přidat'))?></button>
-                  </td>
-               </tr>
-            </tfoot>
-            <tbody>
-               <?php 
-               if(!empty($box['items'])){
-                  foreach ($box['items'] as $item) {?>
-                  <tr id="custom-menu-item-<?php echo $item->getPK()?>" class="custom-menu-item ui-widget-content"
-                      data-id="<?php echo $item->getPK()?>"
-                      data-name='<?php echo htmlentities(json_encode($item->{AdminCustomMenu_Model_Items::COLUMN_NAME}->getArray()))?>'
-                      data-box='<?php echo $item->{AdminCustomMenu_Model_Items::COLUMN_BOX}?>'
-                      data-active="<?php echo $item->{AdminCustomMenu_Model_Items::COLUMN_ACTIVE} ? "true" : "false" ?>"
-                      data-link="<?php echo $item->{AdminCustomMenu_Model_Items::COLUMN_LINK}?>"
-                      data-idcat="<?php echo $item->{AdminCustomMenu_Model_Items::COLUMN_ID_CATEGORY}?>"
-                      data-newwin="<?php echo $item->{AdminCustomMenu_Model_Items::COLUMN_NEW_WINDOW} ? "true" : "false" ?>"
-                          >
-                     <td class="move"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span></td>
-                     <td class="name"><?php ps($item->{AdminCustomMenu_Model_Items::COLUMN_NAME})?></td>
-                     <td class="link">
-                        <?php 
-                        $href = $item->{AdminCustomMenu_Model_Items::COLUMN_LINK} != null ? $item->{AdminCustomMenu_Model_Items::COLUMN_LINK} : $item->catLink;
-                        ?>
-                        <a href="<?php echo $href?>" title="<?php ps($href);?>"><?php echo(vve_tpl_xhtml_cut($href, 30))?></a>
-                     </td>
-                     <td class="actions">
-                        <?php $icon = $item->{AdminCustomMenu_Model_Items::COLUMN_ACTIVE} ? 'eye' : "eye-slash";?>
-                        <a href="<?php echo $this->link()->route('edit')->param('action', 'changeState')->param('id', $item->getPK())?>"><span class="icon icon-<?php echo $icon?>"></span></a>
-                        <a href="<?php echo $this->link()->param('action', 'edit')->param('id', $item->getPK())?>"
-                           onclick="CustomMenu.editCustomMenuItem(<?php echo $item->getPK()?>); return false;"
-                           class="button-edit-param"><span class="icon icon-pencil"></span></a>
-                        <a href="<?php echo $this->link()->route('edit')->param('action', 'delete')->param('id', $item->getPK())?>"
-                           onclick="CustomMenu.deleteCustomMenuItem(<?php echo $item->getPK()?>);"
-                           class="button-delete-param"><span class="icon icon-times"></span></a>
-                     </td>
-                  </tr>
-                  <?php 
-                  }
-               } else {?>
-                  <tr class="ui-widget-content"><td colspan="4"><?php ps($this->tr('Žádná položka není přidána'))?></td></tr>
-               <?php }?>
-            </tbody>
-         </table>
-      </div>
-      <?php }
-   } else {?>
-      <div class="message message-warning">
-         <?php ps($this->tr('Pro tuto šablonu není definováno žádné menu'))?>
-      </div>
-   <?php }?>
-   <div id="form-edit-menu-item">
-      <?php echo $this->form;?>
+   <?php
+   $this->moduleButtons = array(
+       array(
+           'title' => $this->tr('Přidat nové menu'),
+           'icon' => Template_Toolbox2::ICON_ADD,
+           'name' => $this->tr('Přidat nové menu'),
+           'id' => 'buttonAddMenu',
+       ),
+//       array(
+//           'title' => $this->tr('Upravit vybrané menu'),
+//           'icon' => Template_Toolbox2::ICON_PEN,
+//           'name' => $this->tr('Upravit menu'),
+//           'id' => 'buttonEditMenu',
+//       ),
+       array(
+           'title' => $this->tr('Přidat novou položku menu'),
+           'icon' => Template_Toolbox2::ICON_ADD,
+           'name' => $this->tr('Přidat položku menu'),
+           'id' => 'buttonAddMenuItem',
+       ),
+//       array(
+//           'title' => $this->tr('Upravit položku menu'),
+//           'icon' => Template_Toolbox2::ICON_PEN,
+//           'name' => $this->tr('Upravit položku menu'),
+//           'id' => 'buttonEditMenuItem',
+//       ),
+   );
+   if (CUBE_CMS_DEBUG_LEVEL > 0) {
+      $this->moduleButtons[] = array(
+          'title' => $this->tr('Obnovit'),
+          'icon' => Template_Toolbox2::ICON_COG,
+          'name' => $this->tr('Obnovit'),
+          'id' => 'buttonRefreshMenuItem',
+      );
+   }
+   $this->includeTpl('modules/buttons.phtml', true);
+   ?>
+   <div>
+     <?php
+     echo $this->formTest;
+     ?>
    </div>
+   <div class="row">
+      <div class="col-md-8">
+         <div id="menus-structure-wrap">
+            <div id="menus-structure" class=""></div>
+         </div>
+      </div>
+      <div class="col-md-4">
+         <div id="form-edit-item">
+
+         </div>
+      </div>
+   </div>
+
+   <?php
+   $this->formMenu->html()->setAttrib('id', 'form-add-menu');
+   $this->includeFile('tpl://engine:components/modal.phtml', array('content' => (string) $this->formMenu,
+       'id' => 'modal-form-add-menu',
+       'header' => $this->tr('Vytvoření nového menu'),
+       'close' => true,
+       'large' => true,
+       'footer' => '<button class="btn btn-default close-modal">' . $this->tr('Zavřít') . '</button>'));
+
+   $this->form->html()->setAttrib('id', 'form-add-menu-item');
+   $this->includeFile('tpl://engine:components/modal.phtml', array('content' => (string) $this->form,
+       'id' => 'modal-form-add-menu-item',
+       'header' => $this->tr('Vytvoření položky menu'),
+       'close' => true,
+       'large' => true,
+       'footer' => '<button class="btn btn-default close-modal">' . $this->tr('Zavřít') . '</button>'));
+   ?>
    <script type="text/javascript">
-      $(document).ready(function(){
-         CustomMenu.init({
-            editUrl : '<?php echo $this->link()->route('edit')?>',
-            dialogTitle : {  add : '<?php ps($this->tr('Přidání položky'))?>', edit: '<?php ps($this->tr('Úprava položky'))?>'}
+      $(document).ready(function () {
+         $.jstree.plugins.addNodeInfo = function (options, parent) {
+            this.redraw_node = function (obj, deep, callback, force_draw) {
+               obj = parent.redraw_node.call(this, obj, deep, callback, force_draw);
+               if (obj) {
+                  var node = this.get_node($(obj).attr('id'));
+//                  $(obj).find('.menu-item-info').remove();
+                  if (node && node.data && node.type !== "root") {
+                     var html = '<div class="menu-item-info">';
+                     if (node.data.catname != "") {
+                        html += '<strong><?php echo $this->tr('Kategorie') ?>:</strong> '
+                                + '<a href="' + node.data.link + '" class="link-external">' + node.data.catname + '</span></a>';
+                     } else {
+                        html += '<strong><?php echo $this->tr('Odkaz') ?>:</strong> '
+                                + '<a href="' + node.data.link + '" class="link-external">' + node.data.link + ' <span class="icon icon-external-link"></span></a>';
+                     }
+                     html += ',&nbsp;<strong><?php echo $this->tr('nové okno') ?>:</strong> ';
+                     if (node.data.newWin) {
+                        html += '<?php echo $this->tr('ano') ?>';
+                     } else {
+                        html += '<?php echo $this->tr('ne') ?>';
+                     }
+                     html += '</div>';
+                     if($(obj).children('.menu-item-info').length === 0){
+                        $(obj).children('a').after(html);
+                     }
+                  }
+               }
+               return obj;
+            };
+         };
+
+         $.jstree.defaults.addHTML = {};
+         var $structure = $('#menus-structure');
+         var stopPreloadSelected = false;
+         $structure
+                 .on('select_node.jstree', function (e, node) {
+                    if (!stopPreloadSelected) {
+                       var url;
+                       if (node.node.data.type === "root") {
+                          url = '<?php echo $this->link()->route('editMenu', array('id' => '[ID]')) ?>';
+                       } else {
+                          url = '<?php echo $this->link()->route('editMenuItem', array('id' => '[ID]')) ?>';
+                       }
+                       $('#form-edit-item').load(url.replace('[ID]', node.node.data.itemid), function () {
+                          CubeCMS.Form.initLangSelector();
+                          $(this).fadeIn(400);
+                       });
+                    } else {
+                       stopPreloadSelected = false;
+                    }
+                    if(node.node.type === "root"){
+                        $('#form-add-menu-item select[name="edit_menu_item_root"]').val(node.node.data.itemid);
+                    }
+                  })
+                 .on('deselect_node.jstree', function (e, node) {
+                    $('#form-edit-item').fadeOut(400, function () {
+                       $(this).html(null);
+                    });
+                 })
+                 .on('move_node.jstree', function (e, node) {
+                    console.log(node);
+                    var parent = $structure.jstree(true).get_node(node.parent);
+                    var parentOld = $structure.jstree(true).get_node(node.old_parent);
+                    var newPos = {
+                       id: node.node.data.itemid,
+                       parent: node.parent === "#" ? 0 : parent.data.itemid,
+                       parentold: node.old_parent === "#" ? 0 : parentOld.data.itemid,
+                       position: node.position,
+                       positionold: node.old_position
+                    };
+                    $.ajax({
+                       type: "POST",
+                       url: "<?php echo $this->link()->route("moveItem") ?>",
+                       data: newPos,
+                       success: function (data) {
+                          CubeCMS.Loader.hideLoadBox();
+                       }
+                    });
+                 })
+                 .jstree({
+                    core: {
+                       data: {url: '<?php echo $this->link()->route('getTree') ?>'},
+                       animation: 0,
+                       "check_callback": true,
+                       themes: {name: 'proton', responsive: true}
+                    },
+                    dnd: {
+                       "is_draggable": function (node) {
+                          if (node[0].type === 'root') {
+                             return false;
+                          }
+                          return true;
+                       }
+                    },
+                    types: {
+                       "#": {
+                          "max_children": -1,
+                          "max_depth": -1,
+                          "valid_children": ["root"]
+                       },
+                       "root": {
+                          icon: "icon icon-list-alt",
+                          "valid_children": -1
+                       },
+                       "default": {
+                          icon: "icon icon-file-o",
+                          "valid_children": -1
+                       },
+                       "globe": {
+                          icon: "icon icon-globe",
+                          "valid_children": -1
+                       },
+                       "folder": {
+                          icon: "icon icon-folder",
+                          "valid_children": -1
+                       }
+                    },
+                    plugins: ["dnd", "themes", "types", "addNodeInfo"]
+                 });
+
+         $('#buttonAddMenu').on('click', function () {
+            $('#modal-form-add-menu').show();
+         });
+         $('#buttonAddMenuItem').on('click', function () {
+            $('#modal-form-add-menu-item').show();
+         });
+         $('#buttonEditMenu').attr('disable', 'disable');
+
+         $('#form-edit-item').on('submit', '#form-edit-menu-item', function (e) {
+            e.preventDefault();
+            var $form = $(this);
+            stopPreloadSelected = true;
+            $.ajax({
+               method: 'POST',
+               url: $form.prop('action') + '?<?php echo Url_Request::URL_OUTPUT_TYPE?>=json',
+               data: $form.serialize(),
+               success: function (data) {
+                  CubeCMS.Form.setMessages($form, data);
+                  $structure.jstree(true).refresh();
+               }
+            });
+            return false;
+         });
+         $('#form-add-menu, #form-add-menu-item').on('submit', function (e) {
+            e.preventDefault();
+            var $form = $(this);
+            stopPreloadSelected = true;
+            $.ajax({
+               method: 'POST',
+               url: $form.prop('action') + '?<?php echo Url_Request::URL_OUTPUT_TYPE?>=json',
+               data: $form.serialize(),
+               success: function (data) {
+                  CubeCMS.Form.setMessages($form, data);
+                  $structure.jstree(true).refresh();
+                  if(data.errmsg.length === 0){
+                     CubeCMS.Form.hideMessages($form);
+                     $('#modal-form-add-menu, #modal-form-add-menu-item').hide();
+                     $('input[type="text"]', $form).each(function(){
+                        $(this).val(null);
+                     });
+                     $('select', $form).each(function(){
+                        $(this).val(0);
+                     });
+                  }
+               }
+            });
+            return false;
+         });
+
+         $('#buttonRefreshMenuItem').on('click', function (e) {
+            $structure.jstree(true).refresh();
          });
       });
    </script>

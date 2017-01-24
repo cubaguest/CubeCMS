@@ -1,7 +1,8 @@
 <?php
-class AdminCustomMenu_Controller extends Controller {
-   private $catsArray = array();
 
+class AdminCustomMenu_Controller extends Controller {
+
+   private $catsArray = array();
 
    protected function init()
    {
@@ -10,65 +11,145 @@ class AdminCustomMenu_Controller extends Controller {
       parent::init();
    }
 
-   public function mainController() {
-      $menus = $this->category()->getParam('positions', null);
-      if(empty($menus)){
-         return;
-      }
-
-      $this->view()->form = $this->createFormMenuItem();
-
-      $boxes = array();
+   public function mainController()
+   {
+      /**
+       * @todo - asi vytvořit nějaký algoritmus, který bude menu vytvářet podla face pokud neexitují
+       * To samé patří přidat 
+       */
+      $menusFace = Face::getCurrent()->getParam('positions', 'custommenu');
+      $boxesFace = array();
       // vytvoření pole pro boxy
-      foreach($menus as $key => $name){
-         $boxes[$key] = array('name' => $name, 'items' => array());
+      foreach ($menusFace as $key => $name) {
+         $boxesFace[$key] = array('name' => $name, 'items' => array());
       }
+
+      $formItem = $this->createFormMenuItem();
+      $this->processEditMenuItemForm($formItem);
+      $this->view()->form = $formItem;
+      
+      $formMenu = $this->createFormMenu();
+      $this->processEditMenuForm($formMenu);
+      $this->view()->formMenu = $formMenu;
 
       // zařazení položek
       // načtení položek z jednotlivých menu
-      $model = new AdminAdminCustomMenu_Model_Items();
-      $records = $model
-         ->joinFK(AdminCustomMenu_Model_Items::COLUMN_ID_CATEGORY)
-         ->order(array(AdminCustomMenu_Model_Items::COLUMN_BOX => Model_ORM::ORDER_ASC, AdminCustomMenu_Model_Items::COLUMN_ORDER => Model_ORM::ORDER_ASC))
-         ->records();
-      $linkCat = new Url_Link(true);
-      foreach($records as $item){
-         // createCatLink
-         $item->catLink = (string)$linkCat->category($item->{Model_Category::COLUMN_URLKEY});
-         $boxes[$item->{AdminCustomMenu_Model_Items::COLUMN_BOX}]['items'][] = $item;
+      if(!Url_Request::isXHRRequest()){
+         $model = new AdminCustomMenu_Model_Items();
+         $structureRoots = $model->getRoots();
+         $this->view()->structure = $structureRoots;
       }
 
-      $this->view()->boxes = $boxes;
+// testy
+      $ft = new Form('ftest');
+
+      $inp = new Form_Element_Text('id', 'ID');
+      $ft->addElement($inp);
+
+      $send = new Form_Element_Submit('send', 'proved');
+      $ft->addElement($send);
+
+      if($ft->isValid()){
+         $rec = AdminCustomMenu_Model_Items::getRecord($ft->id->getValues());
+
+         $p = $rec->getParent();
+
+         Debug::log($p->{AdminCustomMenu_Model_Items::COLUMN_NAME}, $rec->getPK(), $p->getPK());
+      }
+
+      $this->view()->formTest = $ft;
+   }
+   
+   protected function processEditMenuForm(Form $form)
+   {
+      if($form->isValid()){
+         $item = AdminCustomMenu_Model_Items::getNewRecord();
+         $item->{AdminCustomMenu_Model_Items::COLUMN_NAME} = $form->name->getValues();
+         $item->save();
+         /* @var $item AdminCustomMenu_Model_Items_Record */
+         $item->setAsRoot();
+         $this->infoMsg()->addMessage($this->tr('Menu bylo vytvořeno'));
+         $this->link()->redirect();
+      }
+   }
+   
+   protected function processEditMenuItemForm(Form $form)
+   {
+      if($form->isValid()){
+         $root = AdminCustomMenu_Model_Items::getRecord($form->root->getValues());
+         /* @var $root AdminCustomMenu_Model_Items_Record */
+         
+         /* @var $item AdminCustomMenu_Model_Items_Record */
+         $item = AdminCustomMenu_Model_Items::getNewRecord();
+         $item->{AdminCustomMenu_Model_Items::COLUMN_NAME} = $form->name->getValues();
+         $item->{AdminCustomMenu_Model_Items::COLUMN_ACTIVE} = $form->active->getValues();
+         $item->{AdminCustomMenu_Model_Items::COLUMN_BOX} = $root->{AdminCustomMenu_Model_Items::COLUMN_BOX};
+         $item->{AdminCustomMenu_Model_Items::COLUMN_ID_CATEGORY}= $form->cat->getValues();
+         $item->{AdminCustomMenu_Model_Items::COLUMN_LINK} = $form->link->getValues();
+         $item->{AdminCustomMenu_Model_Items::COLUMN_NEW_WINDOW} = $form->newWin->getValues();
+         $root->addNode($item); // save se provádí i přidáním
+         
+         $this->infoMsg()->addMessage($this->tr('Položka menu byla vytvořena'));
+         $this->link()->redirect();
+      }
    }
 
-   public function editController() {
+   public function editController()
+   {
       $action = $this->getRequestParam('action', false);
       $id = $this->getRequestParam('id');
-      if(!$action){
+      if (!$action) {
          throw new UnexpectedValueException('Nebyla předána akce');
       }
-      if($action == 'edit'){
+      if ($action == 'edit') {
          $this->createFormMenuItem();
-      } else if($action == "delete" && $id != null){
+      } else if ($action == "delete" && $id != null) {
          $model = new AdminCustomMenu_Model_Items();
          $model->delete($id);
          $this->infoMsg()->addMessage($this->tr('Položka byla smazána'));
          $this->link()->route()->rmParam()->file()->redirect();
-
-      } else if($action == "changeState" && $id != null){
-         AdminCustomMenu_Model_Items::changeState($id);
-         $this->infoMsg()->addMessage($this->tr('Položka byla smazána'));
-         $this->link()->route()->rmParam()->file()->redirect();
-
-      } else if($action == "changepos" && $id != null
-         && ($pos = $this->getRequestParam('pos')) != null){
-         AdminCustomMenu_Model_Items::setRecordPosition($id, $pos);
-         $this->infoMsg()->addMessage($this->tr('Položka byla přesunuta'));
-         $this->link()->route()->rmParam()->file()->redirect();
+      } else if ($action == "changeState" && $id != null) {
+//         AdminCustomMenu_Model_Items::changeState($id);
+//         $this->infoMsg()->addMessage($this->tr('Položka byla smazána'));
+//         $this->link()->route()->rmParam()->file()->redirect();
       }
    }
+   
+   public function editMenuController($id)
+   {
+      $item = AdminCustomMenu_Model_Items::getRecord($id);
+      $form = $this->createFormMenu($item);
+      if($form->isValid()){
+         $item->{AdminCustomMenu_Model_Items::COLUMN_NAME} = $form->name->getValues();
+         $item->save();
+         $this->infoMsg()->addMessage($this->tr('Položky byla uložena'));
+         $this->link()->redirect();
+      }
+      
+      $this->view()->form = $form;
+   }
+   
+   public function editMenuItemController($id)
+   {
+      $item = AdminCustomMenu_Model_Items::getRecord($id);
+      $form = $this->createFormMenuItem($item);
+      
+      if($form->isValid()){
+         $item->{AdminCustomMenu_Model_Items::COLUMN_NAME} = $form->name->getValues();
+         $item->{AdminCustomMenu_Model_Items::COLUMN_LINK} = $form->link->getValues();
+         $item->{AdminCustomMenu_Model_Items::COLUMN_ID_CATEGORY} = $form->cat->getValues();
+//         $item->{AdminCustomMenu_Model_Items::COLUMN_NAME} = $form->root->getValues();
+         $item->{AdminCustomMenu_Model_Items::COLUMN_ACTIVE} = $form->active->getValues();
+         $item->{AdminCustomMenu_Model_Items::COLUMN_NEW_WINDOW} = $form->newWin->getValues();
+         $item->save();
+         $this->infoMsg()->addMessage($this->tr('Položky byla uložena'));
+         $this->link()->redirect();
+      }
+      
+      $this->view()->form = $form;
+   }
 
-   protected function createFormMenuItem($item = null)
+   protected function createFormMenuItem(Model_ORM_Tree_Record $item = null)
    {
       $f = new Form('edit_menu_item_');
 
@@ -93,12 +174,13 @@ class AdminCustomMenu_Controller extends Controller {
       }
       $f->addElement($eCats);
 
-      $eBox = new Form_Element_Select('box', $this->tr('Umístění'));
-      $boxes = $this->category()->getParam('positions', null);
-      foreach($boxes as $key => $name){
-         $eBox->addOption($name, $key);
+      $eRoot = new Form_Element_Select('root', $this->tr('Umístění'));
+      $model = new AdminCustomMenu_Model_Items();
+      $structureRoots = $model->getRoots();
+      foreach ($structureRoots as $node) {
+         $eRoot->addOption($node->{AdminCustomMenu_Model_Items::COLUMN_NAME}, $node->getPK());
       }
-      $f->addElement($eBox);
+      $f->addElement($eRoot);
 
       $eAct = new Form_Element_Checkbox('active', $this->tr('Aktivní'));
       $eAct->setValues(true);
@@ -111,33 +193,129 @@ class AdminCustomMenu_Controller extends Controller {
       $eSave = new Form_Element_Submit('save', $this->tr('Uložit'));
       $f->addElement($eSave);
 
-      if($f->isSend()){
-         if($f->link->getValues() == null && $f->cat->getValues() == 0){
-            $eCats->setError($this->tr('Nebyl zadán odkaz položky. Musíte zadat buď odkaz nebo kategorii'));
-         }
-      }
-
-      if($f->isValid()){
-         $model = new AdminCustomMenu_Model_Items();
-         if($f->id->getValues() != null){
-            $item = $model->record($f->id->getValues());
-         } else {
-            $item = $model->newRecord();
-         }
-
-         $item->{AdminCustomMenu_Model_Items::COLUMN_NAME} = $f->name->getValues();
-         $item->{AdminCustomMenu_Model_Items::COLUMN_LINK} = $f->link->getValues();
-         $item->{AdminCustomMenu_Model_Items::COLUMN_BOX} = $f->box->getValues();
-         $item->{AdminCustomMenu_Model_Items::COLUMN_ID_CATEGORY} = $f->cat->getValues();
-         $item->{AdminCustomMenu_Model_Items::COLUMN_ACTIVE} = $f->active->getValues();
-         $item->{AdminCustomMenu_Model_Items::COLUMN_NEW_WINDOW} = $f->newWin->getValues();
-         $item->save();
-
-         $this->infoMsg()->addMessage($this->tr('Položka byla uložena'));
-         $this->link()->redirect();
+      if($item != null){
+         $f->id->setValues($item->getPK());
+         $f->name->setValues($item->{AdminCustomMenu_Model_Items::COLUMN_NAME});
+         $f->link->setValues($item->{AdminCustomMenu_Model_Items::COLUMN_LINK});
+         $f->cat->setValues($item->{AdminCustomMenu_Model_Items::COLUMN_ID_CATEGORY});
+//         $f->root->setValues($item->{AdminCustomMenu_Model_Items::COLUMN_NAME});
+         $f->active->setValues($item->{AdminCustomMenu_Model_Items::COLUMN_ACTIVE});
+         $f->newWin->setValues($item->{AdminCustomMenu_Model_Items::COLUMN_NEW_WINDOW});
       }
 
       return $f;
+   }
+
+   protected function createFormMenu(Model_ORM_Tree_Record $menu = null)
+   {
+      $f = new Form('edit_menu_');
+
+      $eId = new Form_Element_Hidden('id');
+      $f->addElement($eId);
+
+      $eName = new Form_Element_Text('name', $this->tr('Název'));
+      $eName->setLangs();
+      $eName->addValidation(New Form_Validator_NotEmpty(null, Locales::getDefaultLang(true)));
+      $f->addElement($eName);
+
+      $eSave = new Form_Element_Submit('save', $this->tr('Uložit'));
+      $f->addElement($eSave);
+
+      if($menu != null){
+         $f->id->setValues($menu->getPK());
+         $f->name->setValues($menu->{AdminCustomMenu_Model_Items::COLUMN_NAME});
+      }
+      return $f;
+   }
+
+   public function moveItemController()
+   {
+      $this->checkWritebleRights();
+
+      $idParent = (int) $this->getRequestParam('parent');
+      $idParentOld = (int) $this->getRequestParam('parentold');
+      $id = (int) $this->getRequestParam('id');
+      $index = (int) $this->getRequestParam('position');
+      $indexOld = (int) $this->getRequestParam('positionold');
+
+      // oprava pozice pokud se posunuje dolů
+      if($idParent == $idParentOld && $index > $indexOld){
+         $index++;
+      }
+      
+      $model = new AdminCustomMenu_Model_Items();
+
+      $item = $model->record($id);
+      $parent = $model->record($idParent);
+
+      $model->moveNode($item, $parent, $index);
+   }
+
+   public function getTreeController()
+   {
+      $this->checkWritebleRights();
+
+      $model = new AdminCustomMenu_Model_Items();
+
+      $roots = $model
+              ->joinFK(AdminCustomMenu_Model_Items::COLUMN_ID_CATEGORY)
+              ->getRoots();
+      $treeArray = array();
+      foreach ($roots as $node) {
+         $treeArray[] = array_merge(
+                 $this->createTreeItem($node, 'root'), array('children' => $this->createTreeArray($node))
+         );
+      }
+      Template_Output::setOutputType('json');
+      Template_Output::sendHeaders();
+      echo json_encode($treeArray);
+      die;
+   }
+
+   protected function createTreeArray(Model_ORM_Tree_Record $tree)
+   {
+      $childs = $tree->getNodes();
+      $treeData = array();
+      if(!$tree->isEmpty()){
+         foreach ($childs as $node) {
+            $type = $node->{AdminCustomMenu_Model_Items::COLUMN_LINK} != null ? 'globe' : '';
+      //         $type = $node->isEmpty() ? $type : 'folder';
+            $treeData[] = array_merge(
+                    $this->createTreeItem($node, $type), array('children' => $this->createTreeArray($node))
+            );
+         }
+      }
+      return $treeData;
+   }
+
+   protected function createTreeItem($node, $type = null)
+   {
+      $link = $node->{AdminCustomMenu_Model_Items::COLUMN_LINK};
+      if($node->{AdminCustomMenu_Model_Items::COLUMN_ID_CATEGORY} != null){
+         
+      }
+      return array(
+          'id' => 'menu-item-' . $node->getPK(),
+          'itemid' => $node->getPK(),
+          'text' => (string) $node->{AdminCustomMenu_Model_Items::COLUMN_NAME}. ' <em>(ID: '.$node->getPK().')</em>',
+          'children' => array(),
+//             'li_attr' => array(),
+             'a_attr' => array(
+                 'class' => $node->{AdminCustomMenu_Model_Items::COLUMN_ACTIVE} ? 'active' : 'inactive'
+             ),
+          'type' => $type,
+          'data' => array(
+              'type' => $type,
+              'itemid' => $node->getPK(),
+              'name' => $node->{AdminCustomMenu_Model_Items::COLUMN_NAME}->toArray(),
+              'link' => $link,
+              'newWin' => (bool)$node->{AdminCustomMenu_Model_Items::COLUMN_NEW_WINDOW},
+              'state' => $node->{AdminCustomMenu_Model_Items::COLUMN_ACTIVE},
+              'idcat' => $node->{AdminCustomMenu_Model_Items::COLUMN_ID_CATEGORY},
+              'catname' => (string)$node->{Model_Category::COLUMN_NAME},
+              'box' => (string)$node->{Model_Category::COLUMN_BOX},
+          ),
+      );
    }
 
    protected function loadCats()
@@ -148,10 +326,10 @@ class AdminCustomMenu_Controller extends Controller {
 
    private function fillInCats($struct, $level = 0)
    {
-      foreach($struct as $i){
-         $this->catsArray[$i->getCatObj()->getId()] = str_repeat('.', $level*3).$i->getCatObj()->getName();
-         if(!empty($i)){
-            $this->fillInCats($i, $level+1);
+      foreach ($struct as $i) {
+         $this->catsArray[$i->getCatObj()->getId()] = str_repeat('.', $level * 3) . $i->getCatObj()->getName();
+         if (!empty($i)) {
+            $this->fillInCats($i, $level + 1);
          }
       }
    }

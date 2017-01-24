@@ -1,0 +1,7 @@
+<?php 
+$this->form->html()->setAttrib('id', 'form-edit-menu-item');
+$this->form->setDecorator(new Form_Decorator_Vertical(array(
+    'labelColClass' => 'col-md-5',
+     'controlColClass' => 'col-md-7')
+        ));
+echo $this->form;
