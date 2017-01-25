@@ -24,5 +24,4 @@ ADD COLUMN `article_priority` INT NULL DEFAULT 0  AFTER `author` ,
 ADD COLUMN `article_priority_end_date` DATE NULL DEFAULT NULL AFTER `article_priority`, 
 ADD INDEX `urlkey_cs_id_cat` (`id_cat` ASC, `urlkey_cs` ASC),
 ADD INDEX `urlkey_en_id_cat` (`id_cat` ASC, `urlkey_en` ASC),
-ADD INDEX `urlkey_de_id_cat` (`id_cat` ASC, `urlkey_de` ASC),
-ADD INDEX `urlkey_sk_id_cat` (`id_cat` ASC, `urlkey_sk` ASC) ;
+ADD INDEX `urlkey_de_id_cat` (`id_cat` ASC, `urlkey_de` ASC);
