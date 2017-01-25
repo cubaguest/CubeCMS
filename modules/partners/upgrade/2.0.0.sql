@@ -11,7 +11,6 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}partners_groups` (
 DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_unicode_ci;
 
-
 SET @s = (SELECT IF(
     (SELECT COUNT(*)
         FROM INFORMATION_SCHEMA.COLUMNS
@@ -20,7 +19,7 @@ SET @s = (SELECT IF(
         AND column_name = 'id_group'
     ) = 1,
     "SELECT 1",
-    "ALTER TABLE `{PREFIX}partners` CHANGE COLUMN `id_partner` `id_partner` INT(11) NOT NULL, CHANGE COLUMN `id_category` `id_group` INT(11) NOT NULL;"
+    "ALTER TABLE `{PREFIX}partners` CHANGE COLUMN `id_partner` `id_partner` INT(11) NOT NULL AUTO_INCREMENT, CHANGE COLUMN `id_category` `id_group` INT(11) NOT NULL;"
 ));
 
 PREPARE stmt FROM @s;

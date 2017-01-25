@@ -7,20 +7,28 @@ class Partners_Panel extends Panel {
    const LIST_TYPE_RAND = "rand";
 
    public function panelController() {
-//      $model = new Partners_Model();
-//      $model
-//         ->where(Partners_Model::COLUMN_ID_CATEGORY." = :idc AND ".Partners_Model::COLUMN_DISABLED." = 0", array('idc' => $this->category()->getId()));
-//      
-//      switch ($this->panelObj()->getParam('type', self::DEFAULT_TYPE)) {
-//         case self::LIST_TYPE_RAND:
-//            $model->order(array('RAND(NOW())' => Model_ORM::ORDER_ASC));
-//            break;
-//         case self::LIST_TYPE_LIST:
-//         default:
-//            $model->order(array(Partners_Model::COLUMN_ORDER => Model_ORM::ORDER_ASC));
-//            break;
-//      }
-//      $this->template()->partners = $model->limit(0, $this->panelObj()->getParam('num',self::DEFAULT_NUM_PARTNERS))->records();
+      $model = new Partners_Model();
+      $model->joinFK(Partners_Model::COLUMN_ID_GROUP);
+      
+      $grpIds = $this->panelObj()->getParam('grpids',array());
+      if(empty($grpIds)){
+         $model
+            ->where(Partners_Model_Groups::COLUMN_ID_CATEGORY." = :idc AND ".Partners_Model::COLUMN_DISABLED." = 0", array('idc' => $this->category()->getId()));
+      } else {
+         $model
+            ->where(Partners_Model::COLUMN_ID_GROUP." IN (:idgs) AND ".Partners_Model::COLUMN_DISABLED." = 0", array(':idgs' => $grpIds));
+      }
+      
+      switch ($this->panelObj()->getParam('type', self::DEFAULT_TYPE)) {
+         case self::LIST_TYPE_RAND:
+            $model->order(array('RAND(NOW())' => Model_ORM::ORDER_ASC));
+            break;
+         case self::LIST_TYPE_LIST:
+         default:
+            $model->order(array(Partners_Model_Groups::COLUMN_ORDER => Model_ORM::ORDER_ASC, Partners_Model::COLUMN_ORDER => Model_ORM::ORDER_ASC));
+            break;
+      }
+      $this->template()->partners = $model->limit(0, $this->panelObj()->getParam('num',self::DEFAULT_NUM_PARTNERS))->records();
    }
 
    public function panelView() {
@@ -48,6 +56,19 @@ class Partners_Panel extends Panel {
       if(isset($settings['type'])) {
          $form->type->setValues($settings['type']);
       }
+      
+      $elemGRPids = new Form_Element_Select('grpids', $this->tr('Zobrazit pouze ze skupin'));
+      $grps = Partners_Model_Groups::getAllRecords();
+      foreach ($grps as $grp) {
+         $elemGRPids->addOption($grp->{Partners_Model_Groups::COLUMN_NAME}, $grp->getPK());
+      }
+      $elemGRPids->setSubLabel($this->tr('Pokud není vybráno, zobrazí se všechy skupiny.'));
+      $elemGRPids->setMultiple(true);
+      $form->addElement($elemGRPids,'basic');
+
+      if(isset($settings['grpids'])) {
+         $form->grpids->setValues($settings['grpids']);
+      }
 
       if($form->isValid()) {
          $settings['num'] = $form->num->getValues();
@@ -57,7 +78,7 @@ class Partners_Panel extends Panel {
          } else {
             unset ($settings['type']);
          }
+         $settings['grpids'] = $form->grpids->getValues();
       }
    }
 }
-?>

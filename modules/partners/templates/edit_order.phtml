@@ -1,6 +1,6 @@
-<?php 
+<?php
 // do titulku
-$h = $this->tr('úprava pořadí položek');
+$h = sprintf($this->tr('Úprava pořadí položek ve skupině "%s"'), $this->group->{Partners_Model_Groups::COLUMN_NAME});
 $this->addPageTitle($h);
 
 $jq = new JsPlugin_JQuery();
@@ -8,58 +8,56 @@ $jq->addUISortable();
 $this->addJsPlugin($jq);
 $this->addFile('css://style.css');
 ?>
-<h1><?php echo  $h ?></h1>
+<h1><?php echo $h ?></h1>
 <div class="main-content-form-edit">
-   <?php  echo $this->form->renderStart(); ?>
-   <fieldset class="fieldset-alt"><legend><span class="form-legend-name"><?php echo $this->tr('Pořadí položek v zobrazení')?></span>
-         <span class="form-legend-text"></span>
-      </legend>
-      <table class="form-table">
-         <tr>
-            <th class="form-labels"><label for="partner_degreeAfter_1" class="partner_degreeAfter_label_class"><?php echo $this->tr('Partneři')?>:</label></th>
-            <td class="form-controlls">
-            <ul id="partners-list">
-               <?php 
-               foreach ($this->partners as $partner) {
-                  ?>
-                  <li class="ui-state-default">
-                     <span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
-                     <?php 
-                     echo $partner->{Partners_Model::COLUMN_NAME};
-                     $this->form->id->setValues($partner->{Partners_Model::COLUMN_ID});
+   <?php echo $this->form->renderStart(); ?>
+   <div id="partners-list-wrap" class="cubecms-widget cubecms-widget-sorting">
+      <div class="cubecms-content">
+         <ul  id="partners-list" class="cubecms-widget cubecms-list">
+            <?php
+            foreach ($this->partners as $partner) {
+               ?>
+               <li id="ppartner-<?php echo $partner->getPK() ?>"
+                   class="item cubecms-list-row clearfix"
+                   data-id="<?php echo $partner->getPK() ?>">
+                  <div class="cubecms-sort sort-area">
+                     <span class="icon icon-arrows"></span>
+                  </div>
+                  <span class="cubecms-name">
+                     <?php
+                     p_lang($partner->{Partners_Model::COLUMN_NAME});
+                     $this->form->id->setValues($partner->getPK());
                      echo $this->form->id;
-                     if($partner->{Partners_Model::COLUMN_DISABLED}){
-                        echo "<em>(".$this->tr('vypnut').")</em>";
+                     if ($partner->{Partners_Model::COLUMN_DISABLED}) {
+                        echo "<em>(" . $this->tr('vypnut') . ")</em>";
                      }
-                     if($partner->{Partners_Model::COLUMN_IMAGE} != null){
-                        $imgsrc = vve_image_cacher($this->category()->getModule()->getDataDir(true).$partner->{Partners_Model::COLUMN_IMAGE}, null, 20);
-                     ?>
-                     <img src="<?php echo $imgsrc ?>" alt="<?php ps($partner->{Partners_Model::COLUMN_NAME})?>" />
-                     <?php }?>
-                  </li>
-               <?php }?>
-            </ul>
-            </td>
-         </tr>
-         <tr>
-            <td class="form-labels"></td>
-            <td class="form-controlls font-small"><?php echo $this->tr('Pro změnu pořadí stačí položku uchopit myší a přesunout.')?></td>
-         </tr>
-         <tr>
-            <th class="form-labels"><?php echo $this->form->save->label()?></th>
-            <td class="form-controlls"><?php echo $this->form->save->controllAll()?></td>
-         </tr>
-      </table>
-   </fieldset>   
-   <?php  echo $this->form->renderEnd(); ?>
+                     if ($partner->{Partners_Model::COLUMN_IMAGE} != null) {
+                        $imgsrc = vve_image_cacher($this->category()->getModule()->getDataDir(true) . $partner->{Partners_Model::COLUMN_IMAGE}, null, 40);
+                        ?>
+                        <img src="<?php echo $imgsrc ?>" alt="<?php ps($partner->{Partners_Model::COLUMN_NAME}) ?>" />
+                     <?php } ?>
+                  </span>
+               </li>
+            <?php } ?>
+         </ul>
+         <div id="pgroups-control" class="cubecms-footer">
+            <?php echo $this->form->save->controllAll() ?>
+         </div>
+      </div>
+   </div>
+   <div class="alert alert-info">
+      <?php echo $this->tr('Pro změnu pořadí stačí položku uchopit myší a přesunout.') ?>
+   </div>     
+   <?php echo $this->form->renderEnd(); ?>
    <script>
-	$(function() {
-		$( "#partners-list" ).sortable({
-			placeholder: "ui-state-highlight",
-         cursor: 'move',
-         forceHelperSize: true
-		});
-		$( "#partners-list" ).disableSelection();
-	});
-	</script>
+      $(function () {
+         $("#partners-list").sortable({
+           handle: ".sort-area",
+            placeholder: "cubecms-list-row cubecms-state-highlight",
+            forceHelperSize: true,
+            forcePlaceholderSize: true
+         });
+//         $("#partners-list").disableSelection();
+      });
+   </script>
 </div>

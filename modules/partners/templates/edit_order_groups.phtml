@@ -1,4 +1,4 @@
-<?php 
+<?php
 // do titulku
 $h = $this->tr('Úprava pořadí skupin položek');
 $this->addPageTitle($h);
@@ -8,51 +8,60 @@ $jq->addUISortable();
 $this->addJsPlugin($jq);
 $this->addFile('css://style.css');
 ?>
-<h1><?php echo  $h ?></h1>
-<div class="main-content-form-edit">
-   <?php  echo $this->form->renderStart(); ?>
-   <fieldset class="fieldset-alt"><legend><span class="form-legend-name"><?php echo $this->tr('Pořadí skupin položek v zobrazení')?></span>
-         <span class="form-legend-text"></span>
-      </legend>
-      <table class="form-table">
-         <tr>
-            <th class="form-labels"><label for="partner_degreeAfter_1" class="partner_degreeAfter_label_class"><?php echo $this->tr('Skupiny')?>:</label></th>
-            <td class="form-controlls">
-            <ul id="partners-list">
-               <?php 
-               foreach ($this->partnersGroups as $group) {
-                  ?>
-                  <li class="ui-state-default">
-                     <span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
-                     <?php 
-                     echo $group->{Partners_Model_Groups::COLUMN_NAME};
+<h1><?php echo $h ?></h1>
+<div class="content-admin">
+   <?php echo $this->form->renderStart(); ?>
+   <div id="partners-groups-list-wrap" class="cubecms-widget cubecms-widget-sorting">
+      <div class="cubecms-content">
+         <ul  id="partners-groups-list" class="cubecms-widget cubecms-list">
+            <?php
+            foreach ($this->partnersGroups as $group) {
+               ?>
+               <li id="pgroup-<?php echo $group->getPK() ?>"
+                   class="item cubecms-list-row clearfix"
+                   data-id="<?php echo $group->getPK() ?>">
+                  <div class="cubecms-sort sort-area">
+                     <span class="icon icon-arrows"></span>
+                  </div>
+                  <span class="cubecms-name">
+                     <?php
+                     p_lang($group->{Partners_Model_Groups::COLUMN_NAME});
                      $this->form->id->setValues($group->{Partners_Model_Groups::COLUMN_ID});
                      echo $this->form->id;
-                    ?>
-                  </li>
-               <?php }?>
-            </ul>
-            </td>
-         </tr>
-         <tr>
-            <td class="form-labels"></td>
-            <td class="form-controlls font-small"><?php echo $this->tr('Pro změnu pořadí stačí položku uchopit myší a přesunout.')?></td>
-         </tr>
-         <tr>
-            <th class="form-labels"><?php echo $this->form->save->label()?></th>
-            <td class="form-controlls"><?php echo $this->form->save->controllAll()?></td>
-         </tr>
-      </table>
-   </fieldset>   
-   <?php  echo $this->form->renderEnd(); ?>
+                     ?>
+                  </span>
+
+      <!--            <span class="cubecms-tools">
+                     <a href="<?php echo $this->link()->param('editv', $group->getPK()) ?>"
+                        onclick="ShopVariants.editVariant(<?php echo $group->getPK() ?>); return false;"
+                        class="button-edit-value"><span class="icon icon-pencil"></span></a>
+                     <a href="<?php echo $this->link()->param('deletev', $group->getPK()) ?>"
+                        onclick="ShopVariants.deleteVariant(<?php echo $group->getPK() ?>); return false;"
+                        class="button-delete-value important"><span class="icon icon-remove"></span></a>
+                  </span>-->
+               </li>
+               <?php
+            }
+            ?>
+         </ul>
+         <div id="pgroups-control" class="cubecms-footer">
+            <?php echo $this->form->save->controllAll() ?>
+         </div>
+      </div>
+   </div>
+   <div class="alert alert-info">
+      <?php echo $this->tr('Pro změnu pořadí stačí položku uchopit myší a přesunout.') ?>
+   </div>
+   <?php echo $this->form->renderEnd(); ?>
    <script>
-	$(function() {
-		$( "#partners-list" ).sortable({
-			placeholder: "ui-state-highlight",
-         cursor: 'move',
-         forceHelperSize: true
-		});
-		$( "#partners-list" ).disableSelection();
-	});
-	</script>
+      $(function () {
+         $("#partners-groups-list").sortable({
+            handle: ".sort-area",
+            placeholder: "cubecms-list-row cubecms-state-highlight",
+            forceHelperSize: true,
+            forcePlaceholderSize: true
+         });
+//         $("#partners-groups-list").disableSelection();
+      });
+   </script>
 </div>

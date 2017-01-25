@@ -23,20 +23,6 @@
 }
 
 /* pořadí */
-#partners-list, #partners-list li {
-   margin: 0;
-   padding: 0;
-   list-style: none;
-}
-
-#partners-list li {
-   padding: 3px;
-   cursor: move;
-   min-height: 1.2em;
-}
-#partners-list li .ui-icon {
-   float: left;
-}
 #partners-list li img {
    float: right;
 }

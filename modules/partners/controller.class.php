@@ -102,14 +102,8 @@ class Partners_Controller extends Controller {
          $record->{Partners_Model::COLUMN_TEXT} = $form->text->getValues();
          $record->{Partners_Model::COLUMN_URL} = $form->url->getValues();
          $record->{Partners_Model::COLUMN_DISABLED} = $form->disabled->getValues();
-         
-         $c = $model->columns(array('m' => 'MAX(`'.Partners_Model::COLUMN_ORDER.'`)'))
-               ->where(Partners_Model::COLUMN_ID_CATEGORY.' = :idc', 
-                  array('idc' => $this->category()->getId()))->record()->m;
-            
-            $record->{Partners_Model::COLUMN_ORDER} = $c + 1;
-         
-         $model->save($record);
+         $record->{Partners_Model::COLUMN_ID_GROUP} = $form->groupid->getValues();
+         $record->save();
          
          $this->infoMsg()->addMessage($this->tr('Partner byl uložen'));
          $this->link()->route()->reload();
@@ -223,6 +217,9 @@ class Partners_Controller extends Controller {
       foreach ($grps as $grp) {
          $eGroup->addOption($grp->{Partners_Model_Groups::COLUMN_NAME}, $grp->getPK());
       }
+      if($this->getRequestParam('idg')){
+         $eGroup->setValues($this->getRequestParam('idg'));
+      }
       $form->addElement($eGroup);
       
 
@@ -275,16 +272,15 @@ class Partners_Controller extends Controller {
       return $form;
    }
 
-   public function editOrderController()
+   public function editOrderController($id)
    {
       $this->checkWritebleRights();
       
       $model = new Partners_Model();
-      $partners = $model->where(Partners_Model::COLUMN_ID_CATEGORY.' = :idc', array('idc' => $this->category()->getId()))
-         ->order(array(
-            Partners_Model::COLUMN_ORDER => Model_ORM::ORDER_ASC,
-            Partners_Model::COLUMN_NAME => Model_ORM::ORDER_ASC,
-         ))->records();
+      $partners = $model
+         ->joinFK(Partners_Model::COLUMN_ID_GROUP)
+         ->where(Partners_Model::COLUMN_ID_GROUP.' = :id', array(':id' => $id))
+         ->records();
 
       $form = new Form('partners_order_');
       
@@ -303,13 +299,15 @@ class Partners_Controller extends Controller {
       if($form->isValid()){
          $ids = $form->id->getValues();
          foreach ($ids as $index => $id) {
-            $model->where(Partners_Model::COLUMN_ID." = :idp", array('idp' => $id))->update(array(Partners_Model::COLUMN_ORDER => $index+1));
+            $model->where(Partners_Model::COLUMN_ID." = :idp", array('idp' => $id))
+                    ->update(array(Partners_Model::COLUMN_ORDER => $index+1));
          }
          $this->infoMsg()->addMessage($this->tr('Pořadí bylo uloženo'));
          $this->link()->route()->reload();
       }
       
       $this->view()->partners = $partners;
+      $this->view()->group = Partners_Model_Groups::getRecord($id);
       $this->view()->form = $form;
    }
    
