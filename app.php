@@ -31,7 +31,7 @@ class AppCore extends TrObject {
    /**
     * Verze enginu
     */
-   const ENGINE_VERSION = '8.4.1';
+   const ENGINE_VERSION = '8.4.3';
 
    /**
     * Obsahuje hlavní soubor aplikace
@@ -892,6 +892,8 @@ class AppCore extends TrObject {
          $panelsM->where(" AND ( " . Model_Panel::COLUMN_ID_SHOW_CAT . " = 0 OR " . Model_Panel::COLUMN_FORCE_GLOBAL . " = 1 )"
             . " AND " . Model_Category::COLUMN_MODULE . ' IS NOT NULL', array(), true);
       }
+      $panelsM->where(' OR '.Model_Panel::COLUMN_ADMIN_CAT." = 1", array(), true);
+
       $panels = $panelsM->records();
 
       foreach ($panels as $panel) {
@@ -900,8 +902,12 @@ class AppCore extends TrObject {
             continue;
          }
          try {
-            $panelCat = new Category(null, false, $panel);
-
+            if($panel->{Model_Panel::COLUMN_ID_CAT} > Model_CategoryAdm::CATEGORY_BASE_ID) {
+              $panelCat = new Category_Admin($panel->{Model_Panel::COLUMN_ID_CAT}, false);
+            } else {
+              $panelCat = new Category(null, false, $panel);
+            }
+            
             if (!$panelCat->getRights()->isReadable() || !file_exists(AppCore::getAppLibDir() . self::MODULES_DIR . DIRECTORY_SEPARATOR
                   . $panelCat->getModule()->getName() . DIRECTORY_SEPARATOR . 'panel.class.php')) {
                continue;
