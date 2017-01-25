@@ -30,4 +30,11 @@ class Shop_Model_OrdersStates extends Model_ORM {
       
       $this->addForeignKey(self::COLUMN_ID_TEMPLATE, 'Templates_Model', Templates_Model::COLUMN_ID);
    }
+   
+   public static function getActiveStates()
+   {
+      $m = new self();
+      
+      return $m->where(self::COLUMN_DELETED, 0)->order(self::COLUMN_NAME)->records();
+   }
 }

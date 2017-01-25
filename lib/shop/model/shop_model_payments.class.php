@@ -40,5 +40,7 @@ class Shop_Model_Payments extends Model_ORM
       $this->addColumn(self::COLUMN_SETINGS, array('datatype' => 'blob', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
 
       $this->setPk(self::COLUMN_ID);
+      
+      $this->addForeignKey(self::COLUMN_ID_STATE, 'Shop_Model_OrdersStates', Shop_Model_OrdersStates::COLUMN_ID);
    }
 }

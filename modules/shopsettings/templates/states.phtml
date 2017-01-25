@@ -1,0 +1,88 @@
+<?php
+$this->addJsPlugin(new JsPlugin_JQuery());
+?>
+<h1><?php echo $this->tr('Stavy objednávek') ?></h1>
+<?php
+$this->includeFile('tpl://nav.phtml');
+?>
+<div class="content-admin">
+   <?php
+   $this->moduleButtons = array(
+       array(
+           'link' => $this->link()->route('addOrderState'),
+           'title' => $this->tr('Přidat nový stav'),
+           'icon' => Template_Toolbox2::ICON_ADD,
+           'name' => $this->tr('Přidat nový stav'),
+       ),
+   );
+   $this->includeTpl('modules/buttons.phtml', true);
+   ?>
+   <table class="panels-list cubecms-widget cubecms-table">
+      <thead class="cubecms-header">
+         <tr class="">
+            <th scope="col" class="orderstate-tb-category"><?php echo $this->tr('Název') ?></th>
+            <th scope="col" class="orderstate-tb-tpl"><?php echo $this->tr('Šablona mailu') ?></th>
+            <th scope="col" class="orderstate-tb-color"><?php echo $this->tr('Barva') ?></th>
+            <th scope="col" class="orderstate-tb-complete"><?php echo $this->tr('Dokončena') ?></th>
+            <th scope="col" class="orderstate-tb-actions"><?php echo $this->tr('Akce') ?></th>
+         </tr>
+      </thead>
+      <tbody>
+         <?php
+         if (!empty($this->orderStates)) {
+            foreach ($this->orderStates as $key => $state) {
+               ?>
+               <tr class="cubecms-row ">
+                  <td>
+                     <?php
+                     ps($state->{Shop_Model_OrdersStates::COLUMN_NAME});
+                     ?>
+                  </td>
+                  <td>
+                     <?php
+                     if($state->{Shop_Model_OrdersStates::COLUMN_ID_TEMPLATE} != 0){
+                        ps($state->{Templates_Model::COLUMN_NAME}. ' (ID: '.$state->{Shop_Model_OrdersStates::COLUMN_ID_TEMPLATE}.' )');
+                     } else {
+                        echo '<em>'.$this->tr('není nastavena').'</em>';
+                     }
+                     ?>
+                  </td>
+                  <td style="<?php echo $state->{Shop_Model_OrdersStates::COLUMN_COLOR} ? 'background-color:'.$state->{Shop_Model_OrdersStates::COLUMN_COLOR} : ''?>">
+                     <?php
+                     if($state->{Shop_Model_OrdersStates::COLUMN_COLOR}){
+                        echo $state->{Shop_Model_OrdersStates::COLUMN_COLOR};
+                     }
+                     ?>
+                  </td>
+                  <td>
+                     <?php
+                     ps ($state->{Shop_Model_OrdersStates::COLUMN_COMPLETE} ? $this->tr('Ano') : $this->tr('Ne'));
+                     ?>
+                  </td>
+                  <td class="text-right">
+                     <?php
+                     if($state->getPK() != CUBE_CMS_SHOP_ORDER_DEFAULT_STATUS){
+                        echo $state->toolbox;
+                     } else {
+                        echo '<em>'.$this->tr('výhozí').'</em>';
+                     }
+                     ?>
+                  </td>
+               </tr>
+               <?php
+            }
+         } else {
+            ?>
+            <tr class="cubecms-row">
+               <td colspan="4"><?php echo $this->tr('Není uložen žádný stav'); ?></td>
+            </tr>
+         <?php } ?>
+      </tbody>
+   </table>
+</div>
+
+<script type="text/javascript" charset="utf-8">
+   /* <![CDATA[ */
+
+   /* ]]> */
+</script>

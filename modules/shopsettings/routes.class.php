@@ -15,8 +15,12 @@ class ShopSettings_Routes extends Routes {
       $this->addRoute('editPayment', 'edit-payment.php', 'editPayment', 'edit-payment.php', 'XHR_Respond_VVEAPI');
       $this->addRoute('shippingsList', "shippings.json", 'shippingsList','shippings.json');
       $this->addRoute('editShipping', 'edit-shipping.php', 'editShipping', 'edit-shipping.php', 'XHR_Respond_VVEAPI');
+      $this->addRoute('zonesList', "zones.json", 'zonesList','zones.json');
+      $this->addRoute('editZone', "edit-zone.php", 'editZone','edit-zone.php', 'XHR_Respond_VVEAPI');
       $this->addRoute('mailVariables', 'mail-vars.json', 'mailVariables', 'mail-vars.json', 'XHR_Respond_VVEAPI');
+      
+      $this->addRoute('orderStates');
+      $this->addRoute('editOrderState', "order-state-::id::/edit/", 'editOrderState','order-state-{id}/edit/');
+      $this->addRoute('addOrderState', "order-state/add/", 'addOrderState','order-state/add/');
 	}
 }
-
-?>

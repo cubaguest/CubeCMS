@@ -4,6 +4,7 @@ $this->items[$this->tr('Základní')] = (string) $this->link()->route();
 $this->items[$this->tr('Měna a daně')] = (string) $this->link()->route('currencyAndTaxes');
 $this->items[$this->tr('Platby a dopravy')] = (string) $this->link()->route('shipAndPay');
 $this->items[$this->tr('Objednávky')] = (string) $this->link()->route('orders');
+$this->items[$this->tr('Stavy objednávek')] = (string) $this->link()->route('orderStates');
 
 $this->includeTpl('module_navigation.phtml', true);
 ?>

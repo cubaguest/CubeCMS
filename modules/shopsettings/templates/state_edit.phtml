@@ -1,0 +1,27 @@
+<?php 
+$this->addJsPlugin(new JsPlugin_JQuery());
+$this->addJsPlugin(new JsPlugin_JQueryColorPicker());
+?>
+<h1><?php 
+if($this->state){
+   ps(sprintf($this->tr('Úprava stavu "%s" objednáveky'), $this->state->{Shop_Model_OrdersStates::COLUMN_NAME}));
+} else {
+   ps($this->tr('Přidání nového stavu objednáveky'));
+}
+
+?></h1>
+<?php 
+//$this->includeFile('tpl://nav.phtml');
+?>
+<div class="main-content-form-edit">
+   <?php 
+   echo $this->formEditOrderState;
+   ?>
+</div>
+<script type="text/javascript" charset="utf-8">
+   /* <![CDATA[ */
+   $(document).ready(function(){
+      $('input[name="editorderstatecolor"]').colorPicker();
+   });
+   /* ]]> */
+</script>
