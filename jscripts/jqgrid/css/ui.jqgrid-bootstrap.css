@@ -581,6 +581,10 @@ div.tablediv > .table-bordered {
 .ui-jqdialog-content select.FormElement {
    min-width: 100%;
 }
+.ui-jqdialog-content input[type="checkbox"].FormElement {
+   min-width: 0%;
+   width: auto;
+}
 .ui-jqdialog-content .data-line {
 	padding-top:.1em;
 	border: 0 none;
@@ -596,6 +600,19 @@ div.tablediv > .table-bordered {
 	padding: 2px; 
 	border: 0 none; 
 	vertical-align: top;
+}
+.ui-jqdialog-content .DataTD .required {
+	position: relative;
+}
+.ui-jqdialog-content .DataTD .required:before {
+	position: absolute;
+   top: 20px;
+   left: -20px;
+   color: red;
+   content: "*";
+   width: 10px;
+   height: 10px;
+   font-size: 18px;
 }
 .ui-jqdialog-content .form-view-data {
 	white-space:pre
@@ -615,11 +632,12 @@ div.tablediv > .table-bordered {
 	margin-left: 4px; 
 	margin-right: 4px; 
 }
-#sData, #cData { 
+#sData, #cData, #dData, #eData { 
    padding: 5px;
    cursor: pointer;
 }
-#sData span, #cData span { 
+#sData span, #cData span, 
+#dData span, #eData span { 
 	margin-left: 5px;
    display: inline-block;
 }
