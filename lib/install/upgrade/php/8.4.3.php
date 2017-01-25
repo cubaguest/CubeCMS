@@ -9,17 +9,20 @@ if(defined('CUBE_CMS_SHOP') && CUBE_CMS_SHOP == true){
    $mHistory = new Shop_Model_OrdersHistory();
    $mHistory->truncate();
    
-   $oldStatuses = $mStates->groupBy(array(Shop_Model_OrderStatus::COLUMN_NAME))->records();
-   
+//   $oldStatuses = $mStates->groupBy(array(Shop_Model_OrderStatus::COLUMN_NAME))->records();
+   $oldStatuses = explode(';', CUBE_CMS_SHOP_ORDER_STATUS);
    $storedStates = array();
    
    foreach ($oldStatuses as $status) {
+      if($status == null){
+         continue;
+      }
       $newState = $mNewStates->newRecord();
-      $newState->{Shop_Model_OrdersStates::COLUMN_NAME} = array(Locales::getDefaultLang() => $status->{Shop_Model_OrderStatus::COLUMN_NAME});
+      $newState->{Shop_Model_OrdersStates::COLUMN_NAME} = array(Locales::getDefaultLang() => $status);
       $newState->save();
-      $storedStates[(string)$status->{Shop_Model_OrderStatus::COLUMN_NAME}] = $newState->getPK();
+      $storedStates[(string)$status] = $newState->getPK();
    }
-   
+
    // přiřazení uložených stavů
    $allStatuses = Shop_Model_OrderStatus::getAllRecords();
    foreach ($allStatuses as $status) {

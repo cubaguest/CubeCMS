@@ -18,7 +18,7 @@ DEALLOCATE PREPARE stmt;
 -- Obrázky produktů
 CREATE TABLE IF NOT EXISTS `{PREFIX}shop_order_states` (
   `id_order_state` INT NOT NULL AUTO_INCREMENT,
-  `id_order_state_mail_template` INT NOT NULL,
+  `id_order_state_mail_template` INT NOT NULL DEFAULT 0,
   `order_state_name_cs` VARCHAR(50) CHARACTER SET 'utf8' COLLATE 'utf8_czech_ci' NULL DEFAULT NULL  ,
   `order_state_name_en` VARCHAR(50) NULL,
   `order_state_name_sk` VARCHAR(50) CHARACTER SET 'utf8' COLLATE 'utf8_slovak_ci' NULL DEFAULT NULL , 
