@@ -246,8 +246,8 @@ $this->includeFile('tpl://nav.phtml');
                width: 33, fixed: true, editable: false},
             {name: '<?php echo Shop_Model_Zones::COLUMN_NAME ?>', index: '<?php echo Shop_Model_Zones::COLUMN_NAME ?>',
                formatter: langFmatter, unformat: langUnFmatter,
-               editable: true, editoptions: {defaultValue: ""},
-               formoptions: {rowpos: 2, label: "<?php echo $this->tr('Název') ?>", elmprefix: "(*)"}}
+               editable: true, editrules: {required: true}, editoptions: {defaultValue: ""},
+               formoptions: {rowpos: 2, label: "<?php echo $this->tr('Název') ?>", elmprefix: "<span class=\"required\"></span>"}}
          ],
          rowNum: 5,
          rowList: [5, 10, 20, 50],
