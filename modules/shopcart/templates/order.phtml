@@ -9,350 +9,364 @@ $this->step = 2;
 <?php $this->includeFile('tpl://navigation.phtml') ?>
 <div class="main-content-detail">
 
-    <?php
-    // echo $this->formItems->renderStart();
-    echo $this->formOrder->renderStart();
-    ?>
-    <fieldset class="fieldset-alt">
-        <legend><span class="form-legend-name"><?php echo $this->tr('Informace o zákazníkovi') ?></span></legend>
+   <?php
+   // echo $this->formItems->renderStart();
+   echo $this->formOrder->renderStart();
+   ?>
+   <fieldset class="fieldset-alt">
+      <legend><span class="form-legend-name"><?php echo $this->tr('Informace o zákazníkovi') ?></span></legend>
 
-        <div class="form-group">
+      <div class="form-group">
+         <?php
+         $this->formOrder->customerName->htmlLabel()->addClass('col-sm-2 control-label');
+         echo $this->formOrder->customerName->label();
+         ?>
+         <div class="col-sm-10">
             <?php
-            $this->formOrder->customerName->htmlLabel()->addClass('col-sm-2 control-label');
-            echo $this->formOrder->customerName->label();
+            $this->formOrder->customerName->html()->addClass('form-control');
+            echo $this->formOrder->customerName->ControlAll();
             ?>
-            <div class="col-sm-10">
-                <?php
-                $this->formOrder->customerName->html()->addClass('form-control');
-                echo $this->formOrder->customerName->ControlAll();
-                ?>
-                <!--<input type="name" class="form-control" placeholder="">-->
-            </div>
-        </div>
-        <div class="form-group">
+             <!--<input type="name" class="form-control" placeholder="">-->
+         </div>
+      </div>
+      <div class="form-group">
+         <?php
+         $this->formOrder->customerSurname->htmlLabel()->addClass('col-sm-2 control-label');
+         echo $this->formOrder->customerSurname->label();
+         ?>
+         <div class="col-sm-10">
             <?php
-            $this->formOrder->customerSurname->htmlLabel()->addClass('col-sm-2 control-label');
-            echo $this->formOrder->customerSurname->label();
-            ?>
-            <div class="col-sm-10">
-                <?php
-                $this->formOrder->customerSurname->html()->addClass('form-control');
-                echo $this->formOrder->customerSurname->ControlAll();
-                ?>        
-            </div>
-        </div>
-        <div class="form-group">
+            $this->formOrder->customerSurname->html()->addClass('form-control');
+            echo $this->formOrder->customerSurname->ControlAll();
+            ?>        
+         </div>
+      </div>
+      <div class="form-group">
+         <?php
+         $this->formOrder->customerEmail->htmlLabel()->addClass('col-sm-2 control-label');
+         echo $this->formOrder->customerEmail->label();
+         ?>
+         <div class="col-sm-10">
             <?php
-            $this->formOrder->customerEmail->htmlLabel()->addClass('col-sm-2 control-label');
-            echo $this->formOrder->customerEmail->label();
-            ?>
-            <div class="col-sm-10">
-                <?php
-                $this->formOrder->customerEmail->html()->addClass('form-control');
-                echo $this->formOrder->customerEmail->ControlAll();
-                ?>       
-            </div>
-        </div>
-        <div class="form-group">
+            $this->formOrder->customerEmail->html()->addClass('form-control');
+            echo $this->formOrder->customerEmail->ControlAll();
+            ?>       
+         </div>
+      </div>
+      <div class="form-group">
+         <?php
+         $this->formOrder->customerPhone->htmlLabel()->addClass('col-sm-2 control-label');
+         echo $this->formOrder->customerPhone->label();
+         ?>
+         <div class="col-sm-10">
             <?php
-            $this->formOrder->customerPhone->htmlLabel()->addClass('col-sm-2 control-label');
-            echo $this->formOrder->customerPhone->label();
-            ?>
-            <div class="col-sm-10">
-                <?php
-                $this->formOrder->customerPhone->html()->addClass('form-control');
-                echo $this->formOrder->customerPhone->ControlAll();
-                ?>         
-            </div>
-        </div>
-    </fieldset>
-    <fieldset class="fieldset-alt">
-        <legend><span class="form-legend-name"><?php echo $this->tr('Fakturační adresa') ?></span></legend>
+            $this->formOrder->customerPhone->html()->addClass('form-control');
+            echo $this->formOrder->customerPhone->ControlAll();
+            ?>         
+         </div>
+      </div>
+   </fieldset>
+   <fieldset class="fieldset-alt">
+      <legend><span class="form-legend-name"><?php echo $this->tr('Fakturační adresa') ?></span></legend>
 
-        <div class="form-group">
+      <div class="form-group">
+         <?php
+         $this->formOrder->paymentStreet->htmlLabel()->addClass('col-sm-2 control-label');
+         echo $this->formOrder->paymentStreet->label();
+         ?>
+         <div class="col-sm-10">
             <?php
-            $this->formOrder->paymentStreet->htmlLabel()->addClass('col-sm-2 control-label');
-            echo $this->formOrder->paymentStreet->label();
-            ?>
-            <div class="col-sm-10">
-                <?php
-                $this->formOrder->paymentStreet->html()->addClass('form-control');
-                echo $this->formOrder->paymentStreet->ControlAll();
-                ?>         
-            </div>
-        </div>
-        <div class="form-group">
+            $this->formOrder->paymentStreet->html()->addClass('form-control');
+            echo $this->formOrder->paymentStreet->ControlAll();
+            ?>         
+         </div>
+      </div>
+      <div class="form-group">
+         <?php
+         $this->formOrder->paymentCity->htmlLabel()->addClass('col-sm-2 control-label');
+         echo $this->formOrder->paymentCity->label();
+         ?>
+         <div class="col-sm-10">
             <?php
-            $this->formOrder->paymentCity->htmlLabel()->addClass('col-sm-2 control-label');
-            echo $this->formOrder->paymentCity->label();
-            ?>
-            <div class="col-sm-10">
-                <?php
-                $this->formOrder->paymentCity->html()->addClass('form-control');
-                echo $this->formOrder->paymentCity->ControlAll();
-                ?>         
-            </div>
-        </div>
-        <div class="form-group">
+            $this->formOrder->paymentCity->html()->addClass('form-control');
+            echo $this->formOrder->paymentCity->ControlAll();
+            ?>         
+         </div>
+      </div>
+      <div class="form-group">
+         <?php
+         $this->formOrder->paymentPostCode->htmlLabel()->addClass('col-sm-2 control-label');
+         echo $this->formOrder->paymentPostCode->label();
+         ?>
+         <div class="col-sm-10">
             <?php
-            $this->formOrder->paymentPostCode->htmlLabel()->addClass('col-sm-2 control-label');
-            echo $this->formOrder->paymentPostCode->label();
-            ?>
-            <div class="col-sm-10">
-                <?php
-                $this->formOrder->paymentPostCode->html()->addClass('form-control');
-                echo $this->formOrder->paymentPostCode->ControlAll();
-                ?>         
-            </div>
-        </div>
-        <div class="form-group">
+            $this->formOrder->paymentPostCode->html()->addClass('form-control');
+            echo $this->formOrder->paymentPostCode->ControlAll();
+            ?>         
+         </div>
+      </div>
+      <div class="form-group">
+         <?php
+         $this->formOrder->paymentCountry->htmlLabel()->addClass('col-sm-2 control-label');
+         echo $this->formOrder->paymentCountry->label();
+         ?>
+         <div class="col-sm-10">
             <?php
-            $this->formOrder->paymentCountry->htmlLabel()->addClass('col-sm-2 control-label');
-            echo $this->formOrder->paymentCountry->label();
-            ?>
-            <div class="col-sm-10">
-                <?php
-                $this->formOrder->paymentCountry->html()->addClass('form-control');
-                echo $this->formOrder->paymentCountry->ControlAll();
-                ?>         
-            </div>
-        </div>
-        <div class="form-group">
+            $this->formOrder->paymentCountry->html()->addClass('form-control');
+            echo $this->formOrder->paymentCountry->ControlAll();
+            ?>         
+         </div>
+      </div>
+      <div class="form-group">
+         <?php
+         $this->formOrder->paymentCompanyName->htmlLabel()->addClass('col-sm-2 control-label');
+         echo $this->formOrder->paymentCompanyName->label();
+         ?>
+         <div class="col-sm-10">
             <?php
-            $this->formOrder->paymentCompanyName->htmlLabel()->addClass('col-sm-2 control-label');
-            echo $this->formOrder->paymentCompanyName->label();
-            ?>
-            <div class="col-sm-10">
-                <?php
-                $this->formOrder->paymentCompanyName->html()->addClass('form-control');
-                echo $this->formOrder->paymentCompanyName->ControlAll();
-                ?>         
-            </div>
-        </div>
-        <div class="form-group">
+            $this->formOrder->paymentCompanyName->html()->addClass('form-control');
+            echo $this->formOrder->paymentCompanyName->ControlAll();
+            ?>         
+         </div>
+      </div>
+      <div class="form-group">
+         <?php
+         $this->formOrder->paymentCompanyIC->htmlLabel()->addClass('col-sm-2 control-label');
+         echo $this->formOrder->paymentCompanyIC->label();
+         ?>
+         <div class="col-sm-10">
             <?php
-            $this->formOrder->paymentCompanyIC->htmlLabel()->addClass('col-sm-2 control-label');
-            echo $this->formOrder->paymentCompanyIC->label();
-            ?>
-            <div class="col-sm-10">
-                <?php
-                $this->formOrder->paymentCompanyIC->html()->addClass('form-control');
-                echo $this->formOrder->paymentCompanyIC->ControlAll();
-                ?>         
-            </div>
-        </div>
-        <div class="form-group">
+            $this->formOrder->paymentCompanyIC->html()->addClass('form-control');
+            echo $this->formOrder->paymentCompanyIC->ControlAll();
+            ?>         
+         </div>
+      </div>
+      <div class="form-group">
+         <?php
+         $this->formOrder->paymentCompanyDIC->htmlLabel()->addClass('col-sm-2 control-label');
+         echo $this->formOrder->paymentCompanyDIC->label();
+         ?>
+         <div class="col-sm-10">
             <?php
-            $this->formOrder->paymentCompanyDIC->htmlLabel()->addClass('col-sm-2 control-label');
-            echo $this->formOrder->paymentCompanyDIC->label();
-            ?>
-            <div class="col-sm-10">
-                <?php
-                $this->formOrder->paymentCompanyDIC->html()->addClass('form-control');
-                echo $this->formOrder->paymentCompanyDIC->ControlAll();
-                ?>         
-            </div>
-        </div>
-    </fieldset>
-    <fieldset class="fieldset-alt">
-        <legend><span class="form-legend-name"><?php echo $this->tr('Dodací adresa') ?></span></legend>
+            $this->formOrder->paymentCompanyDIC->html()->addClass('form-control');
+            echo $this->formOrder->paymentCompanyDIC->ControlAll();
+            ?>         
+         </div>
+      </div>
+   </fieldset>
+   <fieldset class="fieldset-alt">
+      <legend><span class="form-legend-name"><?php echo $this->tr('Dodací adresa') ?></span></legend>
 
-        <div class="form-group">
+      <div class="form-group">
+         <?php
+         $this->formOrder->isDeliveryAddress->htmlLabel()->addClass('col-sm-2 control-label form-labels');
+         echo $this->formOrder->isDeliveryAddress->label();
+         ?>            
+         <div class="col-sm-10">
             <?php
-            $this->formOrder->isDeliveryAddress->htmlLabel()->addClass('col-sm-2 control-label form-labels');
-            echo $this->formOrder->isDeliveryAddress->label();
-            ?>            
-            <div class="col-sm-10">
-                <?php
-                $this->formOrder->isDeliveryAddress->html()->addClass('form-control form-controlls');
-                echo $this->formOrder->isDeliveryAddress->ControlAll();
-                ?>         
-            </div>
-        </div>
-        <div class="form-group">
+            $this->formOrder->isDeliveryAddress->html()->addClass('form-controlls');
+            echo $this->formOrder->isDeliveryAddress->ControlAll();
+            ?>         
+         </div>
+      </div>
+      <div class="form-group delivery-form-group">
+         <?php
+         $this->formOrder->deliveryName->htmlLabel()->addClass('col-sm-2 control-label');
+         echo $this->formOrder->deliveryName->label();
+         ?>            
+         <div class="col-sm-10">
             <?php
-            $this->formOrder->deliveryName->htmlLabel()->addClass('col-sm-2 control-label');
-            echo $this->formOrder->deliveryName->label();
-            ?>            
-            <div class="col-sm-10">
-                <?php
-                $this->formOrder->deliveryName->html()->addClass('form-control');
-                echo $this->formOrder->deliveryName->ControlAll();
-                ?>         
-            </div>
-        </div>
-        <div class="form-group">
+            $this->formOrder->deliveryName->html()->addClass('form-control');
+            echo $this->formOrder->deliveryName->ControlAll();
+            ?>         
+         </div>
+      </div>
+      <div class="form-group delivery-form-group">
+         <?php
+         $this->formOrder->deliveryStreet->htmlLabel()->addClass('col-sm-2 control-label');
+         echo $this->formOrder->deliveryStreet->label();
+         ?>             
+         <div class="col-sm-10">
             <?php
-            $this->formOrder->deliveryStreet->htmlLabel()->addClass('col-sm-2 control-label');
-            echo $this->formOrder->deliveryStreet->label();
-            ?>             
-            <div class="col-sm-10">
-                <?php
-                $this->formOrder->deliveryStreet->html()->addClass('form-control');
-                echo $this->formOrder->deliveryStreet->ControlAll();
-                ?>         
-            </div>
-        </div>
-        <div class="form-group">
+            $this->formOrder->deliveryStreet->html()->addClass('form-control');
+            echo $this->formOrder->deliveryStreet->ControlAll();
+            ?>         
+         </div>
+      </div>
+      <div class="form-group delivery-form-group">
+         <?php
+         $this->formOrder->deliveryCity->htmlLabel()->addClass('col-sm-2 control-label');
+         echo $this->formOrder->deliveryCity->label();
+         ?>              
+         <div class="col-sm-10">
             <?php
-            $this->formOrder->deliveryCity->htmlLabel()->addClass('col-sm-2 control-label');
-            echo $this->formOrder->deliveryCity->label();
-            ?>              
-            <div class="col-sm-10">
-                <?php
-                $this->formOrder->deliveryCity->html()->addClass('form-control');
-                echo $this->formOrder->deliveryCity->ControlAll();
-                ?>         
-            </div>
-        </div>
-        <div class="form-group">
+            $this->formOrder->deliveryCity->html()->addClass('form-control');
+            echo $this->formOrder->deliveryCity->ControlAll();
+            ?>         
+         </div>
+      </div>
+      <div class="form-group delivery-form-group">
+         <?php
+         $this->formOrder->deliveryPostCode->htmlLabel()->addClass('col-sm-2 control-label');
+         echo $this->formOrder->deliveryPostCode->label();
+         ?>           
+         <div class="col-sm-10">
             <?php
-            $this->formOrder->deliveryPostCode->htmlLabel()->addClass('col-sm-2 control-label');
-            echo $this->formOrder->deliveryPostCode->label();
-            ?>           
-            <div class="col-sm-10">
-                <?php
-                $this->formOrder->deliveryPostCode->html()->addClass('form-control');
-                echo $this->formOrder->deliveryPostCode->ControlAll();
-                ?>         
-            </div>
-        </div>
-        <div class="form-group">
+            $this->formOrder->deliveryPostCode->html()->addClass('form-control');
+            echo $this->formOrder->deliveryPostCode->ControlAll();
+            ?>         
+         </div>
+      </div>
+      <div class="form-group delivery-form-group">
+         <?php
+         $this->formOrder->deliveryCountry->htmlLabel()->addClass('col-sm-2 control-label');
+         echo $this->formOrder->deliveryCountry->label();
+         ?>             
+         <div class="col-sm-10">
             <?php
-            $this->formOrder->deliveryCountry->htmlLabel()->addClass('col-sm-2 control-label');
-            echo $this->formOrder->deliveryCountry->label();
-            ?>             
-            <div class="col-sm-10">
-                <?php
-                $this->formOrder->deliveryCountry->html()->addClass('form-control');
-                echo $this->formOrder->deliveryCountry->ControlAll();
-                ?>         
-            </div>
-        </div>
-    </fieldset>
-    <fieldset class="fieldset-alt">
-        <legend><span class="form-legend-name"><?php echo $this->tr('Rekapitulace objednávky') ?></span></legend>
-        <div class="table-responsive">
-            <table class="form-table table table-striped">
-                <thead>
-                    <tr>
-                        <th><?php echo $this->tr('Název') ?></th>
-                        <th><?php echo $this->tr('Množství') ?></th>
-                        <th><?php echo $this->tr('Cena') ?></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($this->cart as $item) { ?>
-                        <tr>
-                            <td>
-                                <a href="<?php echo $item->getUrl() ?>" title="<?php ps($item->getName()); ?>"><?php ps($item->getName()); ?></a>
-                                <?php
-                                if ($item->getNote() != null) {
-                                    echo "<br />";
-                                    ps($item->getNote());
-                                }
-                                ?>
-                            </td>
-                            <td class="column-unit">
-                                <?php
-                                ps($item->getQty() . " " . $item->getUnit());
-                                ?>
-                            </td>
-                            <td class="column-price">
-                                <?php
-                                echo Shop_Tools::getFormatedPrice($item->getPrice(true));
-                                ?>
-                            </td>
-                        </tr>
-                    <?php } ?>
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td colspan="2">
-                            <?php printf($this->tr('<strong>Doprava:</strong> %s'), $this->shipping->{Shop_Model_Shippings::COLUMN_NAME}) ?>
-                        </td>
-                        <td class="column-price"><?php echo Shop_Tools::getFormatedPrice($this->shippingPrice) ?></td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            <?php printf($this->tr('<strong>Platba:</strong> %s'), $this->payment->{Shop_Model_Payments::COLUMN_NAME}) ?>
-                        </td>
-                        <td class="column-price"><?php echo Shop_Tools::getFormatedPrice($this->paymentPrice) ?></td>
-                    </tr>
-                    <tr>
-                        <th colspan="2">
-                            <?php echo $this->tr('Cena celkem:') ?>
-                        </th>
-                        <th class="column-price">
-                            <span class="price price-total">
-                                <?php echo Shop_Tools::getFormatedPrice($this->priceTotal) ?>
-                            </span>
-                        </th>
-                    </tr>
-                </tfoot>
-            </table>
-        </div>
-    </fieldset>
+            $this->formOrder->deliveryCountry->html()->addClass('form-control');
+            echo $this->formOrder->deliveryCountry->ControlAll();
+            ?>         
+         </div>
+      </div>
+   </fieldset>
+   <fieldset class="fieldset-alt">
+      <legend><span class="form-legend-name"><?php echo $this->tr('Rekapitulace objednávky') ?></span></legend>
+      <div class="table-responsive">
+         <table class="form-table table table-striped">
+            <thead>
+               <tr>
+                  <th><?php echo $this->tr('Název') ?></th>
+                  <th><?php echo $this->tr('Množství') ?></th>
+                  <th><?php echo $this->tr('Cena') ?></th>
+               </tr>
+            </thead>
+            <tbody>
+               <?php foreach ($this->cart as $item) { ?>
+                  <tr>
+                     <td>
+                        <a href="<?php echo $item->getUrl() ?>" title="<?php ps($item->getName()); ?>"><?php ps($item->getName()); ?></a>
+                        <?php
+                        if ($item->getNote() != null) {
+                           echo "<br />";
+                           ps($item->getNote());
+                        }
+                        ?>
+                     </td>
+                     <td class="column-unit">
+                        <?php
+                        ps($item->getQty() . " " . $item->getUnit());
+                        ?>
+                     </td>
+                     <td class="column-price">
+                        <?php
+                        echo Shop_Tools::getFormatedPrice($item->getPrice(true));
+                        ?>
+                     </td>
+                  </tr>
+               <?php } ?>
+            </tbody>
+            <tfoot>
+               <tr>
+                  <td colspan="2">
+                     <?php printf($this->tr('<strong>Doprava:</strong> %s'), $this->shipping->{Shop_Model_Shippings::COLUMN_NAME}) ?>
+                     <?php
+                     if ((string) $this->shipping->{Shop_Model_Shippings::COLUMN_TEXT} != null) {
+                        ?>
+                        <div class="shipping-note"><?php echo $this->shipping->{Shop_Model_Shippings::COLUMN_TEXT} ?></div>
+                        <?php
+                     }
+                     ?>
+                  </td>
+                  <td class="column-price"><?php echo Shop_Tools::getFormatedPrice($this->shippingPrice) ?></td>
+               </tr>
+               <tr>
+                  <td colspan="2">
+                     <?php printf($this->tr('<strong>Platba:</strong> %s'), $this->payment->{Shop_Model_Payments::COLUMN_NAME}) ?>
+                     <?php
+                     if ((string) $this->payment->{Shop_Model_Payments::COLUMN_TEXT} != null) {
+                        ?>
+                        <div class="payment-note"><?php echo $this->payment->{Shop_Model_Payments::COLUMN_TEXT} ?></div>
+                        <?php
+                     }
+                     ?>
+                  </td>
+                  <td class="column-price"><?php echo Shop_Tools::getFormatedPrice($this->paymentPrice) ?></td>
+               </tr>
+               <tr>
+                  <th colspan="2">
+                     <?php echo $this->tr('Cena celkem:') ?>
+                  </th>
+                  <th class="column-price">
+                     <span class="price price-total">
+                        <?php echo Shop_Tools::getFormatedPrice($this->priceTotal) ?>
+                     </span>
+                  </th>
+               </tr>
+            </tfoot>
+         </table>
+      </div>
+   </fieldset>
 </div>
 <fieldset class="fieldset-alt">
-    <legend><span class="form-legend-name"><?php echo $this->tr('Odeslání objednávky') ?></span></legend>
+   <legend><span class="form-legend-name"><?php echo $this->tr('Odeslání objednávky') ?></span></legend>
 
-    <div class="form-group">
-        <?php
-        $this->formOrder->note->htmlLabel()->addClass('col-sm-2 control-label');
-        echo $this->formOrder->note->label();
-        ?>             
-        <div class="col-sm-10">
-            <?php
-            $this->formOrder->note->html()->addClass('form-control');
-            echo $this->formOrder->note->ControlAll();
-            ?>         
-        </div>
-    </div>
-    <div class="form-group">
-        <?php
-        $this->formOrder->send->htmlLabel()->addClass('col-sm-2 control-label');
-        echo $this->formOrder->send->label();
-        ?>             
-        <div class="col-sm-10">
-            <?php
-            $this->formOrder->send->html()->addClass('form-control');
-            echo $this->formOrder->send->ControlAll();
-            ?>         
-        </div>
-    </div>
+   <div class="form-group">
+      <?php
+      $this->formOrder->note->htmlLabel()->addClass('col-sm-2 control-label');
+      echo $this->formOrder->note->label();
+      ?>             
+      <div class="col-sm-10">
+         <?php
+         $this->formOrder->note->html()->addClass('form-control');
+         echo $this->formOrder->note->ControlAll();
+         ?>         
+      </div>
+   </div>
+   <div class="form-group">
+      <?php
+      $this->formOrder->send->htmlLabel()->addClass('col-sm-2 control-label');
+      echo $this->formOrder->send->label();
+      ?>             
+      <div class="col-sm-10">
+         <?php
+         $this->formOrder->send->html()->addClass('form-control');
+         echo $this->formOrder->send->ControlAll();
+         ?>         
+      </div>
+   </div>
 </fieldset>
 <?php
 echo $this->formOrder->renderEnd();
 ?>
 <script type="text/javascript">
-    $(document).ready(function () {
-        // skrytí dodací adresy
-        toggleAddress($('input[name="order_isDeliveryAddress"]'));
-        $('input[name="order_isDeliveryAddress"]').change(function () {
-            toggleAddress($(this));
-        });
+   $(document).ready(function () {
+      // skrytí dodací adresy
+      toggleAddress($('input[name="order_isDeliveryAddress"]'));
+      $('input[name="order_isDeliveryAddress"]').change(function () {
+         toggleAddress($(this));
+      });
 
-        togglePassword($('input[name="order_createAcc"]'));
-        $('input[name="order_createAcc"]').change(function () {
-            togglePassword($(this));
-        });
+      togglePassword($('input[name="order_createAcc"]'));
+      $('input[name="order_createAcc"]').change(function () {
+         togglePassword($(this));
+      });
 
-    });
-    function toggleAddress($this) {
-        var items = $this.parents('table').find('tr:not(:first)');
-        if ($this.is(':checked')) {
-            items.show();
-        } else {
-            items.hide();
-        }
-    }
-    function togglePassword($this) {
-        if ($this.is(':checked')) {
-            $this.parents('tr').next('tr').show();
-        } else {
-            $this.parents('tr').next('tr').hide();
-        }
-    }
+   });
+   function toggleAddress($this) {
+      var items = $('.delivery-form-group');
+      if ($this.is(':checked')) {
+         items.show();
+      } else {
+         items.hide();
+      }
+   }
+   function togglePassword($this) {
+      if ($this.is(':checked')) {
+         $this.parents('tr').next('tr').show();
+      } else {
+         $this.parents('tr').next('tr').hide();
+      }
+   }
 </script>
 </div>

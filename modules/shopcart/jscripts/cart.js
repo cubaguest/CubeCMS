@@ -86,11 +86,17 @@ Cart = {
       });
       // change shipping
       $('select[name="goto_order_shipping"]').change(function(){
+         var info = Cart.cart.shippings[$(this).val()];
+         $('.cart-shipping-note').text(info.note);
+         info.note === "" ? $('.cart-shipping-note').hide() : $('.cart-shipping-note').show();
          Cart.updateAllowedPayments();
          Cart.updateShippingPrice($(this).val());
       });
       // change payment
       $('select[name="goto_order_payment"]').change(function(){
+         var info = Cart.cart.payments[$(this).val()];
+         $('.cart-payment-note').text(info.note);
+         info.note === "" ? $('.cart-payment-note').hide() : $('.cart-payment-note').show();
          Cart.updatePaymentPrice($(this).val());
       });
 

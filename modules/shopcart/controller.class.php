@@ -98,7 +98,8 @@ class ShopCart_Controller extends Controller {
          $sh[$shipping->{Shop_Model_Shippings::COLUMN_ID}] =
             array(
                'price' => $shipping->{Shop_Model_Shippings::COLUMN_VALUE},
-               'name' => (string)$shipping->{Shop_Model_Shippings::COLUMN_NAME}
+               'name' => (string)$shipping->{Shop_Model_Shippings::COLUMN_NAME},
+               'note' => (string)$shipping->{Shop_Model_Shippings::COLUMN_TEXT}
             );
          
          $shippingDisallowedPayments[$shipping->{Shop_Model_Shippings::COLUMN_ID}] = 
@@ -141,7 +142,8 @@ class ShopCart_Controller extends Controller {
          $py[$payment->{Shop_Model_Payments::COLUMN_ID}] =
             array(
                'price' => $payment->{Shop_Model_Payments::COLUMN_PRICE_ADD},
-               'name' => (string)$payment->{Shop_Model_Payments::COLUMN_NAME}
+               'name' => (string)$payment->{Shop_Model_Payments::COLUMN_NAME},
+               'note' => (string)$payment->{Shop_Model_Payments::COLUMN_TEXT}
             );
 
          $paymentsArray[$payment->{Shop_Model_Payments::COLUMN_ID}] = $payment;

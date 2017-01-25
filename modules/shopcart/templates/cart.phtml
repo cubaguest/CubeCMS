@@ -131,7 +131,7 @@ if (!$this->cart->isEmpty()) {
 
         <h2><?php echo $this->tr('Doprava a platba'); ?></h2>
         <?php echo $this->formNext->renderStart(); ?>
-        <div class="table-responsive">
+        <div class="table-responsive ship2pay-form">
         <table class="table table-striped">
             <tbody>
                 <tr>
@@ -142,14 +142,19 @@ if (!$this->cart->isEmpty()) {
                             echo $this->formNext->pickupDate->label();
                             echo $this->formNext->pickupDate->controll();
                         }
-                        ?></td>
+                        ?>
+                     <div class="cart-shipping-note"></div>
+                    </td>
                     <td class="column-4 column-price" >
                         <span id="shipping-price"><?php echo $this->shippingPrice > 0 ? Shop_Tools::getFormatedPrice($this->shippingPrice) : $this->tr('Zdarma') ?></span>
                     </td>
                 </tr>
                 <tr>
                     <td><?php echo $this->formNext->payment->label(); ?></td>
-                    <td><?php echo $this->formNext->payment->controll(); ?></td>
+                    <td>
+                       <?php echo $this->formNext->payment->controll(); ?>
+                       <div class="cart-payment-note"></div>
+                    </td>
                     <td class="column-4 column-price" >
                         <span id="payment-price"><?php echo $this->paymentPrice > 0 ? Shop_Tools::getFormatedPrice($this->paymentPrice) : $this->tr('Zdarma') ?></span>
                     </td>
