@@ -125,11 +125,13 @@ class Shop_Tools extends TrObject {
           "{WEBSITE_NAME}",
           "{ADRESA_OBCHOD}",
           "{STORE_ADDRESS}",
+          "{CURRENT_DATE}",
               ), array(
           CUBE_CMS_WEB_NAME,
           CUBE_CMS_WEB_NAME,
           CUBE_CMS_SHOP_STORE_ADDRESS,
           CUBE_CMS_SHOP_STORE_ADDRESS,
+          Utils_DateTime::fdate('%x'),
               ), $cnt);
 
       /* Objednávka */
@@ -139,6 +141,7 @@ class Shop_Tools extends TrObject {
              "{ORDER_NOTE}",
              "{CISLO}",
              "{ORDER_TOTAL}",
+             "{ORDER_DATE}",
              
              "{ADDRESS_DELIVERY}",
              "{ADDRESS_BILLING}",
@@ -153,6 +156,7 @@ class Shop_Tools extends TrObject {
              $order->{Shop_Model_Orders::COLUMN_NOTE},
              self::getFormatOrderNumber($order->{Shop_Model_Orders::COLUMN_ID}),
              self::getFormatedPrice($order->{Shop_Model_Orders::COLUMN_TOTAL}),
+             Utils_DateTime::fdate("%x",new DateTime($order->{Shop_Model_Orders::COLUMN_TIME_ADD})),
                      
              self::createAddressDeliveryHtmlBlock($order, $lang),
              self::createAddressBillingHtmlBlock($order, $lang),
