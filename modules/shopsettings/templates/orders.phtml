@@ -5,68 +5,9 @@ $this->addJsPlugin(new JsPlugin_JQuery());
 <?php 
 $this->includeFile('tpl://nav.phtml');
 ?>
-<div class="main-content-form-edit">
+<div class="content-admin content-edit-form">
    <?php 
    $this->form->html()->setAttrib('name', 'orderSetup');
-   $this->form->notifyUserMail->html()->setAttrib('rows', 12);
-   $this->form->notifyAdminMail->html()->setAttrib('rows', 12);
-   $this->form->userOrderStatusMail->html()->setAttrib('rows', 12);
-   $rpl = $this->tr('Proměnné, které se nahradí:').'<br />';
-   foreach ($this->replace as $key => $title) {
-      $rpl .= '<a href="#" title="'.$this->tr('vložit').'" class="add-mail-var-butt">'.$key.'</a> - '.$title.'<br />';
-   }
-   $this->form->notifyUserMail->setSubLabel($rpl);
-   $rpl = $this->tr('Proměnné, které se nahradí:').'<br />';
-   foreach ($this->replace as $key => $title) {
-      $rpl .= '<a href="#" title="'.$this->tr('vložit').'"  class="add-mail-var-butt">'.$key.'</a> - '.$title.'<br />';
-   }
-   
-   $this->form->userOrderStatusMail->setSubLabel($rpl);
-   $rpl = $this->tr('Proměnné, které se nahradí:').'<br />';
-   foreach ($this->replaceStatus as $key => $title) {
-      $rpl .= '<a href="#" title="'.$this->tr('vložit').'"  class="add-mail-var-butt">'.$key.'</a> - '.$title.'<br />';
-   }
-   $this->form->userOrderStatusMail->setSubLabel($rpl);
-   
    echo $this->form;
    ?>
 </div>
-
-<script type="text/javascript" charset="utf-8">
-   /* <![CDATA[ */
-   
-   $.fn.extend({
-      insertAtCaret: function(myValue){
-         return this.each(function(i) {
-            if (document.selection) {
-               this.focus();
-               sel = document.selection.createRange();
-               sel.text = myValue;
-               this.focus();
-            }
-            else if (this.selectionStart || this.selectionStart == '0') {
-               var startPos = this.selectionStart;
-               var endPos = this.selectionEnd;
-               var scrollTop = this.scrollTop;
-               this.value = this.value.substring(0, startPos)+myValue+this.value.substring(endPos,this.value.length);
-               this.focus();
-               this.selectionStart = startPos + myValue.length;
-               this.selectionEnd = startPos + myValue.length;
-               this.scrollTop = scrollTop;
-            } else {
-               this.value += myValue;
-               this.focus();
-            }
-         });
-      }
-   });
-
-   $('a.add-mail-var-butt').click(function(){
-      var tr = $(this).parents('tr');
-      var $textarea = tr.find('textarea:visible');
-      $textarea.insertAtCaret( $(this).text() );
-      return false;
-   });
-
-   /* ]]> */
-</script>

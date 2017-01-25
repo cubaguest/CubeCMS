@@ -497,58 +497,14 @@ class ShopSettings_Controller extends Controller {
       $eNotifyMail->setValues(VVE_SHOP_ORDER_MAIL);
       $eNotifyMail->setSubLabel($this->tr('na tento e-mail budou chodit oznámení o nových objednávkách'));
       $form->addElement($eNotifyMail, $grpNotify);
-
-      $eUserMailText = new Form_Element_TextArea('notifyUserMail', $this->tr('Text e-mailu pro uživatele'));
-      $eUserMailText->setLangs();
-      // načtení hodnot pokud existují
-      $values = array();
-      foreach (Locales::getAppLangs() as $lang) {
-         $values[$lang] = null;
-         $file = $this->module()->getDataDir() . 'mail_tpl_user_' . $lang . '.html';
-         if (is_file($file)) {
-            $values[$lang] = file_get_contents($file);
-         }
-      }
-      $eUserMailText->setValues($values);
-      $form->addElement($eUserMailText, $grpNotify);
-
-      $eUserStatusText = new Form_Element_TextArea('userOrderStatusMail', $this->tr('Text e-mailu pro změnu stavu'));
-      $eUserStatusText->setLangs();
-      // načtení hodnot pokud existují
-      $values = array();
-      foreach (Locales::getAppLangs() as $lang) {
-         $values[$lang] = null;
-         $file = $this->module()->getDataDir() . 'mail_tpl_orderstatus_' . $lang . '.html';
-         if (is_file($file)) {
-            $values[$lang] = file_get_contents($file);
-         }
-      }
-      $eUserStatusText->setValues($values);
-      $form->addElement($eUserStatusText, $grpNotify);
-
-      $eAdminMailText = new Form_Element_TextArea('notifyAdminMail', $this->tr('Text e-mailu pro administrátora'));
-
-      $file = $this->module()->getDataDir() . 'mail_tpl_admin.html';
-      if (is_file($file)) {
-         $eAdminMailText->setValues(file_get_contents($file));
-      }
-      $form->addElement($eAdminMailText, $grpNotify);
-
+      
       $grpStatus = $form->addGroup('status', $this->tr('Stavy objednávek'));
 
-      //VVE_SHOP_ORDER_DEFAULT_STATUS
-      $eDefaultStatus = new Form_Element_Text('statusDefault', $this->tr('Výchozí stav objednávky'));
+      $eDefaultStatus = new Form_Element_Text('statusDefault', $this->tr('ID výchozího stavu objednávky'));
       $eDefaultStatus->addValidation(new Form_Validator_NotEmpty());
-      $eDefaultStatus->setSubLabel($this->tr('Počáteční stav při přijetí objednávky. Například "přijato".'));
+      $eDefaultStatus->setSubLabel($this->tr('Počáteční stav při přijetí objednávky. ID ze stavů.'));
       $eDefaultStatus->setValues(VVE_SHOP_ORDER_DEFAULT_STATUS);
       $form->addElement($eDefaultStatus, $grpStatus);
-
-      $eStatus = new Form_Element_TextArea('status', $this->tr('Stavy objednávky'));
-      $eStatus->addValidation(new Form_Validator_NotEmpty());
-      $eStatus->setValues(VVE_SHOP_ORDER_STATUS);
-      $eStatus->setSubLabel($this->tr('Předdefinované stavy objednávek (např. přijato;odesláno;vráceno) oddělené středníkem.'));
-      $form->addElement($eStatus, $grpStatus);
-
 
       $eSave = new Form_Element_Submit('save', $this->tr('Uložit'));
       $form->addElement($eSave);
@@ -556,26 +512,6 @@ class ShopSettings_Controller extends Controller {
       if ($form->isValid()) {
          $this->storeSystemCfg('VVE_SHOP_ORDER_MAIL', $form->notifyMail->getValues());
          $this->storeSystemCfg('VVE_SHOP_ORDER_DEFAULT_STATUS', $form->statusDefault->getValues());
-         $this->storeSystemCfg('VVE_SHOP_ORDER_STATUS', $form->status->getValues());
-
-         // uložení mailů
-         $usersTexts = $form->notifyUserMail->getValues();
-         foreach ($usersTexts as $lang => $text) {
-            if ($text != null && !file_put_contents($this->module()->getDataDir() . 'mail_tpl_user_' . $lang . '.html', $text)) {
-               throw new UnexpectedValueException(sprintf($this->tr('Chyba při zápisu do souboru s mailem uživatele (jazyk: %s)'), $lang));
-            }
-         }
-
-         $statusTexts = $form->userOrderStatusMail->getValues();
-         foreach ($statusTexts as $lang => $text) {
-            if ($text != null && !file_put_contents($this->module()->getDataDir() . 'mail_tpl_orderstatus_' . $lang . '.html', $text)) {
-               throw new UnexpectedValueException(sprintf($this->tr('Chyba při zápisu do souboru s mailem změny stavu objednávky (jazyk: %s)'), $lang));
-            }
-         }
-
-         if (!file_put_contents($this->module()->getDataDir() . 'mail_tpl_admin.html', $form->notifyAdminMail->getValues())) {
-            throw new UnexpectedValueException($this->tr('Chyba při zápisu do souboru s mailem administrátora'));
-         }
 
          $this->infoMsg()->addMessage($this->tr('Nastavení bylo uloženo'));
          $this->link()->reload();
