@@ -576,6 +576,11 @@ div.tablediv > .table-bordered {
 	padding:.3em; 
 	margin-bottom: 3px;
 }
+.ui-jqdialog-content input.FormElement,
+.ui-jqdialog-content textarea.FormElement,
+.ui-jqdialog-content select.FormElement {
+   min-width: 100%;
+}
 .ui-jqdialog-content .data-line {
 	padding-top:.1em;
 	border: 0 none;
@@ -610,8 +615,13 @@ div.tablediv > .table-bordered {
 	margin-left: 4px; 
 	margin-right: 4px; 
 }
+#sData, #cData { 
+   padding: 5px;
+   cursor: pointer;
+}
 #sData span, #cData span { 
 	margin-left: 5px;
+   display: inline-block;
 }
 /* End Eorm edit */
 /*.ui-jqgrid .edit-cell {}*/
