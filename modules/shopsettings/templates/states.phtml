@@ -6,6 +6,11 @@ $this->addJsPlugin(new JsPlugin_JQuery());
 $this->includeFile('tpl://nav.phtml');
 ?>
 <div class="content-admin">
+   <div class="alert alert-info">
+      <?php 
+      $linkTemplates = Url_Link::getCategoryAdminLink(32792);
+      printf($this->tr('Šablony emailů se přidávají v administračním menu v položce Obsah a šablony > <a class="link-external" href="%s">šablony</a>'), $linkTemplates) ?>
+   </div>
    <?php
    $this->moduleButtons = array(
        array(
@@ -79,6 +84,26 @@ $this->includeFile('tpl://nav.phtml');
          <?php } ?>
       </tbody>
    </table>
+   <h2><?php ps($this->tr('Přehled proměnných pro šablony e-mailů')) ?></h2>
+   <ul class="styled">
+      <li><em>{WEBSITE_NAME}</em> - <?php ps($this->tr('název obchodu')) ?></li>
+      <li><em>{STORE_ADDRESS}</em> - <?php ps($this->tr('adresa obchodu')) ?></li>
+      <li><em>{ORDER_NUMBER}</em> - <?php ps($this->tr('číslo objednávky')) ?></li>
+      <li><em>{ORDER_NOTE}</em> - <?php ps($this->tr('poznámka k objednávce')) ?></li>
+      <li><em>{ORDER_TOTAL}</em> - <?php ps($this->tr('celková cena objednávky')) ?></li>
+      <li><em>{ADDRESS_DELIVERY}</em> - <?php ps($this->tr('doručovací adresa')) ?></li>
+      <li><em>{ADDRESS_BILLING}</em> - <?php ps($this->tr('fakturační adresa')) ?></li>
+      <li><em>{PAYMENT_NAME}</em> - <?php ps($this->tr('název platební metody')) ?></li>
+      <li><em>{PAYMENT_PRICE}</em> - <?php ps($this->tr('cena platební metody')) ?></li>
+      <li><em>{SHIPPING_NAME}</em> - <?php ps($this->tr('název doručovací metody')) ?></li>
+      <li><em>{SHIPPING_PRICE}</em> - <?php ps($this->tr('cena doručovací metody')) ?></li>
+      <li><em>{PRODUCTS}</em> - <?php ps($this->tr('přehled produktů v tabulce se souhrnem')) ?></li>
+      <li><em>{STATE}</em> - <?php ps($this->tr('stav objednávky')) ?></li>
+      <li><em>{STATE_NOTE}</em> - <?php ps($this->tr('poznámka ke stavu objednávky')) ?></li>
+   </ul>
+   <div class="alert alert-warning">
+      <?php ps($this->tr('Ne všechny proměnné jsou vždy k dispozici. Například infomace o objednávce jsou k dispozici pouze u e-mailů týkajících se objednávky.')) ?>
+   </div>
 </div>
 
 <script type="text/javascript" charset="utf-8">
