@@ -93,7 +93,7 @@ class Menu_Admin {
    {
       $items = array();
       foreach ($this->items as $key => $section) {
-         if($section['position'] == $position){
+         if( isset($section['position']) && $section['position'] == $position){
             $items[$key] = $section;
          }
       }
