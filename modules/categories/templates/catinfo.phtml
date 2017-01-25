@@ -73,7 +73,7 @@ foreach ($this->catInfo->{Model_Category::COLUMN_DISABLE} as $lang => $dis) {
    <tr class="cubecms-row">
       <th class=""><?php echo $this->tr('Viditelné');?></th>
       <td class="">
-         <select name="cat_visibility">
+         <select name="cat_visibility" class="form-control">
             <?php foreach ($this->visTypes as $type => $label) {?>
             <option value="<?php echo $type?>" <?php if($this->catInfo->{Model_Category::COLUMN_VISIBILITY} == $type) echo 'selected="selected"'?>><?php echo $label?></option>
             <?php }?>
@@ -123,7 +123,7 @@ foreach ($this->catInfo->{Model_Category::COLUMN_DISABLE} as $lang => $dis) {
    ?></td></tr>
 
    <tr class="cubecms-row"><th class="" colspan="2"><?php echo $this->tr('Klíčová slova (vyhledávač)');?>:</th></tr>
-   <tr class=""><td colspan="2"><?php 
+   <tr class="cubecms-row"><td colspan="2"><?php 
    echo (string)$this->catInfo->{Model_Category::COLUMN_KEYWORDS} == null ? $this->tr('Není') : $this->catInfo->{Model_Category::COLUMN_KEYWORDS};
    ?></td></tr>
 </table>

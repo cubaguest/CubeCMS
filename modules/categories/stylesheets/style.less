@@ -1,4 +1,4 @@
-#category-structure-wrap { float: left; width: 60%;}
+@import "variables.less";
 #category-structure {
    border: 1px solid gray;
    overflow: auto;
@@ -15,9 +15,10 @@
    input, button {
       vertical-align: top;
    }
+   margin-bottom: @padding-base-vertical;
 }
 
-#category-info { width: 40%; overflow: auto; }
+/*#category-info { width: 40%; overflow: auto; }*/
 #category-info div { margin-left: 10px; }
 #category-info td, #category-info th {padding: 2px;}
 #category-info td.cell-lang {width: 30px; text-align: right;}
