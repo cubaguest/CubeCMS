@@ -55,6 +55,9 @@ class Template_Navigation extends Template {
       if($link == null){
          $link = new Url_Link();
       }
+      if(Category::getSelectedCategory() instanceof Category_Admin){
+        $arr['admin'] = true;
+      }
       if($key == null){
          array_push(self::$extendedParts, $arr );
       } else {
@@ -116,6 +119,4 @@ class Template_Navigation extends Template {
          );
       }
    }
-   
 }
-?>
