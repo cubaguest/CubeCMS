@@ -674,6 +674,35 @@ CubeCMS.Form = {
       });
       
       
+   },
+   setMessages : function($form, cmsXhrRespond){
+      $form.find('.form-errors,.form-success').html(null);
+      if(cmsXhrRespond.errmsg.length > 0){
+         var $box = $form.find('.form-errors');
+         $box.html(null);
+         $.each(cmsXhrRespond.errmsg, function(index, data){
+            $box.append('<div>'+data+'</div>');
+         });
+         $box.slideDown(400);
+      } else {
+         $form.find('.form-errors').hide();
+      }
+      if(cmsXhrRespond.infomsg.length > 0){
+         var $box = $form.find('.form-success');
+         $box.html(null);
+         $.each(cmsXhrRespond.infomsg, function(index, data){
+            $box.append('<div>'+data+'</div>');
+         });
+         $box.slideDown(400);
+      } else {
+         $form.find('.form-success').hide();
+      }
+      if(cmsXhrRespond.infomsg.length == 0 && cmsXhrRespond.errmsg.length == 0){
+         this.hideMessages($form);
+      }
+   },
+   hideMessages : function($form){
+      $form.find('.form-success,.form-errors').slideUp(400);
    }
 };
 
