@@ -134,3 +134,5 @@ ADD INDEX `urlkey_en` (`urlkey_en` ASC),
 ADD INDEX `urlkey_de` (`urlkey_de` ASC) ;
 
 
+ALTER TABLE `{PREFIX}sessions` CHANGE `created` `created` DATETIME NULL DEFAULT NULL;
+ALTER TABLE `{PREFIX}sessions` CHANGE `updated` `updated` DATETIME NULL DEFAULT NULL;
