@@ -42,7 +42,7 @@ echo $this->toolbox;
       <?php if((string)$article->{Articles_Model_Detail::COLUMN_ANNOTATION} != null){?>
          <div class="main-content-list-record-annotation"><?php echo $article->{Articles_Model_Detail::COLUMN_ANNOTATION};?></div>
       <?php } else if((string)$article->{Articles_Model_Detail::COLUMN_TEXT} != null) {?>
-         <div class="main-content-list-record-text"><?php echo vve_tpl_truncate(strip_tags($article->{Articles_Model_Detail::COLUMN_TEXT}), 640);?></div>
+         <div class="main-content-list-record-text"><?php echo Utils_String::truncate(strip_tags($article->{Articles_Model_Detail::COLUMN_TEXT}), 640);?></div>
       <?php }?>
       <hr class="reseter" />
       <div class="main-content-showed"><?php echo $this->tr('Zobrazeno')?>:&nbsp;<?php echo $article->{Articles_Model_Detail::COLUMN_SHOWED}?>&times;</div>
