@@ -1,0 +1,2 @@
+Vylepšení:
+- Stavy u objednávky
