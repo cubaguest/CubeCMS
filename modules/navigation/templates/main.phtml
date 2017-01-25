@@ -1,44 +1,62 @@
-<?php 
-   $h1 = $this->category()->getName(true);
-   $this->addPageTitle($h1);
+<?php
+$h1 = $this->category()->getName();
+$this->addPageTitle($h1);
 
-   define('M_NAVIGATION_GOTO', $this->tr('Přejít na'));
+define('M_NAVIGATION_GOTO', $this->tr('Přejít na'));
 
-   function navRenderStruvcutre($structure, $level=1)
-   {
-      if(empty ($structure)) return null;
-      $retStr = null;
-      $retStr .= '<ul class="module-navigation-container module-navigation-level-'.$level.'">';
-      foreach ($structure as $item) {
-         $retStr .= '<li>'
-            .'<a href="'.$item['link'].'" title="'.M_NAVIGATION_GOTO.' '.htmlspecialchars($item['namelong']).'">'
-               .'<img src="'.$item['category']->getImage().'" height="40" /> '
-               .htmlspecialchars($item['namelong']).'</a>';
-            if(!empty ($item['label'])){
-               $retStr .= '<br />'.$item['label'];
-            }
-            if(!empty ($item['childs'])){
-               $retStr .= navRenderStruvcutre($item['childs'], $level+1);
-            }
-         $retStr .= '</li>';
-      }
-      $retStr .= '</ul>';
-      return $retStr;
-   }
-
+function navRenderStruvcutre($structure, $level = 1) {
+    if (empty($structure))
+        return null;
+    $retStr = null;
+    $retStr .= '<div class="row">';
+    foreach ($structure as $item) {
+        //   echo $item['category']->getImage();
+        $retStr .= '<div class="col-md-6">'
+                . '<a href="' . $item['link'] . '" title="' . M_NAVIGATION_GOTO . ' ' . htmlspecialchars($item['name']) . '">'
+                . '<img class="img-responsive" src="' . $item['category']->getImage() . '" height="" /> '
+                //  . '</a>'
+                //   . '<a class="products" href="' . $item['link'] . '" title="' . M_NAVIGATION_GOTO . ' ' 
+                . '<span class="products">'
+                . htmlspecialchars($item['name'])
+                . '</span>'
+                . '</a>';
+        if (!empty($item['label'])) {
+            $retStr .= '<br />' . $item['label'];
+        }
+        if (!empty($item['childs'])) {
+            $retStr .= navRenderStruvcutre($item['childs'], $level + 1);
+        }
+        $retStr .= '</div>';
+    }
+    $retStr .= '</div>';
+    return $retStr;
+}
 ?>
-<h1><?php $this->includeFile('tpl://engine:headline/icon.phtml'); echo $h1;?></h1>
-<div class="main-content-detail" style="background-color: <?php echo $this->category()->getParam('bgcolor')?>">
-   <div class="main-content-text">
-   <?php 
-   if($this->text != null AND strpos($this->text, '{LIST}') !== false){
-      echo str_replace('{LIST}', navRenderStruvcutre($this->structure), $this->text);
-   } else if($this->text != null) {
-      echo $this->text;
-      echo navRenderStruvcutre($this->structure);
-   } else {
-      echo navRenderStruvcutre($this->structure);
-   }
-   echo $this->toolbox;
-   ?></div>
+<h1><?php
+    $this->includeFile('tpl://engine:headline/icon.phtml');
+    echo $h1;
+    ?></h1> 
+<div class="main-content-detail">
+    <div class="main-content-text">
+        <?php
+        if ($this->text != null AND strpos($this->text, '{LIST}') !== false) {
+            echo str_replace('{LIST}', navRenderStruvcutre($this->structure), $this->text);
+        } else if ($this->text != null) {
+            echo $this->text;
+            echo navRenderStruvcutre($this->structure);
+        } else {
+            echo navRenderStruvcutre($this->structure);
+        }
+        echo $this->toolbox;
+        ?>
+    </div>
+    <?php
+$parent = Category_Structure::getStructure(Category_Structure::ALL)->getCategory($this->category()->getId())->getParent();
+if ($parent) {
+    $link = new Url_Link(true);
+    $link->category($parent->getCatObj()->getUrlKey());
+    ?><a href="<?php echo $link ?>" class="btn btn-primary"><span class="icon icon-chevron-left obalka"></span> zpět</a>
+        <?php
+    }
+    ?>
 </div>

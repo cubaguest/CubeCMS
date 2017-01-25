@@ -12,18 +12,18 @@ if (!defined('M_NAVIGATION_PANEL_GOTO')) {
       if (empty($structure))
          return null;
       $retStr = null;
-      $retStr .= '<ul class="module-navigation-container module-navigation-level-' . $level . '">';
+      $retStr .= '<div class="module-navigation-container module-navigation-level-' . $level . '">';
       foreach ($structure as $item) {
-         $retStr .= '<li>'
-            . '<a href="' . $item['link'] . '" title="' . M_NAVIGATION_PANEL_GOTO . ' ' . htmlspecialchars($item['name']) . '">'
-            . '<img src="' . $item['category']->getImage() . '" height="40" /> '
+         $retStr .= '<div>'
+            . '<a class="products-panel" href="' . $item['link'] . '" title="' . M_NAVIGATION_PANEL_GOTO . ' ' . htmlspecialchars($item['name']) . '">'
+            . '<img class="panel-img" src="' . $item['category']->getImage() . '" height="60" /> '
             . htmlspecialchars($item['name']) . '</a>';
          if (!empty($item['childs'])) {
             $retStr .= navPanelRenderStructure($item['childs'], $level + 1);
          }
-         $retStr .= '</li>';
+         $retStr .= '</div>';
       }
-      $retStr .= '</ul>';
+      $retStr .= '</div>';
       return $retStr;
    }
 
@@ -38,10 +38,10 @@ if ($this->panelObj()->getBackImage() != null) {
 }
 $form = Auth::getAuthenticator('internal')->getLoginForm();
 ?>
-<div class="name">
+<h2 class="h1">
    <?php echo $icon ?><a href="<?php echo $this->l(); ?>" title="<?php psa($this->panelObj()->getName()) ?>"
       ><?php ps($this->panelObj()->getName()) ?></a>
-</div>
+</h2>
 <div class="content" style="<?php echo $backImg ?>">
    <?php
    echo navPanelRenderStructure($this->structure);
