@@ -1,0 +1,56 @@
+@padding-base: 3px;
+#variants-groups, #variants-values {
+   h2 {
+      margin: 0;
+      padding: @padding-base;
+   }
+
+   ul {
+      li {
+         a.name {
+            width: 80%;
+            display: block;
+            float: left;
+         }
+         .controls {
+            float: right;
+         }
+         .ui-icon {
+            float: left;
+            margin: 2px 2px 0 0;
+            cursor: ns-resize;
+         }
+
+         padding: @padding-base;
+      }
+
+      list-style: none;
+      margin: 0;
+      padding: 0;
+   }
+   .ui-widget-controls {
+      p {
+
+      }
+      input[type="text"] {
+         width: 100%;
+      }
+      .name-label {
+         margin-bottom: @padding-base;
+      }
+      .button-save {
+         margin-top: @padding-base;
+         text-align: right;
+      }
+
+      padding: 2*@padding-base;
+      margin-top: 2*@padding-base;
+   }
+}
+.empty-list {
+   padding: @padding-base;
+}
+
+#variants-groups {
+   margin-right: 10px;
+}

@@ -1,0 +1,75 @@
+<?php 
+$jQuery = new JsPlugin_JQuery();
+$jQuery->addUICore();
+$jQuery->addUIDialog();
+$jQuery->addUISortable();
+$this->addJsPlugin($jQuery);
+$this->addFile('css://style.less');
+$this->addFile('js://shop-variants.js');
+$buttonCancelEdit = '<button name="cancel" class="button-cancel" onclick="clearForm(this); return false;" >'
+   .$this->tr('Vyčistit').'</button> ';
+?>
+<h1><?php echo  $this->category()->getName() ?></h1>
+<div class="main-content-admin-form">
+   <div class="row">
+      <div class="col-md-6">
+         <div id="variants-groups">
+            <h2 class="ui-widget ui-widget-header"><?php echo $this->tr('Skupiny')?></h2>
+
+            <ul id="variants-groups-list" class="ui-widget ui-widget-content"></ul>
+            <div id="groups-control" class="ui-widget ui-widget-header ui-cube-widget">
+               <button onclick="ShopVariants.addGroup()"><?php ps($this->tr('Přidat'))?></button>
+               <button onclick="ShopVariants.loadGroups()"><?php ps($this->tr('Obnovit'))?></button>
+            </div>
+            <div id="dialog-variant-group-edit">
+               <?php echo $this->formEditGroup;?>
+            </div>
+         </div>
+      </div>
+      <div class="col-md-6">
+         <div id="variants-values">
+            <h2 class="ui-widget ui-widget-header"><?php ps($this->tr('Atributy'));?> <span id="group-name"></span></h2>
+
+            <ul id="variants-values-list" class="ui-widget ui-widget-content"></ul>
+
+            <div id="values-control" class="ui-widget ui-widget-header ui-cube-widget">
+               <button id="button-add-variant" onclick="ShopVariants.addVariant()"><?php ps($this->tr('Přidat'))?></button>
+            </div>
+            <div id="dialog-variant-edit">
+               <?php echo $this->formEditVariant;?>
+            </div>
+         </div>
+      </div>
+   </div>
+
+   <script type="text/javascript" charset="utf-8">
+      /* <![CDATA[ */
+      function clearForm(button){
+         var $this = $(button);
+         $this.parents('form').find('input[type="text"],input[type="hidden"]').val("");
+      }
+      $(document).ready(function() {
+          $('.button-delete-group,.button-delete-value').click(function(){
+             return confirm('<?php echo $this->tr('Opravdu zmazat tuto skupinu/hodnotu?')?>');
+          });
+
+         ShopVariants.init({
+            urlGroups : '<?php echo $this->link()->clear()->route('groupsList')?>',
+            urlEditGroup : '<?php echo $this->link()->clear()->route('editGroup')?>',
+            urlVariants : '<?php echo $this->link()->clear()->route('variantsList')?>',
+            urlEditVariant : '<?php echo $this->link()->clear()->route('editVariant')?>'
+         }, {
+            $dialogGroup : $('#dialog-variant-group-edit'),
+            $dialogVariant : $('#dialog-variant-edit'),
+            $listGroups : $('#variants-groups-list'),
+            $listVariants : $('#variants-values-list'),
+            $formEditGroup : $("#dialog-variant-group-edit form"),
+            $formEditVariant : $("#dialog-variant-edit form"),
+            $groupNameBox : $('#group-name'),
+            $buttonAddVariant : $('#button-add-variant')
+         });
+
+      });
+      /* ]]> */
+   </script>
+</div>
