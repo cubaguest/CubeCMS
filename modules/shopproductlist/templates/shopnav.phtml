@@ -1,0 +1,39 @@
+<?php
+$struct = Category_Structure::getStructure(Category_Structure::ALL);
+$products = $struct->getCategory($this->category()->getID());
+
+$pathIDS = Category_Structure::getStructure(Category_Structure::ALL)->getPath(Category::getSelectedCategory()->getId(), array(), true);
+
+
+if (!function_exists("shopBootstrapMenuRenderFunc")) {
+
+   function shopBootstrapMenuRenderFunc($menuArr, $link, $pathIDS)
+   {
+      foreach ($menuArr as $key => $item) {
+         $class = in_array($item->getId(), $pathIDS) ? 'open' : '';
+
+         if (!$item->isEmpty()) {
+            echo '<li class="line ' . $class . '">';
+            echo '<a href="' . $link->clear()->category($item->getCatObj()->getUrlKey()) . '" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">'
+            . $item->getCatObj()->getLabel() . ' <span class="caret"></span></a>' . "";
+            echo '<ul  class="dropdown-menu" role="menu">' . "\n";
+            shopBootstrapMenuRenderFunc($item, $link, $pathIDS);
+            echo '</ul>' . "\n";
+         } else {
+            echo '<li class="' . $class . '">';
+            echo '<a class="hm" href="' . $link->clear()->category($item->getCatObj()->getUrlKey()) . '">'
+            . $item->getCatObj()->getLabel()
+            . ' (' . Shop_Model_Product::getCountFromCategory($item->getCatObj()->getId()) . ')'
+            . '</a>' . "";
+         }
+         echo '</li>' . "\n";
+      }
+   }
+
+}
+?>
+<div class="menu-shop">
+   <ul class="styled">  
+      <?php echo shopBootstrapMenuRenderFunc($products, $this->link(), $pathIDS) ?>
+   </ul>
+</div>

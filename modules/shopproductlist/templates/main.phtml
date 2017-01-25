@@ -1,7 +1,17 @@
-<?php 
-$this->addCssFile("style.less");
+<?php
+//$this->addCssFile("style.less");
+echo $this->toolbox;
 ?>
-<h1>ShopProductList</h1>
+<h1><?php ps($this->category()->getName()); ?></h1>
 <div class="content">
+   <?php
+   $this->includeFile('tpl://shopnav.phtml');
+   ?>
+
+   <div class="main-content-list block-aut-height">
+      <?php
+      $this->includeFile('tpl://shopproductgeneral:list_products.phtml');
+      ?>
+   </div>
 
 </div>
