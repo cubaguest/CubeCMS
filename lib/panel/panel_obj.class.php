@@ -70,7 +70,6 @@ class Panel_Obj {
       } else {
          $this->panelName = $panelData->{Model_Category::COLUMN_CAT_LABEL};
       }
-      $this->panelIcon = $panelData->{Model_Panel::COLUMN_ICON};
       $this->panelId = (int)$panelData->{Model_Panel::COLUMN_ID};
       $this->panelImg = $panelData->{Model_Panel::COLUMN_IMAGE};
       $this->box = $panelData->{Model_Panel::COLUMN_POSITION};
@@ -142,9 +141,10 @@ class Panel_Obj {
    /**
     * Metoda vrací id kategorie
     * @return integer -- id kategorie
+    * @deprecated - nepoužívá se. Místo toho nastavení a parametry
     */
    public function getIcon() {
-      return $this->panelIcon;
+      return false;
    }
 
    /**
@@ -159,8 +159,19 @@ class Panel_Obj {
     * Metoda vrací obrázek panelu
     * @return string -- název souboru s obrázkem panelu nebo null
     */
-   public function getImage() {
+   public function getImage($name = null) {
+      if($this->getParam($name) != null){
+         return $this->getParam($name);
+      }
       return $this->panelImg;
+   }
+
+   /**
+    * Metoda vrací adresu obrázku panelu
+    * @return string -- název souboru s obrázkem panelu nebo null
+    */
+   public function getImageUrl($name = null, $url = true) {
+      return $this->getImgDir($url).$this->getImage($name);
    }
    
    /**
@@ -174,6 +185,7 @@ class Panel_Obj {
    /**
     * Metodda vrací adresář s ikonami panelů
     * @return string
+    * @deprecated - nepoužívá se. Místo toho nastavení a parametry
     */
    final static function getIconDir($http = true) {
       if($http){
@@ -188,6 +200,7 @@ class Panel_Obj {
    /**
     * Metoda vrcí adresář s pozadím panelu
     * @return string
+    * @deprecated - nepoužívá se. Místo toho nastavení a parametry
     */
    final static function getBackImgDir($http = true) {
       return self::getImgDir($http);
@@ -207,4 +220,3 @@ class Panel_Obj {
       }
    }
 }
-?>
