@@ -122,9 +122,13 @@ class Shop_Tools extends TrObject {
       // základní nahrazení
       $cnt = str_replace(array(
           "{STRANKY}",
+          "{WEBSITE_NAME}",
           "{ADRESA_OBCHOD}",
+          "{STORE_ADDRESS}",
               ), array(
           CUBE_CMS_WEB_NAME,
+          CUBE_CMS_WEB_NAME,
+          CUBE_CMS_SHOP_STORE_ADDRESS,
           CUBE_CMS_SHOP_STORE_ADDRESS,
               ), $cnt);
 
@@ -182,7 +186,7 @@ class Shop_Tools extends TrObject {
              "{STATE}",
              "{STAV}",
              "{POZN}",
-             "{NOTE}",
+             "{STATE_NOTE}",
                  ), array(
              (string) $stateHistory->{Shop_Model_OrdersStates::COLUMN_NAME},
              (string) $stateHistory->{Shop_Model_OrdersStates::COLUMN_NAME},
