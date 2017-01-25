@@ -51,7 +51,7 @@ $this->addPageTitle($h);
                <tr class="cubecms-row text-right">
                   <td colspan="5">
                      <?php
-                     $this->formEdit->save->html()->addClass('btn')->addClass('btn-default');
+                     $this->formEdit->save->html()->addClass('btn')->addClass('btn-primary');
                      echo $this->formEdit->save->control();
                      ?>
                   </td>
@@ -106,11 +106,13 @@ $this->addPageTitle($h);
                            </div>
                         <?php } ?>
                      </td>
-                     <td>
-                        <?php echo $this->formEdit->delete->control(); ?>
-                        <?php echo $this->formEdit->isTitle->control(); ?>
-                        <a href="#" class="mark-image-title text-warning <?php echo $image->{Shop_Model_Product_Images::COLUMN_IS_TITLE} ? 'hidden' : '' ?>"><span class="icon icon-star"></span></a>
-                        <a href="#" class="mark-image-delete text-danger"><span class="icon icon-remove"></span></a>
+                     <td class="">
+                        <div class="cubecms-tools">
+                           <?php echo $this->formEdit->delete->control(); ?>
+                           <?php echo $this->formEdit->isTitle->control(); ?>
+                           <a href="#" class="mark-image-title text-warning <?php echo $image->{Shop_Model_Product_Images::COLUMN_IS_TITLE} ? 'hidden' : '' ?>"><span class="icon icon-star"></span></a>
+                           <a href="#" class="mark-image-delete important"><span class="icon icon-remove"></span></a>
+                        </div>
                      </td>
                   </tr>
                   <?php

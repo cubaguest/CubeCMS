@@ -7,8 +7,8 @@
       }
 
    ?>" title="<?php echo $this->tr('Seřadit vzestupně')?>"
-      class="button-order-up <?php if(isset($_GET[$this->orderParam]) && $_GET[$this->orderParam] == "a"){ echo "ui-state-highlight";}?>"
-           ><span class="ui-icon ui-icon-triangle-1-n"></span></a>
+      class="button-order-up <?php if(isset($_GET[$this->orderParam]) && $_GET[$this->orderParam] == "a"){ echo "active";}?>"
+           ><span class="icon icon-chevron-up"></span></a>
    <a href="<?php 
    if(isset($_GET[$this->orderParam]) && $_GET[$this->orderParam] == "d"){
       echo $this->link()->param($this->orderParam);
@@ -17,6 +17,6 @@
    }
 
    ?>" title="<?php echo $this->tr('Seřadit sestupně')?>"
-      class="button-order-down <?php if(isset($_GET[$this->orderParam]) && $_GET[$this->orderParam] == "d"){ echo "ui-state-highlight";}?>"
-           ><span class="ui-icon ui-icon-triangle-1-s"></span></a>
+      class="button-order-down <?php if(isset($_GET[$this->orderParam]) && $_GET[$this->orderParam] == "d"){ echo "active";}?>"
+           ><span class="icon icon-chevron-down"></span></a>
 </div>

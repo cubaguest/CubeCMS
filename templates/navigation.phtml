@@ -3,17 +3,16 @@ if(empty($this->baseParts) && empty($this->extendedParts)){
    return;
 }
 
-$strArray = array( '<a href="'.$this->link(true)->clear(true).'">'.$this->tr('Domů').'</a>' );
+$strArray = array( '<li><a href="'.$this->link(true)->clear(true).'">'.$this->tr('Domů').'</a></li>' );
 foreach ($this->baseParts as $item) {
-   $strArray[] = '<a href="'.$item['link'].'" title="'.htmlspecialchars($item['title']).'" class="'.($item['admin'] ? 'admin' : null).'">'.htmlspecialchars($item['name']).'</a>';
+   $strArray[] = '<li><a href="'.$item['link'].'" title="'.htmlspecialchars($item['title']).'" class="'.($item['admin'] ? 'text-danger' : null).'">'.htmlspecialchars($item['name']).'</a></li>';
 }
 if(!empty($this->extendedParts)){
    foreach ($this->extendedParts as $item) {
-      $strArray[] = '<a href="'.$item['link'].'" title="'.htmlspecialchars($item['title']).'" class="'.($item['admin'] ? 'admin' : null).'">'.htmlspecialchars($item['name']).'</a>';
+      $strArray[] = '<li><a href="'.$item['link'].'" title="'.htmlspecialchars($item['title']).'" class="'.($item['admin'] ? 'text-danger' : null).'">'.htmlspecialchars($item['name']).'</a></li>';
    }
 }
 ?>
-<div id="breadcrumb">
-   <?php  echo $this->tr('Právě se nacházíte:')?>
-   <?php  echo implode(' > ', $strArray);?>
-</div>
+<ol id="breadcrumb" class="breadcrumb hidden-print">
+   <?php  echo implode('', $strArray);?>
+</ol>
