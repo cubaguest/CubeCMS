@@ -16,6 +16,12 @@ class Template_Output {
     * @var string
     */
    private static $outputType = 'html';
+   
+   /**
+    * Raw typ výstupu
+    * @var string
+    */
+   private static $contentType = null;
 
    /**
     * Pole s hlavičkami, připravenými k odeslání
@@ -66,6 +72,9 @@ class Template_Output {
     * Metoda připraví hlavičky pro zadaný výstup
     */
    private static function prepareHeaders() {
+      if(self::$contentType != null){
+         self::addHeader("Content-type: ".self::$contentType);
+      } else {
       switch (self::$outputType) {
          case "json":
             self::addHeader('Content-type: application/json; charset=utf-8');
@@ -110,6 +119,7 @@ class Template_Output {
 //            self::addHeader("Content-type: application/xhtml+xml");
             break;
       }
+      }
    }
 
    /**
@@ -126,6 +136,14 @@ class Template_Output {
     */
    public static function setContentLenght($lenght) {
       self::$cntLenght = $lenght;
+   }
+   
+   /**
+    * Metoda nastaví surový typ výstupu
+    * @param string $type -- typ vůstupu
+    */
+   public static function setContentType($type) {
+      self::$contentType = $type;
    }
 
    /**
@@ -203,4 +221,3 @@ class Template_Output {
       self::addHeader('Content-Description: File Transfer');
    }
 }
-?>
