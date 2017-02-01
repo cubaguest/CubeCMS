@@ -324,25 +324,25 @@ $this->stepAllowBack = true;
          ?>         
       </div>
    </div>
-   <div class="form-group">
-      <div class="col-sm-12">
-         <div class="pull-left">
-            <?php
-            $this->formOrder->back->setPrefixIcon('chevron-left');
-            $this->formOrder->back->html()->addClass('form-control')->addClass('btn btn-danger');
-            echo $this->formOrder->back->ControlAll();
-            ?> 
-         </div>
-         <div class="pull-right">
-            <?php
-            $this->formOrder->send->setSufixIcon('check');
-            $this->formOrder->send->html()->addClass('form-control')->addClass('btn btn-success');
-            echo $this->formOrder->send->ControlAll();
-            ?>         
-         </div>
+</fieldset>
+<div class="row">
+   <div class="col-sm-12">
+      <div class="pull-left">
+         <?php
+         $this->formOrder->back->setPrefixIcon('chevron-left');
+         $this->formOrder->back->html()->addClass('form-control')->addClass('btn btn-danger');
+         echo $this->formOrder->back->ControlAll();
+         ?> 
+      </div>
+      <div class="pull-right">
+         <?php
+         $this->formOrder->send->setSufixIcon('check');
+         $this->formOrder->send->html()->addClass('form-control')->addClass('btn btn-success');
+         echo $this->formOrder->send->ControlAll();
+         ?>         
       </div>
    </div>
-</fieldset>
+</div>
 <?php
 echo $this->formOrder->renderEnd();
 ?>

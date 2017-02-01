@@ -109,15 +109,15 @@ if (!$this->cart->isEmpty()) {
             </tbody>
             <tfoot>
                <tr>
-                  <td><?php 
-                  $this->formItems->set->setPrefixIcon('refresh');
-                  $this->formItems->set->html()->addClass('btn btn-primary');
-                  echo $this->formItems->set->controll(); 
-                  
-                  $this->formItems->reset->setPrefixIcon('trash');
-                  $this->formItems->reset->html()->addClass('btn btn-danger');
-                  echo $this->formItems->reset->controll();
-                  ?></td>
+                  <td><?php
+                     $this->formItems->set->setPrefixIcon('refresh');
+                     $this->formItems->set->html()->addClass('btn btn-primary');
+                     echo $this->formItems->set->controll();
+
+                     $this->formItems->reset->setPrefixIcon('trash');
+                     $this->formItems->reset->html()->addClass('btn btn-danger');
+                     echo $this->formItems->reset->controll();
+                     ?></td>
                   <td colspan="2" class="price column-price"><?php echo $this->tr('Cena za zboží:') ?></strong></td>
                   <td colspan="" class="price column-price products-price">
                      <?php echo Shop_Tools::getFormatedPrice($this->cart->getPrice()) ?> </strong>
@@ -170,15 +170,19 @@ if (!$this->cart->isEmpty()) {
                </tr>
                <tr>
                   <td colspan="3" class="align-right">
-                     <?php
-                     $this->formNext->send->html()->addClass('btn btn-success');
-                     $this->formNext->send->setSufixIcon('chevron-right');
-                     echo $this->formNext->send->controll();
-                     ?>
                   </td>
                </tr>
             </tbody>
          </table>
+      </div>
+      <div class="clearfix">
+         <div class="pull-right">
+            <?php
+            $this->formNext->send->html()->addClass('btn btn-success');
+            $this->formNext->send->setSufixIcon('chevron-right');
+            echo $this->formNext->send->controll();
+            ?>
+         </div>
       </div>
       <?php echo $this->formNext->renderEnd(); ?>
    <?php } else { ?>
