@@ -50,7 +50,11 @@ class Templates_Model extends Model_ORM {
     * @return Object -- pole s šablonou
     * @deprecated - Use ORM!
     */
-   public function getTemplate($id) {
-      return $this->record($id);
+   public static function getTemplate($id, $lang = null) {
+      $m = new self();
+      if($lang == null){
+         return $m->where(self::COLUMN_ID.' = :id', array('id' => $id))->record();
+      }
+      return $m->where(self::COLUMN_ID.' = :id AND '.self::COLUMN_LANG.' = :lang', array('id' => $id, 'lang' => $lang))->record();
    }
 }
