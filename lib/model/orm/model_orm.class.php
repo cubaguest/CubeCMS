@@ -237,6 +237,26 @@ abstract class Model_ORM extends Model implements ArrayAccess {
       if($this->tableStructure[$column]['aliasFor'] != null) $columnReal = $this->tableStructure[$column]['aliasFor'];
       $this->foreignKeys[$column] = array('column' => $columnReal, 'modelName' => $modelName, 'modelColumn' => $externColumn, 'prefix' => $columnsPrefix);
    }
+   
+   /**
+    * Kontroluje jestli je daný klíč cizí
+    * @param string $colName
+    * @return bool
+    */
+   public function isForeignKey($colName)
+   {
+      return isset($this->foreignKeys[$colName]);
+   }
+   
+   /**
+    * Vrací nasatvení cizího klíče pokud existuje
+    * @param string $colName
+    * @return array
+    */
+   public function getForeignKey($colName)
+   {
+      return isset($this->foreignKeys[$colName]) ? $this->foreignKeys[$colName] : false;
+   }
 
    /**
     * Přidá relaci 1:N na jiný model
