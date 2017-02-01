@@ -14,9 +14,23 @@
  * @abstract      Třída pro obsluhu formulářového prvku typu Input-Text
  */
 class Form_Element_Submit extends Form_Element implements Form_Element_Interface {
+   
+   protected $prefixIcon = null;
+   protected $sufixIcon = null;
+
    protected function init() {
       $this->htmlElement = new Html_Element('button');
       $this->html()->setAttrib('type', 'submit');
+   }
+   
+   public function setSufixIcon($icon)
+   {
+      $this->sufixIcon = $icon;
+   }
+   
+   public function setPrefixIcon($icon)
+   {
+      $this->prefixIcon = $icon;
    }
 
    /**
@@ -26,7 +40,16 @@ class Form_Element_Submit extends Form_Element implements Form_Element_Interface
    public function control($renderKey = null) {
       
       $this->setValues($this->getLabel());
-      $this->html()->setContent((string)$this->getLabel());
+      $cnt = null;
+      if($this->prefixIcon != null){
+         $cnt .= '<span class="icon icon-'.$this->prefixIcon.'"></span> ';
+      }
+      $cnt .= (string)$this->getLabel();
+      if($this->sufixIcon != null){
+         $cnt .= ' <span class="icon icon-'.$this->sufixIcon.'"></span>';
+      }
+      $this->html()->setContent($cnt);
+      
       $this->html()->setAttrib('name', $this->getName());
       $this->html()->setAttrib('id', $this->getName().'_'.$this->renderedId);
       $this->html()->addClass($this->getName()."_class");
