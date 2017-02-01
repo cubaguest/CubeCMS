@@ -143,7 +143,13 @@ abstract class Shop_Product_Controller extends Controller {
             )
             : $this->addToCart($formAdd->productId->getValues(), $formAdd->qty->getValues());
 
-         $this->infoMsg()->addMessage($this->tr('Položka byla přidána do košíku'));
+         $linkCart = Url_Link::getCategoryLinkByModule('shopcart');
+         if(!empty($linkCart)){
+            $linkCart = reset($linkCart);
+            $this->infoMsg()->addMessage(sprintf($this->tr('Položka byla přidána do <a href="%s">košíku</a>'), (string)$linkCart));
+         } else {
+            $this->infoMsg()->addMessage($this->tr('Položka byla přidána do košíku'));
+         }
          $this->link()->reload();
       }
       
