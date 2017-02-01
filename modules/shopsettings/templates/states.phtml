@@ -9,7 +9,7 @@ $this->includeFile('tpl://nav.phtml');
    <div class="alert alert-info">
       <?php 
       $linkTemplates = Url_Link::getCategoryAdminLink(32792);
-      printf($this->tr('Šablony emailů se přidávají v administračním menu v položce Obsah a šablony > <a class="link-external" href="%s">šablony</a>'), $linkTemplates) ?>
+      printf($this->tr('Šablony emailů se přidávají v administračním menu v položce Obsah a šablony > <a class="link-external" href="%s">šablony</a>'), $linkTemplates->clear()) ?>
    </div>
    <?php
    $this->moduleButtons = array(
@@ -46,7 +46,8 @@ $this->includeFile('tpl://nav.phtml');
                   <td>
                      <?php
                      if($state->{Shop_Model_OrdersStates::COLUMN_ID_TEMPLATE} != 0){
-                        ps($state->{Templates_Model::COLUMN_NAME}. ' (ID: '.$state->{Shop_Model_OrdersStates::COLUMN_ID_TEMPLATE}.' )');
+                        ps($state->{Templates_Model::COLUMN_NAME});
+                        echo ' <a href="'.$linkTemplates->route(Templates_Routes::ROUTE_EDIT, array('id' => $state->{Shop_Model_OrdersStates::COLUMN_ID_TEMPLATE})).'" class="link-external">(ID: '.$state->{Shop_Model_OrdersStates::COLUMN_ID_TEMPLATE}.' )</a>';
                      } else {
                         echo '<em>'.$this->tr('není nastavena').'</em>';
                      }
