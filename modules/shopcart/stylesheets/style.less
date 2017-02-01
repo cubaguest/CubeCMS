@@ -1,3 +1,5 @@
+@import "variables.less";
+
 #shop-cart table td, #shop-cart table th {
    padding: 5px 10px;
 }
@@ -38,9 +40,34 @@ table.form-table {
 }
 
 .ship2pay-info, .product-note {
-   padding: 5px;
-   background-color: #EFEFEF;
+   font-size: @font-size-small;
    font-weight: normal;
+}
+
+.table-order {
+   .col-price, .col-quantity {
+      text-align: right;
+   }
+   thead {
+      .col-price, .col-quantity {
+         /*text-align: center;*/
+      }
+   }
+   td.spacer {
+     border-left: 0; 
+     border-right: 0; 
+   }
+}
+
+.table-address {
+   .col-label {
+      font-size: @font-size-large;
+      padding-bottom: @padding-base-vertical;
+   }
+   td {
+      vertical-align: top;
+      width: 50%;
+   }
 }
 
 input.goto_order_pickupDate_class {

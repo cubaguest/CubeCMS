@@ -1,132 +1,136 @@
-<?php 
+<?php
 $this->addFile('css://style.less');
 $h = $this->tr('Objednávka byla dokončena');
 Template_Core::addPageTitle($h);
 //$this->addJsPlugin(new JsPlugin_JQuery());
 $this->step = 3;
 ?>
-<h1><?php echo $h?></h1>
+<h1><?php echo $h ?></h1>
 <?php //$this->includeFile('tpl://navigation.phtml')?>
-<div class="main-content-detail">
+<div class="content">
    <p><?php echo $this->tr('Děkujeme za vaši objednávku. Na uvedený e-mail byly zaslány informace o obejdnávce.<br />O průběhu vyřizování 
-      objednávky Vás budeme informovat.<br />V případě jakáchkoliv dotazů nás kontaktujte.')?></p>
-   <table class="full-width">
-      <tr>
-         <th><h2><?php echo $this->tr('Fakturační adresa')?></h2></th>
-         <th><h2><?php echo $this->tr('Dodací adresa')?></h2></th>
-      </tr>
-      <tr>
-         <td>
-            <?php 
-            echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_NAME}.'<br />';
-            echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_STREET}.'<br />';
-            echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_CITY}.
-               ' '.$this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_POST_CODE}.'<br />';
-            echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COUNTRY}.'<br /><br />';
-            echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_EMAIL}.'<br /><br />';
-            echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_PHONE}.'<br /><br />';
-            if($this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY} != null){
-               echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY}.'<br />';
-               echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY_IC}.'<br />';
-               echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY_DIC}.'<br />';
-            }
-            ?>
-         </td>
-         <td>
-            <?php 
-            echo $this->order->{Shop_Model_Orders::COLUMN_DELIVERY_NAME}.'<br />';
-            echo $this->order->{Shop_Model_Orders::COLUMN_DELIVERY_STREET}.'<br />';
-            echo $this->order->{Shop_Model_Orders::COLUMN_DELIVERY_CITY}.
-               ' '.$this->order->{Shop_Model_Orders::COLUMN_DELIVERY_POST_CODE}.'<br />';
-            echo $this->order->{Shop_Model_Orders::COLUMN_DELIVERY_COUNTRY}.'<br />';
-            ?>
-         </td>
-      </tr>
-   </table>
-   <br />
-   <h2><?php echo $this->tr('Souhrn položek');?></h2>
-   <table class="full-width">
-      <thead>
+      objednávky Vás budeme informovat.<br />V případě jakáchkoliv dotazů nás kontaktujte.') ?></p>
+   <div class="table-responsive">
+      <table class="full-width table-address">
          <tr>
-            <th><?php echo $this->tr('Název')?></th>
-            <th><?php echo $this->tr('Počet')?></th>
-            <th><?php echo $this->tr('Cena')?></th>
+            <th class="col-label"><strong><?php echo $this->tr('Fakturační adresa') ?></strong></th>
+            <th class="col-label"><strong><?php echo $this->tr('Dodací adresa') ?></strong></th>
          </tr>
-      </thead>
-      <tbody>
-      <?php foreach ($this->items as $item){?>
          <tr>
-            <td><?php 
-               echo $item->{Shop_Model_OrderItems::COLUMN_NAME};
-               if($item->{Shop_Model_OrderItems::COLUMN_NOTE} != null){
-                  echo '<div class="product-note">'; 
-                  echo $item->{Shop_Model_OrderItems::COLUMN_NOTE};
-                  echo '</div>'; 
+            <td>
+               <?php
+               echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_NAME} . '<br />';
+               echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_STREET} . '<br />';
+               echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_CITY} .
+               ' ' . $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_POST_CODE} . '<br />';
+               echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COUNTRY} . '<br /><br />';
+               echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_EMAIL} . '<br /><br />';
+               echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_PHONE} . '<br /><br />';
+               if ($this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY} != null) {
+                  echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY} . '<br />';
+                  echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY_IC} . '<br />';
+                  echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY_DIC} . '<br />';
                }
-               ?></td>
-            <td><?php 
-               echo $item->{Shop_Model_OrderItems::COLUMN_QTY}.' '.$item->{Shop_Model_OrderItems::COLUMN_UNIT};
                ?>
             </td>
-            <td><?php echo Shop_Tools::getFormatedPrice($item->{Shop_Model_OrderItems::COLUMN_PRICE})?></td>
-         </tr>
-      <?php }?>
-         <tr><td colspan="3" class="spacer">&nbsp;</td></tr>
-         <tr>
-            <th><?php 
-               echo $this->order->{Shop_Model_Orders::COLUMN_SHIPPING_METHOD};
-               if($this->order->{Shop_Model_Orders::COLUMN_PICKUP_DATE} != null){
-                  echo " - <strong>";
-                  printf($this->tr('datum odběru: %s'), vve_date("%x", new DateTime($this->order->{Shop_Model_Orders::COLUMN_PICKUP_DATE})));
-                  echo "</strong>";
-               }
-               
-               if((string)$this->shipping->{Shop_Model_Shippings::COLUMN_TEXT} != null){
-                  echo '<br />';
-                  echo '<div class="ship2pay-info">';
-                  echo $this->shipping->{Shop_Model_Shippings::COLUMN_TEXT};
-                  echo '</div>';
-                  // asi tady bude přesměrování na platební systémy 
-               }
+            <td>
+               <?php
+               echo $this->order->{Shop_Model_Orders::COLUMN_DELIVERY_NAME} . '<br />';
+               echo $this->order->{Shop_Model_Orders::COLUMN_DELIVERY_STREET} . '<br />';
+               echo $this->order->{Shop_Model_Orders::COLUMN_DELIVERY_CITY} .
+               ' ' . $this->order->{Shop_Model_Orders::COLUMN_DELIVERY_POST_CODE} . '<br />';
+               echo $this->order->{Shop_Model_Orders::COLUMN_DELIVERY_COUNTRY} . '<br />';
                ?>
-            </th>
-            <td></td>
-            <td><?php 
-            if($this->order->{Shop_Model_Orders::COLUMN_SHIPPING_PRICE} == 0){
-               echo $this->tr('zdarma');
-            } else {
-               echo Shop_Tools::getFormatedPrice($this->order->{Shop_Model_Orders::COLUMN_SHIPPING_PRICE});
-            }
-            ?></td>
+            </td>
          </tr>
-         <tr>
-            <th><?php 
-               echo $this->order->{Shop_Model_Orders::COLUMN_PAYMENT_METHOD};
-               if((string)$this->payment->{Shop_Model_Payments::COLUMN_TEXT} != null){
-                  echo '<br />';
-                  echo '<div class="ship2pay-info">';
-                  echo $this->payment->{Shop_Model_Payments::COLUMN_TEXT};
-                  echo '</div>';
-                  // asi tady bude přesměrování na platební systémy 
-               }
-               ?>
-            </th>
-            <td></td>
-            <td><?php 
-            if($this->order->{Shop_Model_Orders::COLUMN_PAYMENT_PRICE} == 0){
-               echo $this->tr('zdarma');
-            } else {
-               echo Shop_Tools::getFormatedPrice($this->order->{Shop_Model_Orders::COLUMN_PAYMENT_PRICE});
-            }
-            ?></td>
-         </tr>
-         <tr><td colspan="3" class="spacer">&nbsp;</td></tr>
-         <tr class="basket-full-price">
-            <td colspan="2"><?php echo $this->tr('Cena celkem')?></td>
-            <td><?php echo Shop_Tools::getFormatedPrice($this->order->{Shop_Model_Orders::COLUMN_TOTAL}) ?></td>
-         </tr>
-      </tbody>
-   </table>
-   <script type="text/javascript">
-   </script>
+      </table>
+   </div>
+   <h2><?php echo $this->tr('Souhrn položek'); ?></h2>
+   <div class="table-responsive">
+      <table class="full-width table table-order">
+         <thead>
+            <tr>
+               <th><?php echo $this->tr('Název') ?></th>
+               <th class="col-quantity"><?php echo $this->tr('Počet') ?></th>
+               <th class="col-price"><?php echo $this->tr('Cena') ?></th>
+            </tr>
+         </thead>
+         <tbody>
+            <?php foreach ($this->items as $item) { ?>
+               <tr>
+                  <td><?php
+                     echo $item->{Shop_Model_OrderItems::COLUMN_NAME};
+                     if ($item->{Shop_Model_OrderItems::COLUMN_NOTE} != null) {
+                        echo '<div class="product-note">';
+                        echo $item->{Shop_Model_OrderItems::COLUMN_NOTE};
+                        echo '</div>';
+                     }
+                     ?></td>
+                  <td class="col-quantity"><?php
+                     echo $item->{Shop_Model_OrderItems::COLUMN_QTY} . ' ' . $item->{Shop_Model_OrderItems::COLUMN_UNIT};
+                     ?>
+                  </td>
+                  <td class="col-price"><?php echo Shop_Tools::getFormatedPrice($item->{Shop_Model_OrderItems::COLUMN_PRICE}) ?></td>
+               </tr>
+            <?php } ?>
+            <tr><td colspan="3" class="spacer">&nbsp;</td></tr>
+            <tr>
+               <th colspan="3"><?php ps($this->tr('Doprava a platba')) ?></th>
+            </tr>
+            <tr>
+               <th><?php
+                  echo $this->order->{Shop_Model_Orders::COLUMN_SHIPPING_METHOD};
+                  if ($this->order->{Shop_Model_Orders::COLUMN_PICKUP_DATE} != null) {
+                     echo " - <strong>";
+                     printf($this->tr('datum odběru: %s'), vve_date("%x", new DateTime($this->order->{Shop_Model_Orders::COLUMN_PICKUP_DATE})));
+                     echo "</strong>";
+                  }
+
+                  if ((string) $this->shipping->{Shop_Model_Shippings::COLUMN_TEXT} != null) {
+                     echo '<br />';
+                     echo '<div class="ship2pay-info">';
+                     echo $this->shipping->{Shop_Model_Shippings::COLUMN_TEXT};
+                     echo '</div>';
+                     // asi tady bude přesměrování na platební systémy 
+                  }
+                  ?>
+               </th>
+               <td class="col-quantity"></td>
+               <td class="col-price"><?php
+                  if ($this->order->{Shop_Model_Orders::COLUMN_SHIPPING_PRICE} == 0) {
+                     echo $this->tr('zdarma');
+                  } else {
+                     echo Shop_Tools::getFormatedPrice($this->order->{Shop_Model_Orders::COLUMN_SHIPPING_PRICE});
+                  }
+                  ?></td>
+            </tr>
+            <tr>
+               <th><?php
+                  echo $this->order->{Shop_Model_Orders::COLUMN_PAYMENT_METHOD};
+                  if ((string) $this->payment->{Shop_Model_Payments::COLUMN_TEXT} != null) {
+                     echo '<br />';
+                     echo '<div class="ship2pay-info">';
+                     echo $this->payment->{Shop_Model_Payments::COLUMN_TEXT};
+                     echo '</div>';
+                     // asi tady bude přesměrování na platební systémy 
+                  }
+                  ?>
+               </th>
+               <td class="col-quantity"></td>
+               <td class="col-price"><?php
+                  if ($this->order->{Shop_Model_Orders::COLUMN_PAYMENT_PRICE} == 0) {
+                     echo $this->tr('zdarma');
+                  } else {
+                     echo Shop_Tools::getFormatedPrice($this->order->{Shop_Model_Orders::COLUMN_PAYMENT_PRICE});
+                  }
+                  ?></td>
+            </tr>
+            <tr><td colspan="3" class="spacer">&nbsp;</td></tr>
+            <tr class="cart-full-price">
+               <td colspan="2"><?php echo $this->tr('Cena celkem') ?></td>
+               <td class="col-price"><?php echo Shop_Tools::getFormatedPrice($this->order->{Shop_Model_Orders::COLUMN_TOTAL}) ?></td>
+            </tr>
+         </tbody>
+      </table>
+   </div>
 </div>
