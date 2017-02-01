@@ -665,7 +665,7 @@ CubeCMS.Form = {
          }
          // pokud fildsed nemá žádný viditelný prvek typu div.form-group, tak jej označ a schovej
          $('form fieldset').each(function(){
-            if($(this).find('div.form-group:visible').length === 0 && $(this).find('table.form-table').length === 0){
+            if($(this).find('div.form-group:visible').length === 0 && $(this).find('table.form-table').length === 0 && !$(this).hasClass('not-hidden')){
                $(this).addClass('form-fieldset-advanced').hide();
             }
          });
