@@ -39,6 +39,9 @@ class ShopCart_Controller extends Controller {
       $eQty->addValidation(new Form_Validator_IsNumber($this->tr('počet zboží musí být celé číslo'), Form_Validator_IsNumber::TYPE_INT));
       $formItems->addElement($eQty);
       
+      $eResetSet = new Form_Element_Submit('reset', $this->tr('Vymazat položky'));
+      $formItems->addElement($eResetSet);
+      
       $eSet = new Form_Element_Submit('set', $this->tr('Aktualizovat'));
       $formItems->addElement($eSet);
       
@@ -48,26 +51,21 @@ class ShopCart_Controller extends Controller {
       }
       
       if($formItems->isValid()){
-         $newQty = $formItems->qty->getValues();
-         foreach ($newQty as $idItem => $qty) {
-            $cart->editQty($idItem, $qty);
+         if($formItems->set->getValues() != false){
+            $newQty = $formItems->qty->getValues();
+            foreach ($newQty as $idItem => $qty) {
+               $cart->editQty($idItem, $qty);
+            }
+            $this->link()->reload();
+         } else if($formItems->reset->getValues() != false){
+            $cart->clear();
+            $this->infoMsg()->addMessage($this->tr('Všechny položky byly vymazány'));
+            $this->link()->reload();
          }
          $this->link()->reload();
       }
       
       $this->view()->formItems = $formItems;
-      
-      $formReset = new Form('cart_reset_');
-      $formReset->setProtected(false);
-      $eSend = new Form_Element_Submit('reset', $this->tr('Vymazat položky'));
-      $formReset->addElement($eSend);
-      
-      if($formReset->isValid()){
-         $cart->clear();
-         $this->infoMsg()->addMessage($this->tr('Všechny položky byly vymazány'));
-         $this->link()->reload();
-      }
-      $this->view()->formReset = $formReset;
       
       // doprava a platba
       $modelShippings = new Shop_Model_Shippings();
@@ -357,22 +355,27 @@ class ShopCart_Controller extends Controller {
       $eNewsletter->setSubLabel($this->tr('Registrovat k se odběru novinek na zadaný e-mail'));
       $formOrder->addElement($eNewsletter);
       
-//      $eCreateAccount = new Form_Element_Checkbox('createAcc', $this->tr('Vytvořit účet'));
-//      $eCreateAccount->setSubLabel($this->tr('Vytvořit uživatelský účet ze zadaných údajů pro příští nákup'));
-//      $formOrder->addElement($eCreateAccount);
-//      
-//      $eCreateAccountPass = new Form_Element_Text('createAccPassword', $this->tr('Heslo'));
-//      $formOrder->addElement($eCreateAccountPass);
+      $eCreateAccount = new Form_Element_Checkbox('createAcc', $this->tr('Vytvořit uživatelský účet'));
+      $eCreateAccount->setSubLabel($this->tr('Vytvořit uživatelský účet ze zadaných údajů pro příští nákup nebo prohlížení objednávek.'));
+      $formOrder->addElement($eCreateAccount);
       
-      $eSend = new Form_Element_SaveCancel('send', array($this->tr('Potvrdit objednávku'), $this->tr('Zpět do košíku')));
-      $eSend->setCancelConfirm(false);
+      $eCreateAccountPass = new Form_Element_Text('createAccPassword', $this->tr('Heslo'));
+      $formOrder->addElement($eCreateAccountPass);
+      
+      $eCreateAccountPassConfirm = new Form_Element_Text('createAccPasswordC', $this->tr('Kontrola hesla'));
+      $formOrder->addElement($eCreateAccountPassConfirm);
+      
+      $eSend = new Form_Element_Submit('send', $this->tr('Potvrdit objednávku'));
       $formOrder->addElement($eSend);
+      
+      $eBack = new Form_Element_Submit('back', $this->tr('Zpět do košíku'));
+      $formOrder->addElement($eBack);
       
       // obnova dat pokud existují
       $this->restoreOrderInfo($formOrder);
       
       if($formOrder->isSend()){
-         if($formOrder->send->getValues() == false){
+         if($formOrder->back->getValues() != false){
             $this->link()->route()->reload();
          }
          

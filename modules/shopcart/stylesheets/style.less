@@ -1,14 +1,5 @@
 @import "variables.less";
 
-#shop-cart table td, #shop-cart table th {
-   padding: 5px 10px;
-}
-
-#shop-cart {
-   .price { font-weight: bold;}
-   .no-wrap { white-space: nowrap; }
-}
-
 input.shop-cart-qty {
    width: 40px;
 }
@@ -17,20 +8,33 @@ table .cart-full-price {
    font-weight: bold;
    font-size: 120%;
 }
-table.form-table {
-    background-color: inherit !important;
-    border: none !important;
-}
 .shop-step-list {
+   a,a:link,a:visited, a:active {
+      text-decoration: none;
+   }
    div {
-      &.selected {
-         background-color: #fdf5ce;
-         font-weight: bold;
-      }
-
       padding: 5px 0;
       text-align: center;
       margin-bottom: 1em;
+   }
+   .step-current {
+      font-weight: bold;
+      background-color: darken(@brand-primary, 20%);
+      &,a,a:link,a:visited {
+         color: #fff;
+      }
+   }
+   .step-next {
+      font-weight: bold;
+      background-color: lighten(@gray, 50%);
+      color: lighten(@gray, 30%);
+   }
+   .step-prev {
+      font-weight: bold;
+      background-color: lighten(@brand-primary, 30%);
+      &,a,a:link,a:visited {
+         color: @text-color;
+      }
    }
    padding: 0; margin: 0;
 }
@@ -54,8 +58,8 @@ table.form-table {
       }
    }
    td.spacer {
-     border-left: 0; 
-     border-right: 0; 
+      border-left: 0; 
+      border-right: 0; 
    }
 }
 
@@ -70,6 +74,18 @@ table.form-table {
    }
 }
 
+.table-cart {
+   .product-attributes {
+      font-size: @font-size-small;
+   }
+   .product-code {
+      font-style: italic;
+      font-size: @font-size-small;
+   }
+   .column-price {
+   }
+}
+
 input.goto_order_pickupDate_class {
    width: 80px;
 }
@@ -77,11 +93,12 @@ input.goto_order_pickupDate_class {
 .column-price {
    white-space: nowrap;
    text-align: right;
+   font-weight: bold;
 }
 .form-group {
-    .col-sm-10 {
-    margin-bottom: 14px !important;
-    }
+   .col-sm-10 {
+      margin-bottom: 14px !important;
+   }
 }
 
 /* info o platbe a dopravě */ 

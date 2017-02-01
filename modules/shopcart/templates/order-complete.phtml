@@ -4,9 +4,10 @@ $h = $this->tr('Objednávka byla dokončena');
 Template_Core::addPageTitle($h);
 //$this->addJsPlugin(new JsPlugin_JQuery());
 $this->step = 3;
+$this->stepAllowBack = false;
 ?>
 <h1><?php echo $h ?></h1>
-<?php //$this->includeFile('tpl://navigation.phtml')?>
+<?php $this->includeFile('tpl://navigation.phtml')?>
 <div class="content">
    <p><?php echo $this->tr('Děkujeme za vaši objednávku. Na uvedený e-mail byly zaslány informace o obejdnávce.<br />O průběhu vyřizování 
       objednávky Vás budeme informovat.<br />V případě jakáchkoliv dotazů nás kontaktujte.') ?></p>

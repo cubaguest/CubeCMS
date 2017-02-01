@@ -15,5 +15,3 @@ class ShopCart_View extends View {
       $this->template()->addFile('tpl://order-complete.phtml');
    }
 }
-
-?>
