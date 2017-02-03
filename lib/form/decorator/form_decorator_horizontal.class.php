@@ -28,8 +28,8 @@ class Form_Decorator_Horizontal extends Form_Decorator implements Form_Decorator
       'labelwrapwidth' => 100,
       'ctrlwrapwidth' => 400,
       'hiddenClass' => 'hidden',
-      'labelColClass' => 'col-md-3',
-      'controlColClass' => 'col-md-9',
+      'labelColClass' => 'col-xs-3',
+      'controlColClass' => 'col-xs-9',
        );
    protected $content = null;
    protected $groupText = null;
