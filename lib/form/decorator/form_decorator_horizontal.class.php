@@ -28,8 +28,8 @@ class Form_Decorator_Horizontal extends Form_Decorator implements Form_Decorator
       'labelwrapwidth' => 100,
       'ctrlwrapwidth' => 400,
       'hiddenClass' => 'hidden',
-      'labelColClass' => 'col-xs-3',
-      'controlColClass' => 'col-xs-9',
+      'labelColClass' => 'col-sm-3',
+      'controlColClass' => 'col-sm-9',
        );
    protected $content = null;
    protected $groupText = null;
@@ -160,9 +160,17 @@ class Form_Decorator_Horizontal extends Form_Decorator implements Form_Decorator
             $wrap->addContent($wrapControl);
          }
          $cell->addContent($wrap);
-      } else if($element instanceof Form_Element_Checkbox && mb_strlen($element->getLabel()) > self::CHECKBOX_LABEL_AFTER_CHARS) {
-         $cell->addContent($element->control());
-         $cell->addContent($element->label(null, true));
+      } else if($element instanceof Form_Element_Checkbox ) {
+         $cellInner = new Html_Element('div');
+         $cellInner->addClass('checkbox');
+         if(mb_strlen($element->getLabel()) > self::CHECKBOX_LABEL_AFTER_CHARS){
+            $cellInner->addContent($element->control());
+            $cellInner->addContent($element->label(null, true));
+         } else {
+            $cellInner->addContent($element->control());
+         }
+         $cell->addContent($cellInner);
+         
       } else {
          $this->addControlClass($element);
          $cell->addContent($element->control());
