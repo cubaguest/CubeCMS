@@ -23,6 +23,10 @@ class People_Model extends Model_ORM_Ordered {
    const COLUMN_EMAIL = 'person_email';
    const COLUMN_PHONE = 'person_phone';
    const COLUMN_SOCIAL_URL = 'person_social_url';
+   const COLUMN_FACEBOOK_URL = 'person_facebook_url';
+   const COLUMN_TWITTER_URL = 'person_twitter_url';
+   const COLUMN_GOOGLE_PLUS_URL = 'person_gplus_url';
+   const COLUMN_INSTAGRAM_URL = 'person_instagram_url';
 
    protected function  _initTable() {
       $this->setTableName(self::DB_TABLE, 't_persons');
@@ -41,7 +45,11 @@ class People_Model extends Model_ORM_Ordered {
       $this->addColumn(self::COLUMN_LABEL, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR, 'default' => null, 'lang' => true));
       $this->addColumn(self::COLUMN_EMAIL, array('datatype' => 'varchar(50)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
       $this->addColumn(self::COLUMN_PHONE, array('datatype' => 'varchar(20)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
-      $this->addColumn(self::COLUMN_SOCIAL_URL, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
+      $this->addColumn(self::COLUMN_SOCIAL_URL, array('datatype' => 'varchar(200)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
+      $this->addColumn(self::COLUMN_FACEBOOK_URL, array('datatype' => 'varchar(200)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
+      $this->addColumn(self::COLUMN_TWITTER_URL, array('datatype' => 'varchar(200)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
+      $this->addColumn(self::COLUMN_GOOGLE_PLUS_URL, array('datatype' => 'varchar(200)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
+      $this->addColumn(self::COLUMN_INSTAGRAM_URL, array('datatype' => 'varchar(200)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
       
       $this->setPk(self::COLUMN_ID);
       $this->setOrderColumn(self::COLUMN_ORDER);

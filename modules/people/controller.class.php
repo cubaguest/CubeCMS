@@ -1,45 +1,43 @@
 <?php
 
 class People_Controller extends Controller {
+
    const DEFAULT_RECORDS_ON_PAGE = 10;
-
    const DATA_DIR = 'people';
-
 
    /**
     * Kontroler pro zobrazení novinek
     */
-   public function mainController() {
+   public function mainController()
+   {
       //		Kontrola práv
       $this->checkReadableRights();
       $model = new People_Model();
-      $model->where(People_Model::COLUMN_ID_CATEGORY.' = :idc', array('idc' => $this->category()->getId()))
-         ->order(array(
-            People_Model::COLUMN_ORDER => Model_ORM::ORDER_ASC,
-            People_Model::COLUMN_SURNAME => Model_ORM::ORDER_ASC,
-            People_Model::COLUMN_NAME => Model_ORM::ORDER_ASC,
-         ));
+      $model->where(People_Model::COLUMN_ID_CATEGORY . ' = :idc', array('idc' => $this->category()->getId()))
+              ->order(array(
+                  People_Model::COLUMN_ORDER => Model_ORM::ORDER_ASC,
+                  People_Model::COLUMN_SURNAME => Model_ORM::ORDER_ASC,
+                  People_Model::COLUMN_NAME => Model_ORM::ORDER_ASC,
+      ));
 
-      if($this->getRequestParam('sid', null) != null){
+      if ($this->getRequestParam('sid', null) != null) {
          $all = $model->records();
          $page = 1;
          $counter = 1;
-         foreach($all as $person) {
-            if($counter > $this->category()->getParam('recordsonpage', self::DEFAULT_RECORDS_ON_PAGE)){
+         foreach ($all as $person) {
+            if ($counter > $this->category()->getParam('recordsonpage', self::DEFAULT_RECORDS_ON_PAGE)) {
                $counter = 1;
                $page++;
             }
-            if($person->{People_Model::COLUMN_ID} == $this->getRequestParam('sid')){
-               $this->link()->param(Component_Scroll::GET_PARAM, $page)->anchor('person-'.$person->{People_Model::COLUMN_ID})
-               ->rmParam('sid')->reload();
+            if ($person->{People_Model::COLUMN_ID} == $this->getRequestParam('sid')) {
+               $this->link()->param(Component_Scroll::GET_PARAM, $page)->anchor('person-' . $person->{People_Model::COLUMN_ID})
+                       ->rmParam('sid')->reload();
             }
             $counter++;
          }
-
-
       }
 
-      if($this->category()->getRights()->isWritable()){
+      if ($this->category()->getRights()->isWritable()) {
          $formDel = new Form('person_del_');
 
          $elemId = new Form_Element_Hidden('id');
@@ -48,7 +46,7 @@ class People_Controller extends Controller {
          $elemSubmit = new Form_Element_Submit('delete', $this->tr('Smazat'));
          $formDel->addElement($elemSubmit);
 
-         if($formDel->isValid()){
+         if ($formDel->isValid()) {
             $model->delete($formDel->id->getValues());
 
             $this->infoMsg()->addMessage($this->tr('Osoba byla smazána'));
@@ -58,30 +56,29 @@ class People_Controller extends Controller {
       }
 
       $scrollComponent = null;
-      if($this->category()->getParam('recordsonpage', self::DEFAULT_RECORDS_ON_PAGE) != 0){
+      if ($this->category()->getParam('recordsonpage', self::DEFAULT_RECORDS_ON_PAGE) != 0) {
          $scrollComponent = new Component_Scroll();
          $scrollComponent->setConfig(Component_Scroll::CONFIG_CNT_ALL_RECORDS, $model->count());
 
-         $scrollComponent->setConfig(Component_Scroll::CONFIG_RECORDS_ON_PAGE,
-              $this->category()->getParam('recordsonpage', self::DEFAULT_RECORDS_ON_PAGE));
+         $scrollComponent->setConfig(Component_Scroll::CONFIG_RECORDS_ON_PAGE, $this->category()->getParam('recordsonpage', self::DEFAULT_RECORDS_ON_PAGE));
 
          $model->limit($scrollComponent->getStartRecord(), $scrollComponent->getRecordsOnPage());
       }
 
       $this->view()->compScroll = $scrollComponent;
       $this->view()->people = $model->records();
-      
+
       // načtení textu
       $textM = new Text_Model();
-      $textRecord = $textM->where(Text_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Text_Model::COLUMN_SUBKEY.' = :subkey', 
-         array('idc' => $this->category()->getId(), 'subkey' => Text_Controller::TEXT_MAIN_KEY) )->record();
+      $textRecord = $textM->where(Text_Model::COLUMN_ID_CATEGORY . ' = :idc AND ' . Text_Model::COLUMN_SUBKEY . ' = :subkey', array('idc' => $this->category()->getId(), 'subkey' => Text_Controller::TEXT_MAIN_KEY))->record();
       $this->view()->text = $textRecord;
    }
 
    /**
     * Kontroler pro přidání novinky
     */
-   public function addController() {
+   public function addController()
+   {
       $this->checkWritebleRights();
       $addForm = $this->createForm();
 
@@ -98,19 +95,20 @@ class People_Controller extends Controller {
    /**
     * controller pro úpravu novinky
     */
-   public function editController() {
+   public function editController()
+   {
       $this->checkWritebleRights();
 
       // načtení dat
       $model = new People_Model();
       $person = $model->record($this->getRequest('id'));
-      if($person == false) {
+      if ($person == false) {
          throw new UnexpectedPageException();
       }
 
       $editForm = $this->createForm($person);
 
-      
+
 
       if ($editForm->isValid()) {
          $this->processEditForm($editForm, $person);
@@ -126,11 +124,11 @@ class People_Controller extends Controller {
       if ($form->image->getValues() != null) {
          $file = $form->image->createFileObject();
          $person->{People_Model::COLUMN_IMAGE} = $file->getName();
-         unset ($file);
+         unset($file);
       } else {
          $person->{People_Model::COLUMN_IMAGE} = null;
       }
-      
+
       $person->{People_Model::COLUMN_ID_CATEGORY} = $this->category()->getId();
       $person->{People_Model::COLUMN_NAME} = $form->name->getValues();
       $person->{People_Model::COLUMN_SURNAME} = $form->surname->getValues();
@@ -144,18 +142,23 @@ class People_Controller extends Controller {
       $person->{People_Model::COLUMN_PHONE} = $form->phone->getValues();
       $person->{People_Model::COLUMN_SOCIAL_URL} = $form->socialUrl->getValues();
 
+      $person->{People_Model::COLUMN_FACEBOOK_URL} = $form->fcbUrl->getValues();
+      $person->{People_Model::COLUMN_GOOGLE_PLUS_URL} = $form->gplusUrl->getValues();
+      $person->{People_Model::COLUMN_TWITTER_URL} = $form->twitterUrl->getValues();
+      $person->{People_Model::COLUMN_INSTAGRAM_URL} = $form->instagramUrl->getValues();
+
       // pokud byla zadáno pořadí, zařadíme na pořadí. Jinak dáme na konec
       $person->save($person);
-      
+
       return $person;
    }
-
 
    /**
     * Metoda  vytvoří element formuláře
     * @return Form
     */
-   protected function createForm(Model_ORM_Record $person = null) {
+   protected function createForm(Model_ORM_Record $person = null)
+   {
       $form = new Form('person_');
 
       $gbase = $form->addGroup('basic', $this->tr('Informace o osobě'));
@@ -173,24 +176,16 @@ class People_Controller extends Controller {
 
       $iDegreeA = new Form_Element_Text('degreeAfter', $this->tr('Titul za jménem'));
       $form->addElement($iDegreeA, $gbase);
-      
+
       $iAge = new Form_Element_Text('age', $this->tr('Věk'));
       $iAge->addValidation(new Form_Validator_IsNumber(null, Form_Validator_IsNumber::TYPE_INT));
       $form->addElement($iAge, $gbase);
-      
-      $iEmail = new Form_Element_Text('email', $this->tr('Kontaktní e-mail'));
-      $iEmail->addValidation(new Form_Validator_Email());
-      $form->addElement($iEmail, $gbase);
-      
-      $iPhone = new Form_Element_Text('phone', $this->tr('Kontaktní telefon'));
-      $iPhone->addValidation(new Form_Validator_Regexp(Form_Validator_Regexp::REGEXP_PHONE_CZSK));
-      $form->addElement($iPhone, $gbase);
-      
-      $iSocilaUrl = new Form_Element_Text('socialUrl', $this->tr('Adresa sociálního profilu'));
-      $iSocilaUrl->setSubLabel($this->tr('Url adresa profilu na sociální síti (Facebook, Google+) nebo osobní stránky'));
-      $iSocilaUrl->addValidation(new Form_Validator_Url());
-      $form->addElement($iSocilaUrl, $gbase);
-      
+
+      $iImage = new Form_Element_Image('image', $this->tr('Portrét'));
+      $iImage->setAllowDelete(true);
+      $iImage->setUploadDir($this->module()->getDataDir());
+      $form->addElement($iImage, $gbase);
+
       $iLabel = new Form_Element_Text('label', $this->tr('Funkce'));
       $iLabel->setLangs();
       $iLabel->setSubLabel($this->tr('Zařazení, přezdívka, krátký popis a podobně'));
@@ -199,24 +194,46 @@ class People_Controller extends Controller {
 
       $iText = new Form_Element_TextArea('text', $this->tr('Popis'));
       $iText->setLangs();
-//      $iText->addValidation(New Form_Validator_NotEmpty());
       $form->addElement($iText, $gbase);
 
-      
-//      $iOrder = new Form_Element_Text('order', $this->tr('Pořadí'));
-//      $iOrder->setSubLabel($this->tr('Určuje pořadí osoby v seznamu'));
-//      $iOrder->addValidation(new Form_Validator_IsNumber());
-//      $form->addElement($iOrder, $gothr);
-//      
-      $iImage = new Form_Element_Image('image', $this->tr('Portrét'));
-      $iImage->setAllowDelete(true);
-      $iImage->setUploadDir($this->module()->getDataDir());
-      $form->addElement($iImage, $gbase);
+
+      $grpContact = $form->addGroup('grpcontact', $this->tr('Kontaktní údaje'));
+
+      $iEmail = new Form_Element_Text('email', $this->tr('Kontaktní e-mail'));
+      $iEmail->addValidation(new Form_Validator_Email());
+      $form->addElement($iEmail, $grpContact);
+
+      $iPhone = new Form_Element_Text('phone', $this->tr('Kontaktní telefon'));
+//      $iPhone->addValidation(new Form_Validator_Regexp(Form_Validator_Regexp::REGEXP_PHONE_CZSK));
+      $form->addElement($iPhone, $grpContact);
+
+      $iSocilaUrl = new Form_Element_Text('socialUrl', $this->tr('Adresa sociálního profilu'));
+      $iSocilaUrl->setSubLabel($this->tr('Url adresa profilu nebo osobní stránky'));
+      $iSocilaUrl->addValidation(new Form_Validator_Url());
+      $form->addElement($iSocilaUrl, $grpContact);
+
+      $iFcbUrl = new Form_Element_Text('fcbUrl', $this->tr('Adresa Facebook'));
+      $iFcbUrl->addValidation(new Form_Validator_Url());
+      $form->addElement($iFcbUrl, $grpContact);
+
+      $iTwitterUrl = new Form_Element_Text('twitterUrl', $this->tr('Adresa Twitter'));
+      $iTwitterUrl->addValidation(new Form_Validator_Url());
+      $form->addElement($iTwitterUrl, $grpContact);
+
+      $iGPlusUrl = new Form_Element_Text('gplusUrl', $this->tr('Adresa Google plus'));
+      $iGPlusUrl->addValidation(new Form_Validator_Url());
+      $form->addElement($iGPlusUrl, $grpContact);
+
+      $iInstUrl = new Form_Element_Text('instagramUrl', $this->tr('Adresa Instagram'));
+      $iInstUrl->addValidation(new Form_Validator_Url());
+      $form->addElement($iInstUrl, $grpContact);
+
+
 
       $iSubmit = new Form_Element_SaveCancel('save');
-      $form->addElement($iSubmit, $gbase);
+      $form->addElement($iSubmit);
 
-      if($person){
+      if ($person) {
          // element pro odstranění obrázku
 //         if($person->{People_Model::COLUMN_IMAGE} != null){
 //            $elemRemImg = new Form_Element_Checkbox('imgdel', $this->tr('Odstranit uložený portrét'));
@@ -234,70 +251,75 @@ class People_Controller extends Controller {
          $form->phone->setValues($person->{People_Model::COLUMN_PHONE});
          $form->socialUrl->setValues($person->{People_Model::COLUMN_SOCIAL_URL});
          $form->image->setValues($person->{People_Model::COLUMN_IMAGE});
+
+         $form->fcbUrl->setValues($person->{People_Model::COLUMN_FACEBOOK_URL});
+         $form->gplusUrl->setValues($person->{People_Model::COLUMN_GOOGLE_PLUS_URL});
+         $form->twitterUrl->setValues($person->{People_Model::COLUMN_TWITTER_URL});
+         $form->instagramUrl->setValues($person->{People_Model::COLUMN_INSTAGRAM_URL});
       }
-      
-      if($form->isSend() && $form->save->getValues() == false){
+
+      if ($form->isSend() && $form->save->getValues() == false) {
          $this->link()->route()->reload();
       }
-      
+
       return $form;
    }
 
    public function editOrderController()
    {
       $this->checkWritebleRights();
-      
+
       $model = new People_Model();
-      $people = $model->where(People_Model::COLUMN_ID_CATEGORY.' = :idc', array('idc' => $this->category()->getId()))
-         ->order(array(
-            People_Model::COLUMN_ORDER => Model_ORM::ORDER_ASC,
-            People_Model::COLUMN_SURNAME => Model_ORM::ORDER_ASC,
-            People_Model::COLUMN_NAME => Model_ORM::ORDER_ASC,
-         ))->records();
+      $people = $model->where(People_Model::COLUMN_ID_CATEGORY . ' = :idc', array('idc' => $this->category()->getId()))
+                      ->order(array(
+                          People_Model::COLUMN_ORDER => Model_ORM::ORDER_ASC,
+                          People_Model::COLUMN_SURNAME => Model_ORM::ORDER_ASC,
+                          People_Model::COLUMN_NAME => Model_ORM::ORDER_ASC,
+                      ))->records();
 
       $form = new Form('person_order_');
-      
+
       $eId = new Form_Element_Hidden('id');
       $eId->setDimensional();
-      
+
       $form->addElement($eId);
-      
+
       $eSave = new Form_Element_SaveCancel('save');
       $form->addElement($eSave);
 
-      if($form->isSend() && $form->save->getValues() == false){
+      if ($form->isSend() && $form->save->getValues() == false) {
          $this->link()->route()->reload();
       }
-      
-      if($form->isValid()){
+
+      if ($form->isValid()) {
          $ids = $form->id->getValues();
-         
-         $stmt = $model->query("UPDATE {THIS} SET `".People_Model::COLUMN_ORDER."` = :ord WHERE ".People_Model::COLUMN_ID." = :id");
+
+         $stmt = $model->query("UPDATE {THIS} SET `" . People_Model::COLUMN_ORDER . "` = :ord WHERE " . People_Model::COLUMN_ID . " = :id");
          foreach ($ids as $index => $id) {
             $stmt->bindValue('id', $id);
-            $stmt->bindValue('ord', $index+1);
+            $stmt->bindValue('ord', $index + 1);
             $stmt->execute();
          }
-         
+
          $this->infoMsg()->addMessage($this->tr('Pořadí bylo uloženo'));
          $this->link()->route()->reload();
       }
-      
+
       $this->view()->people = $people;
       $this->view()->form = $form;
    }
 
-   public function editTextController() {
+   public function editTextController()
+   {
       $this->checkControllRights();
       $form = new Form('list_text_', true);
-      
+
       $textM = new Text_Model();
-      $textRecord = $textM->where(Text_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Text_Model::COLUMN_SUBKEY.' = :subkey', 
-         array('idc' => $this->category()->getId(), 'subkey' => Text_Controller::TEXT_MAIN_KEY) )->record();
+      $textRecord = $textM->where(Text_Model::COLUMN_ID_CATEGORY . ' = :idc AND ' . Text_Model::COLUMN_SUBKEY . ' = :subkey', array('idc' => $this->category()->getId(), 'subkey' => Text_Controller::TEXT_MAIN_KEY))->record();
 
       $elemText = new Form_Element_TextArea('text', $this->tr('Text'));
       $elemText->setLangs();
-      if($textRecord != false){
+      if ($textRecord != false) {
          $elemText->setValues($textRecord->{Text_Model::COLUMN_TEXT});
       }
       $form->addElement($elemText);
@@ -305,21 +327,21 @@ class People_Controller extends Controller {
       $elemS = new Form_Element_SaveCancel('save');
       $form->addElement($elemS);
 
-      if($form->isSend() AND $form->save->getValues() == false){
+      if ($form->isSend() AND $form->save->getValues() == false) {
          $this->infoMsg()->addMessage($this->tr('Úpravy úvodního textu byly zrušeny'));
          $this->link()->route()->redirect();
       }
 
-      if($form->isValid()) {
-         if($textRecord == false){
+      if ($form->isValid()) {
+         if ($textRecord == false) {
             $textRecord = $textM->newRecord();
          }
-         
-         $textRecord->{Text_Model::COLUMN_TEXT} = $form->text->getValues(); 
-         $textRecord->{Text_Model::COLUMN_TEXT_CLEAR} = vve_strip_tags($form->text->getValues()); 
-         $textRecord->{Text_Model::COLUMN_ID_CATEGORY} = $this->category()->getId(); 
-         $textRecord->{Text_Model::COLUMN_SUBKEY} = Text_Controller::TEXT_MAIN_KEY; 
-         
+
+         $textRecord->{Text_Model::COLUMN_TEXT} = $form->text->getValues();
+         $textRecord->{Text_Model::COLUMN_TEXT_CLEAR} = vve_strip_tags($form->text->getValues());
+         $textRecord->{Text_Model::COLUMN_ID_CATEGORY} = $this->category()->getId();
+         $textRecord->{Text_Model::COLUMN_SUBKEY} = Text_Controller::TEXT_MAIN_KEY;
+
          $textM->save($textRecord);
 
          $this->infoMsg()->addMessage($this->tr('Úvodní text byl uložen'));
@@ -328,21 +350,22 @@ class People_Controller extends Controller {
 
       $this->view()->form = $form;
    }
-   
 
    /**
     * Smazání článků při odstranění kategorie
     * @param Category $category
     */
-   public static function clearOnRemove(Category $category) {
+   public static function clearOnRemove(Category $category)
+   {
       $model = new People_Model();
-      $model->where(People_Model::COLUMN_ID_CATEGORY. " = :idc", array('idc' => $category->getId()))->delete();
+      $model->where(People_Model::COLUMN_ID_CATEGORY . " = :idc", array('idc' => $category->getId()))->delete();
    }
 
    /**
     * Metoda pro nastavení modulu
     */
-   public function settings(&$settings, Form &$form) {
+   public function settings(&$settings, Form &$form)
+   {
       $eOnPage = new Form_Element_Text('numOnPage', $this->tr('Počet osob na stránku'));
       $eOnPage->addValidation(new Form_Validator_IsNumber());
       $eOnPage->setSubLabel(sprintf($this->tr('Výchozí: %s osob na stránku'), self::DEFAULT_RECORDS_ON_PAGE));
@@ -360,10 +383,8 @@ class People_Controller extends Controller {
 //      $elemImgH->setSubLabel($this->tr('Výchozí: ') . $this->category()->getGlobalParam('imgh', self::DEFAULT_IMAGE_HEIGHT) . ' px');
 //      $elemImgH->addValidation(new Form_Validator_IsNumber());
 //      $form->addElement($elemImgH, 'images');
-
 //      $elemCropImage = new Form_Element_Checkbox('cropimg', $this->tr('Ořezávat portréty'));
 //      $form->addElement($elemCropImage, 'images');
-
 //      if (isset($settings['imgw'])) {
 //         $form->imgw->setValues($settings['imgw']);
 //      }
