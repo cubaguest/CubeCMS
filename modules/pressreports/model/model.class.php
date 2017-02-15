@@ -26,12 +26,12 @@ class PressReports_Model extends Model_ORM {
    {
       $this->setTableName(self::DB_TABLE, 't_press_reports');
 
-      $this->addColumn(self::COLUMN_ID, array('datatype' => 'smallint', 'ai' => true, 'nn' => true, 'pk' => true));
-      $this->addColumn(self::COLUMN_ID_USER, array('datatype' => 'smallint', 'nn' => true, 
+      $this->addColumn(self::COLUMN_ID, array('datatype' => 'int', 'ai' => true, 'nn' => true, 'pk' => true));
+      $this->addColumn(self::COLUMN_ID_USER, array('datatype' => 'int', 'nn' => true, 
             'pdoparam' => PDO::PARAM_INT, 'index' => true));
-      $this->addColumn(self::COLUMN_ID_CATEGORY, array('datatype' => 'smallint', 'nn' => true, 
+      $this->addColumn(self::COLUMN_ID_CATEGORY, array('datatype' => 'int', 'nn' => true, 
             'pdoparam' => PDO::PARAM_INT, 'index' => true));
-      $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(200)', 'nn' => true, 'lang' => true, 
+      $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(200)', 'lang' => true, 
             'pdoparam' => PDO::PARAM_STR, 'fulltext' => true, 'fulltextRel' => VVE_SEARCH_ARTICLE_REL_MULTIPLIER));
       $this->addColumn(self::COLUMN_AUTHOR, array('datatype' => 'varchar(200)', 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_TEXT, array('datatype' => 'varchar(500)', 'lang' => true, 'pdoparam' => PDO::PARAM_STR));
@@ -47,5 +47,3 @@ class PressReports_Model extends Model_ORM {
    }
    
 }
-
-?>
