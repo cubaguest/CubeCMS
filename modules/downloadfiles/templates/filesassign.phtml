@@ -1,0 +1,61 @@
+<?php
+$h = sprintf($this->tr('Přiřazení souborů do sekcí'), $this->category()->getName());
+Template_Core::setPageTitle($h);
+?>
+<h1><?php echo $h ?></h1>
+<div class="content-form-edit content-admin">
+   <?php
+   echo $this->form->renderStart();
+   ?>
+   <table class="cubecms-widget cubecms-table">
+      <thead>
+         <tr class="cubecms-header">
+            <th><?php ps($this->tr('Název souboru')); ?></th>
+            <th><?php ps($this->tr('Datum přidání')); ?></th>
+            <th><?php ps($this->tr('Přiřadit do sekce')); ?></th>
+            <th><?php ps($this->tr('Název nové sekce')); ?></th>
+         </tr>
+      </thead>
+      <tbody>
+         <?php
+         foreach ($this->files as $file) {
+            $this->form->groupId->setValues($file->{DownloadFiles_Model::COLUMN_ID_SECTION});
+            $this->form->groupId->setDimensional($file->getPk());
+            $this->form->groupNewName->setDimensional($file->getPk());
+            ?>
+            <tr class="cubecms-row">
+               <td>
+                  <a href="<?php echo $this->dataDir.$file->{DownloadFiles_Model::COLUMN_FILE}?>"
+                      ><?php ps($file->{DownloadFiles_Model::COLUMN_NAME}) ?></a>
+               </td>
+               <td><?php ps(Utils_DateTime::fdate('%x', $file->{DownloadFiles_Model::COLUMN_TIME_ADD})) ?></td>
+               <td>
+                  <?php
+                  echo $this->form->groupId->control();
+                  ?>
+               </td>
+               <td>
+                  <?php
+                  echo $this->form->groupNewName->control();
+                  ?>
+               </td>
+            </tr>
+            <?php
+         }
+         ?>
+      </tbody>
+      <tfoot class="cubecms-header">
+         <tr>
+            <td colspan="4">
+               <?php 
+               echo $this->form->save->control();
+               ?>
+            </td>
+         </tr>
+      </tfoot>
+   </table>
+   <?php
+   echo $this->form->renderEnd();
+   ?>
+   <script type="text/javascript"></script>
+</div>

@@ -1,45 +1,101 @@
-<?php 
+<?php
 $h1 = $this->category()->getName();
 $dwLink = new Url_DownloadLink($this->category()->getModule()->getDataDir());
-$this->addFile('css://style.less');
 echo $this->toolbox;
 ?>
-<h1><?php $this->includeFile('tpl://engine:headline/icon.phtml'); echo $h1;?></h1>
-<div class="posts-list files-list">
-   <?php 
-   if($this->formLogin){
-         echo $this->formLogin;
+<h1><?php ps($h1); ?></h1>
+<div>
+   <?php
+   if ($this->formLogin) {
+      echo $this->formLogin;
    } else {
-      if($this->files != false && !empty ($this->files)){?>
-         <?php foreach ($this->files as $file) {?>
-            <div class="text dwfile file clearfix">
-               <h2 id="dwfile-<?php echo $file->{DownloadFiles_Model::COLUMN_FILE}?>"><?php echo $file->{DownloadFiles_Model::COLUMN_NAME}?></h2>
-               <?php if(!$file->{DownloadFiles_Model::COLUMN_ACTIVE}){?>
-                  <div class="message message-warning">
-                     <?php ps($this->tr('Neaktivní'))?>
-                     - <a href="<?php echo $this->link()->param('activate', $file->getPK())?>"><strong><?php ps($this->tr('aktivovat'))?></strong></a><br />
+      if ($this->files != false && !empty($this->files)) {
+         ?>
+         <div class="row">
+            <div class="col-md-6">
+               <form action="" class="form">
+                  <div class="form-group">
+                     <div class="form-labels col-sm-2">
+                        <label for="inputFilesFilter"><?php ps($this->tr('Fitlrace')); ?>:</label>
+                     </div>
+                     <div class="form-controls col-sm-10">
+                        <input id="inputFilesFilter" type="text" class="form-control" />
+                     </div>
                   </div>
-               <?php }?>
-               <?php if($file->{DownloadFiles_Model::COLUMN_TEXT} != null){?><p><?php echo $file->{DownloadFiles_Model::COLUMN_TEXT}?></p><?php }?>
-               <div class="date">
-                  <?php echo $this->tr('Přidáno')?>: <strong><?php echo vve_date("%x", new DateTime($file->{DownloadFiles_Model::COLUMN_TIME_ADD}))?></strong>
-               </div>
-               <div class="links">
-                  <a href="<?php echo $this->dataDir.$file->{DownloadFiles_Model::COLUMN_FILE}?>" title="<?php echo $this->tr('Zobrazit')?>"
-                     class="link-external"><span class="icon icon-external-link"></span> <?php echo $this->tr('Zobrazit')?></a>&nbsp;&nbsp;
-                  <a href="<?php echo $dwLink->file($file->{DownloadFiles_Model::COLUMN_FILE})?>" title="<?php echo $this->tr('Stáhnout')?>"
-                     ><span class="icon icon-download"></span> <?php echo $this->tr('Stáhnout')?></a>
-               </div>
-               <?php echo $file->toolbox;?>
+               </form>
             </div>
-         <?php }?>
-      <?php } else if($this->category()->getRights()->isWritable()) {?>
-         <div class="admin-info-text"><?php  echo $this->tr('Žádný soubor nebyl vložen. Soubor nahrajete pomocí nástrojů.'); ?></div>
-      <?php } else {?>
+         </div>
+         <div class="posts-list files-list">
+            <?php
+            $prevGrp = null;
+            foreach ($this->files as $file) {
+               ?>
+               <?php
+               if ($prevGrp != $file->{DownloadFiles_Model_Sections::COLUMN_ID}) {
+                  ?>
+                  <h2><?php ps($file->{DownloadFiles_Model_Sections::COLUMN_NAME}) ?></h2>
+                  <?php
+                  $prevGrp = $file->{DownloadFiles_Model_Sections::COLUMN_ID};
+               }
+               ?>
+
+               <div class="text dwfile file clearfix">
+                  <h3 id="dwfile-<?php echo $file->{DownloadFiles_Model::COLUMN_FILE} ?>"
+                      ><a href="<?php echo $this->dataDir . $file->{DownloadFiles_Model::COLUMN_FILE} ?>"><?php echo $file->{DownloadFiles_Model::COLUMN_NAME} ?></a></h2>
+                         <?php if (!$file->{DownloadFiles_Model::COLUMN_ACTIVE}) { ?>
+                        <div class="message message-warning">
+                           <?php ps($this->tr('Neaktivní')) ?>
+                           - <a href="<?php echo $this->link()->param('activate', $file->getPK()) ?>"><strong><?php ps($this->tr('aktivovat')) ?></strong></a><br />
+                        </div>
+                     <?php } ?>
+                     <?php if ($file->{DownloadFiles_Model::COLUMN_TEXT} != null) { ?><p><?php echo $file->{DownloadFiles_Model::COLUMN_TEXT} ?></p><?php } ?>
+                     <div class="info">
+                        <span class="date"><?php echo $this->tr('Přidáno') ?>: 
+                           <strong><?php echo Utils_DateTime::fdate("%x", new DateTime($file->{DownloadFiles_Model::COLUMN_TIME_ADD})) ?></strong></span>,
+                        <?php if (file_exists($this->category()->getModule()->getDataDir() . $file->{DownloadFiles_Model::COLUMN_FILE})) { ?>
+                           <span class="size"><?php echo $this->tr('velikost') ?>: 
+                              <strong><?php
+                                 echo
+                                 Utils_String::createSizeString(filesize($this->category()->getModule()->getDataDir() . $file->{DownloadFiles_Model::COLUMN_FILE}))
+                                 ?></strong></span>
+                        <?php } ?>
+                     </div>
+                     <div class="links">
+                        <a href="<?php echo $this->dataDir . $file->{DownloadFiles_Model::COLUMN_FILE} ?>" title="<?php echo $this->tr('Zobrazit') ?>"
+                           class="link-external"><span class="icon icon-external-link"></span> <?php echo $this->tr('Zobrazit') ?></a>&nbsp;&nbsp;
+                        <a href="<?php echo $dwLink->file($file->{DownloadFiles_Model::COLUMN_FILE}) ?>" title="<?php echo $this->tr('Stáhnout') ?>"
+                           ><span class="icon icon-download"></span> <?php echo $this->tr('Stáhnout') ?></a>
+                     </div>
+                     <?php echo $file->toolbox; ?>
+               </div>
+            <?php } ?>
+         </div>
+      <?php } else if ($this->category()->getRights()->isWritable()) { ?>
+         <div class="admin-info-text"><?php echo $this->tr('Žádný soubor nebyl vložen. Soubor nahrajete pomocí nástrojů.'); ?></div>
+      <?php } else { ?>
          <div class="post text">
             <?php echo $this->tr('Žádný soubor nebyl vložen.'); ?>
          </div>
-      <?php }?>
-   <?php }?>
+      <?php } ?>
+   <?php } ?>
 </div>
+<script type="text/javascript">
+   $(document).ready(function () {
+      $('#inputFilesFilter').on('keyup', function () {
+         var val = $(this).val().toString().toLowerCase();
+         if (val === "") {
+            $('.files-list .dwfile').show();
+         } else {
+            $('.files-list .dwfile').each(function () {
+               var text = $('h2', this).text() + ' ' + $('p', this).text() + ' ' + $('.date', this).text();
+               if (text.toLowerCase().search(val) > -1) {
+                  $(this).show();
+               } else {
+                  $(this).hide();
+               }
+            });
+         }
+      });
+   });
+</script>
 

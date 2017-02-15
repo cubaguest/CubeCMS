@@ -1,0 +1,77 @@
+<?php
+$h = sprintf($this->tr('Úprava sekcí'), $this->category()->getName());
+Template_Core::setPageTitle($h);
+
+$jq = new JsPlugin_JQuery();
+$jq->addUISortable();
+$this->addJsPlugin($jq);
+?>
+<h1><?php echo $h ?></h1>
+<div class="content-form-edit content-admin">
+   <?php
+   echo $this->form->renderStart();
+   ?>   
+   <table class="cubecms-widget cubecms-table">
+      <thead>
+         <tr class="cubecms-header">
+            <th></th>
+            <th><?php ps($this->tr('Púvodní název')); ?></th>
+            <th><?php ps($this->tr('Název nové sekce')); ?></th>
+         </tr>
+      </thead>
+      <tbody id="dwfiles-sections">
+         <?php
+         foreach ($this->sections as $section) {
+            $this->form->groupName->setValues($section->{DownloadFiles_Model_Sections::COLUMN_NAME});
+            $this->form->groupName->setDimensional($section->getPk());
+            ?>
+            <tr class="cubecms-row">
+               <td class="cubecms-sortable-column">
+                  <span class="icon icon-arrows-v"></span>
+               </td>
+               <td><?php ps($section->{DownloadFiles_Model_Sections::COLUMN_NAME}) ?></td>
+               <td>
+                  <?php
+                  echo $this->form->groupName->control();
+                  ?>
+               </td>
+            </tr>
+            <?php
+         }
+         ?>
+      </tbody>
+      <tfoot class="cubecms-header">
+         <tr>
+            <td colspan="3">
+               <?php
+               echo $this->form->save->control();
+               ?>
+            </td>
+         </tr>
+      </tfoot>
+   </table>
+   <?php
+   echo $this->form->renderEnd();
+   ?>
+   <script type="text/javascript">
+      $(function () {
+         function fixWidthHelper(e, ui) {
+            ui.children().each(function () {
+               $(this).width($(this).width());
+            });
+            return ui;
+         }
+
+         $("#dwfiles-sections").sortable({
+            placeholder: "cubecms-state-highlight",
+            forcePlaceholderSize: true,
+            cursor: 'move',
+            helper: fixWidthHelper,
+            axis : 'y',
+            handle : '.cubecms-sortable-column'
+         });
+         $("#textblock-list").disableSelection();
+      });
+   </script>
+</script>
+</div>
