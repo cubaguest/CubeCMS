@@ -31,14 +31,14 @@ $this->addJsPlugin($jQuery);
                   width:33,fixed: true,editable:false},
                {name:'<?php echo Model_Groups::COLUMN_NAME?>',index:'<?php echo Model_Groups::COLUMN_NAME?>', 
                   width:130,fixed: true, editable:true,editoptions:{size:20},
-                  formoptions:{ rowpos:2, label: "<?php echo $this->tr('Název')?>",elmprefix:"(*)"}},
+                  formoptions:{ rowpos:2, label: "<?php echo $this->tr('Název')?>",elmprefix:"<span class=\"required\"></span>"}},
                {name:'<?php echo Model_Groups::COLUMN_LABEL?>',index:'<?php echo Model_Groups::COLUMN_LABEL?>', 
                   width:250,editable: true,edittype:"textarea", editoptions:{rows:"2",cols:"18"},
-                  formoptions:{ rowpos:3, label: "<?php echo $this->tr('Popis')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
+                  formoptions:{ rowpos:3, label: "<?php echo $this->tr('Popis')?>",elmprefix:""}},
                {name:'<?php echo Model_Groups::COLUMN_IS_ADMIN?>',index:'<?php echo Model_Groups::COLUMN_IS_ADMIN?>', formatter: 'checkbox',
                   width:50,fixed:true, editable:true,edittype:'checkbox', editoptions:{size:20, value:"true:false"
                   },
-                  formoptions:{ rowpos:4, label: "<?php echo $this->tr('Admin')?>",elmprefix:"&nbsp;&nbsp;&nbsp;&nbsp;"}},
+                  formoptions:{ rowpos:4, label: "<?php echo $this->tr('Admin')?>",elmprefix:""}},
                {name:'sites',index:'sites', width:170, fixed : true, editable: true, edittype:"select", editoptions: {
                      value: <?php echo json_encode($this->sites)?>,
                      multiple: true, size: 3
@@ -55,7 +55,9 @@ $this->addJsPlugin($jQuery);
             height: '100%',
             editurl:"<?php echo $this->link()->route('editGroup')?>"
          });
-         $.jgrid.del.msg = '<strong>'+$.jgrid.del.msg+"</strong><br /><?php echo $this->tr('Budou smazáni také všichni<br />uživatelé těchto skupin')?>.";
+//         console.log($.jgrid.currentLanguage);
+//         console.log($.jgrid.regional);
+         $.jgrid.regional.<?php echo Locales::getLang()?>.del.msg = '<strong>'+$.jgrid.regional.<?php echo Locales::getLang()?>.del.msg+"</strong><br /><?php echo $this->tr('Budou smazáni také všichni<br />uživatelé těchto skupin')?>.";
          groupsGrid.jqGrid('navGrid','#table-groups-pager',
             {edit:true,add:true,del:true},
             // edit options
