@@ -22,7 +22,7 @@ class JsPlugin_BootstrapDatepicker extends JsPlugin {
 		$this->addFile(new JsPlugin_JsFile("moment-with-locales.min.js"));
 		$this->addFile(new JsPlugin_JsFile("bootstrap-datetimepicker.min.js"));
       if($this->getCfgParam('includecss') == true){
-         $this->addFile(new JsPlugin_CssFile("jquery.tagsinput.css"));
+         $this->addFile(new JsPlugin_CssFile("bootstrap-datetimepicker.min.css"));
       }
 	}
 }
