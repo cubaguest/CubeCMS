@@ -91,4 +91,25 @@ class Utils_CMS {
       }
       return AppCore::getAppWebDir().VVE_DATA_DIR.DIRECTORY_SEPARATOR.VVE_ARTICLE_TITLE_IMG_DIR.DIRECTORY_SEPARATOR;
    }
+   
+   /**
+    * Vytvoří poles pro html select s kategoriemi
+    * @param Category_Structure $categories
+    * @param array $ignoreModulesOrIds
+    */
+   public static function catsToArrayForForm(Category_Structure $categories, $ignoreModulesOrIds = array(), $retArray = array())
+   {
+      // pokud je hlavní kategorie
+      if ($categories->getLevel() > 0) {
+         $retArray[str_repeat('.', ($categories->getLevel()-1) * 3) .
+         Utils_String::truncate((string)$categories->getCatObj()->getLabel(), 50) . ' - id: ' . $categories->getCatObj()->getId()]
+            = (int) $categories->getCatObj()->getId();
+      } 
+      if (!$categories->isEmpty()) {
+         foreach ($categories as $cat) {
+            $retArray = array_merge($retArray, self::catsToArrayForForm($cat, $ignoreModulesOrIds));
+         }
+      }
+      return $retArray;
+   }
 }
