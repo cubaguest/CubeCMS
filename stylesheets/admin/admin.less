@@ -409,7 +409,8 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
    a {
       &:hover {
          background-color: @color-bg-hover;
-         color: @color-text-hover;
+         color: darken(@color-text, 20%);
+         text-decoration: none;
       }
       color: @color-text;
       text-decoration: none;
@@ -427,6 +428,7 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
       visibility: hidden;
    }
    .module-navigation {
+      @padding-vertical: 5px;
       &, li {
          list-style: none;
          margin: 0;
@@ -438,15 +440,17 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
                &:hover {
                   background-color: @color-bg-hover;
                   color: @color-text-hover;
+                  padding-bottom: @padding-vertical;
                }
-               background-color: lighten(@color-bg-hover, 37);
                /*padding: 2px 7px 5px 7px;*/
                /*margin: 3px 3px 0px 3px;*/
+               /*background-color: #fff;*/
                .rounded-corners(@border-radius @border-radius 0 0);
+               padding-bottom: @padding-vertical + 3;
             }
             .name {
                display: inline-block;
-               /*font-weight: bold;*/
+               font-weight: bold;
             }
          }
          &.collapsible {
@@ -480,7 +484,9 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
          }
          a {
             display: block;
-            padding: 5px 10px;
+            padding: @padding-vertical 10px;
+            font-size: @font-size-base;
+            background-color: #fff;
          }
          .name {
          }
@@ -496,8 +502,9 @@ body.with-admin-menu {padding: 0; margin: 0; padding-top: 25px}
          float: left;
          border: 1px solid @color-border;
          border-bottom-width: 0;
-         margin-right: 5px;
-         overflow: hidden;
+         margin-right: @padding-vertical;
+         /*overflow: hidden;*/
+         height: @line-height-computed + (2 * @padding-vertical) + 2px; // + link padding + border bottom nav
          .rounded-corners(@border-radius @border-radius 0 0);
          .tools-box-sahadow();
       }

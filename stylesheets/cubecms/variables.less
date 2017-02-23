@@ -38,10 +38,13 @@
 @color-bg-hightlight: #FFF7B4;
 @color-border-hightlight: darken(@color-bg-hightlight, 30%);
 
-@font-size: 16px;
+@font-size: 14px;
+@font-size-base: @font-size;
 @font-size-small: @font-size - 2;
 @font-size-large: @font-size + 2;
 @font-family: Candara, Calibri, Segoe, "Segoe UI", Optima, Arial, sans-serif;
+@line-height-base:        1.428571429; // 20/14
+@line-height-computed:    floor((@font-size-base * @line-height-base)); // ~20px
 
 @border-radius: 5px;
 @padding-content: 3px;
