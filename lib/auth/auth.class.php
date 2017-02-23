@@ -109,6 +109,9 @@ class Auth extends TrObject {
     */
    public static function getAuthenticator($name = null)
    {
+      if($name == null){
+         $name = 'internal';
+      }
       $class = 'Auth_Provider_'.ucfirst($name);
       return isset(self::$authenticators[$name]) ? self::$authenticators[$name] : new $class();
    }
