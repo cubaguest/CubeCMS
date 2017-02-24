@@ -146,6 +146,7 @@ class People_Controller extends Controller {
       $person->{People_Model::COLUMN_GOOGLE_PLUS_URL} = $form->gplusUrl->getValues();
       $person->{People_Model::COLUMN_TWITTER_URL} = $form->twitterUrl->getValues();
       $person->{People_Model::COLUMN_INSTAGRAM_URL} = $form->instagramUrl->getValues();
+      $person->{People_Model::COLUMN_LINKEDIN_URL} = $form->linkedinUrl->getValues();
 
       // pokud byla zadáno pořadí, zařadíme na pořadí. Jinak dáme na konec
       $person->save($person);
@@ -228,6 +229,10 @@ class People_Controller extends Controller {
       $iInstUrl->addValidation(new Form_Validator_Url());
       $form->addElement($iInstUrl, $grpContact);
 
+      $iLinkedinUrl = new Form_Element_Text('linkedinUrl', $this->tr('Adresa Linkedin'));
+      $iLinkedinUrl->addValidation(new Form_Validator_Url());
+      $form->addElement($iLinkedinUrl, $grpContact);
+
 
 
       $iSubmit = new Form_Element_SaveCancel('save');
@@ -235,11 +240,6 @@ class People_Controller extends Controller {
 
       if ($person) {
          // element pro odstranění obrázku
-//         if($person->{People_Model::COLUMN_IMAGE} != null){
-//            $elemRemImg = new Form_Element_Checkbox('imgdel', $this->tr('Odstranit uložený portrét'));
-//            $elemRemImg->setSubLabel($this->tr('Uložen portrét').': '.$person->{People_Model::COLUMN_IMAGE});
-//            $form->addElement($elemRemImg, 'basic');
-//         }
          $form->name->setValues($person->{People_Model::COLUMN_NAME});
          $form->surname->setValues($person->{People_Model::COLUMN_SURNAME});
          $form->degree->setValues($person->{People_Model::COLUMN_DEGREE});
@@ -256,6 +256,7 @@ class People_Controller extends Controller {
          $form->gplusUrl->setValues($person->{People_Model::COLUMN_GOOGLE_PLUS_URL});
          $form->twitterUrl->setValues($person->{People_Model::COLUMN_TWITTER_URL});
          $form->instagramUrl->setValues($person->{People_Model::COLUMN_INSTAGRAM_URL});
+         $form->linkedinUrl->setValues($person->{People_Model::COLUMN_LINKEDIN_URL});
       }
 
       if ($form->isSend() && $form->save->getValues() == false) {
@@ -371,40 +372,11 @@ class People_Controller extends Controller {
       $eOnPage->setSubLabel(sprintf($this->tr('Výchozí: %s osob na stránku'), self::DEFAULT_RECORDS_ON_PAGE));
       $form->addElement($eOnPage, 'view');
 
-
-//      $form->addGroup('images', $this->tr('Nasatvení obrázků'));
-//
-//      $elemImgW = new Form_Element_Text('imgw', $this->tr('Šířka portrétu'));
-//      $elemImgW->setSubLabel($this->tr('Výchozí: ') . $this->category()->getGlobalParam('imgw', self::DEFAULT_IMAGE_WIDTH) . ' px');
-//      $elemImgW->addValidation(new Form_Validator_IsNumber());
-//      $form->addElement($elemImgW, 'images');
-//
-//      $elemImgH = new Form_Element_Text('imgh', $this->tr('Výška portrétu'));
-//      $elemImgH->setSubLabel($this->tr('Výchozí: ') . $this->category()->getGlobalParam('imgh', self::DEFAULT_IMAGE_HEIGHT) . ' px');
-//      $elemImgH->addValidation(new Form_Validator_IsNumber());
-//      $form->addElement($elemImgH, 'images');
-//      $elemCropImage = new Form_Element_Checkbox('cropimg', $this->tr('Ořezávat portréty'));
-//      $form->addElement($elemCropImage, 'images');
-//      if (isset($settings['imgw'])) {
-//         $form->imgw->setValues($settings['imgw']);
-//      }
-//      if (isset($settings['imgh'])) {
-//         $form->imgh->setValues($settings['imgh']);
-//      }
-//      if (isset($settings['cropimg'])) {
-//         $form->cropimg->setValues($settings['cropimg']);
-//      } else {
-//         $form->cropimg->setValues($this->category()->getGlobalParam('cropimg', self::DEFAULT_IMAGE_CROP));
-//      }
-
       if (isset($settings['recordsonpage'])) {
          $form->numOnPage->setValues($settings['recordsonpage']);
       }
       // znovu protože mohl být už jednou validován bez těchto hodnot
       if ($form->isValid()) {
-//         $settings['imgw'] = $form->imgw->getValues();
-//         $settings['imgh'] = $form->imgh->getValues();
-//         $settings['cropimg'] = $form->cropimg->getValues();
          $settings['recordsonpage'] = $form->numOnPage->getValues();
       }
    }

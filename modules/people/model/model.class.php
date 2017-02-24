@@ -27,6 +27,7 @@ class People_Model extends Model_ORM_Ordered {
    const COLUMN_TWITTER_URL = 'person_twitter_url';
    const COLUMN_GOOGLE_PLUS_URL = 'person_gplus_url';
    const COLUMN_INSTAGRAM_URL = 'person_instagram_url';
+   const COLUMN_LINKEDIN_URL = 'person_linkedin_url';
 
    protected function  _initTable() {
       $this->setTableName(self::DB_TABLE, 't_persons');
@@ -50,10 +51,26 @@ class People_Model extends Model_ORM_Ordered {
       $this->addColumn(self::COLUMN_TWITTER_URL, array('datatype' => 'varchar(200)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
       $this->addColumn(self::COLUMN_GOOGLE_PLUS_URL, array('datatype' => 'varchar(200)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
       $this->addColumn(self::COLUMN_INSTAGRAM_URL, array('datatype' => 'varchar(200)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
+      $this->addColumn(self::COLUMN_LINKEDIN_URL, array('datatype' => 'varchar(200)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
       
       $this->setPk(self::COLUMN_ID);
       $this->setOrderColumn(self::COLUMN_ORDER);
       $this->setLimitedColumns(array(self::COLUMN_ID_CATEGORY));
       $this->addForeignKey(self::COLUMN_ID_CATEGORY, 'Model_Category');
+   }
+}
+
+class People_Model_Record extends Model_ORM_Ordered_Record {
+   
+   public function getImageUrl(Module $mod = null)
+   {
+      $mod = $mod ? $mod : Category::getSelectedCategory()->getModule();
+      return $mod->getDataDir(true).$this->{People_Model::COLUMN_IMAGE};
+   }
+   
+   public function getImagePath(Module $mod = null)
+   {
+      $mod = $mod ? $mod : Category::getSelectedCategory()->getModule();
+      return $mod->getDataDir(false).$this->{People_Model::COLUMN_IMAGE};
    }
 }

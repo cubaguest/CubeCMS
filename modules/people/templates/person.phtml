@@ -1,0 +1,99 @@
+<?php
+if (!function_exists('getDegree')) {
+
+   function getDegree($degree)
+   {
+      $str = null;
+      if ($degree != null) {
+         $str .= $degree;
+         if ($degree[strlen($degree) - 1] != '.') {
+            $str .= '.';
+         }
+         $str .= ' ';
+      }
+      return $str;
+   }
+
+}
+
+if (!isset($person)) {
+   $person = $this->person;
+}
+if (!isset($this->headline)) {
+   $this->headline = 'h2';
+}
+
+if ($person == null) {
+   return;
+}
+$name = getDegree($person->{People_Model::COLUMN_DEGREE})
+        . $person->{People_Model::COLUMN_NAME} . ' '
+        . $person->{People_Model::COLUMN_SURNAME} . ' '
+        . getDegree($person->{People_Model::COLUMN_DEGREE_AFTER});
+?>
+<div class="person person-card" id="person-<?php echo $person->{People_Model::COLUMN_ID} ?>">
+   <?php
+   echo '<' . $this->headline . ' class="">';
+   ps($name);
+   echo '</' . $this->headline . '>';
+   ?>
+   <div class="row">
+      <div class="col-xs-4">
+         <?php
+         $src = Utils_Image::cache($this->category()->getModule()->getDataDir() . $person->{People_Model::COLUMN_IMAGE}, 300, 275, true);
+         ?>
+         <span class="avatar hover-double-images">
+            <img class="img-responsive person-image" src="<?php echo $src ?>" alt="<?php ps($name) ?>" />
+         </span>
+         <?php if ($person->{People_Model::COLUMN_PHONE}) { ?>
+            <div class="function"><?php ps($person->{People_Model::COLUMN_LABEL}) ?></div>
+         <?php } ?>
+      </div>
+      <div class="col-xs-8">
+         <div class="person-content text">
+            <div class="text">
+               <?php echo $person->{People_Model::COLUMN_TEXT}; ?>
+            </div>
+            <?php
+            if ($person->{People_Model::COLUMN_PHONE}) {
+               ?>
+               <p class=""><strong><?php ps($this->tr('Tel.:')); ?></strong> <span class="phone"><?php ps($person->{People_Model::COLUMN_PHONE}) ?></span></p>
+               <?php
+            }
+            if ($person->{People_Model::COLUMN_EMAIL}) {
+               ?>
+               <p class=""><strong><?php ps($this->tr('E-mail:')); ?></strong> <span class="email"><?php ps($person->{People_Model::COLUMN_EMAIL}) ?></span></p>
+               <?php
+            }
+            ?>
+            <div class="social-icons small">
+               <?php if ($person->{People_Model::COLUMN_FACEBOOK_URL}) { ?>
+                  <a href="<?php echo $person->{People_Model::COLUMN_FACEBOOK_URL} ?>" class="link-external"><span class="fa fa-facebook-square"></span></a>
+                  <?php } ?>
+               <?php if ($person->{People_Model::COLUMN_TWITTER_URL}) { ?>
+                  <a href="<?php echo $person->{People_Model::COLUMN_TWITTER_URL} ?>" class="link-external"><span class="fa fa-twitter-square"></span></a>
+                  <?php } ?>
+               <?php if ($person->{People_Model::COLUMN_INSTAGRAM_URL}) { ?>
+                  <a href="<?php echo $person->{People_Model::COLUMN_INSTAGRAM_URL} ?>" class="link-external"><span class="fa fa-instagram"></span></a>
+                  <?php } ?>
+               <?php if ($person->{People_Model::COLUMN_GOOGLE_PLUS_URL}) { ?>
+                  <a href="<?php echo $person->{People_Model::COLUMN_GOOGLE_PLUS_URL} ?>" class="link-external"><span class="fa fa-google-plus"></span></a>
+                  <?php } ?>
+               <?php if ($person->{People_Model::COLUMN_LINKEDIN_URL}) { ?>
+                  <a href="<?php echo $person->{People_Model::COLUMN_LINKEDIN_URL} ?>" class="link-external"><span class="fa fa-linkedin-square"></span></a>
+                  <?php } ?>
+               <?php if ($person->{People_Model::COLUMN_SOCIAL_URL}) { ?>
+                  <a href="<?php echo $person->{People_Model::COLUMN_SOCIAL_URL} ?>" class="link-external"><span class="fa fa-globe"></span></a>
+                  <?php } ?>
+            </div>
+         </div>
+         <?php
+         if ($this->toolboxEdit != null) {
+            $this->toolboxEdit->person_edit->setAction($this->link()->route('edit', array('id' => $person->{People_Model::COLUMN_ID})));
+            $this->toolboxEdit->person_del_->getForm()->id->setValues($person->{People_Model::COLUMN_ID});
+            echo $this->toolboxEdit;
+         }
+         ?>
+      </div>
+   </div>
+</div>

@@ -71,4 +71,24 @@ class People_View extends View {
       $this->template()->addFile('tpl://edittext.phtml');
       Template::setFullWidth(true);
    }
+   
+   public function contentFilterPerson($params)
+   {
+      if(!isset($params[0])){
+         return;
+      }
+      $this->person = People_Model::getRecord((int)$params[0]);
+      
+      $cats = Model_Category::getCategoryListByModule('people');
+      foreach ($cats as $cat) {
+         if(is_file(AppCore::getAppDataDir().$cat->{Model_Category::COLUMN_DATADIR}.DIRECTORY_SEPARATOR.$this->person->{People_Model::COLUMN_IMAGE})){
+            $this->category()->getModule()->setDataDir($cat->{Model_Category::COLUMN_DATADIR});
+            break;
+         }
+      }
+      if(isset($params['headline'])){
+         $this->headline = strtolower($params['headline']);
+      }
+      $this->template()->addFile('tpl://person.phtml');
+   }
 }
