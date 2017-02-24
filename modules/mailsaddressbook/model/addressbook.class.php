@@ -28,6 +28,12 @@ class MailsAddressBook_Model_Addressbook extends Model_ORM {
       $this->addForeignKey(self::COLUMN_ID_GRP, 'MailsAddressBook_Model_Groups', MailsAddressBook_Model_Groups::COLUMN_ID);
    }
    
+   public static function removeMail($mail)
+   {
+      $m = new self();
+      return $m->where(self::COLUMN_MAIL.' = :mail', array('mail' => $mail))->delete();
+   }
+   
    public function saveMail($mail, $idGrp = Mails_Model_Groups::GROUP_ID_DEFAULT,
       $name = null, $surname = null, $note = null, $id = null) {
       $dbc = Db_PDO::getInstance();
@@ -117,5 +123,16 @@ class MailsAddressBook_Model_Addressbook extends Model_ORM {
       }
       return false;
    }
+   
+   public function getDuplicatedMials($idg = null)
+   {
+      $q = $this->query('SELECT * FROM {THIS} mto WHERE EXISTS '
+              . ' ( SELECT 1 FROM {THIS} mti WHERE mti.addressbook_mail = mto.addressbook_mail AND id_addressbook_group = :idg LIMIT 1, 1 )');
+      
+      $q->bindValue(':idg', $idg);
+      $q->execute();
+      
+      return $q->fetchAll();
+      
+   }
 }
-?>
