@@ -532,7 +532,9 @@ class Articles_Controller extends Controller {
          $modelTags = new Articles_Model_TagsConnection();
          $similar = $modelTags
             ->joinFK(Articles_Model_TagsConnection::COLUMN_ID_ARTICLE,
-            array(Articles_Model::COLUMN_URLKEY, Articles_Model::COLUMN_NAME, Articles_Model::COLUMN_ADD_TIME))
+            array(Articles_Model::COLUMN_URLKEY, Articles_Model::COLUMN_NAME, Articles_Model::COLUMN_ADD_TIME, 
+                Articles_Model::COLUMN_TITLE_IMAGE, Articles_Model::COLUMN_ANNOTATION, Articles_Model::COLUMN_AUTHOR, 
+                Articles_Model::COLUMN_DATADIR, Articles_Model::COLUMN_PLACE))
             ->where(Articles_Model_TagsConnection::COLUMN_ID_TAG." IN (".implode(',', array_keys($tagsIds)).")"
                ." AND ".Articles_Model::COLUMN_ID_CATEGORY." = :idc"
                ." AND ".Articles_Model::COLUMN_CONCEPT." = 0"

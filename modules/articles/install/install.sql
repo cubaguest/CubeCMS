@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}articles` (
   `article_priority` int(11) DEFAULT '0',
   `article_priority_end_date` date DEFAULT NULL,
   `article_place` VARCHAR(50) NULL DEFAULT NULL,
-  `article_datadir` VARCHAR(50) NULL DEFAULT NULL,
+  `article_datadir` VARCHAR(200) NULL DEFAULT NULL,
   PRIMARY KEY (`id_article`),
   KEY `urlkey_cs` (`urlkey_cs`),
   KEY `urlkey_en` (`urlkey_en`),
