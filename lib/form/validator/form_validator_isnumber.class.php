@@ -84,7 +84,7 @@ class Form_Validator_IsNumber extends Form_Validator implements Form_Validator_I
                   return false;
                }
             } else {
-               if (filter_var($elemObj->getUnfilteredValues(), $this->numberType, $filterOptions) === false) {
+               if (filter_var(str_replace(',', '.', $elemObj->getUnfilteredValues()), $this->numberType, $filterOptions) === false) {
                   $this->errMsg()->addMessage(sprintf($this->errMessage, $elemObj->getLabel()));
                   return false;
                }
@@ -99,7 +99,7 @@ class Form_Validator_IsNumber extends Form_Validator implements Form_Validator_I
    private function filterArray($array, $filterOptions)
    {
       foreach($array as $v){
-         if (filter_var($v, $this->numberType, $filterOptions) === false) {
+         if (filter_var(str_replace(',', '.', $v), $this->numberType, $filterOptions) === false) {
             return false;
          }
       }
