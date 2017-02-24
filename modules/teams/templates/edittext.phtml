@@ -1,0 +1,15 @@
+<?php 
+// nasatvení maximálního kontextu
+Template::setPVar('MAX_CONTENT', true);
+
+// do titulku
+$h1 = $this->tr('úprava textu k').' "'.$this->category()->getName().'"';
+$this->addPageTitle($h1);
+$this->addPageHeadline($h1);
+// donastavení formuláře
+$this->form->text->html()->setAttrib('cols', 60)->setAttrib('rows', 15);
+?>
+<h1><?php echo $h1;?></h1>
+<div id="editActionsLabelForm">
+   <?php echo($this->form);?>
+</div>

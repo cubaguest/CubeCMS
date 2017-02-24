@@ -37,6 +37,12 @@ class Teams_Controller extends Controller {
       }
       
       $this->view()->teams = $this->getTeams();
+      
+      // načtení textu
+      $textM = new Text_Model();
+      $textRecord = $textM->where(Text_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Text_Model::COLUMN_SUBKEY.' = :subkey', 
+         array('idc' => $this->category()->getId(), 'subkey' => Text_Controller::TEXT_MAIN_KEY) )->record();
+      $this->view()->text = $textRecord;
    }
 
    /**
@@ -73,14 +79,7 @@ class Teams_Controller extends Controller {
             $record->{Teams_Model_Persons::COLUMN_IMAGE} = $image->getName();
          }
          
-         $record->{Teams_Model_Persons::COLUMN_NAME} = $addForm->name->getValues();
-         $record->{Teams_Model_Persons::COLUMN_SURNAME} = $addForm->surname->getValues();
-         $record->{Teams_Model_Persons::COLUMN_WORK} = $addForm->work->getValues();
-         $record->{Teams_Model_Persons::COLUMN_DEGREE} = $addForm->degree->getValues();
-         $record->{Teams_Model_Persons::COLUMN_DEGREE_AFTER} = $addForm->degreeAfter->getValues();
-         $record->{Teams_Model_Persons::COLUMN_TEXT} = $addForm->text->getValues();
-         $record->{Teams_Model_Persons::COLUMN_LINK} = $addForm->link->getValues();
-         $model->save($record);
+         $this->assignRecordData($addForm, $record);
          
          $this->infoMsg()->addMessage($this->tr('Osoba byla uložena'));
 //         if($addForm->gotoEdit->getValues() == true){
@@ -105,13 +104,6 @@ class Teams_Controller extends Controller {
 
       $editForm = $this->createForm($person);
 
-      // element pro odstranění obrázku
-      if($person->{Teams_Model_Persons::COLUMN_IMAGE} != null){
-         $elemRemImg = new Form_Element_Checkbox('imgdel', $this->tr('Odstranit uložený portrét'));
-         $elemRemImg->setSubLabel($this->tr('Uložen portrét').': '.$person->{Teams_Model_Persons::COLUMN_IMAGE});
-         $editForm->addElement($elemRemImg, 'others',3);
-      }
-
       if ($editForm->isValid()) {
 
          $grpName = $editForm->groupNewName->getValues();
@@ -135,42 +127,34 @@ class Teams_Controller extends Controller {
             throw new UnexpectedValueException($this->tr('Vloženo neočekávané id týmu'), 1);
          }
          
-         
-         if ($editForm->image->getValues() != null OR ($editForm->haveElement('imgdel') AND $editForm->imgdel->getValues() == true)) {
-            // smaže se původní
-            if(is_file($this->category()->getModule()->getDataDir().$person->{Teams_Model_Persons::COLUMN_IMAGE})){
-               /* if upload file with same name it's overwrited and then deleted. This make error!!! */
-//               @unlink($this->category()->getModule()->getDataDir().$person->{Teams_Model_Persons::COLUMN_IMAGE});
-            }
-            $person->{Teams_Model_Persons::COLUMN_IMAGE} = null;
+         $img = $editForm->image->getValues();
+         if($img){
+            $person->{Teams_Model_Persons::COLUMN_IMAGE} = $img['name'];
          }
-
-         if ($editForm->image->getValues() != null) {
-            $image = new File_Image($editForm->image);
-            // store original
-            $image->move($this->module()->getDataDir());
-            $person->{Teams_Model_Persons::COLUMN_IMAGE} = $image->getName();
-         }
-         
-         $person->{Teams_Model_Persons::COLUMN_NAME} = $editForm->name->getValues();
-         $person->{Teams_Model_Persons::COLUMN_SURNAME} = $editForm->surname->getValues();
-         $person->{Teams_Model_Persons::COLUMN_WORK} = $editForm->work->getValues();
-         $person->{Teams_Model_Persons::COLUMN_DEGREE} = $editForm->degree->getValues();
-         $person->{Teams_Model_Persons::COLUMN_DEGREE_AFTER} = $editForm->degreeAfter->getValues();
-         $person->{Teams_Model_Persons::COLUMN_TEXT} = $editForm->text->getValues();
          $person->{Teams_Model_Persons::COLUMN_ID_TEAM} = $idTeam;
-         $person->{Teams_Model_Persons::COLUMN_LINK} = $editForm->link->getValues();
          
-         // tohle zde není, protože není jak to řadit zde
-//         $person->{Teams_Model_Persons::COLUMN_ORDER} = $c + 1;
-         
-         $model->save($person);
+         $this->assignRecordData($editForm, $person);
 
          $this->infoMsg()->addMessage($this->tr('Osoba byla uložena'));
          $this->link()->route()->reload();
       }
       $this->view()->form = $editForm;
       $this->view()->person = $person;
+   }
+   
+   protected function assignRecordData(Form $form, Model_ORM_Record $person)
+   {
+      $person->{Teams_Model_Persons::COLUMN_NAME} = $form->name->getValues();
+         $person->{Teams_Model_Persons::COLUMN_SURNAME} = $form->surname->getValues();
+         $person->{Teams_Model_Persons::COLUMN_WORK} = $form->work->getValues();
+         $person->{Teams_Model_Persons::COLUMN_DEGREE} = $form->degree->getValues();
+         $person->{Teams_Model_Persons::COLUMN_DEGREE_AFTER} = $form->degreeAfter->getValues();
+         $person->{Teams_Model_Persons::COLUMN_TEXT} = $form->text->getValues();
+         $person->{Teams_Model_Persons::COLUMN_LINK} = $form->link->getValues();
+         $person->{Teams_Model_Persons::COLUMN_PHONE} = $form->phone->getValues();
+         $person->{Teams_Model_Persons::COLUMN_EMAIL} = $form->email->getValues();
+         $person->{Teams_Model_Persons::COLUMN_SOCIAL} = $form->linkSocial->getValues();
+         $person->save();
    }
    
    public function editPhotoController() {
@@ -249,7 +233,7 @@ class Teams_Controller extends Controller {
       $form->addElement($iName, $gbase);
 
       $iSurName = new Form_Element_Text('surname', $this->tr('Přijmení'));
-      $iSurName->addValidation(New Form_Validator_NotEmpty());
+//      $iSurName->addValidation(New Form_Validator_NotEmpty());
       $form->addElement($iSurName, $gbase);
 
       $iDegree = new Form_Element_Text('degree', $this->tr('Titul'));
@@ -261,10 +245,17 @@ class Teams_Controller extends Controller {
       $iWork = new Form_Element_Text('work', $this->tr('Činnost/práce'));
       $iWork->setSubLabel($this->tr('Například co daná osoba dělá.'));
       $form->addElement($iWork, $gbase);
+      
+      $iPhone = new Form_Element_Text('phone', $this->tr('Telefon'));
+      $form->addElement($iPhone, $gbase);
+      
+      $iMail = new Form_Element_Text('email', $this->tr('E-mail'));
+      $iMail->addValidation(new Form_Validator_Email());
+      $form->addElement($iMail, $gbase);
 
       $iText = new Form_Element_TextArea('text', $this->tr('Popis'));
       $iText->setLangs();
-      $iText->addValidation(New Form_Validator_NotEmpty(null, Locales::getDefaultLang()));
+//      $iText->addValidation(New Form_Validator_NotEmpty(null, Locales::getDefaultLang()));
       $form->addElement($iText, $gbase);
 
       $iGroup = new Form_Element_Select('groupId', $this->tr('Skupina'));
@@ -296,25 +287,29 @@ class Teams_Controller extends Controller {
       
       $form->addElement($iNewGroup, $gothr);
       
-      $iImage = new Form_Element_File('image', $this->tr('Portrét'));
+      $iImage = new Form_Element_Image('image', $this->tr('Portrét'));
       $iImage->setSubLabel($this->tr('Velikost obrázku je upravena automaticky'));
-      $iImage->addValidation(new Form_Validator_FileExtension('jpg;png'));
-      $iImage->setUploadDir(AppCore::getAppCacheDir());
+      $iImage->setUploadDir($this->category()->getModule()->getDataDir());
+      $iImage->setAllowDelete(true);
       $form->addElement($iImage, $gothr);
-      
-//      $iImageGoToPhotoEdit = new Form_Element_Checkbox('gotoEdit', $this->tr('Upravit portrét'));
-//      $iImageGoToPhotoEdit->setSubLabel($this->tr('Při zaškrtnutí přejde na stránku úpravy portrétu'));
-//      $form->addElement($iImageGoToPhotoEdit, $gothr);
       
       $iLink = new Form_Element_Text('link', $this->tr('Prolink'));
       $iLink->addValidation(New Form_Validator_Url());
-      $iLink->setSubLabel($this->tr('Například odkaz na profil uživatele na stránkách či jinou externí službu (facebook)'));
+      $iLink->setSubLabel($this->tr('Například odkaz na profil uživatele na stránkách či jinou externí službu (linkedin)'));
       $form->addElement($iLink, $gothr);
+      
+      $iLinkSocial = new Form_Element_Text('linkSocial', $this->tr('Sociální síť'));
+      $iLinkSocial->addValidation(New Form_Validator_Url());
+      $iLinkSocial->setSubLabel($this->tr('Například odkaz na profil uživatele na stránkách či jinou externí službu (facebook)'));
+      $form->addElement($iLinkSocial, $gothr);
 
       $iSubmit = new Form_Element_SaveCancel('save');
       $form->addElement($iSubmit);
 
       if($person instanceof Model_ORM_Record){
+         if($person->{Teams_Model_Persons::COLUMN_IMAGE} != null){
+            $form->image->setValues($person->{Teams_Model_Persons::COLUMN_IMAGE});
+         }
          $form->name->setValues($person->{Teams_Model_Persons::COLUMN_NAME});
          $form->surname->setValues($person->{Teams_Model_Persons::COLUMN_SURNAME});
          $form->work->setValues($person->{Teams_Model_Persons::COLUMN_WORK});
@@ -323,7 +318,9 @@ class Teams_Controller extends Controller {
          $form->degreeAfter->setValues($person->{Teams_Model_Persons::COLUMN_DEGREE_AFTER});
          $form->text->setValues($person->{Teams_Model_Persons::COLUMN_TEXT});
          $form->link->setValues($person->{Teams_Model_Persons::COLUMN_LINK});
-//         $form->order->setValues($person->{groupId::COLUMN_ORDER});
+         $form->phone->setValues($person->{Teams_Model_Persons::COLUMN_PHONE});
+         $form->email->setValues($person->{Teams_Model_Persons::COLUMN_EMAIL});
+         $form->linkSocial->setValues($person->{Teams_Model_Persons::COLUMN_SOCIAL});
       }
       
       if($form->isSend() && $form->save->getValues() == false){
@@ -412,6 +409,48 @@ class Teams_Controller extends Controller {
       $this->view()->teams = $this->getTeams();
    }
 
+   public function editTextController() {
+      $this->checkControllRights();
+      $form = new Form('list_text_', true);
+      
+      $textM = new Text_Model();
+      $textRecord = $textM->where(Text_Model::COLUMN_ID_CATEGORY.' = :idc AND '.Text_Model::COLUMN_SUBKEY.' = :subkey', 
+         array('idc' => $this->category()->getId(), 'subkey' => Text_Controller::TEXT_MAIN_KEY) )->record();
+
+      $elemText = new Form_Element_TextArea('text', $this->tr('Text'));
+      $elemText->setLangs();
+      if($textRecord != false){
+         $elemText->setValues($textRecord->{Text_Model::COLUMN_TEXT});
+      }
+      $form->addElement($elemText);
+
+      $elemS = new Form_Element_SaveCancel('save');
+      $form->addElement($elemS);
+
+      if($form->isSend() AND $form->save->getValues() == false){
+         $this->infoMsg()->addMessage($this->tr('Úpravy úvodního textu byly zrušeny'));
+         $this->link()->route()->redirect();
+      }
+
+      if($form->isValid()) {
+         if($textRecord == false){
+            $textRecord = $textM->newRecord();
+         }
+         
+         $textRecord->{Text_Model::COLUMN_TEXT} = $form->text->getValues(); 
+         $textRecord->{Text_Model::COLUMN_TEXT_CLEAR} = vve_strip_tags($form->text->getValues()); 
+         $textRecord->{Text_Model::COLUMN_ID_CATEGORY} = $this->category()->getId(); 
+         $textRecord->{Text_Model::COLUMN_SUBKEY} = Text_Controller::TEXT_MAIN_KEY; 
+         
+         $textM->save($textRecord);
+
+         $this->infoMsg()->addMessage($this->tr('Úvodní text byl uložen'));
+         $this->link()->route()->redirect();
+      }
+
+      $this->view()->form = $form;
+   }
+   
    private function getTeams()
    {
       $model = new Teams_Model();

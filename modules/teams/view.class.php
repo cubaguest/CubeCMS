@@ -22,6 +22,10 @@ class Teams_View extends View {
             $toolOrder->setIcon('arrow_up_down.png')->setTitle($this->tr("upravit pořadí osob"));
             $toolbox->addTool($toolOrder);
          }
+         
+         $toolEditText = new Template_Toolbox2_Tool_PostRedirect('edit_text', $this->tr('Upravit text'), $this->link()->route('editText'));
+         $toolEditText->setIcon(Template_Toolbox2::ICON_PAGE_EDIT)->setTitle($this->tr("Upravit úvodní text"));
+         $toolbox->addTool($toolEditText);
 
          $this->toolbox = $toolbox;
          if(!empty($this->teams)){
@@ -90,6 +94,10 @@ class Teams_View extends View {
       $this->template()->addFile('tpl://edit_order.phtml');
    }
 
+   public function editTextView() {
+      $this->setTinyMCE($this->form->text, 'advanced');
+      $this->template()->addFile('tpl://edittext.phtml');
+      Template::setFullWidth(true);
+   }
+   
 }
-
-?>

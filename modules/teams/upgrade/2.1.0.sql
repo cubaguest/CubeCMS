@@ -1,0 +1,7 @@
+ALTER TABLE `{PREFIX}teams_persons`
+ADD COLUMN `person_phone` VARCHAR(20) NULL DEFAULT NULL,
+ADD COLUMN `person_email` VARCHAR(50) NULL DEFAULT NULL,
+ADD COLUMN `person_social_url` VARCHAR(200) NULL DEFAULT NULL;
+
+ALTER TABLE `{PREFIX}teams` 
+CHANGE COLUMN `team_name_cs` `team_name_cs` VARCHAR(100) CHARACTER SET 'utf8' COLLATE 'utf8_czech_ci' NOT NULL ;
