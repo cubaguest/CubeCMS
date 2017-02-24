@@ -150,6 +150,15 @@ class Model_Users extends Model_ORM {
              ->record();
    }
    
+   public static function getUsersByMail($mail) 
+   {
+      $model = new Model_Users();
+      return $model
+             ->where(Model_Users::COLUMN_MAIL.' = :username AND '.Model_Users::COLUMN_MAIL.' IS NOT NULL', array('username' => $mail))
+             ->joinFK(Model_Users::COLUMN_ID_GROUP, array('group_name' => Model_Groups::COLUMN_NAME, '*'))
+             ->record();
+   }
+   
    public static function getUserByID($id) 
    {
       $model = new Model_Users();

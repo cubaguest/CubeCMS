@@ -49,6 +49,9 @@ class Auth_Provider_Internal extends Auth_Provider implements Auth_Provider_Inte
          
          $user = Model_Users::getUsersByUsername($form->{self::FORM_USERNAME}->getValues());
          if (!$user){
+            $user = Model_Users::getUsersByMail($form->{self::FORM_USERNAME}->getValues());
+         }
+         if (!$user){
             $form->{self::FORM_USERNAME}->setError($this->tr('Nepodařilo se přihlásit. Zřejmě váš účet neexistuje.'));
             
             $attempt = Model_UsersLoginAttempts::getNewRecord();
@@ -101,7 +104,7 @@ class Auth_Provider_Internal extends Auth_Provider implements Auth_Provider_Inte
             Log::msg($this->tr('Uživateli bylo obnoveno nové heslo'), null, $user->{Model_Users::COLUMN_SURNAME});
          }
          // reset kontroly
-//         Model_UsersLoginAttempts::clearUserAttempts($user->getPK(), Utils_Net::getClientIP());
+         Model_UsersLoginAttempts::clearUserAttempts($user->getPK(), Utils_Net::getClientIP());
          
          // uložení přihlášení
          $modelUserLogins = new Model_UsersLogins();
