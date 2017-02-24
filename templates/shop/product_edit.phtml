@@ -1,10 +1,13 @@
-<?php 
+<?php
 $jq = new JsPlugin_JQuery();
-$jq->addUIDatepicker();
 $this->addJsPlugin($jq);
+$this->addFile('js://engine:bootstrap/bootstrap.min.js');
+$dateTime = new JsPlugin_BootstrapDatepicker();
+$dateTime->setCfgParam('includecss', true);
+$this->addJsPlugin($dateTime);
 // do titulku
-if($this->edit) {
-   $h = $this->tr('úprava produktu').' '.$this->product->{Shop_Model_Product::COLUMN_NAME};
+if ($this->edit) {
+   $h = $this->tr('úprava produktu') . ' ' . $this->product->{Shop_Model_Product::COLUMN_NAME};
 } else {
    $h = $this->tr('přidání produktu');
 }
@@ -13,6 +16,8 @@ $this->addPageTitle($h);
 $this->form->name->html()->setAttrib('size', 60)->addClass('form-element-long');
 $this->form->keywords->html()->setAttrib('size', 60)->addClass('form-element-long');
 $this->form->urlkey->html()->setAttrib('size', 60)->addClass('form-element-long');
+$this->form->isNewDate->html()->addClass('datepicker');
+$this->form->quantity->setType('number');
 //$this->form->metaKeywords->html()->setAttrib('size', 60)->addClass('form-element-long');
 //$this->form->annotation->html()->setAttrib('cols', 58)->setAttrib('rows', 5);
 //$this->form->metaDesc->html()->setAttrib('cols', 58)->setAttrib('rows', 3);
@@ -20,60 +25,84 @@ $this->form->urlkey->html()->setAttrib('size', 60)->addClass('form-element-long'
 // datepickery
 //$this->form->created_date->html()->addClass('datepicker');
 ?>
-<h1><?php echo $h;?></h1>
+<h1><?php echo $h; ?></h1>
 <div class="main-content-form-edit" id="article-edit-form">
-   <?php echo($this->form);
-   
+   <?php
+   echo($this->form);
+
    $taxesPrint = array();
-   foreach($this->taxes as $tax){ 
-      $taxesPrint[(int)$tax->{Shop_Model_Tax::COLUMN_ID}] = (int)$tax->{Shop_Model_Tax::COLUMN_VALUE};
+   foreach ($this->taxes as $tax) {
+      $taxesPrint[(int) $tax->{Shop_Model_Tax::COLUMN_ID}] = (int) $tax->{Shop_Model_Tax::COLUMN_VALUE};
    }
    ?>
    <script type="text/javascript">
-      var taxes = <?php echo json_encode($taxesPrint)?>;
-   
-      $(document).ready(function(){
+      var taxes = <?php echo json_encode($taxesPrint) ?>;
+
+      $(document).ready(function () {
          var $iPrice = $('input[name="product_price"]');
          var $iPriceWTax = $('input[name="product_pricewtax"]');
          var $iTax = $('select[name="product_tax"]');
-         
-         $iPrice.change(function(){
+
+
+
+         $iPrice.change(function () {
             var tax = parseFloat(taxes[$iTax.val()]);
-            if($iPrice.val() != ""){
+            if ($iPrice.val() != "") {
                var price = parseFloat($iPrice.val());
-               if(tax != 0){ price = (1+tax/100)*price; }
+               if (tax != 0) {
+                  price = (1 + tax / 100) * price;
+               }
                $iPriceWTax.val(price.toFixed(1));
             }
          });
-         $('input[name="product_stock"]').change(function(){
+         $('input[name="product_stock"]').change(function () {
             var $row = $('input[name="product_quantity"]').closest('tr');
             $(this).is(':checked') ? $row.show() : $row.hide();
          }).change();
 
-         $iTax.change(function(){$iPrice.change();});
-         $iPriceWTax.change(function(){
+         $iTax.change(function () {
+            $iPrice.change();
+         });
+         $iPriceWTax.change(function () {
             var tax = parseFloat(taxes[$iTax.val()]);
-            if($iPriceWTax.val() != ""){
+            if ($iPriceWTax.val() != "") {
                var price = parseFloat($iPriceWTax.val());
-               if(tax != 0){ price = price/(1+tax/100);}
-               $iPrice.val(price.toFixed(1) );
+               if (tax != 0) {
+                  price = price / (1 + tax / 100);
+               }
+               $iPrice.val(price.toFixed(1));
             }
          });
          $iPrice.change();
-         
+
          // generate url address
-         $('input.product_name_class').change(function(){
+         $('input.product_name_class').change(function () {
             var lang = $(this).attr('name').match(/\[([a-z]+)\]/)[1];
-            var $url = $('input[name="product_urlkey['+lang+']"]');
+            var $url = $('input[name="product_urlkey[' + lang + ']"]');
             $url.val(str2url($(this).val()));
          });
-         
-         $('input[name="product_isNewDate"]').datepicker({
-            showOtherMonths: true,
-            selectOtherMonths: true,
-            showButtonPanel: true
+
+         $('.datepicker').datetimepicker({
+            locale: '<?php echo Locales::getLang() ?>',
+            format: 'l',
+            icons: {
+               time: 'icon icon-time',
+               date: 'icon icon-calendar',
+               up: 'icon icon-chevron-up',
+               down: 'icon icon-chevron-down',
+               previous: 'icon icon-chevron-left',
+               next: 'icon icon-chevron-right',
+               today: 'icon icon-screenshot',
+               clear: 'icon icon-trash',
+               close: 'icon icon-remove'
+            }
          });
+//         $('input[name="product_isNewDate"]').datepicker({
+//            showOtherMonths: true,
+//            selectOtherMonths: true,
+//            showButtonPanel: true
+//         });
       });
-   
+
    </script>
 </div>
