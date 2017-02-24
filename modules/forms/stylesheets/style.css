@@ -67,6 +67,7 @@
 }
 
 #form-wrap .validator {font-size: 62%;}
+#form-wrap .note {font-size: 62%; font-style: italic;}
 
 #form-settings p {
    clear: both;

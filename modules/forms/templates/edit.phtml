@@ -27,76 +27,13 @@ $this->addJsPlugin($jq);
          </ul>
       </div>
       <div class="ui-widget-header">
-         <h2>Nastavení formuláře</h2>
+         <h2><?php ps($this->tr('Nastavení formuláře')) ?></h2>
       </div>
-      <div id="form-settings" class="ui-widget-content">
+      <div id="form-settings" class="ui-widget-content clearfix">
          <?php 
          $this->form->html()->setAttrib('id','form-data');
          echo $this->form;
-         
-         /*echo $this->form->renderStart();
          ?>
-         <p class="ui-state-default">
-            <?php 
-            $this->form->name->html()->setAttrib('onkeyup', "FormEditor.changeFormName(this.value)");
-            echo $this->form->name->label();
-            echo $this->form->name->controll();
-            ?>
-            <br class="reseter" />
-         </p>
-         <p class="ui-state-default">
-            <?php 
-            $this->form->messageSend->html()->setAttrib('onkeyup', "FormEditor.changeFormMessage(this.value)");
-            echo $this->form->messageSend->label();
-            echo $this->form->messageSend->controll();
-            ?>
-            <br class="reseter" />
-         </p>
-         <?php if($this->form->data instanceof Form_Element_Hidden){
-            echo $this->form->data->controll();
-         } else {?>
-         <p class="ui-state-default">
-            <?php 
-//            $this->form->data->html()->setAttrib('rows', 10);
-//            $this->form->data->html()->setAttrib("disabled", "disabled");
-            $this->form->data->setSubLabel($this->tr('Data nejsou ručně upravitelná.'));
-            echo $this->form->data->label();
-            echo $this->form->data->controll();
-            ?>
-            <br class="reseter" />
-         </p>
-         <?php }?>
-         <p class="ui-state-default">
-            <?php 
-            echo $this->form->sysRecipients->label();
-            echo $this->form->sysRecipients->controll();
-            echo $this->form->sysRecipients->getSubLabel();
-            ?>
-            <br class="reseter" />
-         </p>
-         <p class="ui-state-default">
-            <?php 
-            echo $this->form->active->label();
-            echo $this->form->active->controll();
-            ?>
-            <br class="reseter" />
-         </p>
-         <?php 
-         echo $this->form->delete->label();
-         echo $this->form->delete->controll();
-         ?>
-         <p class="ui-state-default">
-            <label> </label>
-            <?php 
-            echo $this->form->save->label();
-            echo $this->form->save->controll();
-            ?>
-            <br class="reseter" />
-         </p>
-         <?php 
-         echo $this->form->renderEnd();*/
-         ?>
-         <hr class="reseter" />
          <button id="button-serialize">Serializovat</button>
       </div>
    </div>
@@ -127,19 +64,21 @@ $this->addJsPlugin($jq);
          <div class="ui-widget-content" id="form-elem-setup">
             <form  id="form-elem-settings" onsubmit="return false;">
                <label>Název:</label><br />
-               <input type="text" name="name" value="" onkeyup="FormEditor.$selectedItem.trigger('chengeLabel', $(this).val())" />
+               <input type="text" name="name" value="" onkeyup="FormEditor.$selectedItem.trigger('chengeLabel', $(this).val())" class="form-control" /><br />
+               <label>Poznámka:</label><br />
+               <input type="text" name="note" value="" onkeyup="FormEditor.$selectedItem.trigger('chengeNote', $(this).val())" class="form-control" />
                <div class="elem-optional" id="elem-optional-require-wrap">
                   <label>Povinný:</label>
                   <input type="checkbox" name="require" onchange="FormEditor.$selectedItem.trigger('chengeRequire', $(this).is(':checked'))"/>
                </div>
                <div class="elem-optional" id="elem-optional-options-wrap">
                   <label>Položky:</label><br />
-                  <textarea name="optional-settings" onkeyup="FormEditor.$selectedItem.trigger('chengeOptions', $(this).val())"></textarea>
+                  <textarea name="optional-settings" onkeyup="FormEditor.$selectedItem.trigger('chengeOptions', $(this).val())" class="form-control"></textarea>
                   <p class="note">Nový řádek je nová položka</p>
                </div>
                <div class="elem-optional" id="elem-optional-validators-wrap">
                   <label>Validátor:</label><br />
-                  <select name="validator" onchange="FormEditor.$selectedItem.trigger('chengeValidator', [this])">
+                  <select name="validator" onchange="FormEditor.$selectedItem.trigger('chengeValidator', [this])" class="form-control">
                      <option value=""><?php echo $this->tr('Žádný')?></option>
                      <option value="mail"><?php echo $this->tr('E-Mail')?></option>
                      <option value="url"><?php echo $this->tr('URL adresa')?></option>

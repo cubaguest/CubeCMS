@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}forms_elements` (
   `id_form_element` int(11) NOT NULL AUTO_INCREMENT,
   `id_form` int(11) NOT NULL,
   `form_element_name` varchar(50) NOT NULL,
+  `form_element_note` varchar(200) DEFAULT NULL,
   `form_element_label` varchar(50) NOT NULL,
   `form_element_type` varchar(20) NOT NULL DEFAULT 'text',
   `form_element_value` varchar(200) DEFAULT NULL,

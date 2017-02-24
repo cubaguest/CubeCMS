@@ -48,6 +48,16 @@ var FormEditor = {
             var $elem = FormEditor.getFormItem($item);
             $elem.attr('name', name);
          },
+         chengeNote : function(e, value){
+            var note = value;
+            if( typeof(value) == "object" ){
+               note = $(value).val();
+            }
+            var $item = $(this);
+            $item.data("note", note);
+            var $elem = FormEditor.getFormItem($item);
+            $elem.parent().find('.note').text(note);
+         },
          chengeLabel : function(e, value){
             var label = value;
             if( typeof(value) == "object" ){
@@ -207,6 +217,7 @@ var FormEditor = {
          validator : "",
          label : this.elementParams.defaultlabel,
          name : "name"+rid,
+         note : "",
          value : null,
          type : type,
          id : null,
@@ -217,7 +228,7 @@ var FormEditor = {
       }
       
       $.extend(params, eparams);
-      
+
       var $item = $('<li></li>')
          .addClass("item")
          .addClass("ui-state-default")
@@ -238,7 +249,6 @@ var FormEditor = {
                id : params.idStr
             })
          );
-         
       } else if(params.type == "textarea"){
          $item.append(
             $('<label></label>').attr({"for" : params.idStr}).text(params.label)
@@ -300,6 +310,7 @@ var FormEditor = {
       
       $item
          .append($('<span></span>').addClass('validator') )
+         .append($('<div class="note"></div>').attr({ id : params.idStr+'-note' }).text(params.note))
          .append('<hr class="reseter" />');
       
       var $selected = this.$form.find(".item-selected");
@@ -315,6 +326,7 @@ var FormEditor = {
       $item.trigger("chengeValidator", params.validator);
       $item.trigger("chengeLabel", params.label);
       $item.trigger("chengeName", params.name);
+      $item.trigger("chengeNote", params.note);
       if(params.options.length > 0){
          $item.trigger("chengeOptions", [params.options]);
       }
@@ -338,7 +350,11 @@ var FormEditor = {
       var type = this.getFormItemType($item);
       var form = $('#form-elem-settings')[0];
       form.name.value = $item.data("label");
-      
+      if(typeof($item.data("note")) !== "undefined" ){
+         form.note.value = $item.data("note");
+      } else {
+         form.note.value = null;
+      }
       // show allowed items
       if(type == "text" ){
          this.showFormItemOptions("require");
@@ -394,6 +410,13 @@ var FormEditor = {
    getFormItemName : function($formItem){
       return $formItem.data("name");
    },
+   getFormItemNote : function($formItem){
+      if(typeof($formItem.data("note")) !== "undefined" ){
+         return $formItem.data("note");
+      } else {
+         return null;
+      }
+   },
    getFormItemLabel : function($formItem){
       return $formItem.data("label");
    },
@@ -443,6 +466,7 @@ var FormEditor = {
          var $item = $(this);
          var itemDesc = {
             name : FormEditor.getFormItemName($item),
+            note : FormEditor.getFormItemNote($item),
             label : FormEditor.getFormItemLabel($item),
             type : FormEditor.getFormItemType($item),
             required : $item.data('required'),

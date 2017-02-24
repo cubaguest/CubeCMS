@@ -11,6 +11,7 @@ class Forms_Model_Elements extends Model_ORM {
    const COLUMN_ID = 'id_form_element';
    const COLUMN_ID_FORM = 'id_form';
    const COLUMN_NAME = 'form_element_name';
+   const COLUMN_NOTE = 'form_element_note';
    const COLUMN_LABEL = 'form_element_label';
    const COLUMN_TYPE = 'form_element_type';
    const COLUMN_VALUE = 'form_element_value';
@@ -28,6 +29,7 @@ class Forms_Model_Elements extends Model_ORM {
       
       $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(400)', 'pdoparam' => PDO::PARAM_STR, 'nn' => true));
       $this->addColumn(self::COLUMN_LABEL, array('datatype' => 'varchar(400)', 'pdoparam' => PDO::PARAM_STR, 'nn' => true));
+      $this->addColumn(self::COLUMN_NOTE, array('datatype' => 'varchar(200)', 'pdoparam' => PDO::PARAM_STR));
       
       $this->addColumn(self::COLUMN_TYPE, array('datatype' => 'varchar(20)', 'pdoparam' => PDO::PARAM_STR, 'nn' => true));
       $this->addColumn(self::COLUMN_VALUE, array('datatype' => 'varchar(500)', 'pdoparam' => PDO::PARAM_STR, "default" => null ));

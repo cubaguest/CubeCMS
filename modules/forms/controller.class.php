@@ -108,6 +108,7 @@ class Forms_Controller extends Controller {
          $obj = $this->getBaseElementObj();
          $obj->name = $e->{Forms_Model_Elements::COLUMN_NAME};
          $obj->label = $e->{Forms_Model_Elements::COLUMN_LABEL};
+         $obj->note = $e->{Forms_Model_Elements::COLUMN_NOTE};
          $obj->type = $e->{Forms_Model_Elements::COLUMN_TYPE};
          $obj->required = $e->{Forms_Model_Elements::COLUMN_REQUIRED};
          $obj->value = $e->{Forms_Model_Elements::COLUMN_VALUE};
@@ -160,11 +161,15 @@ class Forms_Controller extends Controller {
       foreach ($elements as $element) {
          if($element->id == null){
             $elemRec = $modelElements->newRecord();
+            $sname = substr(lcfirst(implode('', array_map('ucfirst', explode('-', Utils_Url::toUrlKey($element->name))))), 40);
          } else {
             $elemRec = $modelElements->record($element->id);
+            $sname = Utils_Url::toUrlKey($element->name);
          }
+         
          $elemRec->{Forms_Model_Elements::COLUMN_ID_FORM} = $formId;
-         $elemRec->{Forms_Model_Elements::COLUMN_NAME} = vve_cr_url_key($element->name);
+         $elemRec->{Forms_Model_Elements::COLUMN_NAME} = $sname;
+         $elemRec->{Forms_Model_Elements::COLUMN_NOTE} = $element->note;
          $elemRec->{Forms_Model_Elements::COLUMN_LABEL} = $element->label;
          $elemRec->{Forms_Model_Elements::COLUMN_TYPE} = $element->type;
          $elemRec->{Forms_Model_Elements::COLUMN_REQUIRED} = $element->required;
@@ -229,6 +234,7 @@ class Forms_Controller extends Controller {
       if(empty($formElemets)){
          $textLine = $this->getBaseElementObj();
          $textLine->name = "elem-1";
+         $textLine->note = "";
          $textLine->label = $this->tr('Název');
          $textLine->type = "text";
          $textLine->required = false;
@@ -241,6 +247,7 @@ class Forms_Controller extends Controller {
       
          $button = $this->getBaseElementObj();
          $button->name = "submit";
+         $button->note = "";
          $button->label = $this->tr('Odeslat');
          $button->type = "submit";
          $button->required = false;
@@ -312,6 +319,7 @@ class Forms_Controller extends Controller {
    {
       $elem = new Object();
       $elem->name = "elem-1";
+      $elem->note = "";
       $elem->label = $this->tr('Název');
       $elem->type = "text";
       $elem->required = false;
@@ -426,6 +434,7 @@ class Forms_Controller extends Controller {
          if($e->{Forms_Model_Elements::COLUMN_REQUIRED} == true){
             $formElement->addValidation(new Form_Validator_NotEmpty());
          }
+         $formElement->setSubLabel($e->{Forms_Model_Elements::COLUMN_NOTE});
          
          switch ($e->{Forms_Model_Elements::COLUMN_VALIDATOR}) {
             case "mail":
@@ -542,6 +551,7 @@ class Forms_Controller extends Controller {
     * Filtrace obsahu a dosazení formulářů
     * @param string $cnt
     * @return string
+    * @deprecated - používat radši dynamické generování content filtrů
     */
    public static function contentFilter($cnt) {
       $cnt = preg_replace_callback('/\{[A-Z]+:([0-9]+)\}/', function($matches){
@@ -684,13 +694,7 @@ class Forms_Controller extends Controller {
          }
       }
       $mail->addAddress($recipients);
-//      var_dump($recipients);
       $mail->send();
-      
-//      var_dump($mail);
-//      flush();
-//      die;
    }
 }
 
-?>
