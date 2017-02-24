@@ -48,6 +48,7 @@ class PressReports_Controller extends Controller {
          $report->{PressReports_Model::COLUMN_FILE} = $file['name'];
          $report->{PressReports_Model::COLUMN_NAME} = $form->name->getValues();
          $report->{PressReports_Model::COLUMN_AUTHOR} = $form->author->getValues();
+         $report->{PressReports_Model::COLUMN_TIME_ADD} = $form->date->getValues();
          
          $model->save($report);
          $this->infoMsg()->addMessage($this->tr('Zpráva byla uložena'));
@@ -84,6 +85,7 @@ class PressReports_Controller extends Controller {
          
          $report->{PressReports_Model::COLUMN_NAME} = $form->name->getValues();
          $report->{PressReports_Model::COLUMN_AUTHOR} = $form->author->getValues();
+         $report->{PressReports_Model::COLUMN_TIME_ADD} = $form->date->getValues();
          
          $model->save($report);
          $this->infoMsg()->addMessage($this->tr('Tisková zpráva byla uložena'));
@@ -91,7 +93,7 @@ class PressReports_Controller extends Controller {
       }
       
       $this->view()->form = $form;
-      $this->view()->message = $message;
+//      $this->view()->message = $message;
    }
 
    private function createForm(Model_ORM_Record $report = null)
@@ -108,10 +110,10 @@ class PressReports_Controller extends Controller {
       $elemAuthor->addFilter(new Form_Filter_StripTags());
       $form->addElement($elemAuthor);
       
-//       $elemText = new Form_Element_TextArea('text', $this->tr('Popis'));
-//       $elemText->addFilter(new Form_Filter_StripTags());
-//       $elemText->setLangs();
-//       $form->addElement($elemText);
+       $elemDate = new Form_Element_Text('date', $this->tr('Datum zveřejnění'));
+       $elemDate->addFilter(new Form_Filter_DateTimeObj());
+       $elemDate->setValues(Utils_DateTime::fdate('%x'));
+       $form->addElement($elemDate);
       
       $elemFile = new Form_Element_File('file', $this->tr('Soubor'));
       $elemFile->setUploadDir($this->module()->getDataDir());
@@ -125,6 +127,7 @@ class PressReports_Controller extends Controller {
       if($report != null){
          $form->name->setValues($report->{PressReports_Model::COLUMN_NAME});
          $form->author->setValues($report->{PressReports_Model::COLUMN_AUTHOR});
+         $form->date->setValues(Utils_DateTime::fdate('%x', $report->{PressReports_Model::COLUMN_TIME_ADD}));
 //          $form->text->setValues($report->{DownloadFiles_Model::COLUMN_TEXT});
          $form->file->setSubLabel(sprintf($this->tr('Nahraný soubor: <strong>%s</strong>. Pokud nahrajete nový, dojde k přepsání.'), 
                $report->{PressReports_Model::COLUMN_FILE}));

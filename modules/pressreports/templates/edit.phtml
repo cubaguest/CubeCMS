@@ -5,7 +5,9 @@ if($this->file != null){
    $h = sprintf($this->tr('Přidání zpravy do kategorie "%s"'), $this->category()->getName());
 }
 Template_Core::setPageTitle($h);
-
+$datepicker = new JsPlugin_BootstrapDatepicker();
+$datepicker->setCfgParam('includecss', true);
+$this->addJsPlugin($datepicker);
 ?>
 <h1><?php echo $h?></h1>
 <div class="main-content-form-edit">
@@ -13,5 +15,23 @@ Template_Core::setPageTitle($h);
    // form
    echo $this->form;
    ?>
-   <script type="text/javascript"></script>
+   <script type="text/javascript">
+   $(document).ready(function(){
+      $('input[name="dwfile_date"]').datetimepicker({
+         locale: '<?php echo Locales::getLang()?>',
+         format : 'l',
+         icons : {
+            time: 'icon icon-time',
+            date: 'icon icon-calendar',
+            up: 'icon icon-chevron-up',
+            down: 'icon icon-chevron-down',
+            previous: 'icon icon-chevron-left',
+            next: 'icon icon-chevron-right',
+            today: 'icon icon-screenshot',
+            clear: 'icon icon-trash',
+            close: 'icon icon-remove'
+        }
+      });
+   });
+   </script>
 </div>
