@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Třída pro obsluhu chyb jádra a modulů
  * Třída implementuje shromažďování chyb v Jádře a jednotlivých module. Nejedná
@@ -13,10 +14,11 @@
  * @abstract      Třída pro obsluhu chyb jádra a modulů
  */
 class CoreErrors {
-/**
- * pole s vyjímkami vyvolanými v aplikaci
- * @var array
- */
+
+   /**
+    * pole s vyjímkami vyvolanými v aplikaci
+    * @var array
+    */
    private static $exceptionsArray = array();
 
    /**
@@ -29,7 +31,8 @@ class CoreErrors {
     * Konstruktor třídy, přiřadí vyjímku do výstupu
     * @param Exception $e -- zachycená vyjímka
     */
-   public function  __construct(Exception $e) {
+   public function __construct(Exception $e)
+   {
       self::addException($e);
    }
 
@@ -37,11 +40,9 @@ class CoreErrors {
     * Metoda přidá vijímku do pole vyjímek
     * @param Exception $exception -- zachycená vyjímka
     */
-   public static function addException(Exception $exception) {
-      if(defined("CUBE_CMS_DEBUG_LEVEL") && CUBE_CMS_DEBUG_LEVEL == 0){
-         self::logError($exception->getCode(), $exception->getMessage(), $exception->getFile(), $exception->getLine());
-         self::sendErrorToMail($exception->getCode(), $exception->getMessage(), $exception->getFile(), $exception->getLine(), $exception->getTraceAsString());
-      }
+   public static function addException(Exception $exception)
+   {
+      self::logProductionError($exception->getCode(), $exception->getMessage(), $exception->getFile(), $exception->getLine(), $exception->getTraceAsString());
       array_push(self::$exceptionsArray, $exception);
    }
 
@@ -49,11 +50,12 @@ class CoreErrors {
     * Metoda vrací všechny zaznamenané vyjímky v poli
     * @return array -- pole vyjímek
     */
-   public static function getErrors() {
+   public static function getErrors()
+   {
       $errArray = array();
 
       foreach (self::$exceptionsArray as $exception) {
-         $errArray[] = array('message'=>$exception->getMessage(),
+         $errArray[] = array('message' => $exception->getMessage(),
              'file' => $exception->getFile(),
              'name' => get_class($exception),
              'line' => $exception->getLine(),
@@ -61,7 +63,7 @@ class CoreErrors {
              'trace' => $exception->getTrace());
       }
       foreach (self::$errorsArray as $err) {
-         $errArray[] = array('message'=>$err['message'],
+         $errArray[] = array('message' => $err['message'],
              'file' => $err['file'],
              'name' => $err['name'],
              'code' => $err['code'],
@@ -75,8 +77,9 @@ class CoreErrors {
     * Metoda zjišťuje jestli je pole s vyjímkami prázdné
     * @return boolean -- true pokud je pole prázdné
     */
-   public static function isEmpty() {
-      if(empty (self::$exceptionsArray) AND empty (self::$errorsArray)) {
+   public static function isEmpty()
+   {
+      if (empty(self::$exceptionsArray) AND empty(self::$errorsArray)) {
          return true;
       }
       return false;
@@ -86,71 +89,73 @@ class CoreErrors {
     * Metoda vrací poslední chybu v enginu jako string
     * @return string -- poslední chyba
     */
-   public static function getLastError() {
-      return self::$exceptionsArray[0]->getMessage().' - '.self::$exceptionsArray[0]->getFile()
-          .' > line: '.self::$exceptionsArray[0]->getLine();
+   public static function getLastError()
+   {
+      return self::$exceptionsArray[0]->getMessage() . ' - ' . self::$exceptionsArray[0]->getFile()
+              . ' > line: ' . self::$exceptionsArray[0]->getLine();
    }
 
    /**
     * Metoda pro zachytávání normálních chyb v enginu a modulech
     */
-   public static function errorHandler($errno, $errstr, $errfile, $errline, $errcontext) {
+   public static function errorHandler($errno, $errstr, $errfile, $errline, $errcontext)
+   {
+      self::addError($errno, $errstr, $errfile, $errline);
+      return true;
+   }
+
+   protected static function logProductionError($errno, $errstr, $errfile, $errline, $trace)
+   {
+      if (defined("CUBE_CMS_DEBUG_LEVEL") && CUBE_CMS_DEBUG_LEVEL == 0) {
+         self::logError($errno, $errstr, $errfile, $errline, $trace);
+         self::sendErrorToMail($errno, $errstr, $errfile, $errline, $trace);
+      }
+   }
+
+   /**
+    * Metoda pro zachytávání normálních chyb v enginu a modulech
+    */
+   public static function addError($errno, $errstr = null, $errfile = null, $errline = null, $trace = null)
+   {
       $error = array();
       switch ($errno) {
          case E_ERROR:
          case E_USER_ERROR:
             $error['name'] = "ERROR";
-            $error['code'] = $errno;
-            $error['message'] = $errstr;
-            $error['file'] = $errfile;
-            $error['line'] = $errline;
             break;
          case E_WARNING:
          case E_USER_WARNING:
-            if(VVE_DEBUG_LEVEL > 0){
-               $error['name'] = "WARNING";
-               $error['code'] = $errno;
-               $error['message'] = $errstr;
-               $error['file'] = $errfile;
-               $error['line'] = $errline;
-            }
+            $error['name'] = "WARNING";
             break;
          case E_NOTICE:
          case E_USER_NOTICE:
-            if(VVE_DEBUG_LEVEL > 1){
-               $error['name'] = "NOTICE";
-               $error['code'] = $errno;
-               $error['message'] = $errstr;
-               $error['file'] = $errfile;
-               $error['line'] = $errline;
-            }
+            $error['name'] = "NOTICE";
             break;
          default:
             $error['name'] = "UNKNOWN ERROR";
-            $error['code'] = $errno;
-            $error['message'] = $errstr;
-            $error['file'] = $errfile;
-            $error['line'] = $errline;
             break;
       }
-      if(!empty($error)){
-         array_push(self::$errorsArray, $error);
-         // send to mail
+      $error['code'] = $errno;
+      $error['message'] = $errstr;
+      $error['file'] = $errfile;
+      $error['line'] = $errline;
+      $error['trace'] = $trace;
+
+      if(VVE_DEBUG_LEVEL == 0 && ($errno == E_NOTICE || $errno == E_USER_NOTICE)){
          
-      }
-      if(CUBE_CMS_DEBUG_LEVEL == 0){
-         self::logError($errno, $errstr, $errfile, $errline);
-         self::sendErrorToMail($errno, $errstr, $errfile, $errline);
+      } else {
+         array_push(self::$errorsArray, $error);
+         self::logProductionError($errno, $errstr, $errfile, $errline, $trace);
       }
       return true;
    }
-   
+
    public static function sendErrorToMail($errno, $errstr, $errfile, $errline, $str = null)
    {
-      if(CUBE_CMS_ERRORS_MAIL != null){
-         
+      if (CUBE_CMS_ERRORS_MAIL != null) {
+
          $mail = new Email(true);
-         $mail->setSubject('[ERROR]: '.CUBE_CMS_WEB_NAME);
+         $mail->setSubject('[ERROR]: ' . CUBE_CMS_WEB_NAME);
          $mail->addAddress(CUBE_CMS_ERRORS_MAIL);
 
          switch ($errno) {
@@ -170,16 +175,16 @@ class CoreErrors {
                $type = "UNKNOWN ERROR";
                break;
          }
-         
-         $tpl = '<p><strong>'.$type.': in file '.$errfile.' on line: '.$errline.'</strong></p>';
-         $tpl .= '<p>'.$errstr.'</p>';
-         
-         if($str){
-            $tpl .= '<p style="color: red;">'.nl2br($str).'</p>';
+
+         $tpl = '<p><strong>' . $type . ': in file ' . $errfile . ' on line: ' . $errline . '</strong></p>';
+         $tpl .= '<p>' . $errstr . '</p>';
+
+         if ($str) {
+            $tpl .= '<p style="color: red;">' . nl2br($str) . '</p>';
          }
-         
+
          $mail->setContent(Email::getBaseHtmlMail($tpl));
-         
+
          try {
             $mail->send();
          } catch (Exception $exc) {
@@ -187,7 +192,7 @@ class CoreErrors {
          }
       }
    }
-   
+
    protected static function logError($errno, $errstr, $errfile, $errline)
    {
       switch ($errno) {
@@ -207,31 +212,36 @@ class CoreErrors {
             $type = "UNKNOWN ERROR";
             break;
       }
-      $str = '['.date('Y-m-d H:i:s').'] '.$type.': in file '.$errfile.' on line: '.$errline.', MSG: '.$errstr."\n";
-      file_put_contents(AppCore::getAppLogDir().'error-'.date('Y-m-d').'.log', $str, FILE_APPEND);
+      $str = '[' . date('Y-m-d H:i:s') . '] ' . $type . ': in file ' . $errfile . ' on line: ' . $errline . ', MSG: ' . $errstr . "\n";
+      file_put_contents(AppCore::getAppLogDir() . 'error-' . date('Y-m-d') . '.log', $str, FILE_APPEND);
    }
-   
+
    /**
     * Handler na neodchycené vyjímky
     * @param Exception $exception
     */
-   public static function exceptionHandler($exception) {
-      self::addException($exception);
+   public static function exceptionHandler($exception)
+   {
+      if ($exception instanceof Exception) {
+         self::addException($exception);
+      } else if ($exception instanceof Error) {
+         self::addError($exception->getCode(), $exception->getMessage(), $exception->getFile(), $exception->getLine(), $exception->getTraceAsString());
+      }
       return true;
    }
-   
-   public static function printErrors() {
+
+   public static function printErrors()
+   {
       foreach (self::$exceptionsArray as $exception) {
-         printf(_("%s(%d): %s v souboru %s, řádek %d")."<br />",get_class($exception),$exception->getCode(),
-         $exception->getMessage(),$exception->getFile(),$exception->getLine());
+         printf(_("%s(%d): %s v souboru %s, řádek %d") . "<br />", get_class($exception), $exception->getCode(), $exception->getMessage(), $exception->getFile(), $exception->getLine());
       }
       foreach (self::$errorsArray as $err) {
-         printf(_("%s(%d): %s v souboru %s, řádek %d")."<br />",$err['name'],$err['code'],
-         $err['message'],$err['file'],$err['line']);
+         printf(_("%s(%d): %s v souboru %s, řádek %d") . "<br />", $err['name'], $err['code'], $err['message'], $err['file'], $err['line']);
       }
    }
 
-   public static function eraseErrors() {
+   public static function eraseErrors()
+   {
       self::$exceptionsArray = array();
       self::$errorsArray = array();
    }
@@ -240,24 +250,24 @@ class CoreErrors {
     * Metoda vrací hednorozměrné pole určené pro tisk
     * @return array
     */
-   public static function getErrorsInArrayForPrint(){
+   public static function getErrorsInArrayForPrint()
+   {
       $re = array();
       foreach (self::$exceptionsArray as $exception) {
-         if(VVE_DEBUG_LEVEL > 2) {
-               $re [] = sprintf(_("%s(%d): %s v souboru %s, řádek %d"),get_class($exception),$exception->getCode(),
-                  $exception->getMessage(),$exception->getFile(),$exception->getLine());
+         if (VVE_DEBUG_LEVEL > 2) {
+            $re [] = sprintf(_("%s(%d): %s v souboru %s, řádek %d"), get_class($exception), $exception->getCode(), $exception->getMessage(), $exception->getFile(), $exception->getLine());
          } else {
             $re [] = $exception->getMessage();
          }
       }
       foreach (self::$errorsArray as $err) {
-         if(VVE_DEBUG_LEVEL > 2) {
-            $re [] = sprintf(_("%s(%d): %s v souboru %s, řádek %d"),$err['name'],$err['code'], $err['message'],$err['file'],$err['line']);
+         if (VVE_DEBUG_LEVEL > 2) {
+            $re [] = sprintf(_("%s(%d): %s v souboru %s, řádek %d"), $err['name'], $err['code'], $err['message'], $err['file'], $err['line']);
          } else {
             $re [] = $err['message'];
          }
       }
       return $re;
    }
+
 }
-?>
