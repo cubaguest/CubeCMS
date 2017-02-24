@@ -186,6 +186,7 @@ abstract class Model_ORM extends Model implements ArrayAccess {
                $params['pdoparam'] = PDO::PARAM_INT;
                break;
             case 'float':
+            case 'decimal':
             case 'double':
             case 'time':
             case 'date':
