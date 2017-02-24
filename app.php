@@ -31,7 +31,7 @@ class AppCore extends TrObject {
    /**
     * Verze enginu
     */
-   const ENGINE_VERSION = '8.4.4';
+   const ENGINE_VERSION = '8.4.5';
 
    /**
     * Obsahuje hlavní soubor aplikace
@@ -1251,6 +1251,8 @@ class AppCore extends TrObject {
             $this->runCoreModule();
          } catch (Exception $e) {
             CoreErrors::addException($e);
+         } catch (Error $e) {
+            CoreErrors::exceptionHandler($e);
          }
 
          //vytvoření hlavního menu
