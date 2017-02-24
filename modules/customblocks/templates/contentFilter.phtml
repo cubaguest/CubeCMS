@@ -1,0 +1,15 @@
+<?php
+$this->addCssFile("style.less");
+
+$block = $this->block;
+?>
+<div id="customblock-<?php echo $block->getPK() ?>" class="shortcut-hover">
+   <?php if ($this->category()->getRights()->isWritable()) { ?>
+      <div class="container shortcut-helper">
+         <div class="shortcut shortcut-right"><?php ps($this->tr('Kód pro vložení')) ?>: <code>{CUSTOMBLOCKS:<?php echo $block->getPK() ?>}</code></div>
+      </div>
+   <?php } ?>
+   <?php
+   $this->includeFile('tpl://blocks/' . $block->block_tpl, array("block" => $block));
+   ?>
+</div>

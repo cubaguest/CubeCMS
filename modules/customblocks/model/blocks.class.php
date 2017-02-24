@@ -38,6 +38,12 @@ class CustomBlocks_Model_Blocks extends Model_ORM_Ordered {
       $m = new static();
       return $m->where(self::COLUMN_ID_CAT." = :idc", array('idc' => $idCategory))->records();
    }
+   
+   public static function getAllBlocks()
+   {
+      $m = new static();
+      return $m->joinFK(self::COLUMN_ID_CAT)->records();
+   }
 }
 
 class CustomBlocks_Model_Blocks_Rrcord extends Model_ORM_Ordered_Record {
