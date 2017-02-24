@@ -1,5 +1,5 @@
 <?php
 
 class HPSlideShow_Module extends Module_Admin {
-   protected $version = '1.1.0';
+   protected $version = '1.1.1';
 }

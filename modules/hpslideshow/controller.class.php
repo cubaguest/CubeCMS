@@ -54,7 +54,7 @@ class HPSlideShow_Controller extends Controller {
             $image = new File_Image($sendImg);
             $image->move($this->module()->getDataDir())->rename($imgRec->getPK().'.'.$image->getExtension());
             $image->getData()
-               ->resize($dimensions['width'], $dimensions['height'], File_Image_Base::RESIZE_CROP)
+               ->resize($dimensions['width'], $dimensions['height'], isset($dimensions['crop']) ? $dimensions['crop'] : File_Image_Base::RESIZE_CROP)
                ->save();
 
             $imgRec->{HPSlideShow_Model::COLUMN_FILE} = $imgRec->getPK().'.'.$image->getExtension();
@@ -111,7 +111,7 @@ class HPSlideShow_Controller extends Controller {
             $image = new File_Image($formEdit->image->getValues());
             $image->move($this->module()->getDataDir())->rename($img->getPK().'.'.$image->getExtension(), false);
             $image->getData()
-               ->resize($dimensions['width'], $dimensions['height'], File_Image_Base::RESIZE_CROP)
+               ->resize($dimensions['width'], $dimensions['height'], isset($dimensions['crop']) ? $dimensions['crop'] : File_Image_Base::RESIZE_CROP)
                ->save();
             $img->{HPSlideShow_Model::COLUMN_FILE} = $image->getName();
          }
