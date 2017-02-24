@@ -34,6 +34,7 @@ class Shop_Model_Customers extends Model_ORM
    const COLUMN_DELIVERY_CITY = 'customer_delivery_city';
    const COLUMN_DELIVERY_PSC = 'customer_delivery_psc';
    const COLUMN_ID_DELIVERY_COUNTRY = 'id_delivery_country';
+   const COLUMN_NEWSLETTER = 'newsletter';
 
    protected function  _initTable() {
       $this->setTableName(self::DB_TABLE, 't_s_cust');
@@ -55,6 +56,7 @@ class Shop_Model_Customers extends Model_ORM
       $this->addColumn(self::COLUMN_DELIVERY_STREET, array('datatype' => 'varchar(70)', 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_DELIVERY_CITY, array('datatype' => 'varchar(50)', 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_DELIVERY_PSC, array('datatype' => 'varchar(6)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_NEWSLETTER, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => false));
 
       $this->setPk(self::COLUMN_ID);
 
@@ -85,4 +87,3 @@ class Shop_Model_Customers extends Model_ORM
          ->record();
    }
 }
-?>
