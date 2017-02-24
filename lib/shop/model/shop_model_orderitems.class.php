@@ -25,9 +25,9 @@ class Shop_Model_OrderItems extends Model_ORM {
       $this->addColumn(self::COLUMN_ID_ORDER, array('datatype' => 'smallint', 'nn' => true));
       
       $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(400)', 'nn' => true, 'pdoparam' => PDO::PARAM_STR));
-      $this->addColumn(self::COLUMN_QTY, array('datatype' => 'smallint', 'nn' => true, 'default' => 1));
-      $this->addColumn(self::COLUMN_PRICE, array('datatype' => 'smallint', 'default' => 0));
-      $this->addColumn(self::COLUMN_TAX, array('datatype' => 'smallint', 'default' => 0));
+      $this->addColumn(self::COLUMN_QTY, array('datatype' => 'decimal(11,4)', 'nn' => true, 'default' => 1));
+      $this->addColumn(self::COLUMN_PRICE, array('datatype' => 'int', 'default' => 0));
+      $this->addColumn(self::COLUMN_TAX, array('datatype' => 'int', 'default' => 0));
       $this->addColumn(self::COLUMN_CODE, array('datatype' => 'varchar(100)', 'default' => null, 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_UNIT, array('datatype' => 'varchar(5)', 'default' => 'ks', 'pdoparam' => PDO::PARAM_STR));
       $this->addColumn(self::COLUMN_NOTE, array('datatype' => 'varchar(500)', 'default' => null, 'pdoparam' => PDO::PARAM_STR));

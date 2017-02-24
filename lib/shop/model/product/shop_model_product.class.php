@@ -30,6 +30,7 @@ class Shop_Model_Product extends Model_ORM {
    const COLUMN_PRICE = 'product_price';
    const COLUMN_UNIT = 'product_unit';
    const COLUMN_UNIT_SIZE = 'product_unit_size';
+   const COLUMN_UNIT_DECIMALS = 'product_unit_decimals';
    const COLUMN_QUANTITY = 'product_quantity';
    const COLUMN_STOCK = 'product_stock';
    const COLUMN_WEIGHT = 'product_weight';
@@ -66,7 +67,7 @@ class Shop_Model_Product extends Model_ORM {
 
       $this->addColumn(self::COLUMN_PRICE, array('datatype' => 'int', 'pdoparam' => PDO::PARAM_STR, 'default' => 0));
       $this->addColumn(self::COLUMN_UNIT, array('datatype' => 'varchar(20)', 'pdoparam' => PDO::PARAM_STR));
-      $this->addColumn(self::COLUMN_UNIT_SIZE, array('datatype' => 'int', 'pdoparam' => PDO::PARAM_INT, 'default' => 0));
+      $this->addColumn(self::COLUMN_UNIT_SIZE, array('datatype' => 'decimal(11,4)', 'pdoparam' => PDO::PARAM_STR, 'default' => 0));
       $this->addColumn(self::COLUMN_QUANTITY, array('datatype' => 'int', 'pdoparam' => PDO::PARAM_INT, 'default' => 0));
       $this->addColumn(self::COLUMN_STOCK, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => true));
       $this->addColumn(self::COLUMN_WEIGHT, array('datatype' => 'float', 'pdoparam' => PDO::PARAM_STR));

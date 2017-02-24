@@ -25,7 +25,7 @@ class Shop_Model_Cart extends Model_ORM {
       $this->addColumn(self::COLUMN_ID_COMBINATION, array('datatype' => 'int', 'nn' => true, 'default' => 0));
       $this->addColumn(self::COLUMN_ID_USER, array('datatype' => 'int', 'nn' => true, 'default' => 0));
       $this->addColumn(self::COLUMN_ID_SESSION, array('datatype' => 'varchar', 'size' => 32 , 'nn' => false));
-      $this->addColumn(self::COLUMN_QTY, array('datatype' => 'smallint', 'nn' => true, 'default' => 1));
+      $this->addColumn(self::COLUMN_QTY, array('datatype' => 'decimal(11,4)', 'nn' => true, 'default' => 1));
       $this->addColumn(self::COLUMN_DATE_ADD, array('datatype' => 'timestamp', 'default' => 'CURRENT_TIMESTAMP'));
       $this->addColumn(self::COLUMN_VARIANT_LABEL, array('datatype' => 'varchar(300)', 'default' => null));
 

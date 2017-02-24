@@ -389,9 +389,9 @@ abstract class Shop_Product_Controller extends Controller {
       
       $eUnitSize = new Form_Element_Text('unitSize', $this->tr('Velikost jednotky'));
       $eUnitSize->addValidation(new Form_Validator_NotEmpty());
-      $eUnitSize->addValidation(new Form_Validator_IsNumber(null, Form_Validator_IsNumber::TYPE_INT));
+      $eUnitSize->addValidation(new Form_Validator_IsNumber(null, Form_Validator_IsNumber::TYPE_FLOAT));
       $eUnitSize->setValues(1);
-      $eUnitSize->setSubLabel($this->tr('Velikost jednotky, v jaké se zboží prodává. Např: 1, 5, 100'));
+      $eUnitSize->setSubLabel($this->tr('Velikost jednotky, v jaké se zboží prodává. Např: 1, 5, 100 a nebo 0.5, 0.25, 0.01'));
       $form->addElement($eUnitSize, $fGrpPrice);
       
       $eUnit = new Form_Element_Text('unit', $this->tr('Jednotka'));

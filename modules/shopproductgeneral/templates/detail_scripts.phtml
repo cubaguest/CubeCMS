@@ -19,7 +19,7 @@
       function changeCombination(varArr) {
          $.each(CubeCMS.Shop.combinations, function (key, value) {
             if ($(varArr).not(this.variants).length == 0 && $(this.variants).not(varArr).length == 0) {
-               var multipler = parseInt($('input[name="product_add_qty"]').val()) /<?php echo $this->product->{Shop_Model_Product::COLUMN_UNIT_SIZE} ?>;
+               var multipler = parseFloat($('input[name="product_add_qty"]').val().replace(',', '.')) /<?php echo $this->product->{Shop_Model_Product::COLUMN_UNIT_SIZE} ?>;
                // update price
                var price = multipler * CubeCMS.Shop.getProductPrice(CubeCMS.Shop.product.price + this.price, CubeCMS.Shop.product.tax);
                var priceWoutTax = multipler * (CubeCMS.Shop.product.price + this.price);
@@ -74,7 +74,7 @@
             $('select.select-variant').first().change();
          } else {
             // přepočítat zboží podle množství
-            var multipler = parseInt($('input[name="product_add_qty"]').val()) /<?php echo $this->product->{Shop_Model_Product::COLUMN_UNIT_SIZE} ?>;
+            var multipler = parseFloat($('input[name="product_add_qty"]').val().replace(',', '.')) /<?php echo $this->product->{Shop_Model_Product::COLUMN_UNIT_SIZE} ?>;
             $('.product-weight').text(multipler * (CubeCMS.Shop.product.weight) + " Kg");
             var price = multipler * CubeCMS.Shop.getProductPrice(CubeCMS.Shop.product.price, CubeCMS.Shop.product.tax);
             var priceWoutTax = multipler * CubeCMS.Shop.roundPrice(CubeCMS.Shop.product.price);
