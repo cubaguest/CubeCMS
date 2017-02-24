@@ -1,30 +1,32 @@
 <?php
+
 class ShopCart_Controller extends Controller {
-   
+
    protected function init()
    {
       $this->category()->getModule()->setDataDir('shop');
    }
 
-   public function mainController() {
+   public function mainController()
+   {
       $this->checkReadableRights();
-      
+
       $cart = new Shop_Cart();
       $cart->loadItems();
-      
+
       $this->view()->cart = $cart;
-      if($cart->isEmpty()){
+      if ($cart->isEmpty()) {
          return;
       }
 
-      if($this->getRequestParam('dp', false)){
+      if ($this->getRequestParam('dp', false)) {
          // delete product from cart
          $cart->deleteItem($this->getRequestParam('dp'));
          $this->infoMsg()->addMessage($this->tr('Položka byla smazána'));
          $this->link()->param('dp')->reload();
       }
 
-      if($this->getRequestParam('updateQtyId', false) && $this->getRequestParam('qty', false)){
+      if ($this->getRequestParam('updateQtyId', false) && $this->getRequestParam('qty', false)) {
          $cart->editQty($this->getRequestParam('updateQtyId'), $this->getRequestParam('qty'));
          $this->infoMsg()->addMessage($this->tr('Množství bylo upraveno'));
          $this->link()->rmParam(array('updateQtyId', 'qty'))->reload();
@@ -32,164 +34,160 @@ class ShopCart_Controller extends Controller {
 
       $formItems = new Form('cart_items_');
       $formItems->setProtected(false);
-      
+
       $eQty = new Form_Element_Text('qty', $this->tr('Množství'));
       $eQty->setDimensional();
       $eQty->addValidation(new Form_Validator_NotEmpty());
       $eQty->addValidation(new Form_Validator_IsNumber($this->tr('počet zboží musí být celé číslo'), Form_Validator_IsNumber::TYPE_INT));
       $formItems->addElement($eQty);
-      
+
       $eResetSet = new Form_Element_Submit('reset', $this->tr('Vymazat položky'));
       $formItems->addElement($eResetSet);
-      
+
       $eSet = new Form_Element_Submit('set', $this->tr('Aktualizovat'));
       $formItems->addElement($eSet);
-      
-      if($formItems->isSend()){
+
+      if ($formItems->isSend()) {
          $newQty = $formItems->qty->getValues();
          // kontroly minimálního množství
       }
-      
-      if($formItems->isValid()){
-         if($formItems->set->getValues() != false){
+
+      if ($formItems->isValid()) {
+         if ($formItems->set->getValues() != false) {
             $newQty = $formItems->qty->getValues();
             foreach ($newQty as $idItem => $qty) {
                $cart->editQty($idItem, $qty);
             }
             $this->link()->reload();
-         } else if($formItems->reset->getValues() != false){
+         } else if ($formItems->reset->getValues() != false) {
             $cart->clear();
             $this->infoMsg()->addMessage($this->tr('Všechny položky byly vymazány'));
             $this->link()->reload();
          }
          $this->link()->reload();
       }
-      
+
       $this->view()->formItems = $formItems;
-      
+
       // doprava a platba
       $modelShippings = new Shop_Model_Shippings();
       $modelPayments = new Shop_Model_Payments();
-      
+
       $formGoNext = new Form('goto_order_');
       $formGoNext->setProtected(false);
-      
+
       $eShipping = new Form_Element_Select('shipping', $this->tr('Doprava'));
-      
-      if($cart->personalPickUpOnly()){
-         $modelShippings->where(Shop_Model_Shippings::COLUMN_PERSONAL_PICKUP.' = 1', array());
+
+      if ($cart->personalPickUpOnly()) {
+         $modelShippings->where(Shop_Model_Shippings::COLUMN_PERSONAL_PICKUP . ' = 1', array());
       }
       $shippings = $modelShippings->records();
-      
+
       $shippingDisallowedPayments = array();
       $sh = $shippingsArray = array();
       foreach ($shippings as $shipping) {
-         $str = (string)$shipping->{Shop_Model_Shippings::COLUMN_NAME};
+         $str = (string) $shipping->{Shop_Model_Shippings::COLUMN_NAME};
          // free shipping
          $price = $shipping->{Shop_Model_Shippings::COLUMN_VALUE};
-         if($cart->getPrice() >= VVE_SHOP_FREE_SHIPPING && VVE_SHOP_FREE_SHIPPING != -1 ){
+         if ($cart->getPrice() >= CUBE_CMS_SHOP_FREE_SHIPPING && CUBE_CMS_SHOP_FREE_SHIPPING != -1) {
             $price = 0;
          }
-         $str .= $price != 0 ? ' ('.Shop_Tools::getPrice($price).')' : null;
+         $str .= $price != 0 ? ' (' . Shop_Tools::getPrice($price) . ')' : null;
          $eShipping->setOptions(array($str => $shipping->{Shop_Model_Shippings::COLUMN_ID}), true);
-         
-         $sh[$shipping->{Shop_Model_Shippings::COLUMN_ID}] =
-            array(
-               'price' => $shipping->{Shop_Model_Shippings::COLUMN_VALUE},
-               'name' => (string)$shipping->{Shop_Model_Shippings::COLUMN_NAME},
-               'note' => (string)$shipping->{Shop_Model_Shippings::COLUMN_TEXT}
-            );
-         
-         $shippingDisallowedPayments[$shipping->{Shop_Model_Shippings::COLUMN_ID}] = 
-            $shipping->{Shop_Model_Shippings::COLUMN_DISALLOWED_PAYMENTS} == null ?
-            array() : explode(';', $shipping->{Shop_Model_Shippings::COLUMN_DISALLOWED_PAYMENTS});
-            
-         $shippingsArray[$shipping->{Shop_Model_Shippings::COLUMN_ID}] = $shipping;   
+
+         $sh[$shipping->{Shop_Model_Shippings::COLUMN_ID}] = array(
+                     'price' => $shipping->{Shop_Model_Shippings::COLUMN_VALUE},
+                     'name' => (string) $shipping->{Shop_Model_Shippings::COLUMN_NAME},
+                     'note' => (string) $shipping->{Shop_Model_Shippings::COLUMN_TEXT}
+         );
+
+         $shippingDisallowedPayments[$shipping->{Shop_Model_Shippings::COLUMN_ID}] = $shipping->{Shop_Model_Shippings::COLUMN_DISALLOWED_PAYMENTS} == null ?
+                 array() : explode(';', $shipping->{Shop_Model_Shippings::COLUMN_DISALLOWED_PAYMENTS});
+
+         $shippingsArray[$shipping->{Shop_Model_Shippings::COLUMN_ID}] = $shipping;
       }
-      $eShipping->setValues( key($sh) );
+      $eShipping->setValues(key($sh));
 
       $this->view()->shippings = $sh;
       $this->view()->disallowPayments = $shippingDisallowedPayments;
-      if(isset ($_SESSION['shop_order']['shipping'])){
+      if (isset($_SESSION['shop_order']['shipping'])) {
          $eShipping->setValues($_SESSION['shop_order']['shipping']);
       }
       $formGoNext->addElement($eShipping);
 
-      if($cart->needPickUpDate()){
+      if ($cart->needPickUpDate()) {
          $ePickUpDate = new Form_Element_Text('pickupDate', $this->tr('Datum vyzvednutí'));
          $ePickUpDate->addValidation(new Form_Validator_NotEmpty());
          $ePickUpDate->addValidation(new Form_Validator_Date());
          $ePickUpDate->addFilter(new Form_Filter_DateTimeObj());
          $formGoNext->addElement($ePickUpDate);
       }
-      
+
       $ePayment = new Form_Element_Select('payment', $this->tr('Platba'));
-      
+
       $payments = $modelPayments->records();
       $py = $paymentsArray = array();
       foreach ($payments as $payment) {
-         $str = (string)$payment->{Shop_Model_Payments::COLUMN_NAME};
+         $str = (string) $payment->{Shop_Model_Payments::COLUMN_NAME};
          // free shipping
          $price = $payment->{Shop_Model_Payments::COLUMN_PRICE_ADD};
-         if($cart->getPrice() >= VVE_SHOP_FREE_SHIPPING && VVE_SHOP_FREE_SHIPPING != -1 ){
+         if ($cart->getPrice() >= CUBE_CMS_SHOP_FREE_SHIPPING && CUBE_CMS_SHOP_FREE_SHIPPING != -1) {
             $price = 0;
          }
-         $str .= $price != 0 ? ' ('.$price.' Kč)' : null;
+         $str .= $price != 0 ? ' (' . $price . ' Kč)' : null;
          $ePayment->setOptions(array($str => $payment->{Shop_Model_Payments::COLUMN_ID}), true);
-         
-         $py[$payment->{Shop_Model_Payments::COLUMN_ID}] =
-            array(
-               'price' => $payment->{Shop_Model_Payments::COLUMN_PRICE_ADD},
-               'name' => (string)$payment->{Shop_Model_Payments::COLUMN_NAME},
-               'note' => (string)$payment->{Shop_Model_Payments::COLUMN_TEXT}
-            );
+
+         $py[$payment->{Shop_Model_Payments::COLUMN_ID}] = array(
+                     'price' => $payment->{Shop_Model_Payments::COLUMN_PRICE_ADD},
+                     'name' => (string) $payment->{Shop_Model_Payments::COLUMN_NAME},
+                     'note' => (string) $payment->{Shop_Model_Payments::COLUMN_TEXT}
+         );
 
          $paymentsArray[$payment->{Shop_Model_Payments::COLUMN_ID}] = $payment;
       }
-      $ePayment->setValues( key($py) );
+      $ePayment->setValues(key($py));
       $this->view()->payments = $py;
-      if(isset ($_SESSION['shop_order']['payment'])){
+      if (isset($_SESSION['shop_order']['payment'])) {
          $ePayment->setValues($_SESSION['shop_order']['payment']);
       }
       $formGoNext->addElement($ePayment);
 
       $eSend = new Form_Element_Submit('send', $this->tr('Pokračovat'));
       $formGoNext->addElement($eSend);
-      if($formGoNext->isSend()){
+      if ($formGoNext->isSend()) {
          // kontrola způsobu platby
-         if(in_array($formGoNext->payment->getValues(), $shippingDisallowedPayments[$formGoNext->shipping->getValues()])){
+         if (in_array($formGoNext->payment->getValues(), $shippingDisallowedPayments[$formGoNext->shipping->getValues()])) {
             $formGoNext->payment->setError($this->tr('Tuto kombinaci dopravy a platby nelze provést. Vyberte jiný způsob platby.'));
          }
       }
       $this->view()->paymentPrice = Shop_Tools::getPaymentOrShippingPrice($py[$formGoNext->payment->getValues()]['price'], $cart->getPrice());
       $this->view()->shippingPrice = Shop_Tools::getPaymentOrShippingPrice($sh[$formGoNext->shipping->getValues()]['price'], $cart->getPrice());
-      $this->view()->freeShipAndPayFrom = VVE_SHOP_FREE_SHIPPING;
+      $this->view()->freeShipAndPayFrom = CUBE_CMS_SHOP_FREE_SHIPPING;
 
-      if($formGoNext->isValid()){
+      if ($formGoNext->isValid()) {
          // uložení dopravy a platby
          $store = $this->getOrderStore();
          $pId = $formGoNext->payment->getValues();
          $sId = $formGoNext->shipping->getValues();
          $pickUpDate = null;
-         if(isset ($formGoNext->pickupDate)){
+         if (isset($formGoNext->pickupDate)) {
             $pickUpDate = $formGoNext->pickupDate->getValues();
          }
-         
+
          $_SESSION['shop_order']['payment'] = $pId;
          $_SESSION['shop_order']['shipping'] = $sId;
          $_SESSION['shop_order']['pickupdate'] = $pickUpDate;
-         
+
          $this->link()->route('order')->reload();
       }
-      
+
       $this->view()->formNext = $formGoNext;
-      
    }
 
    public function cartUpdateController()
    {
       $action = $this->getRequestParam('action', false);
-      if(!$action){
+      if (!$action) {
          return;
       }
 
@@ -198,11 +196,11 @@ class ShopCart_Controller extends Controller {
          case "updateQty":
             $id = $this->getRequestParam('id', false);
             $qty = $this->getRequestParam('qty', false);
-            if(!$id || !$qty || !is_numeric($qty)){
+            if (!$id || !$qty || !is_numeric($qty)) {
                throw new UnexpectedValueException($this->tr('Nebyly předány správné parametry'));
             }
 
-            if(!$cart[$id]){
+            if (!$cart[$id]) {
                throw new UnexpectedValueException($this->tr('Zadaná položka v košíku neexistuje'));
             }
             $cart->editQty($id, $qty);
@@ -211,25 +209,25 @@ class ShopCart_Controller extends Controller {
             break;
          case "delete":
             $id = $this->getRequestParam('id', false);
-            if(!$id){
+            if (!$id) {
                throw new UnexpectedValueException($this->tr('Nebyly předány správné parametry'));
             }
-            if(isset($cart[$id])) {
+            if (isset($cart[$id])) {
                $cart->deleteItem($id);
             }
             $this->view()->deleted = true;
             break;
       }
-
    }
 
    public function orderController()
    {
       $cart = new Shop_Cart();
-      if($cart->isEmpty() || !isset($_SESSION['shop_order']) ){
+      if ($cart->isEmpty() || !isset($_SESSION['shop_order'])) {
          $this->link()->route()->reload();
       }
       $this->orderControllerForm();
+      $this->orderControllerLoginForm();
       $modelPayments = new Shop_Model_Payments();
       $modelShippings = new Shop_Model_Shippings();
       $payment = $modelPayments->record($_SESSION['shop_order']['payment']);
@@ -241,20 +239,20 @@ class ShopCart_Controller extends Controller {
       $this->view()->payment = $payment;
 
       $this->view()->cart = $cart;
-      $this->view()->priceTotal = $cart->getPrice()+$this->view()->shippingPrice+$this->view()->paymentPrice;
+      $this->view()->priceTotal = $cart->getPrice() + $this->view()->shippingPrice + $this->view()->paymentPrice;
    }
-   
+
    protected function orderControllerForm()
    {
       // načtení zón a způsobů doručení a plateb
       $modelZones = new Shop_Model_Zones();
       $zones = $modelZones->records();
-      
+
       $formOrder = new Form('order_');
       $formOrder->setProtected(false);
-      
+
       $fCustomerInfo = $formOrder->addGroup('customer', $this->tr('Informace o zákazníkovi'));
-      
+
       $eCustomerName = new Form_Element_Text('customerName', $this->tr('Jméno'));
       $eCustomerName->addValidation(new Form_Validator_NotEmpty());
       $formOrder->addElement($eCustomerName, $fCustomerInfo);
@@ -267,7 +265,7 @@ class ShopCart_Controller extends Controller {
       $eCustomerEmail->addValidation(new Form_Validator_NotEmpty());
       $eCustomerEmail->addValidation(new Form_Validator_Email());
       $formOrder->addElement($eCustomerEmail, $fCustomerInfo);
-      
+
       $eCustomerPhone = new Form_Element_Text('customerPhone', $this->tr('Telefon'));
       $phone = null;
       switch (Locales::getLang()) {
@@ -280,109 +278,130 @@ class ShopCart_Controller extends Controller {
       $eCustomerPhone->addValidation(new Form_Validator_NotEmpty());
       $eCustomerPhone->addValidation(new Form_Validator_Regexp(Form_Validator_Regexp::REGEXP_PHONE_CZSK, $this->tr('Telefon nebyl zadán ve správném formátu')));
       $formOrder->addElement($eCustomerPhone, $fCustomerInfo);
-      
+
       // adresa nakupujícího
       $fGPayment = $formOrder->addGroup('payment', $this->tr('Fakturační adresa'));
-      
+
       $ePaymentStreet = new Form_Element_Text('paymentStreet', $this->tr('Ulice a čp'));
       $ePaymentStreet->addValidation(new Form_Validator_NotEmpty());
       $formOrder->addElement($ePaymentStreet, $fGPayment);
-      
+
       $ePaymentCity = new Form_Element_Text('paymentCity', $this->tr('Město'));
       $ePaymentCity->addValidation(new Form_Validator_NotEmpty());
       $formOrder->addElement($ePaymentCity, $fGPayment);
-      
+
       $ePaymentPostCode = new Form_Element_Text('paymentPostCode', $this->tr('PSČ'));
       $ePaymentPostCode->addValidation(new Form_Validator_NotEmpty());
       $formOrder->addElement($ePaymentPostCode, $fGPayment);
-      
+
       // stát je načten ze zones
       $ePaymentState = new Form_Element_Select('paymentCountry', $this->tr('Stát'));
-      
+
       foreach ($zones as $zone) {
          $ePaymentState->setOptions(array($zone->{Shop_Model_Zones::COLUMN_NAME} => $zone->{Shop_Model_Zones::COLUMN_ID}), true);
       }
       $formOrder->addElement($ePaymentState, $fGPayment);
-      
+
       $ePaymentCompanyName = new Form_Element_Text('paymentCompanyName', $this->tr('Firma'));
       $formOrder->addElement($ePaymentCompanyName, $fGPayment);
-      
+
       $ePaymentCompanyIC = new Form_Element_Text('paymentCompanyIC', $this->tr('IČ'));
       $formOrder->addElement($ePaymentCompanyIC, $fGPayment);
-      
+
       $ePaymentCompanyDIC = new Form_Element_Text('paymentCompanyDIC', $this->tr('DIČ'));
       $formOrder->addElement($ePaymentCompanyDIC, $fGPayment);
-      
-      
+
+
       // dodací adresa
       $fGDelivery = $formOrder->addGroup('shipping', $this->tr('Dodací adresa'));
-      
+
       $eIsDeliveryAddress = new Form_Element_Checkbox('isDeliveryAddress', $this->tr('Jiná dodací adresa'));
       $eIsDeliveryAddress->setSubLabel($this->tr('Pokud chcete zaslat zboží na jinou adresu než fakturační.'));
       $formOrder->addElement($eIsDeliveryAddress, $fGDelivery);
-      
+
       $eDeliveryName = new Form_Element_Text('deliveryName', $this->tr('Jméno a příjmení'));
       $eDeliveryName->addValidation(new Form_Validator_NotEmpty());
       $formOrder->addElement($eDeliveryName, $fGDelivery);
-      
+
       $eDeliveryStreet = new Form_Element_Text('deliveryStreet', $this->tr('Ulice a čp'));
       $eDeliveryStreet->addValidation(new Form_Validator_NotEmpty());
       $formOrder->addElement($eDeliveryStreet, $fGDelivery);
-      
+
       $eDeliveryCity = new Form_Element_Text('deliveryCity', $this->tr('Město'));
       $eDeliveryCity->addValidation(new Form_Validator_NotEmpty());
       $formOrder->addElement($eDeliveryCity, $fGDelivery);
-      
+
       $eDeliveryPostCode = new Form_Element_Text('deliveryPostCode', $this->tr('PSČ'));
       $eDeliveryPostCode->addValidation(new Form_Validator_NotEmpty());
       $formOrder->addElement($eDeliveryPostCode, $fGDelivery);
-      
+
       // stát je načten ze zones
       $eDeliveryCountry = new Form_Element_Select('deliveryCountry', $this->tr('Stát'));
-      
+
       foreach ($zones as $zone) {
          $eDeliveryCountry->setOptions(array($zone->{Shop_Model_Zones::COLUMN_NAME} => $zone->{Shop_Model_Zones::COLUMN_ID}), true);
       }
       $formOrder->addElement($eDeliveryCountry, $fGDelivery);
-      
-      
+
+
       // ostatní (vytvořit účet, newsletter)
       $eNote = new Form_Element_TextArea('note', $this->tr('Poznámka'));
       $formOrder->addElement($eNote);
-      
-      $eNewsletter = new Form_Element_Checkbox('newsletter', $this->tr('Novinky e-mailem'));
+
+      $eNewsletter = new Form_Element_Checkbox('newsletter', $this->tr('Přihlásit se k odběru novinek'));
       $eNewsletter->setValues(true);
-      $eNewsletter->setSubLabel($this->tr('Registrovat k se odběru novinek na zadaný e-mail'));
       $formOrder->addElement($eNewsletter);
       
-      $eCreateAccount = new Form_Element_Checkbox('createAcc', $this->tr('Vytvořit uživatelský účet'));
-      $eCreateAccount->setSubLabel($this->tr('Vytvořit uživatelský účet ze zadaných údajů pro příští nákup nebo prohlížení objednávek.'));
-      $formOrder->addElement($eCreateAccount);
-      
-      $eCreateAccountPass = new Form_Element_Text('createAccPassword', $this->tr('Heslo'));
-      $formOrder->addElement($eCreateAccountPass);
-      
-      $eCreateAccountPassConfirm = new Form_Element_Text('createAccPasswordC', $this->tr('Kontrola hesla'));
-      $formOrder->addElement($eCreateAccountPassConfirm);
-      
+      if(!Auth::isLogin()){
+
+         $eCreateAccount = new Form_Element_Checkbox('createAcc', $this->tr('Vytvořit uživatelský účet'));
+         $eCreateAccount->setSubLabel($this->tr('Vytvořit uživatelský účet ze zadaných údajů pro příští nákup nebo prohlížení objednávek.'));
+         $formOrder->addElement($eCreateAccount);
+
+         $eCreateAccountPass = new Form_Element_Password('createAccPassword', $this->tr('Heslo'));
+         $formOrder->addElement($eCreateAccountPass);
+
+         $eCreateAccountPassConfirm = new Form_Element_Password('createAccPasswordC', $this->tr('Kontrola hesla'));
+         $formOrder->addElement($eCreateAccountPassConfirm);
+      }
+
+      if (CUBE_CMS_SHOP_ORDER_CAT_TERMS != null) {
+         $termsLink = Url_Link::getCategoryLink(CUBE_CMS_SHOP_ORDER_CAT_TERMS);
+         $eTerms = new Form_Element_Checkbox('terms', sprintf($this->tr('Souhlasím s obchodními podmínkami. (<a href="%s" class="read-terms link-external">Přečtěte si obchodní podmínky</a>)'), $termsLink));
+         $eTerms->addValidation(new Form_Validator_NotEmpty($this->tr('Musíte souhlasit s obchodními podmínkami.')));
+         $formOrder->addElement($eTerms);
+      }
+
       $eSend = new Form_Element_Submit('send', $this->tr('Potvrdit objednávku'));
       $formOrder->addElement($eSend);
-      
+
       $eBack = new Form_Element_Submit('back', $this->tr('Zpět do košíku'));
       $formOrder->addElement($eBack);
-      
+
       // obnova dat pokud existují
+      $this->restoreCustomerDetails($formOrder);
       $this->restoreOrderInfo($formOrder);
-      
-      if($formOrder->isSend()){
-         if($formOrder->back->getValues() != false){
+
+      if ($formOrder->isSend()) {
+         if ($formOrder->back->getValues() != false) {
             $this->link()->route()->reload();
          }
-         
-         if(isset($formOrder->createAcc) && $formOrder->createAcc->getValues() == true){
-//            $eCreateAccountPass->addValidation(new Form_Validator_NotEmpty());
+
+         if (isset($formOrder->createAcc) && $formOrder->createAcc->getValues() == true) {
+            
+            $customer = Shop_Model_Customers::getCustomerByEmail($formOrder->customerEmail->getValues());
+            if($customer){
+               $formOrder->createAcc->setError($this->tr('Zákazník s tímto e-mailem je již registrován. Přihlašte se pro načtení Vašich údajů.'));
+               $formOrder->customerEmail->setError($this->tr('Zákazník s tímto e-mailem je již registrován. Přihlašte se pro načtení Vašich údajů.'));
+            }
+            
+            $eCreateAccountPass->addValidation(new Form_Validator_NotEmpty());
+            if($formOrder->createAccPassword->getValues() != $formOrder->createAccPasswordC->getValues()){
+               $formOrder->createAccPassword->setError($this->tr('Zadaná hesla se neshodují'));
+               $formOrder->createAccPasswordC->setError($this->tr('Zadaná hesla se neshodují'));
+            }
          }
-         if($formOrder->isDeliveryAddress->getValues() == false){
+         if ($formOrder->isDeliveryAddress->getValues() == false) {
             $formOrder->deliveryName->removeValidation('Form_Validator_NotEmpty');
             $formOrder->deliveryStreet->removeValidation('Form_Validator_NotEmpty');
             $formOrder->deliveryCity->removeValidation('Form_Validator_NotEmpty');
@@ -392,11 +411,11 @@ class ShopCart_Controller extends Controller {
          $this->storeOrderInfo($formOrder);
       }
 
-      if($formOrder->isValid()){
+      if ($formOrder->isValid()) {
          try {
             $cart = new Shop_Cart();
             $cart->loadItems();
-         
+
             /*
              * Kontroly stavu zboží a odečty položek pokud je zakázáno nakupování vyprodaného zboží.
              * Pokud nelze odečíst, nelze vytvořit objednávku a redirect s chybou na košík.
@@ -408,35 +427,30 @@ class ShopCart_Controller extends Controller {
             $mProductsComb = new Shop_Model_Product_Combinations();
 //            Model_ORM::lockModels(array($mProducts, Model_ORM::LOCK_WRITE), array($mProductsComb, Model_ORM::LOCK_READ));
             // kontrola dosupnosti zboží pokud není povolen nákup zboží které není skladem
-            if(!VVE_SHOP_ALLOW_BUY_NOT_IN_STOCK){
+            if (!CUBE_CMS_SHOP_ALLOW_BUY_NOT_IN_STOCK) {
                foreach ($cart->getItems() as $item) {
                   $product = $mProducts
-                     ->columns(array(
-                        '*',
-                        Shop_Model_Product::COLUMN_QUANTITY =>
-                           'COALESCE('.$mProductsComb->getTableShortName().'.'.Shop_Model_Product_Combinations::COLUMN_QTY
-                              .', '.$mProducts->getTableShortName().'.'.Shop_Model_Product::COLUMN_QUANTITY.')',
-                     ))
-                     ->join(
-                        Shop_Model_Product::COLUMN_ID, array( $mProductsComb->getTableShortName() => 'Shop_Model_Product_Combinations'),
-                        Shop_Model_Product_Combinations::COLUMN_ID_PRODUCT)
+                          ->columns(array(
+                              '*',
+                              Shop_Model_Product::COLUMN_QUANTITY =>
+                              'COALESCE(' . $mProductsComb->getTableShortName() . '.' . Shop_Model_Product_Combinations::COLUMN_QTY
+                              . ', ' . $mProducts->getTableShortName() . '.' . Shop_Model_Product::COLUMN_QUANTITY . ')',
+                          ))
+                          ->join(
+                                  Shop_Model_Product::COLUMN_ID, array($mProductsComb->getTableShortName() => 'Shop_Model_Product_Combinations'), Shop_Model_Product_Combinations::COLUMN_ID_PRODUCT)
+                          ->where(// tady je chyba pokud není kombinace (idc = 0)
+                                  Shop_Model_Product::COLUMN_ID . " = :idp AND "
+                                  . "(" . Shop_Model_Product_Combinations::COLUMN_ID . " = :idc OR " . Shop_Model_Product_Combinations::COLUMN_ID . " IS NULL)", array('idp' => $item->getProductId(), 'idc' => $item->getCombinationId()))
+                          ->record();
+                  $mProducts->reset(); // reset variables ob product
 
-
-                     ->where(    // tady je chyba pokud není kombinace (idc = 0)
-                        Shop_Model_Product::COLUMN_ID." = :idp AND "
-                           ."(".Shop_Model_Product_Combinations::COLUMN_ID." = :idc OR ".Shop_Model_Product_Combinations::COLUMN_ID." IS NULL)",
-                        array('idp' => $item->getProductId(), 'idc' => $item->getCombinationId()))
-                     ->record();
-                  $mProducts->reset();// reset variables ob product
-
-                  if(!$product->{Shop_Model_Product::COLUMN_STOCK}){ // skip products without stock
+                  if (!$product->{Shop_Model_Product::COLUMN_STOCK}) { // skip products without stock
                      continue;
                   }
 
-                  if(!$product){
+                  if (!$product) {
                      throw new RangeException(
-                        sprintf($this->tr('Omlouváme se, ale zboží "%s" bylo stáhnuto z prodeje. Upravte prosím položky v košíku.'),
-                           $product->{Shop_Model_Product::COLUMN_NAME}));
+                     sprintf($this->tr('Omlouváme se, ale zboží "%s" bylo stáhnuto z prodeje. Upravte prosím položky v košíku.'), $product->{Shop_Model_Product::COLUMN_NAME}));
                   }
 
                   /* @var $item Shop_Cart_Item */
@@ -444,21 +458,23 @@ class ShopCart_Controller extends Controller {
                   // zboží už je vyprodané
                   if ($prQty <= 0) {
                      throw new RangeException(
-                        sprintf($this->tr('Omlouváme se, ale zboží "%s" je již vyprodané. Upravte prosím položky v košíku.'),
-                           $product->{Shop_Model_Product::COLUMN_NAME}.($item->getNote() != null ? " - ".$item->getNote() : null) ));
+                     sprintf($this->tr('Omlouváme se, ale zboží "%s" je již vyprodané. Upravte prosím položky v košíku.'), $product->{Shop_Model_Product::COLUMN_NAME} . ($item->getNote() != null ? " - " . $item->getNote() : null)));
                   }
                   // zboží není v potřebném množství
-                  else if ( $prQty < $item->getQty()) {
+                  else if ($prQty < $item->getQty()) {
                      throw new RangeException(
-                        sprintf($this->tr("Omlouváme se, ale zboží %s není již v požadovaném množství.
-                           Upravte prosím položky v košíku. Aktuálně je dostupné: %s %s."),
-                           $product->{Shop_Model_Product::COLUMN_NAME}.($item->getNote() != null ? " - ".$item->getNote() : null),
-                           $prQty, $product->{Shop_Model_Product::COLUMN_UNIT} ));
+                     sprintf($this->tr("Omlouváme se, ale zboží %s není již v požadovaném množství.
+                           Upravte prosím položky v košíku. Aktuálně je dostupné: %s %s."), $product->{Shop_Model_Product::COLUMN_NAME} . ($item->getNote() != null ? " - " . $item->getNote() : null), $prQty, $product->{Shop_Model_Product::COLUMN_UNIT}));
                   }
                }
             }
+            
             // vytvoření zákazníka
-            $customer = $this->createCustomer($formOrder);
+            if(isset($formOrder->createAcc) && $formOrder->createAcc->getValues() == true){
+               $customer = $this->createCustomer($formOrder, true);
+            } else {
+               $customer = $this->createCustomer($formOrder, false);
+            }
             // vytvoření objednávky
             $order = $this->createOrder($formOrder, $cart, $customer);
             $orderID = $order->getPK();
@@ -469,22 +485,22 @@ class ShopCart_Controller extends Controller {
             // samotný update zboží a zařazování položek do objednávky
             foreach ($cart->getItems() as $id => $item) {
 
-               if($item->getCombinationId() == 0){
+               if ($item->getCombinationId() == 0) {
                   // update product combination
-                  $mProducts->where(Shop_Model_Product::COLUMN_ID." = :idp", array('idp' => $item->getProductId()))
-                  ->update(
-                     array( Shop_Model_Product::COLUMN_QUANTITY => array(
-                        'stmt' => Shop_Model_Product::COLUMN_QUANTITY." - :qty",
-                        'values' => array('qty' => (int)$item->getQty())
-                     )));
+                  $mProducts->where(Shop_Model_Product::COLUMN_ID . " = :idp", array('idp' => $item->getProductId()))
+                          ->update(
+                                  array(Shop_Model_Product::COLUMN_QUANTITY => array(
+                                          'stmt' => Shop_Model_Product::COLUMN_QUANTITY . " - :qty",
+                                          'values' => array('qty' => (int) $item->getQty())
+                  )));
                } else {
                   // update product
-                  $mCombination->where(Shop_Model_Product_Combinations::COLUMN_ID." = :idc", array('idc' => $item->getCombinationId()))
-                     ->update(
-                     array( Shop_Model_Product_Combinations::COLUMN_QTY => array(
-                        'stmt' => Shop_Model_Product_Combinations::COLUMN_QTY." - :qty",
-                        'values' => array('qty' => (int)$item->getQty())
-                     )));
+                  $mCombination->where(Shop_Model_Product_Combinations::COLUMN_ID . " = :idc", array('idc' => $item->getCombinationId()))
+                          ->update(
+                                  array(Shop_Model_Product_Combinations::COLUMN_QTY => array(
+                                          'stmt' => Shop_Model_Product_Combinations::COLUMN_QTY . " - :qty",
+                                          'values' => array('qty' => (int) $item->getQty())
+                  )));
                }
 
                // add order item
@@ -499,23 +515,17 @@ class ShopCart_Controller extends Controller {
 
             // základní stav objednávky
 //            $order->changeState(CUBE_CMS_SHOP_ORDER_DEFAULT_STATUS);
-            
             // stav objednávky pokud má platba 
-             // základní stav objednávky
+            // základní stav objednávky
             $order->changeState(CUBE_CMS_SHOP_ORDER_DEFAULT_STATUS);
 
             $modelPayments = new Shop_Model_Payments();
             $payment = $modelPayments->record($order->{Shop_Model_Orders::COLUMN_PAYMENT_ID});
-            if($payment->{Shop_Model_Payments::COLUMN_ID_STATE} != null){
+            if ($payment->{Shop_Model_Payments::COLUMN_ID_STATE} != null) {
                $order->changeState($payment->{Shop_Model_Payments::COLUMN_ID_STATE});
             }
-            
-            // nasatvení stavu objendávky, podle zadané platební metody
-//            $this->createOrderStatus($orderID);
-
             // send mails
             $this->generateMails($order, $cart);
-
          } catch (RangeException $exc) {
 //            $this->errMsg()->addMessage($exc->getMessage()); // del
             $this->errMsg()->addMessage($exc->getMessage(), true);
@@ -535,58 +545,79 @@ class ShopCart_Controller extends Controller {
       $this->view()->formOrder = $formOrder;
    }
 
-   private function createCustomer(Form $formOrder)
+   protected function orderControllerLoginForm()
    {
-      $modelCustomer = new Shop_Model_Customers();
-      $modelUsers = new Model_Users();
-//      $email = $formOrder->customerEmail->getValues();
-
-      $user = $modelUsers->where(Model_Users::COLUMN_MAIL." = :mail", array('mail' => $formOrder->customerEmail->getValues()))->record();
-      if(!$user){
-         // nový uživatel
-         $user = $modelUsers->newRecord();
-         $user->{Model_Users::COLUMN_ID_GROUP} = VVE_SHOP_CUSTOMERS_GROUP_ID != 0 ? VVE_SHOP_CUSTOMERS_GROUP_ID : VVE_DEFAULT_ID_GROUP;
-         $user->{Model_Users::COLUMN_USERNAME} = vve_cr_safe_file_name($formOrder->customerSurname->getValues());
-         $user->{Model_Users::COLUMN_MAIL} = $formOrder->customerEmail->getValues();
-         $user->{Model_Users::COLUMN_NAME} = $formOrder->customerName->getValues();
-         $user->{Model_Users::COLUMN_SURNAME} = $formOrder->customerSurname->getValues();
-         $user->{Model_Users::COLUMN_PASSWORD} = Auth::cryptPassword(Auth::generatePassword());
-         $user->save();
+      if(!Auth::isLogin()){
+         $formLogin = Auth::getAuthenticator()->getLoginForm();
+         $this->view()->formLogin = $formLogin;
       }
-
-      $customer = $modelCustomer->where(Shop_Model_Customers::COLUMN_ID_USER." = :idu", array('idu' => $user->getPK()))->record();
+   }
+   
+   private function createCustomer(Form $formOrder, $createAccount = false)
+   {
+      $modelUsers = new Model_Users();
+      $user = false;
+      
+      $user = $modelUsers->where(Model_Users::COLUMN_MAIL . " = :mail", array('mail' => $formOrder->customerEmail->getValues()))->record();
+      if (!$user) {
+         $user = $modelUsers->newRecord();
+      }
+      
+      $login = Utils_String::toSafeFileName($formOrder->customerName->getValues().$formOrder->customerSurname->getValues());
+      $login = Model_Users::createUniqueUsername($login);
+      
+      $user->{Model_Users::COLUMN_ID_GROUP} = $createAccount ? CUBE_CMS_SHOP_CUSTOMERS_GROUP_ID : CUBE_CMS_DEFAULT_ID_GROUP;
+      $user->{Model_Users::COLUMN_USERNAME} = $login;
+      $user->{Model_Users::COLUMN_MAIL} = $formOrder->customerEmail->getValues();
+      $user->{Model_Users::COLUMN_NAME} = $formOrder->customerName->getValues();
+      $user->{Model_Users::COLUMN_SURNAME} = $formOrder->customerSurname->getValues();
+      if($createAccount){
+         $user->{Model_Users::COLUMN_PASSWORD} = Auth::cryptPassword(Auth::generatePassword());
+      }
+      $user->save();
+      
+      
+      $customer = Shop_Model_Customers::getCustomer($user->getPK());
       // pokud neexituje zákazník se zadaným emailem, vytvoří se
-      if(!$customer){
-         $customer = $modelCustomer->newRecord();
+      if (!$customer) {
+         $customer = Shop_Model_Customers::getNewRecord();
          $customer->{Shop_Model_Customers::COLUMN_ID_USER} = $user->getPK();
-         $customer->{Shop_Model_Customers::COLUMN_ID_GROUP} = VVE_SHOP_CUSTOMERS_DEFAULT_GROUP_ID;
-         $customer->{Shop_Model_Customers::COLUMN_PHONE} = $formOrder->customerPhone->getValues();
+         $customer->{Shop_Model_Customers::COLUMN_ID_GROUP} = CUBE_CMS_SHOP_CUSTOMERS_DEFAULT_GROUP_ID;
+      } else {
+         // update loginu a emailu u uživatele. Orpavdu?
+      }
+         
+      $customer->{Shop_Model_Customers::COLUMN_PHONE} = $formOrder->customerPhone->getValues();
 
-         $customer->{Shop_Model_Customers::COLUMN_COMPANY} = $formOrder->paymentCompanyName->getValues();
-         $customer->{Shop_Model_Customers::COLUMN_STREET} = $formOrder->paymentStreet->getValues();
-         $customer->{Shop_Model_Customers::COLUMN_CITY} = $formOrder->paymentCity->getValues();
-         $customer->{Shop_Model_Customers::COLUMN_PSC} = $formOrder->paymentPostCode->getValues();
-         $customer->{Shop_Model_Customers::COLUMN_ID_COUNTRY} = $formOrder->paymentCountry->getValues();
-         $customer->{Shop_Model_Customers::COLUMN_IC} = $formOrder->paymentCompanyIC->getValues();
-         $customer->{Shop_Model_Customers::COLUMN_DIC} = $formOrder->paymentCompanyDIC->getValues();
-         $customer->{Shop_Model_Customers::COLUMN_DELIVERY_NAME} = $formOrder->deliveryName->getValues();
-         $customer->{Shop_Model_Customers::COLUMN_DELIVERY_STREET} = $formOrder->deliveryStreet->getValues();
-         $customer->{Shop_Model_Customers::COLUMN_DELIVERY_CITY} = $formOrder->deliveryCity->getValues();
-         $customer->{Shop_Model_Customers::COLUMN_DELIVERY_PSC} = $formOrder->deliveryPostCode->getValues();
-         $customer->{Shop_Model_Customers::COLUMN_ID_DELIVERY_COUNTRY} = $formOrder->deliveryCountry->getValues();
+      $customer->{Shop_Model_Customers::COLUMN_COMPANY} = $formOrder->paymentCompanyName->getValues();
+      $customer->{Shop_Model_Customers::COLUMN_STREET} = $formOrder->paymentStreet->getValues();
+      $customer->{Shop_Model_Customers::COLUMN_CITY} = $formOrder->paymentCity->getValues();
+      $customer->{Shop_Model_Customers::COLUMN_PSC} = $formOrder->paymentPostCode->getValues();
+      $customer->{Shop_Model_Customers::COLUMN_ID_COUNTRY} = $formOrder->paymentCountry->getValues();
+      $customer->{Shop_Model_Customers::COLUMN_IC} = $formOrder->paymentCompanyIC->getValues();
+      $customer->{Shop_Model_Customers::COLUMN_DIC} = $formOrder->paymentCompanyDIC->getValues();
+      $customer->{Shop_Model_Customers::COLUMN_DELIVERY_NAME} = $formOrder->deliveryName->getValues();
+      $customer->{Shop_Model_Customers::COLUMN_DELIVERY_STREET} = $formOrder->deliveryStreet->getValues();
+      $customer->{Shop_Model_Customers::COLUMN_DELIVERY_CITY} = $formOrder->deliveryCity->getValues();
+      $customer->{Shop_Model_Customers::COLUMN_DELIVERY_PSC} = $formOrder->deliveryPostCode->getValues();
+      $customer->{Shop_Model_Customers::COLUMN_ID_DELIVERY_COUNTRY} = $formOrder->deliveryCountry->getValues();
+      $customer->{Shop_Model_Customers::COLUMN_NEWSLETTER} = $formOrder->newsletter->getValues();
          // customer info
 
-         $customer->save();
-      }
+      $customer->save();
+      
       // newsletter
-      if($formOrder->newsletter->getValues() && VVE_SHOP_NEWSLETTER_GROUP_ID != 0){
-         $modelMails = new MailsAddressBook_Model_Addressbook();
-         $newRec = $modelMails->newRecord();
-         $newRec->{MailsAddressBook_Model_Addressbook::COLUMN_NAME} = $formOrder->customerName->getValues();
-         $newRec->{MailsAddressBook_Model_Addressbook::COLUMN_SURNAME} = $formOrder->customerSurname->getValues();
-         $newRec->{MailsAddressBook_Model_Addressbook::COLUMN_MAIL} = $formOrder->customerEmail->getValues();
-         $newRec->{MailsAddressBook_Model_Addressbook::COLUMN_ID_GRP} = VVE_SHOP_NEWSLETTER_GROUP_ID;
-         $newRec->save();
+      if (CUBE_CMS_SHOP_NEWSLETTER_GROUP_ID != 0) {
+         if($formOrder->newsletter->getValues()){
+            $newRec = MailsAddressBook_Model_Addressbook::getNewRecord();
+            $newRec->{MailsAddressBook_Model_Addressbook::COLUMN_NAME} = $formOrder->customerName->getValues();
+            $newRec->{MailsAddressBook_Model_Addressbook::COLUMN_SURNAME} = $formOrder->customerSurname->getValues();
+            $newRec->{MailsAddressBook_Model_Addressbook::COLUMN_MAIL} = $formOrder->customerEmail->getValues();
+            $newRec->{MailsAddressBook_Model_Addressbook::COLUMN_ID_GRP} = CUBE_CMS_SHOP_NEWSLETTER_GROUP_ID;
+            $newRec->save();
+         } else if($user instanceof Model_ORM_Record) {
+            MailsAddressBook_Model_Addressbook::removeMail($user->{Model_Users::COLUMN_MAIL});
+         }
       }
 
       return $customer;
@@ -601,7 +632,7 @@ class ShopCart_Controller extends Controller {
 
       $order = $modelOrder->newRecord();
 
-      $order->{Shop_Model_Orders::COLUMN_CUSTOMER_NAME} = $formOrder->customerName->getValues()." ".$formOrder->customerSurname->getValues();
+      $order->{Shop_Model_Orders::COLUMN_CUSTOMER_NAME} = $formOrder->customerName->getValues() . " " . $formOrder->customerSurname->getValues();
       $order->{Shop_Model_Orders::COLUMN_ID_CUSTOMER} = $customer->getPK();
       $order->{Shop_Model_Orders::COLUMN_CUSTOMER_PHONE} = $formOrder->customerPhone->getValues();
       $order->{Shop_Model_Orders::COLUMN_CUSTOMER_EMAIL} = $formOrder->customerEmail->getValues();
@@ -609,27 +640,24 @@ class ShopCart_Controller extends Controller {
       $order->{Shop_Model_Orders::COLUMN_CUSTOMER_CITY} = $formOrder->paymentCity->getValues();
       $order->{Shop_Model_Orders::COLUMN_CUSTOMER_POST_CODE} = $formOrder->paymentPostCode->getValues();
 
-      $order->{Shop_Model_Orders::COLUMN_CUSTOMER_COUNTRY} =
-         array_search($formOrder->paymentCountry->getValues(), $formOrder->paymentCountry->getOptions());
+      $order->{Shop_Model_Orders::COLUMN_CUSTOMER_COUNTRY} = array_search($formOrder->paymentCountry->getValues(), $formOrder->paymentCountry->getOptions());
 
       $order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY} = $formOrder->paymentCompanyName->getValues();
       $order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY_IC} = $formOrder->paymentCompanyIC->getValues();
       $order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY_DIC} = $formOrder->paymentCompanyDIC->getValues();
 
-      if($formOrder->isDeliveryAddress->getValues() == true){
+      if ($formOrder->isDeliveryAddress->getValues() == true) {
          $order->{Shop_Model_Orders::COLUMN_DELIVERY_NAME} = $formOrder->deliveryName->getValues();
          $order->{Shop_Model_Orders::COLUMN_DELIVERY_STREET} = $formOrder->deliveryStreet->getValues();
          $order->{Shop_Model_Orders::COLUMN_DELIVERY_CITY} = $formOrder->deliveryCity->getValues();
          $order->{Shop_Model_Orders::COLUMN_DELIVERY_POST_CODE} = $formOrder->deliveryPostCode->getValues();
-         $order->{Shop_Model_Orders::COLUMN_DELIVERY_COUNTRY} =
-            array_search($formOrder->deliveryCountry->getValues(), $formOrder->deliveryCountry->getOptions());
+         $order->{Shop_Model_Orders::COLUMN_DELIVERY_COUNTRY} = array_search($formOrder->deliveryCountry->getValues(), $formOrder->deliveryCountry->getOptions());
       } else {
-         $order->{Shop_Model_Orders::COLUMN_DELIVERY_NAME} = $formOrder->customerName->getValues()." ".$formOrder->customerSurname->getValues();
+         $order->{Shop_Model_Orders::COLUMN_DELIVERY_NAME} = $formOrder->customerName->getValues() . " " . $formOrder->customerSurname->getValues();
          $order->{Shop_Model_Orders::COLUMN_DELIVERY_STREET} = $formOrder->paymentStreet->getValues();
          $order->{Shop_Model_Orders::COLUMN_DELIVERY_CITY} = $formOrder->paymentCity->getValues();
          $order->{Shop_Model_Orders::COLUMN_DELIVERY_POST_CODE} = $formOrder->paymentPostCode->getValues();
-         $order->{Shop_Model_Orders::COLUMN_DELIVERY_COUNTRY} =
-            array_search($formOrder->paymentCountry->getValues(), $formOrder->paymentCountry->getOptions());
+         $order->{Shop_Model_Orders::COLUMN_DELIVERY_COUNTRY} = array_search($formOrder->paymentCountry->getValues(), $formOrder->paymentCountry->getOptions());
       }
 
       $productsPrice = $cart->getPrice();
@@ -640,25 +668,25 @@ class ShopCart_Controller extends Controller {
 
       // metoda platby
       $order->{Shop_Model_Orders::COLUMN_PAYMENT_ID} = $payment->{Shop_Model_Payments::COLUMN_ID};
-      $order->{Shop_Model_Orders::COLUMN_PAYMENT_METHOD} = (string)$payment->{Shop_Model_Payments::COLUMN_NAME};
+      $order->{Shop_Model_Orders::COLUMN_PAYMENT_METHOD} = (string) $payment->{Shop_Model_Payments::COLUMN_NAME};
       $order->{Shop_Model_Orders::COLUMN_SHIPPING_ID} = $shipping->{Shop_Model_Shippings::COLUMN_ID};
-      $order->{Shop_Model_Orders::COLUMN_SHIPPING_METHOD} = (string)$shipping->{Shop_Model_Shippings::COLUMN_NAME};
+      $order->{Shop_Model_Orders::COLUMN_SHIPPING_METHOD} = (string) $shipping->{Shop_Model_Shippings::COLUMN_NAME};
       $order->{Shop_Model_Orders::COLUMN_PICKUP_DATE} = $pickUpDate;
 
-      if($productsPrice >= VVE_SHOP_FREE_SHIPPING && VVE_SHOP_FREE_SHIPPING != -1){ // doprava a platba zdarma
+      if ($productsPrice >= CUBE_CMS_SHOP_FREE_SHIPPING && CUBE_CMS_SHOP_FREE_SHIPPING != -1) { // doprava a platba zdarma
          $shippingPrice = 0;
          $paymentPrice = 0;
       } else {
-         if(strpos($payment->{Shop_Model_Payments::COLUMN_PRICE_ADD}, '%') === false){
-            $paymentPrice = (int)$payment->{Shop_Model_Payments::COLUMN_PRICE_ADD};
+         if (strpos($payment->{Shop_Model_Payments::COLUMN_PRICE_ADD}, '%') === false) {
+            $paymentPrice = (int) $payment->{Shop_Model_Payments::COLUMN_PRICE_ADD};
          } else {
-            $paymentPrice = $productsPrice/100*(int)$payment->{Shop_Model_Payments::COLUMN_PRICE_ADD};
+            $paymentPrice = $productsPrice / 100 * (int) $payment->{Shop_Model_Payments::COLUMN_PRICE_ADD};
          }
 
-         if(strpos($shipping->{Shop_Model_Shippings::COLUMN_VALUE}, '%') === false){
-            $shippingPrice = (int)$shipping->{Shop_Model_Shippings::COLUMN_VALUE};
+         if (strpos($shipping->{Shop_Model_Shippings::COLUMN_VALUE}, '%') === false) {
+            $shippingPrice = (int) $shipping->{Shop_Model_Shippings::COLUMN_VALUE};
          } else {
-            $shippingPrice = $productsPrice/100*(int)$shipping->{Shop_Model_Shippings::COLUMN_VALUE};
+            $shippingPrice = $productsPrice / 100 * (int) $shipping->{Shop_Model_Shippings::COLUMN_VALUE};
          }
       }
 
@@ -671,17 +699,15 @@ class ShopCart_Controller extends Controller {
 //         if($formOrder->newsletter->getValues() == true){
 //
 //         }
-
       // registrace uživatelského účtu
 //         if($formOrder->createAcc->getValues() == true){
 //
 //         }
-
       // ostatní položky objednávky
       $order->{Shop_Model_Orders::COLUMN_NOTE} = $formOrder->note->getValues();
       $order->{Shop_Model_Orders::COLUMN_IP} = $_SERVER['REMOTE_ADDR'];
       $order->save();
-      
+
       $_SESSION['shop_order']['orderId'] = $order->getPK();
       $_SESSION['shop_order']['paymentClass'] = $payment->{Shop_Model_Payments::COLUMN_CLASS};
       return $order;
@@ -694,7 +720,7 @@ class ShopCart_Controller extends Controller {
       $orderItem = $modelOrderItems->newRecord();
 
       $orderItem->{Shop_Model_OrderItems::COLUMN_ID_ORDER} = $orderId;
-      $orderItem->{Shop_Model_OrderItems::COLUMN_NAME} = (string)$item->getName();
+      $orderItem->{Shop_Model_OrderItems::COLUMN_NAME} = (string) $item->getName();
       $orderItem->{Shop_Model_OrderItems::COLUMN_NOTE} = $item->getNote();
       $orderItem->{Shop_Model_OrderItems::COLUMN_PRICE} = $item->getPrice(true, false);
       $orderItem->{Shop_Model_OrderItems::COLUMN_QTY} = $item->getQty();
@@ -708,7 +734,7 @@ class ShopCart_Controller extends Controller {
 
    private function &getOrderStore()
    {
-      if(!isset ($_SESSION['shop_order']) || !is_array($_SESSION['shop_order'])){
+      if (!isset($_SESSION['shop_order']) || !is_array($_SESSION['shop_order'])) {
          $_SESSION['shop_order'] = array();
       }
       return $_SESSION['shop_order'];
@@ -718,12 +744,12 @@ class ShopCart_Controller extends Controller {
    {
       // tady pouze admin mail. uživatel se odesílá při změně stavu
       $state = Shop_Model_OrdersStates::getRecord(CUBE_CMS_SHOP_ORDER_DEFAULT_STATUS);
-      
-      if($state->{Shop_Model_OrdersStates::COLUMN_ID_TEMPLATE} != 0 && CUBE_CMS_SHOP_ORDER_MAIL != null){
+
+      if ($state->{Shop_Model_OrdersStates::COLUMN_ID_TEMPLATE} != 0 && CUBE_CMS_SHOP_ORDER_MAIL != null) {
          $cnt = Templates_Model::getTemplate($state->{Shop_Model_OrdersStates::COLUMN_ID_TEMPLATE}, Locales::getDefaultLang());
-         
+
          $mailCnt = Shop_Tools::getMailTplContent($cnt->{Templates_Model::COLUMN_CONTENT}, $order);
-         
+
          $emailAdmin = new Email(true);
          $emailAdmin->addAddress(CUBE_CMS_SHOP_ORDER_MAIL);
          $emailAdmin->setFrom(CUBE_CMS_NOREPLAY_MAIL);
@@ -732,195 +758,226 @@ class ShopCart_Controller extends Controller {
          $emailAdmin->send();
       }
       return;
-      
-      
-      $userMailText = $adminMailText =
-         "Objednávka z {STRANKY}<br /><br />
+
+
+      $userMailText = $adminMailText = "Objednávka z {STRANKY}<br /><br />
          {INFO}<br /><br />
          <h2>Zboží:</h2> {ZBOZI}<br /><br />
          <h2>Dodací adresa:</h2>{ADRESA_DODACI}<br /><br />
          <h2>Fakturační adresa:</h2>{ADRESA_FAKTURACNI}<br />";
 
-      if (is_file($this->module()->getDataDir().'mail_tpl_user_'.Locales::getLang().'.html')) {
-         $userMailText = file_get_contents($this->module()->getDataDir().'mail_tpl_user_'.Locales::getLang().'.html');
+      if (is_file($this->module()->getDataDir() . 'mail_tpl_user_' . Locales::getLang() . '.html')) {
+         $userMailText = file_get_contents($this->module()->getDataDir() . 'mail_tpl_user_' . Locales::getLang() . '.html');
       }
-      
-      if (is_file($this->module()->getDataDir().'mail_tpl_admin.html')) {
-         $adminMailText = file_get_contents($this->module()->getDataDir().'mail_tpl_admin.html');
+
+      if (is_file($this->module()->getDataDir() . 'mail_tpl_admin.html')) {
+         $adminMailText = file_get_contents($this->module()->getDataDir() . 'mail_tpl_admin.html');
       }
-      
+
       /* info o objednávce */
       $orderInfo = "";
-      $orderInfo .= 'Číslo objednávky / variabilní symbol: <strong>'.$order->{Shop_Model_Orders::COLUMN_ID}."</strong><br/>";
-      $orderInfo .= 'Datum objednávky: '.  vve_date("%x");
+      $orderInfo .= 'Číslo objednávky / variabilní symbol: <strong>' . $order->{Shop_Model_Orders::COLUMN_ID} . "</strong><br/>";
+      $orderInfo .= 'Datum objednávky: ' . vve_date("%x");
       $orderInfo .= "";
 
       /* Zboží */
       $orderItems = '<table class="table-data">';
       $orderItems .= '<tr>'
-         .'<th style="text-align: left;">'.$this->tr('Zboží').'</th>'
-         .'<th style="text-align: left;">'.$this->tr('Množství').'</th>'
-         .'<th style="text-align: left;">'.$this->tr('Cena').'</th>'
+              . '<th style="text-align: left;">' . $this->tr('Zboží') . '</th>'
+              . '<th style="text-align: left;">' . $this->tr('Množství') . '</th>'
+              . '<th style="text-align: left;">' . $this->tr('Cena') . '</th>'
       ;
       $orderItems .= '</tr>';
       foreach ($cart as $item) {
          // 1 Ks Náhrdelník (zlatý) = 500 Kč
          $itemStr = $item->getName();
-         if($item->getNote() != null){
-            $itemStr .= '<br />('.$item->getNote().')';
+         if ($item->getNote() != null) {
+            $itemStr .= '<br />(' . $item->getNote() . ')';
          }
-         $orderItems .= '<tr><td>'.$itemStr.'</td>'
-            .'<td>'.$item->getQty().' '.$item->getUnit().'</td>'
-            .'<td style="text-align: right;">'.Shop_Tools::getFormatedPrice($item->getPrice()).'</td></tr>';
+         $orderItems .= '<tr><td>' . $itemStr . '</td>'
+                 . '<td>' . $item->getQty() . ' ' . $item->getUnit() . '</td>'
+                 . '<td style="text-align: right;">' . Shop_Tools::getFormatedPrice($item->getPrice()) . '</td></tr>';
       }
       $orderItems .= '<tr><td colspan="3"></td></tr>';
       $orderItems .= '<tr><td colspan="2">Mezisoučet:</td>'
-         .'<td style="text-align: right;"><strong>'.Shop_Tools::getFormatedPrice($cart->getPrice())."</strong></td></tr>";
+              . '<td style="text-align: right;"><strong>' . Shop_Tools::getFormatedPrice($cart->getPrice()) . "</strong></td></tr>";
       $orderItems .= '<tr><td colspan="3"></td></tr>';
       // info k dopravě
-      $orderItems .= '<tr><td colspan="2">Doprva: '.$order->{Shop_Model_Orders::COLUMN_SHIPPING_METHOD}.'</td>'
-         .'<td style="text-align: right;"><strong>'.Shop_Tools::getFormatedPrice($order->{Shop_Model_Orders::COLUMN_SHIPPING_PRICE})."</strong></td></tr>";
+      $orderItems .= '<tr><td colspan="2">Doprva: ' . $order->{Shop_Model_Orders::COLUMN_SHIPPING_METHOD} . '</td>'
+              . '<td style="text-align: right;"><strong>' . Shop_Tools::getFormatedPrice($order->{Shop_Model_Orders::COLUMN_SHIPPING_PRICE}) . "</strong></td></tr>";
 
       $modelS = new Shop_Model_Shippings;
       $ship = $modelS->record($order->{Shop_Model_Orders::COLUMN_SHIPPING_ID});
-      if($ship != false){
-         $orderItems .= preg_replace(array('/\n\n*/', '/\s{2,}/'),array("\n", " "), strip_tags($ship->{Shop_Model_Shippings::COLUMN_TEXT}))."\n";
+      if ($ship != false) {
+         $orderItems .= preg_replace(array('/\n\n*/', '/\s{2,}/'), array("\n", " "), strip_tags($ship->{Shop_Model_Shippings::COLUMN_TEXT})) . "\n";
       }
       // info k platbě
       $modelP = new Shop_Model_Payments();
       $payment = $modelP->record($order->{Shop_Model_Orders::COLUMN_PAYMENT_ID});
-      $orderItems .= '<tr><td colspan="2">Platba: '.$order->{Shop_Model_Orders::COLUMN_PAYMENT_METHOD}.'</td>'
-         .'<td style="text-align: right;"><strong>'.Shop_Tools::getFormatedPrice($order->{Shop_Model_Orders::COLUMN_PAYMENT_PRICE})."</strong></td></tr>";
+      $orderItems .= '<tr><td colspan="2">Platba: ' . $order->{Shop_Model_Orders::COLUMN_PAYMENT_METHOD} . '</td>'
+              . '<td style="text-align: right;"><strong>' . Shop_Tools::getFormatedPrice($order->{Shop_Model_Orders::COLUMN_PAYMENT_PRICE}) . "</strong></td></tr>";
 
-      if($payment != false){
+      if ($payment != false) {
          $orderItems .= '<tr><td colspan="2"><em>'
-            .preg_replace(array('/\n\n*/', '/\s{2,}/'),array("\n", " "), strip_tags($payment->{Shop_Model_Payments::COLUMN_TEXT})).'</em></td>'
-            .'<td style="text-align: right;"></td></tr>';
+                 . preg_replace(array('/\n\n*/', '/\s{2,}/'), array("\n", " "), strip_tags($payment->{Shop_Model_Payments::COLUMN_TEXT})) . '</em></td>'
+                 . '<td style="text-align: right;"></td></tr>';
       }
       // kompletní cena
-      $orderItems .= '<tr><td colspan="2"><strong>Cena celkem:</strong></td>'.
-         '<td><strong>'.Shop_Tools::getFormatedPrice(
-            $cart->getPrice()+$order->{Shop_Model_Orders::COLUMN_PAYMENT_PRICE}+$order->{Shop_Model_Orders::COLUMN_SHIPPING_PRICE})."</strong></td></tr>";
+      $orderItems .= '<tr><td colspan="2"><strong>Cena celkem:</strong></td>' .
+              '<td><strong>' . Shop_Tools::getFormatedPrice(
+                      $cart->getPrice() + $order->{Shop_Model_Orders::COLUMN_PAYMENT_PRICE} + $order->{Shop_Model_Orders::COLUMN_SHIPPING_PRICE}) . "</strong></td></tr>";
       $orderItems .= '</table>';
 
       /* Adresa fakturační */
 
       $addressPayment = '';
-      $addressPayment .= $order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY} != null ? $order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY}."<br />" : null;
+      $addressPayment .= $order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY} != null ? $order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY} . "<br />" : null;
 
-      $addressPayment .= $order->{Shop_Model_Orders::COLUMN_CUSTOMER_NAME}."<br />";
-      $addressPayment .= $order->{Shop_Model_Orders::COLUMN_CUSTOMER_STREET}."<br />";
-      $addressPayment .= $order->{Shop_Model_Orders::COLUMN_CUSTOMER_CITY}.' '.$order->{Shop_Model_Orders::COLUMN_CUSTOMER_POST_CODE}."<br />";
-      $addressPayment .= $order->{Shop_Model_Orders::COLUMN_CUSTOMER_COUNTRY}."<br />";
-      $addressPayment .= $order->{Shop_Model_Orders::COLUMN_CUSTOMER_EMAIL}."<br />";
-      $addressPayment .= $order->{Shop_Model_Orders::COLUMN_CUSTOMER_PHONE}."<br />";
+      $addressPayment .= $order->{Shop_Model_Orders::COLUMN_CUSTOMER_NAME} . "<br />";
+      $addressPayment .= $order->{Shop_Model_Orders::COLUMN_CUSTOMER_STREET} . "<br />";
+      $addressPayment .= $order->{Shop_Model_Orders::COLUMN_CUSTOMER_CITY} . ' ' . $order->{Shop_Model_Orders::COLUMN_CUSTOMER_POST_CODE} . "<br />";
+      $addressPayment .= $order->{Shop_Model_Orders::COLUMN_CUSTOMER_COUNTRY} . "<br />";
+      $addressPayment .= $order->{Shop_Model_Orders::COLUMN_CUSTOMER_EMAIL} . "<br />";
+      $addressPayment .= $order->{Shop_Model_Orders::COLUMN_CUSTOMER_PHONE} . "<br />";
 
       $addressPayment .= $order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY_DIC} != null ?
-         'DIČ: '.$order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY_DIC}."<br />" : null;
+              'DIČ: ' . $order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY_DIC} . "<br />" : null;
       $addressPayment .= $order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY_IC} != null ?
-         'IČ: '.$order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY_IC}."<br /><br />" : null;
+              'IČ: ' . $order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY_IC} . "<br /><br />" : null;
 
       /* adresa dodací */
       $addressShip = "";
-      $addressShip .= $order->{Shop_Model_Orders::COLUMN_DELIVERY_NAME}."<br />";
-      $addressShip .= $order->{Shop_Model_Orders::COLUMN_DELIVERY_STREET}."<br />";
-      $addressShip .= $order->{Shop_Model_Orders::COLUMN_DELIVERY_CITY}.' '.$order->{Shop_Model_Orders::COLUMN_DELIVERY_POST_CODE}."<br />";
-      $addressShip .= $order->{Shop_Model_Orders::COLUMN_DELIVERY_COUNTRY}."<br />";
+      $addressShip .= $order->{Shop_Model_Orders::COLUMN_DELIVERY_NAME} . "<br />";
+      $addressShip .= $order->{Shop_Model_Orders::COLUMN_DELIVERY_STREET} . "<br />";
+      $addressShip .= $order->{Shop_Model_Orders::COLUMN_DELIVERY_CITY} . ' ' . $order->{Shop_Model_Orders::COLUMN_DELIVERY_POST_CODE} . "<br />";
+      $addressShip .= $order->{Shop_Model_Orders::COLUMN_DELIVERY_COUNTRY} . "<br />";
       $addressShip .= '';
-       
+
       /* poznamka */
       $note = null;
-      if($order->{Shop_Model_Orders::COLUMN_NOTE} != null){
-         $note = "".$order->{Shop_Model_Orders::COLUMN_NOTE}."";
+      if ($order->{Shop_Model_Orders::COLUMN_NOTE} != null) {
+         $note = "" . $order->{Shop_Model_Orders::COLUMN_NOTE} . "";
       }
-      
+
       $searchArr = array(
-         '{STRANKY}',
-         '{DATUM}',
-         '{INFO}',
-         '{ZBOZI}',
-         '{ADRESA_OBCHOD}',
-         '{ADRESA_DODACI}',
-         '{ADRESA_FAKTURACNI}',
-         '{POZNAMKA}',
-         '{IP}',
+          '{STRANKY}',
+          '{DATUM}',
+          '{INFO}',
+          '{ZBOZI}',
+          '{ADRESA_OBCHOD}',
+          '{ADRESA_DODACI}',
+          '{ADRESA_FAKTURACNI}',
+          '{POZNAMKA}',
+          '{IP}',
       );
       $replaceArr = array(
-         '<a href="'.Url_Link::getMainWebDir().'" title="'.VVE_WEB_NAME.'">'.VVE_WEB_NAME.'</a>',
-         vve_date('%X %x'),
-         $orderInfo,
-         $orderItems,
-         VVE_SHOP_STORE_ADDRESS,
-         $addressShip,
-         $addressPayment,
-         $note,
-         $_SERVER['REMOTE_ADDR'],
+          '<a href="' . Url_Link::getMainWebDir() . '" title="' . CUBE_CMS_WEB_NAME . '">' . CUBE_CMS_WEB_NAME . '</a>',
+          vve_date('%X %x'),
+          $orderInfo,
+          $orderItems,
+          CUBE_CMS_SHOP_STORE_ADDRESS,
+          $addressShip,
+          $addressPayment,
+          $note,
+          $_SERVER['REMOTE_ADDR'],
       );
-      
-      
+
+
       $userMailText = str_replace($searchArr, $replaceArr, $userMailText);
       $adminMailText = str_replace($searchArr, $replaceArr, $adminMailText);
-      
+
       $emailUser = new Email(true);
 //      $emailUser->addAddress($order->{Shop_Model_Orders::COLUMN_CUSTOMER_EMAIL});
-//      $emailUser->setFrom(VVE_NOREPLAY_MAIL);
+//      $emailUser->setFrom(CUBE_CMS_NOREPLAY_MAIL);
 //      $emailUser->setSubject(sprintf('[NOVÁ OBJEDNÁVKA] číslo %s', $order->{Shop_Model_Orders::COLUMN_ID}));
 //      $emailUser->setContent(Email::getBaseHtmlMail($userMailText));
 //      $emailUser->send();
 
-      if(VVE_SHOP_ORDER_MAIL != null){
+      if (CUBE_CMS_SHOP_ORDER_MAIL != null) {
 //         $emailAdmin = new Email(true);
-//         $emailAdmin->addAddress(VVE_SHOP_ORDER_MAIL);
-//         $emailAdmin->setFrom(VVE_NOREPLAY_MAIL);
+//         $emailAdmin->addAddress(CUBE_CMS_SHOP_ORDER_MAIL);
+//         $emailAdmin->setFrom(CUBE_CMS_NOREPLAY_MAIL);
 //         $emailAdmin->setSubject(sprintf('[NOVÁ OBJEDNÁVKA] číslo %s', $order->{Shop_Model_Orders::COLUMN_ID}));
 //         $emailAdmin->setContent(Email::getBaseHtmlMail($adminMailText));
 //         $emailAdmin->send();
       }
    }
-   
+
    private function storeOrderInfo($form)
    {
       $_SESSION['shop_order']['orderinfo'] = array();
       foreach ($form as $element) {
-         if( $element instanceof Form_Element_Text || $element instanceof Form_Element_TextArea
-            || $element instanceof Form_Element_Select || $element instanceof Form_Element_Checkbox ){
+         if ($element instanceof Form_Element_Text || $element instanceof Form_Element_TextArea || $element instanceof Form_Element_Select || $element instanceof Form_Element_Checkbox) {
             $_SESSION['shop_order']['orderinfo'][$element->getName()] = $element->getValues();
          }
       }
    }
-   
+
    private function restoreOrderInfo(Form $form)
    {
-      if(isset ($_SESSION['shop_order']['orderinfo'])){
+      if (isset($_SESSION['shop_order']['orderinfo'])) {
          foreach ($_SESSION['shop_order']['orderinfo'] as $eName => $value) {
+            // hesla neobnovovat
+            if(strpos($eName, 'password') !== false){
+               continue;
+            }
             $eName = str_replace($form->getPrefix(), '', $eName);
             $form->{$eName}->setValues($value);
          }
       }
    }
-
+   
+   private function restoreCustomerDetails(Form $form)
+   {
+      if(Auth::isLogin() && $customer = Shop_Model_Customers::getCustomer(Auth::getUser()->getUserId())){
+         
+         $form->customerName->setValues($customer->{Model_Users::COLUMN_NAME});
+         $form->customerSurname->setValues($customer->{Model_Users::COLUMN_SURNAME});
+         $form->customerEmail->setValues($customer->{Model_Users::COLUMN_MAIL});
+         $form->customerPhone->setValues($customer->{Model_Users::COLUMN_PHONE});
+         $form->paymentStreet->setValues($customer->{Shop_Model_Customers::COLUMN_STREET});
+         $form->paymentCity->setValues($customer->{Shop_Model_Customers::COLUMN_CITY});
+         $form->paymentPostCode->setValues($customer->{Shop_Model_Customers::COLUMN_PSC});
+         $form->paymentCountry->setValues($customer->{Shop_Model_Customers::COLUMN_ID_COUNTRY});
+         $form->paymentCompanyName->setValues($customer->{Shop_Model_Customers::COLUMN_COMPANY});
+         $form->paymentCompanyIC->setValues($customer->{Shop_Model_Customers::COLUMN_IC});
+         $form->paymentCompanyDIC->setValues($customer->{Shop_Model_Customers::COLUMN_DIC});
+         
+         $form->isDeliveryAddress->setValues((bool)$customer->{Shop_Model_Customers::COLUMN_DELIVERY_NAME});
+         $form->deliveryName->setValues($customer->{Shop_Model_Customers::COLUMN_DELIVERY_NAME});
+         $form->deliveryStreet->setValues($customer->{Shop_Model_Customers::COLUMN_DELIVERY_STREET});
+         $form->deliveryCity->setValues($customer->{Shop_Model_Customers::COLUMN_DELIVERY_CITY});
+         $form->deliveryPostCode->setValues($customer->{Shop_Model_Customers::COLUMN_DELIVERY_PSC});
+         $form->deliveryCountry->setValues($customer->{Shop_Model_Customers::COLUMN_ID_DELIVERY_COUNTRY});
+         
+         $form->newsletter->setValues($customer->{Shop_Model_Customers::COLUMN_NEWSLETTER});
+      }
+   }
 
    public function orderCompleteController()
    {
-      if(!isset ($_SESSION['shop_order']) || !isset ($_SESSION['shop_order']['orderId']) || $_SESSION['shop_order']['orderId'] == null){
+      if (!isset($_SESSION['shop_order']) || !isset($_SESSION['shop_order']['orderId']) || $_SESSION['shop_order']['orderId'] == null) {
          $this->link()->route()->reload();
       }
       $modelOrders = new Shop_Model_Orders();
       $modelItems = new Shop_Model_OrderItems();
       $order = $modelOrders->record($_SESSION['shop_order']['orderId']);
-      
+
       $this->view()->order = $order;
       $this->view()->items = $modelItems
-         ->where(Shop_Model_OrderItems::COLUMN_ID_ORDER.' = :ido', array('ido' => $order->{Shop_Model_Orders::COLUMN_ID}))
-         ->records();
-         
-      $modelP = new Shop_Model_Payments();   
+              ->where(Shop_Model_OrderItems::COLUMN_ID_ORDER . ' = :ido', array('ido' => $order->{Shop_Model_Orders::COLUMN_ID}))
+              ->records();
+
+      $modelP = new Shop_Model_Payments();
       $this->view()->payment = $modelP->record($order->{Shop_Model_Orders::COLUMN_PAYMENT_ID});
-      
-      $modelS = new Shop_Model_Shippings();   
+
+      $modelS = new Shop_Model_Shippings();
       $this->view()->shipping = $modelS->record($order->{Shop_Model_Orders::COLUMN_SHIPPING_ID});
    }
 
-   public function settings(&$settings, Form &$form) {
+   public function settings(&$settings, Form &$form)
+   {
+      
    }
+
 }
