@@ -154,8 +154,10 @@ class Model_Users extends Model_ORM {
    {
       $model = new Model_Users();
       return $model
-             ->where(Model_Users::COLUMN_MAIL.' = :username AND '.Model_Users::COLUMN_MAIL.' IS NOT NULL', array('username' => $mail))
+             ->where(Model_Users::COLUMN_MAIL.' = :username AND '.Model_Users::COLUMN_MAIL.' IS NOT NULL AND '.Model_Users::COLUMN_PASSWORD.' IS NOT NULL', 
+                     array('username' => $mail))
              ->joinFK(Model_Users::COLUMN_ID_GROUP, array('group_name' => Model_Groups::COLUMN_NAME, '*'))
+             ->order(array(self::COLUMN_ID => Model_ORM::ORDER_DESC)) // bereme poslední email v potaz
              ->record();
    }
    
@@ -168,7 +170,12 @@ class Model_Users extends Model_ORM {
              ->record();
    }
 
-
+   public static function createUniqueUsername($login)
+   {
+      return uniqid($login);
+   }
+   
+   
    /* DEPRECATED */
 
    /**
