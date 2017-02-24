@@ -22,5 +22,6 @@ class ShopSettings_Routes extends Routes {
       $this->addRoute('orderStates');
       $this->addRoute('editOrderState', "order-state-::id::/edit/", 'editOrderState','order-state-{id}/edit/');
       $this->addRoute('addOrderState', "order-state/add/", 'addOrderState','order-state/add/');
+      $this->addRoute('registrations');
 	}
 }

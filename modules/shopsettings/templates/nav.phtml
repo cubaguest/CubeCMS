@@ -6,4 +6,4 @@ $this->items[$this->tr('Platby a dopravy')] = (string) $this->link()->route('shi
 $this->items[$this->tr('Objednávky')] = (string) $this->link()->route('orders');
 $this->items[$this->tr('Stavy objednávek')] = (string) $this->link()->route('orderStates');
 
-$this->includeTpl('module_navigation.phtml', true);
+$this->includeFile('tpl://engine:modules/navigation.phtml');

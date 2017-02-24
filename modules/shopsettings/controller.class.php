@@ -23,25 +23,25 @@ class ShopSettings_Controller extends Controller {
       $grpStock = $form->addGroup('shop_stock', $this->tr('Nastavení skladu'));
 
       $eStoreName = new Form_Element_Text('name', $this->tr('Název obchodu'));
-      $eStoreName->setValues(VVE_WEB_NAME);
+      $eStoreName->setValues(CUBE_CMS_WEB_NAME);
       $form->addElement($eStoreName, $grpInfo);
 
       $eStoreInfo = new Form_Element_TextArea('info', $this->tr('Adresa obchodu'));
-      $eStoreInfo->setValues(VVE_SHOP_STORE_ADDRESS);
+      $eStoreInfo->setValues(CUBE_CMS_SHOP_STORE_ADDRESS);
       $form->addElement($eStoreInfo, $grpInfo);
 
       $elemAllowBuyNotInStock = new Form_Element_Checkbox('buyNotInStock', $this->tr('Řízení skladu'));
       $elemAllowBuyNotInStock->setSubLabel($this->tr('Při zapnutí omezí nákup produktů pouze na produkty které jsou skladem. Zboží, které není skladem nelze zakoupit.'));
-      $elemAllowBuyNotInStock->setValues(!VVE_SHOP_ALLOW_BUY_NOT_IN_STOCK);
+      $elemAllowBuyNotInStock->setValues(!CUBE_CMS_SHOP_ALLOW_BUY_NOT_IN_STOCK);
       $form->addElement($elemAllowBuyNotInStock, $grpStock);
 
       $eSave = new Form_Element_Submit('save', $this->tr('Uložit'));
       $form->addElement($eSave);
 
       if ($form->isValid()) {
-         $this->storeSystemCfg('VVE_WEB_NAME', $form->name->getValues());
-         $this->storeSystemCfg('VVE_SHOP_STORE_ADDRESS', $form->info->getValues());
-         $this->storeSystemCfg('VVE_SHOP_ALLOW_BUY_NOT_IN_STOCK', $form->buyNotInStock->getValues() ? "false" : "true");
+         $this->storeSystemCfg('CUBE_CMS_WEB_NAME', $form->name->getValues());
+         $this->storeSystemCfg('CUBE_CMS_SHOP_STORE_ADDRESS', $form->info->getValues());
+         $this->storeSystemCfg('CUBE_CMS_SHOP_ALLOW_BUY_NOT_IN_STOCK', $form->buyNotInStock->getValues() ? "false" : "true");
 
          $this->infoMsg()->addMessage($this->tr('Nastavení bylo uloženo'));
          $this->link()->reload();
@@ -59,12 +59,12 @@ class ShopSettings_Controller extends Controller {
       $grpCurrencies = $form->addGroup('currencies', $this->tr('Měny'));
 
       $eCurrencyName = new Form_Element_Text('name', $this->tr('Název měny'));
-      $eCurrencyName->setValues(VVE_SHOP_CURRENCY_NAME);
+      $eCurrencyName->setValues(CUBE_CMS_SHOP_CURRENCY_NAME);
       $eCurrencyName->setSubLabel($this->tr('Například Kč'));
       $form->addElement($eCurrencyName, $grpCurrencies);
 
       $eCurrencyCode = new Form_Element_Text('code', $this->tr('Kód měny'));
-      $eCurrencyCode->setValues(VVE_SHOP_CURRENCY_CODE);
+      $eCurrencyCode->setValues(CUBE_CMS_SHOP_CURRENCY_CODE);
       $eCurrencyCode->setSubLabel($this->tr('Například CZK nebo EUR'));
       $form->addElement($eCurrencyCode, $grpCurrencies);
 
@@ -72,8 +72,8 @@ class ShopSettings_Controller extends Controller {
       $form->addElement($eSave);
 
       if ($form->isValid()) {
-         $this->storeSystemCfg('VVE_SHOP_CURRENCY_NAME', $form->name->getValues());
-         $this->storeSystemCfg('VVE_SHOP_CURRENCY_CODE', $form->code->getValues());
+         $this->storeSystemCfg('CUBE_CMS_SHOP_CURRENCY_NAME', $form->name->getValues());
+         $this->storeSystemCfg('CUBE_CMS_SHOP_CURRENCY_CODE', $form->code->getValues());
 
          $this->infoMsg()->addMessage($this->tr('Nastavení bylo uloženo'));
 //         $this->link()->reload();
@@ -171,7 +171,7 @@ class ShopSettings_Controller extends Controller {
       $grpShipping = $form->addGroup('payment', $this->tr('Platby'));
 
       $eFreeShipping = new Form_Element_Text('freeShipping', $this->tr('Doprava zdarma od'));
-      $eFreeShipping->setValues(VVE_SHOP_FREE_SHIPPING);
+      $eFreeShipping->setValues(CUBE_CMS_SHOP_FREE_SHIPPING);
       $eFreeShipping->setSubLabel($this->tr('Například od 2000 Kč zadat 2000. -1 pro vypnutí.'));
       $form->addElement($eFreeShipping, $grpShipping);
 
@@ -179,7 +179,7 @@ class ShopSettings_Controller extends Controller {
       $form->addElement($eSave);
 
       if ($form->isValid()) {
-         $this->storeSystemCfg('VVE_SHOP_FREE_SHIPPING', $form->freeShipping->getValues());
+         $this->storeSystemCfg('CUBE_CMS_SHOP_FREE_SHIPPING', $form->freeShipping->getValues());
          $this->infoMsg()->addMessage($this->tr('Nastavení bylo uloženo'));
          $this->link()->reload();
       }
@@ -494,24 +494,37 @@ class ShopSettings_Controller extends Controller {
       $eNotifyMail = new Form_Element_Text('notifyMail', $this->tr('E-mail administrátora'));
       $eNotifyMail->addValidation(new Form_Validator_NotEmpty());
       $eNotifyMail->addValidation(new Form_Validator_Email());
-      $eNotifyMail->setValues(VVE_SHOP_ORDER_MAIL);
+      $eNotifyMail->setValues(CUBE_CMS_SHOP_ORDER_MAIL);
       $eNotifyMail->setSubLabel($this->tr('na tento e-mail budou chodit oznámení o nových objednávkách'));
       $form->addElement($eNotifyMail, $grpNotify);
       
-      $grpStatus = $form->addGroup('status', $this->tr('Stavy objednávek'));
+      $grpOrders = $form->addGroup('order', $this->tr('Objednávky'));
 
-      $eDefaultStatus = new Form_Element_Text('statusDefault', $this->tr('ID výchozího stavu objednávky'));
-      $eDefaultStatus->addValidation(new Form_Validator_NotEmpty());
-      $eDefaultStatus->setSubLabel($this->tr('Počáteční stav při přijetí objednávky. ID ze stavů.'));
-      $eDefaultStatus->setValues(VVE_SHOP_ORDER_DEFAULT_STATUS);
-      $form->addElement($eDefaultStatus, $grpStatus);
+      $states = Shop_Model_OrdersStates::getAllRecords();
+      
+      $eDefaultStatus = new Form_Element_Select('statusDefault', $this->tr('Výchozí stav objednávky'));
+      $eDefaultStatus->setSubLabel($this->tr('Počáteční stav při přijetí objednávky.'));
+      $eDefaultStatus->setValues(CUBE_CMS_SHOP_ORDER_DEFAULT_STATUS);
+      
+      foreach ($states as $state) {
+         $eDefaultStatus->addOption($state->{Shop_Model_OrdersStates::COLUMN_NAME}, $state->getPK());
+      }
+      $form->addElement($eDefaultStatus, $grpOrders);
 
+      $eCatTerms = new Form_Element_Select('termsCatId', $this->tr('Stránka podmínek'));
+      $eCatTerms->setValues(CUBE_CMS_SHOP_ORDER_CAT_TERMS);
+      $cats = Utils_CMS::catsToArrayForForm(Category_Structure::getStructure());
+      $eCatTerms->setOptions($cats, false, false);
+      $form->addElement($eCatTerms, $grpOrders);
+      
       $eSave = new Form_Element_Submit('save', $this->tr('Uložit'));
       $form->addElement($eSave);
 
+      
       if ($form->isValid()) {
-         $this->storeSystemCfg('VVE_SHOP_ORDER_MAIL', $form->notifyMail->getValues());
-         $this->storeSystemCfg('VVE_SHOP_ORDER_DEFAULT_STATUS', $form->statusDefault->getValues());
+         $this->storeSystemCfg('CUBE_CMS_SHOP_ORDER_MAIL', $form->notifyMail->getValues());
+         $this->storeSystemCfg('CUBE_CMS_SHOP_ORDER_DEFAULT_STATUS', $form->statusDefault->getValues());
+         $this->storeSystemCfg('CUBE_CMS_SHOP_ORDER_CAT_TERMS', $form->termsCatId->getValues());
 
          $this->infoMsg()->addMessage($this->tr('Nastavení bylo uloženo'));
          $this->link()->reload();
@@ -529,19 +542,19 @@ class ShopSettings_Controller extends Controller {
       $grpInfo = $form->addGroup('shop', $this->tr('Informace o obchod'));
 
       $eStoreName = new Form_Element_Text('name', $this->tr('Název obchodu'));
-      $eStoreName->setValues(VVE_WEB_NAME);
+      $eStoreName->setValues(CUBE_CMS_WEB_NAME);
       $form->addElement($eStoreName, $grpInfo);
 
       $eStoreInfo = new Form_Element_TextArea('info', $this->tr('Adresa obchodu'));
-      $eStoreInfo->setValues(VVE_SHOP_STORE_ADDRESS);
+      $eStoreInfo->setValues(CUBE_CMS_SHOP_STORE_ADDRESS);
       $form->addElement($eStoreInfo, $grpInfo);
 
       $eSave = new Form_Element_Submit('save', $this->tr('Uložit'));
       $form->addElement($eSave);
 
       if ($form->isValid()) {
-         $this->storeSystemCfg('VVE_WEB_NAME', $form->name->getValues());
-         $this->storeSystemCfg('VVE_SHOP_STORE_ADDRESS', $form->info->getValues());
+         $this->storeSystemCfg('CUBE_CMS_WEB_NAME', $form->name->getValues());
+         $this->storeSystemCfg('CUBE_CMS_SHOP_STORE_ADDRESS', $form->info->getValues());
 
          $this->infoMsg()->addMessage($this->tr('Nastavení bylo uloženo'));
 //         $this->link()->reload();
@@ -741,7 +754,7 @@ class ShopSettings_Controller extends Controller {
          $this->model = new Model_Config();
       }
       // web name
-      $cfg = $this->model->where(Model_Config::COLUMN_KEY . ' = :key', array('key' => str_replace('VVE_', '', $constName)))->record();
+      $cfg = $this->model->where(Model_Config::COLUMN_KEY . ' = :key', array('key' => str_replace('CUBE_CMS_', '', $constName)))->record();
 
       if ($cfg != false) {// vytvoř nový záznam, asi nebyl definován
          $cfg->{Model_Config::COLUMN_VALUE} = $value;
