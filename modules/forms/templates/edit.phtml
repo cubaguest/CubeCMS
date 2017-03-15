@@ -1,5 +1,5 @@
 <?php 
-$this->addFile("css://style.css?original");
+$this->addFile("css://style.less?original");
 $this->addFile("js://engine:json2.js?original");
 $this->addFile("js://form-edit.js?original");
 // do titulku
@@ -53,6 +53,7 @@ $this->addJsPlugin($jq);
                   <option value="select"><?php echo $this->tr('Výběr')?></option>
                   <option value="radio"><?php echo $this->tr('Výběr (radio)')?></option>
                   <option value="label"><?php echo $this->tr('Napis')?></option>
+                  <option value="file"><?php echo $this->tr('Soubor')?></option>
                </optgroup>
                <optgroup label="<?php echo $this->tr('Pokročilé')?>">
                   <option value="selectcountry"><?php echo $this->tr('Výběr státu')?></option>
@@ -84,6 +85,16 @@ $this->addJsPlugin($jq);
                      <option value="url"><?php echo $this->tr('URL adresa')?></option>
                      <option value="phone"><?php echo $this->tr('Telefon')?></option>
                   </select>
+               </div>
+               <div class="elem-optional" id="elem-optional-filetype-wrap">
+                  <label>Typ souboru:</label><br />
+                  <select name="filetype" onchange="FormEditor.$selectedItem.trigger('chengeFileType', $(this).val())" class="form-control">
+                     <option value="imgonly"><?php echo $this->tr('Pouze obrázky')?></option>
+                     <option value="doconly"><?php echo $this->tr('Pouze dokumenty')?></option>
+                     <option value="extonly"><?php echo $this->tr('Dle přípony')?></option>
+                  </select>
+                  <label for="item-fileext"><?php ps($this->tr('Pouze soubory s příponou:'))?></label><br />
+                  <input type="text" name="fileext" id="item-fileext" value="" onchange="FormEditor.$selectedItem.trigger('chengeFileType', $(this).val())" class="form-control" />
                </div>
                <div class="elem-optional" id="elem-optional-is-multiple-wrap">
                   <label>Více voleb:</label>

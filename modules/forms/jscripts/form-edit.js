@@ -47,6 +47,11 @@ var FormEditor = {
             $item.data("name", name);
             var $elem = FormEditor.getFormItem($item);
             $elem.attr('name', name);
+            if($item.id == null){
+               console.log(CubeCMS.Tools.str2url(name));
+               $item.data('name', CubeCMS.Tools.str2url(name));
+               $elem.attr('name', $item.data('name'));
+            }
          },
          chengeNote : function(e, value){
             var note = value;
@@ -184,6 +189,26 @@ var FormEditor = {
             if(validator != ""){
                $item.find('span.validator').text(" "+validatorText);
             }
+         },
+         chengeFileType : function(ev, filetype){
+            var $item = $(this);
+            var validatorText = null;
+            
+            if(filetype === ""){
+               filetype = 'imgonly';
+            }
+            $item.data("validator", filetype);
+            var $select = $('select[name="filetype"]');
+            var $inputExt = $('input[name="fileext"]');
+            if(filetype == "imgonly" || filetype == "doconly"){
+               validatorText = $select.find('option[value="'+filetype+'"]').text();
+            } else {
+               validatorText = $('label[for='+$inputExt.prop('id')+']').text();
+               validatorText += ' ' + ($inputExt.val() != '' ? $inputExt.val() : filetype);
+            }
+            if(filetype != ""){
+               $item.find('span.validator').text(" "+validatorText);
+            }
          }
       });
       
@@ -216,7 +241,7 @@ var FormEditor = {
          isMultiple : false,
          validator : "",
          label : this.elementParams.defaultlabel,
-         name : "name"+rid,
+         name : "name",
          note : "",
          value : null,
          type : type,
@@ -234,10 +259,7 @@ var FormEditor = {
          .addClass("ui-state-default")
          .addClass('item-'+params.type)
          .append($('#form-tpls .element-tools').clone(true))
-         .data({
-            type : params.type,
-            id : params.id
-         });
+         .data(params);
       
       if(params.type == "text"){
          $item.append(
@@ -306,6 +328,15 @@ var FormEditor = {
                id : params.idStr
             })
          );
+      } else if(type == "file"){
+         $item.append(
+            $('<label></label>').text(" ")
+         ).append(
+            $('<input />').attr({
+               type : "file",
+               id : params.idStr
+            })
+         );
       }
       
       $item
@@ -323,7 +354,11 @@ var FormEditor = {
       }
       
       $item.trigger("chengeRequire", params.required);
-      $item.trigger("chengeValidator", params.validator);
+      if(type == "file"){
+         $item.trigger("chengeFileType", params.validator);
+      } else {
+         $item.trigger("chengeValidator", params.validator);
+      }
       $item.trigger("chengeLabel", params.label);
       $item.trigger("chengeName", params.name);
       $item.trigger("chengeNote", params.note);
@@ -387,6 +422,19 @@ var FormEditor = {
             
          });
          $('#elem-optional-options-wrap textarea').val(opts);
+      } else if(type == 'file'){
+         this.showFormItemOptions("require");
+         this.showFormItemOptions("filetype");
+         // doplnění typu validátoru
+         if($item.data('validator') != ''){
+            if($item.data('validator') == 'imgonly' || $item.data('validator') == 'doconly'){
+               $(form.filetype).val($item.data('validator'));
+               $(form.fileext).val("");
+            } else {
+               $(form.filetype).val('extonly');
+               $(form.fileext).val($item.data('validator'));
+            }
+         }
       }
       if(typeof(focus) === "undefined" || focus == true ){
          $(form.name).select().focus();
@@ -398,9 +446,10 @@ var FormEditor = {
       form.ismultiple.checked = $item.data('isMultiple');
       
       // select validators
-      form.validator.value = "";
-      if($elem.data("validator") != null){
-         form.validator.value = $elem.data("validator");
+      $(form.validator).val("");
+      if(type != 'file' && $item.data("validator") != null){
+         console.log();
+         $(form.validator).val($item.data("validator"));
       }
    },
    

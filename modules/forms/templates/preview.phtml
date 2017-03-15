@@ -1,7 +1,7 @@
 <?php 
 $h = sprintf($this->tr('Náhled formuláře "%s"'), $this->form->{Forms_Model::COLUMN_NAME} );
 Template_Core::setPageTitle($h);
-$this->addFile("css://style.css");
+$this->addFile("css://style.less");
 echo $this->toolbox;
 ?>
 <h1><?php ps($h);?></h1>

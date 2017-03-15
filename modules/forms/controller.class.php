@@ -158,15 +158,29 @@ class Forms_Controller extends Controller {
    protected function saveFormStruct($formId, $elements, $deleteIds = array())
    {
       $modelElements = new Forms_Model_Elements();
+      $existNames = array();
       foreach ($elements as $element) {
          if($element->id == null){
             $elemRec = $modelElements->newRecord();
-            $sname = substr(lcfirst(implode('', array_map('ucfirst', explode('-', Utils_Url::toUrlKey($element->name))))), 40);
+            $name = $element->name;
+            if($name == null){
+               $name = $element->label;
+            }
+            $sname = substr(lcfirst(implode('', array_map('ucfirst', explode('-', Utils_Url::toUrlKey($name))))), 0, 40);
          } else {
             $elemRec = $modelElements->record($element->id);
             $sname = Utils_Url::toUrlKey($element->name);
+            if($element->name == null){
+               $sname = Utils_Url::toUrlKey($element->label);
+            }
          }
-         
+         $basename = $sname;
+         $i = 1;
+         while (isset($existNames[$sname])) {
+            $sname = $basename.'_'.$i;
+            $i++;
+         }
+         $existNames[$sname] = true;
          $elemRec->{Forms_Model_Elements::COLUMN_ID_FORM} = $formId;
          $elemRec->{Forms_Model_Elements::COLUMN_NAME} = $sname;
          $elemRec->{Forms_Model_Elements::COLUMN_NOTE} = $element->note;
@@ -424,6 +438,17 @@ class Forms_Controller extends Controller {
             case 'textarea':
                $formElement = new Form_Element_TextArea($e->{Forms_Model_Elements::COLUMN_NAME}, $e->{Forms_Model_Elements::COLUMN_LABEL});
                break;
+            case 'file':
+               $formElement = new Form_Element_File($e->{Forms_Model_Elements::COLUMN_NAME}, $e->{Forms_Model_Elements::COLUMN_LABEL});
+               if($e->{Forms_Model_Elements::COLUMN_VALIDATOR} == 'imgonly'){
+                  $formElement->addValidation(new Form_Validator_FileExtension(Form_Validator_FileExtension::IMG));
+               } else if($e->{Forms_Model_Elements::COLUMN_VALIDATOR} == 'doconly'){
+                  $formElement->addValidation(new Form_Validator_FileExtension(Form_Validator_FileExtension::DOC));
+               } else {
+                  $formElement->addValidation(new Form_Validator_FileExtension($e->{Forms_Model_Elements::COLUMN_VALIDATOR}));
+               }
+               
+               break;
             case 'text':
             default:
                $formElement = new Form_Element_Text($e->{Forms_Model_Elements::COLUMN_NAME}, $e->{Forms_Model_Elements::COLUMN_LABEL});
@@ -606,6 +631,7 @@ class Forms_Controller extends Controller {
       
       $data = null;
       $sendFromEmail = null;
+      $removeFiles = array();
       foreach ($form as $element) {
          // přeskakování elementů které nejsou
          if( $element->getName(false) == 'sendToMail' 
@@ -622,6 +648,17 @@ class Forms_Controller extends Controller {
             $val = $element->getValues() == true ? $tr->tr('Ano') : $tr->tr('Ne');
          } else {
             $val = htmlspecialchars($element->getValues());
+         }
+         
+         if($element instanceof Form_Element_File){
+            $val = $tr->tr('Nevloženo');
+            if($element->getValues() != null){
+               $file = $element->createFileObject();
+               $val = $file->getName();
+               $filename = (string)$file->rename($file->getName());
+               $mail->addAttachment($filename);
+               $removeFiles[] = $file;
+            }
          }
          
          if($val == null){
@@ -695,6 +732,10 @@ class Forms_Controller extends Controller {
       }
       $mail->addAddress($recipients);
       $mail->send();
+      
+      foreach ($removeFiles as $file) {
+         $file->delete();
+      }
    }
 }
 
