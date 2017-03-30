@@ -18,7 +18,7 @@ class Templates_Controller extends Controller {
       $formDel->addElement($elemSubmitDel);
 
       if($formDel->isValid()){
-         $model->deleteTemplate($formDel->id->getValues());
+         $model->where(Templates_Model::COLUMN_ID.' = :idt', array('idt' => $formDel->id->getValues()))->delete();
          $this->infoMsg()->addMessage($this->tr('Šablona byla smazána'));
          $this->link()->reload();
       }
