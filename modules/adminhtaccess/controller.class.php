@@ -42,6 +42,12 @@ class AdminHtaccess_Controller extends Controller {
          $eExpiration->setValues(Model_Config::getValue('HTACCESS_USE_CACHE', false));
          $form->addElement($eExpiration);
       }
+      
+      $eForceHttps = new Form_Element_Checkbox('https', $this->tr('Vynutit HTTPS protokol').'         ');
+      $eForceHttps->setSubLabel($this->tr('HTTPS protokol musí být zapnut u webhostingu, jinak si zablokujete stránku'));
+      $eForceHttps->setValues(Model_Config::getValue('HTACCESS_FORCE_HTTPS', false));
+      $form->addElement($eForceHttps);
+      
       $eCusotm = new Form_Element_TextArea('custom', $this->tr('Vlastní řetězec'));
       $eCusotm->setValues($this->getHtaccessCustomContent($site->{Model_Sites::COLUMN_DIR}));
       $form->addElement($eCusotm);
@@ -58,16 +64,19 @@ class AdminHtaccess_Controller extends Controller {
             self::generateMainHtaccess(
                 $form->caching->getValues(),
                 $form->www->getValues(),
+                $form->https->getValues(),
                 $form->custom->getValues()
                 );
             Model_ConfigGlobal::setValue('HTACCESS_WWW_REDIRECT', (bool)$form->www->getValues(), 'bool');
             Model_ConfigGlobal::setValue('HTACCESS_USE_CACHE', (bool)$form->caching->getValues(), 'bool');
          } else {
             self::generateSubHtaccess(
-                $site->{Model_Sites::COLUMN_DIR},
+                $site->{Model_Sites::COLUMN_DIR}, 
+                $form->https->getValues(),
                 $form->custom->getValues()
                 );
          }
+         Model_ConfigGlobal::setValue('HTACCESS_FORCE_HTTPS', (bool)$form->https->getValues(), 'bool');
          $this->infoMsg()->addMessage($this->tr('Htaccess byl uložen'));
          $this->link()->redirect();
       }
@@ -125,6 +134,15 @@ RewriteRule ^.*$ /index.php [NC,L]
       $str = "
 RewriteCond %{HTTP_HOST} !^www\.
 RewriteRule ^(.*)$ http://www.%{HTTP_HOST}/$1 [R=301,L]
+\n";
+      return $str;
+   }
+   
+   protected static function createHtaccessForceHTTPS()
+   {
+      $str = "
+RewriteCond %{HTTPS} !=on
+RewriteRule ^.*$ https://%{SERVER_NAME}%{REQUEST_URI} [R,L]
 \n";
       return $str;
    }
@@ -273,6 +291,7 @@ Rewriterule faces/([A-Za-z0-1]+)/images/(.*) http://$domain/faces/$1/images/$2 [
    public static function generateMainHtaccess(
        $enableCaching = null,
        $wwwRedirect = null,
+       $forceHttps = null,
        $customCnt = false
        )
    {
@@ -282,12 +301,18 @@ Rewriterule faces/([A-Za-z0-1]+)/images/(.*) http://$domain/faces/$1/images/$2 [
       if($wwwRedirect === null){
          $wwwRedirect = Model_ConfigGlobal::getValue('HTACCESS_WWW_REDIRECT', true);
       }
+      if($forceHttps === null){
+         $forceHttps = Model_ConfigGlobal::getValue('HTACCESS_FORCE_HTTPS', false);
+      }
       $content = "RewriteEngine On\n";
       if($enableCaching){
          $content .= self::createHtaccessExpires();
       }
       if($wwwRedirect){
          $content .= self::createHtaccessWWWRedirect();
+      }
+      if($forceHttps){
+         $content .= self::createHtaccessForceHTTPS();
       }
       $content .= self::createHtaccessCustom($customCnt);
       
@@ -299,9 +324,16 @@ Rewriterule faces/([A-Za-z0-1]+)/images/(.*) http://$domain/faces/$1/images/$2 [
       }
    }
    
-   public static function generateSubHtaccess($siteDir, $customCnt = false)
+   public static function generateSubHtaccess($siteDir, $forceHttps = null, $customCnt = false)
    {
+      if($forceHttps === null){
+         $forceHttps = Model_ConfigGlobal::getValue('HTACCESS_FORCE_HTTPS', false);
+      }
+      
       $content = "RewriteEngine On\n";
+      if($forceHttps){
+         $content .= self::createHtaccessForceHTTPS();
+      }
       $content .= self::createHtaccessCustom($customCnt, $siteDir);
       $content .= self::createHtaccessSubDomainStatic();
       $content .= self::createHtaccessInternalApps();
