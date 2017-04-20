@@ -238,7 +238,7 @@ class Locales extends TrObject {
        ),
        'bn' =>
        array(
-           'name' => 'Bengali (Bangladesh)',
+           'name' => 'Bengali (Bangladesh) - default',
            'locale' => 'bn_BD.UTF-8',
            'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
@@ -248,9 +248,9 @@ class Locales extends TrObject {
            'locale' => 'bn_IN.UTF-8',
            'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
-       'bo_CN' =>
+       'bo' =>
        array(
-           'name' => 'Tibetan (China)',
+           'name' => 'Tibetan (China) - default',
            'locale' => 'bo_CN.UTF-8',
            'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
@@ -278,9 +278,9 @@ class Locales extends TrObject {
            'locale' => 'ca_AD.UTF-8',
            'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
-       'ca_ES' =>
+       'ca' =>
        array(
-           'name' => 'Catalan (Spain)',
+           'name' => 'Catalan (Spain) - default',
            'locale' => 'ca_ES.UTF-8',
            'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
@@ -351,7 +351,7 @@ class Locales extends TrObject {
        ),
        'de' =>
        array(
-           'name' => 'German (Germany)',
+           'name' => 'German (Germany) - default',
            'locale' => 'de_DE.UTF-8',
            'collation' => array('mysql' => 'utf8_german2_ci'),
        ),
@@ -387,7 +387,7 @@ class Locales extends TrObject {
        ),
        'el' =>
        array(
-           'name' => 'Greek (Greece)',
+           'name' => 'Greek (Greece) - default',
            'locale' => 'el_GR.UTF-8',
            'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
@@ -424,7 +424,7 @@ class Locales extends TrObject {
        'en' =>
        array(
            'name' => 'English',
-           'label' => 'English',
+           'label' => 'English - default',
            'locale' => 'en_GB.UTF-8',
            'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
@@ -495,7 +495,7 @@ class Locales extends TrObject {
        ),
        'es' =>
        array(
-           'name' => 'Spanish (Spain)',
+           'name' => 'Spanish (Spain) - default',
            'locale' => 'es_ES.UTF-8',
            'collation' => array('mysql' => 'utf8_spanish_ci'),
        ),
@@ -669,7 +669,7 @@ class Locales extends TrObject {
        ),
        'fr' =>
        array(
-           'name' => 'French (France)',
+           'name' => 'French (France) - default',
            'locale' => 'fr_FR.UTF-8',
            'collation' => array('mysql' => 'utf8_unicode_ci'),
        ),
