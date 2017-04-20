@@ -65,6 +65,8 @@ class Banners_View extends View {
          // náhodně poskládat
          //shuffle($banners);
          $model->order(array('RAND()' => Model_ORM::ORDER_ASC));
+      } else {
+         $model->order(array(Banners_Model::COLUMN_ORDER => Model_ORM::ORDER_ASC));
       }
       
       if(isset($boxes[$boxName]['limit'])){
