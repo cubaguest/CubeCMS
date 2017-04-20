@@ -109,7 +109,6 @@ class Model_ORM_Tree extends Model_ORM {
     */
    public function addNode($parent, Model_ORM_Tree_Record $record, $index = false)
    {
-      $this->lock(self::LOCK_WRITE);
       if (!$parent instanceof Model_ORM_Tree_Record) {
          $parent = self::getRecord($parent);
       }
@@ -139,6 +138,7 @@ class Model_ORM_Tree extends Model_ORM {
       } else {
          // load tree by parent and get childs?
       }
+      $this->lock(self::LOCK_WRITE);
       // update pravé strany
       $m = new static();
       $m->where($this->rightColumn . ' >= :prtg', array('prtg' => $pRight));
