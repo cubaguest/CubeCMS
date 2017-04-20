@@ -132,7 +132,7 @@ class Loader {
              '<?php'."\n"
              .'self::$classCacheHost = "'.$_SERVER['SERVER_NAME'].'";'."\n"
              .'self::$classCacheHash = "'.$curHash.'";'."\n"
-             .'self::$classCache = '.var_export(self::$classCache, true).';'."\n"
+             .'self::$classCache = '.var_export(self::$classCache, true).';'."\n", LOCK_EX
              );
       }
    }
