@@ -42,12 +42,6 @@ class AdminHtaccess_Controller extends Controller {
          $eExpiration->setValues(Model_Config::getValue('HTACCESS_USE_CACHE', false));
          $form->addElement($eExpiration);
       }
-      
-      $eForceHttps = new Form_Element_Checkbox('https', $this->tr('Vynutit HTTPS protokol').'         ');
-      $eForceHttps->setSubLabel($this->tr('HTTPS protokol musí být zapnut u webhostingu, jinak si zablokujete stránku'));
-      $eForceHttps->setValues(Model_Config::getValue('HTACCESS_FORCE_HTTPS', false));
-      $form->addElement($eForceHttps);
-      
       $eCusotm = new Form_Element_TextArea('custom', $this->tr('Vlastní řetězec'));
       $eCusotm->setValues($this->getHtaccessCustomContent($site->{Model_Sites::COLUMN_DIR}));
       $form->addElement($eCusotm);
@@ -64,19 +58,16 @@ class AdminHtaccess_Controller extends Controller {
             self::generateMainHtaccess(
                 $form->caching->getValues(),
                 $form->www->getValues(),
-                $form->https->getValues(),
                 $form->custom->getValues()
                 );
             Model_ConfigGlobal::setValue('HTACCESS_WWW_REDIRECT', (bool)$form->www->getValues(), 'bool');
             Model_ConfigGlobal::setValue('HTACCESS_USE_CACHE', (bool)$form->caching->getValues(), 'bool');
          } else {
             self::generateSubHtaccess(
-                $site->{Model_Sites::COLUMN_DIR}, 
-                $form->https->getValues(),
+                $site->{Model_Sites::COLUMN_DIR},
                 $form->custom->getValues()
                 );
          }
-         Model_ConfigGlobal::setValue('HTACCESS_FORCE_HTTPS', (bool)$form->https->getValues(), 'bool');
          $this->infoMsg()->addMessage($this->tr('Htaccess byl uložen'));
          $this->link()->redirect();
       }
@@ -137,15 +128,6 @@ RewriteRule ^(.*)$ http://www.%{HTTP_HOST}/$1 [R=301,L]
 \n";
       return $str;
    }
-   
-   protected static function createHtaccessForceHTTPS()
-   {
-      $str = "
-RewriteCond %{HTTPS} !=on
-RewriteRule ^.*$ https://%{SERVER_NAME}%{REQUEST_URI} [R,L]
-\n";
-      return $str;
-   }
 
    protected static function createHtaccessSubDomains($wwwRedirect = false)
    {
@@ -179,10 +161,12 @@ RewriteRule ^.*$ https://%{SERVER_NAME}%{REQUEST_URI} [R,L]
    ExpiresDefault A300
    ExpiresByType image/x-icon A2592000
    ExpiresByType application/x-javascript A3600
+   ExpiresByType application/javascript ".(CUBE_CMS_DEBUG_LEVEL == 0 ? 'A172800' : 'A360')."
    ExpiresByType text/css A604800
    ExpiresByType image/gif A604800
    ExpiresByType image/png A604800
    ExpiresByType image/jpeg A604800
+   ExpiresByType image/svg+xml A604800
    ExpiresByType text/plain A300
    ExpiresByType application/x-shockwave-flash A604800
    ExpiresByType video/x-flv A604800
@@ -198,12 +182,12 @@ RewriteRule ^.*$ https://%{SERVER_NAME}%{REQUEST_URI} [R,L]
       Header set Cache-Control \"public\"
       Header set Cache-Control \"max-age=604800\"
    </filesMatch>
-   <filesMatch \"\.(ico|jpe?g|png|gif|swf|css|flv|pdf|eot|ttf|otf|woff)$\">
+   <filesMatch \"\.(ico|jpe?g|png|gif|swf|css|flv|pdf|eot|ttf|otf|woff|svg)$\">
       Header set Cache-Control \"public\"
       Header set Cache-Control \"max-age=2592000\"
    </filesMatch>
    <filesMatch \"\.(js|json)$\">
-      Header set Cache-Control \"private\"
+      Header set Cache-Control \"private, max-age=7200\"
    </filesMatch>
    <filesMatch \"\.(x?html?|php|phtml)$\">
       Header set Cache-Control \"private, max-age=60, must-revalidate\"
@@ -291,7 +275,6 @@ Rewriterule faces/([A-Za-z0-1]+)/images/(.*) http://$domain/faces/$1/images/$2 [
    public static function generateMainHtaccess(
        $enableCaching = null,
        $wwwRedirect = null,
-       $forceHttps = null,
        $customCnt = false
        )
    {
@@ -301,18 +284,12 @@ Rewriterule faces/([A-Za-z0-1]+)/images/(.*) http://$domain/faces/$1/images/$2 [
       if($wwwRedirect === null){
          $wwwRedirect = Model_ConfigGlobal::getValue('HTACCESS_WWW_REDIRECT', true);
       }
-      if($forceHttps === null){
-         $forceHttps = Model_ConfigGlobal::getValue('HTACCESS_FORCE_HTTPS', false);
-      }
       $content = "RewriteEngine On\n";
       if($enableCaching){
          $content .= self::createHtaccessExpires();
       }
       if($wwwRedirect){
          $content .= self::createHtaccessWWWRedirect();
-      }
-      if($forceHttps){
-         $content .= self::createHtaccessForceHTTPS();
       }
       $content .= self::createHtaccessCustom($customCnt);
       
@@ -324,16 +301,9 @@ Rewriterule faces/([A-Za-z0-1]+)/images/(.*) http://$domain/faces/$1/images/$2 [
       }
    }
    
-   public static function generateSubHtaccess($siteDir, $forceHttps = null, $customCnt = false)
+   public static function generateSubHtaccess($siteDir, $customCnt = false)
    {
-      if($forceHttps === null){
-         $forceHttps = Model_ConfigGlobal::getValue('HTACCESS_FORCE_HTTPS', false);
-      }
-      
       $content = "RewriteEngine On\n";
-      if($forceHttps){
-         $content .= self::createHtaccessForceHTTPS();
-      }
       $content .= self::createHtaccessCustom($customCnt, $siteDir);
       $content .= self::createHtaccessSubDomainStatic();
       $content .= self::createHtaccessInternalApps();
