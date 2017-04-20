@@ -511,6 +511,7 @@ abstract class Model_ORM extends Model implements ArrayAccess {
             $dbst->setFetchMode(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, $this->rowClass, array($obj->tableStructure, true, $this));
             $dbst->execute();
             $r = $dbst->fetch(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE);
+            $r instanceof Model_ORM_Record ? $r->load() : false;
          } else {
             $dbst->setFetchMode($fetchParams);
             $dbst->execute();
@@ -580,7 +581,9 @@ abstract class Model_ORM extends Model implements ArrayAccess {
          }
       }
       if ($fetchParams == self::FETCH_LANG_CLASS OR $fetchParams == self::FETCH_PKEY_AS_ARR_KEY) {
-         return $this->stmt->fetch(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE);
+         $rec = $this->stmt->fetch(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE);
+         $rec instanceof Model_ORM_Record ? $rec->load() : false;
+         return $rec;
       } else {
          return $this->stmt->fetch($fetchParams);
       }
@@ -623,6 +626,9 @@ abstract class Model_ORM extends Model implements ArrayAccess {
             $dbst->setFetchMode(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, $this->rowClass, array($this->tableStructure, true, $this));
             $dbst->execute();
             $r = $dbst->fetchAll(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, $this->rowClass, array($this->tableStructure, true, $this));
+            foreach ($r as &$rec) {
+               $rec instanceof Model_ORM_Record ? $rec->load() : '';
+            }
          } else {
             $dbst->setFetchMode($fetchParams);
             $dbst->execute();
@@ -716,7 +722,11 @@ abstract class Model_ORM extends Model implements ArrayAccess {
             $pk = '`'.$this->getTableShortName().'`.`'.$this->pKey.'`';
          }
          if(!empty ($this->groupby)){
-            $sql = 'SELECT COUNT(distinct '.$pk.') AS cnt FROM `' . $this->getDbName() . '`.`' . $this->getTableName() . '` AS ' . $this->getTableShortName();
+            $col = $pk;
+            if(count($this->groupby) == 1){
+               $col = '`'.$this->getTableShortName().'`.`'.reset($this->groupby).'`';
+            }
+            $sql = 'SELECT COUNT(distinct '.$col.') AS cnt FROM `' . $this->getDbName() . '`.`' . $this->getTableName() . '` AS ' . $this->getTableShortName();
          } else {
             $sql = 'SELECT COUNT('.$pk.') AS cnt FROM `' . $this->getDbName() . '`.`' . $this->getTableName() . '` AS ' . $this->getTableShortName();
          }

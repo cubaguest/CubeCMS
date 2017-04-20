@@ -160,7 +160,9 @@ class Model_ORM_Record implements ArrayAccess, Countable, Iterator {
       }
    }
 
-   /**
+   protected function load(){}
+
+      /**
     * Magic pro vybrání hodnoty slupce
     * @param string $collName -- název sloupce
     */
