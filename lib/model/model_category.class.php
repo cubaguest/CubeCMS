@@ -287,3 +287,24 @@ class Model_Category extends Model_ORM {
       return $model->records();
    }
 }
+
+class Model_Category_Record extends Model_ORM_Record {
+   
+   protected $params = null;
+
+
+   public function getParam($name, $default = null)
+   {
+      if($this->params === null){
+         $this->params = false;
+         if($this->{Model_Category::COLUMN_PARAMS} != null){
+            $this->params = unserialize($this->{Model_Category::COLUMN_PARAMS});
+         }
+      }
+      
+      if(isset($this->params[$name]) && $this->params[$name] != null){
+         return $this->params[$name];
+      }
+      return $default;
+   }
+}
