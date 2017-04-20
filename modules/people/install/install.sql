@@ -18,6 +18,7 @@ CREATE TABLE `{PREFIX}people` (
   `person_twitter_url` VARCHAR(200) NULL DEFAULT NULL,
   `person_gplus_url` VARCHAR(200) NULL DEFAULT NULL,
   `person_instagram_url` VARCHAR(200) NULL DEFAULT NULL,
+  `person_linkedin_url` VARCHAR(200) NULL DEFAULT NULL,
   PRIMARY KEY (`id_person`),
   KEY `id_category` (`id_category`),
   FULLTEXT KEY `name` (`person_name`),
