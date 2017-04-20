@@ -81,10 +81,10 @@ class Utils_Html {
     * @param int $length
     * @return string
     */
-   public static function truncate($html, $length)
+   public static function truncate($html, $length, $endChars = '...')
    {
       if (mb_strlen(strip_tags($html)) > $length) {
-         $cutter = new HtmlCutString($html, $length);
+         $cutter = new HtmlCutString($html, $length, $endChars);
          return $cutter->cut();
       }
       return $html;
