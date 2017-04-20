@@ -67,12 +67,12 @@ class AdminEnviroment_Controller extends Controller {
       
       $eEmailSMTPServer = new Form_Element_Text('emailsmtpserver', $this->tr('Adresa SMTP serveru'));
       $eEmailSMTPServer->setAdvanced(true);
-      $eEmailSMTPServer->setValues(CUBE_CMS_SMTP_SERVER == null ? 'localhost' : CUBE_CMS_SMTP_SERVER);
+      $eEmailSMTPServer->setValues(CUBE_CMS_SMTP_SERVER);
       $form->addElement($eEmailSMTPServer, $grpEmails);
       
       $eEmailSMTPServerPort = new Form_Element_Text('emailsmtpserverport', $this->tr('Port SMTP serveru'));
       $eEmailSMTPServerPort->setAdvanced(true);
-      $eEmailSMTPServerPort->setValues(CUBE_CMS_SMTP_SERVER_PORT == null ? 25 : CUBE_CMS_SMTP_SERVER_PORT);
+      $eEmailSMTPServerPort->setValues(CUBE_CMS_SMTP_SERVER_PORT);
       $form->addElement($eEmailSMTPServerPort, $grpEmails);
       
       $eEmailSMTPUser = new Form_Element_Text('emailsmtpuser', $this->tr('Uživatel SMTP serveru'));
