@@ -18,11 +18,13 @@ abstract class Controller extends TrObject {
    const SETTINGS_GROUP_TEMPLATES = 'tpls';
    const SETTINGS_GROUP_SOCIAL = 'social';
    const SETTINGS_GROUP_IMAGES = 'images';
+   const SETTINGS_GROUP_SHOP = 'shop';
    
    const METADATA_GROUP_BASE = 'basic';
    const METADATA_GROUP_SITEMAP = 'sitemap';
    const METADATA_GROUP_OTHER = 'other';
    const METADATA_GROUP_SEO = 'seo';
+   const METADATA_GROUP_SHOP = 'seo';
    
    
    /**
@@ -716,11 +718,18 @@ abstract class Controller extends TrObject {
       $catModel = new Model_Category();
       $cat = $catModel->record($this->category()->getId());
       
+      if($this->category()->getCatDataObj()->{Model_Category::COLUMN_PARAMS}!= null){
+         $settings = unserialize($this->category()->getCatDataObj()->{Model_Category::COLUMN_PARAMS});
+      } else {
+         $settings = array();
+      }
+      
       $form = new Form('metadata_', true);
       $grpBasic = $form->addGroup(self::METADATA_GROUP_BASE, $this->tr('Základní'), $this->tr('Základní popisky'));
-      $grpSeo = $form->addGroup(self::METADATA_GROUP_SITEMAP, $this->tr('SEO nasatvení'), $this->tr('SEO nastavení kateogire'));
+      $grpSeo = $form->addGroup(self::METADATA_GROUP_SITEMAP, $this->tr('SEO nastavení'), $this->tr('SEO nastavení kateogire'));
       $grpSitemap = $form->addGroup(self::METADATA_GROUP_SITEMAP, $this->tr('Mapa stránek'), $this->tr('Nastavení mapy stránek pro vyhledávače'));
       $grpOther = $form->addGroup(self::METADATA_GROUP_OTHER, $this->tr('Ostatní'), $this->tr('Ostatní metadata kategorie'));
+      $grpShop = $form->addGroup(self::METADATA_GROUP_SHOP, $this->tr('Nastavení obchodu'), $this->tr('Nastavení obchodu a exportu kateogire'));
       
       $eName = new Form_Element_Text('name', $this->tr('Název kategorie'));
       $eName->addValidation(new Form_Validator_NotEmpty(null, Locales::getDefaultLang(true)));
@@ -776,6 +785,25 @@ abstract class Controller extends TrObject {
       $eSitemapPrior->setValues($cat->{Model_Category::COLUMN_SITEMAP_CHANGE_PRIORITY});
       $form->addElement($eSitemapPrior, $grpSitemap);
 
+      
+      if(defined('CUBE_CMS_SHOP') && CUBE_CMS_SHOP && $this instanceof Shop_Product_Controller){
+         $eHeurekaCat = new Form_Element_Text('heureka_cat', $this->tr('Heureka kategorie'));
+         $eHeurekaCat->setSubLabel($this->tr('Řetezec kateogrie pro heureku'));
+         $eHeurekaCat->setValues($cat->getParam('heureka_cat'));
+         $form->addElement($eHeurekaCat, $grpShop);
+         
+         $eGoogleCat = new Form_Element_Text('google_cat', $this->tr('Google kategorie'));
+         $eGoogleCat->setSubLabel($this->tr('Řetezec kateogrie pro Google'));
+         $eGoogleCat->setValues($cat->getParam('google_cat'));
+         $form->addElement($eGoogleCat, $grpShop);
+         
+         $eZboziCat = new Form_Element_Text('zbozi_cat', $this->tr('Zboží.cz kategorie'));
+         $eZboziCat->setSubLabel($this->tr('Řetezec kateogriše pro Zboží.cz'));
+         $eZboziCat->setValues($cat->getParam('zbozi_cat'));
+         $form->addElement($eZboziCat, $grpShop);
+         
+      }
+      
       if(function_exists('extendCategoryMetadata')){
          extendCategoryMetadata($this->category, $form, $this->translator);
       }
@@ -802,6 +830,19 @@ abstract class Controller extends TrObject {
          }
          $cat->{Model_Category::COLUMN_SITEMAP_CHANGE_FREQ} = $form->sitemap_frequency->getValues();
          $cat->{Model_Category::COLUMN_SITEMAP_CHANGE_PRIORITY} = $form->sitemap_priority->getValues();
+         if(isset($form->heureka_cat)){
+            $settings['heureka_cat'] = $form->heureka_cat->getValues();
+         }
+         if(isset($form->google_cat)){
+            $settings['google_cat'] = $form->google_cat->getValues();
+         }
+         if(isset($form->zbozi_cat)){
+            $settings['zbozi_cat'] = $form->zbozi_cat->getValues();
+         }
+            
+         $cat->{Model_Category::COLUMN_SITEMAP_CHANGE_PRIORITY} = $form->sitemap_priority->getValues();
+         
+         $cat->{Model_Category::COLUMN_PARAMS} = serialize($settings);
          
          $catModel->save($cat);
          $this->infoMsg()->addMessage($this->tr('Metadata byla uložena'));
