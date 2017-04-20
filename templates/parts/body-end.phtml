@@ -91,7 +91,9 @@ if(Category::getSelectedCategory()->getRights()->isWritable() || Template::pVar(
 
 // souhlas s použitím cookies
 $this->includeFile('tpl://parts/cookieinfo.phtml');
-if($this->disableFooterGA !== true && defined('VVE_GOOGLE_ANALYTICS_CODE') && VVE_GOOGLE_ANALYTICS_CODE != null
+if($this->disableFooterGA !== true 
+   && Auth::isAdmin() == false
+   && defined('VVE_GOOGLE_ANALYTICS_CODE') && VVE_GOOGLE_ANALYTICS_CODE != null
    && !in_array($_SERVER['REMOTE_ADDR'], explode(',', VVE_ANALYTICS_DISABLED_HOSTS))){?>
 <script type="text/javascript">
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
