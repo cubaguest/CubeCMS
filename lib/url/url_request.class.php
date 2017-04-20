@@ -146,6 +146,12 @@ class Url_Request {
     * @var boolean
     */
    private static $isXHRRequest = false;
+   
+   /**
+    * Proměnná obsahuje jestli se má požadavek vynutit jako XHR
+    * @var boolean
+    */
+   private static $XHRRespondClass = false;
 
    private static $instance = false;
 
@@ -203,6 +209,8 @@ class Url_Request {
          if(VVE_SUB_SITE_DOMAIN == null){
             // remove dir from script, it's on virtula root
             self::$fullUrl = substr($fullUrl, strpos(preg_replace('/\/[a-z0-9_-]+\//i', "/", $scriptName), AppCore::APP_MAIN_FILE));
+            // Wedos sračka
+            // self::$fullUrl = substr($fullUrl, strpos(preg_replace('/\/[a-z0-9._-]+\/[a-z0-9._-]+\//i', "/", $scriptName), AppCore::APP_MAIN_FILE));
          } else if(VVE_SUB_SITE_USE_HTACCESS == true) {
             // sub web na subdoméně
             throw new Exception('Metoda není implementována!');
@@ -223,6 +231,10 @@ class Url_Request {
       if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'
           || isset($_GET['SIMULATE_XHR'])) {
           self::$isXHRRequest = true;
+      }
+      if(isset($_POST['_cubecms_respond_class']) || isset($_GET['_cubecms_respond_class'])) {
+          self::$isXHRRequest = true;
+          self::$XHRRespondClass = isset($_POST['_cubecms_respond_class']) ? $_POST['_cubecms_respond_class'] : $_GET['_cubecms_respond_class'];
       }
    }
 
@@ -386,7 +398,12 @@ class Url_Request {
     */
    private function parseCoreModuleUrl() {
       $return = false;
-      $regexp = '/((?:sitemap|rss|autorun|logincheck|cookieinfo)).((xml|txt|html|php)+)/i';
+      // načtení seznamu interních modulů
+      $modules = array();
+      foreach (glob(AppCore::getAppLibDir().'lib'.DIRECTORY_SEPARATOR.'module'.DIRECTORY_SEPARATOR.'*', GLOB_ONLYDIR) as $value) {
+         $modules[] = basename($value);
+      }
+      $regexp = '/((?:'. implode('|', $modules).')).((xml|txt|html|php)+)/i';
       $matches = array();
       if(preg_match($regexp, self::$fullUrl, $matches) != 0) {
          $this->pageFull = false;
@@ -398,7 +415,7 @@ class Url_Request {
          }
          $return = true;
       }
-   return $return;
+      return $return;
    }
 
    /**
@@ -612,5 +629,21 @@ class Url_Request {
     */
    public static function isXHRRequest() {
       return self::$isXHRRequest;
+   }
+   
+   /**
+    * Metoda vrací jestli se je definováne reposn třída XHR (ajax)
+    * @return boolean
+    */
+   public static function isXHRRespondClass() {
+      return self::$XHRRespondClass !== false ;
+   }
+   
+   /**
+    * Metoda vrací třídu pro XHR (ajax)
+    * @return string
+    */
+   public static function getXHRRespondClass() {
+      return self::$XHRRespondClass;
    }
 }

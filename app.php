@@ -31,7 +31,7 @@ class AppCore extends TrObject {
    /**
     * Verze enginu
     */
-   const ENGINE_VERSION = '8.4.5';
+   const ENGINE_VERSION = '8.4.8';
 
    /**
     * Obsahuje hlavní soubor aplikace
@@ -806,10 +806,14 @@ class AppCore extends TrObject {
             OR ( Url_Request::getInstance()->getOutputType() == 'json' AND $routes->getRespondClass() == null AND ob_get_contents() == null )
                     /* je XHR, není implmentována metoda viewru a výstup je také prázdný */
             OR ( Url_Request::getInstance()->isXHRRequest() AND $controller->view()->hasViewer($controller->getActionView()) === false AND ob_get_contents() == null )
+            OR (Url_Request::getInstance()->isXHRRequest() AND Url_Request::getInstance()->isXHRRespondClass())
                  ) {
             // render odpovědi pro XHR
             if ($routes->getRespondClass() != null) {
                $class = $routes->getRespondClass();
+               $respond = new $class();
+            } else if(Url_Request::getInstance()->getXHRRespondClass() != null) {
+               $class = Url_Request::getInstance()->getXHRRespondClass();
                $respond = new $class();
             } else {
                $respond = new XHR_Respond_VVEAPI();

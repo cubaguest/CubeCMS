@@ -79,6 +79,8 @@ class Form extends TrObject implements ArrayAccess, Iterator {
    private $decorator = null;
    
    protected $errors = array();
+   
+   protected $ajaxProcess = false;
 
    /**
     * Konstruktor vytváří objekt formuláře
@@ -107,6 +109,7 @@ class Form extends TrObject implements ArrayAccess, Iterator {
    }
 
    public function  __toString() {
+      $this->isAjaxProcess() ? $this->html()->addClass('cubecms-ajax-form') : false;
       return $this->decorator->render($this);
    }
 
@@ -481,6 +484,26 @@ class Form extends TrObject implements ArrayAccess, Iterator {
       }
       return $this;
    }
+   
+   /**
+    * Jestli se má zkusti formulář zpracovat ajaxem
+    * @param bool $ajax
+    * @return self
+    */
+   public function setAjaxProcess($ajax = true)
+   {
+      $this->ajaxProcess = $ajax;
+      return $this;
+   }
+   
+   /**
+    * Vrací, jestli se formulář zpracovává ajaxem
+    * @return bool
+    */
+   public function isAjaxProcess()
+   {
+      return $this->ajaxProcess;
+   }
 
    /**
     * Metoda přidá element do formuláře
@@ -600,6 +623,7 @@ class Form extends TrObject implements ArrayAccess, Iterator {
     * @param Form_Decorator $decorator -- objekt Form dekorátoru
     */
    public function render(Form_Decorator_Interface $decorator = null) {
+      $this->isAjaxProcess() ? $this->html()->addClass('cubecms-ajax-form') : false;
       if($decorator == null){
          echo $this->decorator->render($this);
       } else {
