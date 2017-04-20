@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS `{PREFIX}dwfiles` (
   `id_dwfile` INT NOT NULL AUTO_INCREMENT,
-  `id_dwfile_section` INT NULL DEFAULT '1',
-  `id_category` INT NOT NULL,
+  `id_dwfile_section` INT NULL DEFAULT 1,
+  `id_category` INT NULL DEFAULT 1,
   `id_user` INT NOT NULL,
   `dwfile_name_cs` varchar(200) CHARACTER SET utf8 COLLATE utf8_czech_ci NULL DEFAULT NULL,
   `dwfile_text_cs` varchar(500) CHARACTER SET utf8 COLLATE utf8_czech_ci NULL DEFAULT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}dwfiles` (
 COLLATE = utf8_general_ci;
 
 
-INSERT INTO `cubecms_global_config` 
+INSERT INTO `cubecms_global_config`
 (`key`, `label`, `value`, `values`, `protected`, `type`, `id_group`, `callback_func`) VALUES
 ('MODULE_DOWNLOADFILES_COLS', 'Počet sloupců se soubory', '1',     NULL, 0, 'number', 20, NULL)
    ON DUPLICATE KEY UPDATE `callback_func`= NULL;
