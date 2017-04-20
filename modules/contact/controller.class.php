@@ -127,11 +127,23 @@ class Contact_Controller extends Controller {
 
    /**
     * 
-    * @return \Form
+    * @return \Form|bool
     */
-   public static function getShortForm(Translator $tr)
+   public static function getShortForm(Translator $tr, $contactCatId = false)
    {
+      // pokud není kontakt, vyber první modul kontaktu (stejně je většinou jenom jeden)
+      if($contactCatId){
+         $linkTarget = Url_Link::getCategoryLink($contactCatId);
+      } else {
+         $links = Url_Link::getCategoryLinkByModule('contact');
+         if(empty($links)){
+            return false;
+         }
+         $linkTarget = reset($links);
+      }
+      
       $f = new Form('conShortForm');
+      $f->setAction($linkTarget->param('back', (string)(new Url_Link())));
 
       $eName = new Form_Element_Text('name', $tr->tr('Jméno'));
       $eName->addValidation(new Form_Validator_NotEmpty());
@@ -161,7 +173,7 @@ class Contact_Controller extends Controller {
       if ($f->isValid()) {
          $this->processMessage($f);
          $this->infoMsg()->addMessage($this->tr('Váš dotaz byl úspěšně odeslán. Co nejdříve Vám odpovíme.'));
-         $this->link()->reload();
+         $this->link()->reload( $this->getRequestParam('back', null) );
       }
    }
 
