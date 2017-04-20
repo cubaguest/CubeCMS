@@ -603,10 +603,11 @@ div.tablediv > .table-bordered {
 }
 .ui-jqdialog-content .DataTD .required {
 	position: relative;
+   height: 0px;
 }
 .ui-jqdialog-content .DataTD .required:before {
 	position: absolute;
-   top: 20px;
+   top: 0px;
    left: -20px;
    color: red;
    content: "*";
