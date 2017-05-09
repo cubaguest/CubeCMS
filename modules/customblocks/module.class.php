@@ -1,7 +1,7 @@
 <?php
 
 class CustomBlocks_Module extends Module {
-   protected $version = '1.1.1';
+   protected $version = '1.1.2';
    
    public function install()
    {

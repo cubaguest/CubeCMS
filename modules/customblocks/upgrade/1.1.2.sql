@@ -1,0 +1,1 @@
+ALTER TABLE `{PREFIX}custom_blocks` CHANGE `block_type` `block_type` VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;
