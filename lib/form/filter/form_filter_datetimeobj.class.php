@@ -21,14 +21,9 @@ class Form_Filter_DateTimeObj extends Form_Filter {
     * @param Form_Element $elem
     */
    public function filter(Form_Element &$elem, &$values) {
-      switch (get_class($elem)) {
-         case "Form_Element_Text":
-            $this->filterValue($values);
-            break;
-         default:
-            break;
+      if($elem instanceof Form_Element_Text){
+         $this->filterValue($values);
       }
-//      $elem->setFilteredValues($values);
    }
 
    /**
