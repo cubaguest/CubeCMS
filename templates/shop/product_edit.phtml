@@ -2,6 +2,7 @@
 $jq = new JsPlugin_JQuery();
 $this->addJsPlugin($jq);
 $this->addFile('js://engine:bootstrap/bootstrap.min.js');
+$this->addJsPlugin(new JsPlugin_BootstrapTypehead());
 $dateTime = new JsPlugin_BootstrapDatepicker();
 $dateTime->setCfgParam('includecss', true);
 $this->addJsPlugin($dateTime);
@@ -18,12 +19,7 @@ $this->form->keywords->html()->setAttrib('size', 60)->addClass('form-element-lon
 $this->form->urlkey->html()->setAttrib('size', 60)->addClass('form-element-long');
 $this->form->isNewDate->html()->addClass('datepicker');
 $this->form->quantity->setType('number');
-//$this->form->metaKeywords->html()->setAttrib('size', 60)->addClass('form-element-long');
-//$this->form->annotation->html()->setAttrib('cols', 58)->setAttrib('rows', 5);
-//$this->form->metaDesc->html()->setAttrib('cols', 58)->setAttrib('rows', 3);
-//$this->form->text->html()->setAttrib('cols', 58)->setAttrib('rows', 30);
-// datepickery
-//$this->form->created_date->html()->addClass('datepicker');
+$this->form->manufacturer->html()->setAttrib('autocomplete', 'off');
 ?>
 <h1><?php echo $h; ?></h1>
 <div class="main-content-form-edit" id="article-edit-form">
@@ -39,6 +35,23 @@ $this->form->quantity->setType('number');
       var taxes = <?php echo json_encode($taxesPrint) ?>;
 
       $(document).ready(function () {
+         $('input[name="product_manufacturer"]').typeahead({
+            autoSelect: true,
+            minLength: 1,
+            items : 10,
+            delay: 400,
+            showHintOnFocus: true,
+            source: function (query, process) {
+               $.ajax({
+                  url: '<?php echo $this->link()->route('getManufacturers')?>',
+                  data: {search: query},
+                  dataType: 'json'
+               }).done(function(response) {
+                    return process(response.list);
+                });
+            }
+         });
+
          var $iPrice = $('input[name="product_price"]');
          var $iPriceWTax = $('input[name="product_pricewtax"]');
          var $iTax = $('select[name="product_tax"]');
@@ -97,11 +110,67 @@ $this->form->quantity->setType('number');
                close: 'icon icon-remove'
             }
          });
-//         $('input[name="product_isNewDate"]').datepicker({
-//            showOtherMonths: true,
-//            selectOtherMonths: true,
-//            showButtonPanel: true
-//         });
+
+         var numFeedItems = 50;
+         var feedMinCatChars = 3;
+         // feedy 
+         <?php 
+         $catsLink = new Url_Link_ModuleStatic();
+         $catsLink->module('shopproductgeneral')->action('getFeedCategories', 'json');
+         ?>
+         $('input[name="product_zboziCat"]').typeahead({
+            autoSelect: true,
+            minLength: feedMinCatChars,
+            items : numFeedItems,
+            delay: 400,
+            fitToElement : true,
+            showHintOnFocus: true,
+            source: function (query, process) {
+               $.ajax({
+                  url: '<?php echo $catsLink->param('feed', 'zbozi')?>',
+                  data: {q: query},
+                  dataType: 'json'
+               }).done(function(response) {
+                    return process(response.items);
+                });
+            }
+         });
+         $('input[name="product_googleCat"]').typeahead({
+            autoSelect: true,
+            minLength: feedMinCatChars,
+            items : numFeedItems,
+            delay: 400,
+            fitToElement : true,
+            showHintOnFocus: true,
+            source: function (query, process) {
+               $.ajax({
+                  url: '<?php echo $catsLink->param('feed', 'google')?>',
+                  data: {q: query},
+                  dataType: 'json'
+               }).done(function(response) {
+                    return process(response.items);
+                });
+            }
+         });
+         
+         $('input[name="product_heurekaCat"]').typeahead({
+            autoSelect: true,
+            minLength: feedMinCatChars,
+            items : numFeedItems,
+            delay: 400,
+            fitToElement : true,
+            showHintOnFocus: true,
+            source: function (query, process) {
+               $.ajax({
+                  url: '<?php echo $catsLink->param('feed', 'heureka')?>',
+                  data: {q: query},
+                  dataType: 'json'
+               }).done(function(response) {
+                    return process(response.items);
+                });
+            }
+         });
+
       });
 
    </script>

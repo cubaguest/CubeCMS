@@ -1,0 +1,53 @@
+<?php
+$this->addFile('css://engine:shop/style.less');
+$this->addFile('js://engine:shop.js');
+$jq = new JsPlugin_JQuery();
+$this->addJsPlugin($jq);
+$this->addJsPlugin(new JsPlugin_JQuerySelectize());
+// do titulku
+if ($this->productParam && !$this->productParam->isNew()) {
+   $h = sprintf($this->tr('Úprava parametru %s'), $this->productParam->{Shop_Model_ProductParams::COLUMN_NAME});
+} else {
+   $h = sprintf($this->tr('Přidání parametru k produktu %s'), $this->product->{Shop_Model_Product::COLUMN_NAME});
+}
+
+$this->addPageTitle($h);
+?>
+<h1><?php echo $h; ?></h1>
+<div class="main-content-form-edit">
+   <?php
+   $this->formParam->name->html()->setAttrib('id', 'product-param-name');
+   echo $this->formParam;
+   ?>
+   <script type="text/javascript">
+      $(document).ready(function () {
+
+         $('#productParamname_1').selectize({
+            maxItems: 1,
+            create : true,
+            persist: true,
+            load: function (query, callback) {
+               if (!query.length)
+                  return callback();
+               $.ajax({
+                  url: '<?php echo $this->link()->route('getProductsParams') ?>',
+                  type: 'GET',
+                  data: {search: query},
+                  error: function () {
+                     callback();
+                  },
+                  success: function (res) {
+//                     console.log(res.params);
+                     var items = [];
+                     $.each(res.params, function(index, data){
+                        items.push({value : data, text : data});
+                     });
+                     callback(items);
+                  }
+               });
+            }
+         });
+         // ajax načítání podobných
+      });
+   </script>
+</div>

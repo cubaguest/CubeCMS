@@ -333,7 +333,7 @@ $this->addPageTitle($h);
                      </td>
                   </tr>
                </tfoot>
-               <tbody>
+               <tbody class="combination-edit">
                   <?php
                   if (!empty($this->productCombinations)) {
                      $row = 1;
@@ -357,9 +357,7 @@ $this->addPageTitle($h);
                            </td>
                            <td class="combination-code text-nowrap">
                               <?php
-                              echo Shop_Tools::getProductCode(
-                                      $this->product->{Shop_Model_Product::COLUMN_CODE}, json_decode($c->comb_codes_json), $c->comb_attr_codes_json
-                              );
+                              echo Shop_Tools::getProductCode($this->product->{Shop_Model_Product::COLUMN_CODE}, $c);
                               ?>
                            </td>
                            <td class="combination-weight">
