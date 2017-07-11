@@ -33,16 +33,30 @@ $modules['banners']['positions'] = array(
 
 $modules['custommenu']['positions'] = array(
    'bottom' => 'Spodní menu',
+   'left' => 'Levé menu',
+   'right' => 'Pravé menu',
 );
 
 $modules['articles']['connectPhotogallery'] = true;
 
 $modules['hpslideshow']['enabled'] = true;
 $modules['hpslideshow']['wysiwyg'] = true;
+$modules['hpslideshow']['slides'] = 5;
 $modules['hpslideshow']['dimensions'] = array(
    'width' => 1140,
    'height' => 250,
 );
+
+$translator = new Translator();
+$elemSpeed = new Form_Element_Text('speed', $translator->tr('Rychlost'));
+//$elemSpeed->setDefault(1000);
+$elemDelay = new Form_Element_Text('delay', $translator->tr('Prodleva'));
+//$elemDelay->setDefault(5000);
+$modules['hpslideshow']['options'] = array(
+    $elemSpeed,
+    $elemDelay,
+);
+
 
 $modules['contact']['footer'] = true;
 
