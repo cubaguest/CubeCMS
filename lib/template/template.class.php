@@ -119,6 +119,7 @@ class Template extends TrObject {
 
    protected static $baseContentFilters = array(
        'anchors',
+       'Template_Postfilters::modulesContentFilter',
        'Forms_Controller::contentFilter',
    );
        
@@ -426,11 +427,11 @@ class Template extends TrObject {
     * @param string/JsPlugin_JsFile $jsfile -- název souboru nebo objek JsPlugin_JsFile(pro virtuální)
     * @return Template -- objekt sebe
     */
-   public function addJsFile($jsfile) {
+   public function addJsFile($jsfile, $params = array()) {
       if(strncmp ($jsfile, 'http', 4) == 0){
-         Template::addJS($jsfile);
+         Template::addJS($jsfile, $params);
       } else {
-         $this->addFile('js://'.$jsfile);
+         $this->addFile('js://'.$jsfile, false, $params);
       }
       return $this;
    }
@@ -480,11 +481,16 @@ class Template extends TrObject {
     * @param string -- název javascriptu
     * @param boolean -- true pokud je zadána i cesta se souborem
     */
-   public static function addJS($jsFile) {
+   public static function addJS($jsFile, $params = array()) {
       //TODO kontrola souborů
-      if(!in_array($jsFile, self::$javascripts)) {
-         array_push(self::$javascripts, $jsFile);
+      $params += array(
+          'async' => false
+      );
+      if(!isset(self::$javascripts[$jsFile])){
+         self::$javascripts[$jsFile] = $params;
       }
+//      if(!in_array($jsFile, self::$javascripts)) {
+//      }
    }
 
    /**
@@ -615,7 +621,7 @@ class Template extends TrObject {
       if(preg_match('/^(?P<res>tpl|css|js|http|https):\/\/(?:(?P<module>[a-z_-]+):)?(?P<filepath>(?:[a-z0-9_\/.-]*\/)?(?P<file>[^.]+\.(?P<ext>[^?#]+)))(?:[?#](?P<params>[a-z0-9_.=&#-]+))?$/i', $resource, $matches) == 1) {
          $original = false;
          if(isset ($matches['params']) AND $matches['params'] == 'original'){
-            $original == true;
+            $original = true;
          }
          switch ($matches['res']) {
             case 'tpl':
@@ -662,7 +668,7 @@ class Template extends TrObject {
                } else {
                   $filePath = $this->getLinkPathFromModule($matches['filepath'], $matches['module'], self::JAVASCRIPTS_DIR, $original);
                }
-               Template::addJs($filePath);
+               Template::addJs($filePath, is_array($vars) ? $vars : array());
                break;
             default:
                // detekujeme koncovku souboru
@@ -1075,7 +1081,7 @@ class Template extends TrObject {
     * @param array/string $filters -- pole filtrů
     * @return string -- přefiltrovaný text
     */
-   public function filter($text, $filters){
+   public function filter($text, $filters = array()){
       if(is_string($filters)) $filters = array($filters);
       $filters = array_merge($filters, self::$baseContentFilters);
       array_unique($filters);

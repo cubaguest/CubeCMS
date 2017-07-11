@@ -108,7 +108,7 @@ class Template_Core extends Template {
          $this->addFile('css://admin/admin.less');
          if(Auth::isAdmin()){
             $this->addJsPlugin(new JsPlugin_JQuery());
-            $this->addFile('js://admin/menu.js');
+            $this->addFile('js://admin/menu.js', false, array('async' => true));
          }
       }
    }
@@ -189,18 +189,16 @@ class Template_Core extends Template {
       }
 
       // css
-//      if(VVE_DEBUG_LEVEL == 0){
-//         $css = $this->getCombinedCss();
-//      } else {
-         $css = Template::getStylesheets();
-//      }
+      $css = Template::getStylesheets();
       array_walk($css, create_function('&$i,$k','$i = "<link rel=\"stylesheet\" type=\"text/css\" href=\"$i\" />\n";'));
       $cssfiles = implode('', $css);
       unset ($css);
       // js
       $js = Template::getJavascripts();
-      array_walk($js, create_function('&$i,$k','$i = "<script type=\"text/javascript\" src=\"$i\"></script>\n";'));
-      $jscripts = implode('', $js);
+      $jscripts = null;
+      foreach ($js as $file => $params) {
+         $jscripts .= '<script type="text/javascript" src="'.$file.'" '.($params['async'] == true ? 'async' : '').'></script>'."\n";
+      }
       unset ($js);
 
       // doplníme titulek stránky
