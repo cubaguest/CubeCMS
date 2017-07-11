@@ -57,4 +57,18 @@ class Templates_Model extends Model_ORM {
       }
       return $m->where(self::COLUMN_ID.' = :id AND '.self::COLUMN_LANG.' = :lang', array('id' => $id, 'lang' => $lang))->record();
    }
+   
+   /**
+    * Metoda vrací šablony podle typu
+    *
+    * @param int -- id šablony
+    * @return Model_ORM_Record[] -- pole s šablonami
+    */
+   public static function getTemplates($type = self::TEMPLATE_TYPE_TEXT, $lang = null) {
+      $m = new self();
+      if($lang == null){
+         return $m->where(self::COLUMN_TYPE.' = :type', array('type' => $type))->records();
+      }
+      return $m->where(self::COLUMN_TYPE.' = :type AND '.self::COLUMN_LANG.' = :lang', array('type' => $type, 'lang' => $lang))->records();
+   }
 }
