@@ -2,11 +2,11 @@
 /**
  * Třída Modelu pro práci s celou databází, jsou zde metody pro výběr tabulek atd
  *
- * @copyright  	Copyright (c) 2008-2009 Jakub Matas
- * @version    	$Id: $ VVE6.0.0 $Revision: $
- * @author			$Author: $ $Date: $
- *						$LastChangedBy: $ $LastChangedDate: $
- * @abstract 		Třída pro práci s celou databází
+ * @copyright   Copyright (c) 2008-2009 Jakub Matas
+ * @version     $Id: $ VVE6.0.0 $Revision: $
+ * @author      $Author: $ $Date: $
+ *            $LastChangedBy: $ $LastChangedDate: $
+ * @abstract    Třída pro práci s celou databází
  */
 
 class Model_DbSupport extends Model_PDO {
@@ -77,7 +77,36 @@ class Model_DbSupport extends Model_PDO {
     */
    public function runSQL($sql) {
       $pdo = Db_PDO::getInstance();
-      return $pdo->query($sql);
+      //$pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, 0);
+      $ret = $pdo->query($sql);
+      //$pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, 1);
+      return $ret;
+      
+   }
+
+   /**
+    * Metoda spustí zadaný sql dotaz na db
+    * @param string $sql -- SQL dotaz
+    * @return PDOStatement
+    */
+   public function execSQL($sql) {
+      $pdo = Db_PDO::getInstance();
+      // remove comments
+      $RXSQLComments = '@(--[^\r\n]*)|(\#[^\r\n]*)|(/\*[\w\W]*?(?=\*/)\*/)@ms';
+      //$sql = preg_replace( $RXSQLComments, '', $sql );
+      // explode to subquries
+      $sqlParts = explode(';', $sql);
+
+      foreach ($sqlParts as $subQuery) {
+         $subQuery = trim($subQuery);
+         if($subQuery != null && $subQuery != ''){
+            //var_dump(trim($subQuery));
+            $ret = $pdo->exec($subQuery);
+         }
+      }
+      //die;
+      return $ret;
+      
    }
    
    public static function dropTable($table)
