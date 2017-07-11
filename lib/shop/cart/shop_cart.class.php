@@ -215,7 +215,7 @@ class Shop_Cart implements Iterator, ArrayAccess {
    public function editQty($idItem, $qty)
    {
       $modelCart = new Shop_Model_Cart();
-      if($qty < 1){
+      if($qty == 0){
          $modelCart->delete($idItem);
          unset(self::$items[$idItem]);
       } else {

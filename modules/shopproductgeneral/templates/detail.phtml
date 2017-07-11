@@ -1,74 +1,43 @@
 <?php
 $this->addFile('css://style.less');
 $this->addFile('js://engine:shop.js');
-$piroBox = new JsPlugin_PrettyPhoto();
-$this->addJsPlugin($piroBox);
-
-$jQuery = new JsPlugin_JQuery();
-$jQuery->addUISpinner();
-$this->addJsPlugin($jQuery);
-
+//$piroBox = new JsPlugin_PrettyPhoto();
+//$this->addJsPlugin($piroBox);
 // do titulku
 $this->addPageTitle($this->product->{Shop_Model_Product::COLUMN_NAME});
 Template_Core::setPageKeywords($this->product->{Shop_Model_Product::COLUMN_KEYWORDS});
 Template_Core::setPageDescription(strip_tags($this->product->{Shop_Model_Product::COLUMN_TEXT_SHORT}));
 echo $this->toolbox;
 
-// setup product
+// setup combinations
 $this->includeFile('tpl://shopproductgeneral:detail_pre.phtml');
 ?>
-<h1><?php
+<div itemscope itemtype="http://schema.org/Product">
+<h1 itemprop="name"><?php
    echo $this->product->{Shop_Model_Product::COLUMN_NAME};
    echo strtotime($this->product->{Shop_Model_Product::COLUMN_IS_NEW_TO_DATE}) + (24 * 60 * 60) >= time() ? ' - ' . $this->tr('Novinka!') : null;
    echo!$this->product->{Shop_Model_Product::COLUMN_ACTIVE} ? ' - ' . $this->tr('neaktivní') : null;
    ?></h1>
-<div class="row">
+<div class="row shop shop-detail">
    <div class="col-sm-12">
       <div class="content">
-         <div class="text">
-            <?php echo $this->product->{Shop_Model_Product::COLUMN_TEXT_SHORT} ?>
-         </div>
          <div class="row">
             <div class="col-sm-6">
-               <?php if ($this->product->getTitleImage()) { ?>
-                  <div class="title-image">
-                     <?php
-                     $imgSmall = Utils_Image::cache($this->product->getTitleImage()->getUrl(), 400);
-                     ?>
-                     <a href="<?php echo $this->product->getTitleImage()->getUrl() ?>"
-                        rel="prettyPhoto[pr]" title="<?php ps($this->product->{Shop_Model_Product::COLUMN_NAME}) ?>">
-                        <img class="img-responsive image" src="<?php echo $imgSmall ?>" alt="<?php echo $this->product->getTitleImage()->{Shop_Model_Product_Images::COLUMN_NAME} ?>"/>
-                     </a>
-                  </div>
-
-                  <?php
-               }
-
-               $images = $this->product->getImages();
-               foreach ($images as $img) {
-                  $smallSrc = Utils_Image::cache($img->getUrl(), 80, 80, true);
-                  ?>
-                  <a href="<?php echo $img->getUrl() ?>" title="<?php ps($img->{Shop_Model_Product_Images::COLUMN_NAME}) ?>"
-                     rel="prettyPhoto[pr]"
-                     ><img src="<?php echo $smallSrc ?>" alt="<?php ps($img->{Shop_Model_Product_Images::COLUMN_NAME}) ?>" /></a>
-                     <?php
-                  }
-                  ?>
-
-            </div>
-            <div class="col-sm-6">
+               <div class="text">
+                  <?php echo $this->product->{Shop_Model_Product::COLUMN_TEXT_SHORT} ?>
+               </div>
                <div class="product-detail shop-product-attributes">
                   <?php if ($this->product->{Shop_Model_Product::COLUMN_CODE} != null) { ?>
                      <div class="attr-line clearfix">
                         <div class="left"><?php echo $this->tr('Kód') ?></div>
-                        <div class="right product-code"><?php echo $this->productCode ?></div>
+                        <div class="right product-code" itemprop="sku"><?php echo $this->productCode ?></div>
                      </div>
                   <?php } ?>
                   <div class="attr-line clearfix">
                      <div class="left"><?php echo $this->tr('Dostupnost') ?></div>
                      <div class="right product-qty"><?php
                         if ($this->productQty > 0 && $this->product->{Shop_Model_Product::COLUMN_STOCK}) {
-                           printf($this->tr('Skladem %s %s'), $this->productQty, $this->product->{Shop_Model_Product::COLUMN_UNIT});
+                           printf($this->tr('Skladem %s %s'), Utils_Number::formatFloat($this->productQty), $this->product->{Shop_Model_Product::COLUMN_UNIT});
                         } else if ($this->productQty < 0 || !$this->product->{Shop_Model_Product::COLUMN_STOCK}) {
                            echo $this->tr('Skladem');
                         } else {
@@ -77,12 +46,26 @@ $this->includeFile('tpl://shopproductgeneral:detail_pre.phtml');
                         ?>
                      </div>
                   </div>
-                  <div class="attr-line clearfix">
-                     <div class="left"><?php echo $this->tr('Váha') ?></div>
-                     <div class="right product-weight"><?php
-                        echo round($this->productWeight, 3) . " Kg";
-                        ?></div>
-                  </div>
+                  <?php if ($this->productWeight > 0) { ?>
+                     <div class="attr-line clearfix">
+                        <div class="left"><?php echo $this->tr('Váha') ?></div>
+                        <div class="right product-weight"><?php
+                           echo round($this->productWeight, 3) . " Kg";
+                           ?></div>
+                     </div>
+                  <?php } ?>
+                  <?php if ($this->product->{Shop_Model_Product::COLUMN_WARRANTY} != null) { ?>
+                     <div class="attr-line clearfix">
+                        <div class="left"><?php echo $this->tr('Záruka') ?></div>
+                        <div class="right"><?php echo $this->tr(array('%s rok', '%s roky', '%s let'), $this->product->{Shop_Model_Product::COLUMN_WARRANTY}); ?></div>
+                     </div>
+                  <?php } ?>
+                  <?php if ($this->product->{Shop_Model_Product::COLUMN_MANUFACTURER} != null) { ?>
+                     <div class="attr-line clearfix" itemprop="manufacturer" itemscope itemtype="http://schema.org/Organization">
+                        <div class="left"><?php echo $this->tr('Výrobce') ?></div>
+                        <div class="right" itemprop="name"><?php echo $this->product->{Shop_Model_Product::COLUMN_MANUFACTURER}; ?></div>
+                     </div>
+                  <?php } ?>
                   <?php if ($this->product->{Shop_Model_Product::COLUMN_PERSONAL_PICKUP_ONLY} == true) { ?>
                      <div class="attr-line clearfix">
                         <div class="left"><?php echo $this->tr('Odběr') ?></div>
@@ -93,19 +76,31 @@ $this->includeFile('tpl://shopproductgeneral:detail_pre.phtml');
                   // render Combinations
                   ?>
                   <div class="attr-line clearfix">
-                     <div class="left product-price-label"><?php echo $this->tr('Cena s daní') ?></div>
-                     <div class="right product-price"><?php echo Shop_Tools::getFormatedPrice($this->productPrice, $this->product->{Shop_Model_Tax::COLUMN_VALUE}); ?></div>
+                     <div class="left product-price-label"> <strong><?php echo $this->tr('Cena s daní') ?></strong></div>
+                     <div class="right" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+                        <strong>
+                           <span class="product-price" itemprop="price" content="<?php echo Shop_Tools::getPrice($this->productPrice, $this->product->{Shop_Model_Tax::COLUMN_VALUE}, false) ?>">
+                              <?php echo Shop_Tools::getFormatedPrice($this->productPrice, $this->product->{Shop_Model_Tax::COLUMN_VALUE}, false); ?>
+                           </span>
+                           <span itemprop="priceCurrency" content="<?php echo Shop_Tools::getCurrencyCode() ?>"><?php echo Shop_Tools::getCurrency() ?></span>
+                        </strong> 
+                        <?php if($this->productQty > 0 && $this->product->{Shop_Model_Product::COLUMN_STOCK}){?>
+                           <link itemprop="availability" href="http://schema.org/InStock" />
+                        <?php }  else { ?>
+                           <link itemprop="availability" href="http://schema.org/OutOfStock" />
+                        <?php } ?>
+                     </div>
                   </div>
                   <div class="attr-line clearfix">
                      <div class="left product-price-label"><?php echo $this->tr('Cena bez daně') ?></div>
                      <div class="right product-price-wout-tax"><?php echo Shop_Tools::getFormatedPrice($this->productPrice); ?></div>
                   </div>
-                  <div id="product-buy-form">
+                  <div id="product-buy-form ">
                      <?php
                      if ($this->formAddToCart instanceof Form) {
                         echo $this->formAddToCart->renderStart();
                         $this->formAddToCart->productId->setValues($this->product->{Shop_Model_Product::COLUMN_ID});
-                        $this->formAddToCart->qty->setValues($this->product->{Shop_Model_Product::COLUMN_UNIT_SIZE});
+                        $this->formAddToCart->qty->setValues(Utils_Number::formatFloat($this->product->{Shop_Model_Product::COLUMN_UNIT_SIZE}));
                         $this->formAddToCart->qty->html()->addClass('quantity');
                         // varianty
                         if ($this->productVariantsSelects) {
@@ -171,46 +166,172 @@ $this->includeFile('tpl://shopproductgeneral:detail_pre.phtml');
                   </div>
                </div>
             </div>
-         </div>
-         <h2><?php echo $this->tr('Popis') ?></h2>
-         <div class="main-content-text">
-            <?php echo $this->product->{Shop_Model_Product::COLUMN_TEXT}; ?>
-         </div>
-         <?php
-         // parametry
-         $params = $this->product->getParams();
-         if (!empty($params)) {
-            ?>
-            <h2><?php echo $this->tr('Parametry') ?></h2>
-            <div class="product-params">
-               <dl class="dl-horizontal">
-                  <?php
-                  foreach ($params as $param) {
-                     ?>
-                     <dt><?php ps($param->{Shop_Model_Product_Params::COLUMN_NAME}) ?><dt>
-                     <dd><?php ps($param->{Shop_Model_Product_ParamsValues::COLUMN_VALUE}) ?></dd>
+            <div class="col-sm-6">
+               <?php if ($this->product->getTitleImage()) { ?>
+                  <div class="title-image hidden-xs">
                      <?php
-                  }
+                     $imgSmall = Utils_Image::cache($this->product->getTitleImage()->getUrl(), 400);
+                     ?>
+                     <a href="<?php echo $this->product->getTitleImage()->getUrl() ?>"
+                        title="<?php ps($this->product->getTitleImage()->{Shop_Model_Product_Images::COLUMN_NAME}) ?>">
+                        <img itemprop="image" class="img-responsive image" src="<?php echo $imgSmall ?>" alt="<?php echo $this->product->getTitleImage()->{Shop_Model_Product_Images::COLUMN_NAME} ?>"/>
+                     </a>
+                  </div>
+                  <?php
+               }
+               $images = $this->product->getImages();
+               if ($images) {
                   ?>
-               </dl>
+                  <div class="product-thumbnails <?php echo count($images) == 1 ? 'hidden' : ''?> ">
+                     <?php
+                     $i = 0;
+                     foreach ($images as $img) {
+                        $smallSrc = Utils_Image::cache($img->getUrl(), 400, 400, true);
+                        ?>
+                        <div class="slide">
+                           <a href="<?php echo $img->getUrl() ?>" title="<?php ps($img->{Shop_Model_Product_Images::COLUMN_NAME}) ?>"
+                              class="product-thumbnail" data-index="<?php echo $i?>"
+                              ><img class="img-responsive" src="<?php echo $smallSrc ?>" alt="<?php ps($img->{Shop_Model_Product_Images::COLUMN_NAME}) ?>" /></a>
+                        </div>
+                        <?php
+                        $i++;
+                     }
+                     ?>
+                  </div>
+                  <?php
+               }
+               ?>
             </div>
+         </div>
+         <hr class="line" />
+         <div class="row">
             <?php
-         }
-         ?>
+            $params = $this->product->getParams();
+            ?>
+            <div class=" <?php echo!empty($params) ? 'col-sm-6' : 'col-sm-12' ?>">
+               <h2><?php echo $this->tr('Popis') ?></h2>
+               <div class="main-content-text" itemprop="description">
+                  <?php echo $this->product->{Shop_Model_Product::COLUMN_TEXT}; ?>
+               </div>  
+            </div>
+            <?php if (!empty($params)) { ?>
+               <div class="col-sm-6">
+                  <h3 class="h2"><?php echo $this->tr('Parametry') ?></h3>
+                  <div class="product-params">
+                     <table class="table table-hover table-condensed">
+                        <?php
+                        foreach ($params as $param) {
+                           ?>
+                           <tr>
+                              <th><?php ps($param->{Shop_Model_Product_Params::COLUMN_NAME}) ?></th>
+                              <td><?php ps($param->{Shop_Model_Product_ParamsValues::COLUMN_VALUE}) ?></td>
+                           </tr>
+                           <?php
+                        }
+                        ?>
+                     </table>
+                  </div>
+               </div>
+            <?php } ?>
+         </div>
          <?php
          $this->includeTpl("buttonback.phtml", true, array('text' => $this->tr('Zpět na seznam zboží')));
          ?>
       </div>  
    </div>
 </div>
+</div>
 <?php
-$this->includeFile('tpl://shopproductgeneral:detail_scripts.phtml');
+$this->addFile('css://engine:slick-theme-product.less');
+//$this->addFile('css://engine:slick-theme.less');
 ?>
 <script type="text/javascript">
-$(document).ready(function(){
-   $("a[rel^='prettyPhoto']").prettyPhoto();
-   
-   
-   
-});
+   $(document).ready(function () {
+      $('.product-thumbnails').slick({
+         dots: false,
+         infinite: true,
+         speed: 300,
+         slidesToShow: 4,
+         slidesToScroll: 4,
+         autoplay: true,
+         autoplaySpeed: 8000,
+         responsive: [
+            {
+               breakpoint: 1280,
+               settings: {
+                  slidesToShow: 3,
+                  slidesToScroll: 3,
+                  infinite: true,
+                  dots: true
+               }
+            },
+            {
+               breakpoint: 1024,
+               settings: {
+                  slidesToShow: 2,
+                  slidesToScroll: 2
+               }
+            },
+            {
+               breakpoint: 480,
+               settings: {
+                  slidesToShow: 1,
+                  slidesToScroll: 1
+               }
+            }
+         ]
+      });
+
+      var $titleImageA = $('.title-image a');
+      $('.product-thumbnails .slide a').on('click', function (e) {
+         e.preventDefault();
+         $('img', $titleImageA).attr('src', $(this).prop('href'));
+         $titleImageA.prop('href', $(this).prop('href'));
+      });
+      $('.title-image').height($('.title-image').width());
+      
+      if ($('#blueimp-gallery').length === 0) {
+         $('body').append('<div id="blueimp-gallery" class="blueimp-gallery blueimp-gallery-controls">'
+                 + '<div class="slides"></div>'
+                 + '<h3 class="title"></h3>'
+                 + '<a class="prev">‹</a>'
+                 + '<a class="next">›</a>'
+                 + '<a class="close">×</a>'
+                 + '<a class="play-pause"></a>'
+                 + '<ol class="indicator"></ol>'
+                 + '</div>');
+
+      }
+      var blueimpOpts = {
+         toggleControlsOnReturn: false,
+         closeOnSwipeUpOrDown: true,
+         disableScroll: false,
+         stretchImages: false
+      };
+
+      $('.title-image a').on('click', function (e) {
+         e.preventDefault();
+         var $this = $(this);
+         var $images = $('.product-thumbnails div.slide').not('.slick-cloned').find('a');
+         var images = new Array();
+         if ($images.length > 0) {
+            $images.each(function () {
+               var imageObj = {
+                  title: $(this).prop('title'),
+                  href: $(this).prop('href'),
+//                  type: 'image/jpeg',
+                  thumbnail: $('img', this).prop('src')
+               };
+               images.push(imageObj);
+            });
+            console.log(parseInt($('.product-thumbnails').find('a[href="'+$this.prop('href')+'"]').data('index')));
+            var fullscreenGallery = blueimp.Gallery(images, $.extend({
+               index: parseInt($('.product-thumbnails').find('a[href="'+$this.prop('href')+'"]').data('index'))
+            }, blueimpOpts));
+         }
+         return false;
+      });
+   });
 </script>
+<?php
+$this->includeFile('tpl://shopproductgeneral:detail_scripts.phtml');

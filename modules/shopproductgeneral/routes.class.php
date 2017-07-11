@@ -9,5 +9,3 @@ class ShopProductGeneral_Routes extends Shop_Product_Routes {
       parent::initRoutes();
 	}
 }
-
-?>

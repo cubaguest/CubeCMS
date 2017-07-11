@@ -45,7 +45,8 @@ if (!empty($this->products)) {
                   </div>
                   <?php
                   $qty = $product->{Shop_Model_Product_Combinations::COLUMN_QTY} != null ?
-                          (int) $product->{Shop_Model_Product_Combinations::COLUMN_QTY} : (int) $product->{Shop_Model_Product::COLUMN_QUANTITY};
+                          (int) $product->{Shop_Model_Product_Combinations::COLUMN_QTY} 
+                          : (int) $product->{Shop_Model_Product::COLUMN_QUANTITY};
                   if ($this->formAddToCart instanceof Form && ( ($product->{Shop_Model_Product::COLUMN_STOCK} && $qty > 0) || (!$product->{Shop_Model_Product::COLUMN_STOCK}) || VVE_SHOP_ALLOW_BUY_NOT_IN_STOCK)
                   ) {
                      echo $this->formAddToCart->renderStart();

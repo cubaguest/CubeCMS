@@ -13,6 +13,8 @@ abstract class Shop_Product_Routes extends Routes {
       $this->addRoute('editImages', "::urlkey::/edit-images/", 'editImages','{urlkey}/edit-images/');
       $this->addRoute('editParams', "::urlkey::/edit-params/", 'editParams','{urlkey}/edit-params/');
       $this->addRoute('params', "::urlkey::/params.php", 'params','{urlkey}/params.php', 'XHR_Respond_VVEAPI');
+      $this->addRoute('getManufacturers', "manufacturers.php", 'getManufacturers','manufacturers.php', 'XHR_Respond_VVEAPI');
+      $this->addRoute('getFeedCategories', "feed-categories.php", 'getFeedCategories','feed-categories.php', 'XHR_Respond_VVEAPI');
       $this->addRoute('edit', "::urlkey::/edit", 'edit','{urlkey}/edit/');
       // detail a editace úvodního textu (proč text?)
       $this->addRoute('edittext', "edit-text/", 'edittext','edit-text/');

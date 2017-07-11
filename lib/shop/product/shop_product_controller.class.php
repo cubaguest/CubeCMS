@@ -27,7 +27,7 @@ abstract class Shop_Product_Controller extends Controller {
       
       $eQuantity = new Form_Element_Text('qty', $this->tr('Množství'));
       $eQuantity->addValidation(new Form_Validator_NotEmpty($this->tr('Musí být vyplněno pole s množstvím zboží')));
-      $eQuantity->addValidation(new Form_Validator_IsNumber(null, Form_Validator_IsNumber::TYPE_INT));
+      $eQuantity->addValidation(new Form_Validator_IsNumber(null, Form_Validator_IsNumber::TYPE_FLOAT));
       $formAdd->addElement($eQuantity);
       
       $eProductId = new Form_Element_Hidden('productId');
@@ -84,8 +84,15 @@ abstract class Shop_Product_Controller extends Controller {
                $eQuantity->isValid(false);
                throw new UnexpectedValueException('Množství nemůže být měnší než nominální hodnota');
             }
-            
-            if($eQuantity->getValues() % $product->{Shop_Model_Product::COLUMN_UNIT_SIZE} != 0){
+//            var_dump(Utils_Number::formatFloat($eQuantity->getValues()), 
+//                    $product->{Shop_Model_Product::COLUMN_UNIT_SIZE},
+//                    fmod((float)Utils_Number::formatFloat($eQuantity->getValues()),  (float)$product->{Shop_Model_Product::COLUMN_UNIT_SIZE}),
+//                    ,
+//                    Utils_Number::formatFloat($eQuantity->getValues()) / $product->{Shop_Model_Product::COLUMN_UNIT_SIZE}
+//                    );
+//                    
+//                    die;
+            if(filter_var((float)Utils_Number::formatFloat($eQuantity->getValues()) / (float)$product->{Shop_Model_Product::COLUMN_UNIT_SIZE}, FILTER_VALIDATE_INT) === false){
                $eQuantity->isValid(false);
                throw new UnexpectedValueException('Množství musí být v násobcích nominální hodnoty');
             }
@@ -336,7 +343,7 @@ abstract class Shop_Product_Controller extends Controller {
 
       $eQuantity = new Form_Element_Text('quantity', $this->tr('Položek na skladě'));
       $eQuantity->addValidation(new Form_Validator_NotEmpty());
-      $eQuantity->addValidation(new Form_Validator_IsNumber(null, Form_Validator_IsNumber::TYPE_INT));
+      $eQuantity->addValidation(new Form_Validator_IsNumber(null, Form_Validator_IsNumber::TYPE_FLOAT));
       $eQuantity->setValues(0);
       $form->addElement($eQuantity, $fGrpInfo);
 
@@ -412,6 +419,12 @@ abstract class Shop_Product_Controller extends Controller {
       $eText->addValidation(new Form_Validator_NotEmpty(null, Locales::getDefaultLang(true)));
       $form->addElement($eText, $fGrpLabels);
       
+      $eManufacturer = new Form_Element_Text('manufacturer', $this->tr('Výrobce'));
+      $form->addElement($eManufacturer, $fGrpLabels);
+      
+      $eWarranty = new Form_Element_Text('warranty', $this->tr('Záruka'));
+      $eWarranty->setSubLabel($this->tr('Záruka v letech nebo textový řetězec'));
+      $form->addElement($eWarranty, $fGrpLabels);
       
       $fGrpSeo = $form->addGroup('seo', $this->tr('SEO optimalizace'));
       
@@ -423,6 +436,15 @@ abstract class Shop_Product_Controller extends Controller {
       $eKeyWords = new Form_Element_Text('keywords', $this->tr('Klíčová slova'));
       $eKeyWords->setLangs();
       $form->addElement($eKeyWords, $fGrpSeo);
+      
+      $eHeurekaCat = new Form_Element_Text('heurekaCat', $this->tr('Heureka kategorie'));
+      $form->addElement($eHeurekaCat, $fGrpSeo);
+      
+      $eGoogleCat = new Form_Element_Text('googleCat', $this->tr('Google kategorie'));
+      $form->addElement($eGoogleCat, $fGrpSeo);
+      
+      $eZboziCat = new Form_Element_Text('zboziCat', $this->tr('Zbozi.cz kategorie'));
+      $form->addElement($eZboziCat, $fGrpSeo);
       
       
 //      $eEditAttributes = new Form_Element_Checkbox('editAttr', $this->tr('Upravit atributy'));
@@ -452,10 +474,15 @@ abstract class Shop_Product_Controller extends Controller {
          $form->textShort->setValues($product->{Shop_Model_Product::COLUMN_TEXT_SHORT});
          $form->urlkey->setValues($product->{Shop_Model_Product::COLUMN_URLKEY});
          $form->keywords->setValues($product->{Shop_Model_Product::COLUMN_KEYWORDS});
+         $form->heurekaCat->setValues($product->{Shop_Model_Product::COLUMN_HEUREKA_CAT});
+         $form->googleCat->setValues($product->{Shop_Model_Product::COLUMN_GOOGLE_CAT});
+         $form->zboziCat->setValues($product->{Shop_Model_Product::COLUMN_GOOGLE_CAT});
+         $form->warranty->setValues($product->{Shop_Model_Product::COLUMN_WARRANTY});
          if($product->{Shop_Model_Product::COLUMN_IS_NEW_TO_DATE} != '0000-00-00' AND 
             $product->{Shop_Model_Product::COLUMN_IS_NEW_TO_DATE} != null){
             $form->isNewDate->setValues(vve_date("%x", new DateTime($product->{Shop_Model_Product::COLUMN_IS_NEW_TO_DATE})));
          }
+         $form->manufacturer->setValues($product->{Shop_Model_Product::COLUMN_MANUFACTURER});
       }
       
       return $form;
@@ -513,6 +540,11 @@ abstract class Shop_Product_Controller extends Controller {
          $product->{Shop_Model_Product::COLUMN_URLKEY} = $form->urlkey->getValues();
          $product->{Shop_Model_Product::COLUMN_KEYWORDS} = $form->keywords->getValues();
          $product->{Shop_Model_Product::COLUMN_IS_NEW_TO_DATE} = $form->isNewDate->getValues();
+         $product->{Shop_Model_Product::COLUMN_MANUFACTURER} = $form->manufacturer->getValues();
+         $product->{Shop_Model_Product::COLUMN_HEUREKA_CAT} = $form->heurekaCat->getValues();
+         $product->{Shop_Model_Product::COLUMN_GOOGLE_CAT} = $form->googleCat->getValues();
+         $product->{Shop_Model_Product::COLUMN_ZBOZI_CAT} = $form->zboziCat->getValues();
+         $product->{Shop_Model_Product::COLUMN_WARRANTY} = $form->warranty->getValues();
          $model->save($product);
          
          // uložení nového obrázku
@@ -559,6 +591,44 @@ abstract class Shop_Product_Controller extends Controller {
       
       $this->view()->form = $form;
       $this->view()->product = $product;
+   }
+   
+   public function getManufacturersController()
+   {
+      $search = $this->getRequestParam('search');
+      
+      $model = new Shop_Model_Product();
+      if($search){
+         $model->where(Shop_Model_Product::COLUMN_MANUFACTURER.' LIKE :search', array('search' => '%'.$search.'%'));
+      } else {
+         $model->where(Shop_Model_Product::COLUMN_MANUFACTURER.' != \'\' ', array());
+      }
+      $recs = $model
+              ->limit(0, 20)
+              ->groupBy(Shop_Model_Product::COLUMN_MANUFACTURER)
+              ->records();
+      $ret = array();
+      foreach ($recs as $r) {
+         $ret[] = (string)$r->{Shop_Model_Product::COLUMN_MANUFACTURER};
+      }
+      
+      $this->view()->list = $ret;
+   }
+   
+   public static function getFeedCategoriesController()
+   {
+      $feedType = isset($_GET['feed']) ? $_GET['feed'] : 'google';
+      $query = isset($_GET['q']) ? $_GET['q'] : null;
+      
+      $className = 'Shop_Feed_'. ucfirst($feedType);
+      
+      $items = array();
+      if(class_exists($className)){
+         $items = $className::getCategories($query);
+      }
+      Template_Output::setContentType('json');
+      Template_Output::sendHeaders();
+      echo json_encode(array('items' => $items));
    }
    
    /**
@@ -682,7 +752,7 @@ abstract class Shop_Product_Controller extends Controller {
             }
             $modelCombination->where(Shop_Model_Product_Combinations::COLUMN_ID." = :idc", array('idc' => (int)$id))
                ->update(array(
-                  Shop_Model_Product_Combinations::COLUMN_QTY => (int)$qty,
+                  Shop_Model_Product_Combinations::COLUMN_QTY => $qty,
                   Shop_Model_Product_Combinations::COLUMN_PRICE => (int)$prices[$id],
                ));
          }
@@ -1116,9 +1186,6 @@ abstract class Shop_Product_Controller extends Controller {
                continue;
             }
             
-//            var_dump($id, $deletes[$id], $paramnames[$id], $values[$id]);
-            
-            
             if($deletes[$id] == 1){
                // pokud není new smazat z db. jinak na něj kašlat
                if(strpos($id, '{NEW_') === false){
@@ -1132,7 +1199,14 @@ abstract class Shop_Product_Controller extends Controller {
                }
                
                // pokud je vyplněn název nového parametru
-               if($paramnames[$id][Locales::getDefaultLang()] != null){
+               if(isset ($paramids) && isset ($paramids[$id]) && $paramids[$id] != 0 &&
+                  $paramnames[$id][Locales::getDefaultLang()] != null ) {
+                  $recordValue->{Shop_Model_Product_ParamsValues::COLUMN_ID_PARAM} = $paramids[$id];
+
+                  $recordParam = Shop_Model_Product_Params::getRecord($paramids[$id]);
+                  $recordParam->{Shop_Model_Product_Params::COLUMN_NAME} = $name;
+                  $recordParam->save();
+               } else if($paramnames[$id][Locales::getDefaultLang()] != null){
                   // vytvoří se nový parametr
                   $recordParam = Shop_Model_Product_Params::getNewRecord();
                   $recordParam->{Shop_Model_Product_Params::COLUMN_NAME} = $name;
@@ -1140,11 +1214,11 @@ abstract class Shop_Product_Controller extends Controller {
                   
                   // přiřadí se hodnota parametru k produktu a hodnotě
                   $recordValue->{Shop_Model_Product_ParamsValues::COLUMN_ID_PARAM} = $recordParam->getPK(); // id parametru
-               } 
+               }
                // pokud není vyplněn název, ale je zadáno id
                else if(isset ($paramids) && isset ($paramids[$id])) {
                   $recordValue->{Shop_Model_Product_ParamsValues::COLUMN_ID_PARAM} = $paramids[$id];
-               }
+               } 
                // přiřadí se hodnota parametru k produktu a hodnotě
                $recordValue->{Shop_Model_Product_ParamsValues::COLUMN_ID_PRODUCT} = $product->getPK();
                $recordValue->{Shop_Model_Product_ParamsValues::COLUMN_VALUE} = $values[$id];
@@ -1154,8 +1228,6 @@ abstract class Shop_Product_Controller extends Controller {
                $order++;
             }
          }
-//         var_dump(CoreErrors::getErrors());
-//         die;
          
          $this->infoMsg()->addMessage($this->tr('Parametry byly uloženy'));
          $this->link()->reload();

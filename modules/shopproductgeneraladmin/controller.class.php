@@ -197,7 +197,7 @@ class ShopProductGeneralAdmin_Controller extends Shop_Product_Controller {
             'priceMin' => '(MIN(`'.Shop_Model_Product_Combinations::COLUMN_PRICE.'`) + `'.Shop_Model_Product::COLUMN_PRICE.'`)',
             'priceMax' => '(MAX(`'.Shop_Model_Product_Combinations::COLUMN_PRICE.'`) + `'.Shop_Model_Product::COLUMN_PRICE.'`)',
 //            'quantity' => 'SUM(`'.Shop_Model_Product_Combinations::COLUMN_QTY.'`) + `'.Shop_Model_Product::COLUMN_QUANTITY.'`',
-            'quantity' => 'SUM(`'.Shop_Model_Product_Combinations::COLUMN_QTY.'`)',
+            'quantity' => 'IF(`'.Shop_Model_Product_Combinations::COLUMN_ID.'` IS NULL, `'.Shop_Model_Product::COLUMN_QUANTITY.'`, SUM(`'.Shop_Model_Product_Combinations::COLUMN_QTY.'`) )',
          ))
          ->joinFK(Shop_Model_Product::COLUMN_ID_CATEGORY, array(
             Model_Category::COLUMN_NAME, Model_Category::COLUMN_MODULE, Model_Category::COLUMN_URLKEY,

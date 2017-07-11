@@ -175,7 +175,7 @@ Cart = {
    // vrací cenu, pokud obsahuje procento, vypočítá cenu
    getShipOrPayPrice : function(price) {
       if(price.toString().indexOf("%") != -1){ // price je procento z ceny
-         var priceProd = Math.floor( this.cart.priceCart*( parseInt( price ) )/100 )
+         var priceProd = Math.floor( this.cart.priceCart*( parseFloat( price ) )/100 )
          return price + " / " + this.getFormattedPrice(priceProd);
       } else {
          return this.getFormattedPrice(price);
@@ -212,11 +212,11 @@ Cart = {
          this.cart.priceShipping = 0;
       } else {
          if(this.cart.shippings[idshipping].price.indexOf("%") != -1){
-            this.cart.priceShipping = Math.floor( this.cart.priceCart*( parseInt( this.cart.shippings[idshipping].price ))/100 );
+            this.cart.priceShipping = Math.floor( this.cart.priceCart*( parseFloat( this.cart.shippings[idshipping].price ))/100 );
             priceText = this.cart.priceShipping != 0 ?
                this.cart.shippings[idshipping].price + " / " + this.getShipOrPayPrice( this.cart.priceShipping ) : this.cart.msg.free;
          } else {
-            this.cart.priceShipping = parseInt( this.cart.shippings[idshipping].price );
+            this.cart.priceShipping = parseFloat( this.cart.shippings[idshipping].price );
             priceText = this.cart.priceShipping != 0 ?
                this.getShipOrPayPrice( this.cart.priceShipping ) : this.cart.msg.free;
          }
@@ -232,12 +232,12 @@ Cart = {
          this.cart.pricePayment = 0;
       } else {
          if(this.cart.payments[idpayment].price.indexOf("%") != -1){
-            this.cart.pricePayment = Math.floor( this.cart.priceCart*( parseInt( this.cart.payments[idpayment].price ) )/100 );
+            this.cart.pricePayment = Math.floor( this.cart.priceCart*( parseFloat( this.cart.payments[idpayment].price ) )/100 );
             priceText = this.cart.pricePayment != 0 ?
                this.cart.payments[idpayment].price + " / " +
                this.getShipOrPayPrice( this.cart.pricePayment ) : this.cart.msg.free;
          } else {
-            this.cart.pricePayment = parseInt( this.cart.payments[idpayment].price );
+            this.cart.pricePayment = parseFloat( this.cart.payments[idpayment].price );
             priceText = this.cart.pricePayment != 0 ?
                this.getShipOrPayPrice( this.cart.pricePayment ) : this.cart.msg.free;
          }

@@ -21,6 +21,7 @@ class ShopSettings_Controller extends Controller {
 
       $grpInfo = $form->addGroup('shop', $this->tr('Informace o obchod'));
       $grpStock = $form->addGroup('shop_stock', $this->tr('Nastavení skladu'));
+      $grpOther = $form->addGroup('shop_other', $this->tr('Ostatní nastavení'));
 
       $eStoreName = new Form_Element_Text('name', $this->tr('Název obchodu'));
       $eStoreName->setValues(CUBE_CMS_WEB_NAME);
@@ -35,6 +36,15 @@ class ShopSettings_Controller extends Controller {
       $elemAllowBuyNotInStock->setValues(!CUBE_CMS_SHOP_ALLOW_BUY_NOT_IN_STOCK);
       $form->addElement($elemAllowBuyNotInStock, $grpStock);
 
+      $tplsMials = Templates_Model::getTemplates(Templates_Model::TEMPLATE_TYPE_MAIL);
+      $eRegTpl = new Form_Element_Select('regtplid', $this->tr('Šablona mailu registrace uživatele'));
+      $eRegTpl->addOption($this->tr('--nenastaveno--'), 0);
+      foreach ($tplsMials as $mail) {
+         $eRegTpl->addOption($mail->{Templates_Model::COLUMN_NAME}, $mail->getPK());
+      }
+      $eRegTpl->setValues(CUBE_CMS_SHOP_USER_REG_TPL_ID);
+      $form->addElement($eRegTpl, $grpOther);
+      
       $eSave = new Form_Element_Submit('save', $this->tr('Uložit'));
       $form->addElement($eSave);
 
@@ -42,6 +52,7 @@ class ShopSettings_Controller extends Controller {
          $this->storeSystemCfg('CUBE_CMS_WEB_NAME', $form->name->getValues());
          $this->storeSystemCfg('CUBE_CMS_SHOP_STORE_ADDRESS', $form->info->getValues());
          $this->storeSystemCfg('CUBE_CMS_SHOP_ALLOW_BUY_NOT_IN_STOCK', $form->buyNotInStock->getValues() ? "false" : "true");
+         $this->storeSystemCfg('CUBE_CMS_SHOP_USER_REG_TPL_ID', $form->regtplid->getValues());
 
          $this->infoMsg()->addMessage($this->tr('Nastavení bylo uloženo'));
          $this->link()->reload();
@@ -257,6 +268,7 @@ class ShopSettings_Controller extends Controller {
              Shop_Model_Payments::COLUMN_PRICE_ADD => $payment->{Shop_Model_Payments::COLUMN_PRICE_ADD},
              Shop_Model_Payments::COLUMN_TEXT => $text,
              Shop_Model_Payments::COLUMN_ID_STATE => $payment->{Shop_Model_Payments::COLUMN_ID_STATE},
+             Shop_Model_Payments::COLUMN_IS_COD => $payment->{Shop_Model_Payments::COLUMN_IS_COD},
              Shop_Model_OrdersStates::COLUMN_NAME=> (string)$payment->{Shop_Model_OrdersStates::COLUMN_NAME} != null 
                ? (string)$payment->{Shop_Model_OrdersStates::COLUMN_NAME}
                : $this->tr('není nastaveno'),
@@ -306,6 +318,7 @@ class ShopSettings_Controller extends Controller {
             }
             $record->{Shop_Model_Payments::COLUMN_PRICE_ADD} = $jqGridReq->{Shop_Model_Payments::COLUMN_PRICE_ADD};
             $record->{Shop_Model_Payments::COLUMN_ID_STATE} = $jqGridReq->{Shop_Model_OrdersStates::COLUMN_NAME};
+            $record->{Shop_Model_Payments::COLUMN_IS_COD} = $jqGridReq->{Shop_Model_Payments::COLUMN_IS_COD};
             $this->view()->r = $record;
             $model->save($record);
 
@@ -390,6 +403,9 @@ class ShopSettings_Controller extends Controller {
              Shop_Model_Shippings::COLUMN_DISALLOWED_PAYMENTS => $record->{Shop_Model_Shippings::COLUMN_DISALLOWED_PAYMENTS},
              Shop_Model_Shippings::COLUMN_PERSONAL_PICKUP => $record->{Shop_Model_Shippings::COLUMN_PERSONAL_PICKUP},
              Shop_Model_Shippings::COLUMN_ID_ZONE => $record->{Shop_Model_Shippings::COLUMN_ID_ZONE},
+             Shop_Model_Shippings::COLUMN_MIN_DAYS => $record->{Shop_Model_Shippings::COLUMN_MIN_DAYS},
+             Shop_Model_Shippings::COLUMN_MAX_DAYS => $record->{Shop_Model_Shippings::COLUMN_MAX_DAYS},
+             Shop_Model_Shippings::COLUMN_HEUREKA_CODE => $record->{Shop_Model_Shippings::COLUMN_HEUREKA_CODE},
              Shop_Model_Zones::COLUMN_NAME => $record->{Shop_Model_Shippings::COLUMN_ID_ZONE} != 0 
                   ? (string)$record->{Shop_Model_Zones::COLUMN_NAME}
                   : $this->tr('bez omezení'),
@@ -442,6 +458,9 @@ class ShopSettings_Controller extends Controller {
             $record->{Shop_Model_Shippings::COLUMN_PERSONAL_PICKUP} = $jqGridReq->{Shop_Model_Shippings::COLUMN_PERSONAL_PICKUP};
             $record->{Shop_Model_Shippings::COLUMN_DISALLOWED_PAYMENTS} = (string) $jqGridReq->{Shop_Model_Shippings::COLUMN_DISALLOWED_PAYMENTS};
             $record->{Shop_Model_Shippings::COLUMN_ID_ZONE} = (int) $jqGridReq->{Shop_Model_Zones::COLUMN_NAME};
+            $record->{Shop_Model_Shippings::COLUMN_MIN_DAYS} = (int) $jqGridReq->{Shop_Model_Shippings::COLUMN_MIN_DAYS};
+            $record->{Shop_Model_Shippings::COLUMN_MAX_DAYS} = (int) $jqGridReq->{Shop_Model_Shippings::COLUMN_MAX_DAYS};
+            $record->{Shop_Model_Shippings::COLUMN_HEUREKA_CODE} = (string) $jqGridReq->{Shop_Model_Shippings::COLUMN_HEUREKA_CODE};
             $record->save();
             $this->infoMsg()->addMessage($this->tr('Doprava byla uložena'));
             break;
@@ -594,6 +613,7 @@ class ShopSettings_Controller extends Controller {
          array_push($jqGrid->respond()->rows, array('id' => $record->{Shop_Model_Zones::COLUMN_ID},
              Shop_Model_Zones::COLUMN_ID => $record->{Shop_Model_Zones::COLUMN_ID},
              Shop_Model_Zones::COLUMN_NAME => $record->{Shop_Model_Zones::COLUMN_NAME},
+             Shop_Model_Zones::COLUMN_CODES => $record->{Shop_Model_Zones::COLUMN_CODES},
          ));
       }
       $this->view()->respond = $jqGrid->respond();
@@ -618,6 +638,7 @@ class ShopSettings_Controller extends Controller {
 
             $record = $model->record($jqGridReq->id);
             $record->{Shop_Model_Zones::COLUMN_NAME} = $jqGridReq->{Shop_Model_Zones::COLUMN_NAME};
+            $record->{Shop_Model_Zones::COLUMN_CODES} = $jqGridReq->{Shop_Model_Zones::COLUMN_CODES};
             $model->save($record);
 //            $record->save();
             $this->infoMsg()->addMessage($this->tr('Zóna byla uložena'));

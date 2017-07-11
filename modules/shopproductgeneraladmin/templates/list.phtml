@@ -92,6 +92,11 @@ $this->addJsPlugin(new JsPlugin_PrettyPhoto());
                               </a>
                               )</div>
                         <?php } ?>
+                        <?php if ($p->{Shop_Model_Product::COLUMN_MANUFACTURER}) { ?>
+                           <div class="manufacturer-name">
+                              <em><?php ps($p->{Shop_Model_Product::COLUMN_MANUFACTURER}) ?></em>
+                           </div>
+                        <?php } ?>
                      </td>
                      <td class="text-center">
                         <a href="<?php echo $this->link()->param('idp', $p->getPK())->param('action', 'changeState') ?>" title="<?php ps($this->tr('Změnit stav')) ?>">
@@ -108,7 +113,7 @@ $this->addJsPlugin(new JsPlugin_PrettyPhoto());
                      <td class="text-right">
                         <?php
                         if ($p->{Shop_Model_Product::COLUMN_STOCK}) {
-                           ps((int) $p->quantity . ' ' . $p->{Shop_Model_Product::COLUMN_UNIT});
+                           ps((float) $p->quantity . ' ' . $p->{Shop_Model_Product::COLUMN_UNIT});
                         } else {
                            ps('---');
                         }

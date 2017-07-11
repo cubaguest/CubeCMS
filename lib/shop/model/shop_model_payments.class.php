@@ -24,6 +24,7 @@ class Shop_Model_Payments extends Model_ORM
    const COLUMN_PRICE_ADD = 'price_add';
    const COLUMN_CLASS = 'payment_class';
    const COLUMN_SETINGS = 'payment_settings';
+   const COLUMN_IS_COD = 'payment_settings';
    
    protected function  _initTable() {
       $this->setTableName(self::DB_TABLE, 't_s_pay');
@@ -38,6 +39,7 @@ class Shop_Model_Payments extends Model_ORM
       
       $this->addColumn(self::COLUMN_PRICE_ADD, array('datatype' => 'varchar(20)', 'pdoparam' => PDO::PARAM_STR, 'default' => 0));
       $this->addColumn(self::COLUMN_SETINGS, array('datatype' => 'blob', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
+      $this->addColumn(self::COLUMN_IS_COD, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => false));
 
       $this->setPk(self::COLUMN_ID);
       

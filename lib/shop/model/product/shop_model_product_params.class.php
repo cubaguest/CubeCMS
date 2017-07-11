@@ -17,7 +17,7 @@ class Shop_Model_Product_Params extends Model_ORM {
 
       $this->addColumn(self::COLUMN_ID, array('datatype' => 'int', 'ai' => true, 'nn' => true, 'pk' => true));
 
-      $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(100)', 'nn' => true, 'pdoparam' => PDO::PARAM_STR, 'lang' => true));
+      $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR, 'lang' => true));
       $this->addColumn(self::COLUMN_DEFAULT, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR));
 
       $this->setPk(self::COLUMN_ID);

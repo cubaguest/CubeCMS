@@ -185,7 +185,8 @@ class Shop_Model_Orders_Record extends Model_ORM_Record {
          }
          $tplCnt = $tpl->{Templates_Model::COLUMN_CONTENT};
          $email = new Email(true);
-         $email->setSubject(sprintf($tr->tr('Změna stavu Vaší objednávky č. %s'), $this->getOrderNumber()));
+//         $email->setSubject(sprintf($tr->tr('Změna stavu Vaší objednávky č. %s'), $this->getOrderNumber()));
+         $email->setSubject(str_replace('{ORDER_NUMBER}', $this->getOrderNumber() , $tpl->{Templates_Model::COLUMN_NAME}));
          
          $tplCnt = Shop_Tools::getMailTplContent($tplCnt, $this, null, $history, $lang);
          

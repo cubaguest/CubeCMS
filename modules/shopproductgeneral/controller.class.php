@@ -112,5 +112,3 @@ class ShopProductGeneral_Controller extends Shop_Product_Controller {
 
    }
 }
-
-?>

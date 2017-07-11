@@ -7,44 +7,39 @@ $this->step = 3;
 $this->stepAllowBack = false;
 ?>
 <h1><?php echo $h ?></h1>
-<?php $this->includeFile('tpl://navigation.phtml')?>
+<?php $this->includeFile('tpl://navigation.phtml') ?>
 <div class="content">
    <p><?php echo $this->tr('Děkujeme za vaši objednávku. Na uvedený e-mail byly zaslány informace o obejdnávce.<br />O průběhu vyřizování 
       objednávky Vás budeme informovat.<br />V případě jakáchkoliv dotazů nás kontaktujte.') ?></p>
-   <div class="table-responsive">
-      <table class="full-width table-address">
-         <tr>
-            <th class="col-label"><strong><?php echo $this->tr('Fakturační adresa') ?></strong></th>
-            <th class="col-label"><strong><?php echo $this->tr('Dodací adresa') ?></strong></th>
-         </tr>
-         <tr>
-            <td>
-               <?php
-               echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_NAME} . '<br />';
-               echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_STREET} . '<br />';
-               echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_CITY} .
-               ' ' . $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_POST_CODE} . '<br />';
-               echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COUNTRY} . '<br /><br />';
-               echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_EMAIL} . '<br /><br />';
-               echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_PHONE} . '<br /><br />';
-               if ($this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY} != null) {
-                  echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY} . '<br />';
-                  echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY_IC} . '<br />';
-                  echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY_DIC} . '<br />';
-               }
-               ?>
-            </td>
-            <td>
-               <?php
-               echo $this->order->{Shop_Model_Orders::COLUMN_DELIVERY_NAME} . '<br />';
-               echo $this->order->{Shop_Model_Orders::COLUMN_DELIVERY_STREET} . '<br />';
-               echo $this->order->{Shop_Model_Orders::COLUMN_DELIVERY_CITY} .
-               ' ' . $this->order->{Shop_Model_Orders::COLUMN_DELIVERY_POST_CODE} . '<br />';
-               echo $this->order->{Shop_Model_Orders::COLUMN_DELIVERY_COUNTRY} . '<br />';
-               ?>
-            </td>
-         </tr>
-      </table>
+
+   <div class="row">
+      <div class="col-sm-6">
+         <h2><?php echo $this->tr('Fakturační adresa') ?></h2>
+         <?php
+         echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_NAME} . '<br />';
+         echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_STREET} . '<br />';
+         echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_CITY} .
+         ' ' . $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_POST_CODE} . '<br />';
+         echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COUNTRY} . '<br /><br />';
+         echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_EMAIL} . '<br /><br />';
+         echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_PHONE} . '<br /><br />';
+         if ($this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY} != null) {
+            echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY} . '<br />';
+            echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY_IC} . '<br />';
+            echo $this->order->{Shop_Model_Orders::COLUMN_CUSTOMER_COMPANY_DIC} . '<br />';
+         }
+         ?>
+      </div>
+      <div class="col-sm-6">
+         <h2><?php echo $this->tr('Dodací adresa') ?></h2>
+         <?php
+         echo $this->order->{Shop_Model_Orders::COLUMN_DELIVERY_NAME} . '<br />';
+         echo $this->order->{Shop_Model_Orders::COLUMN_DELIVERY_STREET} . '<br />';
+         echo $this->order->{Shop_Model_Orders::COLUMN_DELIVERY_CITY} .
+         ' ' . $this->order->{Shop_Model_Orders::COLUMN_DELIVERY_POST_CODE} . '<br />';
+         echo $this->order->{Shop_Model_Orders::COLUMN_DELIVERY_COUNTRY} . '<br />';
+         ?>
+      </div>
    </div>
    <h2><?php echo $this->tr('Souhrn položek'); ?></h2>
    <div class="table-responsive">

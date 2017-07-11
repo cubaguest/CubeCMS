@@ -84,7 +84,7 @@ if (!$this->cart->isEmpty()) {
                      </td>
                      <td class="product-price-by-piece no-wrap"><?php
                         echo Shop_Tools::getFormatedPrice($item->getPrice(false));
-                        echo ' / ' . $item->getUnitSize() . ' ' . $item->getUnit();
+                        echo ' / ' . Utils_Number::formatFloat($item->getUnitSize()) . ' ' . $item->getUnit();
                         ?>
                         <input class="unit-size" type="hidden" value="<?php echo $item->getUnitSize() ?>" />
                         <?php if ($item->getProductQty() >= 0) { // @todo kontrola jestli je pro zboží povolen sklad (z produktu)   ?>

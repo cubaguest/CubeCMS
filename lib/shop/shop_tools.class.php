@@ -31,16 +31,30 @@ class Shop_Tools extends TrObject {
    public static function getFormatedPrice($price, $tax = 0, $withCurrency = true)
    {
       // compute tax
-      return number_format(self::getPrice($price, $tax, false), VVE_SHOP_PRICE_DECIMALS, ",", " ") . ($withCurrency ? self::getCurrency() : null );
+      return number_format(self::getPrice($price, $tax, false), VVE_SHOP_PRICE_DECIMALS, ",", " ") . ($withCurrency ? ' '.self::getCurrency() : null );
    }
 
    public static function getCurrency($id = 0)
    {
-      return ' ' . VVE_SHOP_CURRENCY_NAME;
+      return CUBE_CMS_SHOP_CURRENCY_NAME;
+   }
+   
+   public static function getCurrencyCode($id = 0)
+   {
+      return CUBE_CMS_SHOP_CURRENCY_CODE;
    }
 
    public static function getProductCode($code, $groupIdsNames = false, $attrCodes = false)
    {
+      if(is_object($groupIdsNames) && property_exists($groupIdsNames, 'comb_attr_codes_json') && property_exists( $groupIdsNames, 'comb_codes_json')){
+         $attrCodes = $groupIdsNames->comb_attr_codes_json;
+         $groupIdsNames = $groupIdsNames->comb_codes_json;
+      }
+      if(is_object($groupIdsNames) && $groupIdsNames instanceof Model_ORM_Record){
+         $attrCodes = $groupIdsNames->comb_attr_codes_json;
+         $groupIdsNames = $groupIdsNames->comb_codes_json;
+      }
+      
       if (is_string($groupIdsNames)) {
          $groupIdsNames = json_decode($groupIdsNames);
       }
@@ -248,56 +262,52 @@ class Shop_Tools extends TrObject {
    {
       $items = $order->getItems();
       $translator = new Translator();
-      $str = '<table class="table table-data">';
+      $str = '<table class="table table-data" style="width:100%;padding: 5px 0px;">';
       $str .= '<tr>'
          .'<th style="text-align: left;">'.$translator->tr('Zboží').'</th>'
          .'<th style="text-align: left;">'.$translator->tr('Množství').'</th>'
-         .'<th style="text-align: left;">'.$translator->tr('Cena').'</th>'
+         .'<th style="text-align: center;">'.$translator->tr('Cena').'</th>'
       ;
       $str .= '</tr>';
+      $prodPrice = 0;
       foreach ($items as $item) {
          // 1 Ks Náhrdelník (zlatý) = 500 Kč
          $itemStr = $item->{Shop_Model_OrderItems::COLUMN_NAME};
          if($item->{Shop_Model_OrderItems::COLUMN_NOTE} != null){
             $itemStr .= '<br />('.$item->{Shop_Model_OrderItems::COLUMN_NOTE}.')';
          }
-         $str .= '<tr><td>'.$itemStr.'</td>'
+         $str .= '<tr><th>'.$itemStr.'</th>'
             .'<td>'.$item->{Shop_Model_OrderItems::COLUMN_QTY}.' '.$item->{Shop_Model_OrderItems::COLUMN_UNIT}.'</td>'
             .'<td style="text-align: right;">'.Shop_Tools::getFormatedPrice($item->{Shop_Model_OrderItems::COLUMN_PRICE}).'</td></tr>';
+         $prodPrice = $prodPrice + $item->{Shop_Model_OrderItems::COLUMN_PRICE};
       }
+      // mezisoučet
       $str .= '<tr><td colspan="3"></td></tr>';
-//      $str .= '<tr><td colspan="2">Mezisoučet:</td>'
-//         .'<td style="text-align: right;"><strong>'.Shop_Tools::getFormatedPrice($cart->getPrice())."</strong></td></tr>";
-//      $str .= '<tr><td colspan="3"></td></tr>';
+      $str .= '<tr><th colspan="2"><strong>Mezisoučet:</strong></th>'
+         .'<td style="text-align: right;"><strong>'.Shop_Tools::getFormatedPrice($prodPrice)."</strong></td></tr>";
+      $str .= '<tr><td colspan="3"></td></tr>';
+      
       // info k dopravě
-//      $str .= '<tr><td colspan="2">Doprva: '.$order->{Shop_Model_Orders::COLUMN_SHIPPING_METHOD}.'</td>'
-//         .'<td style="text-align: right;"><strong>'.Shop_Tools::getFormatedPrice($order->{Shop_Model_Orders::COLUMN_SHIPPING_PRICE})."</strong></td></tr>";
-
-//      $modelS = new Shop_Model_Shippings;
-//      $ship = $modelS->record($order->{Shop_Model_Orders::COLUMN_SHIPPING_ID});
-//      if($ship != false){
-//         $str .= preg_replace(array('/\n\n*/', '/\s{2,}/'),array("\n", " "), strip_tags($ship->{Shop_Model_Shippings::COLUMN_TEXT}))."\n";
-//      }
+      $str .= '<tr>'
+              . '<th colspan="2">Doprva: '.$order->{Shop_Model_Orders::COLUMN_SHIPPING_METHOD}.'</th>'
+            .'<td style="text-align: right;"><strong>'.Shop_Tools::getFormatedPrice($order->{Shop_Model_Orders::COLUMN_SHIPPING_PRICE})."</strong></td>"
+                    . "</tr>";
+      $str .= '<tr><td colspan="3"></td></tr>';
       // info k platbě
-//      $modelP = new Shop_Model_Payments();
-//      $payment = $modelP->record($order->{Shop_Model_Orders::COLUMN_PAYMENT_ID});
-//      $str .= '<tr><td colspan="2">Platba: '.$order->{Shop_Model_Orders::COLUMN_PAYMENT_METHOD}.'</td>'
-//         .'<td style="text-align: right;"><strong>'.Shop_Tools::getFormatedPrice($order->{Shop_Model_Orders::COLUMN_PAYMENT_PRICE})."</strong></td></tr>";
-
-//      if($payment != false){
-//         $str .= '<tr><td colspan="2"><em>'
-//            .preg_replace(array('/\n\n*/', '/\s{2,}/'),array("\n", " "), strip_tags($payment->{Shop_Model_Payments::COLUMN_TEXT})).'</em></td>'
-//            .'<td style="text-align: right;"></td></tr>';
-//      }
+      $str .= '<tr>'
+              . '<th colspan="2">Platba: '.$order->{Shop_Model_Orders::COLUMN_PAYMENT_METHOD}.'</th>'
+            .'<td style="text-align: right;"><strong>'.Shop_Tools::getFormatedPrice($order->{Shop_Model_Orders::COLUMN_PAYMENT_PRICE})."</strong></td>"
+                    . "</tr>";
+      $str .= '<tr><td colspan="3"></td></tr>';
+      $str .= '<tr><td colspan="3"></td></tr>';
+      
       // kompletní cena
-//      $str .= '<tr><td colspan="2"><strong>Cena celkem:</strong></td>'.
-//         '<td><strong>'.Shop_Tools::getFormatedPrice(
-//            $cart->getPrice()+$order->{Shop_Model_Orders::COLUMN_PAYMENT_PRICE}+$order->{Shop_Model_Orders::COLUMN_SHIPPING_PRICE})."</strong></td></tr>";
+      $str .= '<tr><th colspan="2"><strong>Cena celkem:</strong></th>'.
+         '<td style="text-align: right; font-size: 110%;"><strong>'.Shop_Tools::getFormatedPrice(
+            $prodPrice + $order->{Shop_Model_Orders::COLUMN_PAYMENT_PRICE}+$order->{Shop_Model_Orders::COLUMN_SHIPPING_PRICE})
+            ."</strong></td></tr>";
       $str .= '</table>';
       
-//      foreach ($items as $item) {
-//         $str .= $item->{Shop_Model_OrderItems::COLUMN_NAME} . ', ';
-//      }
       return $str;
    }
 

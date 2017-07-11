@@ -1,6 +1,7 @@
 <script type="text/javascript">
    /* <![CDATA[ */
    CubeCMS.Shop.currency = '<?php echo Shop_Tools::getCurrency() ?>';
+   CubeCMS.Shop.currencyCode = '<?php echo Shop_Tools::getCurrencyCode() ?>';
    CubeCMS.Shop.roundDecimals = <?php echo (int) VVE_SHOP_PRICE_ROUND_DECIMAL ?>;
    CubeCMS.Shop.decimals = <?php echo (int) VVE_SHOP_PRICE_DECIMALS ?>;
    var defaultCombinationId = <?php echo ($this->defaultCombination ? $this->defaultCombination->{Shop_Model_Product_Combinations::COLUMN_ID} : 0 ) ?>;
@@ -23,7 +24,7 @@
                // update price
                var price = multipler * CubeCMS.Shop.getProductPrice(CubeCMS.Shop.product.price + this.price, CubeCMS.Shop.product.tax);
                var priceWoutTax = multipler * (CubeCMS.Shop.product.price + this.price);
-               $('.product-price').text(CubeCMS.Shop.getFormattedPrice(price));
+               $('.product-price').text(CubeCMS.Shop.getFormattedPrice(price, false));
                $('.product-price-wout-tax').text(CubeCMS.Shop.getFormattedPrice(priceWoutTax));
 
                <?php if ($this->product->{Shop_Model_Product::COLUMN_STOCK}) { ?>

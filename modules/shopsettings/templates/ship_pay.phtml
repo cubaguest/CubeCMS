@@ -52,6 +52,7 @@ $this->includeFile('tpl://nav.phtml');
          colNames: ['ID',
             '<?php echo $this->tr('Název') ?>',
             '<?php echo $this->tr('Cena') ?>',
+            '<?php echo $this->tr('Dobírka') ?>',
             '<?php echo $this->tr('Doplňující text pro uživatele') ?>',
             '<?php echo $this->tr('Stav objednávky') ?>'],
          colModel: [
@@ -68,18 +69,24 @@ $this->includeFile('tpl://nav.phtml');
             {name: '<?php echo Shop_Model_Payments::COLUMN_PRICE_ADD ?>', index: '<?php echo Shop_Model_Payments::COLUMN_PRICE_ADD ?>',
                width: 50, fixed: true, editable: true, editoptions: {size: 20},
                formoptions: {rowpos: 3, label: "<?php echo $this->tr('Cena') ?>", elmprefix: ""}},
+                    
+            {name: '<?php echo Shop_Model_Payments::COLUMN_IS_COD ?>', index: '<?php echo Shop_Model_Payments::COLUMN_IS_COD ?>', formatter: 'checkbox',
+               formatoptions: {disabled: true, 'class': 'bersonal-pickup'},
+               width: 70, fixed: true, editable: true, edittype: 'checkbox', editoptions: {size: 20, value: "true:false"},
+               formoptions: {rowpos: 4, label: "<?php echo $this->tr('Dobírka') ?>", elmprefix: ""}},
+           
             {name: '<?php echo Shop_Model_Payments::COLUMN_TEXT ?>', index: '<?php echo Shop_Model_Payments::COLUMN_TEXT ?>',
                formatter: langFmatter, unformat: langUnFmatter,
                editable: true, edittype: "textarea", editoptions: {rows: "12", cols: "40",
                   defaultValue: "<?php echo $langDefaultValue ?>"
                },
-               formoptions: {rowpos: 4, label: "<?php echo $this->tr('Text pro uživatele') ?>", elmprefix: ""}
+               formoptions: {rowpos: 5, label: "<?php echo $this->tr('Text pro uživatele') ?>", elmprefix: ""}
             },
             {name: '<?php echo Shop_Model_OrdersStates::COLUMN_NAME ?>',
                index: '<?php echo Shop_Model_Payments::COLUMN_ID_STATE ?>',
                width: 200, fixed: true, editable: true, edittype: 'select',
                editoptions: {value: <?php echo json_encode($orderStates, JSON_FORCE_OBJECT) ?>},
-               formoptions: {rowpos: 5, label: "<?php echo $this->tr('Stav objednávky') ?>", elmprefix: ""}
+               formoptions: {rowpos: 6, label: "<?php echo $this->tr('Stav objednávky') ?>", elmprefix: ""}
             }
          ],
          rowNum: 5,
@@ -140,6 +147,9 @@ $this->includeFile('tpl://nav.phtml');
             '<?php echo $this->tr('Cena') ?>',
             '<?php echo $this->tr('Doplňující text pro uživatele') ?>',
             '<?php echo $this->tr('ID zakázaných plateb') ?>',
+            '<?php echo $this->tr('Min dnů') ?>',
+            '<?php echo $this->tr('Max dnů') ?>',
+            '<?php echo $this->tr('Heureka') ?>',
             '<?php echo $this->tr('Osobní <br />odběr') ?>',
             '<?php echo $this->tr('Zóna') ?>'],
          colModel: [
@@ -165,15 +175,27 @@ $this->includeFile('tpl://nav.phtml');
             {name: '<?php echo Shop_Model_Shippings::COLUMN_DISALLOWED_PAYMENTS ?>', index: '<?php echo Shop_Model_Shippings::COLUMN_DISALLOWED_PAYMENTS ?>',
                width: 100, fixed: true, editable: true, editoptions: {size: 20},
                formoptions: {rowpos: 5, label: "<?php echo $this->tr('ID zakázaných plateb <br />oddělených středníky') ?>", elmprefix: ""}},
+                    
+            {name: '<?php echo Shop_Model_Shippings::COLUMN_MIN_DAYS ?>', index: '<?php echo Shop_Model_Shippings::COLUMN_MIN_DAYS ?>',
+               width: 70, fixed: true, editable: true, editoptions: {size: 20},
+               formoptions: {rowpos: 6, label: "<?php echo $this->tr('Min dnů') ?>", elmprefix: ""}},
+            {name: '<?php echo Shop_Model_Shippings::COLUMN_MAX_DAYS ?>', index: '<?php echo Shop_Model_Shippings::COLUMN_MAX_DAYS ?>',
+               width: 70, fixed: true, editable: true, editoptions: {size: 20},
+               formoptions: {rowpos: 7, label: "<?php echo $this->tr('Max dnů') ?>", elmprefix: ""}},
+ 
+            {name: '<?php echo Shop_Model_Shippings::COLUMN_HEUREKA_CODE ?>', index: '<?php echo Shop_Model_Shippings::COLUMN_HEUREKA_CODE ?>',
+               width: 100, fixed: true, editable: true, editoptions: {size: 20},
+               formoptions: {rowpos: 8, label: "<?php echo $this->tr('Kód heureky pro dopravu<br />pokud není, doprava se<br /> neexportuje') ?>", elmprefix: ""}},
+ 
             {name: '<?php echo Shop_Model_Shippings::COLUMN_PERSONAL_PICKUP ?>', index: '<?php echo Shop_Model_Shippings::COLUMN_PERSONAL_PICKUP ?>', formatter: 'checkbox',
                formatoptions: {disabled: true, 'class': 'bersonal-pickup'},
                width: 50, fixed: true, editable: true, edittype: 'checkbox', editoptions: {size: 20, value: "true:false"},
-               formoptions: {rowpos: 7, label: "<?php echo $this->tr('Osobní odběr') ?>", elmprefix: ""}},
+               formoptions: {rowpos: 9, label: "<?php echo $this->tr('Osobní odběr') ?>", elmprefix: ""}},
             {name: '<?php echo Shop_Model_Zones::COLUMN_NAME ?>',
                index: '<?php echo Shop_Model_Shippings::COLUMN_ID_ZONE ?>',
                width: 100, fixed: true, editable: true, edittype: "select",
                editoptions: {value: <?php echo json_encode($zonesArr, JSON_FORCE_OBJECT) ?>},
-               formoptions: {rowpos: 8, label: "<?php echo $this->tr('Zóna') ?>", elmprefix: ""}}
+               formoptions: {rowpos: 10, label: "<?php echo $this->tr('Zóna') ?>", elmprefix: ""}}
          ],
          rowNum: 5,
          rowList: [5, 10, 20, 50],
@@ -240,14 +262,18 @@ $this->includeFile('tpl://nav.phtml');
          ajaxGridOptions: {type: "POST"},
          url: '<?php echo $this->link()->route('zonesList'); ?>',
          datatype: "json",
-         colNames: ['ID', '<?php echo $this->tr('Název') ?>'],
+         colNames: ['ID', '<?php echo $this->tr('Název') ?>', '<?php echo $this->tr('Kódy zemí') ?>'],
          colModel: [
             {name: '<?php echo Shop_Model_Zones::COLUMN_ID ?>', index: '<?php echo Shop_Model_Zones::COLUMN_ID ?>',
                width: 33, fixed: true, editable: false},
             {name: '<?php echo Shop_Model_Zones::COLUMN_NAME ?>', index: '<?php echo Shop_Model_Zones::COLUMN_NAME ?>',
                formatter: langFmatter, unformat: langUnFmatter,
                editable: true, editrules: {required: true}, editoptions: {defaultValue: ""},
-               formoptions: {rowpos: 2, label: "<?php echo $this->tr('Název') ?>", elmprefix: "<span class=\"required\"></span>"}}
+               formoptions: {rowpos: 2, label: "<?php echo $this->tr('Název') ?>", elmprefix: "<span class=\"required\"></span>"}},
+            {name: '<?php echo Shop_Model_Zones::COLUMN_CODES ?>', index: '<?php echo Shop_Model_Zones::COLUMN_CODES ?>',
+               formatter: langFmatter, unformat: langUnFmatter,
+               editable: true, editrules: {required: true}, editoptions: {defaultValue: "CZ"},
+               formoptions: {rowpos: 2, label: "<?php echo $this->tr('Kódy zemí (ISO 3166) - CZ;US') ?>", elmprefix: "<span class=\"required\"></span>"}}
          ],
          rowNum: 5,
          rowList: [5, 10, 20, 50],

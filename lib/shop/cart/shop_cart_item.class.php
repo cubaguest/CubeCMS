@@ -107,7 +107,7 @@ class Shop_Cart_Item
    public function getPrice($allItems = true, $withTax = true, $withCurrency = false)
    {
       if ($allItems) {
-         return round($this->getPrice(false) * ($this->qty == 0 ? $this->unitSize : $this->qty / $this->unitSize), 1);
+         return round($this->getPrice(false) * ($this->qty == 0 ? $this->unitSize : $this->qty / $this->unitSize), 3);
       }
       if ($withTax) {
          return Shop_Tools::getPrice($this->price, $this->tax, $withCurrency);

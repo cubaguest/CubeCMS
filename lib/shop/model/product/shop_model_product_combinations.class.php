@@ -15,10 +15,10 @@ class Shop_Model_Product_Combinations extends Model_ORM {
    {
       $this->setTableName(self::DB_TABLE, 't_product_comb');
 
-      $this->addColumn(self::COLUMN_ID, array('datatype' => 'smallint', 'ai' => true, 'nn' => true, 'pk' => true));
-      $this->addColumn(self::COLUMN_ID_PRODUCT, array('datatype' => 'smallint', 'nn' => true, 'index' => self::COLUMN_ID_PRODUCT ));
+      $this->addColumn(self::COLUMN_ID, array('datatype' => 'int', 'ai' => true, 'nn' => true, 'pk' => true));
+      $this->addColumn(self::COLUMN_ID_PRODUCT, array('datatype' => 'int', 'nn' => true, 'index' => self::COLUMN_ID_PRODUCT ));
       
-      $this->addColumn(self::COLUMN_QTY, array('datatype' => 'int', 'pdoparam' => PDO::PARAM_INT, 'default' => 0));
+      $this->addColumn(self::COLUMN_QTY, array('datatype' => 'decimal(11,4)', 'pdoparam' => PDO::PARAM_STR, 'default' => 0));
       $this->addColumn(self::COLUMN_PRICE, array('datatype' => 'int', 'pdoparam' => PDO::PARAM_INT, 'default' => 0));
       $this->addColumn(self::COLUMN_IS_DEFAULT, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => false));
 
@@ -355,5 +355,3 @@ class Shop_Model_Product_Combinations extends Model_ORM {
       return $this;
    }
 }
-
-?>

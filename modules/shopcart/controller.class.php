@@ -38,7 +38,7 @@ class ShopCart_Controller extends Controller {
       $eQty = new Form_Element_Text('qty', $this->tr('Množství'));
       $eQty->setDimensional();
       $eQty->addValidation(new Form_Validator_NotEmpty());
-      $eQty->addValidation(new Form_Validator_IsNumber($this->tr('počet zboží musí být celé číslo'), Form_Validator_IsNumber::TYPE_INT));
+      $eQty->addValidation(new Form_Validator_IsNumber($this->tr('počet zboží musí být celé číslo'), Form_Validator_IsNumber::TYPE_FLOAT));
       $formItems->addElement($eQty);
 
       $eResetSet = new Form_Element_Submit('reset', $this->tr('Vymazat položky'));
@@ -364,8 +364,7 @@ class ShopCart_Controller extends Controller {
          $eCreateAccountPassConfirm = new Form_Element_Password('createAccPasswordC', $this->tr('Kontrola hesla'));
          $formOrder->addElement($eCreateAccountPassConfirm);
       }
-
-      if (CUBE_CMS_SHOP_ORDER_CAT_TERMS != null) {
+      if (CUBE_CMS_SHOP_ORDER_CAT_TERMS != 0) {
          $termsLink = Url_Link::getCategoryLink(CUBE_CMS_SHOP_ORDER_CAT_TERMS);
          $eTerms = new Form_Element_Checkbox('terms', sprintf($this->tr('Souhlasím s obchodními podmínkami. (<a href="%s" class="read-terms link-external">Přečtěte si obchodní podmínky</a>)'), $termsLink));
          $eTerms->addValidation(new Form_Validator_NotEmpty($this->tr('Musíte souhlasit s obchodními podmínkami.')));
@@ -557,10 +556,12 @@ class ShopCart_Controller extends Controller {
    {
       $modelUsers = new Model_Users();
       $user = false;
+      $sendNotify = false;
       
       $user = $modelUsers->where(Model_Users::COLUMN_MAIL . " = :mail", array('mail' => $formOrder->customerEmail->getValues()))->record();
       if (!$user) {
          $user = $modelUsers->newRecord();
+         
       }
       
       $login = Utils_String::toSafeFileName($formOrder->customerName->getValues().$formOrder->customerSurname->getValues());
@@ -572,7 +573,8 @@ class ShopCart_Controller extends Controller {
       $user->{Model_Users::COLUMN_NAME} = $formOrder->customerName->getValues();
       $user->{Model_Users::COLUMN_SURNAME} = $formOrder->customerSurname->getValues();
       if($createAccount){
-         $user->{Model_Users::COLUMN_PASSWORD} = Auth::cryptPassword(Auth::generatePassword());
+         $user->{Model_Users::COLUMN_PASSWORD} = Auth::cryptPassword($formOrder->createAccPassword->getValues());
+         $sendNotify = true;
       }
       $user->save();
       
@@ -618,6 +620,19 @@ class ShopCart_Controller extends Controller {
          } else if($user instanceof Model_ORM_Record) {
             MailsAddressBook_Model_Addressbook::removeMail($user->{Model_Users::COLUMN_MAIL});
          }
+      }
+      
+      if($sendNotify){
+//         $cnt = Templates_Model::getTemplate($state->{Shop_Model_OrdersStates::COLUMN_ID_TEMPLATE}, Locales::getDefaultLang());
+//
+//         $mailCnt = Shop_Tools::getMailTplContent($cnt->{Templates_Model::COLUMN_CONTENT}, $order);
+//
+//         $emailAdmin = new Email(true);
+//         $emailAdmin->addAddress(CUBE_CMS_SHOP_ORDER_MAIL);
+//         $emailAdmin->setFrom(CUBE_CMS_NOREPLAY_MAIL);
+//         $emailAdmin->setSubject(sprintf('[NOVÁ OBJEDNÁVKA] číslo %s', Shop_Tools::getFormatOrderNumber($order->{Shop_Model_Orders::COLUMN_ID})));
+//         $emailAdmin->setContent(Email::getBaseHtmlMail($mailCnt));
+//         $emailAdmin->send();
       }
 
       return $customer;
@@ -922,7 +937,9 @@ class ShopCart_Controller extends Controller {
                continue;
             }
             $eName = str_replace($form->getPrefix(), '', $eName);
-            $form->{$eName}->setValues($value);
+            if(isset($form->{$eName})){
+               $form->{$eName}->setValues($value);
+            }
          }
       }
    }

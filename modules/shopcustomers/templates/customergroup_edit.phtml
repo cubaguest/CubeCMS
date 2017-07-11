@@ -1,0 +1,16 @@
+<h1><?php 
+if($this->group){
+   printf($this->tr('Úprava zákaznické skupiny "%s"'), $this->group->{Shop_Model_CustomersGroups::COLUMN_NAME});
+   
+} else {
+   echo $this->tr('Přidání zákaznické skupiny');
+}
+?></h1>
+<?php
+$this->includeFile('tpl://nav.phtml');
+?>
+<div class="main-content-form-edit">
+   <?php
+   echo $this->form;
+   ?>
+</div>
