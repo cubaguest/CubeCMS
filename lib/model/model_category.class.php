@@ -41,6 +41,7 @@ class Model_Category extends Model_ORM {
    const COLUMN_ACTIVE = 'active';
    const COLUMN_KEYWORDS = 'keywords';
    const COLUMN_DESCRIPTION = 'description';
+   const COLUMN_CREATED = 'created';
    const COLUMN_CHANGED = 'changed';
    const COLUMN_FEEDS = 'feeds';
    const COLUMN_IMAGE = 'icon';
@@ -104,6 +105,7 @@ class Model_Category extends Model_ORM {
       $this->addColumn(self::COLUMN_DESCRIPTION, array('datatype' => 'varchar(500)', 'lang' => true, 'pdoparam' => PDO::PARAM_STR, 'fulltext' => true));
 
       $this->addColumn(self::COLUMN_CHANGED, array('datatype' => 'timestamp', 'pdoparam' => PDO::PARAM_STR, 'default' => 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
+      $this->addColumn(self::COLUMN_CREATED, array('datatype' => 'timestamp', 'pdoparam' => PDO::PARAM_STR, 'default' => 'CURRENT_TIMESTAMP'));
 
       $this->addColumn(self::COLUMN_FEEDS, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => false));
 
@@ -164,7 +166,8 @@ class Model_Category extends Model_ORM {
                Model_Category::COLUMN_INDIVIDUAL_PANELS, Model_Category::COLUMN_MODULE, Model_Category::COLUMN_URLKEY,
                Model_Category::COLUMN_VISIBILITY, Model_Category::COLUMN_ICON,  Model_Category::COLUMN_BACKGROUND,
                Model_Category::COLUMN_PRIORITY, Model_Category::COLUMN_DISABLE,
-               Model_Category::COLUMN_PARAMS, Model_Category::COLUMN_DATADIR
+               Model_Category::COLUMN_PARAMS, Model_Category::COLUMN_DATADIR,
+               Model_Category::COLUMN_CREATED, Model_Category::COLUMN_CHANGED
    //            , 'uk_l' => 'LENGTH( '.self::COLUMN_URLKEY.'_'.Locales::getLang().' )'
             ));
             $this->setSelectAllLangs($allLangs)

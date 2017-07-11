@@ -1,0 +1,2 @@
+Vylepšení:
+- Přidání času vytvoření kateogrie
