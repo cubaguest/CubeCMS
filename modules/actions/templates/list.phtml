@@ -4,6 +4,19 @@ $dateRangeStr = vve_date("%x", $this->dateStart);
 if($this->dateStart->format('Y-m-d') != $this->dateEnd->format('Y-m-d')){
    $dateRangeStr .= ' - '.vve_date("%x", $this->dateEnd);
 }
+// pokud je kalendář, tak tohle zaručí přechod na první den aktuálního měsíce a roku
+// http://www.cube-cms.com/udalosti/akce/2017-02/
+//$rPrams = $this->link()->getRoutes()->getRouteParams();
+//if(empty($rPrams)){
+//   $this->link()->route('list', array(
+//       'fromyear' => date('Y'),
+//       'frommonth' => date('m'),
+//       'fromday' => null,
+//       'toyear' => null,
+//       'tomonth' => null,
+//       'today' => null,
+//       ))->redirect();
+//}
 
 $this->addPageTitle($dateRangeStr);
 ?>

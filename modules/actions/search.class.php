@@ -1,10 +1,10 @@
 <?php
 class Actions_Search extends Search {
    public function runSearch() {
-      $model = new Actions_Model_Detail();
+      $model = new Actions_Model();
       $result = $model->search($this->getCategory()->getId(), $this->getSearchString(), !$this->getCategory()->getRights()->isWritable());
 
-      while ($res = $result->fetch()) {
+      foreach ($result as $res) {
          $text = null;
          $label = $res->{Actions_Model_Detail::COLUMN_NAME};
          if((string)$res->{Actions_Model_Detail::COLUMN_SUBANME} != null|''){
@@ -25,4 +25,3 @@ class Actions_Search extends Search {
       }
    }
 }
-?>
