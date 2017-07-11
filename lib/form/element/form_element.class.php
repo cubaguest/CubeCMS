@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Třída elementu formuláře
  *
@@ -11,6 +12,7 @@
  * @todo          Přepsat dimesional na multiple
  */
 class Form_Element extends TrObject implements Form_Element_Interface {
+
    /**
     * Název elementu
     * @var string
@@ -137,7 +139,6 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     */
    protected $htmlValidationsLabels = array();
    protected $htmlValidationsLabelsAdded = false;
-
    protected static $elementFocused = false;
 
    /**
@@ -146,38 +147,36 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     */
    protected $isAdvanced = false;
 
-
    /**
     * Id renderované část -- použito při vytváření id
     * @var integer
     */
    protected $renderedId = 1;
-
    protected $containerElement = null;
-
 
    /**
     * Název css tříd, která se přidávají k elementům
     * @var array
     */
    public $cssClasses = array('error' => 'form-error',
-      'validations' => 'validations',
-      'langLinkContainer' => 'lang-container',
-      'langLink' => 'link-lang',
-      'langLinkSel' => 'link-lang-sel',
-      'elemContainer' => 'elem-container',
-      'multipleClass' => 'form-input-multiple',
-      'multipleClassLast' => 'form-input-multiple-last',
-       );
+       'validations' => 'validations',
+       'langLinkContainer' => 'lang-container',
+       'langLink' => 'link-lang',
+       'langLinkSel' => 'link-lang-sel',
+       'elemContainer' => 'elem-container',
+       'multipleClass' => 'form-input-multiple',
+       'multipleClassLast' => 'form-input-multiple-last',
+   );
 
    /**
     * Konstruktor elemntu
     * @param string/Form_Element $name -- název elemntu
     * @param string $label -- popis elemntu
     */
-   public function  __construct($name, $label = null, $prefix = null) {
+   public function __construct($name, $label = null, $prefix = null)
+   {
       $this->containerElement = new Html_Element('div');
-      if($name instanceof Form_Element){
+      if ($name instanceof Form_Element) {
          $this->formElementName = str_replace($name->formElementPrefix, '', $name->getName());
          $this->formElementLabel = $name->getLabel();
          $this->formElementPrefix = $name->formElementPrefix;
@@ -193,13 +192,16 @@ class Form_Element extends TrObject implements Form_Element_Interface {
    /**
     * Metoda pro inicializaci
     */
-   protected function init() {
+   protected function init()
+   {
+      
    }
 
    /**
     * Metoda pro inicializaci html elementu
     */
-   protected function initHtmlElements() {
+   protected function initHtmlElements()
+   {
       $this->htmlElement = new Html_Element('input');
       $this->htmlElementLabel = new Html_Element('label');
       $this->htmlElementValidaionLabel = clone $this->containerElement;
@@ -208,13 +210,14 @@ class Form_Element extends TrObject implements Form_Element_Interface {
 
    /*
     * Metody pro práci s parametry elementu
-   */
+    */
 
    /**
     * Metoda přidá elemntu pravidlo pro validace
     * @param Form_Validator_Interface $validator -- typ validace
     */
-   final public function addValidation(Form_Validator_Interface $validator) {
+   final public function addValidation(Form_Validator_Interface $validator)
+   {
       $this->validators[get_class($validator)] = $validator;
       $this->isPopulated = false;
    }
@@ -223,8 +226,9 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * Metoda odebere elemntu pravidlo pro validace
     * @param string $validator -- název validátoru
     */
-   final public function removeValidation($validator) {
-      unset ($this->validators[$validator]);
+   final public function removeValidation($validator)
+   {
+      unset($this->validators[$validator]);
       $this->isPopulated = false;
    }
 
@@ -239,10 +243,21 @@ class Form_Element extends TrObject implements Form_Element_Interface {
    }
 
    /**
+    * Metoda vrací dany validátor elementu
+    * @param string $name -- název validátoru
+    * @return Form_Validator|bool
+    */
+   final public function getValidator($name)
+   {
+      return isset($this->validators[$name]) ? $this->validators[$name] : false;
+   }
+
+   /**
     * Metoda přidá elemntu filtr, který upraví výstup elementu
     * @param Form_Filter_Interface $filter -- typ filtru
     */
-   final public function addFilter(Form_Filter_Interface $filter) {
+   final public function addFilter(Form_Filter_Interface $filter)
+   {
       $this->filters[get_class($filter)] = $filter;
       // doplnění popisků k validaci
       $filter->addHtmlElementParams($this);
@@ -256,10 +271,11 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * @param bool $unfiltered -- jestli se mají hodnoty ukládat do nefiltrovaných (vhodné pro filtry)
     * @return Form_Element
     */
-   public function setValues($values, $key = null) {
+   public function setValues($values, $key = null)
+   {
       $this->isFiltered = false;
       $this->isPopulated = false;
-      if($key === null) {
+      if ($key === null) {
          $this->unfilteredValues = $values;
       } else {
          $this->unfilteredValues[$key] = $values;
@@ -272,7 +288,8 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * @param mixed $values -- hodnoty
     * @return Form_Element
     */
-   public function setFilteredValues($values) {
+   public function setFilteredValues($values)
+   {
       $this->values = $values;
       return $this;
    }
@@ -282,7 +299,8 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * @param string $name -- (option) název prvku pro pole
     * @@return Form_Element
     */
-   public function setDimensional($name = null) {
+   public function setDimensional($name = null)
+   {
       $this->dimensional = $name;
       return $this;
    }
@@ -292,7 +310,8 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * @param string $name -- (option) název prvku pro pole
     * @@return Form_Element
     */
-   public function setMultiple($key = true) {
+   public function setMultiple($key = true)
+   {
       $this->dimensional = $key;
       return $this;
    }
@@ -302,7 +321,8 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * @param bool $allow -- (option) název prvku pro pole
     * @@return Form_Element
     */
-   public function setMultipleAllowAdd($allow = true) {
+   public function setMultipleAllowAdd($allow = true)
+   {
       $this->multipleAllowAdd = $allow;
       return $this;
    }
@@ -311,7 +331,8 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * Metoda přidá popisek k validaci
     * @param string $text -- popisek
     */
-   public function addValidationConditionLabel($text) {
+   public function addValidationConditionLabel($text)
+   {
       array_push($this->htmlValidationsLabels, $text);
    }
 
@@ -321,9 +342,10 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * interní jazyky aplikace
     * @return Form_Element -- vrací samo sebe
     */
-   public function setLangs($langs = null) {
+   public function setLangs($langs = null)
+   {
       $this->isMultilang = $langs === false ? false : true;
-      if($langs == null) {
+      if ($langs == null) {
          $langs = Locales::getAppLangsNames();
       }
       $this->langs = $langs;
@@ -335,7 +357,8 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * @param string $string -- subpopisek
     * @return Form_Element
     */
-   public function setSubLabel($string) {
+   public function setSubLabel($string)
+   {
       $this->formElementSubLabel = $string;
       return $this;
    }
@@ -354,7 +377,8 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * @return bool -- true pokud je element vicerozměrný
     * @deprecated -- používat isMultiple
     */
-   public function isDimensional() {
+   public function isDimensional()
+   {
       return $this->dimensional === false ? false : true;
    }
 
@@ -362,7 +386,8 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * Metofda vrací jestli se jedná o vícerozměrný element
     * @return bool -- true pokud je element vicerozměrný
     */
-   public function isMultiple() {
+   public function isMultiple()
+   {
       return $this->dimensional === false ? false : true;
    }
 
@@ -370,7 +395,8 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * Metofda vrací jestli se jedná o vícerozměrný element
     * @return bool -- true pokud je element vicerozměrný
     */
-   public function isMultiLang() {
+   public function isMultiLang()
+   {
       return $this->isMultilang;
    }
 
@@ -378,7 +404,8 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * Metofda vrací pole s jazyky prvku
     * @return array -- pole s jazyky
     */
-   public function getLangs() {
+   public function getLangs()
+   {
       return $this->langs;
    }
 
@@ -386,9 +413,10 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * Metoda vrací název elementu
     * @return string
     */
-   final public function getName($withFormPrefix = true) {
-      if($withFormPrefix){
-         return $this->formElementPrefix.$this->formElementName;
+   final public function getName($withFormPrefix = true)
+   {
+      if ($withFormPrefix) {
+         return $this->formElementPrefix . $this->formElementName;
       }
       return $this->formElementName;
    }
@@ -397,7 +425,8 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * Metoda nasatví popis elementu
     * @param string $label -- popis elementu
     */
-   final public function setLabel($label) {
+   final public function setLabel($label)
+   {
       $this->formElementLabel = $label;
    }
 
@@ -405,7 +434,8 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * Metoda vrací popis prvku
     * @return string -- popis prvku, je zadáván při vytvoření
     */
-   final public function getLabel() {
+   final public function getLabel()
+   {
       return $this->formElementLabel;
    }
 
@@ -414,13 +444,14 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * @param $key -- (option) klíč hodnoty (pokud je pole)
     * @return mixed -- hodnota prvku
     */
-   public function getValues($key = null) {
-      if(!$this->isValidated){
+   public function getValues($key = null)
+   {
+      if (!$this->isValidated) {
          $this->validate();
       }
-      if($this->isValid()){
+      if ($this->isValid()) {
          $this->filter();
-         if($key !== null AND isset($this->values[$key])) {
+         if ($key !== null AND isset($this->values[$key])) {
             return $this->values[$key];
          }
       }
@@ -431,8 +462,9 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * Metoda vrací nefiltrované hodnoty prvku
     * @return mixed -- hodnota prvku
     */
-   public function getUnfilteredValues($key = null) {
-      if($key !== null AND isset($this->unfilteredValues[$key])) {
+   public function getUnfilteredValues($key = null)
+   {
+      if ($key !== null AND isset($this->unfilteredValues[$key])) {
          return $this->unfilteredValues[$key];
       }
       return $this->unfilteredValues;
@@ -442,15 +474,17 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * Metoda nastaví prefix elementu
     * @param string $prefix -- prefix elementu ve formuláři
     */
-   public function setPrefix($prefix) {
-      $this->formElementPrefix = $prefix.$this->formElementPrefix;
+   public function setPrefix($prefix)
+   {
+      $this->formElementPrefix = $prefix . $this->formElementPrefix;
    }
-   
+
    /**
     * Metoda vrací prefix elementu
     * @return string -- prefix elementu ve formuláři
     */
-   public function getPrefix() {
+   public function getPrefix()
+   {
       return $this->formElementPrefix;
    }
 
@@ -465,19 +499,19 @@ class Form_Element extends TrObject implements Form_Element_Interface {
       return $this;
    }
 
-
    /*
     * Metody pro vykreslení
-   */
+    */
 
    /**
     * Metoda vrací jestli je element validní
     */
-   public function isValid($valid = null) {
-      if($valid !== null){
+   public function isValid($valid = null)
+   {
+      if ($valid !== null) {
          $this->isValid = $valid;
          $this->isValidated = true;
-      } else if(!$this->isValidated){
+      } else if (!$this->isValidated) {
          $this->validate();
       }
       return $this->isValid;
@@ -486,18 +520,21 @@ class Form_Element extends TrObject implements Form_Element_Interface {
    /**
     * Metoda vrací jestli je prvek naplněn
     */
-   public function isPopulated() {
+   public function isPopulated()
+   {
       return $this->isPopulated;
    }
 
    /**
     * Metoda vrací jestli je element prázdný
     */
-   public function isEmpty() {
+   public function isEmpty()
+   {
       return $this->checkEmpty($this->getUnfilteredValues());
    }
 
-   public function setError($msg) {
+   public function setError($msg)
+   {
       $this->isValid = false;
       $this->errMsg()->addMessage($msg);
    }
@@ -506,13 +543,14 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * Metoda vrací jestli byl element vůbec odeslán
     * @return bool
     */
-   public function isSend() {
-      return isset ($_REQUEST[$this->getName()]);
+   public function isSend()
+   {
+      return isset($_REQUEST[$this->getName()]);
    }
 
    /*
     * Interní metody
-   */
+    */
 
    /**
     * metoda zkorntroluje jestli je prvek prázdný
@@ -520,21 +558,23 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * @return boolean -- true pro prázdný prvek
     * @todo Je to k něčemu???
     */
-   private function checkEmpty($array) {
-      if(is_array($array)) {
+   private function checkEmpty($array)
+   {
+      if (is_array($array)) {
          foreach ($array as $var) {
-            if(!$this->checkEmpty($var)) {
+            if (!$this->checkEmpty($var)) {
                return false;
             }
          }
-      } else if($array != null AND $array != '') {
+      } else if ($array != null AND $array != '') {
          return false;
       }
       return true;
    }
 
-   protected function createValidationLabels(){
-      if(!$this->htmlValidationsLabelsAdded) {
+   protected function createValidationLabels()
+   {
+      if (!$this->htmlValidationsLabelsAdded) {
          $this->htmlValidationsLabelsAdded = true;
          // doplnění popisků k validaci
          foreach ($this->validators as $validator) {
@@ -550,11 +590,12 @@ class Form_Element extends TrObject implements Form_Element_Interface {
    /**
     * Metoda naplní element
     */
-   public function populate() {
-      if(!$this->isPopulated){
-         if(isset ($_POST[$this->getName()]) && $_POST[$this->getName()] != "") {
+   public function populate()
+   {
+      if (!$this->isPopulated) {
+         if (isset($_POST[$this->getName()]) && $_POST[$this->getName()] != "") {
             $this->values = $_POST[$this->getName()];
-            if($this->isMultiple()){
+            if ($this->isMultiple()) {
                $this->addFilter(new Form_Filter_RemoveEmptyValues());
             }
          } else {
@@ -569,10 +610,11 @@ class Form_Element extends TrObject implements Form_Element_Interface {
    /**
     * Metoda provede validace
     */
-   public function validate() {
+   public function validate()
+   {
       // validace prvku
       foreach ($this->validators as $validator) {
-         if(!$validator->validate($this)) {
+         if (!$validator->validate($this)) {
             $this->isValid = false;
             break;
          }
@@ -584,8 +626,9 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * Metodda provede přefiltrování obsahu elementu
     * @param boolean $newFilter -- (option true) jestli se má znovu přefiltrovat
     */
-   public function filter($newFilter = false) {
-      if($this->isValidated == true && ($this->isFiltered == false OR $newFilter == true) ) {
+   public function filter($newFilter = false)
+   {
+      if ($this->isValidated == true && ($this->isFiltered == false OR $newFilter == true)) {
          $this->values = $this->unfilteredValues;
          foreach ($this->filters as $filter) {
             $filter->filter($this, $this->values);
@@ -598,7 +641,8 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * Metoda vrací objekt s chybovými zprávami
     * @return Messages -- objekt zpráv
     */
-   final protected function errMsg() {
+   final protected function errMsg()
+   {
       return AppCore::getUserErrors();
    }
 
@@ -606,52 +650,54 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * Metoda vrací popisek k prvku (html element label)
     * @return string
     */
-   public function label($renderKey = null, $after = false) {
-      $rKey = $renderKey != null ? $renderKey : ($after ? $this->renderedId-1 : $this->renderedId);
+   public function label($renderKey = null, $after = false)
+   {
+      $rKey = $renderKey != null ? $renderKey : ($after ? $this->renderedId - 1 : $this->renderedId);
       $this->createValidationLabels();
       $elem = clone $this->htmlLabel();
       $elem->clearContent();
-      if(!$this->isValid AND $this->isPopulated) {
+      if (!$this->isValid AND $this->isPopulated) {
          $elem->addClass($this->cssClasses['error']);
       }
-      if($this->formElementLabel !== null) {
-         $elem->addContent(!$after ? $this->formElementLabel.":" : $this->formElementLabel);
+      if ($this->formElementLabel !== null) {
+         $elem->addContent(!$after ? $this->formElementLabel . ":" : $this->formElementLabel);
       }
-      if($this->isDimensional()) {
-         $elem->addClass($this->getName()."_".$this->dimensional."_label_class");
+      if ($this->isDimensional()) {
+         $elem->addClass($this->getName() . "_" . $this->dimensional . "_label_class");
       } else {
-         $elem->addClass($this->getName()."_label_class");
+         $elem->addClass($this->getName() . "_label_class");
       }
-      if($this->isMultilang()) {
+      if ($this->isMultilang()) {
          $cnt = $langButtons = null;
          foreach ($this->getLangs() as $langKey => $langLabel) {
-            if($this->isDimensional()) {
-               $elem->setAttrib('for', $this->getName().'_'.$rKey."_".$this->dimensional.'_'.$langKey);
-               $elem->setAttrib('id', $this->getName()."_".$this->dimensional.'_label_'.$langKey);
+            if ($this->isDimensional()) {
+               $elem->setAttrib('for', $this->getName() . '_' . $rKey . "_" . $this->dimensional . '_' . $langKey);
+               $elem->setAttrib('id', $this->getName() . "_" . $this->dimensional . '_label_' . $langKey);
                $elem->setAttrib('lang', $langKey);
             } else {
-               $elem->setAttrib('for', $this->getName().'_'.$rKey.'_'.$langKey);
-               $elem->setAttrib('id', $this->getName().'_label_'.$langKey);
+               $elem->setAttrib('for', $this->getName() . '_' . $rKey . '_' . $langKey);
+               $elem->setAttrib('id', $this->getName() . '_label_' . $langKey);
                $elem->setAttrib('lang', $langKey);
             }
             $cnt .= $elem;
          }
          return $cnt;
       } else {
-         if(!$this->isDimensional()) {
-            $elem->setAttrib('for', $this->getName().'_'.$rKey);
+         if (!$this->isDimensional()) {
+            $elem->setAttrib('for', $this->getName() . '_' . $rKey);
          } else {
-            $elem->setAttrib('for', $this->getName().'_'.$rKey."_".$this->dimensional);
+            $elem->setAttrib('for', $this->getName() . '_' . $rKey . "_" . $this->dimensional);
          }
       }
-      return (string)$elem;
+      return (string) $elem;
    }
 
    /**
     * Metoda vrací subpopisek
     * @return string -- řetězec z html elementu
     */
-   public function subLabel($renderKey = null) {
+   public function subLabel($renderKey = null)
+   {
       $this->htmlSubLabel()->setContent($this->formElementSubLabel);
       return $this->htmlSubLabel();
    }
@@ -664,102 +710,106 @@ class Form_Element extends TrObject implements Form_Element_Interface {
    {
       $link = new Url_Link();
       $cnt = null;
-      
+
       // button add new row
       $a = new Html_Element('a', '<span class="icon icon-plus"></span>');
-      $a->setAttrib('href', $link."#add".$this->getName());
+      $a->setAttrib('href', $link . "#add" . $this->getName());
       $a->setAttrib('onclick', "return CubeCMS.Form.addRow(this)");
       $a->addClass('button-add-multiple-line')->addClass('input-group-btn');
-      if(!$last){
+      if (!$last) {
          $a->setAttrib('style', 'display:none;');
       }
       $cnt .= $a;
-      
+
       $a = new Html_Element('a', '<span class="icon icon-minus"></span>');
-      $a->setAttrib('href', $link."#add".$this->getName());
+      $a->setAttrib('href', $link . "#add" . $this->getName());
       $a->setAttrib('onclick', "return CubeCMS.Form.removeRow(this)");
       $a->addClass('button-remove-multiple-line')->addClass('input-group-btn');
-      if($first){
+      if ($first) {
          $a->setAttrib('style', 'display:none;');
       }
       $cnt .= $a;
-      
+
       return $cnt;
-      
-      
+
+
       $cnt = clone $this->containerElement;
       $cnt->addClass('buttons');
-      
+
 
       // button remove row
-      $a = new Html_Element('a', '<img src="/images/icons/delete.png" alt="'.$this->tr('odebrat').'" />');
-      $a->setAttrib('href', $link."#add".$this->getName());
+      $a = new Html_Element('a', '<img src="/images/icons/delete.png" alt="' . $this->tr('odebrat') . '" />');
+      $a->setAttrib('href', $link . "#add" . $this->getName());
       $a->setAttrib('onclick', "return CubeCMS.Form.removeRow(this)");
       $a->addClass('button-remove-multiple-line');
-      if($first){
+      if ($first) {
          $a->setAttrib('style', 'display:none;');
       }
       $cnt->addContent($a);
       // button add new row
-      $a = new Html_Element('a', '<img src="/images/icons/add.png" alt="'.$this->tr('přidat').'" />');
-      $a->setAttrib('href', $link."#add".$this->getName());
+      $a = new Html_Element('a', '<img src="/images/icons/add.png" alt="' . $this->tr('přidat') . '" />');
+      $a->setAttrib('href', $link . "#add" . $this->getName());
       $a->setAttrib('onclick', "return CubeCMS.Form.addRow(this)");
       $a->addClass('button-add-multiple-line');
-      if(!$last){
+      if (!$last) {
          $a->setAttrib('style', 'display:none;');
       }
       $cnt->addContent($a);
       return $cnt;
    }
 
-   public function control($renderKey = null) {
+   public function control($renderKey = null)
+   {
       $rKey = $renderKey != null ? $renderKey : $this->renderedId;
       $this->createValidationLabels();
       $this->html()->clearContent();
-      if(!$this->isValid AND $this->isPopulated) {
+      if (!$this->isValid AND $this->isPopulated) {
          $this->html()->addClass($this->cssClasses['error']);
-         if(!self::$elementFocused){ $this->html()->setAttrib('autofocus','autofocus'); self::$elementFocused = true;}
+         if (!self::$elementFocused) {
+            $this->html()->setAttrib('autofocus', 'autofocus');
+            self::$elementFocused = true;
+         }
       }
       $values = $this->getUnfilteredValues();
       $cnt = null;
 
-      $this->html()->addClass($this->getName()."_class");
-      if($this->isMultiLang()) {
+      $this->html()->addClass($this->getName() . "_class");
+      if ($this->isMultiLang()) {
          $cnt = null;
          foreach ($this->getLangs() as $langKey => $langLabel) {
             $this->html()->setAttrib('value', null);
             $container = clone $this->containerElement;
             $container->addClass('input-group');
-            if($this->isMultiple()) {
-               $this->html()->setAttrib('name', $this->getName().'['.$this->dimensional.']['.$langKey.']');
-               $this->html()->setAttrib('id', $this->getName().'_'.$rKey."_".$this->dimensional.'_'.$langKey);
-               if(isset($values[$this->dimensional][$langKey])){
-                  $this->html()->setAttrib('value', htmlspecialchars((string)$values[$this->dimensional][$langKey]));
-               } else if (isset($values[$langKey])){
-                  $this->html()->setAttrib('value', htmlspecialchars((string)$values[$langKey]));
+            if ($this->isMultiple()) {
+               $this->html()->setAttrib('name', $this->getName() . '[' . $this->dimensional . '][' . $langKey . ']');
+               $this->html()->setAttrib('id', $this->getName() . '_' . $rKey . "_" . $this->dimensional . '_' . $langKey);
+               if (isset($values[$this->dimensional][$langKey])) {
+                  $this->html()->setAttrib('value', htmlspecialchars((string) $values[$this->dimensional][$langKey]));
+               } else if (isset($values[$langKey])) {
+                  $this->html()->setAttrib('value', htmlspecialchars((string) $values[$langKey]));
                }
 
-               $container->setAttrib('id', $this->getName().'_'.$this->renderedId."_".$this->dimensional.'_container_'.$langKey);
+               $container->setAttrib('id', $this->getName() . '_' . $this->renderedId . "_" . $this->dimensional . '_container_' . $langKey);
             } else {
-               $this->html()->setAttrib('name', $this->getName().'['.$langKey.']');
-               $this->html()->setAttrib('id', $this->getName().'_'.$rKey.'_'.$langKey);
+               $this->html()->setAttrib('name', $this->getName() . '[' . $langKey . ']');
+               $this->html()->setAttrib('id', $this->getName() . '_' . $rKey . '_' . $langKey);
                $this->html()->setAttrib('value', htmlspecialchars(isset($values[$langKey]) ? $values[$langKey] : null));
-               $container->setAttrib('id', $this->getName().'_container_'.$langKey);
+               $container->setAttrib('id', $this->getName() . '_container_' . $langKey);
             }
             $this->html()->setAttrib('lang', $langKey);
-            $container->addClass($this->cssClasses['elemContainer'])->addClass('form-input-lang-'.$langKey);
+            $container->addClass($this->cssClasses['elemContainer'])->addClass('form-input-lang-' . $langKey);
             $container->setAttrib('lang', $langKey);
-            $container->setContent((string)$this->html());
+            $container->setContent((string) $this->html());
             $cnt .= $container;
          }
       } else {
-         if($this->isMultiple()) {
-            if(is_array($values) && $this->dimensional === true){
+         if ($this->isMultiple()) {
+            if (is_array($values) && $this->dimensional === true) {
                $container = clone $this->containerElement;
                /**
                 * @todo - tohle vyřešit nějak jinak, protože se vkládá index 0 do pole s hodnotami
                 */
-               if(empty($values)){
+               if (empty($values)) {
                   $values[] = null;
                }
                $cnt = null;
@@ -769,14 +819,14 @@ class Form_Element extends TrObject implements Form_Element_Interface {
                foreach ($values as $key => $val) {
                   $container->clearContent();
                   $container
-                   ->addClass($this->cssClasses['multipleClass'])
-                   ->addClass('input-group')
-                   ;
-                  $this->html()->setAttrib('name', $this->getName()."[".$key."]");
-                  $this->html()->setAttrib('id', $this->getName().'_'.$rKey."_".$key);
-                  $this->html()->setAttrib('value', htmlspecialchars((string)$val));
+                          ->addClass($this->cssClasses['multipleClass'])
+                          ->addClass('input-group')
+                  ;
+                  $this->html()->setAttrib('name', $this->getName() . "[" . $key . "]");
+                  $this->html()->setAttrib('id', $this->getName() . '_' . $rKey . "_" . $key);
+                  $this->html()->setAttrib('value', htmlspecialchars((string) $val));
                   $container->setContent($this->html());
-                  if($lastKey != $key){
+                  if ($lastKey != $key) {
                      $container->addContent($this->getMultipleButtons(false, false), true);
                   } else {
                      $container->addClass($this->cssClasses['multipleClassLast']);
@@ -784,37 +834,37 @@ class Form_Element extends TrObject implements Form_Element_Interface {
                   }
                   $cnt .= $container;
                }
-            } else if($values == null && $this->dimensional === true){
+            } else if ($values == null && $this->dimensional === true) {
                $container = clone $this->containerElement;
                $container
-                  ->addClass($this->cssClasses['multipleClass'])
-                  ->addClass('form-input-multiple')
-                  ->addClass('input-group');
-               $this->html()->setAttrib('name', $this->getName()."[]");
-               $this->html()->setAttrib('id', $this->getName().'_'.$rKey);
+                       ->addClass($this->cssClasses['multipleClass'])
+                       ->addClass('form-input-multiple')
+                       ->addClass('input-group');
+               $this->html()->setAttrib('name', $this->getName() . "[]");
+               $this->html()->setAttrib('id', $this->getName() . '_' . $rKey);
                $container->setContent($this->html());
                $container->addClass('form-input-multiple-last');
                $container->addContent($this->getMultipleButtons(true, true), true);
-               $cnt = (string)$container;
+               $cnt = (string) $container;
             } else {
                /*
                 * @todo odstranit nebo přepsat
                 */
-               $this->html()->setAttrib('name', $this->getName()."[".$this->dimensional."]");
-               $this->html()->setAttrib('id', $this->getName().'_'.$rKey."_".$this->dimensional);
-               if(is_array($values) AND key_exists($this->dimensional, $values)) {
-                  $this->html()->setAttrib('value', htmlspecialchars((string)$values[$this->dimensional]));
+               $this->html()->setAttrib('name', $this->getName() . "[" . $this->dimensional . "]");
+               $this->html()->setAttrib('id', $this->getName() . '_' . $rKey . "_" . $this->dimensional);
+               if (is_array($values) AND key_exists($this->dimensional, $values)) {
+                  $this->html()->setAttrib('value', htmlspecialchars((string) $values[$this->dimensional]));
                } else {
-                  $this->html()->setAttrib('value', htmlspecialchars((string)$values));
+                  $this->html()->setAttrib('value', htmlspecialchars((string) $values));
                }
             }
          } else {
             $this->html()->setAttrib('name', $this->getName());
-            $this->html()->setAttrib('id', $this->getName().'_'.$this->renderedId);
-            $this->html()->setAttrib('value', htmlspecialchars((string)$values));
+            $this->html()->setAttrib('id', $this->getName() . '_' . $this->renderedId);
+            $this->html()->setAttrib('value', htmlspecialchars((string) $values));
          }
       }
-      if($renderKey == null){
+      if ($renderKey == null) {
          $this->renderedId++;
       }
       return $cnt == null ? $this->html() : $cnt;
@@ -825,7 +875,8 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * @return string
     * @deprecated -- používat control
     */
-   public function controll($renderKey = null) {
+   public function controll($renderKey = null)
+   {
       return $this->control($renderKey);
    }
 
@@ -833,14 +884,17 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * Metoda vrací všechny prvky, keré patří ke kontrolu, tj controll, labelValidations, subLabel
     * @return string -- včechny prvky vyrenderované
     */
-   public function controlAll($renderKey = null) {
+   public function controlAll($renderKey = null)
+   {
       $ret = $this->labelLangs($renderKey);
       $ret .= $this->control($renderKey);
       $ret .= $this->labelValidations($renderKey);
       $ret .= $this->subLabel($renderKey);
       return $ret;
    }
-   public function controllAll($renderKey = null) {
+
+   public function controllAll($renderKey = null)
+   {
       return $this->control($renderKey);
    }
 
@@ -848,14 +902,15 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * Metoda vrací popisek k validacím
     * @return string
     */
-   public function labelValidations($renderKey = null) {
+   public function labelValidations($renderKey = null)
+   {
       $this->createValidationLabels();
-      if(!empty($this->htmlValidationsLabels)) {
+      if (!empty($this->htmlValidationsLabels)) {
          $labels = "(";
          foreach ($this->htmlValidationsLabels as $lab) {
-            $labels .= $lab.", ";
+            $labels .= $lab . ", ";
          }
-         $labels = substr($labels, 0, strlen($labels)-2).")";
+         $labels = substr($labels, 0, strlen($labels) - 2) . ")";
          $this->htmlValidLabel()->setContent($labels);
          $this->htmlValidLabel()->addClass($this->cssClasses['validations']);
          return $this->htmlValidLabel();
@@ -867,18 +922,19 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * Funkce vygeneruje přepínač pro volbu jazyku
     * @return string
     */
-   public function labelLangs($renderKey = null) {
-      if($this->isMultilang() AND count($this->langs) > 1) {
+   public function labelLangs($renderKey = null)
+   {
+      if ($this->isMultilang() AND count($this->langs) > 1) {
          $langButtons = null;
          $shortCode = count($this->getLangs()) > 5 ? true : false;
          foreach ($this->getLangs() as $langKey => $langLabel) {
             $a = new Html_Element('a', $shortCode ? $langKey : $langLabel);
             $a->setAttrib('href', "#");
             $a->addClass($this->cssClasses['langLink']);
-            if($this->isDimensional()) {
-               $a->setAttrib('id', $this->getName()."_".$this->dimensional."_lang_link_".$langKey);
+            if ($this->isDimensional()) {
+               $a->setAttrib('id', $this->getName() . "_" . $this->dimensional . "_lang_link_" . $langKey);
             } else {
-               $a->setAttrib('id', $this->getName()."_lang_link_".$langKey);
+               $a->setAttrib('id', $this->getName() . "_lang_link_" . $langKey);
             }
             $a->setAttrib('lang', $langKey);
             $a->setAttrib('title', $langLabel);
@@ -887,8 +943,8 @@ class Form_Element extends TrObject implements Form_Element_Interface {
          }
          $a = new Html_Element('a', $this->tr('Do všech'));
          $a->setAttrib('href', "#duplicate");
-         $a->addClass($this->cssClasses['langLink'].'-duplicator');
-         $langButtons .= $a;   
+         $a->addClass($this->cssClasses['langLink'] . '-duplicator');
+         $langButtons .= $a;
          $container = clone $this->containerElement;
          $container->addContent($langButtons);
          return $container->addClass($this->cssClasses['langLinkContainer']);
@@ -899,12 +955,14 @@ class Form_Element extends TrObject implements Form_Element_Interface {
    /**
     * Metoda pro generování scriptů. potřebných pro práci s formulářem
     */
-   public function scripts($renderKey = null) {
+   public function scripts($renderKey = null)
+   {
       return null;
    }
 
-   public function  __toString() {
-      return (string)$this->controll();
+   public function __toString()
+   {
+      return (string) $this->controll();
    }
 
    /**
@@ -912,7 +970,8 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * Element kontrolního prvku formuláře (např. input)
     * @return Html_Element
     */
-   public function html() {
+   public function html()
+   {
       return $this->htmlElement;
    }
 
@@ -921,7 +980,8 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * Element popisku formuláře (label)
     * @return Html_Element
     */
-   public function htmlLabel() {
+   public function htmlLabel()
+   {
       return $this->htmlElementLabel;
    }
 
@@ -930,7 +990,8 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * Element popisku pro validace
     * @return Html_Element
     */
-   public function htmlValidLabel() {
+   public function htmlValidLabel()
+   {
       return $this->htmlElementValidaionLabel;
    }
 
@@ -939,10 +1000,11 @@ class Form_Element extends TrObject implements Form_Element_Interface {
     * Element subpopisku
     * @return Html_Element
     */
-   public function htmlSubLabel() {
+   public function htmlSubLabel()
+   {
       return $this->htmlElementSubLabel;
    }
-   
+
    /**
     * Metoda nastaví prvek pro pokročilé uživatele
     * @param bool $adv
@@ -953,7 +1015,7 @@ class Form_Element extends TrObject implements Form_Element_Interface {
       $this->isAdvanced = $adv;
       return $this;
    }
-   
+
    /**
     * Metoda vrací jestli je prvek pro pokročílé uživatele
     * @return bool
@@ -962,4 +1024,5 @@ class Form_Element extends TrObject implements Form_Element_Interface {
    {
       return $this->isAdvanced;
    }
+
 }
