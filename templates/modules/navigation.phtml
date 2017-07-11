@@ -1,35 +1,41 @@
-<?php 
-$this->addFile('css://engine:admin/admin.less');// need for buttons style
-?>
-<div class="module-navigation-container">
-<ul class="module-navigation">
-<?php 
-$curLink = new Url_Link();
-$curLink = (string)$curLink;
-foreach ($this->items as $name => $link) {
-   $icon = null;
-   $hidden = false;
-   if(is_array($link)){
-      $hidden = true;
-      $icon = $link['icon'];
-      $link = $link['link'];
-   }
-   
-   $classes = array();
-   $hidden ? $classes[] = "collapsible" : ''; 
-   $curLink == (string)$link ? $classes[] = 'active' : '';
-   
-   ?>
-   <li class="<?php echo implode(' ', $classes);?>"
-       ><a href="<?php echo $link?>" title="<?php echo $this->tr('Přejít na').' '.$name?>"><?php 
-   if($icon != null && strpos($icon, '.png') !== false){
-      ?><img src="<?php echo vve_get_tpl_file('icons/'.$icon, VVE_TPL_FILE_IMAGE)?>" alt="icon <?php echo $icon?>" /><?php 
-   } else if($icon != null){
-      ?><span class="icon icon-<?php echo $icon?>"></span><?php 
-   }
-   ?><span class="name"><?php echo $name?></span></a></li>
-<?php 
+<?php
+$this->addFile('css://engine:admin/admin.less'); // need for buttons style
+if (isset($this->moduleNavigationItems) && !isset($items)) {
+   $items = $this->moduleNavigationItems;
 }
-?>
-</ul>
-</div>
+$short = !isset($short) ? true : $short;
+if (!empty($items)) {
+   ?>
+   <div class="module-navigation-container">
+      <ul class="module-navigation">
+         <?php
+         $curLink = new Url_Link();
+         $curLink = (string) $curLink;
+
+         foreach ($items as $name => $link) {
+            $icon = null;
+            $hidden = false;
+            if (is_array($link)) {
+               $hidden = $short;
+               $icon = $link['icon'];
+               $link = $link['link'];
+            }
+
+            $classes = array();
+            $hidden ? $classes[] = "collapsible" : '';
+            $curLink == (string) $link ? $classes[] = 'active' : '';
+            ?>
+            <li class="<?php echo implode(' ', $classes); ?>"
+                ><a href="<?php echo $link ?>" title="<?php echo $this->tr('Přejít na') . ' ' . $name ?>"><?php
+                      if ($icon != null && strpos($icon, '.png') !== false) {
+                         ?><img src="<?php echo vve_get_tpl_file('icons/' . $icon, VVE_TPL_FILE_IMAGE) ?>" alt="icon <?php echo $icon ?>" /><?php
+                  } else if ($icon != null) {
+                     ?><span class="icon icon-<?php echo $icon ?>"></span><?php
+                  }
+                  ?><span class="name"><?php echo $name ?></span></a></li>
+                     <?php
+                  }
+                  ?>
+      </ul>
+   </div>
+<?php } ?>
