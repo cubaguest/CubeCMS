@@ -537,6 +537,11 @@ class Module
     */
    public function getTemplateParam($action, $tpl, $param, $default = null)
    {
+      if(!$tpl && isset(self::$templates[$this->getName()][$action])){
+         // pokud není tpl, použij první šablonu
+         $tpl = current(array_keys(self::$templates[$this->getName()][$action]));
+      }
+      
       if(isset(self::$templates[$this->getName()][$action]) 
           && isset(self::$templates[$this->getName()][$action][$tpl])
           && isset(self::$templates[$this->getName()][$action][$tpl]['params'][$param])
