@@ -349,4 +349,13 @@ class Category_Core extends TrObject {
       }
       return null;
    }
+   
+   /**
+    * Vrací odkaz na kateogiri
+    * @return \Url_Link
+    */
+   public function getLink()
+   {
+      return new Url_Link();
+   }
 }

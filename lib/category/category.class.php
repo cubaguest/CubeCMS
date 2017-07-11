@@ -169,5 +169,12 @@ class Category extends Category_Core {
    public function haveFeed() {
       return $this->getDataObj()->{Model_Category::COLUMN_FEEDS};
    }
+   
+   /**
+    * {@inheritdoc}
+    */
+   public function getLink()
+   {
+      return Url_Link::getCategoryLink($this->getId());
+   }
 }
-?>

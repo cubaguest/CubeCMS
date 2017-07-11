@@ -148,4 +148,12 @@ class Category_Admin extends Category {
    {
       return $this->category;
    }
+   
+   /**
+    * {@inheritdoc}
+    */
+   public function getLink()
+   {
+      return Url_Link::getCategoryAdminLink($this->getId());
+   }
 }
