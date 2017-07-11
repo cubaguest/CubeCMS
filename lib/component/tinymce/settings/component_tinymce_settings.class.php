@@ -267,12 +267,9 @@ abstract class Component_TinyMCE_Settings extends TrObject implements ArrayAcces
    {
       $tpl = new Template(new Url_Link());
       $tpl->addFile('css://style.less');
+      $tpl->addFile('css://cubecms/mce.less');
       $styles = $tpl->getStylesheets();
-      if(isset($styles[0])){
-         return $styles[0];
-      } else {
-         throw new Exception('Doplnit content.css');
-      }
+      return implode(',', $styles);
    }
 
    /* ArrayAccess */
