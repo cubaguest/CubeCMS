@@ -144,6 +144,9 @@ class CustomBlocks_Controller extends Controller {
       $block = $blocks[$type];
 
       $form = $this->createForm($block);
+      if(isset($block['defaultName'])){
+         $form->blockname->setValues($block['defaultName']);
+      }
 
       if ($form->isValid()) {
          $blockRecord = $this->processForm($form, $block, $this->getRequest('type'));
@@ -310,7 +313,16 @@ class CustomBlocks_Controller extends Controller {
                   $elementRecord = null;
                }
             }
-            $customElement = $this->$method($index, $name, $item, $elementRecord);
+            /* @var $customElement Form_Element */
+            if(isset($item['element']) && $item['element'] instanceof Form_Element){
+               $customElement = $item['element'];
+            } else {
+               $customElement = $this->$method($index, $name, $item, $elementRecord);
+               if(isset($item['description']) && isset($item['description'][Locales::getLang()])){
+                  $customElement->setSubLabel($item['description'][Locales::getLang()]);
+               }
+            }
+               
             $form->addElement($customElement);
          }
       }
