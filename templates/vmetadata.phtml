@@ -1,8 +1,82 @@
-<?php 
+<?php
 Template::addPageTitle($this->tr('Popisky a metadata'));
 ?>
 
-<h1><?php ps(sprintf($this->tr('Popisky a metadata stránky "%s"'), $this->category()->getName()))?></h1>
+<h1><?php ps(sprintf($this->tr('Popisky a metadata stránky "%s"'), $this->category()->getName())) ?></h1>
 <div class="main-content-form-edit" id="article-edit-form">
-   <?php echo($this->form);?>
+   <?php echo($this->form); ?>
+   <?php if (isset($this->form->google_cat)) {
+      $jq = new JsPlugin_JQuery();
+      $this->addJsPlugin($jq);
+      $this->addFile('js://engine:bootstrap/bootstrap.min.js');
+      $this->addJsPlugin(new JsPlugin_BootstrapTypehead());
+      
+      $catsLink = new Url_Link_ModuleStatic();
+      $catsLink->module('shopproductgeneral')->action('getFeedCategories', 'json');
+      
+      ?>
+   
+
+      <script type="text/javascript">
+         $(document).ready(function () {
+            var numFeedItems = 50;
+            var feedMinCatChars = 3;
+            // feedy 
+            $('input[name="metadata_zbozi_cat"]').typeahead({
+               autoSelect: true,
+               minLength: feedMinCatChars,
+               items: numFeedItems,
+               delay: 400,
+               fitToElement: true,
+               showHintOnFocus: true,
+               source: function (query, process) {
+                  $.ajax({
+                     url: '<?php echo $catsLink->param('feed', 'zbozi') ?>',
+                     data: {q: query},
+                     dataType: 'json'
+                  }).done(function (response) {
+                     return process(response.items);
+                  });
+               }
+            });
+            $('input[name="metadata_google_cat"]').typeahead({
+               autoSelect: true,
+               minLength: feedMinCatChars,
+               items: numFeedItems,
+               delay: 400,
+               fitToElement: true,
+               showHintOnFocus: true,
+               source: function (query, process) {
+                  $.ajax({
+                     url: '<?php echo $catsLink->param('feed', 'google') ?>',
+                     data: {q: query},
+                     dataType: 'json'
+                  }).done(function (response) {
+                     return process(response.items);
+                  });
+               }
+            });
+
+            $('input[name="metadata_heureka_cat"]').typeahead({
+               autoSelect: true,
+               minLength: feedMinCatChars,
+               items: numFeedItems,
+               delay: 400,
+               fitToElement: true,
+               showHintOnFocus: true,
+               source: function (query, process) {
+                  $.ajax({
+                     url: '<?php echo $catsLink->param('feed', 'heureka') ?>',
+                     data: {q: query},
+                     dataType: 'json'
+                  }).done(function (response) {
+                     return process(response.items);
+                  });
+               }
+            });
+         });
+      </script>
+
+   <?php } ?>
+
 </div>
