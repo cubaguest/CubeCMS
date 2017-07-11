@@ -1,0 +1,34 @@
+.cubecms-shortcut-hover {
+   &:hover {
+      .shortcut {
+         display: inline-block;
+      }
+   }
+   .cubecms-shortcut {
+      &:hover {
+         opacity: 1;
+         display: inline-block;
+      }
+      &.cubecms-shortcut-right {
+         left: auto;
+         right: 30px; // toolbox
+      }
+      position: absolute;
+      top: 0;
+      left: 0;
+      font-size: 14px;
+      text-transform: none;
+      display: none;
+      padding: @padding-small-horizontal @padding-base-vertical;
+      background-color: fade(@gray-lighter, 85%);
+      z-index: 1000;
+      opacity: 0.5;
+   }
+   &.helper, .helper {
+      position: relative;
+   }
+}
+
+.button-remove-pointer {
+   cursor: no-drop;
+}
