@@ -122,15 +122,6 @@ class Form extends TrObject implements ArrayAccess, Iterator {
    }
 
    /**
-    * Metoda vytvoří řetězec s formulářem, pro použití v šabloně
-    * @param Form_Decorator $decorator -- objekt dekorátoru
-    * @return string -- formulář jako řetězec
-    */
-   private function creatString(Form_Decorator_Interface $decorator = null) {
-      
-   }
-
-   /**
     * Metoda vykreslí skripty formuláře
     */
    public function scripts() {
