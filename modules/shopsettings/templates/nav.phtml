@@ -1,9 +1,9 @@
 <?php 
-$this->items = array();
-$this->items[$this->tr('Základní')] = (string) $this->link()->route();
-$this->items[$this->tr('Měna a daně')] = (string) $this->link()->route('currencyAndTaxes');
-$this->items[$this->tr('Platby a dopravy')] = (string) $this->link()->route('shipAndPay');
-$this->items[$this->tr('Objednávky')] = (string) $this->link()->route('orders');
-$this->items[$this->tr('Stavy objednávek')] = (string) $this->link()->route('orderStates');
+$items = array();
+$items[$this->tr('Základní')] = (string) $this->link()->route();
+$items[$this->tr('Měna a daně')] = (string) $this->link()->route('currencyAndTaxes');
+$items[$this->tr('Platby a dopravy')] = (string) $this->link()->route('shipAndPay');
+$items[$this->tr('Objednávky')] = (string) $this->link()->route('orders');
+$items[$this->tr('Stavy objednávek')] = (string) $this->link()->route('orderStates');
 
-$this->includeFile('tpl://engine:modules/navigation.phtml');
+$this->includeFile('tpl://engine:modules/navigation.phtml', array('items' => $items));
