@@ -22,10 +22,10 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
             <div class="cubecms-list-row slide-image-row cubecms-tabs" id="image-<?php echo $img->getPK() ?>" data-id="<?php echo $img->getPK() ?>">
                <ul class="nav nav-tabs" role="tablist">
                   <li role="presentation" class="active">
-                     <a aria-controls="preview-<?php echo $img->getPK() ?>" role="tab" data-toggle="tab"
+                     <a aria-controls="preview-<?php echo $img->getPK() ?>" role="tab" data-toggle="tab" data-tab="preview"
                         href="<?php echo $this->link() ?>#preview-<?php echo $img->getPK() ?>"><?php ps($this->tr('Náhled')) ?></a></li>
                   <li role="presentation" >
-                     <a aria-controls="preview-<?php echo $img->getPK() ?>" role="tab" data-toggle="tab"
+                     <a aria-controls="preview-<?php echo $img->getPK() ?>" role="tab" data-toggle="tab" data-tab="edit"
                         href="<?php echo $this->link() ?>#edit-<?php echo $img->getPK() ?>"
                         ><?php ps($this->tr('Úprava')) ?></a></li>
                   <li class="tab-tools" >
@@ -34,7 +34,7 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
                      </a>
                      <a class="button-changestate" data-id="<?php echo $img->getPK() ?>" href="<?php echo $this->link() ?>#changestate-<?php echo $img->getPK() ?>">
                         <span class="icon icon-fw <?php echo $img->{HPSlideShow_Model::COLUMN_ACTIVE} ? 'icon-check-square-o' : 'icon-square-o' ?>"></span></a>
-                     <a class="button-delete" data-id="<?php echo $img->getPK() ?>" href="<?php echo $this->link() ?>#delete-<?php echo $img->getPK() ?>">
+                     <a class="button-delete button-remove-pointer"  data-id="<?php echo $img->getPK() ?>" href="<?php echo $this->link() ?>#delete-<?php echo $img->getPK() ?>">
                         <span class="icon icon-fw icon-remove text-danger"></span></a>
                   </li>
                </ul>
@@ -66,6 +66,9 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
                      $this->formEdit->catId->setValues($img->{HPSlideShow_Model::COLUMN_ID_CAT});
                      $this->formEdit->link->setValues($img->{HPSlideShow_Model::COLUMN_LINK});
                      $this->formEdit->label->setValues($img->{HPSlideShow_Model::COLUMN_LABEL});
+                     $this->formEdit->slogan_background->setValues($img->{HPSlideShow_Model::COLUMN_SLOGAN_BACKGROUND});
+                     $this->formEdit->valid_from->setValues(Utils_DateTime::fdate('%x', $img->{HPSlideShow_Model::COLUMN_VALID_FROM}, false));
+                     $this->formEdit->valid_to->setValues(Utils_DateTime::fdate('%x', $img->{HPSlideShow_Model::COLUMN_VALID_TO}, false));
                      echo $this->formEdit;
                      ?>
                   </div>
@@ -78,10 +81,6 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
       </div>
       <script type="text/javascript">
          $(document).ready(function () {
-   //            $('.cubecms-tabs .nav-tabs a').click(function (e) {
-   //              e.preventDefault();
-   //              $(this).tab('show');
-   //            });
             $("#images-list").sortable({
                placeholder: "cubecms-state-highlight",
                axis: "y",
@@ -105,7 +104,7 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
                if (!confirm('<?php ps($this->tr('Opravdu smazat obrázek?')) ?>')) {
                   return false;
                }
-               var $li = $(this).closest('li.slide-image-row');
+               var $li = $(this).closest('.slide-image-row');
                var id = $(this).data("id");
                $.ajax({
                   type: "POST",
@@ -140,6 +139,22 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
             });
 
             $('input[name="img_edit_save"]').after($('<img src="images/progress_small.gif" />').addClass('loader').hide());
+            
+            var tabsOpened = {};
+            if(localStorage.getItem('hpslideshow_edit_tabs') !== null){
+               tabsOpened = JSON.parse(localStorage.getItem('hpslideshow_edit_tabs'));
+               $.each(tabsOpened, function(index, tab){
+                  $('div#image-' + index).find('.nav-tabs a[data-tab="'+tab+'"]').click();
+               });
+            }
+            
+            $('.slide-image-row .nav-tabs').on('click', 'a[role="tab"]', function (e) {
+               tabsOpened[$(this).closest('.cubecms-tabs').data('id')] = $(this).data('tab');
+               localStorage.setItem("hpslideshow_edit_tabs", JSON.stringify(tabsOpened));
+            });
+            
+            
+            
          });
       </script>
    <?php } else { ?>
