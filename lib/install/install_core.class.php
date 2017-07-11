@@ -191,6 +191,8 @@ class Install_Core {
          ){
             $isMainSite = false;
          }
+         
+         $recVer = Model_Config::getInstance()->where(Model_Config::COLUMN_KEY.' = :key', array('key' => 'VERSION'))->record();
 
          foreach($upgradeVersions as $version){
             /* php prepare update */
@@ -231,11 +233,11 @@ class Install_Core {
                if (is_file($phpDir.$phpFile)) {
                   include $phpDir.$phpFile;
                }
-
-               $modelCfg
-                  ->where(Model_Config::COLUMN_KEY.' = :key', array('key' => 'VERSION'))
-                  ->update(array(Model_Config::COLUMN_VALUE => $version));
+               
+               $recVer->{Model_Config::COLUMN_VALUE} = $version;
+               $recVer->save();
             } catch (Exception $exc) {
+               var_dump($exc);die;
                echo 'ERROR: Chyba při aktualizaci<br />';
                echo $exc->getMessage().'<br />';
                echo "DEBUG: <br/ >";
@@ -244,7 +246,7 @@ class Install_Core {
             }
          }
       }
-//die;
+
       Install_Module::updateAllModules();
       // update subdomains
       $this->updateSubdomains();
@@ -294,6 +296,7 @@ class Install_Core {
          $sql = $this->replaceDBPrefix($sql);
 //          echo nl2br("-- SQL Update :\n ".$sql).'<br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />';
 //          echo $sql;
+//         print_r(nl2br($sql));die;
          $this->runSQLCommand($sql);
 
          if (!feof($handle)) {
@@ -376,10 +379,10 @@ class Install_Core {
    protected function runSQLCommand($SQL)
    {
       $model = new Model_DbSupport();
-      $stmt = $model->runSQL($SQL);
-      if(!$stmt){
-         throw new PDOException('Undefined SQL error: '.$stmt->errorInfo(). "\n" .
-            'SQL: '.$SQL);
+      $ret = $model->execSQL($SQL);
+      
+      if($ret === false){
+         throw new PDOException('Undefined SQL error: '. "\n" . 'SQL: '.$SQL);
       }
    }
 
