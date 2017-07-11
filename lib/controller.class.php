@@ -657,6 +657,16 @@ abstract class Controller extends TrObject {
          extendCategorySettings($this->category, $form, $settings, $this->translator);
       }
       
+      /* @var $form Form */
+      if($this->category()->getId() != Category::getSelectedCategory()->getId()){
+         $toCategory = new Form_Element_Checkbox('redirectToCategory', $this->tr('Přijít do kategorie po uložení'));
+         if(defined('CUBE_CMS_SHOW_CATEGORY_AFTER_CREATE')){
+            $toCategory->setValues((bool)CUBE_CMS_SHOW_CATEGORY_AFTER_CREATE);
+         }
+         $form->addElement($toCategory, null, -2);
+      }
+//      var_dump($form);
+      
       /* BUTTONS SAVE AND CANCEL */
       $submitButton = new Form_Element_SaveCancel('send');
       $form->addElement($submitButton);
@@ -704,11 +714,13 @@ abstract class Controller extends TrObject {
          $categoryM->save($catRec);
          $this->infoMsg()->addMessage($this->tr('Nastavení bylo uloženo'));
          $this->log('Upraveno nastavení kategorie "'.$this->category()->getName().'"');
-         $this->link()->route()->reload();
+         if(isset($form->redirectToCategory) && $form->redirectToCategory->getValues() == true){
+            $link = Url_Link::getCategoryLink($this->category()->getId());
+            $link->route()->redirect();
+         }
+         $this->link()->route()->redirect();
       }
-
       $this->view()->form = $form;
-
    }
    
    public function viewMetadataController() 
