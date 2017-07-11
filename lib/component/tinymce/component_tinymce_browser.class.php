@@ -398,8 +398,9 @@ class Component_TinyMCE_Browser extends Component_TinyMCE {
       }
       // kontrola home directory
       if(strpos($item, AppCore::getAppDataDir().Component_TinyMCE_Browser::DIR_HOME
-              .DIRECTORY_SEPARATOR.Auth::getUserName().DIRECTORY_SEPARATOR) === 0){
-         return true; 
+              .DIRECTORY_SEPARATOR.Auth::getUserName().DIRECTORY_SEPARATOR) === 0
+         || strpos($item, AppCore::getAppDataDir().Component_TinyMCE_Browser::DIR_PUBLIC.DIRECTORY_SEPARATOR) === 0){
+         return true;
       }
       if(Auth::isAdmin() && (
           strpos($item, AppCore::getAppDataDir().Component_TinyMCE_Browser::DIR_PUBLIC.DIRECTORY_SEPARATOR) === 0
