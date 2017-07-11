@@ -7,6 +7,10 @@
 class NewsLetter_Controller extends Controller {
    const PARAM_ID_MAIL_GRP = 'mgrpid';
 
+   const FORM_SUBMIT_PREFIX = 'regmail_';
+   const FORM_EMAIL = 'mail';
+   const FORM_SUBMIT = 'send';
+   
    public function mainController() {
       $this->checkReadableRights();
       $newMailForm = $this->createRegMailForm();
@@ -36,17 +40,17 @@ class NewsLetter_Controller extends Controller {
       $this->view()->newMailForm = $newMailForm;
    }
 
-   private function createRegMailForm(){
-      $newMailForm = new Form('regmail_');
-
-      $grp = $newMailForm->addGroup('mailreg', $this->tr('Registrace e-mailu'));
+   public static function createRegMailForm(){
+      $newMailForm = new Form(self::FORM_SUBMIT_PREFIX);
+      $tr = new Translator_Module('newsletter');
+      $grp = $newMailForm->addGroup('mailreg', $tr->tr('Registrace e-mailu'));
       
-      $elemMail = new Form_Element_Text('mail', $this->tr('E-mail'));
+      $elemMail = new Form_Element_Text(self::FORM_EMAIL, $tr->tr('E-mail'));
       $elemMail->addValidation(new Form_Validator_NotEmpty());
       $elemMail->addValidation(new Form_Validator_Email());
       $newMailForm->addElement($elemMail, $grp);
 
-      $elemSend = new Form_Element_Submit('send', $this->tr('Registrovat'));
+      $elemSend = new Form_Element_Submit(self::FORM_SUBMIT, $tr->tr('Registrovat'));
       $newMailForm->addElement($elemSend, $grp);
       return $newMailForm;
    }
@@ -156,5 +160,3 @@ class NewsLetter_Controller extends Controller {
    }
 
 }
-
-?>
