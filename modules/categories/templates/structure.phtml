@@ -8,11 +8,11 @@ function vveCatsRenderFunc($menuArr)
 {
    echo '<ul>';
    foreach ($menuArr as $key => $item) {
-      
-      $data =array(
+
+      $data = array(
           'type' => ($item->isEmpty() ? '' : 'folder'),
           'catid' => $item->getID(),
-          );
+      );
 
       switch ($item->getCatObj()->getModule()->getName()) {
          case 'text':
@@ -43,11 +43,11 @@ function vveCatsRenderFunc($menuArr)
             $data['type'] = 'user';
             break;
       }
-      
-      echo '<li id="cat-id-' . $item->getCatObj()->getId() . '" data-jstree=\''.  json_encode($data).'\'>';
 
+      echo '<li id="cat-id-' . $item->getCatObj()->getId() . '" data-jstree=\'' . json_encode($data) . '\'>';
+      $linkCat = Url_Link::getCategoryLink($item->getCatObj()->getId());
       $name = (string) $item != null ? htmlspecialchars((string) $item) : '<span class="no-original">' . htmlspecialchars($item->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_NAME}[Locales::getDefaultLang()]) . '</span>';
-      echo '<a href="#">' . $name . '&nbsp;' . vve_tpl_show_text_langs($item->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_URLKEY}) . ' - ' . $item->getCatObj()->getId() . '</a>';
+      echo '<a href="#">' . $name . '&nbsp;' . vve_tpl_show_text_langs($item->getCatObj()->getCatDataObj()->{Model_Category::COLUMN_URLKEY}) . ' - ' . $item->getCatObj()->getId() . ' - <span class="icon icon-external-link button-open-link" data-target="'.$linkCat.'"></span></a>';
       if (!$item->isEmpty()) {
          vveCatsRenderFunc($item);
       }
@@ -89,12 +89,12 @@ echo $this->toolbox;
       <input id="checkbox-regen-url" type="checkbox" name="cat_regenerate_urls" checked="checked"
              title="<?php echo $this->tr('Upravít URL adresy kategorie a podkategorií.') ?>" />
    </div>
-   
+
    <div class="row">
       <div class="col-md-8">
          <div id="category-structure-wrap">
             <div id="category-structure" class="">
-            <?php
+               <?php
                if ($this->structure != null) {
                   echo vveCatsRenderFunc($this->structure);
                }
@@ -106,14 +106,13 @@ echo $this->toolbox;
       </div>
    </div>
    <?php
-      $this->includeFile('tpl://engine:components/modal.phtml', 
-         array('content' => (string)$this->formCopy, 
-            'id' => 'copy-cat-dialog',
-            'header' => $this->tr('Kopírování kategorie'),
-            'close' => true,
-            'large' => true,
-            'footer' => '<button class="btn btn-default close-modal">'.$this->tr('Zavřít').'</button>'));
-            ?>
+   $this->includeFile('tpl://engine:components/modal.phtml', array('content' => (string) $this->formCopy,
+       'id' => 'copy-cat-dialog',
+       'header' => $this->tr('Kopírování kategorie'),
+       'close' => true,
+       'large' => true,
+       'footer' => '<button class="btn btn-default close-modal">' . $this->tr('Zavřít') . '</button>'));
+   ?>
    <script type="text/javascript">
       /* <![CDATA[ */
       function getIdCat(str) {
@@ -123,7 +122,7 @@ echo $this->toolbox;
       // načte informace o kategorii a vloží do boxu
       function loadCatinfo(idc) {
          showLoadBox($('#category-info').parent('div'));
-         CubeCMS.Loader.showLoadBox($('#category-info'), '<?php echo $this->tr('Načítám...');?>');
+         CubeCMS.Loader.showLoadBox($('#category-info'), '<?php echo $this->tr('Načítám...'); ?>');
          $.ajax({
             type: "GET", url: "<?php echo $this->link()->route("getCatInfo") ?>", cache: false,
             data: {idc: idc},
@@ -133,95 +132,103 @@ echo $this->toolbox;
             }
          });
       }
+      
+      $('#category-structure').on('click', '.button-open-link', function(e){
+         e.stopPropagation();
+         e.preventDefault();
+         window.open($(this).data('target'),'_blank');
+         return false;
+      });
 
       $('#category-structure')
-      .on('select_node.jstree', function(e, node){
-         loadCatinfo(node.node.data.jstree.catid);
-         $('#button-copy-cat').removeClass('disabled').removeAttr('disabled');
-      })
-      .on('deselect_node.jstree', function(e, node){
-         $('#button-copy-cat').addClass('disabled').attr('disabled', 'disabled');
-      })
-      .bind('move_node.jstree', function(e, node){
-         var parent = $('#category-structure').jstree(true).get_node(node.parent);
-         var newPos = {
-            idc : node.node.data.jstree.catid,
-            parent : node.parent == "#" ? 0 : parent.data.jstree.catid,
-            position : node.position,
-            regenerate : $('input[name=cat_regenerate_urls]').is(':checked')
-         };
-         //console.log(parent, e, node, newPos);
-         //return;
-         //newPos.idc = getIdCat($(node.rslt.o).attr('id'));
-         //if(node.rslt.cr != -1){newPos.parent = getIdCat($(node.rslt.cr).attr('id'));}
-         //newPos.position = node.rslt.cp;
-         showLoadBox('#category-structure');
-         $.ajax({
-            type: "POST", url: "<?php echo $this->link()->route("moveCat") ?>",
-            data: newPos,
-            success: function(data){
-               CubeCMS.Loader.hideLoadBox();
-               loadCatinfo(newPos.idc);
-            }
-         });
-      })
-      .jstree({
-         core: {
-            animation: 0,
-            "check_callback": true,
-            themes: {
-               name : 'proton',
-               responsive: true
-            }
-         },
-         types: {
-            "#": {
-               "max_children": -1,
-               "max_depth": -1,
-               "valid_children": -1
-            },
-            "root": {
-               icon: "icon icon-globe",
-               "valid_children": -1
-            },
-            "default": {
-               icon: "icon icon-file-o",
-               "valid_children": -1
-            },
-            "text": {
-               icon: "icon icon-file-text-o",
-               "valid_children": -1
-            },
-            "articles": {
-               icon: "icon icon-files-o",
-               "valid_children": -1
-            },
-            "photogalery": {
-               icon: "icon icon-file-image-o",
-               "valid_children": -1
-            },
-            "sitemap": {
-               icon: "icon icon-sitemap",
-               "valid_children": -1
-            },
-            "blocks": {
-               icon: "icon icon-cubes",
-               "valid_children": -1
-            },
-            "form": {
-               icon: "icon icon-list-alt",
-               "valid_children": -1
-            },
-            "user": {
-               icon: "icon icon-user",
-               "valid_children": -1
-            }
-         },
-         "plugins": [
-            "dnd", "themes", "types"
+              .on('select_node.jstree', function (e, node) {
+                 loadCatinfo(node.node.data.jstree.catid);
+                 $('#button-copy-cat').removeClass('disabled').removeAttr('disabled');
+              })
+              .on('deselect_node.jstree', function (e, node) {
+                 $('#button-copy-cat').addClass('disabled').attr('disabled', 'disabled');
+              })
+              .bind('move_node.jstree', function (e, node) {
+                 var parent = $('#category-structure').jstree(true).get_node(node.parent);
+                 var newPos = {
+                    idc: node.node.data.jstree.catid,
+                    parent: node.parent == "#" ? 0 : parent.data.jstree.catid,
+                    position: node.position,
+                    regenerate: $('input[name=cat_regenerate_urls]').is(':checked')
+                 };
+                 //console.log(parent, e, node, newPos);
+                 //return;
+                 //newPos.idc = getIdCat($(node.rslt.o).attr('id'));
+                 //if(node.rslt.cr != -1){newPos.parent = getIdCat($(node.rslt.cr).attr('id'));}
+                 //newPos.position = node.rslt.cp;
+                 showLoadBox('#category-structure');
+                 $.ajax({
+                    type: "POST", url: "<?php echo $this->link()->route("moveCat") ?>",
+                    data: newPos,
+                    success: function (data) {
+                       CubeCMS.Loader.hideLoadBox();
+                       loadCatinfo(newPos.idc);
+                    }
+                 });
+              })
+              .jstree({
+                 core: {
+                    animation: 0,
+                    "check_callback": true,
+                    themes: {
+                       name: 'proton',
+                       responsive: true
+                    }
+                 },
+                 types: {
+                    "#": {
+                       "max_children": -1,
+                       "max_depth": -1,
+                       "valid_children": -1
+                    },
+                    "root": {
+                       icon: "icon icon-globe",
+                       "valid_children": -1
+                    },
+                    "default": {
+                       icon: "icon icon-file-o",
+                       "valid_children": -1
+                    },
+                    "text": {
+                       icon: "icon icon-file-text-o",
+                       "valid_children": -1
+                    },
+                    "articles": {
+                       icon: "icon icon-files-o",
+                       "valid_children": -1
+                    },
+                    "photogalery": {
+                       icon: "icon icon-file-image-o",
+                       "valid_children": -1
+                    },
+                    "sitemap": {
+                       icon: "icon icon-sitemap",
+                       "valid_children": -1
+                    },
+                    "blocks": {
+                       icon: "icon icon-cubes",
+                       "valid_children": -1
+                    },
+                    "form": {
+                       icon: "icon icon-list-alt",
+                       "valid_children": -1
+                    },
+                    "user": {
+                       icon: "icon icon-user",
+                       "valid_children": -1
+                    }
+                 },
+                 "plugins": [
+                    "dnd", "themes", "types", "state"
 //            , "wholerow"
-         ]
-      });
+                 ],
+                 "state": {"key": "cubecms_cat_struct"}
+              });
 
       // změna panelů
       $('input[name=cat_ind_panels]').live('change', function () {
@@ -242,7 +249,7 @@ echo $this->toolbox;
       $('form[name=form-edit], form[name=form-settings]').submit(function () {
          // doplnění id
          if (typeof ($('#category-structure').jstree("get_selected")) != "undefined") {
-            var id = $('#'+$('#category-structure').jstree("get_selected")).data('jstree').catid;
+            var id = $('#' + $('#category-structure').jstree("get_selected")).data('jstree').catid;
             this.action = decodeURI(this.action).replace('-ID-', id);
             return true;
          }
@@ -251,16 +258,16 @@ echo $this->toolbox;
       // přidání kategorie (pokud je vybraná přidáme id)
       $('form[name=form-add]').submit(function () {
          // doplnění id
-         
+
          if (typeof ($('#category-structure').jstree("get_selected")) != "undefined") {
-            var id = $('#'+$('#category-structure').jstree("get_selected")).data('jstree').catid;
+            var id = $('#' + $('#category-structure').jstree("get_selected")).data('jstree').catid;
             this.action = '<?php echo $this->link()->route('add') ?>?id=' + id;
          }
          return true;
       });
       // mazání
       $('form[name=form-delete]').submit(function () {
-         var node = $('#'+$('#category-structure').jstree("get_selected"));
+         var node = $('#' + $('#category-structure').jstree("get_selected"));
          if (node.length == 0)
             return false;
          var q = '<?php echo $this->tr('Oprvadu odstranit kategorii "%s"? (Odstraní se také její potomci.)') ?>';
@@ -292,7 +299,7 @@ echo $this->toolbox;
          $('#copy-cat-dialog').show();
          // add id to form
          $('#copy-cat-dialog').find('input[name="cat_copy_id"]')
-                 .val($('#'+$('#category-structure').jstree("get_selected")).data('jstree').catid);
+                 .val($('#' + $('#category-structure').jstree("get_selected")).data('jstree').catid);
       });
       /* ]]> */
    </script>
