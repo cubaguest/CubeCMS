@@ -16,6 +16,22 @@ SET time_zone = "+00:00";
 
 -- --------------------------------------------------------
 
+INSERT INTO `{PREFIX}config` (`key`, `label`, `value`, `values`, `protected`, `type`, `id_group`, `callback_func`, `hidden_value`) VALUES
+('SHOP', 'Zapnutí podpory pro e-shop', 'true', NULL, 0, 'bool', 10, NULL, 0),
+('SHOP_CURRENCY_NAME', 'Náze měny (Kč, $, ...)', 'Kč', NULL, 0, 'string', 10, NULL, 0),
+('SHOP_CURRENCY_CODE', 'Kód měny (USD, CZK, ...)', 'CZK', NULL, 0, 'string', 10, NULL, 0),
+('SHOP_FREE_SHIPPING', 'Doprava zdarma od (-1 pro vypnutí)', '-1', NULL, 0, 'number', 10, NULL, 0),
+('SHOP_NEWSLETTER_GROUP_ID', 'Id skupiny, kam se mají řadit maily pro newsletter', '17', NULL, 0, 'number', 10, NULL, 0),
+('SHOP_ORDER_STATUS', 'Stavy objednávek', 'přijato;odesláno;zrušeno;zaplaceno;vráceno;zabaleno', NULL, 0, 'string', 10, NULL, 0),
+('SHOP_ORDER_DEFAULT_STATUS', 'Výchozí status objednávky', 'přijato', NULL, 0, 'string', 10, NULL, 0),
+('SHOP_STORE_ADDRESS', 'Adresa obchodu', 'Ulice 123\r\nValašské Meziříčí\r\n75701', NULL, 0, 'string', 10, NULL, 0),
+('SHOP_ORDER_MAIL', 'E-Mailová adresa, do které budou přeposílány e-maily o nových objednávkách.', 'shop@domain.com', NULL, 0, 'string', 10, NULL, 0),
+('SHOP_CUSTOMERS_GROUP_ID', 'ID uživatelské skupiny se zákazníky.', '5', NULL, 0, 'number', 10, NULL, 0),
+('SHOP_CUSTOMERS_DEFAULT_GROUP_ID', 'ID výchozí skupiny zákazníka.', '1', NULL, 0, 'number', 10, NULL, 0),
+('SHOP_ALLOW_BUY_NOT_IN_STOCK', 'Povolení prodeje pokud zboží není skladem.', 'true', NULL, 0, 'bool', 10, NULL, 0),
+('SHOP_PRICE_ROUND_DECIMAL', 'Počet míst zaokrouhlení ceny.', '0', NULL, 0, 'number', 10, NULL, 0),
+('SHOP_PRICE_DECIMALS', 'Počet desetiných míst ceny.', '0', NULL, 0, 'number', 10, NULL, 0);
+
 --
 -- Struktura tabulky `{PREFIX}shop_attributes`
 --

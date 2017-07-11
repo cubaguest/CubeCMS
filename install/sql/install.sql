@@ -46,7 +46,7 @@ INSERT INTO `cubecms_global_config` (`id_config`, `key`, `label`, `value`, `valu
 (6, 'IMAGES_DIR', NULL, 'images', NULL, 0, 'string', 3, NULL, 0),
 (7, 'IMAGES_LANGS_DIR', NULL, 'langs', NULL, 0, 'string', 3, NULL, 0),
 (8, 'DEBUG_LEVEL', 'Režim ladění stránek (0 pro vypnutí)', '2', NULL, 0, 'number', 3, NULL, 0),
-(9, 'TEMPLATE_FACE', 'Název vzhledu stránek', 'default', NULL, 0, 'string', 4, NULL, 0),
+(9, 'TEMPLATE_FACE', 'Název vzhledu stránek', 'bootstrap', NULL, 0, 'string', 4, NULL, 0),
 (10, 'SITEMAP_PERIODE', 'Výchozí položka pro změnu mapy stránek pro vyhledávače', 'weekly', NULL, 0, 'string', 5, NULL, 0),
 (11, 'SEARCH_RESULT_LENGHT', 'Délka řetězce s výsledkem hledání', '300', NULL, 0, 'number', 9, NULL, 0),
 (12, 'SEARCH_HIGHLIGHT_TAG', 'Název tagu, který se užívá pro zvýraznění slova ve výsledcích hledání', 'strong', NULL, 0, 'string', 9, NULL, 0),
