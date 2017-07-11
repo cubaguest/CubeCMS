@@ -53,12 +53,22 @@ class Form_Element_DateTime extends Form_Element_Text {
    public function setMinDate(DateTime $date = null)
    {
       $this->minDate = $date;
+      if($date != null){
+         $this->addValidation(new Form_Validator_DateMin($date));
+      } else {
+         $this->removeValidation(Form_Validator_DateMin::class);
+      }
       return $this;
    }
    
    public function setMaxDate(DateTime $date = null)
    {
       $this->maxDate = $date;
+      if($date != null){
+         $this->addValidation(new Form_Validator_DateMax($date));
+      } else {
+         $this->removeValidation(Form_Validator_DateMax::class);
+      }
       return $this;
    }
    
@@ -91,8 +101,7 @@ class Form_Element_DateTime extends Form_Element_Text {
       $this->unfilteredValues = $values;
       return parent::control($renderKey);
    }
-   
-   
+
    public function scripts($renderKey = null)
    {
       $jsPicker = new JsPlugin_BootstrapDatepicker();
