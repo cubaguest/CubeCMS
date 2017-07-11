@@ -7,7 +7,7 @@ SET @s = (SELECT IF(
         AND column_name = 'lang'
     ) = 1,
     "SELECT 1",
-    "ALTER TABLE `{PREFIX}templates` ADD COLUMN `lang` VARCHAR(5) NULL DEFAULT NULL;"
+    "ALTER TABLE `{PREFIX}templates` ADD COLUMN `lang` VARCHAR(5) NULL DEFAULT NULL"
 ));
 
 PREPARE stmt FROM @s;

@@ -1,0 +1,2 @@
+Vylepšení:
+- Výchozí modul pro daný vhled
