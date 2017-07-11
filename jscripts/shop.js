@@ -40,7 +40,10 @@ CubeCMS.Shop = {
       });
       return code;
    },
-   getFormattedPrice : function(price){
+   getFormattedPrice : function(price, currency){
+      if(typeof (currency) == "undefined"){
+         currency = true;
+      }
       price = parseFloat(price);
       // zaokrouhlení
       if(this.roundDecimals > 0){
@@ -49,7 +52,7 @@ CubeCMS.Shop = {
          price = Math.round(price);
       }
       // úprava desetiných míst
-      return price.toFixed(this.decimals).toString().replace('.', ',') + " " + CubeCMS.Shop.currency;
+      return price.toFixed(this.decimals).toString().replace('.', ',') + (currency ? " " + CubeCMS.Shop.currency : '' );
    }
 }
 
