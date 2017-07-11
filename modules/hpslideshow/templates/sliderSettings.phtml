@@ -1,0 +1,10 @@
+<?php
+$this->addFile("css://style.less");
+?>
+<h1><?php echo $this->category()->getName(); ?> - <?php ps($this->tr('nastavení slideru')) ?></h1>
+<div class="content-admin">
+   <?php $this->includeFile('tpl://nav.phtml');?>
+   <div>
+      <?php echo $this->formSliderSettings ?>
+   </div>
+</div>

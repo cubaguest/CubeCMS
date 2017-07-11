@@ -1,28 +1,33 @@
 <div id="hp-slideshow">
-   <?php 
+   <?php
    $link = new Url_Link(true);
    foreach ($this->images as $img) {
-   // prepare link
-   $href = (string)vve_get_lang_string($img->{HPSlideShow_Model::COLUMN_LINK});
-   if($img->{HPSlideShow_Model::COLUMN_ID_CAT} != 0){
-      $href = $link->category($img->{Model_Category::COLUMN_URLKEY});
-   }
-   $label = (string)vve_get_lang_string($img->{HPSlideShow_Model::COLUMN_LABEL});
-   ?>
-   <div class="slide">
-      <?php  if($href != null){?>
-      <a href="<?php echo $href?>">
-      <?php }?>
-      <img src="<?php echo $this->imagesUrl.$img->{HPSlideShow_Model::COLUMN_FILE};?>" />
-      <?php  if($href != null){?>
-      </a>
-      <?php }?>
-      <?php if($label != null){?>
-      <div class="text-content"><?php echo $label?></div>
-      <?php }?>
-   </div>
-   <?php }?>
+      // prepare link
+      $href = (string) vve_get_lang_string($img->{HPSlideShow_Model::COLUMN_LINK});
+      if ($img->{HPSlideShow_Model::COLUMN_ID_CAT} != 0) {
+         $href = $link->category($img->{Model_Category::COLUMN_URLKEY});
+      }
+      $label = (string) vve_get_lang_string($img->{HPSlideShow_Model::COLUMN_LABEL});
+      ?>
+      <div class="slide">
+         <?php if ($href != null) { ?>
+            <a href="<?php echo $href ?>">
+            <?php } ?>
+            <img src="<?php echo $this->imagesUrl . $img->{HPSlideShow_Model::COLUMN_FILE}; ?>" />
+            <?php if ($href != null) { ?>
+            </a>
+         <?php } ?>
+         <?php if ($label != null) { ?>
+            <div class="text-content"><?php echo $label ?></div>
+         <?php } ?>
+      </div>
+   <?php } ?>
 </div>
 <script type="text/javascript">
-   $(document).ready(function(){ $('#hp-slideshow').cubeHPSlider(); });
+   $(document).ready(function () {
+      $('#hp-slideshow').cubeHPSlider({
+         speed: <?php echo (int)HPSlideShow_Controller::getSliderOption('speed') ?>,
+         delay: <?php echo (int)HPSlideShow_Controller::getSliderOption('delay') ?>
+      });
+   });
 </script>

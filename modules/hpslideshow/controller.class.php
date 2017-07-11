@@ -29,44 +29,6 @@ class HPSlideShow_Controller extends Controller {
          return;
       }
 
-      $formUpload = new Form('upload_');
-      $grp = $formUpload->addGroup('file', $this->tr('Nahrání obrázků'));
-
-      $elemFile = new Form_Element_File('images', $this->tr('Obrázky'));
-      $elemFile->setMultiple(true);
-      $elemFile->addValidation(new Form_Validator_FileExtension('jpg;png'));
-      $formUpload->addElement($elemFile, $grp);
-
-      $elemUpload = new Form_Element_Submit('upload', $this->tr('Nahrát'));
-      $formUpload->addElement($elemUpload, $grp);
-
-      if ($formUpload->isValid()) {
-         $model = new HPSlideShow_Model();
-
-         $images = $formUpload->images->getValues();
-         $anchorStep = false;
-         foreach ($images as $sendImg) {
-            $imgRec = $model->newRecord();
-            $imgRec->{HPSlideShow_Model::COLUMN_ORDER} = 0;
-            $imgRec->save();
-            // resize?
-            $image = new File_Image($sendImg);
-            $image->move($this->module()->getDataDir())->rename($imgRec->getPK() . '.' . $image->getExtension());
-            $image->getData()
-                    ->resize($dimensions['width'], $dimensions['height'], File_Image_Base::RESIZE_CROP)
-                    ->save();
-
-            $imgRec->{HPSlideShow_Model::COLUMN_FILE} = $imgRec->getPK() . '.' . $image->getExtension();
-            $imgRec->save();
-            if(!$anchorStep){
-               $anchorStep = $imgRec->getPK();
-            }
-         }
-         $this->infoMsg()->addMessage($this->tr('Obrázky byly nahrány'));
-         $this->link()->anchor('image-'.$anchorStep)->redirect();
-      }
-      $this->view()->formUpload = $formUpload;
-
       $formEdit = new Form('img_edit_');
       $formEdit->addElement(new Form_Element_Hidden('id'));
 
@@ -152,7 +114,6 @@ class HPSlideShow_Controller extends Controller {
 
       $this->view()->formEdit = $formEdit;
 
-
       // load images
       $model = new HPSlideShow_Model();
       $this->view()->images = $model
@@ -161,6 +122,81 @@ class HPSlideShow_Controller extends Controller {
               ->records();
 
       $this->view()->imagesUrl = $this->module()->getDataDir(true);
+   }
+
+   public function addSliderImageController()
+   {
+      $dimensions = $this->category()->getParam('dimensions');
+      $formUpload = new Form('upload_');
+      $grp = $formUpload->addGroup('file', $this->tr('Nahrání obrázků'));
+
+      $elemFile = new Form_Element_File('images', $this->tr('Obrázky'));
+      $elemFile->setMultiple(true);
+      $elemFile->addValidation(new Form_Validator_FileExtension('jpg;png'));
+      $formUpload->addElement($elemFile, $grp);
+
+      $elemUpload = new Form_Element_Submit('upload', $this->tr('Nahrát'));
+      $formUpload->addElement($elemUpload, $grp);
+
+      if ($formUpload->isValid()) {
+         $model = new HPSlideShow_Model();
+
+         $images = $formUpload->images->getValues();
+         $anchorStep = false;
+         foreach ($images as $sendImg) {
+            $imgRec = $model->newRecord();
+            $imgRec->{HPSlideShow_Model::COLUMN_ORDER} = 0;
+            $imgRec->save();
+            // resize?
+            $image = new File_Image($sendImg);
+            $image->move($this->module()->getDataDir())->rename($imgRec->getPK() . '.' . $image->getExtension());
+            $image->getData()
+                    ->resize($dimensions['width'], $dimensions['height'], File_Image_Base::RESIZE_CROP)
+                    ->save();
+
+            $imgRec->{HPSlideShow_Model::COLUMN_FILE} = $imgRec->getPK() . '.' . $image->getExtension();
+            $imgRec->save();
+            if (!$anchorStep) {
+               $anchorStep = $imgRec->getPK();
+            }
+         }
+         $this->infoMsg()->addMessage($this->tr('Obrázky byly nahrány'));
+         $this->link()->route()->anchor('image-' . $anchorStep)->redirect();
+      }
+      $this->view()->formUpload = $formUpload;
+   }
+
+   public function sliderSettingsController()
+   {
+      $options = Face::getCurrent()->getParam('options', 'hpslideshow', array());
+      if (!empty($options)) {
+         $form = new Form('slider_setting_');
+
+         foreach ($options as $element) {
+            $element->setValues(self::getSliderOption($element->getName(false)));
+            $form->addElement($element);
+         }
+         $form->addElement(new Form_Element_Submit('save', $this->tr('Uložit')));
+
+         if ($form->isValid()) {
+            foreach ($form as $element) {
+               /* @var $element Form_Element */
+               if ($element instanceof Form_Element_Text || $element instanceof Form_Element_TextArea || $element instanceof Form_Element_Select
+               ) {
+                  $value = $element->getValues();
+                  Model_Config::setValue('HP_SLIDER_' . strtoupper($element->getName(false)), $value, Model_Config::TYPE_STRING, 4);
+               }
+            }
+            $this->infoMsg()->addMessage($this->tr('Nastavení bylo uloženo'));
+            $this->link()->redirect();
+         }
+         $this->view()->formSliderSettings = $form;
+      }
+   }
+
+   public static function getSliderOption($name, $default = false)
+   {
+      return Model_Config::getValue('HP_SLIDER_' . strtoupper($name), $default);
    }
 
    public function editImageController()

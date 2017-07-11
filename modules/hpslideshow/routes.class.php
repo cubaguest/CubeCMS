@@ -4,5 +4,7 @@ class HPSlideShow_Routes extends Routes {
 
    function initRoutes() {
       $this->addRoute('editImage', "edit-image.php", 'editImage', 'edit-image.php', "XHR_Respond_VVEAPI");
+      $this->addRoute('addSliderImage');
+      $this->addRoute('sliderSettings');
 	}
 }

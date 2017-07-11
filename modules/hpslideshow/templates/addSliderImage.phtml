@@ -1,0 +1,12 @@
+<?php
+$this->addFile("css://style.less");
+?>
+<h1><?php echo $this->category()->getName(); ?> - <?php ps($this->tr('přidání obrázku')) ?></h1>
+<div class="content-admin">
+   <?php $this->includeFile('tpl://nav.phtml');?>
+   <div id="form-upload">
+      <?php
+      echo $this->formUpload;
+      ?>
+   </div>
+</div>

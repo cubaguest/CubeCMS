@@ -10,12 +10,7 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
 ?>
 <h1><?php echo $this->category()->getName(); ?></h1>
 <div class="content-admin">
-   <div id="form-upload">
-      <?php
-      echo $this->formUpload;
-      ?>
-   </div>
-   <h2><?php ps($this->tr('Nahrané obrázky')) ?></h2>
+   <?php $this->includeFile('tpl://nav.phtml');?>
    <?php if (!empty($this->images)) { ?>
       <div id="images-list" class="cubecms-list cubecms-list-blocks">
          <?php foreach ($this->images as $img) { ?>
@@ -29,7 +24,7 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
                         href="<?php echo $this->link() ?>#edit-<?php echo $img->getPK() ?>"
                         ><?php ps($this->tr('Úprava')) ?></a></li>
                   <li class="tab-tools" >
-                     <a href="#" style="cursor: ns-resize;">
+                     <a href="#" class="button-sort-v-pointer">
                         <span class="button-move"><span class="icon  icon-fw icon-arrows-v"></span></span>
                      </a>
                      <a class="button-changestate" data-id="<?php echo $img->getPK() ?>" href="<?php echo $this->link() ?>#changestate-<?php echo $img->getPK() ?>">
@@ -73,14 +68,12 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
                      ?>
                   </div>
                </div>
-               <div class="slide-buttons">
-
-               </div>
             </div>
          <?php } ?>
       </div>
       <script type="text/javascript">
          $(document).ready(function () {
+            $(".nav-tabs .button-sort-v-pointer").on('click', function(){ return false;});
             $("#images-list").sortable({
                placeholder: "cubecms-state-highlight",
                axis: "y",

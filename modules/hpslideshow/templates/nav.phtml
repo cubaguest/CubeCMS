@@ -1,0 +1,16 @@
+<?php 
+$items = array();
+$items[$this->tr('Úprava položek slideru')] = array(
+    'link' => (string) $this->link()->route(),
+    'icon' => Template_Toolbox2::ICON_PAGE_EDIT ,
+   );
+$items[$this->tr('Přidání obrázku slideru')] =  array(
+    'link' => (string) $this->link()->route('addSliderImage'),
+    'icon' => Template_Toolbox2::ICON_ADD ,
+   );
+$items[$this->tr('Nastavení slideru')] =  array(
+    'link' => (string) $this->link()->route('sliderSettings'),
+    'icon' => Template_Toolbox2::ICON_COG ,
+   );
+
+$this->includeFile('tpl://engine:modules/navigation.phtml', array('items' => $items, 'short' => false));
