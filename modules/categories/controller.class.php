@@ -314,6 +314,10 @@ class Categories_Controller extends Controller {
       $categoryModel = new Model_Category();
       $form = $this->createForm();
 
+      $appendToBegin = new Form_Element_Checkbox('appendToBegin', $this->tr('Zařadit kategorii na začátek, jako první ve stromu'));
+      $appendToBegin->setValues(true);
+      $form->addElement($appendToBegin, 'settings', 1);
+      
       $form->gotoSettings->setValues(true);
 
       // kategorie
@@ -322,7 +326,7 @@ class Categories_Controller extends Controller {
       $this->catsToArrayForForm($structure);
       $form->parent_cat->setOptions($this->categoriesArray);
 
-      $form->module->setValues('text');
+      $form->module->setValues(defined('CUBE_CMS_DEFAULT_MODULE') ? CUBE_CMS_DEFAULT_MODULE : 'text');
       if($this->getRequestParam('id', 0) != 0){
          $form->parent_cat->setValues($this->getRequestParam('id',0));
       }
@@ -426,7 +430,7 @@ class Categories_Controller extends Controller {
          // po uložení vložíme do struktury
          if ($lastId !== false) {
             $newStructure = Category_Structure::getStructure(Category_Structure::ALL);
-            $newStructure->addChild(new Category_Structure($lastId), $form->parent_cat->getValues());
+            $newStructure->addChild(new Category_Structure($lastId), $form->parent_cat->getValues(), $form->appendToBegin->getValues() == true ? 0 : -1);
             $newStructure->saveStructure();
          }
  
