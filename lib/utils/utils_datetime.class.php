@@ -35,11 +35,14 @@ class Utils_DateTime {
     * <p>%x - Preferred date representation based on locale, without the time - Example: 02/05/09 for February 5, 2009</p>
     * <p>%X - Preferred time representation based on locale, without the date - Example: 03:59:16 or 15:59:16</p>
     */
-   public static function fdate($format, $timestamp = null)
+   public static function fdate($format, $timestamp = null, $returnCurrent = true)
    {
       if ($timestamp instanceof DateTime) {
          $timestamp = $timestamp->format("U");
       } else if ($timestamp === null) {
+         if(!$returnCurrent){
+            return null;
+         } 
          $timestamp = time();
       } else if (is_string($timestamp)) {
          $timestamp = new DateTime($timestamp);
