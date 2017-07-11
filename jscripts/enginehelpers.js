@@ -303,12 +303,20 @@ CubeCMS.Tools = {
          return true;
       }
       return false;
+   },
+   containsObject : function(obj, list) {
+      var i;
+      for (i = 0; i < list.length; i++) {
+         if (list[i] === obj) { return true; }
+      }
+      return false;
    }
 };
 
 CubeCMS.ToolBox = {
    enablePageTracking: true,
    toolboxTop: 30,
+   boxesPositions : new Array(),
    init: function () {
       var that = this;
       // pokud je ajax, reinicializovat znovu toolboxy, které nejsou
@@ -321,6 +329,13 @@ CubeCMS.ToolBox = {
 
 
       this.initHtml();
+   },
+   containPosition : function(obj, list) {
+      var i;
+      for (i = 0; i < list.length; i++) {
+         if (list[i].top === obj.top && list[i].left === obj.left ) { return true; }
+      }
+      return false;
    },
    initHtml: function () {
       // rodiče musí mít relativní pozici kvůli posunu
@@ -337,6 +352,16 @@ CubeCMS.ToolBox = {
          $(this).prop('id', id);
          $('.toolbox-button', this).prop('id', id + '-button');
          $(this).children('.toolbox-tools').prop('id', id + '-tools');
+         
+         var position = { top : $(this).offset().top, left : $(this).offset().left};
+         if(CubeCMS.ToolBox.containPosition(position, CubeCMS.ToolBox.boxesPositions)){
+            $(this).data('offset-right-multiplier', 1);
+         } else {
+            $(this).data('offset-right-multiplier', 0);
+            CubeCMS.ToolBox.boxesPositions.push({ top : $(this).offset().top, left : $(this).offset().left});
+         }
+         console.log(position);
+         $(this).css('right', 3 + CubeCMS.ToolBox.getToolboxOffset($(this)));
       });
       $('.toolbox>.toolbox-tools').appendTo('body');
 
@@ -351,7 +376,6 @@ CubeCMS.ToolBox = {
          // show toolbox
          var idbase = '#' + $(this).prop('id');
          $(idbase).parent().addClass('toolbox-active-content');
-         console.log(idbase);
          var $toolbox = $(idbase + '-tools');
          $toolbox.css({
             top: $(this).offset().top - 2,
@@ -396,7 +420,7 @@ CubeCMS.ToolBox = {
          var toolbox = $('.toolbox');
          toolbox.each(function () {
             var $container = $(this).parent();
-
+            
             if ($container.is(':visible') // musí být viditelný
                     && $container.offset().top < (top + _this.toolboxTop) // box musí začínat výše než je minimální odsazení (většinou admin menu)
                     && top < ($container.offset().top + $container.height() - _this.toolboxTop - $('.toolbox-button', this).outerHeight())) // ještě není odscrolováno
@@ -411,11 +435,19 @@ CubeCMS.ToolBox = {
                $(this).css({
                   position: "absolute",
                   top: 3,
-                  right: 3, left: "auto"
+                  right: 3 + CubeCMS.ToolBox.getToolboxOffset($(this)), 
+                  left: "auto"
                });
             }
          });
       });
+   },
+   getToolboxOffset: function(toolbox) {
+      var offset = 0;
+      if(toolbox.data('offset-right-multiplier') > 0){
+         offset = toolbox.data('offset-right-multiplier') * toolbox.outerWidth() + 5;
+      }
+      return offset;
    },
    initLangLoader: function () {
       $('body').on('click', 'a.toolbox-changelang-button', function (e) {
