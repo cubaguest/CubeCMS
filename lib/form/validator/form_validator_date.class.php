@@ -10,7 +10,7 @@
  */
 class Form_Validator_Date extends Form_Validator implements Form_Validator_Interface {
 
-   public function  __construct($errMsg = null, $beforeDate = null, $afterDate = null) {
+   public function  __construct($errMsg = null) {
       if($errMsg == null) {
          parent::__construct($this->tr('Nebylo vyplněno korektní datum v položce "%s"'));
       } else {
