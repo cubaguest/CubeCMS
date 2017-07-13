@@ -35,7 +35,7 @@ $this->addJsPlugin(new JsPlugin_JQueryCSS());
                </ul>
                <div class="tab-content">
                   <div role="tabpanel" class="tab-pane active" id="preview-<?php echo $img->getPK() ?>">
-                     <img class="image-slide img-responsive" src="<?php echo $this->imagesUrl . $img->{HPSlideShow_Model::COLUMN_FILE} ?>?t=<?php time() ?>" />
+                     <img class="image-slide img-responsive" src="<?php echo $this->imagesUrl . $img->{HPSlideShow_Model::COLUMN_FILE} ?>?t=<?php echo time() ?>" />
                      <?php if((string)$img->{HPSlideShow_Model::COLUMN_LABEL} != null){?>
                      <div class="image-label"><?php echo vve_get_lang_string($img->{HPSlideShow_Model::COLUMN_LABEL})?></div>
                      <?php }?>
