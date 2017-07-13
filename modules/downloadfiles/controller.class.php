@@ -77,6 +77,10 @@ class DownloadFiles_Controller extends Controller {
             ))
             ->records();
 
+         $modelSec = new DownloadFiles_Model_Sections();
+         $this->view()->sections = $modelSec->where(DownloadFiles_Model_Sections::COLUMN_ID_CATEGORY.' = :idc', array('idc' => $this->category()->getId() ))
+                 ->records();
+         
          $this->view()->files = $files;
          $this->view()->dataDir = $this->module()->getDataDir(true);
       }
