@@ -191,8 +191,12 @@ class Html_Element {
     */
    public function addClass($class)
    {
-      $classes = explode(' ', $class);
-      $this->classes = array_merge($this->classes, $classes);
+      if(is_array($class)){
+         $this->classes = array_merge($this->classes, $class);
+      } else {
+         $classes = explode(' ', $class);
+         $this->classes = array_merge($this->classes, $classes);
+      }
       return $this;
    }
 
@@ -237,6 +241,15 @@ class Html_Element {
    public function clearClasses()
    {
       $this->classes = array();
+   }
+   
+   /**
+    * Metoda vrací třídy prvku
+    * @return array třídy prvku
+    */
+   public function getClasses()
+   {
+      return $this->classes;
    }
 
    /**
