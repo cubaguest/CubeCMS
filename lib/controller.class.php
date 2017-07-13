@@ -663,7 +663,7 @@ abstract class Controller extends TrObject {
          if(defined('CUBE_CMS_SHOW_CATEGORY_AFTER_CREATE')){
             $toCategory->setValues((bool)CUBE_CMS_SHOW_CATEGORY_AFTER_CREATE);
          }
-         $form->addElement($toCategory, null, -2);
+         $form->addElement($toCategory, null, -1);
       }
 //      var_dump($form);
       
