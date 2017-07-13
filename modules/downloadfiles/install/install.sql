@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS `{PREFIX}dwfiles` (
   `id_dwfile` INT NOT NULL AUTO_INCREMENT,
   `id_dwfile_section` INT NULL DEFAULT 1,
-  `id_category` INT NULL DEFAULT 1,
-  `id_user` INT NOT NULL,
+  `id_category` INT NULL DEFAULT 0,
+  `id_user` INT NULL DEFAULT 0,
   `dwfile_name_cs` varchar(200) CHARACTER SET utf8 COLLATE utf8_czech_ci NULL DEFAULT NULL,
   `dwfile_text_cs` varchar(500) CHARACTER SET utf8 COLLATE utf8_czech_ci NULL DEFAULT NULL,
   `dwfile_name_en` varchar(200) CHARACTER SET utf8 NULL DEFAULT NULL,
@@ -33,7 +33,7 @@ INSERT INTO `cubecms_global_config`
 
 CREATE TABLE IF NOT EXISTS `{PREFIX}dwfiles_sections` (
   `id_dwfile_section` INT NOT NULL AUTO_INCREMENT,
-  `id_category` INT NULL,
+  `id_category` INT NOT NULL,
   `dwsection_name_cs` VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_czech_ci DEFAULT NULL,
   `dwsection_name_en` VARCHAR(50) CHARACTER SET utf8 NULL DEFAULT NULL,
   `dwsection_order` INT NULL DEFAULT 0,
