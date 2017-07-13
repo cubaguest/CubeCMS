@@ -9,6 +9,8 @@
    
    $this->form->text->html()->setAttrib('cols', 60)->setAttrib('rows', 40);
    $this->form->send->cancel->html()->addClass('cancel');
+   $this->form->send->cancel->html()->addClass('btn-danger');
+   $this->form->send->save->html()->addClass('btn-success');
    $this->form->send->cancel->html()->setAttrib('onclick', 'return confirm(\''.$this->tr('Opravdu zrušit změny?').'\')');
    if(isset($this->form->send->preview)){
       $this->form->send->preview->html()->addClass('exclusive');

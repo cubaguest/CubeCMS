@@ -322,10 +322,8 @@ class Text_Controller extends Controller {
 
       $submits = new Form_Element_Multi_Submit('send');
       $eCancel = new Form_Element_Submit('cancel', $this->tr('Zrušit'));
-      $eCancel->html()->addClass('btn-danger');
       $submits->addElement($eCancel);
       $eSave = new Form_Element_Submit('save', $this->tr('Uložit'));
-      $eSave->html()->addClass('btn-success');
       $submits->addElement($eSave);
       if(($this->category() instanceof Category_Admin) == false) {
          $ePreview = new Form_Element_Submit('preview', $this->tr('Náhled'));
