@@ -204,7 +204,9 @@ class Form_Decorator_Horizontal extends Form_Decorator implements Form_Decorator
       if($element instanceof Form_Element_Button 
           || $element instanceof Form_Element_Submit
           ){
-         $element->html()->addClass('btn')->addClass('btn-primary');
+         $classes = $element->html()->getClasses();
+         $element->html()->clearClasses();
+         $element->html()->addClass('btn')->addClass('btn-primary')->addClass($classes);
       } 
       // textová pole
       else if(
