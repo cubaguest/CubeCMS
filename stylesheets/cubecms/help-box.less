@@ -1,0 +1,70 @@
+/* Box nápovědy u kategorie */
+@import "variables.less";
+#module-help-box {
+   &:hover {
+      width: 300px;
+   }
+   position: fixed;
+   color: black;
+   top: 30px;
+   right: 5px;
+   border: 1px solid @color-border;
+   width: 150px;
+   color: black;
+   background-color: white;
+   -moz-border-radius: @border-radius;
+   border-radius: @border-radius;
+   
+   -moz-box-shadow:    0px 0px 5px #666666;
+   -webkit-box-shadow: 0px 0px 5px #666666;
+   box-shadow:         0px 0px 5px #666666;
+   
+   height: 90%;
+   overflow: auto;
+   text-align: left;
+   z-index: 2000;
+
+   &.thin {
+      .headline, .content {
+         display: none;
+      }
+      width: 24px;
+      height: 24px;
+      overflow: hidden;
+   }
+   .headline {
+      padding: @padding-widget @padding-widget @padding-widget @padding-widget;
+      font-size: 14px;
+      font-weight: bold;
+      border-bottom: 1px solid @color-border;
+      line-height: 18px;
+/*      color: white;*/
+      display: block;
+   }
+   .content {
+      h1,h2,h3 {
+         margin: 5px 0;
+         font-weight: bold;
+      }
+      h1 {
+         font-size: 18px;
+      }
+      h2 {
+         font-size: 18px;
+      }
+      h3 {
+         font-size: 16px;
+      }
+      padding: @padding-widget;
+      font-size: 14px;
+   }
+   #button-toggle-helpbox {
+      .icon {
+         font-size: 18px;
+      }
+      position: absolute;
+      right: 3px;
+      top: 3px;
+      line-height: 0;
+   }
+}

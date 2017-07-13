@@ -741,53 +741,6 @@ body.mceContentBody, body#tinymce {
    display: table;
    width: 100%;
 }
-/* Box nápovědy u kategorie */
-#module-help-box {
-   position: fixed;
-   color: black;
-   top: 30px;
-   right: 5px;
-   border: 1px solid #666666;
-   width: 150px;
-   color: black;
-   background-color: white;
-   -moz-border-radius: 3px;
-   border-radius: 3px;
-   -moz-box-shadow:    0px 0px 5px #666666;
-   -webkit-box-shadow: 0px 0px 5px #666666;
-   box-shadow:         0px 0px 5px #666666;
-   height: 90%;
-   overflow: auto;
-   text-align: left;
-   z-index: 2000;
-
-   &.thin {
-      width: 22px !important;
-      height: 22px !important;
-      .label, .content {
-         display: none;
-      }
-   }
-   .label {
-      padding: 5px 5px 5px 22px;
-      font-size: 14px;
-      font-weight: bold;
-      border-bottom: 1px solid #666666;
-      line-height: 18px;
-      background: #666666 url('@{dirCoreImages}icons/help.png') 3px 5px no-repeat ;
-      color: white;
-   }
-   .content {
-      padding: 5px;
-      font-size: 80%;
-   }
-   #button-toggle-helpbox {
-      position: absolute;
-      right: 3px;
-      top: 3px;
-      line-height: 0;
-   }
-}
 
 /* stránky se závažnou chybou v šabloně */
 #core-error-page {
