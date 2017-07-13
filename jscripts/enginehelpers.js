@@ -270,12 +270,12 @@ CubeCMS.Tools = {
     * @param Object context - kontext, ve kterém se funkce volá (např window)
     * @returns {unresolved}
     */
-   callFunction: function (functionName, context /*, args */) {
+   callFunction : function(functionName, context /*, args */ ){
       var args = Array.prototype.slice.call(arguments, 2);
       var namespaces = functionName.split(".");
       var func = namespaces.pop();
-      for (var i = 0; i < namespaces.length; i++) {
-         context = context[namespaces[i]];
+      for(var i = 0; i < namespaces.length; i++) {
+        context = context[namespaces[i]];
       }
       return context[func].apply(context, args);
    },
@@ -285,40 +285,76 @@ CubeCMS.Tools = {
     * @param Object context - kontext, ve kterém se funkce volá (např window)
     * @returns {unresolved}
     */
-   functionExist: function (functionName, context) {
-      if (typeof context === undefined) {
+   functionExist : function(functionName, context){
+      if(typeof context === undefined){
          context = window;
       }
       var args = Array.prototype.slice.call(arguments, 2);
       var namespaces = functionName.split(".");
       var func = namespaces.pop();
-      for (var i = 0; i < namespaces.length; i++) {
-         context = context[namespaces[i]];
+      for(var i = 0; i < namespaces.length; i++) {
+        context = context[namespaces[i]];
       }
-
-      if (typeof context === "undefined") {
+      
+      if (typeof context === "undefined") { 
          return false;
       }
-      if (typeof context[func] === "function") {
+      if (typeof context[func] === "function") { 
          return true;
       }
       return false;
    },
-   containsObject: function (obj, list) {
+   containsObject : function(obj, list) {
       var i;
       for (i = 0; i < list.length; i++) {
-         if (list[i] === obj) {
-            return true;
-         }
+         if (list[i] === obj) { return true; }
       }
       return false;
+   },
+   /**
+    * Nastaví danou cookie
+    * @param string name
+    * @param string value
+    * @returns {undefined}
+    */
+   setCookie : function(name, value, expireDays){
+      var expires = "";
+      if (expireDays) {
+          var date = new Date();
+          date.setTime(date.getTime() + (expireDays*24*60*60*1000));
+          expires = "; expires=" + date.toUTCString();
+      }
+      document.cookie = name + "=" + value + expires + "; path=/";
+   },
+   /**
+    * Vrací danou cookie
+    * @param string name
+    * @returns {undefined}
+    */
+   getCookie : function(name){
+      var nameEQ = name + "=";
+      var ca = document.cookie.split(';');
+      for(var i=0;i < ca.length;i++) {
+         var c = ca[i];
+         while (c.charAt(0)==' ') c = c.substring(1,c.length);
+         if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+      }
+      return null;
+   },
+   /**
+    * Vymaže danou cookie
+    * @param string name
+    * @returns {undefined}
+    */
+   clearCookie : function(name){
+      CubeCMS.Tools.setCookie(name,"",-1);
    }
 };
 
 CubeCMS.ToolBox = {
    enablePageTracking: true,
    toolboxTop: 30,
-   boxesPositions: new Array(),
+   boxesPositions : new Array(),
    init: function () {
       var that = this;
       // pokud je ajax, reinicializovat znovu toolboxy, které nejsou
@@ -332,12 +368,10 @@ CubeCMS.ToolBox = {
 
       this.initHtml();
    },
-   containPosition: function (obj, list) {
+   containPosition : function(obj, list) {
       var i;
       for (i = 0; i < list.length; i++) {
-         if (list[i].top === obj.top && list[i].left === obj.left) {
-            return true;
-         }
+         if (list[i].top === obj.top && list[i].left === obj.left ) { return true; }
       }
       return false;
    },
@@ -356,13 +390,13 @@ CubeCMS.ToolBox = {
          $(this).prop('id', id);
          $('.toolbox-button', this).prop('id', id + '-button');
          $(this).children('.toolbox-tools').prop('id', id + '-tools');
-
-         var position = {top: $(this).offset().top, left: $(this).offset().left};
-         if (CubeCMS.ToolBox.containPosition(position, CubeCMS.ToolBox.boxesPositions)) {
+         
+         var position = { top : $(this).offset().top, left : $(this).offset().left};
+         if(CubeCMS.ToolBox.containPosition(position, CubeCMS.ToolBox.boxesPositions)){
             $(this).data('offset-right-multiplier', 1);
          } else {
             $(this).data('offset-right-multiplier', 0);
-            CubeCMS.ToolBox.boxesPositions.push({top: $(this).offset().top, left: $(this).offset().left});
+            CubeCMS.ToolBox.boxesPositions.push({ top : $(this).offset().top, left : $(this).offset().left});
          }
          console.log(position);
          $(this).css('right', 3 + CubeCMS.ToolBox.getToolboxOffset($(this)));
@@ -424,7 +458,7 @@ CubeCMS.ToolBox = {
          var toolbox = $('.toolbox');
          toolbox.each(function () {
             var $container = $(this).parent();
-
+            
             if ($container.is(':visible') // musí být viditelný
                     && $container.offset().top < (top + _this.toolboxTop) // box musí začínat výše než je minimální odsazení (většinou admin menu)
                     && top < ($container.offset().top + $container.height() - _this.toolboxTop - $('.toolbox-button', this).outerHeight())) // ještě není odscrolováno
@@ -439,16 +473,16 @@ CubeCMS.ToolBox = {
                $(this).css({
                   position: "absolute",
                   top: 3,
-                  right: 3 + CubeCMS.ToolBox.getToolboxOffset($(this)),
+                  right: 3 + CubeCMS.ToolBox.getToolboxOffset($(this)), 
                   left: "auto"
                });
             }
          });
       });
    },
-   getToolboxOffset: function (toolbox) {
+   getToolboxOffset: function(toolbox) {
       var offset = 0;
-      if (toolbox.data('offset-right-multiplier') > 0) {
+      if(toolbox.data('offset-right-multiplier') > 0){
          offset = toolbox.data('offset-right-multiplier') * toolbox.outerWidth() + 5;
       }
       return offset;
@@ -769,13 +803,13 @@ CubeCMS.Form = {
          var $box = $form.find('.form-errors');
          $box.html(null);
          $.each(cmsXhrRespond.errmsg, function (index, data) {
-            if (typeof data === 'string') {
+            if(typeof data === 'string'){
                $box.append('<div>' + data + '</div>');
             }
          });
          $box.slideDown(400);
-      }
-      if ($form.find('.form-errors div').length === 0) {
+      } 
+      if($form.find('.form-errors div').length === 0){
          $form.find('.form-errors').hide();
       }
       if (cmsXhrRespond.infomsg.length > 0) {
@@ -803,11 +837,11 @@ CubeCMS.Form = {
             var $form = $(this);
             CubeCMS.Form.hideMessages($form);
             var ajaxObj = {
-               method: 'POST',
+               method : 'POST',
                url: $form.prop('action'),
-               data: $form.serialize() + '&_cubecms_respond_class=', // bez hodnoty je výchozí třída
+               data : $form.serialize()+'&_cubecms_respond_class=', // bez hodnoty je výchozí třída
                success: function (response) {
-                  if (typeof response === 'object') {
+                  if(typeof response === 'object'){
                      var callbackFunction = $form.data('callback');
                      if (typeof callbackFunction !== "undefined" && CubeCMS.Tools.functionExist(callbackFunction)) {
                         CubeCMS.Tools.callFunction($form.data('callback'), window, $form, response);
@@ -827,7 +861,7 @@ CubeCMS.Form = {
    ajaxFormSuccess: function ($form, response) {
       // zobraz zprávy
       // pokud má redirect proměnou, tak přesun na tut adresu
-      if (typeof response.redirect !== "undefined") {
+      if(typeof response.redirect !== "undefined"){
          window.location.replace(response.redirect);
       }
       CubeCMS.Form.setMessages($form, response);
