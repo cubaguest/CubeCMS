@@ -4,3 +4,7 @@
 /backup/*
 /nbproject/
 .project
+/index.sublime-project
+/cubecms.sublime-project
+/cubecms.sublime-workspace
+/index.sublime-workspace
