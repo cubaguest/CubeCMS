@@ -22,6 +22,10 @@ class Utils_Net {
       } elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {   //to check ip is pass from proxy
          $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
       }
+      if(strpos($ip, ',') !== false){
+         $ips = explode(',', $ip);
+         $ip = $ips[0];
+      }
       return $ip;
    }
 
