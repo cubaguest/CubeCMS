@@ -5,7 +5,9 @@
 if(!defined('VVE_APP_IS_RUN')){
    define('VVE_APP_IS_RUN', true);
 }
-define('CUBECMS_LIB_DIR', 'lib');
+if(!defined('CUBECMS_LIB_DIR')){
+   define('CUBECMS_LIB_DIR', 'lib');
+}
 //if(is_link(__FILE__)){
 //   var_dump(readlink(__FILE__));
 //} else {
@@ -39,7 +41,7 @@ if($maintenance){
  * Některé specifické součásti systému, např resizer, odstávka a podobně
  */
 if(isset($_GET['internalApp'])){
-   $appFile = $libDir.DIRECTORY_SEPARATOR.'lib'.DIRECTORY_SEPARATOR.'internalapps'.DIRECTORY_SEPARATOR.$_GET['internalApp'].'.php';
+   $appFile = $libDir.DIRECTORY_SEPARATOR.CUBECMS_LIB_DIR.DIRECTORY_SEPARATOR.'internalapps'.DIRECTORY_SEPARATOR.$_GET['internalApp'].'.php';
    if(is_file($appFile) && in_array($_GET['internalApp'], $allowedInternalApps)){
       include $appFile;
    } else {
