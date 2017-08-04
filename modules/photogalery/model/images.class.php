@@ -21,12 +21,12 @@ class PhotoGalery_Model_Images extends Model_ORM_Ordered {
    protected function  _initTable() {
       $this->setTableName(self::DB_TABLE, 't_ph_imgs');
 
-      $this->addColumn(self::COLUMN_ID, array('datatype' => 'smallint', 'ai' => true, 'nn' => true, 'pk' => true));
-      $this->addColumn(self::COLUMN_ID_CAT, array('datatype' => 'smallint', 'nn' => true, 'pdoparam' => PDO::PARAM_INT));
-      $this->addColumn(self::COLUMN_ID_ART, array('datatype' => 'smallint', 'nn' => true, 'pdoparam' => PDO::PARAM_INT));
+      $this->addColumn(self::COLUMN_ID, array('datatype' => 'int', 'ai' => true, 'nn' => true, 'pk' => true));
+      $this->addColumn(self::COLUMN_ID_CAT, array('datatype' => 'int', 'nn' => true, 'pdoparam' => PDO::PARAM_INT));
+      $this->addColumn(self::COLUMN_ID_ART, array('datatype' => 'int', 'nn' => true, 'pdoparam' => PDO::PARAM_INT));
       
       $this->addColumn(self::COLUMN_FILE, array('datatype' => 'varchar(200)', 'nn' => true, 'pdoparam' => PDO::PARAM_STR));
-      $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(300)', 'nn' => true, 'lang' => true, 'pdoparam' => PDO::PARAM_STR, 
+      $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(300)', 'lang' => true, 'pdoparam' => PDO::PARAM_STR, 
          'fulltext' => true, 'fulltextRel' => VVE_SEARCH_ARTICLE_REL_MULTIPLIER));
       $this->addColumn(self::COLUMN_DESC, array('datatype' => 'text', 'lang' => true, 'pdoparam' => PDO::PARAM_STR));
 
