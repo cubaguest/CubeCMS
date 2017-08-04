@@ -42,6 +42,17 @@ class MailsNewsletters_Controller extends Controller {
       $eActive = new Form_Element_Checkbox('active', $this->tr('Aktivní'));
       $form->addElement($eActive, $grpSend);
       
+      $eSendMail = new Form_Element_Select('sendmail', $this->tr('E-mail ze kterého se bude odesílat'));
+      $mails = explode(';', CUBE_CMS_NEWSLETTER_SEND_MAILS);
+      $mails = array_filter($mails);
+      if(!empty($mails)){
+         foreach ($mails as $m) {
+            $eSendMail->addOption($m, $m);
+         }
+      }
+      $eSendMail->addOption(CUBE_CMS_NOREPLAY_MAIL, CUBE_CMS_NOREPLAY_MAIL);
+      $form->addElement($eSendMail, $grpSend);
+      
       $eSendDate = new Form_Element_Text('senddate', $this->tr('Datum odeslání'));
       $date = new DateTime();
       $eSendDate->setValues(vve_date('%x', $date->modify('+1 day')));
@@ -119,7 +130,7 @@ class MailsNewsletters_Controller extends Controller {
                $idgrps = implode('|', $form->groups->getValues());
             }
             $cnt .= self::createUnscribeText($form->sendtestmail->getValues(), $idgrps);
-            $this->sendTest($form->sendtestmail->getValues(), $form->name->getValues(), $cnt);
+            $this->sendTest($form->sendtestmail->getValues(), $form->name->getValues(), $cnt, $form->sendmail->getValues());
          } else if($button == 'save') {
             // save            
             if( !isset($record) ){ // nový
@@ -131,6 +142,7 @@ class MailsNewsletters_Controller extends Controller {
             $record->{MailsNewsletters_Model_Newsletter::COLUMN_DATE_SEND} = $form->senddate->getValues();
             $record->{MailsNewsletters_Model_Newsletter::COLUMN_GROUPS_IDS} = serialize($form->groups->getValues());
             $record->{MailsNewsletters_Model_Newsletter::COLUMN_ID_USER} = Auth::getUserId();
+            $record->{MailsNewsletters_Model_Newsletter::COLUMN_SEND_MAIL} = $form->sendmail->getValues();
             $record->save();
             $idn = $record->{MailsNewsletters_Model_Newsletter::COLUMN_ID};
             $cnt = $form->content->getValues();
@@ -194,7 +206,6 @@ class MailsNewsletters_Controller extends Controller {
                $this->infoMsg()->addMessage($this->tr('Newsletter byl uložen a vyřazen z fronty pokud v ní byl.'));
             }
             $this->link()->route('list')->param('idn')->reload();
-//             $this->link()->param('idn', $idn)->reload();
          } else {
             $this->infoMsg()->addMessage($this->tr('Změny byly zrušeny'));
             if($this->getRequestParam('idn') != null){
@@ -530,12 +541,12 @@ class MailsNewsletters_Controller extends Controller {
       $this->view()->form = $formUpload;
    }
    
-   public function sendTest($recipient, $subject, $content)
+   public function sendTest($recipient, $subject, $content, $sendmail = null)
    {
       $um = new Model_Users();
       $user = $um->record(Auth::getUserId());
-      $mailObj = self::createMail($subject, $content);
-      self::sendMail($mailObj, $recipient, $user->{Model_Users::COLUMN_NAME}." ".$user->{Model_Users::COLUMN_SURNAME});
+      $mailObj = self::createMail($subject, $content, $sendmail);
+      self::sendMail($mailObj, $recipient, $user->{Model_Users::COLUMN_NAME}." ".$user->{Model_Users::COLUMN_SURNAME} );
       $this->infoMsg()->addMessage($this->tr('Testovací newsletter byl odeslán.'), false);
    }
    
@@ -544,9 +555,12 @@ class MailsNewsletters_Controller extends Controller {
     * @param string $cnt
     * @param string $subject
     */
-   protected static function createMail($subject, $cnt) 
+   protected static function createMail($subject, $cnt, $sendmail = null) 
    {
       $mailObj = new Email(true);
+      if($sendmail){
+         $mailObj->setFrom($sendmail, CUBE_CMS_WEB_NAME);
+      }
       $mailObj->setSubject($subject);
       $mailObj->setContent('<html><body>' .$cnt .'</body></html>');
       return $mailObj;       
@@ -630,7 +644,7 @@ class MailsNewsletters_Controller extends Controller {
    {
       $tr = new Translator_Module('mailsnewsletters');
       $unscribeLinkObj = new Url_Link_ModuleStatic(true);
-
+      
       $emailObj->setReplacements( array(
             // complex
             '{WEB_LINK}' => '<a href="'.Url_Request::getBaseWebDir().'" title="{WEB_NAME}">{WEB_NAME}</a>',
@@ -752,7 +766,7 @@ class MailsNewsletters_Controller extends Controller {
       $curIdN = 0;
       $sended = 0;
       foreach ($mails as $mail) {
-         if($sended >= 200){ // sen donly 500 mail per hour
+         if($sended >= CUBE_CMS_NEWSLETTER_SEND_HOURLY_LIMIT){ // send only X mails per hour
             return;
          }
          if($curIdN != $mail->{MailsNewsletters_Model_Queue::COLUMN_ID_NEWSLETTER}){
@@ -772,7 +786,7 @@ class MailsNewsletters_Controller extends Controller {
             $mail->{MailsNewsletters_Model_Queue::COLUMN_MAIL}, 'mail', $idgs );
          $cnt .= self::createUnscribeText(
             $mail->{MailsNewsletters_Model_Queue::COLUMN_MAIL}, $idgs);
-         $mailObj = self::createMail($newsLetter->{MailsNewsletters_Model_Newsletter::COLUMN_SUBJECT}, $cnt);
+         $mailObj = self::createMail($newsLetter->{MailsNewsletters_Model_Newsletter::COLUMN_SUBJECT}, $cnt, $newsLetter->{MailsNewsletters_Model_Newsletter::COLUMN_SEND_MAIL});
 
          $name = null;
          if($mail->{MailsNewsletters_Model_Queue::COLUMN_NAME} != null){
@@ -792,4 +806,3 @@ class MailsNewsletters_Controller extends Controller {
       }
    }
 }
-?>
