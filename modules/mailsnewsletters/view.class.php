@@ -36,20 +36,20 @@ class MailsNewsletters_View extends View {
 	   $toolbox = new Template_Toolbox2();
 	   
 	   $toolStatus = new Template_Toolbox2_Tool_Form($this->formStatus);
-	   $toolStatus->setIcon('enable.png');
+	   $toolStatus->setIcon(Template_Toolbox2::ICON_ENABLE);
 	   $toolbox->addTool($toolStatus);
 	   
 	   $toolPreview = new Template_Toolbox2_Tool_Redirect('previewNewsletter', $this->tr('Náhled newsletteru'));
-	   $toolPreview->setIcon('eye.png')->setAction($this->link()->route('previewNewsletter'));
+	   $toolPreview->setIcon(Template_Toolbox2::ICON_PREVIEW)->setAction($this->link()->route('previewNewsletter'));
 	   $toolbox->addTool($toolPreview);
 	   
 	   $toolEdit = new Template_Toolbox2_Tool_Redirect('editForm', $this->tr('Upravit newsletter'));
-	   $toolEdit->setIcon('page_edit.png')->setAction($this->link()->route("compose"));
+	   $toolEdit->setIcon(Template_Toolbox2::ICON_PAGE_EDIT)->setAction($this->link()->route("compose"));
 	   $toolbox->addTool($toolEdit);
 	   
 	   
 	   $toolDelete = new Template_Toolbox2_Tool_Form($this->formDelete);
-	   $toolDelete->setIcon('delete.png')->setConfirmMeassage($this->tr('Opravdu smazat newsletter?'));
+	   $toolDelete->setIcon(Template_Toolbox2::ICON_DELETE)->setConfirmMeassage($this->tr('Opravdu smazat newsletter?'));
 	   $toolbox->addTool($toolDelete);
 	   
 	   $this->toolboxItem = $toolbox;
@@ -79,15 +79,15 @@ class MailsNewsletters_View extends View {
 	   $toolbox = new Template_Toolbox2();
 	   
 	   $toolEdit = new Template_Toolbox2_Tool_Redirect('editForm', $this->tr('Upravit šablonu'));
-	   $toolEdit->setIcon('page_edit.png')->setAction($this->link()->route("tplEdit"));
+	   $toolEdit->setIcon(Template_Toolbox2::ICON_PAGE_EDIT)->setAction($this->link()->route("tplEdit"));
 	   $toolbox->addTool($toolEdit);
 	   
 	   $toolPreview = new Template_Toolbox2_Tool_Redirect('previewTpl', $this->tr('Náhled šablony'));
-	   $toolPreview->setIcon('eye.png')->setAction($this->link()->route('previewTpl'));
+	   $toolPreview->setIcon(Template_Toolbox2::ICON_PREVIEW)->setAction($this->link()->route('previewTpl'));
 	   $toolbox->addTool($toolPreview);
 	   
 	   $toolDelete = new Template_Toolbox2_Tool_Form($this->formDelete);
-	   $toolDelete->setIcon('delete.png')->setConfirmMeassage($this->tr('Opravdu smazat šablonu?'));
+	   $toolDelete->setIcon(Template_Toolbox2::ICON_DELETE)->setConfirmMeassage($this->tr('Opravdu smazat šablonu?'));
 	   $toolbox->addTool($toolDelete);
 	   
 	   $this->toolboxItem = $toolbox;
@@ -147,4 +147,3 @@ class MailsNewsletters_View extends View {
       die;
    }
 }
-?>

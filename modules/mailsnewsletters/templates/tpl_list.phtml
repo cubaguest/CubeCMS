@@ -14,29 +14,29 @@ $this->addFile('css://style.less');
          array(
                'link' => $this->link()->route('tplAdd'),
                'title' => $this->tr('Vytvořit novou šablonu'),
-               'icon' => 'add.png',
+               'icon' => 'plus',
                'name' => $this->tr('Vytvořit šablonu'),
          ),
          array(
                'link' => $this->link()->route('tplUpload'),
                'title' => $this->tr('Nahrát novou šablonu'),
-               'icon' => 'go-up.png',
+               'icon' => 'upload',
                'name' => $this->tr('Nahrát šablonu'),
          ),
    );
    $this->includeTpl('modules/buttons.phtml', true);
    ?>
    <?php if(!empty ($this->templates)) {?>
-   <table class="templates-list full-width">
+   <table class="templates-list full-width table table-bordered table-hover">
       <thead>
-         <tr class="ui-widget-header">
+         <tr class="">
             <th class="template-tb-name"><?php echo $this->tr('Název')?></th>
             <th class="template-tb-actions"></th>
          </tr>
       </thead>
    <?php 
       foreach ($this->templates as $template) {?>
-      <tr class="ui-widget-content">
+      <tr class="">
          <td class="template-tb-name"><?php echo $template->{MailsNewsletters_Model_Templates::COLUMN_NAME}?></td>
          <td class="template-tb-actions">
             <?php 
@@ -59,19 +59,24 @@ $this->addFile('css://style.less');
 </div>
 <div id="test-prw"></div>
 <?php  
-$this->addJsPlugin(new JsPlugin_PrettyPhoto());
+$this->includeTpl('components/modal.phtml', true, array(
+    'large' => true,
+    'id' => 'tpl-preview-modal',
+    'close' => true,
+    'header' => $this->tr('Náhled šablony <span class="tpl-name"></span>'),
+    'content' => '<iframe frameborder="0" class="tpl-iframe-content"></iframe>',
+));
 ?>
 <a rel="prettyPhoto"></a>
 <script type="text/javascript">
    /* <![CDATA[ */
    $(document).ready(function(){
-      // init prettyphoto
-      $("a[rel^='prettyPhoto']").prettyPhoto({ social_tools: '' }); 
-      
-      $('a.toolbox-button-previewTpl').click(function(){
-         var url = $(this).attr('href')+"&iframe=true&width=1000&height=500";
-         //$('#test-prw').load(url);
-         $.prettyPhoto.open(url,$(this).parents('tr.ui-widget-content').find('td.template-tb-name').text());
+      $('a.toolbox-button-previewTpl').on('click', function (e) {
+         e.preventDefault();
+         $('#tpl-preview-modal .tpl-iframe-content').prop('src', 'about:blank');
+         $('#tpl-preview-modal').show();
+         $('#tpl-preview-modal .tpl-name').text($(this).closest('tr').find('.template-tb-name').text());
+         $('#tpl-preview-modal .tpl-iframe-content').prop('src', $(this).attr('href')+"?iframe=true");
          return false;
       });
    });

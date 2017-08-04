@@ -1,80 +1,97 @@
-<?php 
+<?php
 $h = $this->tr('Seznam newsleterů');
 $this->addPageTitle($h);
 $jQuery = new JsPlugin_JQuery();
 $this->addJsPlugin($jQuery);
 $this->addFile('css://style.less');
 ?>
-<h1><?php echo $h?></h1>
-<?php echo $this->includeTpl('navigation.phtml');?>
+<h1><?php echo $h ?></h1>
+<?php echo $this->includeTpl('navigation.phtml'); ?>
 <div class="main-content-list module-newsleters-list">
-   <?php if(!empty ($this->newsletters)) {?>
-   <table class="newsletters-list full-width">
-      <thead>
-         <tr class="ui-widget-header">
-            <th class="newsletter-tb-name"><?php echo $this->tr('Název')?></th>
-            <th class="newsletter-tb-num-mails"><?php echo $this->tr('Mailů')?></th>
-            <th class="newsletter-tb-viewed"><?php echo $this->tr('Zobrazeno')?></th>
-            <th class="newsletter-tb-date"><?php echo $this->tr('Datum odeslání')?></th>
-            <th class="newsletter-tb-actions"></th>
-         </tr>
-      </thead>
-   <?php 
-      foreach ($this->newsletters as $newsletter) {
-         $dateSend = new DateTime($newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_DATE_SEND});
-         $curDate = new DateTime();
-         $curDate->setTime(0, 0);
-         $cellClass = null;
-         if($dateSend < $curDate) $cellClass = "ui-state-disabled";
-      ?>
-      <tr class="ui-widget-content <?php if($dateSend < $curDate) echo "newsletter-sended";?>">
-         <td class="newsletter-tb-name <?php echo $cellClass?>"
-            ><?php echo $newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_SUBJECT}?></td>
-         <td class="newsletter-tb-num-mails <?php echo $cellClass?>"><?php echo $newsletter->mails?></td>
-         <td class="newsletter-tb-viewed <?php echo $cellClass?>"><?php echo $newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_VIEWED}."x"?></td>
-         <td class="newsletter-tb-date <?php echo $cellClass?>"><?php echo vve_date("%x", $dateSend)?></td>
-         <td class="newsletter-tb-actions">
-            <?php 
-            $toolbox = clone $this->toolboxItem;
-            $toolbox->newsletter_status_->getForm()->id->setValues( $newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_ID} );
-            $newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_ACTIVE} 
-               ? $toolbox->newsletter_status_->setIcon('enable.png') : $toolbox->newsletter_status_->setIcon('disable.png');
-            $toolbox->editForm->setAction(
-                  $this->link()->route('main')->param('idn', $newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_ID})
-                  );
-            $toolbox->previewNewsletter->setAction( $this->link()->route('newsletterPreview', array('id' => $newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_ID})) );
-            $toolbox->newsletter_delete_->getForm()->id->setValues( $newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_ID} );
-            $toolbox->setTemplate(Template_Toolbox2::TEMPLATE_INLINE);
-            echo $toolbox;
-            ?>
-         </td>
-      </tr>
-     <?php }?>
-     <tfoot>
-     	<tr class="ui-widget-header">
-     		<td colspan="5"><?php  echo $this->scrollComp;?></td>
-     	</tr>
-     </tfoot>
-   </table>
-   <?php } else {?>
-      <div class="admin-info-text"><?php  ps($this->tr('Není uložen žádný newsletter')); ?> </div>
-   <?php }?>
+   <?php if (!empty($this->newsletters)) { ?>
+      <div class="table-responsive">
+         <table class="newsletters-list full-width table table-bordered table-hover">
+            <thead>
+               <tr class="">
+                  <th class="newsletter-tb-name"><?php echo $this->tr('Název') ?></th>
+                  <th class="newsletter-tb-num-mails"><?php echo $this->tr('Mailů') ?></th>
+                  <th class="newsletter-tb-viewed"><?php echo $this->tr('Zobrazeno') ?></th>
+                  <th class="newsletter-tb-date"><?php echo $this->tr('Datum odeslání') ?></th>
+                  <th class="newsletter-tb-actions"></th>
+               </tr>
+            </thead>
+            <?php
+            foreach ($this->newsletters as $newsletter) {
+               $dateSend = new DateTime($newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_DATE_SEND});
+               $curDate = new DateTime();
+               $curDate->setTime(0, 0);
+               $cellClass = null;
+               $rowClass = null;
+               if ($dateSend < $curDate) {
+                  $rowClass = "success";
+                  if($newsletter->mails > 0){
+                     $rowClass = "warning";
+                  }
+               } else if($dateSend <= $curDate){
+                  if($newsletter->mails > 0){
+                     $rowClass = "warning";
+                  }
+               }
+               ?>
+               <tr class="<?php echo $rowClass ?>">
+                  <td class="newsletter-tb-name <?php echo $cellClass ?>"
+                      ><?php echo $newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_SUBJECT} ?></td>
+                  <td class="newsletter-tb-num-mails <?php echo $cellClass ?>"><?php echo $newsletter->mails ?></td>
+                  <td class="newsletter-tb-viewed <?php echo $cellClass ?>"><?php echo $newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_VIEWED} . "x" ?></td>
+                  <td class="newsletter-tb-date <?php echo $cellClass ?>"><?php echo vve_date("%x", $dateSend) ?></td>
+                  <td class="newsletter-tb-actions">
+                     <?php
+                     $toolbox = clone $this->toolboxItem;
+                     $toolbox->newsletter_status_->getForm()->id->setValues($newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_ID});
+                     $newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_ACTIVE} ? 
+                        $toolbox->newsletter_status_->setIcon(Template_Toolbox2::ICON_ENABLE) : $toolbox->newsletter_status_->setIcon(Template_Toolbox2::ICON_DISABLE);
+                     $toolbox->editForm->setAction(
+                             $this->link()->route('main')->param('idn', $newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_ID})
+                     );
+                     $toolbox->previewNewsletter->setAction($this->link()->route('newsletterPreview', array('id' => $newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_ID})));
+                     $toolbox->newsletter_delete_->getForm()->id->setValues($newsletter->{MailsNewsletters_Model_Newsletter::COLUMN_ID});
+                     $toolbox->setTemplate(Template_Toolbox2::TEMPLATE_INLINE);
+                     echo $toolbox;
+                     ?>
+                  </td>
+               </tr>
+            <?php } ?>
+            <tfoot>
+               <tr class="ui-widget-header">
+                  <td colspan="5"><?php echo $this->scrollComp; ?></td>
+               </tr>
+            </tfoot>
+         </table>
+      </div>
+   <?php } else { ?>
+      <div class="admin-info-text"><?php ps($this->tr('Není uložen žádný newsletter')); ?> </div>
+   <?php } ?>
 </div>
-<div id="test-prw"></div>
 <?php  
-$this->addJsPlugin(new JsPlugin_PrettyPhoto());
+$this->includeTpl('components/modal.phtml', true, array(
+    'large' => true,
+    'id' => 'tpl-preview-newsletter-modal',
+    'close' => true,
+    'header' => $this->tr('Náhled newsletteru <span class="tpl-name"></span>'),
+    'content' => '<iframe frameborder="0" class="tpl-iframe-content"></iframe>',
+));
 ?>
 <a rel="prettyPhoto"></a>
 <script type="text/javascript">
    /* <![CDATA[ */
-   $(document).ready(function(){
+   $(document).ready(function () {
       // init prettyphoto
-      $("a[rel^='prettyPhoto']").prettyPhoto({ social_tools: '' }); 
-      
-      $('a.toolbox-button-previewNewsletter').click(function(){
-         var url = $(this).attr('href')+"&iframe=true&width=1000&height=500";
-         //$('#test-prw').load(url);
-         $.prettyPhoto.open(url,$(this).parents('tr.ui-widget-content').find('td.newsletter-tb-name').text());
+      $('a.toolbox-button-previewNewsletter').on('click', function (e) {
+         e.preventDefault();
+         $('#tpl-preview-newsletter-modal .tpl-iframe-content').prop('src', 'about:blank');
+         $('#tpl-preview-newsletter-modal').show();
+         $('#tpl-preview-newsletter-modal .tpl-name').text($(this).closest('tr').find('.newsletter-tb-name').text());
+         $('#tpl-preview-newsletter-modal .tpl-iframe-content').prop('src', $(this).attr('href')+"?iframe=true");
          return false;
       });
    });

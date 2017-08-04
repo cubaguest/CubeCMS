@@ -1,9 +1,8 @@
 <?php 
-$this->items = array(
-   $this->tr('Vytvořit newsletter') => array('link' => (string)$this->link()->route(), 'icon' => 'email_edit.png'),
-   $this->tr('Seznam newsletterů') => array('link' => (string)$this->link()->route('list'), 'icon' => 'application_view_list.png'),
+$items = array(
+   $this->tr('Vytvořit newsletter') => array('link' => (string)$this->link()->route(), 'icon' => 'plus'),
+   $this->tr('Seznam newsletterů') => array('link' => (string)$this->link()->route('list'), 'icon' => 'list'),
 //    $this->tr('Fronta odesílání') => array('link' => (string)$this->link()->route('queue'), 'icon' => 'email_go.png'),
-   $this->tr('Šablony') => array('link' => (string)$this->link()->route('tpls'), 'icon' => 'page_lightning.png'),
+   $this->tr('Šablony') => array('link' => (string)$this->link()->route('tpls'), 'icon' => 'file-text-o'),
    );
-$this->includeTpl('module_navigation.phtml', true);
-?>
+$this->includeTpl('module_navigation.phtml', true, array('items' => $items));
