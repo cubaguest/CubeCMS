@@ -873,6 +873,12 @@ CubeCMS.Modal = {
       $('body').on('click', '.cubecms-modal .close-modal', function () {
          CubeCMS.Modal.close($(this).closest('.cubecms-modal'));
          return false;
+      }).on('click', '.cubecms-modal-dialog', function (e) {
+         e.stopPropagation();
+         return false;
+      }).on('click', '.cubecms-modal', function (e) {
+         CubeCMS.Modal.close($(this));
+         return false;
       }).on('click', '.modal-open-button', function () {
          CubeCMS.Modal.open($($(this).data('modal')));
          return false;
