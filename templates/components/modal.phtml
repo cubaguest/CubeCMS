@@ -12,7 +12,9 @@
 $_id = Template::pVar('modal_id') == null ? 1 : Template::pVar('modal_id');
 $id = isset($id) ? $id : 'modal-' . $_id;
 $large = isset($large) ? $large : false;
-$content = isset($id) ? $content : '';
+$content = isset($content) ? $content : '';
+$header = isset($header) ? $header : '';
+$footer = isset($footer) ? $footer : '';
 ?>
 <div id="<?php echo $id ?>" class="cubecms-modal <?=$large ? 'cubecms-modal-large' : ''?>">
    <div class="cubecms-modal-dialog">
