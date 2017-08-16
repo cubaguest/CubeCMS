@@ -1,36 +1,57 @@
-<?php 
+<?php
 $icon = null;
-if($this->panelObj()->getIcon() != null){
-   $icon = '<img src="'.Panel_Obj::getIconDir().$this->panelObj()->getIcon().'" alt="'.$this->panelObj()->getIcon().'" />';
+if ($this->panelObj()->getIcon() != null) {
+   $icon = '<img src="' . Panel_Obj::getIconDir() . $this->panelObj()->getIcon() . '" alt="' . $this->panelObj()->getIcon() . '" />';
 }
 $backImg = null;
-if($this->panelObj()->getBackImage() != null){
-   $backImg = 'background-image: url(\''.Panel_Obj::getBackImgDir().$this->panelObj()->getBackImage().'\');';
+if ($this->panelObj()->getBackImage() != null) {
+   $backImg = 'background-image: url(\'' . Panel_Obj::getBackImgDir() . $this->panelObj()->getBackImage() . '\');';
 }
 $form = Auth::getAuthenticator('internal')->getLoginForm();
 ?>
-<div class="name"><?php echo $icon?><a href="<?php echo $this->l();?>" title="<?php echo htmlspecialchars($this->panelObj()->getName())?>"><?php echo $this->panelObj()->getName()?></a></div>
-<div class="content" style="<?php echo $backImg?>">
-<?php 
-$form->setAction($this->currentLink);
-echo $form->renderStart();
-?>
+<div class="name"><?php echo $icon ?><a href="<?php echo $this->l(); ?>" title="<?php echo htmlspecialchars($this->panelObj()->getName()) ?>"><?php echo $this->panelObj()->getName() ?></a></div>
+<div class="content" style="<?php echo $backImg ?>">
+   <?php
+   $form->setAction($this->currentLink);
+   $form->html()->addClass('form-vertical');
+   echo $form->renderStart();
+   ?>
    <div>
-      <?php  if(!Auth::isLogin()){?>
-      <?php echo $form->{Auth_Provider_Internal::FORM_USERNAME}->label();?><br />
-      <?php echo $form->{Auth_Provider_Internal::FORM_USERNAME}->control();?><br />
-      
-      <?php echo $form->{Auth_Provider_Internal::FORM_PASSWORD}->label();?><br />
-      <?php echo $form->{Auth_Provider_Internal::FORM_PASSWORD}->control();?><br />
-      
-      <?php echo $form->{Auth_Provider_Internal::FORM_PERMANENT}->label();?>
-      <?php echo $form->{Auth_Provider_Internal::FORM_PERMANENT}->control();?><br />
-      
-      <?php echo $form->{Auth_Provider_Internal::FORM_SUBMIT}->control();?>
-      <?php  } else { ?>
-      <?php echo $this->tr('Přihlášen')?>: <a href="<?php echo $this->l();?>" title="<?php echo htmlspecialchars($this->panelObj()->getName())?>"><?php echo Auth::getUserName()?></a><br />
-      <input id="login_submit" type="submit" name="<?php echo Auth::FORM_LOGOUT?>" value="<?php echo $this->tr('odhlásit')?>" />
-      <?php  } ?>
+      <?php if (!Auth::isLogin()) { ?>
+         <div class="form-group">
+            <?php
+            $form->{Auth_Provider_Internal::FORM_USERNAME}->html()->addClass('form-control');
+            echo $form->{Auth_Provider_Internal::FORM_USERNAME}->label();
+            echo $form->{Auth_Provider_Internal::FORM_USERNAME}->control();
+            ?>
+         </div>
+
+         <div class="form-group">
+            <?php
+            $form->{Auth_Provider_Internal::FORM_PASSWORD}->html()->addClass('form-control');
+            echo $form->{Auth_Provider_Internal::FORM_PASSWORD}->label();
+            echo $form->{Auth_Provider_Internal::FORM_PASSWORD}->control();
+            ?>
+         </div>
+
+         <div class="form-group">
+            <?php
+//            $form->{Auth_Provider_Internal::FORM_PASSWORD}->html()->addClass('form-control');
+            echo $form->{Auth_Provider_Internal::FORM_PERMANENT}->label();
+            echo $form->{Auth_Provider_Internal::FORM_PERMANENT}->control();
+            ?>
+         </div>
+
+         <div class="form-group">
+            <?php
+            $form->{Auth_Provider_Internal::FORM_SUBMIT}->html()->addClass('btn btn-primary');
+            echo $form->{Auth_Provider_Internal::FORM_SUBMIT}->control();
+            ?>
+         </div>
+      <?php } else { ?>
+         <?php echo $this->tr('Přihlášen') ?>: <a href="<?php echo $this->l(); ?>" title="<?php echo htmlspecialchars($this->panelObj()->getName()) ?>"><?php echo Auth::getUserName() ?></a><br />
+         <input class="btn btn-primary" id="login_submit" type="submit" name="<?php echo Auth::FORM_LOGOUT ?>" value="<?php echo $this->tr('odhlásit') ?>" />
+      <?php } ?>
    </div>
-<?php echo $form->renderEnd()?>
+   <?php echo $form->renderEnd() ?>
 </div>
