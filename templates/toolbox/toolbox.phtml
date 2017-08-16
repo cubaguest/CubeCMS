@@ -109,10 +109,18 @@ $rTime = rand(1, time());
                <?php 
                break;
             case 'Template_Toolbox2_Tool_Button':
-               ?>
-               <button class="toolbox-button toolbox-button-<?php ps($name)?>" title="<?php ps($tool->getTitle())?>"
-                       onclick="<?php echo $formOnSubmit?>"><span class="icon icon-<?php echo $tool->getIcon()?> icon-fw"></span><?php echo $tool->getLabel()?></button>
-               <?php 
+               $buttonHtml = new Html_Element('button', '<span class="icon icon-'.$tool->getIcon().' icon-fw"></span>'.$tool->getLabel());
+               $buttonHtml->addClass(array('toolbox-button', 'toolbox-button-'.$name));
+               $buttonHtml->setAttrib('title', $tool->getTitle());
+               foreach ($tool->getData() as $key => $value) {
+                  $buttonHtml->setAttrib('data-'.$key, $value);
+               }
+               if($formOnSubmit){
+                  $buttonHtml->setAttrib('onclick', $formOnSubmit);
+               }
+               
+               echo $buttonHtml;
+               
                break;
             case 'Template_Toolbox2':
                error_log('Sub level toolboxu není implementován');
