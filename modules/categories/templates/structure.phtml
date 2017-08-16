@@ -71,17 +71,17 @@ echo $this->toolbox;
    ?>
    <div id="category-buttons">
       <form name="form-add" method="post" action="<?php echo $this->link()->route('add') ?>">
-         <button type="submit" name="category_add" value="<?php psa($this->tr('Přidat')) ?>"><span class="icon icon-plus"></span> <?php ps($this->tr('Přidat')) ?></button>
+         <button class="btn btn-success btn-xs" type="submit" name="category_add" value="<?php psa($this->tr('Přidat')) ?>"><span class="icon icon-plus"></span> <?php ps($this->tr('Přidat')) ?></button>
       </form>
       <form name="form-edit" method="post" action="<?php echo $this->link()->route('edit', array('categoryid' => '-ID-')) ?>">
-         <input type="submit" value="<?php echo $this->tr('Upravit') ?>" name="category_edit" />
+         <input class="btn btn-primary btn-xs" type="submit" value="<?php echo $this->tr('Upravit') ?>" name="category_edit" />
       </form>
       <form name="form-settings" method="post" action="<?php echo $this->link()->route('settings', array('categoryid' => '-ID-')) ?>">
-         <input type="submit" value="<?php echo $this->tr('Nastavit') ?>" name="category_settings"  />
+         <input class="btn btn-primary btn-xs" type="submit" value="<?php echo $this->tr('Nastavit') ?>" name="category_settings"  />
       </form>
-      <button id="button-copy-cat"><?php echo $this->tr('Kopírovat') ?></button>
+      <button  class="btn btn-primary btn-xs" id="button-copy-cat"><?php echo $this->tr('Kopírovat') ?></button>
       <form name="form-delete" method="post" action="<?php echo $this->link() ?>">
-         <input class="button-cancel" type="submit" value="<?php echo $this->tr('Smazat') ?>" name="category_delete"  />
+         <input class="btn btn-danger btn-xs" type="submit" value="<?php echo $this->tr('Smazat') ?>" name="category_delete"  />
          <input type="hidden" value="" name="category_id" />
       </form>
       <label title="<?php echo $this->tr('Upravít URL adresy kategorie a podkategorií.') ?>"
