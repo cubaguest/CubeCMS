@@ -9,7 +9,7 @@ class CustomBlocks_View extends View {
    public function mainView()
    {
       $this->template()->addFile($this->getTemplate('main'));
-
+      
       if ($this->category()->getRights()->isWritable()) {
          if (!$this->toolbox instanceof Template_Toolbox2) {
             $this->toolbox = new Template_Toolbox2();
@@ -48,11 +48,21 @@ class CustomBlocks_View extends View {
                        ->setConfirmMeassage($this->tr('Opravdu smazat blok?'))
                        ->setImportant(true);
                $toolbox->addTool($tooldel);
-
+               
+               $toolShare = new Template_Toolbox2_Tool_Button('link_block', $this->tr('Sdílení a vložení'));
+               $toolShare
+                       ->setIcon(Template_Toolbox2::ICON_SHARE)
+                       ->addData('action', 'show-share-modal')
+                       ->addData('pastelink', '{CUSTOMBLOCKS:'.$block->getPK().'}')
+                       ->addData('sharelink', str_replace(Url_Link::getWebURL(), '/',  $this->link()->anchor('customblock-'.$block->getPK())))
+                       ->addData('sharelinkfull', $this->link()->anchor('customblock-'.$block->getPK()))
+                       ;
+               $toolbox->addTool($toolShare);
 
                $block->toolbox = $toolbox;
             }
          }
+         $this->template()->addFile('tpl://modal_share.phtml');
       }
    }
 

@@ -1,0 +1,39 @@
+<?php
+ob_start();
+?>
+<div>
+   Odkaz pro sdílení v rámci stránky:<br />
+   <code class="cb-share-code"></code>
+</div>
+<div>
+   Odkaz pro sdílení:<br />
+   <code class="cb-share-fullcode"></code>
+</div>
+<div>
+   Blok pro vložení jinde do textu:<br />
+   <code class="cb-share-pastecode"></code>
+</div>
+
+<?php
+$cnt = ob_get_clean();
+
+$this->includeFile('tpl://engine:components/modal.phtml', array(
+    'content' => $cnt,
+    'id' => 'modal-customvblock-share',
+    'header' => $this->tr('Sdílení a vložení bloku'),
+    'close' => true,
+    'large' => false,
+    'footer' => '<button class="btn btn-default close-modal">' . $this->tr('Zavřít') . '</button>'));
+
+
+?>
+<script type="text/javascript">
+   $(document).ready(function(){
+      $('[data-action="show-share-modal"]').on('click', function(){
+         CubeCMS.Modal.open($('#modal-customvblock-share'));
+         $('#modal-customvblock-share').find('.cb-share-code').text($(this).data('sharelink'));
+         $('#modal-customvblock-share').find('.cb-share-fullcode').text($(this).data('sharelinkfull'));
+         $('#modal-customvblock-share').find('.cb-share-pastecode').text($(this).data('pastelink'));
+      });
+   });
+</script>

@@ -60,6 +60,12 @@ class CustomBlocks_Controller extends Controller {
                   unset($blocksData[$key]);
                }
             }
+            // postproces na položkách bloku
+            foreach ($block->block_struct['items'] as $key => $item) {
+               if(isset($block->block_items[$key]) && $item['model'] == CustomBlocks_Model_Texts::class && isset($item['lang']) && $item['lang'] == false){
+                  $block->block_items[$key]->content = $block->block_items[$key][CustomBlocks_Model_Texts::COLUMN_CONTENT][Locales::getDefaultLang()];
+               }
+            }
          }
       }
       $this->view()->blocks = $blocks;
