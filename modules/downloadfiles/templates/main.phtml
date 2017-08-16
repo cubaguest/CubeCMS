@@ -3,25 +3,18 @@ $h1 = $this->category()->getName();
 $dwLink = new Url_DownloadLink($this->category()->getModule()->getDataDir());
 echo $this->toolbox;
 ?>
-<h1><?php ps($h1); ?></h1>
 <div>
    <?php
    if ($this->formLogin) {
       echo $this->formLogin;
    } else {
       if ($this->files != false && !empty($this->files)) {
+         $showSection = count($this->sections) > 1;
          ?>
          <div class="row">
             <div class="col-md-6">
                <form action="" class="form">
-                  <div class="form-group">
-                     <div class="form-labels col-sm-2">
-                        <label for="inputFilesFilter"><?php ps($this->tr('Fitlrace')); ?>:</label>
-                     </div>
-                     <div class="form-controls col-sm-10">
-                        <input id="inputFilesFilter" type="text" class="form-control" />
-                     </div>
-                  </div>
+                  <input id="inputFilesFilter" type="text" class="form-control" placeholder="<?php ps($this->tr('Zadejte klíčová slova')); ?>" />
                </form>
             </div>
          </div>
@@ -32,13 +25,14 @@ echo $this->toolbox;
                ?>
                <?php
                if ($prevGrp != $file->{DownloadFiles_Model_Sections::COLUMN_ID}) {
-                  ?>
-                  <h2><?php ps($file->{DownloadFiles_Model_Sections::COLUMN_NAME}) ?></h2>
-                  <?php
+                  if ($showSection) {
+                     ?>
+                     <h2><?php ps($file->{DownloadFiles_Model_Sections::COLUMN_NAME}) ?></h2>
+                     <?php
+                  }
                   $prevGrp = $file->{DownloadFiles_Model_Sections::COLUMN_ID};
                }
                ?>
-
                <div class="text dwfile file clearfix">
                   <h3 id="dwfile-<?php echo $file->{DownloadFiles_Model::COLUMN_FILE} ?>"
                       ><a href="<?php echo $this->dataDir . $file->{DownloadFiles_Model::COLUMN_FILE} ?>"><?php echo $file->{DownloadFiles_Model::COLUMN_NAME} ?></a></h2>
@@ -50,8 +44,6 @@ echo $this->toolbox;
                      <?php } ?>
                      <?php if ($file->{DownloadFiles_Model::COLUMN_TEXT} != null) { ?><p><?php echo $file->{DownloadFiles_Model::COLUMN_TEXT} ?></p><?php } ?>
                      <div class="info">
-                        <span class="date"><?php echo $this->tr('Přidáno') ?>: 
-                           <strong><?php echo Utils_DateTime::fdate("%x", new DateTime($file->{DownloadFiles_Model::COLUMN_TIME_ADD})) ?></strong></span>,
                         <?php if (file_exists($this->category()->getModule()->getDataDir() . $file->{DownloadFiles_Model::COLUMN_FILE})) { ?>
                            <span class="size"><?php echo $this->tr('velikost') ?>: 
                               <strong><?php
@@ -87,7 +79,7 @@ echo $this->toolbox;
             $('.files-list .dwfile').show();
          } else {
             $('.files-list .dwfile').each(function () {
-               var text = $('h2', this).text() + ' ' + $('p', this).text() + ' ' + $('.date', this).text();
+               var text = $('h3', this).text() + ' ' + $('p', this).text() + ' ' + $('.date', this).text();
                if (text.toLowerCase().search(val) > -1) {
                   $(this).show();
                } else {

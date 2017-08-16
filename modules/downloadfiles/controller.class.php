@@ -8,6 +8,7 @@ class DownloadFiles_Controller extends Controller {
    const PARAM_ALLOWED_TYPES = 'ft';
    const PARAM_COLS = 'cols';
    const PARAM_PASS = 'pass';
+   const PARAM_SHOW_FILTER = 'showf';
 
    /**
     * Kontroler pro zobrazení textu
@@ -598,10 +599,19 @@ class DownloadFiles_Controller extends Controller {
       if (isset($settings[self::PARAM_PASS])) {
          $form->pass->setValues($settings[self::PARAM_PASS]);
       }
+      
+      $elemFilter = new Form_Element_Checkbox('showfilter', $this->tr('Zobrazit filtraci souborů a sekcí').'           ');
+      $elemFilter->setValues(true);
+      $form->addElement($elemFilter, self::SETTINGS_GROUP_VIEW);
+
+      if (isset($settings[self::PARAM_SHOW_FILTER])) {
+         $form->showfilter->setValues($settings[self::PARAM_SHOW_FILTER]);
+      }
 
       // znovu protože mohl být už jednou validován bez těchto hodnot
       if ($form->isValid()) {
          $settings[self::PARAM_PASS] = $form->pass->getValues();
+         $settings[self::PARAM_SHOW_FILTER] = $form->showfilter->getValues();
       }
    }
 
