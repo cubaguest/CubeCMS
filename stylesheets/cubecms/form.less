@@ -1,7 +1,8 @@
 /* formulařové prvky */
 @import "cubecms/variables.less";
+@import "bootstrap/mixins/clearfix.less";
 
-input, button, textarea, select, a.form-button, .button, .btn {
+/*input, button, textarea, select, a.form-button, .button, .btn {
    color: @form-color-text;
    &.disabled, &[disabled] {
       background-color: @form-color-bg-disabled !important;
@@ -58,7 +59,7 @@ input[type="submit"], input[type="reset"], input[type="button"], button, a.form-
    text-align: center;
    margin: 0;
    display: inline-block;
-}
+}*/
 input.form-required, textarea.form-required {
    position: relative;
    background-position: right top;
@@ -225,7 +226,11 @@ form {
             width: 100%;
             float: none;
          }
-         margin-right: -15px;
+         /*margin-right: -15px;*/
+      }
+      .form-group { 
+         margin-left: 0;
+         margin-right: 0;
       }
    }
    &.form-inline {
@@ -587,7 +592,7 @@ form {
    }
 }
 /* modal pro výběr obrázku */
-.image-selector-modal {
+.cubecms-modal-images {
    .modal-image-selector-image {
       &.active {
          .tools-box-sahadow();
@@ -610,6 +615,9 @@ form {
       margin: 0 @padding-small @padding-small 0;
       float: left;
       border: 1px solid @color-border;
+   }
+   .cubecms-modal-content {
+      &:extend(.clearfix all);
    }
 }
 /* typehead */
