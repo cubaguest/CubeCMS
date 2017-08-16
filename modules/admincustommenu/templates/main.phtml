@@ -142,7 +142,6 @@ $this->addJsPlugin(new JsPlugin_JsTree());
                     });
                  })
                  .on('move_node.jstree', function (e, node) {
-                    console.log(node);
                     var parent = $structure.jstree(true).get_node(node.parent);
                     var parentOld = $structure.jstree(true).get_node(node.old_parent);
                     var newPos = {
@@ -225,8 +224,9 @@ $this->addJsPlugin(new JsPlugin_JsTree());
             });
             return false;
          });
-         $('#form-add-menu, #form-add-menu-item').on('submit', function (e) {
-            e.preventDefault();
+         
+         $('#form-add-menu, #form-add-menu-item').on('submit', function () {
+            //e.preventDefault();
             var $form = $(this);
             stopPreloadSelected = true;
             $.ajax({

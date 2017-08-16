@@ -313,7 +313,7 @@ class AdminCustomMenu_Controller extends Controller {
               'state' => $node->{AdminCustomMenu_Model_Items::COLUMN_ACTIVE},
               'idcat' => $node->{AdminCustomMenu_Model_Items::COLUMN_ID_CATEGORY},
               'catname' => (string)$node->{Model_Category::COLUMN_NAME},
-              'box' => (string)$node->{Model_Category::COLUMN_BOX},
+              'box' => (string)$node->{AdminCustomMenu_Model_Items::COLUMN_BOX},
           ),
       );
    }

@@ -6,7 +6,7 @@ class AdminCustomMenu_View extends View {
 
    public static function getMenu($nameOrId)
    {
-      $model = new CustomMenu_Model_Items();
+      $model = new AdminCustomMenu_Model_Items();
       $tpl = new Template_Module(new Url_Link_Module(), Category::getSelectedCategory());
 
       $name = $nameOrId;
@@ -25,9 +25,10 @@ class AdminCustomMenu_View extends View {
 
       $model
          ->joinFK(AdminCustomMenu_Model_Items::COLUMN_ID_CATEGORY)
-         ->where(AdminCustomMenu_Model_Items::COLUMN_BOX." = :box AND ".AdminCustomMenu_Model_Items::COLUMN_ACTIVE." = 1",
+         ->where(AdminCustomMenu_Model_Items::COLUMN_BOX." = :box AND ".AdminCustomMenu_Model_Items::COLUMN_ACTIVE." = 1 AND ".AdminCustomMenu_Model_Items::COLUMN_LEFT.' != 1',
             array('box' => $name))
-         ->order(CustomMenu_Model_Items::COLUMN_ORDER);
+         ->order(AdminCustomMenu_Model_Items::COLUMN_LEFT)
+         ;
       if(!Auth::isAdmin()){
          $model->where(" AND ( ".Model_Category::COLUMN_DISABLE.'_'.Locales::getLang(). " = 0 OR ".AdminCustomMenu_Model_Items::COLUMN_ID_CATEGORY." = 0 )", array(), true);
       }
@@ -44,7 +45,10 @@ class AdminCustomMenu_View extends View {
          }
       }
 
+      // doplnit odkazy do celého stromu - rekurzivně projít asi
+      
       $tpl->items = $items;
+      $tpl->root = $model->where(AdminCustomMenu_Model_Items::COLUMN_BOX." = :box", array('box' => $name))->getRoot();
 
       if($tpl->existTpl('menu-'.$name.'.phtml', 'custommenu')){
          $tpl->addFile('tpl://custommenu:menu-'.$name.'.phtml');
