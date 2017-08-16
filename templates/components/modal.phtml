@@ -15,8 +15,9 @@ $large = isset($large) ? $large : false;
 $content = isset($content) ? $content : '';
 $header = isset($header) ? $header : '';
 $footer = isset($footer) ? $footer : '';
+$class = isset($class) ? $class : '';
 ?>
-<div id="<?php echo $id ?>" class="cubecms-modal <?=$large ? 'cubecms-modal-large' : ''?>">
+<div id="<?php echo $id ?>" class="cubecms-modal <?=$large ? 'cubecms-modal-large' : ''?> <?php echo $class?>">
    <div class="cubecms-modal-dialog">
       <div class="cubecms-modal-wrap">
          <?php if (isset($header)) { ?>
