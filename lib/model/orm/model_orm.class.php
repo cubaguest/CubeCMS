@@ -968,7 +968,7 @@ abstract class Model_ORM extends Model implements ArrayAccess {
       }
       return array(
          'sql' => $sql,
-         'values' => array_merge($this->bindValues, $this->whereBindValues, $this->havingBindValues)
+         'values' => array_merge($this->bindValues, $this->whereBindValues, $this->havingBindValues, $this->limit)
       );
    }
 
@@ -1330,7 +1330,7 @@ abstract class Model_ORM extends Model implements ArrayAccess {
             throw new UnexpectedValueException(sprintf($this->tr('Nepovolená hodnota "%s" v předanám paramteru'), $varType));
          }
 
-         $dbst->bindValue(':'.$key, $value, $pdoParam);
+         $dbst->bindValue(strpos($key, ':') === false ? ':'.$key : $key, $value, $pdoParam);
       }
 
       $this->bindSQLWhere($dbst);
