@@ -70,4 +70,20 @@ class Utils_Url {
          '/'
       ), $path);
    }
+      
+   /**
+    * Převede systémovou url na cestu
+    * @param string $url
+    * @return string
+    */
+   public static function urlToSystemPath($url)
+   {
+      return str_replace(array(
+         Url_Link::getWebURL(),
+         '/'
+      ), array(
+         AppCore::getAppWebDir(), 
+         DIRECTORY_SEPARATOR, 
+      ), $url);
+   }
 }
