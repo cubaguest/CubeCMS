@@ -335,29 +335,22 @@ class Projects_Controller extends Controller {
             $rec->{Projects_Model_Projects::COLUMN_RELATED} = implode(';', $form->related->getValues());
          }
          
-         if($form->url->getValues() == null){
-            $rec->{Projects_Model_Projects::COLUMN_URLKEY} = $this->createUniqueProjectUrlKey( $rec->{Projects_Model_Projects::COLUMN_NAME} );
-         } else {
-            $rec->{Projects_Model_Projects::COLUMN_URLKEY} = $this->createUniqueProjectUrlKey( $form->url->getValues() );
+         
+         $urls = $form->url->getValues();
+         $names = $form->name->getValues();
+         foreach ($urls as $lang => $value) {
+            $urlBase = $value != null ? $value : $names[$lang];
+            $rec[Projects_Model_Projects::COLUMN_URLKEY][$lang] = $this->createUniqueProjectUrlKey( $urlBase, $lang );
          }
          
          // zpracovánbí obrázku
-         $dir = $this->module()->getDataDir().$rec->{Projects_Model_Projects::COLUMN_URLKEY}.DIRECTORY_SEPARATOR;
+         $dir = $this->module()->getDataDir().$rec[Projects_Model_Projects::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR;
          
          // miniatura
          if($form->imageThumb->getValues() != null){
             // zadaná miniatura
             $thumb = new File_Image($form->imageThumb);
             $thumb->move($dir);
-            
-//            $thumb->getData()->resize(
-//                  $this->category()->getParam(self::PARAM_THUM_W, VVE_IMAGE_THUMB_W), 
-//                  $this->category()->getParam(self::PARAM_THUM_H, VVE_IMAGE_THUMB_H),
-//                  $this->category()->getParam(self::PARAM_THUM_C, true) == true 
-//                  ? File_Image_Base::RESIZE_CROP : File_Image_Base::RESIZE_AUTO
-//                  );
-//            
-//            $thumb->save();
             $rec->{Projects_Model_Projects::COLUMN_THUMB} = $thumb->getName();
          }
             
@@ -372,23 +365,8 @@ class Projects_Controller extends Controller {
                $thumbName = $thumbParts['filename'] . '_thumb.' . $thumbParts['extension'];
                
                $thumb = $image->copy($dir, true, $thumbName);
-               
-//               $thumb->getData()->resize(
-//                     $this->category()->getParam(self::PARAM_THUM_W, VVE_IMAGE_THUMB_W),
-//                     $this->category()->getParam(self::PARAM_THUM_H, VVE_IMAGE_THUMB_H),
-//                     $this->category()->getParam(self::PARAM_THUM_C, true) == true
-//                     ? File_Image_Base::RESIZE_CROP : File_Image_Base::RESIZE_AUTO
-//               );
-//               
-//               $thumb->save();
                $rec->{Projects_Model_Projects::COLUMN_THUMB} = $thumb->getName();
             }
-            
-//            $image->getData()->resize(
-//                  $this->category()->getParam(self::PARAM_BIG_W, VVE_DEFAULT_PHOTO_W),
-//                  $this->category()->getParam(self::PARAM_BIG_H, VVE_DEFAULT_PHOTO_H), File_Image_Base::RESIZE_AUTO );
-//            
-//            $image->save();
             $rec->{Projects_Model_Projects::COLUMN_IMAGE} = $image->getName();
          }
          
@@ -456,12 +434,13 @@ class Projects_Controller extends Controller {
             $rec->{Projects_Model_Projects::COLUMN_RELATED} = null;
          }
          
-         $oldDirName = $rec->{Projects_Model_Projects::COLUMN_URLKEY};
+         $oldDirName = $rec[Projects_Model_Projects::COLUMN_URLKEY][Locales::getDefaultLang()];
          
-         if($form->url->getValues() == null){
-            $rec->{Projects_Model_Projects::COLUMN_URLKEY} = $this->createUniqueProjectUrlKey($rec->{Projects_Model_Projects::COLUMN_NAME}, $rec->getPK());
-         } else {
-            $rec->{Projects_Model_Projects::COLUMN_URLKEY} = $this->createUniqueProjectUrlKey($form->url->getValues(), $rec->getPK());
+         $urls = $form->url->getValues();
+         $names = $form->name->getValues();
+         foreach ($urls as $lang => $value) {
+            $urlBase = $value != null ? $value : $names[$lang];
+            $rec[Projects_Model_Projects::COLUMN_URLKEY][$lang] = $this->createUniqueProjectUrlKey( $urlBase, $lang, $rec->getPK() );
          }
          
          $rec->{Projects_Model_Projects::COLUMN_KEYWORDS} = $form->keywords->getValues();
@@ -475,8 +454,8 @@ class Projects_Controller extends Controller {
             $rec->{Projects_Model_Projects::COLUMN_THUMB} = null;
          }
          
-         // titulní obrázek
-         $dir = $this->module()->getDataDir().$rec->{Projects_Model_Projects::COLUMN_URLKEY}.DIRECTORY_SEPARATOR;
+         // zpracovánbí obrázku
+         $dir = $this->module()->getDataDir().$rec[Projects_Model_Projects::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR;
          // miniatura
          if($form->imageThumb->getValues() != null){
             // zadaná miniatura
@@ -720,10 +699,12 @@ class Projects_Controller extends Controller {
       $fGrpSEO = $form->addGroup('seo', $this->tr('SEO'));
       
       $elemName = new Form_Element_Text('name', $this->tr('Název'));
-      $elemName->addValidation(new Form_Validator_NotEmpty());
+      $elemName->setLangs();
+      $elemName->addValidation(new Form_Validator_NotEmpty(null, array(Locales::getDefaultLang())));
       $form->addElement($elemName, $fGrpBase);
       
       $elemShortName = new Form_Element_Text('shortName', $this->tr('Zkrácený název / popisek'));
+      $elemShortName->setLangs();
       $elemShortName->setSubLabel($this->tr('Bývá využit při výpis seznamu projektů. znak "\" nahrazen zalomením řádku'));
       $form->addElement($elemShortName, $fGrpBase);
       
@@ -731,6 +712,7 @@ class Projects_Controller extends Controller {
       $form->addElement($elemPlace, $fGrpBase);
       
       $elemText = new Form_Element_TextArea('text', $this->tr('Popis'));
+      $elemText->setLangs();
       $form->addElement($elemText, $fGrpBase);
       
       $elemImage = new Form_Element_File('image', $this->tr('Titulní obrázek'));
@@ -773,7 +755,7 @@ class Projects_Controller extends Controller {
          if($prRecord != false AND $prRecord->{Projects_Model_Projects::COLUMN_ID} == $project->{Projects_Model_Projects::COLUMN_ID}){
             continue;
          }
-         $elemRealted->setOptions(array($project->{Projects_Model_Projects::COLUMN_ID} => $project->{Projects_Model_Projects::COLUMN_NAME}), true);
+         $elemRealted->addOption($project->{Projects_Model_Projects::COLUMN_NAME}, $project->{Projects_Model_Projects::COLUMN_ID});
       }
       $form->addElement($elemRealted, $fGrpInclusion);
       
@@ -790,6 +772,7 @@ class Projects_Controller extends Controller {
       $form->addElement($elemDateAdd, $fGrpInclusion);
       
       $elemUrl = new Form_Element_UrlKey('url', $this->tr('URL klíč'));
+      $elemUrl->setLangs();
       $elemUrl->setAdvanced(true);
       $elemUrl->setCheckingUrl($this->link()->route('checkProjectUrlkey'))
          ->setUpdateFromElement($elemName);
@@ -851,7 +834,7 @@ class Projects_Controller extends Controller {
    {
       $this->checkReadableRights();
       
-      $this->view()->urlkey = $this->createUniqueProjectUrlKey($_POST['key']);
+      $this->view()->urlkey = $this->createUniqueProjectUrlKey($_POST['key'],$_POST['lang']);
    }
 
    /**
@@ -897,14 +880,14 @@ class Projects_Controller extends Controller {
       $modelSec->delete($ids); // model má nastavenu relaci, takže vymaže i projekty
    }
 
-   protected function createUniqueProjectUrlKey($key, $id = 0)
+   protected function createUniqueProjectUrlKey($key, $lang, $id = 0)
    {
       $model = new Projects_Model_Projects();
       $step = 1;
       $key = vve_cr_url_key($key);
       $origPart = $key;
       
-      $where = Projects_Model_Projects::COLUMN_URLKEY.' = :ukey AND '.Projects_Model_Projects::COLUMN_ID.' != :idp';
+      $where = '('.$lang.')'.Projects_Model_Projects::COLUMN_URLKEY.' = :ukey AND '.Projects_Model_Projects::COLUMN_ID.' != :idp';
       $keys = array('ukey' => $key, 'idp' => (int)$id);
       
       while ($model->where($where, $keys)->count() != 0 ) {

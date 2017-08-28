@@ -36,11 +36,12 @@ class Projects_Model_Projects extends Model_ORM_Ordered {
       $this->addColumn(self::COLUMN_ID_SECTION, array('datatype' => 'int', 'nn' => true, 'pdoparam' => PDO::PARAM_INT));
       $this->addColumn(self::COLUMN_ORDER, array('datatype' => 'int', 'nn' => true, 'pdoparam' => PDO::PARAM_INT));
       
-      $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(300)', 'nn' => true, 'pdoparam' => PDO::PARAM_STR, 'fulltext' => true, 'fulltextRel' => VVE_SEARCH_ARTICLE_REL_MULTIPLIER));
-      $this->addColumn(self::COLUMN_NAME_SHORT, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR));
-      $this->addColumn(self::COLUMN_URLKEY, array('datatype' => 'varchar(200)', 'nn' => true, 'pdoparam' => PDO::PARAM_STR));
-      $this->addColumn(self::COLUMN_TEXT, array('datatype' => 'text', 'pdoparam' => PDO::PARAM_STR));
-      $this->addColumn(self::COLUMN_TEXT_CLEAR, array('datatype' => 'text', 'pdoparam' => PDO::PARAM_STR, 'fulltext' => true));
+      $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(300)', 'nn' => true, 'pdoparam' => PDO::PARAM_STR, 
+          'fulltext' => true, 'fulltextRel' => VVE_SEARCH_ARTICLE_REL_MULTIPLIER, 'lang' => true));
+      $this->addColumn(self::COLUMN_NAME_SHORT, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR, 'lang' => true));
+      $this->addColumn(self::COLUMN_URLKEY, array('datatype' => 'varchar(200)', 'nn' => true, 'pdoparam' => PDO::PARAM_STR, 'lang' => true));
+      $this->addColumn(self::COLUMN_TEXT, array('datatype' => 'text', 'pdoparam' => PDO::PARAM_STR, 'lang' => true));
+      $this->addColumn(self::COLUMN_TEXT_CLEAR, array('datatype' => 'text', 'pdoparam' => PDO::PARAM_STR, 'fulltext' => true, 'lang' => true));
       $this->addColumn(self::COLUMN_PLACE, array('datatype' => 'varchar(100)', 'pdoparam' => PDO::PARAM_STR, 'fulltext' => true));
       
       $this->addColumn(self::COLUMN_IMAGE, array('datatype' => 'varchar(50)', 'pdoparam' => PDO::PARAM_STR, 'default' => null));
@@ -102,7 +103,7 @@ class Projects_Model_Projects_Record extends Model_ORM_Ordered_Record {
    public function getImageSrc(Module $module, $thumb = false)
    {
       return $module->getDataDir(true)
-                . $this[Projects_Model_Projects::COLUMN_URLKEY].DIRECTORY_SEPARATOR
+                . $this[Projects_Model_Projects::COLUMN_URLKEY][Locales::getDefaultLang()].DIRECTORY_SEPARATOR
                 . ($thumb == true ? $this->{Projects_Model_Projects::COLUMN_THUMB} : $this->{Projects_Model_Projects::COLUMN_IMAGE} );
    }
 }
