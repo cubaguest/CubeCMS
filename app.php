@@ -13,13 +13,13 @@
  * @license    GNU General Public License v. 2 viz. Docs/license.txt
  * @internal   Last ErrorCode 22
  */
-if (!defined('CUBECMS_LIB_DIR')) {
-   define('CUBECMS_LIB_DIR', 'lib');
+if (!defined('CUBE_CMS_LIB_DIR')) {
+   define('CUBE_CMS_LIB_DIR', 'lib');
 }
-include_once dirname(__FILE__) . DIRECTORY_SEPARATOR . CUBECMS_LIB_DIR . DIRECTORY_SEPARATOR . 'defines.php';
-include_once dirname(__FILE__) . DIRECTORY_SEPARATOR . CUBECMS_LIB_DIR . DIRECTORY_SEPARATOR . 'loader.class.php';
-include_once dirname(__FILE__) . DIRECTORY_SEPARATOR . CUBECMS_LIB_DIR . DIRECTORY_SEPARATOR . 'trobject.class.php';
-include_once dirname(__FILE__) . DIRECTORY_SEPARATOR . CUBECMS_LIB_DIR . DIRECTORY_SEPARATOR . 'debug' . DIRECTORY_SEPARATOR . 'debug.class.php';
+include_once dirname(__FILE__) . DIRECTORY_SEPARATOR . CUBE_CMS_LIB_DIR . DIRECTORY_SEPARATOR . 'defines.php';
+include_once dirname(__FILE__) . DIRECTORY_SEPARATOR . CUBE_CMS_LIB_DIR . DIRECTORY_SEPARATOR . 'loader.class.php';
+include_once dirname(__FILE__) . DIRECTORY_SEPARATOR . CUBE_CMS_LIB_DIR . DIRECTORY_SEPARATOR . 'trobject.class.php';
+include_once dirname(__FILE__) . DIRECTORY_SEPARATOR . CUBE_CMS_LIB_DIR . DIRECTORY_SEPARATOR . 'debug' . DIRECTORY_SEPARATOR . 'debug.class.php';
 
 class AppCore extends TrObject {
 
@@ -31,7 +31,7 @@ class AppCore extends TrObject {
    /**
     * Verze enginu
     */
-   const ENGINE_VERSION = '8.4.10';
+   const ENGINE_VERSION = '8.4.12';
 
    /**
     * Obsahuje hlavní soubor aplikace
@@ -51,7 +51,7 @@ class AppCore extends TrObject {
    /**
     * Adresář s knihovnami enginu
     */
-   const ENGINE_LIB_DIR = CUBECMS_LIB_DIR;
+   const ENGINE_LIB_DIR = CUBE_CMS_LIB_DIR;
 
    /**
     * Adresář s logy enginu
@@ -279,7 +279,8 @@ class AppCore extends TrObject {
     */
    public static function getAppWebDir()
    {
-      return self::$_appWebDir;
+//      return self::$_appWebDir;
+      return CUBE_CMS_WEB_DIR;
    }
 
    /**
@@ -288,7 +289,7 @@ class AppCore extends TrObject {
     */
    public static function getAppLibDir()
    {
-      return self::$_appLibDir;
+      return CUBE_CMS_BASE_DIR;
    }
 
    /**
@@ -424,6 +425,17 @@ class AppCore extends TrObject {
       define('VVE_MAX_UPLOAD_SIZE', min($max_upload, $max_post, $memory_limit));
       define('CUBE_CMS_MAX_UPLOAD_SIZE', min($max_upload, $max_post, $memory_limit));
    }
+   
+   private function _initCompatibility(){
+      // stará konfigurace DB
+      if(defined('VVE_DB_PREFIX') && !defined('CUBE_CMS_DB_PREFIX')){
+         define('CUBE_CMS_DB_PREFIX', VVE_DB_PREFIX);
+         define('CUBE_CMS_DB_SERVER', VVE_DB_SERVER);
+         define('CUBE_CMS_DB_NAME', VVE_DB_NAME);
+         define('CUBE_CMS_DB_USER', VVE_DB_USER);
+         define('CUBE_CMS_DB_PASSWD', VVE_DB_PASSWD);
+      }
+   }
 
    /**
     * Metoda načte základní třídy
@@ -551,19 +563,19 @@ class AppCore extends TrObject {
     * Metoda nastavuje hlavní adresář aplikace
     * @param string -- hlavní adresář aplikace
     */
-   public static function setAppMainDir($appMainDir)
-   {
-      self::$_appWebDir = $appMainDir;
-   }
+//   public static function setAppMainDir($appMainDir)
+//   {
+//      self::$_appWebDir = $appMainDir;
+//   }
 
    /**
     * Metoda nastavuje hlavní adresář s knihovnami aplikace
     * @param string -- hlavní adresář s knihovnami aplikace
     */
-   public static function setAppMainLibDir($appMainLibDir)
-   {
-      self::$_appLibDir = $appMainLibDir;
-   }
+//   public static function setAppMainLibDir($appMainLibDir)
+//   {
+//      self::$_appLibDir = $appMainLibDir;
+//   }
 
    /**
     * Metoda vytvoří hlavní menu aplikace
@@ -1284,5 +1296,3 @@ class AppCore extends TrObject {
    }
 
 }
-
-?>

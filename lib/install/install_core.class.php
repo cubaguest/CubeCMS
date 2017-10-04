@@ -143,7 +143,7 @@ class Install_Core {
    public function upgrade()
    {
       // kontrola downgrade
-      if(version_compare(AppCore::ENGINE_VERSION, VVE_VERSION) != 1){
+      if(version_compare(AppCore::ENGINE_VERSION, CUBE_CMS_VERSION) != 1){
          return;
       }
 
@@ -151,14 +151,14 @@ class Install_Core {
       $record = $modelCfg->columns(array(Model_Config::COLUMN_KEY, Model_Config::COLUMN_VALUE))->where(Model_Config::COLUMN_KEY, 'VERSION')->record();
 
       if($record == false){ // release není v databázi
-         define('VVE_VERSION', 6);
+         define('CUBE_CMS_VERSION', 6);
          // aktualizovat version na 6.1.0 ???
       }
 
-      $currentVer = VVE_VERSION;
+      $currentVer = CUBE_CMS_VERSION;
       // oprava aktuální verze na plnou hodnotu
-      if(strpos((string)VVE_VERSION, '.') === false){
-         $currentVer = VVE_VERSION.'.'.VVE_RELEASE.'.0';
+      if(strpos((string)CUBE_CMS_VERSION, '.') === false){
+         $currentVer = CUBE_CMS_VERSION.'.'.CUBE_CMS_RELEASE.'.0';
       }
 
       $upgradeVersions = array();
@@ -182,12 +182,12 @@ class Install_Core {
           * Tohle by hctělo předělat nějak jinak a detekovat to přímo z tabulky se sites
           */
          if(
-            defined('VVE_SUB_SITE_DOMAIN') && VVE_SUB_SITE_DOMAIN != null
+            defined('CUBE_CMS_SUB_SITE_DOMAIN') && CUBE_CMS_SUB_SITE_DOMAIN != null
             ||
             // OLD !!!
-            ( defined('VVE_SUB_SITE_DIR') && VVE_SUB_SITE_DIR != null )
+            ( defined('CUBE_CMS_SUB_SITE_DIR') && CUBE_CMS_SUB_SITE_DIR != null )
             ||
-            ( defined('VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND') && VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND != null )
+            ( defined('CUBE_CMS_USE_SUBDOMAIN_HTACCESS_WORKAROUND') && CUBE_CMS_USE_SUBDOMAIN_HTACCESS_WORKAROUND != null )
          ){
             $isMainSite = false;
          }
@@ -225,7 +225,7 @@ class Install_Core {
                }
 
                // update shop sql
-               if (defined('VVE_SHOP') && VVE_SHOP == true && is_file($sqlDir.$sqlFileShop)) {
+               if (defined('CUBE_CMS_SHOP') && CUBE_CMS_SHOP == true && is_file($sqlDir.$sqlFileShop)) {
                   $this->processSqlUpgradeFile($sqlDir.$sqlFileShop);
                }
 
@@ -269,7 +269,7 @@ class Install_Core {
             } else if(strlen($buffer) <= 30 && strpos($buffer, self::SQL_SUB_SITE_UPDATE)){
                $update = 'sub';
                $sql .= $m . ' UPDATING '. $update."\n";
-            } else if(strlen($buffer) <= 30 && strpos($buffer, self::SQL_SHOP_UPDATE)){ // musí být definová VVE_SHOP
+            } else if(strlen($buffer) <= 30 && strpos($buffer, self::SQL_SHOP_UPDATE)){ // musí být definová CUBE_CMS_SHOP
                $update = 'shop';
                $sql .= $m . ' UPDATING SHOP '. $update."\n";
             } else if(strlen($buffer) <= 30 && strpos($buffer, self::SQL_SITE_END_UPDATE)){
@@ -277,14 +277,14 @@ class Install_Core {
                $update = 'all';
             } else if($buffer != null) {
                if($update == 'all' ||
-                  (defined('VVE_SUB_SITE_DIR') && ((!defined('VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND') && VVE_SUB_SITE_DIR == null && $update == 'main' )
-                     || (!defined('VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND') && VVE_SUB_SITE_DIR != null && $update == 'sub' ) ) )
+                  (defined('CUBE_CMS_SUB_SITE_DIR') && ((!defined('CUBE_CMS_USE_SUBDOMAIN_HTACCESS_WORKAROUND') && CUBE_CMS_SUB_SITE_DIR == null && $update == 'main' )
+                     || (!defined('CUBE_CMS_USE_SUBDOMAIN_HTACCESS_WORKAROUND') && CUBE_CMS_SUB_SITE_DIR != null && $update == 'sub' ) ) )
                   // for old subdomain htaccess
-                  || (defined('VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND') && ((VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND == null && $update == 'main' )
-                     || (VVE_USE_SUBDOMAIN_HTACCESS_WORKAROUND != null && $update == 'sub' )) )
+                  || (defined('CUBE_CMS_USE_SUBDOMAIN_HTACCESS_WORKAROUND') && ((CUBE_CMS_USE_SUBDOMAIN_HTACCESS_WORKAROUND == null && $update == 'main' )
+                     || (CUBE_CMS_USE_SUBDOMAIN_HTACCESS_WORKAROUND != null && $update == 'sub' )) )
                ){
                   $sql .= $buffer;
-               } else if($update == 'shop' && defined('VVE_SHOP') && VVE_SHOP == true){
+               } else if($update == 'shop' && defined('CUBE_CMS_SHOP') && CUBE_CMS_SHOP == true){
                   $sql .= $buffer;
                } else {
                   $sql .= $m.' SKIPING '. $update  ."\n";
@@ -433,7 +433,7 @@ class Install_Core {
 
    protected function replaceDBPrefix($cnt)
    {
-      return str_replace(self::SQL_TABLE_PREFIX_REPLACEMENT, VVE_DB_PREFIX, $cnt);
+      return str_replace(self::SQL_TABLE_PREFIX_REPLACEMENT, defined('CUBE_CMS_DB_PREFIX') ? CUBE_CMS_DB_PREFIX : VVE_DB_PREFIX, $cnt);
    }
 
    public static function addUpgradeMessages()

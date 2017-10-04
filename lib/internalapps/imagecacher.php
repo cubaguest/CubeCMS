@@ -47,7 +47,7 @@ $FACE = $strFace = $_GET['tf'];
 $sizesTMP = $strSize = $_GET['is'];
 $HASH = isset($_GET['hash']) ? urldecode($_GET['hash']) : null;
 $SIZES = array('w' => null, 'h' => null, 'c' => false);
-$CACHED_FILE = $webDir.'cache'.DIRECTORY_SEPARATOR."imgc".DIRECTORY_SEPARATOR.$FACE.DIRECTORY_SEPARATOR.$strSize.DIRECTORY_SEPARATOR.$SOURCE;
+$CACHED_FILE = CUBE_CMS_WEB_DIR.'cache'.DIRECTORY_SEPARATOR."imgc".DIRECTORY_SEPARATOR.$FACE.DIRECTORY_SEPARATOR.$strSize.DIRECTORY_SEPARATOR.$SOURCE;
 $cache_file_url = "http://". $_SERVER['SERVER_NAME']."/cache/imgc/$strFace/$strSize/$strSource";
 
 // check face and load face allowed sizes
@@ -55,7 +55,7 @@ $allowSizes = array(/* base ratio 4:3 */
    'w' => array(100, 124, 200, 300, 400),
    'h' => array(100, 75, 150, 225),
 );
-$expectedHash = sha1($strSize.VVE_DB_PASSWD);
+$expectedHash = sha1($strSize.(defined('CUBE_CMS_DB_PASSWD') ? CUBE_CMS_DB_PASSWD : VVE_DB_PASSWD));
 // parse sizes
 $m = array();
 if(preg_match('/^([0-9]+)?x([0-9]+)?(c?)(?:-f_([0-9]+)?(?:_([0-9]+)?)?(?:_([0-9]+)?)?(?:_([0-9]+)?)?(?:_([0-9]+)?)?)?$/', $sizesTMP, $m) == false){
@@ -86,20 +86,20 @@ if( ( $HASH != null && $expectedHash != $HASH )
 
 
 // load file lib and create obj
-include_once $libDir.CUBECMS_LIB_DIR.DIRECTORY_SEPARATOR.'defines.php';
-include_once $libDir.CUBECMS_LIB_DIR.DIRECTORY_SEPARATOR.'trobject.class.php';
-include_once $libDir.CUBECMS_LIB_DIR.DIRECTORY_SEPARATOR.'file'.DIRECTORY_SEPARATOR.'file_interface.class.php';
-include_once $libDir.CUBECMS_LIB_DIR.DIRECTORY_SEPARATOR.'file'.DIRECTORY_SEPARATOR.'file.class.php';
-include_once $libDir.CUBECMS_LIB_DIR.DIRECTORY_SEPARATOR.'file'.DIRECTORY_SEPARATOR.'image'.DIRECTORY_SEPARATOR.'file_image.class.php';
-include_once $libDir.CUBECMS_LIB_DIR.DIRECTORY_SEPARATOR.'file'.DIRECTORY_SEPARATOR.'image'.DIRECTORY_SEPARATOR.'file_image_base.class.php';
-include_once $libDir.CUBECMS_LIB_DIR.DIRECTORY_SEPARATOR.'file'.DIRECTORY_SEPARATOR.'image'.DIRECTORY_SEPARATOR.'file_image_gd.class.php';
-include_once $libDir.CUBECMS_LIB_DIR.DIRECTORY_SEPARATOR.'fs'.DIRECTORY_SEPARATOR.'fs_dir.class.php';
+include_once CUBE_CMS_BASE_DIR.CUBE_CMS_LIB_DIR.DIRECTORY_SEPARATOR.'defines.php';
+include_once CUBE_CMS_BASE_DIR.CUBE_CMS_LIB_DIR.DIRECTORY_SEPARATOR.'trobject.class.php';
+include_once CUBE_CMS_BASE_DIR.CUBE_CMS_LIB_DIR.DIRECTORY_SEPARATOR.'file'.DIRECTORY_SEPARATOR.'file_interface.class.php';
+include_once CUBE_CMS_BASE_DIR.CUBE_CMS_LIB_DIR.DIRECTORY_SEPARATOR.'file'.DIRECTORY_SEPARATOR.'file.class.php';
+include_once CUBE_CMS_BASE_DIR.CUBE_CMS_LIB_DIR.DIRECTORY_SEPARATOR.'file'.DIRECTORY_SEPARATOR.'image'.DIRECTORY_SEPARATOR.'file_image.class.php';
+include_once CUBE_CMS_BASE_DIR.CUBE_CMS_LIB_DIR.DIRECTORY_SEPARATOR.'file'.DIRECTORY_SEPARATOR.'image'.DIRECTORY_SEPARATOR.'file_image_base.class.php';
+include_once CUBE_CMS_BASE_DIR.CUBE_CMS_LIB_DIR.DIRECTORY_SEPARATOR.'file'.DIRECTORY_SEPARATOR.'image'.DIRECTORY_SEPARATOR.'file_image_gd.class.php';
+include_once CUBE_CMS_BASE_DIR.CUBE_CMS_LIB_DIR.DIRECTORY_SEPARATOR.'fs'.DIRECTORY_SEPARATOR.'fs_dir.class.php';
 define('VVE_USE_IMAGEMAGICK', false);
 $image = null;
 try {
-   $image = new File_Image($webDir.$SOURCE);
+   $image = new File_Image(CUBE_CMS_WEB_DIR.$SOURCE);
    if(!$image->exist()){
-      $image = new File_Image($libDir.$SOURCE);
+      $image = new File_Image(CUBE_CMS_BASE_DIR.$SOURCE);
    }
    if(!$image->isImage()){
       header('HTTP/1.0 403 Forbidden');

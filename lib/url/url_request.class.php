@@ -88,6 +88,12 @@ class Url_Request {
    private static $domain = 'localhost';
 
    /**
+    * podadresář aplikace
+    * @var string
+    */ 
+   private static $subdir = null;
+   
+   /**
     * Adresa serveru (např. www.seznam.cz)
     * @var string
     */
@@ -178,56 +184,51 @@ class Url_Request {
     * Metoda inicializuje požadavky v URL
     */
    public static function factory() {
-   //		Vytvoření url
-      $fullUrl = $_SERVER['REQUEST_URI'];
-      $scriptName = $_SERVER["SCRIPT_NAME"];
-      $scriptName = '/'.pathinfo($scriptName, PATHINFO_BASENAME);
-      self::$serverName = $_SERVER["HTTP_HOST"];
+      self::$domain = $_SERVER['SERVER_NAME'];
+      // část mezi doménou a adresářem aplikace
+      $baseAndWebPathDiff = str_replace(DIRECTORY_SEPARATOR, '/', str_replace(CUBE_CMS_BASE_DIR, '', CUBE_CMS_WEB_DIR));
+      $urlPathPart = ltrim(str_replace(
+              array( 'index.php',$baseAndWebPathDiff), 
+              array( '', ''), 
+              $_SERVER['SCRIPT_NAME']
+              ), '/');
+      
+      
       if(isset($_SERVER["HTTPS"])){
          self::$transferProtocol = "https://";
          Url_Link::setTransferProtocol(self::$transferProtocol);
       }
-      if(self::$serverName != 'localhost'){
-         $pos = strpos(self::$serverName, '.');
-         self::$domain = substr(self::$serverName, $pos+1);
-         //self::$subDomain = substr(self::$serverName, 0, -strlen(self::$domain)-1);
-      }
-
-      if(VVE_SUB_SITE_DOMAIN != null AND VVE_SUB_SITE_USE_HTACCESS == true){ // Only if Htacces subdomain workarround
-         $fullUrl = str_replace(VVE_SUB_SITE_DOMAIN, '', $fullUrl);
-         $scriptName = str_replace('/'.VVE_SUB_SITE_DOMAIN, '', $scriptName);
-      }
-      // Najdeme co je cesta k aplikaci a co je předaná url
-      //	Vytvoříme základní URL cestu k aplikaci
-      self::$baseWebUrl = self::$baseMainWebUrl = self::$transferProtocol.self::$serverName.substr($scriptName, 0, strpos($scriptName, '/')).'/';
-      if(VVE_SUB_SITE_DOMAIN != null){
-         self::$baseMainWebUrl = str_replace(self::$serverName, 'www.'.self::$domain, self::$baseWebUrl);
+      
+      // základní url adresa systému
+      self::$baseMainWebUrl = self::$transferProtocol.CUBE_CMS_PRIMARY_DOMAIN.'/';
+      
+      // url adresa webu
+      self::$baseWebUrl = self::$transferProtocol.self::$domain.'/'.$urlPathPart;
+      
+      if(CUBE_CMS_BASE_DIR == CUBE_CMS_WEB_DIR){
+         self::$baseMainWebUrl = self::$baseWebUrl;
       }
       
-      // jsme v adresáři
-      if(substr_count($scriptName, '/') >= 2) {
-         if(VVE_SUB_SITE_DOMAIN == null){
-            // remove dir from script, it's on virtula root
-            self::$fullUrl = substr($fullUrl, strpos(preg_replace('/\/[a-z0-9_-]+\//i', "/", $scriptName), AppCore::APP_MAIN_FILE));
-            // Wedos sračka
-            // self::$fullUrl = substr($fullUrl, strpos(preg_replace('/\/[a-z0-9._-]+\/[a-z0-9._-]+\//i', "/", $scriptName), AppCore::APP_MAIN_FILE));
-         } else if(VVE_SUB_SITE_USE_HTACCESS == true) {
-            // sub web na subdoméně
-            throw new Exception('Metoda není implementována!');
-//            if(strpos(VVE_SUB_SITE_DOMAIN.'.', self::$serverName) === false) {
-////               Debug::log('sub web na doméně přes htaccess');
-//            } else {
-////               Debug::log('sub web na subdoméně přes htaccess');
-//            }             
-         } else {
-            self::$fullUrl = substr($fullUrl, strpos(preg_replace('/\/[a-z0-9_-]+\//i', "/", $scriptName), AppCore::APP_MAIN_FILE));
-         }
-      } else {
-         self::$fullUrl = substr($fullUrl, strpos($scriptName, AppCore::APP_MAIN_FILE));
+      // url za kořenem webu
+      self::$fullUrl = str_replace($urlPathPart, '', ltrim(str_replace('index.php','',$_SERVER['REQUEST_URI']), '/'));
+      self::$subdir = $urlPathPart;
+      
+      // pokud je subdoména pomocí htaccess
+      if($urlPathPart != null && $baseAndWebPathDiff != null){
+         self::$baseWebUrl .= $baseAndWebPathDiff;
+         self::$fullUrl = str_replace($baseAndWebPathDiff, '', self::$fullUrl);
+         self::$subdir = $urlPathPart.$baseAndWebPathDiff;
       }
-      // odstraníme dvojté lomítka
-      self::$fullUrl = preg_replace('/[\/]{2,}/', '/', self::$fullUrl);
-      self::$webUrl = str_replace(self::$baseWebUrl, '', self::$fullUrl);
+      /*
+       * self::$subdir           - podsložka aplikace - tedy její kořen       /myappinfolder/
+       * self::$serverName       - webserver - tedy doména                    www.vkci.com
+       * self::$fullUrl          - cesta za doménou                           ucet/?debug 
+       * self::$webUrl           - cesta za doménou                           ucet/?debug  
+       * self::$baseMainWebUrl   - základní cestak aplikaci (root app)        http://www.vkci.com/
+       * self::$baseWebUrl       - základní cestak aplikaci                   http://www.vkci.com/
+       * self::$domain           - doména bez subdomén                        vkci.com
+       */
+      
       if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'
           || isset($_GET['SIMULATE_XHR'])) {
           self::$isXHRRequest = true;
@@ -403,7 +404,7 @@ class Url_Request {
       foreach (glob(AppCore::getAppLibDir().'lib'.DIRECTORY_SEPARATOR.'module'.DIRECTORY_SEPARATOR.'*', GLOB_ONLYDIR) as $value) {
          $modules[] = basename($value);
       }
-      $regexp = '/((?:'. implode('|', $modules).')).((xml|txt|html|php)+)/i';
+      $regexp = '/^((?:'. implode('|', $modules).')).((xml|txt|html|php)+)/i';
       $matches = array();
       if(preg_match($regexp, self::$fullUrl, $matches) != 0) {
          $this->pageFull = false;
@@ -645,5 +646,13 @@ class Url_Request {
     */
    public static function getXHRRespondClass() {
       return self::$XHRRespondClass;
+   }
+   
+   /**
+    * Metoda podadresář aplikace
+    * @return string
+    */
+   public static function getAppSubdir() {
+      return self::$subdir;
    }
 }

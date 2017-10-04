@@ -855,7 +855,7 @@ class Template extends TrObject {
    }
 
    protected function getLesscCssFromEngine($file, $original = false) {
-      require_once AppCore::getAppLibDir().CUBECMS_LIB_DIR.DIRECTORY_SEPARATOR."nonvve".DIRECTORY_SEPARATOR."lessphp".DIRECTORY_SEPARATOR."lessc.inc.php";
+      require_once AppCore::getAppLibDir().CUBE_CMS_LIB_DIR.DIRECTORY_SEPARATOR."nonvve".DIRECTORY_SEPARATOR."lessphp".DIRECTORY_SEPARATOR."lessc.inc.php";
       $rpFile = str_replace('/', DIRECTORY_SEPARATOR, $file);
       $rpFaceDir = Template::faceDir().self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR;
       $rpParentFaceDir = Template::faceDir(true).self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR;
@@ -917,7 +917,7 @@ class Template extends TrObject {
    }
 
    protected function getLesscCssFromModule($file, $module, $original = false) {
-      require_once AppCore::getAppLibDir().CUBECMS_LIB_DIR.DIRECTORY_SEPARATOR."nonvve".DIRECTORY_SEPARATOR."lessphp".DIRECTORY_SEPARATOR."lessc.inc.php";
+      require_once AppCore::getAppLibDir().CUBE_CMS_LIB_DIR.DIRECTORY_SEPARATOR."nonvve".DIRECTORY_SEPARATOR."lessphp".DIRECTORY_SEPARATOR."lessc.inc.php";
 
       $rpFile = str_replace('/', DIRECTORY_SEPARATOR, $file);
       $rpFaceDir = $rpParentFaceDir = Template::faceDir().AppCore::MODULES_DIR.DIRECTORY_SEPARATOR.$module
@@ -997,7 +997,7 @@ class Template extends TrObject {
    }
 
    protected function getSassCssFromEngine($file, $original = false, $ext = 'scss') {
-      require_once AppCore::getAppLibDir().CUBECMS_LIB_DIR.DIRECTORY_SEPARATOR."nonvve".DIRECTORY_SEPARATOR."phpsass".DIRECTORY_SEPARATOR."SassParser.php";
+      require_once AppCore::getAppLibDir().CUBE_CMS_LIB_DIR.DIRECTORY_SEPARATOR."nonvve".DIRECTORY_SEPARATOR."phpsass".DIRECTORY_SEPARATOR."SassParser.php";
       $rpFile = str_replace('/', DIRECTORY_SEPARATOR, $file);
       $rpFaceDir = Template::faceDir().self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR;
       $rpParentFaceDir = Template::faceDir(true).self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR;
@@ -1038,7 +1038,7 @@ class Template extends TrObject {
    }
 
    protected function getSassCssFromModule($file, $module, $original = false, $ext = 'scss') {
-      require_once AppCore::getAppLibDir().CUBECMS_LIB_DIR.DIRECTORY_SEPARATOR."nonvve".DIRECTORY_SEPARATOR."phpsass".DIRECTORY_SEPARATOR."SassParser.php";
+      require_once AppCore::getAppLibDir().CUBE_CMS_LIB_DIR.DIRECTORY_SEPARATOR."nonvve".DIRECTORY_SEPARATOR."phpsass".DIRECTORY_SEPARATOR."SassParser.php";
 
 //      $rpFile = str_replace('/', DIRECTORY_SEPARATOR, $file);
 //      $rpFaceDir = Template::faceDir().self::STYLESHEETS_DIR.DIRECTORY_SEPARATOR;

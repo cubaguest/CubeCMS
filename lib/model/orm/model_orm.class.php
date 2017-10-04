@@ -34,9 +34,9 @@ abstract class Model_ORM extends Model implements ArrayAccess {
 
    protected $tableName = null;
    protected $tableShortName = null;
-   protected $dbName = VVE_DB_NAME;
+   protected $dbName = null;
    protected $dbEngine = 'MyISAM';
-   public $dbPrefix = VVE_DB_PREFIX;
+   public $dbPrefix = null;
    private $tableStructure = array();
    private $pKey = null;
    private $foreignKeys = array();
@@ -68,7 +68,7 @@ abstract class Model_ORM extends Model implements ArrayAccess {
       'value' => false,
       'valueLoaded' => false,
       'fulltextRel' => 1, // relevance sloupce FULLTEXTu
-       
+
       'validation' => false, // validační funkce
       'maxlen' => false, // maximální délka řetězce
    );
@@ -90,10 +90,10 @@ abstract class Model_ORM extends Model implements ArrayAccess {
    protected $currentSql = null;
    protected $bindValues = array();
    protected $fetchingDbst = false;
-   
+
    /**
     * Název třídy s objektem záznamu
-    * @var string 
+    * @var string
     */
    protected $rowClass = 'Model_ORM_Record';
 
@@ -102,11 +102,13 @@ abstract class Model_ORM extends Model implements ArrayAccess {
    protected $params = array();
 
    /**
-    * 
+    *
     * @param array $params - nepovinné parametry modelu, např datový adresář a podobně
     */
    public function __construct($params = array())
    {
+      $this->dbPrefix = defined('CUBE_CMS_DB_PREFIX') ? CUBE_CMS_DB_PREFIX : VVE_DB_PREFIX;
+      $this->dbName = defined('CUBE_CMS_DB_NAME') ? CUBE_CMS_DB_NAME : VVE_DB_NAME;
       parent::__construct();
       $this->selectedColumns = array();
       $this->orders = array();
@@ -122,13 +124,13 @@ abstract class Model_ORM extends Model implements ArrayAccess {
       $this->fetchingDbst = false;
 
       $this->params = $params;
-      
+
       $this->_initTable();
       if($this->rowClass == 'Model_ORM_Record' && class_exists(get_class($this).'_Record')){
          $this->rowClass = get_class($this).'_Record';
       }
    }
-   
+
    /**
     * Metoda vytvoří nový objekt
     * @return static
@@ -238,7 +240,7 @@ abstract class Model_ORM extends Model implements ArrayAccess {
       if($this->tableStructure[$column]['aliasFor'] != null) $columnReal = $this->tableStructure[$column]['aliasFor'];
       $this->foreignKeys[$column] = array('column' => $columnReal, 'modelName' => $modelName, 'modelColumn' => $externColumn, 'prefix' => $columnsPrefix);
    }
-   
+
    /**
     * Kontroluje jestli je daný klíč cizí
     * @param string $colName
@@ -248,7 +250,7 @@ abstract class Model_ORM extends Model implements ArrayAccess {
    {
       return isset($this->foreignKeys[$colName]);
    }
-   
+
    /**
     * Vrací nasatvení cizího klíče pokud existuje
     * @param string $colName
@@ -303,7 +305,7 @@ abstract class Model_ORM extends Model implements ArrayAccess {
       $this->pKey = $collname;
       $this->tableStructure[$collname]['pk'] = true;
    }
-   
+
    /**
     * Metoda vrací název primárního klíče
     * @return string
@@ -472,7 +474,7 @@ abstract class Model_ORM extends Model implements ArrayAccess {
    }
 
    /**
-    * 
+    *
     * @param Model_ORM $obj
     * @param type $fetchParams
     * @return Model_ORM_Record|false
@@ -527,7 +529,7 @@ abstract class Model_ORM extends Model implements ArrayAccess {
       }
       return $r;
    }
-   
+
    protected $stmt = false;
    protected $stmtSQL = false;
    /**
@@ -542,7 +544,7 @@ abstract class Model_ORM extends Model implements ArrayAccess {
       if(!$this->stmt){
          $sql = null;
          if($this->currentSql == null){
-            $sql = 'SELECT ' . $this->createSQLSelectColumns() . ' FROM `' 
+            $sql = 'SELECT ' . $this->createSQLSelectColumns() . ' FROM `'
                 . $this->getDbName() . '`.`' . $this->getTableName() . '` AS ' . $this->getTableShortName();
             $this->createSQLJoins($sql);
             $this->createSQLWhere($sql, $this->getTableShortName());
@@ -672,7 +674,7 @@ abstract class Model_ORM extends Model implements ArrayAccess {
          $this->fetchingDbst = $this->getDb()->prepare($sql);
       }
       $this->whereBindValues = array_merge($this->whereBindValues, $whereBarams);
-      
+
       $this->bindSQLWhere($this->fetchingDbst); // where values
       $this->bindSQLHaving($this->fetchingDbst); // having values
       $this->bindSQLLimit($this->fetchingDbst); // limit values
@@ -707,7 +709,7 @@ abstract class Model_ORM extends Model implements ArrayAccess {
 
       return $r;
    }
-   
+
    /**
     * Metoda vrací počet záznamů z db podle daného nastavení modelu
     * @return int
@@ -957,10 +959,13 @@ abstract class Model_ORM extends Model implements ArrayAccess {
       $this->createSQLLimi($sql); // limit
       if($assignVars){
          $replacements = array();
-         foreach (array_merge($this->bindValues, $this->whereBindValues, $this->havingBindValues) as $key => $value) {
+         foreach (array_merge($this->bindValues, $this->whereBindValues, $this->havingBindValues, $this->limit) as $key => $value) {
             $k = $key;
             if(strpos($key,':') === false){
                $k = ':'.$key;
+            }
+            if($value instanceof DateTime){
+               $value = $value->format(DATE_ISO8601);
             }
             $replacements[$k] = is_int($value) ? $value : '\''.$value.'\'';
          }
@@ -980,9 +985,9 @@ abstract class Model_ORM extends Model implements ArrayAccess {
    public function save(Model_ORM_Record $record)
    {
       $returnPk = $record->getPK();
-      
-      // validace 
-      
+
+      // validace
+
       if (!$record->isNew()) {
          $this->beforeSave($record, 'U');
          // @TODO - použít metodu update !!!!
@@ -1197,7 +1202,7 @@ abstract class Model_ORM extends Model implements ArrayAccess {
       }
       return $dbst->rowCount();
    }
-      
+
    /**
     * Metoda vymaže všechny záznamy z tabulky
     * @return bool
@@ -1508,7 +1513,7 @@ abstract class Model_ORM extends Model implements ArrayAccess {
          $cond = $cond . ' = :colval';
          $bindValues = array('colval' => $bindValues);
       }
-      
+
       // přidání dvojtečky do všech klíčů (ryhlejší zpracování vy výstupu)
       foreach ($bindValues as $key => $value) {
          if(strpos($key, ':') === false){
@@ -1516,7 +1521,7 @@ abstract class Model_ORM extends Model implements ArrayAccess {
             unset($bindValues[$key]);
          }
       }
-      
+
       if ($append == false) {
          $this->where = $cond;
          $this->whereBindValues = $bindValues;
@@ -1526,7 +1531,7 @@ abstract class Model_ORM extends Model implements ArrayAccess {
       }
       return $this;
    }
-   
+
    /**
     * Podmínka s AND
     * @param string $cond - podmínka
@@ -1537,7 +1542,7 @@ abstract class Model_ORM extends Model implements ArrayAccess {
    {
       return $this->where(' AND '.$cond, $values, true);
    }
-   
+
    /**
     * Podmínka s OR
     * @param string $cond - podmínka
@@ -1831,7 +1836,7 @@ abstract class Model_ORM extends Model implements ArrayAccess {
 
    /**
     * Metoda vytváří řetězec pro sloupce
-    * 
+    *
     * <code>
     * 0 => string 'Model_Groups_1' (length=14)
     * 1 => string 'gname' (length=5)
@@ -1902,7 +1907,7 @@ abstract class Model_ORM extends Model implements ArrayAccess {
    protected function createSQLLimi(&$sql)
    {
       if ($this->limit['from'] !== null) {
-         $sql .= ' LIMIT :fromRow, :rows'."\n";
+         $sql .= ' LIMIT :cube_cms_fromrow, :cube_cms_rows'."\n";
       }
    }
 
@@ -2080,7 +2085,7 @@ abstract class Model_ORM extends Model implements ArrayAccess {
          $this->createSQLSelectJoinColumns(array()); // provede vytvoření sloupců
       $sql .= $this->joinString; // je vytvořen v přípravě sloupců
    }
-   
+
    /**
     * Aktualizace sloupce s jazykovými mutacemi
     * @param string $lang -- kód jazyka
@@ -2100,7 +2105,7 @@ abstract class Model_ORM extends Model implements ArrayAccess {
    {
       $sql = 'SELECT COUNT(*) AS count FROM INFORMATION_SCHEMA.COLUMNS
         WHERE table_name = :tablename AND table_schema = DATABASE() AND column_name = :colname';
-      
+
       $db = $this->getDb()->prepare($sql);
       $db->bindValue(':colname', $name);
       $db->bindValue(':tablename', $this->getTableName());
@@ -2109,12 +2114,12 @@ abstract class Model_ORM extends Model implements ArrayAccess {
       $result = $db->fetch();
       return (isset($result->count) && $result->count > 0 ) ? true : false;
    }
-   
+
    public function tableExist()
    {
       $sql = 'SELECT COUNT(*) AS count FROM INFORMATION_SCHEMA.TABLES
         WHERE table_name = :tablename AND table_schema = DATABASE()';
-      
+
       $db = $this->getDb()->prepare($sql);
       $db->bindValue(':tablename', $this->getTableName());
       $db->setFetchMode(PDO::FETCH_OBJ);
@@ -2122,12 +2127,12 @@ abstract class Model_ORM extends Model implements ArrayAccess {
       $result = $db->fetch();
       return (isset($result->count) && $result->count > 0 ) ? true : false;
    }
-   
+
    public function createColumn($name, $params = array(), $lang = null)
    {
       $params += self::$defaultColumnParams;
       $datatype = strtoupper($params['datatype']);
-      
+
       $sql = 'ALTER TABLE '.$this->getTableName();
       // column
       $sql .= ' ADD '.$name.' '.$datatype;
@@ -2138,7 +2143,7 @@ abstract class Model_ORM extends Model implements ArrayAccess {
          if($params['lang'] && $params['collateautodetect']){
             $collate = Locales::getCollation($lang, 'mysql');
          }
-         
+
          $sql .= ' CHARACTER SET \'utf8\' COLLATE \''.$collate.'\'';
       }
       // výchozí parametry a nulová hodnota
@@ -2150,12 +2155,12 @@ abstract class Model_ORM extends Model implements ArrayAccess {
          }
          $sql .= ' DEFAULT '.$def;
       }
-      
+
       // fulltext
       if($params['fulltext']){
          $sql .= ', ADD FULLTEXT INDEX `'.$name.'` (`'.$name.'` ASC)';
       }
-      
+
       $sql .= ';';
       $this->getDb()->exec($sql);
    }
@@ -2169,8 +2174,8 @@ abstract class Model_ORM extends Model implements ArrayAccess {
    protected function bindSQLLimit(PDOStatement &$stmt)
    {
       if ($this->limit['from'] !== null) {
-         $stmt->bindValue(':fromRow', (int) $this->limit['from'], PDO::PARAM_INT);
-         $stmt->bindValue(':rows', (int) $this->limit['rows'], PDO::PARAM_INT);
+         $stmt->bindValue(':cube_cms_fromrow', (int) $this->limit['from'], PDO::PARAM_INT);
+         $stmt->bindValue(':cube_cms_rows', (int) $this->limit['rows'], PDO::PARAM_INT);
       }
    }
 
@@ -2214,9 +2219,9 @@ abstract class Model_ORM extends Model implements ArrayAccess {
             }
             $nameParam = $name[0] != ":" ? ':'.$name : $name;
             // bindParam use references http://php.net/manual/en/pdostatement.bindvalue.php#80285
-            if (!$mustBeBindValue && $stmt->bindParam($nameParam, $this->whereBindValues[$name], $pdoParam) !== false) { 
+            if (!$mustBeBindValue && $stmt->bindParam($nameParam, $this->whereBindValues[$name], $pdoParam) !== false) {
             } else {
-               $stmt->bindValue(':' . $name, $val, $pdoParam);
+               $stmt->bindValue($nameParam, $val, $pdoParam);
             }
          }
       }
@@ -2259,7 +2264,7 @@ abstract class Model_ORM extends Model implements ArrayAccess {
             $nameParam = $name[0] != ":" ? ':'.$name : $name;
             if (!$mustBeBindValue && $stmt->bindParam($nameParam, $val, $pdoParam) !== false) { // nefunguje při některých where, ale proč??
             } else {
-               $stmt->bindValue(':' . $name, $val, $pdoParam);
+               $stmt->bindValue($nameParam, $val, $pdoParam);
             }
          }
       }
@@ -2294,7 +2299,8 @@ abstract class Model_ORM extends Model implements ArrayAccess {
                break;
                break;
          }
-         $stmt->bindValue(':' . $key, $value, $pdoParam);
+         $nameParam = $key[0] != ":" ? ':'.$key : $key;
+         $stmt->bindValue($nameParam, $value, $pdoParam);
       }
       return $stmt;
    }
@@ -2433,7 +2439,7 @@ abstract class Model_ORM extends Model implements ArrayAccess {
       $m = new static();
       return $m->record($id);
    }
-   
+
    /**
     * metoda vrací nový záznam
     * @return Model_ORM_Record
@@ -2444,7 +2450,7 @@ abstract class Model_ORM extends Model implements ArrayAccess {
       $m = new static();
       return $m->newRecord();
    }
-   
+
    /**
     * Metoda vrací všechny záznamy z db
     * @return Model_ORM_Record[]
@@ -2456,19 +2462,19 @@ abstract class Model_ORM extends Model implements ArrayAccess {
       $m = new static();
       return $m->records();
    }
-   
+
    /**
-    * Metoda vytvoří placeholdery pro klauzuli WHERE IN 
+    * Metoda vytvoří placeholdery pro klauzuli WHERE IN
     * @return string - řetězec s placeholdery
     */
    public static function getWhereINPlaceholders($array)
    {
       array_walk($array, create_function('&$val,$key', '$val = ":key_".$key;'));
-      return implode(',', $array); 
+      return implode(',', $array);
    }
-   
+
    /**
-    * Metoda vytvoří pole s hodnotami pro klauzuli WHERE IN 
+    * Metoda vytvoří pole s hodnotami pro klauzuli WHERE IN
     * @return array pole s elementy pro pro vložení
     */
    public static function getWhereINValues($array)
@@ -2477,6 +2483,6 @@ abstract class Model_ORM extends Model implements ArrayAccess {
       foreach ($array as $key => $value){
          $retArray[':key_'.$key] = $value;
       }
-      return $retArray; 
+      return $retArray;
    }
 }

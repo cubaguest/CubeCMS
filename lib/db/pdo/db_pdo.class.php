@@ -94,14 +94,13 @@ class Db_PDO extends PDO {
     * @return Db Konektory k danému databázovému stroji
     */
    public static function factory() {
-      self::$serverName = VVE_DB_SERVER;
-      self::$serverPort = defined("VVE_DB_SERVER_PORT") ? VVE_DB_SERVER_PORT : null;
-      self::$serverPort = defined("CUBE_CMS_DB_SERVER_PORT") ? CUBE_CMS_DB_SERVER_PORT : self::$serverPort;
-      self::$userName = VVE_DB_USER;
-      self::$userPassword = VVE_DB_PASSWD;
-      self::$dbName = VVE_DB_NAME;
-      self::$tablePrefix = VVE_DB_PREFIX;
-      self::$connectorType = VVE_DB_TYPE;
+      self::$serverName = defined('CUBE_CMS_DB_SERVER') ? CUBE_CMS_DB_SERVER : VVE_DB_SERVER;
+      self::$serverPort = defined('CUBE_CMS_DB_SERVER_PORT') ? CUBE_CMS_DB_SERVER_PORT : (defined("VVE_DB_SERVER_PORT") ? VVE_DB_SERVER_PORT : self::$serverPort);
+      self::$userName = defined('CUBE_CMS_DB_USER') ? CUBE_CMS_DB_USER : VVE_DB_USER;
+      self::$userPassword = defined('CUBE_CMS_DB_PASSWD') ? CUBE_CMS_DB_PASSWD : VVE_DB_PASSWD;
+      self::$dbName = defined('CUBE_CMS_DB_NAME') ? CUBE_CMS_DB_NAME : VVE_DB_NAME;
+      self::$tablePrefix = defined('CUBE_CMS_DB_PREFIX') ? CUBE_CMS_DB_PREFIX : VVE_DB_PREFIX;
+      self::$connectorType = defined('CUBE_CMS_DB_TYPE') ? CUBE_CMS_DB_TYPE : VVE_DB_TYPE;
       if (!isset(self::$instance) || self::$instance == null)
       {
          self::$instance = new Db_PDO();
@@ -145,4 +144,3 @@ class Db_PDO extends PDO {
       return self::$instance;
    }
 }
-?>

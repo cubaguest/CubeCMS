@@ -54,7 +54,7 @@ class Utils_Image {
       }
       $origPath = str_replace(Url_Request::getBaseWebDir(), '', $path);
       $cachePath = 'cache/imgc/' . Template::face() . '/' . $sizes . '/' . $origPath;
-      $hash = sha1($sizes . VVE_DB_PASSWD);
+      $hash = sha1($sizes . (defined('CUBE_CMS_DB_PASSWD') ? CUBE_CMS_DB_PASSWD : VVE_DB_PASSWD));
       // pokud má obrázek url adresu ze současného webu
       if (strpos($path, Url_Request::getBaseWebDir()) !== false) {
          $path = str_replace(Url_Request::getBaseWebDir(), Url_Request::getBaseWebDir() . 'cache/imgc/' . Template::face() . '/' . $sizes . '/', $path);

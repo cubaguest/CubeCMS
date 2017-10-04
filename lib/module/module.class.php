@@ -13,6 +13,8 @@ class Module
 {
    const TPLS_LIST_FILE = 'tpls.php';
 
+   public static $redirectAfterUpgrade = true;
+
    protected $name = null;
    protected $params = null;
    protected $dataDir = null;
@@ -205,7 +207,7 @@ class Module
       }
    }
 
-   public function update($currentVersion)
+   public function update($currentVersion, $redirect = true)
    {
       $updateDir = $this->getModuleDir() . 'upgrade' . DIRECTORY_SEPARATOR;
 
@@ -280,10 +282,14 @@ class Module
                break;
             }
          }
-         AppCore::getInfoMessages()->addMessage(sprintf('Aktualizace modulu %s broběhla úspěšně.', $this->getName()));
+         if(AppCore::getInfoMessages() instanceof Messages){
+            AppCore::getInfoMessages()->addMessage(sprintf('Aktualizace modulu %s broběhla úspěšně.', $this->getName()));
+         }
          // tohle by šlo řešit také aktualizací verze přímo v objektu modulu
-         $link = new Url_Link();
-         $link->redirect();
+         if(self::$redirectAfterUpgrade){
+            $link = new Url_Link();
+            $link->redirect();
+         }
       }
    }
    
@@ -348,7 +354,7 @@ class Module
 
    protected function replaceDBPrefix($cnt)
    {
-      return str_replace(Install_Core::SQL_TABLE_PREFIX_REPLACEMENT, $this->dbPrefix ? $this->dbPrefix : VVE_DB_PREFIX, $cnt);
+      return str_replace(Install_Core::SQL_TABLE_PREFIX_REPLACEMENT, $this->dbPrefix ? $this->dbPrefix : ( defined('CUBE_CMS_DB_PREFIX') ? CUBE_CMS_DB_PREFIX : VVE_DB_PREFIX), $cnt);
    }
 
    /**
