@@ -16,6 +16,7 @@ class JsPlugin_BootstrapDatepicker extends JsPlugin {
    {
       $this->setJsPluginName('bootstrap-datepicker');
       $this->setJsFilesDir('bootstrap-datepicker');
+      $this->setCfgParam('includecss', true);
    }
 
    protected function setFiles()
@@ -43,7 +44,8 @@ class JsPlugin_BootstrapDatepicker extends JsPlugin {
               'today' => 'icon icon-screenshot',
               'clear' => 'icon icon-trash',
               'close' => 'icon icon-remove'
-          )
+          ),
+          'format' => 'L'
       );
       return $opts;
    }
