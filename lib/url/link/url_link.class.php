@@ -97,6 +97,7 @@ class Url_Link extends Url {
    /**
     * Metoda vrací adresu k web aplikaci
     * @return string -- adresa ke kořenu aplikace
+    * @deprecated since version 8.4.12 - použít getWebUrl
     */
    public static function getMainWebDir() {
       return Url_Request::getBaseWebDir();
@@ -240,8 +241,10 @@ class Url_Link extends Url {
             $this->param($var, $_GET[$var]);
          }
       }
-      
       $returnString = $this->getBaseUrl().'/';
+      if(Url_Request::getAppSubdir() != null){
+         $returnString .= Url_Request::getAppSubdir();
+      }
       if($this->lang != null) {
          $returnString.=$this->getLang();
       }
@@ -469,4 +472,3 @@ class Url_Link extends Url {
 //	+--http://sprava.vypecky.info/index.php?cat=2
 //REQUEST_URI: /
 //	+--http://sprava.vypecky.info/
-?>
