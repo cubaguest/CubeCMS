@@ -19,6 +19,8 @@ class Session {
     */
    private $name = 'default';
 
+   protected static $started = false;
+
    /**
     * Model se session
     * @var Model_ORM_Record
@@ -71,6 +73,9 @@ class Session {
     * @param string $sessionName -- název session do ketré se bude ukládat
     */
    public static function factory() {
+      if(self::$started){
+         return;
+      }
       if(( SERVER_PLATFORM == 'UNIX' && !defined('CUBE_CMS_SESSION_SAVE_HANDLER'))
           || ( SERVER_PLATFORM == 'UNIX' && defined('CUBE_CMS_SESSION_SAVE_HANDLER') && CUBE_CMS_SESSION_SAVE_HANDLER == 'db' )){
          session_set_save_handler(array('Session', 'open'),
@@ -118,6 +123,7 @@ class Session {
          setcookie(CUBE_CMS_SESSION_NAME, session_id(), time()+$cookieParams['lifetime'], 
              $cookieParams['path'], $cookieParams['domain'], $cookieParams['secure'], $cookieParams['httponly']);
       }
+      self::$started = true;
    }
 
     public static function regenerateId() {
@@ -197,4 +203,3 @@ class Session {
    }
 
 }
-?>
