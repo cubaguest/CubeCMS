@@ -120,16 +120,18 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
     * Metoda vrátí cestu k zadané kategorii. POkud kaegorie není zadána, použije se aktuální
     * @param int $idCat
     * @param array $retArray -- internal
-    * @param bool $onlyId
+    * @param bool|string $onlyIdOrProperty -- bool pro id nebo objekt, řetězec pro název property datového objektu
     */
-   public function getPath($idCat = null, $retArray = array(), $onlyId = false)
+   public function getPath($idCat = null, $retArray = array(), $onlyIdOrProperty = false)
    {
       if($idCat == null){
          $idCat = Category::getSelectedCategory()->getId();
       }
       if($this->getId() == $idCat){
-         if($onlyId){
+         if($onlyIdOrProperty === true){
             array_push($retArray, (int)$this->getId());
+         } else  if(is_string($onlyIdOrProperty)){
+             array_push($retArray, $this->getCatObj()->getDataObj()->{$onlyIdOrProperty});
          } else {
             array_push($retArray, $this);
          }
@@ -137,14 +139,16 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
       }
       $newArr = $retArray;
       if($this->getCatObj() !== null){
-         if($onlyId){
+         if($onlyIdOrProperty === true){
             array_push($newArr, (int)$this->getId());
+         } else if(is_string($onlyIdOrProperty)){
+            array_push($newArr, $this->getCatObj()->getDataObj()->{$onlyIdOrProperty});
          } else {
             array_push($newArr, $this);
          }
       }
       foreach ($this->childrens as $child) {
-         $ret = $child->getPath($idCat, $newArr, $onlyId);
+         $ret = $child->getPath($idCat, $newArr, $onlyIdOrProperty);
          if($ret !== false){
             return $ret;
          }
@@ -694,6 +698,39 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
    private static function getCacheKey()
    {
       return '_struct_user_'.Auth::getUserId()."_".Locales::getLang();
+   }
+   
+   /**
+    * Projde strom a vrátí v 1D poli hodnoty funkce/property/názvu jako hodnotu, ve funkci lze použít objekt typu Category 
+    * @param string $delimiter
+    * @param Closure $closure
+    * @param strin $_prefix - internal
+    * @return array
+    */
+   public function getCategoryPaths($delimiter, $closure = null, $_prefix = null)
+   {
+      /* pole id => název */
+      $catsArrReturn = array();
+      $newPrefix = null;
+      if($this->id != 0){
+         if(is_null($closure)){
+            $name = $this->getCatObj()->getName();
+         } else if(is_string($closure)){
+            $name = $this->getCatObj()->getDataObj()->{$closure};
+         } else if($closure instanceof Closure){
+            $name = $closure($this->getCatObj());
+         }
+         $newPrefix = $_prefix.($_prefix != null ? $delimiter : null).$name;
+         $catsArrReturn[$this->getId()] = $newPrefix;
+      }
+      
+      foreach ($this as $child) {
+         if($closure instanceof Closure){
+            $closure->bindTo($child);
+         }
+         $catsArrReturn += $child->getCategoryPaths($delimiter, $closure, $newPrefix);
+      }
+      return $catsArrReturn;
    }
 
    /* ARRAY ACCESS */
