@@ -1,8 +1,8 @@
 <?php
 /*
- * Třída modelu detailem článku
+ * Třída modelu s místy
  */
-class Courses_Model_Places extends Model_PDO {
+class Courses_Model_Places extends Model_ORM {
    const DB_TABLE = 'courses_places';
 
 /**
@@ -10,6 +10,16 @@ class Courses_Model_Places extends Model_PDO {
  */
    const COLUMN_ID = 'id_place';
    const COLUMN_NAME = 'place';
+   
+   protected function _initTable()
+   {
+      $this->setTableName(self::DB_TABLE, 't_course_place');
+
+      $this->addColumn(self::COLUMN_ID, array('datatype' => 'int', 'ai' => true, 'nn' => true, 'pk' => true));
+      $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(70)', 'pdoparam' => PDO::PARAM_STR));
+
+      $this->setPk(self::COLUMN_ID);
+   }
 
    public function getPlaces($searched = null){
       $dbc = Db_PDO::getInstance();
@@ -46,5 +56,3 @@ class Courses_Model_Places extends Model_PDO {
    }
 
 }
-
-?>

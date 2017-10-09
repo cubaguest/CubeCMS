@@ -2,7 +2,7 @@
 /*
  * Třída modelu detailem článku
  */
-class Courses_Model_Registrations extends Model_PDO {
+class Courses_Model_Registrations extends Model_ORM {
    const DB_TABLE = 'courses_registrations';
 
 /**
@@ -28,6 +28,36 @@ class Courses_Model_Registrations extends Model_PDO {
    const COLUMN_IP = 'ip_address';
    const COLUMN_CANCELED = 'canceled';
 
+   protected function _initTable()
+   {
+      $this->setTableName(self::DB_TABLE, 't_course_regs');
+
+      $this->addColumn(self::COLUMN_ID, array('datatype' => 'int', 'ai' => true, 'nn' => true, 'pk' => true));
+      $this->addColumn(self::COLUMN_ID_COURSE, array('datatype' => 'int', 'nn' => true, 'index' => true));
+      $this->addColumn(self::COLUMN_NAME, array('datatype' => 'varchar(50)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_SURNAME, array('datatype' => 'varchar(50)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_DEGREE, array('datatype' => 'varchar(15)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_GRADE, array('datatype' => 'varchar(200)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_PRACTICE_LENGHT, array('datatype' => 'varchar(10)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_PHONE, array('datatype' => 'varchar(16)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_MAIL, array('datatype' => 'varchar(50)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_NOTE, array('datatype' => 'varchar(200)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_PAY_TYPE, array('datatype' => 'varchar(15)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_ORG_NAME, array('datatype' => 'varchar(30)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_ORG_ADDR, array('datatype' => 'varchar(300)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_ORG_ICO, array('datatype' => 'varchar(15)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_ORG_PHONE, array('datatype' => 'varchar(15)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_PRIVATE_ADDR, array('datatype' => 'varchar(300)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_TIME_ADD, array('datatype' => 'timestamp', 'pdoparam' => PDO::PARAM_STR, 'default' => 'CURRENT_TIMESTAMP'));
+      $this->addColumn(self::COLUMN_IP, array('datatype' => 'varchar(15)', 'pdoparam' => PDO::PARAM_STR));
+      $this->addColumn(self::COLUMN_CANCELED, array('datatype' => 'tinyint(1)', 'pdoparam' => PDO::PARAM_BOOL, 'default' => false));
+      
+
+      $this->setPk(self::COLUMN_ID);
+      $this->addForeignKey(self::COLUMN_ID_COURSE, Courses_Model::class);
+   }
+   
+   
    /**
     * Vrací počet registrací na daný kurz
     * @param int $idc
@@ -104,5 +134,3 @@ class Courses_Model_Registrations extends Model_PDO {
       return $dbst->execute(array(':idr' => $id));
    }
 }
-
-?>
