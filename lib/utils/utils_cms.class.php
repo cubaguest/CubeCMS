@@ -112,4 +112,20 @@ class Utils_CMS {
       }
       return $retArray;
    }
+
+   /**
+    * Vykreslí nástroje toolboxu
+    * @param stdClass $obj - objekt, odkud toolbox vykreslit
+    * @param bool $eraseAfterPrint - odebrat toolbox po vykreslení
+    * @param string $propName -- název toolboxu
+    */
+   public static function printToolBox($obj, $eraseAfterPrint = true, $propName = 'toolbox')
+   {
+      if(isset($obj->{$propName}) && $obj->{$propName} instanceof Template_Toolbox2){
+         echo $obj->{$propName};
+         if($eraseAfterPrint){
+            $obj->{$propName} = null;
+         }
+      }
+   }
 }
