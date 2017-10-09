@@ -255,6 +255,12 @@ form {
          margin-bottom: 0;
       }
       &.form-group-advanced {
+         .help-block {
+            padding-bottom: 0;
+         }
+         background-color: lighten(@brand-warning, 10%);
+         padding-top: 10px;
+         padding-bottom: 10px;
       }
       input, textarea, button, select, .btn {
          padding: 5px;
@@ -274,6 +280,11 @@ form {
          min-height: 1px;
       }
       .form-controls {
+         .inline-elements {
+            > .radio {
+               margin-right: 10px;
+            }
+         }
          /*float: left;*/
          padding: 0 15px;
       }
@@ -283,9 +294,16 @@ form {
       .form-controls:not([class*="col-"]) {
          width: 75%;
       }
-      > div >.checkbox {
+      > div .checkbox,
+      > div .radio {
          input {
             margin-left: 2px;
+         }
+         input[type="radio"] {
+            margin-left: 0;
+         }
+         .radio-custom-dummy {
+            margin-left: 0;
          }
       }
       margin-bottom: 15px;
@@ -297,7 +315,9 @@ form {
          font-size: @font-size-small;
          position: absolute;
          top: 0;
-         right: 15px;
+         right: 0px;
+         padding-top: 3px;
+         padding-bottom: 3px;
       }
       position: relative;
       /*text-align: right;*/
@@ -369,6 +389,7 @@ form {
       }
       .form-legend-text {
          font-size: @font-size-small;
+         margin-bottom: 10px;
       }
       p.form-legend-text {
          padding: 0 10px 5px;
