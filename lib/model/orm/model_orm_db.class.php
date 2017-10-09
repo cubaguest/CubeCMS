@@ -123,6 +123,10 @@ class Model_ORM_Db {
       if($params['ai']){
          $str .= ' AUTO_INCREMENT';
       }
+      
+      if(isset($params['default']) && $params['default'] === false){
+         $params['default'] = 0;
+      }
    
       if(!$params['nn'] && isset($params['default']) && $params['default'] === null){
          $str .= ' DEFAULT NULL';
