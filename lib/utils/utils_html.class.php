@@ -229,6 +229,60 @@ class Utils_Html {
       }
       return $string;
    }
+   
+   /**
+    * Metoda vrací vnitřní obsah html dokumentu
+    * @param DOMNode $node
+    * @return type
+    */
+   public static function getDOMinnerHTML(DOMNode $node){
+      $innerHTML = ""; 
+      $children  = $node->childNodes;
+      foreach ($children as $child) 
+      { 
+          $innerHTML .= $node->ownerDocument->saveHTML($child);
+      }
+      return $innerHTML; 
+   }
+   
+   /**
+    * Metoda vytvoři DOMDocument s potřebným formátování
+    * @param string $cnt obsah
+    * @return DOMDocument
+    */
+   public static function createDOMDocument($cnt){
+      $doc = new DOMDocument('1.0', 'utf-8');
+      $doc->loadHTML(mb_convert_encoding((string)$cnt, 'HTML-ENTITIES', 'UTF-8'));
+      return $doc;
+   }
+   
+   /**
+    * Metoda obalí tabulky elementem div a třídou - použití u responzivních tabulek
+    * @param string $cnt - obsah
+    * @param string $tableClass - omezení jen na tabulky s danou třídou
+    * @param string $wrapClass - obalová třída
+    * @param string $addClasses - další třídy co se mají přidak do tabulky
+    * @return string
+    */
+   public static function wrapHtmlTables($cnt, $tableClass = null, $wrapClass = 'table-responsive', $addClasses = ''){
+      $doc = Utils_Html::createDOMDocument((string) $cnt);
+
+      $tables = $doc->getElementsByTagName('table');
+      $new_div = $doc->createElement('div');
+      $new_div->setAttribute('class', $wrapClass);
+
+      foreach ($tables as $table) {
+         if ($tableClass == null || 
+                 $table->hasAttribute('class') && strpos($table->getAttribute('class'), $tableClass) !== false) {
+            $table->setAttribute('class', $table->getAttribute('class') . ' '.$addClasses);
+            $new_div_clone = $new_div->cloneNode();
+            $table->parentNode->replaceChild($new_div_clone, $table);
+            $new_div_clone->appendChild($table);
+         }
+      }
+      $body = $doc->getElementsByTagName('body');
+      return Utils_Html::getDOMinnerHTML($body->item(0));
+   }
 }
 
 /**
