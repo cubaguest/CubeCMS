@@ -64,8 +64,8 @@ class Rss {
       $this->getRssComp()->setConfig('desc', $this->category()->getCatDataObj()->{Model_Category::COLUMN_DESCRIPTION});
       $this->getRssComp()->setConfig('link', $this->link());
       $this->getRssComp()->setConfig('type', $this->type);
-      $this->getRssComp()->setConfig('css', 'rss.css');
+      $this->getRssComp()->setConfig('category', $this->category());
+      $this->getRssComp()->setConfig('css', is_file(Face::getCurrent()->getDir().'stylesheets'.DIRECTORY_SEPARATOR.'rss.css') ? 'rss.css' : false);
    }
 
 }
-?>
