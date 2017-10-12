@@ -111,6 +111,14 @@ class Form_Element_Select extends Form_Element {
       $this->isMultiple = $multiple;
       return $this;
    }
+    
+   /**
+    * Metoda vrací jestli je element vícerozměrný
+    * @return bool
+    */
+   public function isMultiple() {
+      return $this->isMultiple;
+   }
    
    /**
     * Metoda nastaví kontrolu odeslaných hodnot
