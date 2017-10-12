@@ -850,10 +850,15 @@ class Form_Element extends TrObject implements Form_Element_Interface {
                /*
                 * @todo odstranit nebo přepsat
                 */
-               $this->html()->setAttrib('name', $this->getName() . "[" . $this->dimensional . "]");
-               $this->html()->setAttrib('id', $this->getName() . '_' . $rKey . "_" . $this->dimensional);
-               if (is_array($values) AND key_exists($this->dimensional, $values)) {
-                  $this->html()->setAttrib('value', htmlspecialchars((string) $values[$this->dimensional]));
+               $key = is_bool($this->dimensional) ? $this->renderedId : $this->dimensional;
+               $this->html()->setAttrib('name', $this->getName() . "[" . $key . "]");
+               $this->html()->setAttrib('id', $this->getName() . '_' . $rKey . "_" . $key);
+               if (is_array($values)) {
+                  if(key_exists($key, $values)){
+                     $this->html()->setAttrib('value', htmlspecialchars((string) $values[$key]));
+                  } else {
+                     $this->html()->setAttrib('value', null);
+                  }
                } else {
                   $this->html()->setAttrib('value', htmlspecialchars((string) $values));
                }
@@ -861,7 +866,11 @@ class Form_Element extends TrObject implements Form_Element_Interface {
          } else {
             $this->html()->setAttrib('name', $this->getName());
             $this->html()->setAttrib('id', $this->getName() . '_' . $this->renderedId);
-            $this->html()->setAttrib('value', htmlspecialchars((string) $values));
+            if (is_array($values) && $this->dimensional == true) {
+               $this->html()->setAttrib('value', htmlspecialchars((string) $values[$this->renderedId]));
+            } else {
+               $this->html()->setAttrib('value', htmlspecialchars((string) $values));
+            }
          }
       }
       if ($renderKey == null) {
@@ -870,6 +879,16 @@ class Form_Element extends TrObject implements Form_Element_Interface {
       return $cnt == null ? $this->html() : $cnt;
    }
 
+   public function getPrototype()
+   {
+      $_this = clone $this;
+      $_this->setRenderID(1);
+      if($_this->isMultiple()){
+         $_this->setMultiple('{KEY}');
+      }
+      return $_this->control('{KEY}');
+   }
+   
    /**
     * Metoda vrací prvek (html element podle typu elementu - input, textarea, ...)
     * @return string
