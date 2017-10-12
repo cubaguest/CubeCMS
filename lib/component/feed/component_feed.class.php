@@ -12,7 +12,7 @@
  */
 
 class Component_Feed extends Component {
-   const RSS_AVAIL_TAGS = '<p><a><strong><br><img><h1><h2><h3><h4><h5>';
+   const RSS_AVAIL_TAGS = '<p><a><strong><br><img><em><h1><h2><h3><h4><h5>';
 
    /**
     * Pole s prvky kanálu
@@ -33,11 +33,12 @@ class Component_Feed extends Component {
            'image' => null,
            'feedLink' => null,
            'urlArgName' => null,
-           'tpl_file' => 'feeds.phtml'
+           'tpl_file' => 'feeds.phtml',
+           'sortByTime' => 'ASC'
    );
 
    public function addItem($title, $desc, $link,DateTime $pubDate, $author = null, $authorEmail = null, $category = null,
-           $guid = null, $source = null, $enclosure = null) {
+           $guid = null, $source = null, $enclosure = null, $image = null) {
 //      if($guid == null) $guid = $link;
       // doplnění odkazů do linků na obrázky
       vve_create_full_url_path($desc);
@@ -52,7 +53,8 @@ class Component_Feed extends Component {
               'category' => $category,
               'guid' => $guid,
               'source' => $source,
-              'enclosure' => $enclosure
+              'enclosure' => $enclosure,
+              'image' => $image,
       );
 
       array_push($this->feeds, $item);
@@ -84,14 +86,28 @@ class Component_Feed extends Component {
     * Metoda provede seřazení výsledků podle data
     */
    private function sortFeed() {
-      usort($this->feeds, array($this, "cmp"));
+      usort($this->feeds, array($this, ($this->getConfig('sortByTime', 'ASC') == 'ASC' ? 'cmpAsc' : 'cmpDesc') ) );
    }
    // Compare function
-   private function cmp($a, $b) {
-      if ($a['pubDate']->format("U") == $b['pubDate']->format("U")) {
+   private function cmpAsc($a, $b) {
+      $ax = clone $a['pubDate'];
+      $bx = clone $b['pubDate'];
+      
+      if ($ax == $bx) {
             return 0;
         }
-        return ($a['pubDate']->format("U") < $b['pubDate']->format("U")) ? +1 : -1;
+        return ($ax < $bx) ? +1 : -1;
+   }
+   
+   // Compare function
+   private function cmpDesc($a, $b) {
+      $ax = clone $a['pubDate'];
+      $bx = clone $b['pubDate'];
+      
+      if ($ax == $bx) {
+            return 0;
+        }
+        return ($ax < $bx) ? -1 : +1;
    }
 
       /**
@@ -106,8 +122,12 @@ class Component_Feed extends Component {
       $feed->startDocument('1.0', 'UTF-8');
 
       // css styl pokud je
-      if($this->getConfig('feedcss') != null) {
-         $feed->writePi("xml-stylesheet", 'type="text/css" href="'.$this->getConfig('feedcss').'"');
+      if($this->getConfig('css') != null) {
+         $href = $this->getConfig('css');
+         if(strpos($this->getConfig('css'), 'http') === false){
+            $href = tp().Template::STYLESHEETS_DIR.$this->getConfig('css');
+         }
+         $feed->writePi("xml-stylesheet", 'type="text/css" href="'.$href.'"');
       }
       $feed->setIndent(4);
 
@@ -133,8 +153,8 @@ class Component_Feed extends Component {
       $feed->writeElement('docs', "http://www.rssboard.org/rss-specification");
 
       $link = $this->getConfig('link');
-      $feed->writeElement('link', $link->clear());
-
+      $feed->writeElement('link', clone $link->clear());
+              
       $feed->startElement("atom:link");
       if($link instanceof Url_Link_Module){
          $feed->writeAttribute("href", $link->route('feed', array('type' => 'rss')));
@@ -146,7 +166,10 @@ class Component_Feed extends Component {
       $feed->endElement();
 
       $feed->writeElement('ttl', VVE_FEED_TTL);
-      $feed->writeElement('pubDate', gmdate("D, d M Y H:i:s")." GMT");
+      $now = new DateTime();
+//      $now->setTimezone(new DateTimeZone('Europe/Prague'));
+//      var_dump($now);
+      $feed->writeElement('pubDate', $now->format(DateTime::RSS));
       $feed->writeElement('generator', AppCore::ENGINE_NAME." ".number_format(AppCore::ENGINE_VERSION,1,'.', ''));
       $feed->writeElement('webMaster', VVE_WEB_MASTER_EMAIL." (".VVE_WEB_MASTER_NAME.")");
 
@@ -170,9 +193,16 @@ class Component_Feed extends Component {
          $feed->startElement("item");// SOF item
          $feed->writeElement('title', $item['title']);
          $feed->writeElement('link', $item['link']);
-         $feed->writeElement('description', strip_tags($item['desc'], self::RSS_AVAIL_TAGS));
+         $feed->writeElement('description', strip_tags(nl2br($item['desc']), self::RSS_AVAIL_TAGS));
          if($item['guid'] != null){
-            $feed->writeElement('guid', $item['guid']);
+            if(strpos($item['guid'], 'http') === false){
+               $feed->startElement("guid");// SOF guid
+               $feed->writeAttribute('isPermaLink', 'false');
+               $feed->text($item['guid']);
+               $feed->endElement();
+            } else {
+               $feed->writeElement('guid', $item['guid']);
+            }
          } else {
             $feed->writeElement('guid', $item['link']);
          }
@@ -181,7 +211,26 @@ class Component_Feed extends Component {
          } else {
 //            $feed->writeElement('dc:creator', $item['author']);
          }
-         $feed->writeElement('pubDate', gmdate("D, d M Y H:i:s", $item['pubDate']->format("U"))." GMT");
+         
+         if($item['image']){
+            $imgPath = Utils_Url::urlToSystemPath($item['image']);
+
+            if(is_file($imgPath)){
+               
+               $img = getimagesize($imgPath);
+               
+               $feed->startElementNs('media', 'content', 'http://search.yahoo.com/mrss/');
+               $feed->writeAttribute('url', $item['image']);
+               $feed->writeAttribute('type', $img['mime']);
+               $feed->writeAttribute('width', $img[0]);
+               $feed->writeAttribute('height', $img[1]);
+               $feed->writeAttribute('medium', 'image');
+               
+               $feed->endElement();
+            }
+         }
+         $feed->writeElement('pubDate', str_replace('+0100', '+0200', $item['pubDate']->format(DateTime::RSS)));
+//         $feed->writeElement('pubDate', $item['pubDate']->format(DateTime::RSS));
 
          if($item['category'] != null) {
             $feed->startElement('category'); // SOF category
@@ -358,4 +407,3 @@ class Component_Feed extends Component {
       
    }
 }
-?>
