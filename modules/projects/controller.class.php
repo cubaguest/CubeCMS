@@ -371,6 +371,7 @@ class Projects_Controller extends Controller {
          }
          
          $model->save($rec);
+         $rec->setRecordPosition(1); // new records first
          
          $this->infoMsg()->addMessage($this->tr('Projekt byl uložen'));
          $this->log('Přidán projekt '. $rec->{Projects_Model_Projects::COLUMN_NAME});
