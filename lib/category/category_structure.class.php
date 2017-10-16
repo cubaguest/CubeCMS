@@ -700,35 +700,49 @@ class Category_Structure implements Iterator, Countable, ArrayAccess {
       return '_struct_user_'.Auth::getUserId()."_".Locales::getLang();
    }
    
-   /**
+    /**
     * Projde strom a vrátí v 1D poli hodnoty funkce/property/názvu jako hodnotu, ve funkci lze použít objekt typu Category 
     * @param string $delimiter
-    * @param Closure $closure
+    * @param Closure $closureName - funkce na hodnotu v poli
+    * @param Closure $closureKey - funkce na klíč v poli
     * @param strin $_prefix - internal
     * @return array
     */
-   public function getCategoryPaths($delimiter, $closure = null, $_prefix = null)
+   public function getCategoryPaths($delimiter, $closureName = null, $closureKey = null, $_prefix = null)
    {
       /* pole id => název */
       $catsArrReturn = array();
       $newPrefix = null;
       if($this->id != 0){
-         if(is_null($closure)){
+         if(is_null($closureName)){
             $name = $this->getCatObj()->getName();
-         } else if(is_string($closure)){
-            $name = $this->getCatObj()->getDataObj()->{$closure};
-         } else if($closure instanceof Closure){
-            $name = $closure($this->getCatObj());
+         } else if(is_string($closureName)){
+            $name = $this->getCatObj()->getDataObj()->{$closureName};
+         } else if($closureName instanceof Closure){
+            $name = $closureName($this->getCatObj());
          }
          $newPrefix = $_prefix.($_prefix != null ? $delimiter : null).$name;
-         $catsArrReturn[$this->getId()] = $newPrefix;
+         
+         if(is_null($closureKey)){
+            $key = $this->getCatObj()->getId();
+         } else if(is_string($closureKey)){
+            $key = $this->getCatObj()->getDataObj()->{$closureKey};
+         } else if($closureKey instanceof Closure){
+            $key = $closureKey($this->getCatObj());
+         }
+         if($key != false && $name != false){
+            $catsArrReturn[(string)$key] = $newPrefix;
+         }
       }
       
       foreach ($this as $child) {
-         if($closure instanceof Closure){
-            $closure->bindTo($child);
+         if($closureName instanceof Closure){
+            $closureName->bindTo($child);
          }
-         $catsArrReturn += $child->getCategoryPaths($delimiter, $closure, $newPrefix);
+         if($closureKey instanceof Closure){
+            $closureKey->bindTo($child);
+         }
+         $catsArrReturn += $child->getCategoryPaths($delimiter, $closureName, $closureKey, $newPrefix);
       }
       return $catsArrReturn;
    }
