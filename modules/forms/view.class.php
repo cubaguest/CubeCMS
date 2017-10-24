@@ -54,5 +54,3 @@ class Forms_View extends View {
 
    }
 }
-
-?>

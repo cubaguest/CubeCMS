@@ -449,6 +449,9 @@ class Forms_Controller extends Controller {
                }
                
                break;
+            case 'captcha':
+               $formElement = new Form_Element_Captcha($e->{Forms_Model_Elements::COLUMN_NAME}, $e->{Forms_Model_Elements::COLUMN_LABEL});
+               break;
             case 'text':
             default:
                $formElement = new Form_Element_Text($e->{Forms_Model_Elements::COLUMN_NAME}, $e->{Forms_Model_Elements::COLUMN_LABEL});

@@ -45,5 +45,3 @@ class Forms_Model_Elements extends Model_ORM {
       $this->addRelatioOneToMany(self::COLUMN_ID_FORM, 'Forms_Model', Forms_Model::COLUMN_ID);
    }
 }
-
-?>

@@ -13,5 +13,3 @@ class Forms_Routes extends Routes {
    }
    
 }
-
-?>

@@ -271,6 +271,8 @@ var FormEditor = {
                id : params.idStr
             })
          );
+      } else if(params.type == "captcha"){
+         $item.append( $('<span></span>').addClass('label').prop('name', 'captcha').text('Captcha') );
       } else if(params.type == "textarea"){
          $item.append(
             $('<label></label>').attr({"for" : params.idStr}).text(params.label)
@@ -394,6 +396,8 @@ var FormEditor = {
       if(type == "text" ){
          this.showFormItemOptions("require");
          this.showFormItemOptions("validators");
+      } else if(type == 'captcha'){
+         form.name.value = $elem.text();
       } else if(type == 'submit'){
          form.name.value = $elem.val();
       } else if(type == 'checkbox'){

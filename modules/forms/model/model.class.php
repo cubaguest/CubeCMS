@@ -40,5 +40,3 @@ class Forms_Model extends Model_ORM {
       return $this->where(self::COLUMN_ACTIVE." = 1", array())->records();
    }
 }
-
-?>
