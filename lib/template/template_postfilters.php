@@ -160,5 +160,17 @@ class Template_Postfilters {
 
       return $string;
    }
+   
+   /**
+    * Filtrace dynamických odkazů
+    * @param string $string
+    * @return string
+    */
+   public static function webLinksContentFilter($string)
+   {
+      return preg_replace_callback('/\{CATLINK-(\d+)\}/i', function($matches){
+         return Url_Link::getCategoryLink((int)$matches[1]);
+      }, $string);
+   }
 
 }

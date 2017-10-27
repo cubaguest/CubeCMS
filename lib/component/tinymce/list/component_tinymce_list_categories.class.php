@@ -12,6 +12,7 @@ class Component_TinyMCE_List_Categories extends Component_TinyMCE_List {
 
       $struct = Category_Structure::getStructure(Category_Structure::ALL)->getCategoryPaths(' > ', null, function(Category $cat) {
          return (string)$cat->getLink();
+         return '{CATLINK-'.$cat->getId().'}';
       });
 
       foreach ($struct as $link => $catName) {
@@ -31,16 +32,18 @@ class Component_TinyMCE_List_Categories extends Component_TinyMCE_List {
                $data = $cat->getDataObj();
                return ( isset($data[Model_Category::COLUMN_NAME][$lang]) && $data[Model_Category::COLUMN_NAME][$lang] != null) ? $data[Model_Category::COLUMN_NAME][$lang] : false;
             }, function(Category $cat) use ($lang) {
-               $linkObj = new Url_Link(true);
+//               $linkObj = new Url_Link(true);
                $data = $cat->getDataObj();
                if($data[Model_Category::COLUMN_URLKEY][$lang] == null){
                   return false;
                }
-               return (string)$linkObj->lang($lang)->category($data[Model_Category::COLUMN_URLKEY][$lang]);
+//               return (string)$linkObj->lang($lang)->category($data[Model_Category::COLUMN_URLKEY][$lang]);
+               return '{CATLINK-'.$cat->getId().'}';
             });
             foreach ($struct as $link => $catName) {
                $label = sprintf($this->tr('Stránka[%s]: %s'), strtoupper($lang), $catName);
-               $this->addItem($label, str_replace(Url_Link::getMainWebDir(), "/", $link));
+//               $this->addItem($label, str_replace(Url_Link::getMainWebDir(), "/", $link));
+               $this->addItem($label, $link);
             }
          }
       }

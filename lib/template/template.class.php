@@ -121,6 +121,7 @@ class Template extends TrObject {
        'anchors',
        'Template_Postfilters::modulesContentFilter',
        'Forms_Controller::contentFilter',
+       'links' => 'Template_Postfilters::webLinksContentFilter',
    );
        
    protected static $baseOutputFilters = array(
@@ -1080,8 +1081,20 @@ class Template extends TrObject {
     * @param string $text -- content
     * @param array/string $filters -- pole filtrů
     * @return string -- přefiltrovaný text
+    * @deprecated since version 8.4.11 - používat filterCnt
     */
    public function filter($text, $filters = array()){
+      return $this->filterCnt($text, $filters);
+   }
+   
+   /**
+    * Metoda provede filtraci podle zadaných filtrů
+    * @param string $text -- content
+    * @param array/string $filters -- pole filtrů
+    * @return string -- přefiltrovaný text
+    */
+   public function filterCnt($text, $filters = array())
+   {
       if(is_string($filters)) $filters = array($filters);
       $filters = array_merge($filters, self::$baseContentFilters);
       array_unique($filters);
