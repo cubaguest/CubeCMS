@@ -1,0 +1,36 @@
+<!--
+<form method="post" action="">
+   <input name="pokus_name" type="text" size="30" maxlength="50" value="" />
+   <input type="submit" name="pokus_send" value="SEND" />
+</form>
+-->
+<?php 
+//$eleme = new Html_Element('form');
+//$eleme->setAttrib('method', 'post')->setAttrib('action', '');
+//
+//$childElement = new Html_Element('input');
+//$childElement->setAttrib('type', 'text');
+//$childElement->setAttrib('name', 'pokus_text2');
+
+$this->form->popisek->html()->setAttrib('size', 50);
+
+//$eleme->addContent($childElement);
+//$this->form->popisek->htmlLabel()->setAttrib('width', 100);
+$this->form->text->html()->addClass('tinymce');
+$this->form->text->html()->setAttrib('cols', "60");
+$this->form->text->html()->setAttrib('rows', "10");
+
+$tinyMCE = new JsPlugin_TinyMce();
+$tinyMCE->setCfgParam('theme', 'full');
+$this->addJsPlugin($tinyMCE);
+
+?>
+<?php echo $this->form?>
+
+
+<?php 
+//print ($this->form->render(new Form_Decorator(array('wrap' => 'ul',
+//                                                    'rowwrap' => 'li',
+//                                                    'labelwrap' => 'span',
+//                                                    'ctrlwrap' => 'span'))));
+?>
