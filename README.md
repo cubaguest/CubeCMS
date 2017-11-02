@@ -1,6 +1,6 @@
 # CubeCMS
 
-Hi gus 
+Hi paople! Jeah!!
 
 Hi is the OLD CMS. Try modules:-D
 
